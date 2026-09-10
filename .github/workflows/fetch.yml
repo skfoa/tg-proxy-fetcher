@@ -1,0 +1,61 @@
+name: Fetch Proxies and CF IPs
+
+on:
+  schedule:
+    # 每天北京时间 18:05（UTC 10:05）执行，微调 5 分钟避开 GitHub Actions 整点排队拥堵
+    - cron: "5 10 * * *"
+  workflow_dispatch: # 支持在 GitHub 页面手动点击触发运行
+
+concurrency:
+  group: fetch-proxies
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: 📥 检出代码
+        uses: actions/checkout@v4
+
+      - name: 🐍 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: 📦 安装依赖
+        run: pip install -r requirements.txt
+
+      - name: 📡 抓取 TG 代理与优选 IP
+        env:
+          TG_API_ID: ${{ secrets.TG_API_ID }}
+          TG_API_HASH: ${{ secrets.TG_API_HASH }}
+          TG_SESSION_STR: ${{ secrets.TG_SESSION_STR }}
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          FETCH_DAYS: 3
+        run: python tg_fetch.py
+
+      - name: 📄 提交并推送数据
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -f socks5.txt ] || [ -f cf_ips.csv ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add socks5.txt cf_ips.csv
+            if git diff --cached --quiet; then
+              echo "⏭️ 节点与优选 IP 无新变化，跳过提交"
+            else
+              git commit -m "🔄 chore(update): refresh socks5 proxies and cf_ips [skip ci]"
+              git pull --rebase origin main || true
+              git push
+              echo "✅ 已成功提交并推送 socks5.txt 与 cf_ips.csv"
+            fi
+          else
+            echo "⚠️ 目标文件未生成，请检查上一步运行日志"
+          fi
