@@ -20,9 +20,9 @@ TG 频道代理与 Cloudflare 优选 IP 抓取脚本（GitHub Actions 专用）
   - 任务完成后若配置了 TG_BOT_TOKEN 与 TG_CHAT_ID，自动推送运行统计到 Telegram。
 
 需要的配置（环境变量）：
-  TG_API_ID        Telegram API ID
-  TG_API_HASH      Telegram API Hash
-  TG_SESSION_STR   Telethon 登录会话字符串
+  TG_SESSION_STR   Telethon 登录会话字符串（必填）
+  TG_API_ID        Telegram API ID（可选，默认使用内置官方 2040）
+  TG_API_HASH      Telegram API Hash（可选，默认使用内置官方 Hash）
   FETCH_DAYS       抓取最近 N 天，默认 3
   TG_BOT_TOKEN     (可选) TG 通知机器人 Token
   TG_CHAT_ID       (可选) TG 通知接收 Chat ID
@@ -48,8 +48,9 @@ if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 # ================= 配置区域 =================
-TG_API_ID = os.getenv("TG_API_ID") or ""
-TG_API_HASH = os.getenv("TG_API_HASH") or ""
+# 若未提供自定义 API ID/Hash，自动默认使用 Telegram 官方开源 Desktop 客户端合法凭据
+TG_API_ID = os.getenv("TG_API_ID") or "2040"
+TG_API_HASH = os.getenv("TG_API_HASH") or "b18441a1ff607e10a989891a5462e627"
 TG_SESSION_STR = os.getenv("TG_SESSION_STR") or ""
 FETCH_DAYS = int(os.getenv("FETCH_DAYS") or "3")
 
@@ -269,11 +270,8 @@ def send_tg_notification(proxies_count: int, cf_ips_count: int):
 
 
 async def main():
-    if not TG_API_ID or not TG_API_HASH:
-        log.error("缺少 TG_API_ID 或 TG_API_HASH，请检查环境变量")
-        sys.exit(1)
     if not TG_SESSION_STR:
-        log.error("缺少 TG_SESSION_STR，请先运行 tg_session.py 获取会话字符串")
+        log.error("缺少 TG_SESSION_STR，请先在本地运行 tg_session.py 获取会话字符串")
         sys.exit(1)
 
     log.info("=" * 50)
