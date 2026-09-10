@@ -108,8 +108,10 @@ def is_valid_host(host: str) -> bool:
     # 若为纯数字构成的 IPv4，检查每个段是否在 0-255
     if len(parts) == 4 and all(p.isdigit() for p in parts):
         return all(0 <= int(p) <= 255 for p in parts)
-    # 域名至少含有点号且非空，长度合规
-    return bool(host and "." in host and len(host) <= 255)
+    # 域名必须至少有两段且顶级域名必须为纯字母（如 .com, .net, .org, .cn）
+    if len(parts) >= 2 and parts[-1].isalpha() and len(parts[-1]) >= 2:
+        return all(bool(re.match(r"^[a-zA-Z0-9-]+$", part)) for part in parts)
+    return False
 
 
 def extract_proxies(text: str) -> list:
@@ -190,7 +192,18 @@ def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
     colo_m = re.search(r"数据中心[:：]\s*([A-Za-z0-9]+)", text)
     cf_loc_m = re.search(r"CF落地位置[:：].*?🌐\s*([^\r\n]+)", text, re.DOTALL)
     delay_m = re.search(r"网络延迟[:：]\s*(\d+(?:\.\d+)?)\s*ms", text)
-    speed_m = re.search(r"下载速度[:：]\s*(\d+(?:\.\d+)?)\s*(?:kB/s|KB/s|kb/s|MB/s|mb/s)?", text)
+    
+    speed_m = re.search(r"下载速度[:：]\s*(\d+(?:\.\d+)?)\s*([kKmMgG]?[bB]/s)?", text)
+    speed_kbs = ""
+    if speed_m:
+        val = float(speed_m.group(1))
+        unit = (speed_m.group(2) or "kB/s").lower()
+        if "m" in unit:
+            val *= 1024
+        elif "g" in unit:
+            val *= 1024 * 1024
+        speed_kbs = int(val)
+
     time_m = re.search(r"(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})", text)
     source_m = re.search(r"IP来源[:：]\s*([@\w]+)", text)
 
@@ -199,7 +212,7 @@ def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
         "port": port,
         "tls": tls_m.group(1).lower() if tls_m else "unknown",
         "delay_ms": int(float(delay_m.group(1))) if delay_m else "",
-        "speed_kbs": int(float(speed_m.group(1))) if speed_m else "",
+        "speed_kbs": speed_kbs,
         "colo": colo_m.group(1).strip() if colo_m else "",
         "cf_location": cf_loc_m.group(1).strip() if cf_loc_m else "",
         "isp": isp_m.group(1).strip() if isp_m else "",
