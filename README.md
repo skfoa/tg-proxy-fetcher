@@ -1,23 +1,40 @@
-# TG-Proxy-Fetcher —— Telegram 代理与 Cloudflare 优选 IP 同步工具
+# TG-Proxy-Fetcher —— Telegram 代理与 Cloudflare 优选 IP 自动化同步工具
 
-从 Telegram 公开频道（[@otcfxq](https://t.me/otcfxq)、[@danfeng2](https://t.me/danfeng2)）自动获取多协议代理节点与 Cloudflare 优选 IP，按键覆盖去重，保存为纯净代理列表与结构化表格，并通过 GitHub Actions 每天定时自动执行并推送到仓库。
+[![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-Automated-2088FF?logo=github-actions&logoColor=white)](https://github.com/skfoa/tg-proxy-fetcher/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
 
-> 🌟 **核心特性：支持「免登录 / 零密钥模式」与「官方 API 模式」双模驱动**
-> - **免登录 Web 模式（默认 / 零配置）**：无需任何 Telegram API 账号、密钥或验证码，Fork 后直接运行，开箱即用！
-> - **官方 API 模式（可选）**：配置 `TG_API_ID` 与 `TG_SESSION_STR` 凭证后自动无缝切换至 Telethon MTProto 模式。
+每天自动从 Telegram 优质公开频道（[@otcfxq](https://t.me/otcfxq)、[@danfeng2](https://t.me/danfeng2)）抓取多协议代理节点与 Cloudflare 优选 IP。具备**永久增量持久化（只增不减）**与**智能去重**机制，自动生成通用代理订阅源、edgetunnel 优选 IP 纯文本列表以及结构化测速数据表格，并通过 GitHub Actions 每天定时自动提交并推送到仓库。
+
+> 🌟 **核心特性亮点**
+> - **🚀 免登录 / 零密钥模式（开箱即用）**：基于公开 Web 频道预览机制，**无需注册 Telegram API、无需配置任何 Secret 密钥、无需手机号或验证码**！Fork 或 Clone 即可直接跑通！
+> - **🛡️ 官方 API 模式（可选兼容）**：配置 `TG_API_ID` 与 `TG_SESSION_STR` 后自动无感升级为 Telethon MTProto 客户端协议。
+> - **📦 永久增量持久化（绝不超时淘汰）**：历史抓取的有效节点全部永久留存，新节点自动追加，重复节点按最新配置/测速实时更新覆盖，节点池只增不减、越用越丰富！
+> - **⚡ edgetunnel / CM 优选专属适配**：自动导出纯净 `IP:端口` 文本列表，支持在管理后台一键全选复制或直接作为远程 IP 库订阅导入！
+> - **🌐 Windows 本地智能环境自适应**：本地运行自动读取 Windows 系统代理（如 v2rayN 等），无缝突破网络限制。
 
 ---
 
 ## 架构与工作流程
 
 ```text
-                   ┌─── @otcfxq ────────┐
-                   │   (代理 + 优选IP)  │
-tg_fetch.py ───────┤                    ├────► 提取与去重 ──────┬───► socks5.txt (纯净代理节点)
-(支持免登录/API双模) │                    │                       ├───► cf_ips.csv (Cloudflare 优选 IP 表格)
-                   └─── @danfeng2 ──────┘                       └───► Telegram Bot 每日卡片推送 (可选)
-                        (优选IP 专属)
+                      ┌─── @otcfxq ────────┐
+                      │   (代理 + 优选IP)  │
+tg_fetch.py ──────────┤                    ├────► 增量抓取 & 智能去重 ──┬──► socks5.txt (通用多协议代理节点)
+(免登录/官方API双模)   │                    │                           ├──► cf_ips.txt (纯净 IP:端口，专供 edgetunnel)
+                      └─── @danfeng2 ──────┘                           ├──► cf_ips.csv (Cloudflare 优选 IP 详细表格)
+                           (优选IP 专属)                                 └──► Telegram Bot 运行卡片推送 (可选)
 ```
+
+---
+
+## 产物清单与订阅直链
+
+| 文件名 | 内容说明 | 适用场景 / 客户端 | GitHub Raw 永久直链（点击即可导入） |
+| :--- | :--- | :--- | :--- |
+| **`socks5.txt`** | 纯净多协议代理清单 | Clash、v2rayN、Sing-box、Shadowrocket 等 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/socks5.txt` |
+| **`cf_ips.txt`** | 纯净 `IP:端口` 优选 IP | **edgetunnel 后台**、CM 优选、Cloudflare 测速工具 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/cf_ips.txt` |
+| **`cf_ips.csv`** | 结构化优选 IP 数据表 | Excel 排序筛选、二次数据分析 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/cf_ips.csv` |
 
 ---
 
@@ -26,25 +43,59 @@ tg_fetch.py ───────┤                    ├────► 提�
 1. **通用标准代理 URL**：
    - `socks5://...`、`http://...`、`https://...`（兼容免密与带账号密码认证）
 2. **TURN 穿透协议节点**：
-   - `turn://114.34.87.173:3479#TW...`（自动识别 `turn://` 协议，剔除标签说明与测速后缀）
+   - `turn://114.34.87.173:3479#TW...`（自动识别 `turn://` 协议，智能剥离测速后缀与中文标签）
 3. **Telegram 官方 SOCKS5 一键直连链接**：
    - `tg://socks?server=8.210.224.195&port=6666&user=6666&pass=6666`
    - `https://t.me/socks?server=8.210.224.195&port=6666&user=6666&pass=6666`
-   - 自动无损转换为标准 `socks5://user:pass@ip:port` 格式，支持任意通用客户端导入。
+   - 自动无损转换为通用标准 `socks5://user:pass@ip:port` 格式，支持任意第三方客户端直接导入。
 4. **开放代理/服务通报消息（已做防污染隔离）**：
    - `[发现开放 HTTP 代理] 174.138.165.213:34887` ➔ 自动补全为 `http://174.138.165.213:34887`
    - `[发现开放 HTTPS 代理] https://121.42.225.20:443#CN` ➔ 自动提取为 `https://121.42.225.20:443`
    - `[发现开放 SOCKS5 代理] IP:Port` ➔ 自动补全为 `socks5://IP:Port`
    - `[发现开放 TURN 代理/服务] IP:Port 或 turn://IP:Port` ➔ 自动提取为 `turn://IP:Port`
-   - 🛡️ **防污染机制**：通报行后半段附带的第三方 SNI 测试目标域名（如 `域名:https://hf.molikuaiyin.com:443...`）会被自动精准隔离过滤，确保代理库 100% 纯净。
+   - 🛡️ **防污染机制**：通报消息后半段附带的第三方 SNI 测试目标域名（如 `域名:https://hf.molikuaiyin.com:443...`）会被自动精准过滤，确保代理库 100% 纯净。
 5. **Cloudflare 优选 IP**：
-   - 提取包含 IP、端口、TLS、网络延迟（纯数值 ms）、下载速度（纯数值 kB/s）、数据中心（Colo）、落地位置、ASN、运营商等全量指标的优选 IP 消息。
+   - 提取包含 IP、端口、TLS、网络延迟（纯数值 ms）、下载速度（纯数值 kB/s）、数据中心（Colo）、落地位置、ASN、运营商、测速时间等全量指标。
+
+---
+
+## 输出产物详细说明
+
+### 1. `socks5.txt`（代理节点清单）
+* **永久累积（只增不减）**：每次抓取优先读取历史文件，已存在的有效节点永久保留，绝不会因为时间推移被误删。
+* **智能覆盖更新**：以 `host:port` 为唯一标识。如果频道主重新发布了某个节点，自动以最新发布的认证密码与配置刷新覆盖。
+* **纯净即用**：纯文本每行一个有效 URL，可直接导入各大代理客户端。
+* **合规校验机制**：自动校验端口范围（1~65535）与 IP/域名有效性，彻底杜绝畸变脏数据。
+
+### 2. `cf_ips.txt`（专为 edgetunnel / CM 优选打造）
+* 纯文本格式，每行一个纯净的 `IP:端口`（如 `23.249.18.144:8581`）。
+* **两种使用方式**：
+  1. **一键复制**：在 GitHub 打开该文件，点击右上角 `Copy raw file` 按钮，直接整段粘贴到 edgetunnel 后台「待选列表」中，点击「优选延迟」即可。
+  2. **IP 库远程订阅**：点击 edgetunnel 后台的「IP库导入」，直接填入 `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/cf_ips.txt` 即可实现远程自动更新！
+
+### 3. `cf_ips.csv`（Cloudflare 优选 IP 结构化表格）
+* 采用 `UTF-8-SIG` 编码，Windows Excel 直接双击打开不乱码。
+* 包含完整指标，数值字段（`delay_ms`, `speed_kbs`）均为纯数字，并在保存时按 **`tested_at`（测速时间）倒序排序**：
+
+| 字段 | 类型 | 说明 | 示例 |
+| :--- | :--- | :--- | :--- |
+| `ip` | 字符串 | 优选 IP 地址 | `23.249.18.144` |
+| `port` | 整数 | 服务端口 | `8581` |
+| `tls` | 字符串 | 是否开启 TLS (`true`/`false`) | `true` |
+| `delay_ms` | 整数 | 网络延迟（毫秒纯数值，便于排序） | `2` |
+| `speed_kbs` | 整数 | 下载速度（kB/s 纯数值，便于排序） | `89086` |
+| `colo` | 字符串 | Cloudflare 数据中心三字代码 | `HKG`、`NRT`、`LAX` |
+| `cf_location` | 字符串 | Cloudflare 落地地理位置 | `亚太 · 香港` |
+| `isp` | 字符串 | 网络运营商 | `Prime Security Corp.` |
+| `asn` | 字符串 | ASN 编号与组织 | `AS400618 Prime Security Corp.` |
+| `tested_at` | 时间字符串 | 测试/发布时间 | `2026-09-13 18:00:33` |
+| `channel` | 字符串 | 来源频道 | `@danfeng2` / `@otcfxq` |
 
 ---
 
 ## 环境变量配置
 
-> 💡 **特别说明**：如果你使用默认的**免登录 Web 模式**，**无需配置任何必填 Secret**，仓库开箱即可直接运行！
+> 💡 **零配置声明**：默认采用**免登录 Web 模式**，**无需配置任何必填 Secret**，开箱即可直接运行！
 
 若需要启用官方 API 模式或 TG 机器人通知，可在 GitHub 仓库 **Settings -> Secrets and variables -> Actions** 中配置以下变量：
 
@@ -53,42 +104,10 @@ tg_fetch.py ───────┤                    ├────► 提�
 | `TG_API_ID` | Telegram API ID（纯数字） | 否（可选） | 留空则自动使用免登录 Web 模式 |
 | `TG_API_HASH` | Telegram API Hash（32位字符） | 否（可选） | 留空则自动使用免登录 Web 模式 |
 | `TG_SESSION_STR` | Telethon 会话字符串（由 `tg_session.py` 生成） | 否（可选） | 留空则自动使用免登录 Web 模式 |
-| `FETCH_DAYS` | 本次抓取回溯的天数（增量窗口） | 否 | `14` |
+| `FETCH_DAYS` | 单次增量回溯的天数（扫描窗口） | 否 | `14` |
 | `PROXY` | 本地抓取代理（如 `socks5h://127.0.0.1:10808`） | 否 | Windows 本地运行可自动读取系统代理设置 |
-| `TG_BOT_TOKEN` | TG 通知机器人 Token | 否（可选） | 用于抓取完成后推送卡片通知 |
-| `TG_CHAT_ID` | TG 通知接收人的 Chat ID 或频道/群组 ID | 否（可选） | 用于抓取完成后推送卡片通知 |
-
----
-
-## 输出产物说明
-
-### 1. `socks5.txt`（代理节点清单）
-* **永久增量累积（只增不减）**：历史抓取到的所有有效节点全部永久保留在仓库中，绝不因为时间推移而草率删除！
-* **智能去重更新**：以 `host:port` 为唯一标识。如果频道主重新发布了某个节点，自动以最新发布的协议、认证密码与配置刷新覆盖。
-* **纯净即用**：纯文本格式，每行一个有效节点，可直接导入 Clash、v2rayN、Sing-box、Shadowrocket 等客户端。
-* **合规校验机制**：自动校验端口合法性（1~65535）与 IP 地址有效性，杜绝畸变垃圾数据。
-
-### 2. `cf_ips.csv`（Cloudflare 优选 IP 结构化表格）
-* 采用 `UTF-8-SIG` 编码，Windows Excel 直接双击打开不乱码。
-* 包含完整指标，数值字段（`delay_ms`, `speed_kbs`）均为纯数字，方便在 Excel 中直接排序筛选：
-
-| 字段 | 类型 | 说明 | 示例 |
-| :--- | :--- | :--- | :--- |
-| `ip` | 字符串 | 优选 IP 地址 | `154.31.112.237` |
-| `port` | 整数 | 服务端口 | `26418` |
-| `tls` | 字符串 | 是否开启 TLS (`true`/`false`) | `true` |
-| `delay_ms` | 整数 | 网络延迟（毫秒纯数值，便于排序） | `116` |
-| `speed_kbs` | 整数 | 下载速度（kB/s 纯数值，便于排序） | `20815` |
-| `colo` | 字符串 | Cloudflare 数据中心三字代码 | `NRT`、`LAX` |
-| `cf_location` | 字符串 | Cloudflare 落地地理位置 | `亚洲 · 日本东京` |
-| `isp` | 字符串 | 网络运营商 | `DMIT Cloud Services` |
-| `asn` | 字符串 | ASN 编号与组织 | `AS906` |
-| `tested_at` | 时间字符串 | 测试/发布时间 | `2026-09-10 18:00:36` |
-| `channel` | 字符串 | 来源频道 | `@danfeng2` / `@otcfxq` |
-
-### 3. `cf_ips.txt`（Cloudflare 优选 IP 纯文本清单）
-* 纯文本格式，每行一个 `IP:端口`（如 `23.249.18.144:8581`）。
-* **专为 edgetunnel / CM 优选 / 测速工具一键复制导入打造**：在 GitHub 打开该文件，点击右上角 `Copy raw file` 按钮即可一键整段复制粘贴到后台待选列表，也可以将 Raw 链接直接用于 IP 库订阅导入。
+| `TG_BOT_TOKEN` | TG 通知机器人 Token | 否（可选） | 用于抓取完成后推送运行结果卡片 |
+| `TG_CHAT_ID` | TG 通知接收人的 Chat ID 或频道/群组 ID | 否（可选） | 用于抓取完成后推送运行结果卡片 |
 
 ---
 
@@ -129,10 +148,9 @@ python tg_fetch.py
 工作流文件位于 `.github/workflows/fetch.yml`。
 
 每天 **北京时间 18:05（UTC 10:05）** 自动执行：
-- 默认无需配置任何 Secrets，开箱即可通过 Web 模式自动抓取
-- 抓取目标频道最近 3 天内的多协议代理与优选 IP
-- 自动按 `IP:Port` 覆盖去重，生成并更新 `socks5.txt` 与 `cf_ips.csv`
-- 具备并发互斥锁（`concurrency`）与 `git pull --rebase` 自动防冲突机制
-- 具备 `if: always()` 容错提交机制与存在性校验，有变动自动提交并推送回仓库
-- 执行完成后（若配置了机器人凭据）自动向 Telegram 发送运行统计卡片
-- 支持在 GitHub 仓库 **Actions** 页面随时点击 **Run workflow** 手动触发立即更新
+- 默认无需配置任何 Secrets，开箱即可通过 Web 模式自动抓取。
+- 智能增量合并更新 `socks5.txt`、`cf_ips.txt` 与 `cf_ips.csv`，历史节点永久留存。
+- 具备并发互斥锁（`concurrency`）与 `git pull --rebase` 自动防冲突机制。
+- 具备 `if: always()` 容错提交机制与存在性校验，有变动自动提交并推送回仓库。
+- 执行完成后（若配置了机器人凭据）自动向 Telegram 发送运行统计卡片。
+- 支持在 GitHub 仓库 **Actions** 页面随时点击 **Run workflow** 手动触发立即更新。
