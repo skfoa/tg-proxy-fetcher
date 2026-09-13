@@ -232,7 +232,14 @@ def load_existing_cf_ips(filepath: str = OUTPUT_CF_FILE) -> dict:
     return existing
 
 
-def send_tg_notification(proxies_count: int, cf_ips_count: int, new_proxies: int = 0, new_cf: int = 0):
+def send_tg_notification(
+    proxies_count: int,
+    cf_ips_count: int,
+    new_proxies: int = 0,
+    updated_proxies: int = 0,
+    new_cf: int = 0,
+    updated_cf: int = 0,
+):
     token = TG_BOT_TOKEN
     chat_id = TG_CHAT_ID
     if not token or not chat_id:
@@ -246,8 +253,8 @@ def send_tg_notification(proxies_count: int, cf_ips_count: int, new_proxies: int
         f"🚀 <b>节点与优选 IP 增量同步完成</b>\n"
         f"------------------------------------\n"
         f"📅 <b>时间</b>：{date_str} (北京时间)\n"
-        f"📥 <b>可用代理</b>：总计 <code>{proxies_count}</code> 个（本次新增/更新: {new_proxies}）\n"
-        f"🌐 <b>优选 IP</b>：总计 <code>{cf_ips_count}</code> 条（本次新增/更新: {new_cf}）\n"
+        f"📫 <b>可用代理</b>：总计 <code>{proxies_count}</code> 个 (新增: {new_proxies}, 刷新: {updated_proxies})\n"
+        f"🌐 <b>优选 IP</b>：总计 <code>{cf_ips_count}</code> 条 (新增: {new_cf}, 刷新: {updated_cf})\n"
         f"📡 <b>目标频道</b>：@otcfxq, @danfeng2\n"
         f"------------------------------------\n"
         f"✅ <b>持久化策略</b>：只增不减，历史节点全量保留，重复节点智能更新！"
@@ -384,7 +391,14 @@ def scrape_channel_web(channel: str, cutoff: datetime, proxy: str = "") -> tuple
     return proxies_found, cf_ips_found
 
 
-def save_and_notify(final_proxies: dict, final_cf_ips: dict, new_proxies_count: int = 0, new_cf_count: int = 0):
+def save_and_notify(
+    final_proxies: dict,
+    final_cf_ips: dict,
+    new_proxies_count: int = 0,
+    updated_proxies_count: int = 0,
+    new_cf_count: int = 0,
+    updated_cf_count: int = 0,
+):
     with open(OUTPUT_PROXY_FILE, "w", encoding="utf-8") as f:
         for node in final_proxies.values():
             f.write(node + "\n")
@@ -402,13 +416,20 @@ def save_and_notify(final_proxies: dict, final_cf_ips: dict, new_proxies_count: 
             writer.writerow(row)
     log.info("已保存优选IP文件: %s (%d 条全量累积记录)", OUTPUT_CF_FILE, len(sorted_cf_ips))
 
-    # 写入 cf_ips.txt（纯净 IP:Port，方便一键全选复制导入 edgetunnel 等）
+    # 写入 cf_ips.txt（行业通用标准 IP:Port 纯文本列表）
     with open(OUTPUT_CF_TXT, "w", encoding="utf-8") as f:
         for row in sorted_cf_ips:
             f.write(f"{row['ip']}:{row['port']}\n")
     log.info("已保存优选IP纯文本: %s (%d 行 IP:Port)", OUTPUT_CF_TXT, len(sorted_cf_ips))
 
-    send_tg_notification(len(final_proxies), len(sorted_cf_ips), new_proxies=new_proxies_count, new_cf=new_cf_count)
+    send_tg_notification(
+        len(final_proxies),
+        len(sorted_cf_ips),
+        new_proxies=new_proxies_count,
+        updated_proxies=updated_proxies_count,
+        new_cf=new_cf_count,
+        updated_cf=updated_cf_count,
+    )
 
     log.info("=" * 50)
     log.info("抓取、增量合并、保存与通知任务全部顺利完成！")
@@ -479,7 +500,14 @@ def run_web_scraper():
     log.info("优选 IP 增量合并: 历史保留 %d 条, 本次新增 %d 条, 本次更新 %d 条 -> 全量总计 %d 条", 
              len(existing_cf_ips) - updated_cf_cnt, new_cf_cnt, updated_cf_cnt, len(final_cf_ips))
 
-    save_and_notify(final_proxies, final_cf_ips, new_proxies_count=new_proxy_cnt + updated_proxy_cnt, new_cf_count=new_cf_cnt + updated_cf_cnt)
+    save_and_notify(
+        final_proxies,
+        final_cf_ips,
+        new_proxies_count=new_proxy_cnt,
+        updated_proxies_count=updated_proxy_cnt,
+        new_cf_count=new_cf_cnt,
+        updated_cf_count=updated_cf_cnt,
+    )
 
 
 async def run_telethon():
@@ -578,7 +606,14 @@ async def run_telethon():
         log.info("优选 IP 增量合并: 历史保留 %d 条, 本次新增 %d 条, 本次更新 %d 条 -> 全量总计 %d 条", 
                  len(existing_cf_ips) - updated_cf_cnt, new_cf_cnt, updated_cf_cnt, len(final_cf_ips))
 
-        save_and_notify(final_proxies, final_cf_ips, new_proxies_count=new_proxy_cnt + updated_proxy_cnt, new_cf_count=new_cf_cnt + updated_cf_cnt)
+        save_and_notify(
+        final_proxies,
+        final_cf_ips,
+        new_proxies_count=new_proxy_cnt,
+        updated_proxies_count=updated_proxy_cnt,
+        new_cf_count=new_cf_cnt,
+        updated_cf_count=updated_cf_cnt,
+    )
 
     finally:
         await client.disconnect()
