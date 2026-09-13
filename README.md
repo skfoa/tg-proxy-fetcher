@@ -159,22 +159,15 @@ python tg_fetch.py
 
 ---
 
-## 🙏 致谢 / Acknowledgements
+## 🙏 致谢
 
-本项目由衷感谢以下开源项目、社区平台以及频道博主的无私分享与技术贡献：
+本项目节点与优选 IP 数据源来自以下 Telegram 公开频道，在此表示感谢：
 
-* **核心数据源频道**：
-  * [@otcfxq](https://t.me/otcfxq) — 长期持续无私分享海量优质多协议代理节点与优质优选测速数据。
-  * [@danfeng2](https://t.me/danfeng2)（丹峰科技） — 专注 Cloudflare 优选 IP 深度测速与实时通报，数据精准可靠。
-* **上游开源项目与生态**：
-  * [Telethon](https://github.com/LonamiWebs/Telethon) — 纯 Python 实现的优秀 Telegram MTProto 客户端框架。
-  * [CloudflareSpeedTest](https://github.com/XIU2/CloudflareSpeedTest) — 全平台优选 IP 测速工具行业标杆。
-  * [edgetunnel](https://github.com/cmliu/edgetunnel) — 优秀的边缘计算代理网络方案。
-* **基础设施**：
-  * [GitHub Actions](https://github.com/features/actions) — 提供稳定可靠的全球定时自动化构建与运行环境。
+- [@otcfxq](https://t.me/otcfxq)
+- [@danfeng2](https://t.me/danfeng2)
 
 ---
 
 ## 📄 开源许可证 / License
 
-本项目遵循 [MIT License](LICENSE) 协议开源。抓取数据仅供个人网络连通性调试与学术测速研究，请遵守当地法律法规。
+本项目遵循 [MIT License](LICENSE) 协议开源。
