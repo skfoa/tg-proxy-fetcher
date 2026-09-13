@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: write
 
     steps:
       - name: 📥 检出代码
@@ -36,7 +37,7 @@ jobs:
           TG_SESSION_STR: ${{ secrets.TG_SESSION_STR }}
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
-          FETCH_DAYS: 14
+          FETCH_DAYS: ${{ vars.FETCH_DAYS || secrets.FETCH_DAYS || '3' }}
         run: python tg_fetch.py
 
       - name: 📄 提交并推送数据
@@ -59,3 +60,10 @@ jobs:
           else
             echo "⚠️ 目标文件未生成，请检查上一步运行日志"
           fi
+
+      - name: 🧹 清理旧工作流记录（保留最近 5 次）
+        if: always()
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          retain_minimum_runs: 5
