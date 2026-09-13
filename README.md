@@ -4,13 +4,13 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
 
-每天自动从 Telegram 优质公开频道（[@otcfxq](https://t.me/otcfxq)、[@danfeng2](https://t.me/danfeng2)）抓取多协议代理节点与 Cloudflare 优选 IP。具备**永久增量持久化（只增不减）**与**智能去重**机制，自动生成通用代理订阅源、全平台测速通用的 `IP:端口` 纯文本清单以及结构化测速数据表格，并通过 GitHub Actions 每天定时自动提交并推送到仓库。
+每天自动从 Telegram 优质公开频道（[@otcfxq](https://t.me/otcfxq)、[@danfeng2](https://t.me/danfeng2)）抓取多协议代理节点与 Cloudflare 优选 IP。具备**永久增量持久化（只增不减）**与**智能去重**机制，自动生成通用代理列表、纯净 `IP:端口` 文本列表以及结构化测速数据表格，并通过 GitHub Actions 每天定时自动提交并推送到仓库。
 
 > 🌟 **核心特性亮点**
 > - **🚀 免登录 / 零密钥模式（开箱即用）**：基于公开 Web 频道预览机制，**无需注册 Telegram API、无需配置任何 Secret 密钥、无需手机号或验证码**！Fork 或 Clone 即可直接跑通！
 > - **🛡️ 官方 API 模式（可选兼容）**：配置 `TG_API_ID` 与 `TG_SESSION_STR` 后自动无感升级为 Telethon MTProto 客户端协议。
 > - **📦 永久增量持久化（绝不超时淘汰）**：历史抓取的有效节点全部永久留存，新节点自动追加，重复节点按最新配置/测速实时更新覆盖，节点池只增不减、越用越丰富！
-> - **⚡ 全平台通用测速标准格式（IP:端口）**：自动导出所有主流测速工具通用的纯净 `IP:端口` 文本列表，支持一键全选复制，或直接作为远程 IP 库订阅导入各大测速工具（如 CloudflareSpeedTest、edgetunnel、CM优选等）！
+> - **⚡ 纯净 IP:端口 列表导出**：自动导出纯文本格式的 `IP:端口` 列表（`cf_ips.txt`），方便直接复制或作为远程 IP 列表导入。
 > - **🌐 Windows 本地智能环境自适应**：本地运行自动读取 Windows 系统代理（如 v2rayN 等），无缝突破网络限制。
 > - **🧹 自动维护与构建瘦身**：每次运行自动清理 GitHub Actions 历史记录，始终**仅保留最近 5 次运行记录**，告别冗余历史堆积！
 
@@ -22,7 +22,7 @@
                       ┌─── @otcfxq ────────┐
                       │   (代理 + 优选IP)  │
 tg_fetch.py ──────────┤                    ├────► 增量抓取 & 智能去重 ──┬──► socks5.txt (通用多协议代理节点)
-(免登录/官方API双模)   │                    │                           ├──► cf_ips.txt (通用标准 IP:端口，适配各类测速工具)
+(免登录/官方API双模)   │                    │                           ├──► cf_ips.txt (纯文本 IP:端口 列表)
                       └─── @danfeng2 ──────┘                           ├──► cf_ips.csv (Cloudflare 优选 IP 详细表格)
                            (优选IP 专属)                                 └──► Telegram Bot 运行卡片推送 (可选)
 ```
@@ -34,7 +34,7 @@ tg_fetch.py ──────────┤                    ├────
 | 文件名 | 内容说明 | 适用场景 / 客户端 | GitHub Raw 永久直链（点击即可导入） |
 | :--- | :--- | :--- | :--- |
 | **`socks5.txt`** | 纯净多协议代理清单 | Clash、v2rayN、Sing-box、Shadowrocket 等 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/socks5.txt` |
-| **`cf_ips.txt`** | 通用标准 `IP:端口` 优选 IP | **全平台测速工具**（CloudflareSpeedTest 等）、edgetunnel、CM 优选、各类测速脚本 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/cf_ips.txt` |
+| **`cf_ips.txt`** | 优选 IP 纯文本列表 | 每行一个 `IP:端口`，便于直接复制或作为远程 IP 列表导入 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/cf_ips.txt` |
 | **`cf_ips.csv`** | 结构化优选 IP 数据表 | Excel 排序筛选、二次数据分析 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/cf_ips.csv` |
 
 ---
@@ -68,12 +68,11 @@ tg_fetch.py ──────────┤                    ├────
 * **纯净即用**：纯文本每行一个有效 URL，可直接导入各大代理客户端。
 * **合规校验机制**：自动校验端口范围（1~65535）与 IP/域名有效性，彻底杜绝畸变脏数据。
 
-### 2. `cf_ips.txt`（全平台测速标准格式：IP:端口）
-* **行业通用标准**：纯文本格式，每行一个 `IP:端口`（如 `23.249.18.144:8581`），属于几乎所有测速工具、优选平台与代理客户端通用的核心标准格式。
-* **广泛适用**：完美适配 CloudflareSpeedTest、edgetunnel 后台、CM 优选、各种优选测速脚本以及客户端节点直接导入。
-* **两种使用方式**：
-  1. **一键复制测试**：在 GitHub 打开该文件，点击右上角 `Copy raw file` 按钮，直接整段复制并粘贴到测速工具或面板的待选列表中即可立即测速。
-  2. **远程 IP 库订阅**：直接将 Raw 订阅链接填入各大支持远程 IP 库的工具中，即可自动定时同步最新优选 IP！
+### 2. `cf_ips.txt`（优选 IP 纯文本列表）
+* 纯文本格式，每行一个 `IP:端口`（如 `23.249.18.144:8581`）。
+* 使用方式：
+  1. **复制使用**：打开该文件直接复制文本内容，粘贴到所需的测速工具或面板中使用。
+  2. **远程订阅**：直接使用 GitHub Raw 直链作为远程 IP 列表导入。
 
 ### 3. `cf_ips.csv`（Cloudflare 优选 IP 结构化表格）
 * 采用 `UTF-8-SIG` 编码，Windows Excel 直接双击打开不乱码。
@@ -103,13 +102,13 @@ tg_fetch.py ──────────┤                    ├────
 
 | 变量名 | 用途 | 是否必填 | 默认值 / 说明 |
 | :--- | :--- | :---: | :--- |
-| `TG_API_ID` | Telegram API ID（纯数字） | 否（可选） | 留空则自动使用免登录 Web 模式 |
-| `TG_API_HASH` | Telegram API Hash（32位字符） | 否（可选） | 留空则自动使用免登录 Web 模式 |
-| `TG_SESSION_STR` | Telethon 会话字符串（由 `tg_session.py` 生成） | 否（可选） | 留空则自动使用免登录 Web 模式 |
-| `FETCH_DAYS` | 单次增量回溯的天数（扫描窗口，支持在 Repo Variables / Secrets 中自定义） | 否 | `3` |
+| `TG_API_ID` | Telegram API ID（纯数字） | 否 | 留空则使用免登录 Web 模式 |
+| `TG_API_HASH` | Telegram API Hash（32位字符） | 否 | 留空则使用免登录 Web 模式 |
+| `TG_SESSION_STR` | Telethon 会话字符串（由 `tg_session.py` 生成） | 否 | 留空则使用免登录 Web 模式 |
+| `FETCH_DAYS` | 单次增量回溯天数（扫描窗口） | 否 | 默认 `3` 天（可在 Variables 中自定义） |
 | `PROXY` | 本地抓取代理（如 `socks5h://127.0.0.1:10808`） | 否 | Windows 本地运行可自动读取系统代理设置 |
-| `TG_BOT_TOKEN` | TG 通知机器人 Token | 否（可选） | 用于抓取完成后推送运行结果卡片 |
-| `TG_CHAT_ID` | TG 通知接收人的 Chat ID 或频道/群组 ID | 否（可选） | 用于抓取完成后推送运行结果卡片 |
+| `TG_BOT_TOKEN` | TG 通知机器人 Token | 否 | 用于抓取完成后推送运行结果卡片 |
+| `TG_CHAT_ID` | TG 通知接收人的 Chat ID 或频道/群组 ID | 否 | 用于抓取完成后推送运行结果卡片 |
 
 ---
 
