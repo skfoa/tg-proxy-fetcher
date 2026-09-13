@@ -1,19 +1,22 @@
-# TG-Proxy-Fetcher — Telegram 代理与 Cloudflare 优选 IP 同步工具
+# TG-Proxy-Fetcher —— Telegram 代理与 Cloudflare 优选 IP 同步工具
 
 从 Telegram 公开频道（[@otcfxq](https://t.me/otcfxq)、[@danfeng_chat](https://t.me/danfeng_chat)）自动获取多协议代理节点与 Cloudflare 优选 IP，按键覆盖去重，保存为纯净代理列表与结构化表格，并通过 GitHub Actions 每天定时自动执行并推送到仓库。
+
+> 🌟 **核心特性：支持「免登录 / 零密钥模式」与「官方 API 模式」双模驱动**
+> - **免登录 Web 模式（默认 / 零配置）**：无需任何 Telegram API 账号、密钥或验证码，Fork 后直接运行，开箱即用！
+> - **官方 API 模式（可选）**：配置 `TG_API_ID` 与 `TG_SESSION_STR` 凭证后自动无缝切换至 Telethon MTProto 模式。
 
 ---
 
 ## 架构与工作流程
 
 ```text
-                   ┌──► @otcfxq ────────┐
-                   │    (代理 + 优选IP)  ▼
-tg_fetch.py ───────┤                   提取与去重 ──────┬──► socks5.txt (纯净代理节点)
-                   │                    ▲              │
-                   └──► @danfeng_chat ──┘              ├──► cf_ips.csv (Cloudflare 优选 IP 表格)
-                        (优选IP 专属)                   │
-                                                       └──► Telegram Bot 每日卡片推送
+                   ┌─── @otcfxq ────────┐
+                   │   (代理 + 优选IP)  │
+tg_fetch.py ───────┤                    ├────► 提取与去重 ──────┬───► socks5.txt (纯净代理节点)
+(支持免登录/API双模) │                    │                       ├───► cf_ips.csv (Cloudflare 优选 IP 表格)
+                   └─── @danfeng_chat ──┘                       └───► Telegram Bot 每日卡片推送 (可选)
+                        (优选IP 专属)
 ```
 
 ---
@@ -33,24 +36,27 @@ tg_fetch.py ───────┤                   提取与去重 ───
    - `[发现开放 HTTPS 代理] https://121.42.225.20:443#CN` ➔ 自动提取为 `https://121.42.225.20:443`
    - `[发现开放 SOCKS5 代理] IP:Port` ➔ 自动补全为 `socks5://IP:Port`
    - `[发现开放 TURN 代理/服务] IP:Port 或 turn://IP:Port` ➔ 自动提取为 `turn://IP:Port`
-   - 🛡️ **防污染机制**：通报行后半段附带的第三方 SNI 测试目标域名（如 `域名:https://hf.molikuaiyin.com:443...`）会被自动精准隔离过滤，确保代理池 100% 纯净。
+   - 🛡️ **防污染机制**：通报行后半段附带的第三方 SNI 测试目标域名（如 `域名:https://hf.molikuaiyin.com:443...`）会被自动精准隔离过滤，确保代理库 100% 纯净。
 5. **Cloudflare 优选 IP**：
-   - 提取包含 IP、端口、TLS、网络延迟（纯数字 ms）、下载速度（纯数字 kB/s）、数据中心（Colo）、落地位置、ASN、运营商等全量指标的优选 IP 消息。
+   - 提取包含 IP、端口、TLS、网络延迟（纯数值 ms）、下载速度（纯数值 kB/s）、数据中心（Colo）、落地位置、ASN、运营商等全量指标的优选 IP 消息。
 
 ---
 
 ## 环境变量配置
 
-在 GitHub 仓库 **Settings -> Secrets and variables -> Actions** 中配置以下 Secret 变量：
+> 💡 **特别说明**：如果你使用默认的**免登录 Web 模式**，**无需配置任何必填 Secret**，仓库开箱即可直接运行！
 
-| 变量名 | 用途 | 是否必填 | 默认值 / 示例 |
+若需要启用官方 API 模式或 TG 机器人通知，可在 GitHub 仓库 **Settings -> Secrets and variables -> Actions** 中配置以下变量：
+
+| 变量名 | 用途 | 是否必填 | 默认值 / 说明 |
 | :--- | :--- | :---: | :--- |
-| `TG_API_ID` | Telegram API ID（纯数字） | **是** | `12345678` |
-| `TG_API_HASH` | Telegram API Hash（32位字符） | **是** | `a1b2c3d4e5f6...` |
-| `TG_SESSION_STR` | Telethon 会话字符串（由 `tg_session.py` 生成） | **是** | `1BVtsO...`（长文本字符串） |
+| `TG_API_ID` | Telegram API ID（纯数字） | 否（可选） | 留空则自动使用免登录 Web 模式 |
+| `TG_API_HASH` | Telegram API Hash（32位字符） | 否（可选） | 留空则自动使用免登录 Web 模式 |
+| `TG_SESSION_STR` | Telethon 会话字符串（由 `tg_session.py` 生成） | 否（可选） | 留空则自动使用免登录 Web 模式 |
 | `FETCH_DAYS` | 回溯抓取最近 N 天内的消息 | 否 | `3` |
-| `TG_BOT_TOKEN` | TG 通知机器人 Token | 否 | `123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11` |
-| `TG_CHAT_ID` | TG 通知接收人的 Chat ID 或频道/群组 ID | 否 | `987654321` |
+| `PROXY` | 本地抓取代理（如 `socks5h://127.0.0.1:10808`） | 否 | Windows 本地运行可自动读取系统代理设置 |
+| `TG_BOT_TOKEN` | TG 通知机器人 Token | 否（可选） | 用于抓取完成后推送卡片通知 |
+| `TG_CHAT_ID` | TG 通知接收人的 Chat ID 或频道/群组 ID | 否（可选） | 用于抓取完成后推送卡片通知 |
 
 ---
 
@@ -76,40 +82,35 @@ tg_fetch.py ───────┤                   提取与去重 ───
 | `cf_location` | 字符串 | Cloudflare 落地地理位置 | `亚洲 · 日本东京` |
 | `isp` | 字符串 | 网络运营商 | `DMIT Cloud Services` |
 | `asn` | 字符串 | ASN 编号与组织 | `AS906` |
-| `tested_at` | 时间字符串 | 测速/发布时间 | `2026-09-10 18:00:36` |
+| `tested_at` | 时间字符串 | 测试/发布时间 | `2026-09-10 18:00:36` |
 | `channel` | 字符串 | 来源频道 | `@danfeng_chat` / `@otcfxq` |
 
 ---
 
 ## 本地运行
 
-### 1. 安装依赖
+### 1. 直接运行（免登录 Web 模式，推荐）
+本地无需安装 Telethon，直接运行脚本即可：
+```bash
+python tg_fetch.py
+```
+> 💡 Windows 运行环境会自动识别系统代理设置（如 v2rayN 等）。如果需要显式指定代理，可设置环境变量：
+> ```bash
+> # Windows PowerShell
+> $env:PROXY="socks5h://127.0.0.1:10808"; python tg_fetch.py
+> 
+> # Linux / macOS
+> PROXY="socks5h://127.0.0.1:10808" python tg_fetch.py
+> ```
+
+### 2. 官方 API 模式运行（可选）
+如果拥有 Telegram API 凭据，可生成 Session 字符串：
 ```bash
 pip install -r requirements.txt
-```
-
-### 2. 获取 Telegram Session 凭证（仅需一次）
-在终端中运行本地交互脚本：
-```bash
 python tg_session.py
 ```
-按终端提示依次输入：
-1. `API ID` 与 `API Hash`（从 [https://my.telegram.org](https://my.telegram.org) 获取）
-2. 本地代理配置（针对国内网络环境，支持输入本地代理如 `127.0.0.1:7890`，若有海外网络直接回车跳过）
-3. 手机号（带国家码，如 `+86138...`）
-4. Telegram 官方收到的验证码（若启用了两步验证则再输入密码）
-
-运行成功后，终端会打印一段 Session 字符串，将其复制并保存到 GitHub Secrets 的 `TG_SESSION_STR` 中。
-
-### 3. 本地执行抓取测试
+按终端提示输入凭据并生成 Session 字符串后，配置环境变量即可运行：
 ```bash
-# Windows PowerShell
-$env:TG_API_ID="你的API_ID"
-$env:TG_API_HASH="你的API_HASH"
-$env:TG_SESSION_STR="你的Session字符串"
-python tg_fetch.py
-
-# Linux / macOS
 export TG_API_ID="你的API_ID"
 export TG_API_HASH="你的API_HASH"
 export TG_SESSION_STR="你的Session字符串"
@@ -123,6 +124,7 @@ python tg_fetch.py
 工作流文件位于 `.github/workflows/fetch.yml`。
 
 每天 **北京时间 18:05（UTC 10:05）** 自动执行：
+- 默认无需配置任何 Secrets，开箱即可通过 Web 模式自动抓取
 - 抓取目标频道最近 3 天内的多协议代理与优选 IP
 - 自动按 `IP:Port` 覆盖去重，生成并更新 `socks5.txt` 与 `cf_ips.csv`
 - 具备并发互斥锁（`concurrency`）与 `git pull --rebase` 自动防冲突机制

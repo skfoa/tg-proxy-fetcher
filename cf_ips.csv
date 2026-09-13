@@ -1,0 +1,12 @@
+﻿ip,port,tls,delay_ms,speed_kbs,colo,cf_location,isp,asn,tested_at,channel
+154.31.115.118,14702,true,88,125,NRT,亚洲 · 日本东京,DMIT Cloud Services,AS906,2026-09-11 06:52:50,@otcfxq
+154.31.114.46,12632,true,7250,62,NRT,亚洲 · 日本东京,DMIT Cloud Services,AS906,2026-09-10 20:06:12,@otcfxq
+154.31.112.237,26418,true,116,125,NRT,亚洲 · 日本东京,DMIT Cloud Services,AS906,2026-09-10 10:28:04,@otcfxq
+64.186.234.87,15984,true,238,175,SJC,北美洲 · 美国圣何塞,GTT Communications Inc.,AS3257,2026-09-10 00:42:09,@otcfxq
+64.186.234.81,25218,true,150,612,SJC,北美洲 · 美国圣何塞,GTT Communications Inc.,AS3257,2026-09-10 00:34:58,@otcfxq
+69.63.202.156,13377,true,268,162,LAX,北美洲 · 美国洛杉矶,DMIT Cloud Services,AS906,2026-09-09 20:36:56,@otcfxq
+69.63.202.130,24685,true,594,162,SJC,北美洲 · 美国圣何塞,DMIT Cloud Services,AS906,2026-09-09 20:07:18,@otcfxq
+69.63.202.75,17640,true,314,162,LAX,北美洲 · 美国洛杉矶,DMIT Cloud Services,AS906,2026-09-09 19:04:23,@otcfxq
+69.63.221.116,25517,true,196,638,LAX,北美洲 · 美国洛杉矶,DMIT Cloud Services,AS906,2026-09-09 16:08:23,@otcfxq
+179.253.240.117,15496,true,275,375,SJC,北美洲 · 美国圣何塞,V tal,AS8167,2026-09-09 11:01:53,@otcfxq
+96.9.212.206,60093,true,378,50,SIN,亚洲 · 新加坡新加坡,xTom Pty Ltd,AS8888,2026-09-09 10:59:23,@otcfxq

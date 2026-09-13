@@ -1,31 +1,9 @@
 #!/usr/bin/env python3
 """
-TG 频道代理与 Cloudflare 优选 IP 抓取脚本（GitHub Actions 专用）
-
-任务分工：
-  1. @otcfxq: 
-     - 抓取代理节点，支持：
-       * 标准代理与 TURN: socks5://, http(s)://, turn://
-       * 开放代理/服务通报文本: [发现开放 HTTP/HTTPS/SOCKS/TURN 代理/服务] (兼容有/无协议前缀，自动过滤测试域名)
-       * TG 官方一键直连链接: tg://socks?... 与 https://t.me/socks?...（自动还原为 socks5://）
-     - 抓取 Cloudflare 优选 IP
-  2. @danfeng_chat: 
-     - 抓取 Cloudflare 优选 IP
-
-输出说明：
-  - socks5.txt: 纯净代理节点列表（按 host:port 去重，保留最新节点）
-  - cf_ips.csv: Cloudflare 优选 IP 结构化数据（UTF-8-SIG 编码，按 ip:port 覆盖去重，按最新测速时间倒序）
-
-通知功能：
-  - 任务完成后若配置了 TG_BOT_TOKEN 与 TG_CHAT_ID，自动推送运行统计到 Telegram。
-
-需要的配置（环境变量）：
-  TG_SESSION_STR   Telethon 登录会话字符串（必填）
-  TG_API_ID        Telegram API ID（可选，默认使用内置官方 2040）
-  TG_API_HASH      Telegram API Hash（可选，默认使用内置官方 Hash）
-  FETCH_DAYS       抓取最近 N 天，默认 3
-  TG_BOT_TOKEN     (可选) TG 通知机器人 Token
-  TG_CHAT_ID       (可选) TG 通知接收 Chat ID
+TG 频道代理与 Cloudflare 优选 IP 抓取脚本
+支持双模式：
+1. 【免登录 Web 模式】（默认 / 零配置）：直接通过公开 Web 频道预览抓取，无需 API 密钥、会话与账号！
+2. 【官方 API 模式】（可选）：配置 TG_API_ID / TG_SESSION_STR 后使用 Telethon 客户端抓取。
 """
 
 import os
@@ -33,31 +11,35 @@ import re
 import csv
 import sys
 import json
-import asyncio
+import html
+import shutil
 import logging
+import asyncio
+import subprocess
 import urllib.request
 from urllib.parse import parse_qs
 from datetime import datetime, timedelta, timezone
 
-from telethon import TelegramClient
-from telethon.sessions import StringSession
-from telethon.errors import FloodWaitError
-
-# Windows 事件循环策略，兼容本地调试
+# Windows 事件循环策略
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    # 避免 Windows 终端输出 UTF-8 字符（如 Emoji）时编码崩溃
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+        sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
 
 # ================= 配置区域 =================
-# 若未提供自定义 API ID/Hash，自动默认使用 Telegram 官方开源 Desktop 客户端合法凭据
-TG_API_ID = os.getenv("TG_API_ID") or "2040"
-TG_API_HASH = os.getenv("TG_API_HASH") or "b18441a1ff607e10a989891a5462e627"
+TG_API_ID = os.getenv("TG_API_ID") or ""
+TG_API_HASH = os.getenv("TG_API_HASH") or ""
 TG_SESSION_STR = os.getenv("TG_SESSION_STR") or ""
 FETCH_DAYS = int(os.getenv("FETCH_DAYS") or "3")
+PROXY = os.getenv("PROXY") or os.getenv("ALL_PROXY") or os.getenv("HTTPS_PROXY") or ""
 
 TG_BOT_TOKEN = os.getenv("TG_BOT_TOKEN") or ""
 TG_CHAT_ID = os.getenv("TG_CHAT_ID") or ""
 
-# 目标频道与分工
 PROXY_CHANNELS = ["@otcfxq"]
 CF_IP_CHANNELS = ["@otcfxq", "@danfeng_chat"]
 
@@ -65,22 +47,16 @@ OUTPUT_PROXY_FILE = "socks5.txt"
 OUTPUT_CF_FILE = "cf_ips.csv"
 # ============================================
 
-# 1. 匹配开放代理/服务通报格式（支持 HTTP/HTTPS/SOCKS/TURN，兼容带/不带协议头，如: [发现开放 HTTPS 代理] https://121.42.225.20:443#CN 或 [发现开放 TURN 服务] IP:Port）
 ANNOUNCE_PROXY_RE = re.compile(
     r"\[发现开放\s*(?P<proto>HTTP|SOCKS5|SOCKS4|HTTPS|TURN)\s*(?:代理|服务)?\]\s*(?:(?:https?|socks5|socks4|turn)://)?(?P<ip>\d{1,3}(?:\.\d{1,3}){3}):(?P<port>\d{1,5})"
 )
-
-# 2. 匹配 Telegram 官方 SOCKS5 一键导入直连链接（如: tg://socks?... 或 https://t.me/socks?...）
 TG_SOCKS_RE = re.compile(
     r"(?:tg://socks|https?://(?:t\.me|telegram\.me)/socks)\?(?P<query>[^\s#]+)"
 )
-
-# 3. 匹配标准代理/TURN 节点 URL（支持带认证 user:pass@host:port 与免密 host:port）
 PROXY_URL_RE = re.compile(
     r"(?P<url>(?P<proto>socks5|http|https|turn)://(?:[^\s#@]+@)?(?P<host>(?:\d{1,3}\.){3}\d{1,3}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}):(?P<port>\d{1,5}))"
 )
 
-# CSV 输出字段定义
 CF_CSV_FIELDS = [
     "ip",
     "port",
@@ -103,49 +79,53 @@ logging.basicConfig(
 log = logging.getLogger("tg-fetch")
 
 
+def get_system_proxy() -> str:
+    """自动获取代理：优先环境变量，Windows 下自动探测系统代理"""
+    if PROXY:
+        return PROXY
+    if sys.platform == "win32":
+        try:
+            import winreg
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Internet Settings") as key:
+                enabled, _ = winreg.QueryValueEx(key, "ProxyEnable")
+                if enabled:
+                    server, _ = winreg.QueryValueEx(key, "ProxyServer")
+                    if server:
+                        if "10808" in server:
+                            return f"socks5h://{server}"
+                        elif not server.startswith("http"):
+                            return f"http://{server}"
+                        return server
+        except Exception:
+            pass
+    return ""
+
+
 def is_valid_host(host: str) -> bool:
-    """验证 IP 或域名格式是否合法"""
     parts = host.split(".")
-    # 若为纯数字构成的 IPv4，检查每个段是否在 0-255
     if len(parts) == 4 and all(p.isdigit() for p in parts):
         return all(0 <= int(p) <= 255 for p in parts)
-    # 域名必须至少有两段且顶级域名必须为纯字母（如 .com, .net, .org, .cn）
     if len(parts) >= 2 and parts[-1].isalpha() and len(parts[-1]) >= 2:
         return all(bool(re.match(r"^[a-zA-Z0-9-]+$", part)) for part in parts)
     return False
 
 
 def extract_proxies(text: str) -> list:
-    """
-    从消息文本中提取纯净代理 URL 及去重 key
-    支持:
-      1. [发现开放 HTTP/HTTPS/SOCKS/TURN 代理/服务] IP:Port 通报文本（自动补全协议头，并隔离该行附带的测试域名）
-      2. tg://socks?... 及 https://t.me/socks?... Telegram 官方一键直连链接，自动转换为 socks5://
-      3. socks5://, http://, https://, turn:// 标准 URL
-    返回: [(url, f"{host}:{port}"), ...]
-    """
     results = []
     lines = text.splitlines()
-
     for line in lines:
         line_s = line.strip()
         if not line_s:
             continue
-
-        # 1. 优先检查开放代理/服务通报行（如 [发现开放 HTTPS 代理] https://... 或 [发现开放 TURN 代理] ...）
         ann_m = ANNOUNCE_PROXY_RE.search(line_s)
         if ann_m:
             proto = ann_m.group("proto").lower()
             ip = ann_m.group("ip")
             port = ann_m.group("port")
             if is_valid_host(ip) and 1 <= int(port) <= 65535:
-                url = f"{proto}://{ip}:{port}"
-                key = f"{ip}:{port}"
-                results.append((url, key))
-            # 通报行中，真实代理节点就是紧跟在通报标题后的 IP:Port，后面附带的 "域名:https://..." 是测试目标，必须跳过
+                results.append((f"{proto}://{ip}:{port}", f"{ip}:{port}"))
             continue
 
-        # 2. TG 官方一键直连链接（tg://socks?... 或 t.me/socks?...）
         for m in TG_SOCKS_RE.finditer(line_s):
             qs = parse_qs(m.group("query"))
             server = qs.get("server", [""])[0].strip()
@@ -153,30 +133,19 @@ def extract_proxies(text: str) -> list:
             user = qs.get("user", [""])[0].strip()
             password = qs.get("pass", [""])[0].strip()
             if server and port and is_valid_host(server) and port.isdigit() and 1 <= int(port) <= 65535:
-                if user or password:
-                    url = f"socks5://{user}:{password}@{server}:{port}"
-                else:
-                    url = f"socks5://{server}:{port}"
-                key = f"{server}:{port}"
-                results.append((url, key))
+                url = f"socks5://{user}:{password}@{server}:{port}" if (user or password) else f"socks5://{server}:{port}"
+                results.append((url, f"{server}:{port}"))
 
-        # 3. 标准 URL 格式（socks5://, http://, https://, turn://）
         for m in PROXY_URL_RE.finditer(line_s):
             host = m.group("host")
             port = m.group("port")
             if is_valid_host(host) and 1 <= int(port) <= 65535:
-                url = m.group("url")
-                key = f"{host}:{port}"
-                results.append((url, key))
+                results.append((m.group("url"), f"{host}:{port}"))
 
     return results
 
 
 def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
-    """
-    从优选 IP 结构化消息中提取各项指标
-    若文本不含有效 IP 和端口，则返回 None
-    """
     ip_m = re.search(r"IP地址[:：]\s*(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})", text)
     port_m = re.search(r"端口[:：]\s*(\d{1,5})", text)
     if not ip_m or not port_m:
@@ -193,7 +162,6 @@ def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
     colo_m = re.search(r"数据中心[:：]\s*([A-Za-z0-9]+)", text)
     cf_loc_m = re.search(r"CF落地位置[:：].*?🌐\s*([^\r\n]+)", text, re.DOTALL)
     delay_m = re.search(r"网络延迟[:：]\s*(\d+(?:\.\d+)?)\s*ms", text)
-    
     speed_m = re.search(r"下载速度[:：]\s*(\d+(?:\.\d+)?)\s*([kKmMgG]?[bB]/s)?", text)
     speed_kbs = ""
     if speed_m:
@@ -224,7 +192,6 @@ def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
 
 
 def send_tg_notification(proxies_count: int, cf_ips_count: int):
-    """通过 Telegram Bot API 发送抓取结果通知汇总"""
     token = TG_BOT_TOKEN
     chat_id = TG_CHAT_ID
     if not token or not chat_id:
@@ -269,13 +236,195 @@ def send_tg_notification(proxies_count: int, cf_ips_count: int):
         log.warning("发送 TG 机器人通知网络异常: %s", e)
 
 
-async def main():
-    if not TG_SESSION_STR:
-        log.error("缺少 TG_SESSION_STR，请先在本地运行 tg_session.py 获取会话字符串")
-        sys.exit(1)
+def fetch_web_page(url: str, proxy: str = "") -> str:
+    """获取网页 HTML 内容，支持 curl 与 urllib.request 优雅降级"""
+    if shutil.which("curl"):
+        cmd = [
+            "curl", "-sL",
+            "-A", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        ]
+        if proxy:
+            cmd.extend(["-x", proxy])
+        cmd.extend([url, "--max-time", "15"])
+        try:
+            res = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="ignore", timeout=20)
+            if res.returncode == 0 and res.stdout:
+                return res.stdout
+        except Exception as e:
+            log.debug("curl 请求失败: %s，降级至 urllib", e)
+
+    handlers = []
+    if proxy and not proxy.startswith("socks"):
+        handlers.append(urllib.request.ProxyHandler({"http": proxy, "https": proxy}))
+    opener = urllib.request.build_opener(*handlers)
+    req = urllib.request.Request(
+        url,
+        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
+    )
+    with opener.open(req, timeout=15) as resp:
+        return resp.read().decode("utf-8", errors="ignore")
+
+
+def scrape_channel_web(channel: str, cutoff: datetime, proxy: str = "") -> tuple[list[tuple[str, str]], list[dict]]:
+    clean_channel = channel.lstrip("@")
+    base_url = f"https://t.me/s/{clean_channel}"
+    
+    proxies_found = []
+    cf_ips_found = []
+    
+    url = base_url
+    page_num = 1
+    max_pages = 20
+
+    while url and page_num <= max_pages:
+        log.info("频道 %s 正在抓取第 %d 页: %s", channel, page_num, url)
+        try:
+            html_content = fetch_web_page(url, proxy=proxy)
+        except Exception as e:
+            log.warning("频道 %s 第 %d 页抓取网络错误: %s", channel, page_num, e)
+            break
+
+        if not html_content or "tgme_widget_message_wrap" not in html_content:
+            log.warning("频道 %s 未获取到公开消息卡片（可能不支持 Web 预览或为群组/私密频道）", channel)
+            break
+
+        chunks = re.split(r'<div class="tgme_widget_message_wrap[^"]*"', html_content)[1:]
+        if not chunks:
+            break
+
+        earliest_id = None
+        reached_cutoff = False
+
+        for chunk in reversed(chunks):
+            p_m = re.search(r'data-post="([^"]+)"', chunk)
+            if p_m:
+                try:
+                    m_id = int(p_m.group(1).split("/")[1])
+                    if earliest_id is None or m_id < earliest_id:
+                        earliest_id = m_id
+                except Exception:
+                    pass
+
+            t_m = re.search(r'<time[^>]*datetime="([^"]+)"', chunk)
+            dt = None
+            if t_m:
+                try:
+                    dt = datetime.fromisoformat(t_m.group(1).replace("Z", "+00:00"))
+                    if dt < cutoff:
+                        reached_cutoff = True
+                except Exception:
+                    pass
+
+            txt_m = re.search(r'<div class="tgme_widget_message_text[^"]*"[^>]*>(.*?)</div>', chunk, re.DOTALL)
+            if not txt_m:
+                continue
+
+            raw_text = txt_m.group(1)
+            cleaned_text = re.sub(r'<br\s*/?>', '\n', raw_text)
+            cleaned_text = re.sub(r'<[^>]+>', '', cleaned_text)
+            cleaned_text = html.unescape(cleaned_text).strip()
+
+            for p_url, key in extract_proxies(cleaned_text):
+                proxies_found.append((p_url, key))
+
+            cf_data = parse_cf_ip(cleaned_text, default_channel=channel)
+            if cf_data:
+                if not cf_data["tested_at"] and dt:
+                    cf_data["tested_at"] = dt.strftime("%Y-%m-%d %H:%M:%S")
+                cf_ips_found.append(cf_data)
+
+        if reached_cutoff or not earliest_id:
+            log.info("频道 %s 已到达时间截止点 (%s)，停止向后翻页", channel, cutoff.strftime("%Y-%m-%d %H:%M:%S UTC"))
+            break
+
+        page_num += 1
+        url = f"{base_url}?before={earliest_id}"
+
+    return proxies_found, cf_ips_found
+
+
+def save_and_notify(proxies_seen: dict, cf_ips_seen: dict):
+    with open(OUTPUT_PROXY_FILE, "w", encoding="utf-8") as f:
+        for node in proxies_seen.values():
+            f.write(node + "\n")
+    log.info("已写入代理文件: %s (%d 个节点)", OUTPUT_PROXY_FILE, len(proxies_seen))
+
+    sorted_cf_ips = sorted(
+        cf_ips_seen.values(),
+        key=lambda item: item.get("tested_at", ""),
+        reverse=True,
+    )
+    with open(OUTPUT_CF_FILE, "w", encoding="utf-8-sig", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=CF_CSV_FIELDS)
+        writer.writeheader()
+        for row in sorted_cf_ips:
+            writer.writerow(row)
+    log.info("已写入优选IP文件: %s (%d 条记录)", OUTPUT_CF_FILE, len(sorted_cf_ips))
+
+    send_tg_notification(len(proxies_seen), len(sorted_cf_ips))
 
     log.info("=" * 50)
-    log.info("TG 节点与优选 IP 抓取启动")
+    if not proxies_seen and not cf_ips_seen:
+        log.warning("本次运行未提取到任何代理或优选 IP")
+    else:
+        log.info("抓取、去重、保存与通知任务全部顺利完成！")
+
+
+def run_web_scraper():
+    log.info("=" * 50)
+    log.info("模式: 【免登录 Web 抓取模式】（公开 Web 频道预览，无需 API ID / 会话密钥）")
+    log.info("抓取时间范围: 最近 %d 天", FETCH_DAYS)
+    log.info("代理抓取频道: %s", ", ".join(PROXY_CHANNELS))
+    log.info("优选 IP 抓取频道: %s", ", ".join(CF_IP_CHANNELS))
+    
+    proxy = get_system_proxy()
+    if proxy:
+        log.info("网络代理: %s", proxy)
+    else:
+        log.info("网络连接: 直连 (Direct)")
+
+    cutoff = datetime.now(timezone.utc) - timedelta(days=FETCH_DAYS)
+    all_channels = sorted(list(set(PROXY_CHANNELS + CF_IP_CHANNELS)))
+
+    proxies_seen = {}
+    cf_ips_seen = {}
+
+    for channel in all_channels:
+        is_proxy_target = channel in PROXY_CHANNELS
+        is_cf_target = channel in CF_IP_CHANNELS
+
+        log.info("-" * 50)
+        log.info("开始处理频道: %s (代理: %s, 优选IP: %s)", channel, is_proxy_target, is_cf_target)
+
+        raw_proxies, raw_cf_ips = scrape_channel_web(channel, cutoff, proxy=proxy)
+
+        if is_proxy_target:
+            p_cnt = 0
+            for url, key in raw_proxies:
+                if key not in proxies_seen:
+                    proxies_seen[key] = url
+                    p_cnt += 1
+            log.info("频道 %s 提取去重代理节点: %d 个", channel, p_cnt)
+
+        if is_cf_target:
+            cf_cnt = 0
+            for item in raw_cf_ips:
+                key = f"{item['ip']}:{item['port']}"
+                if key not in cf_ips_seen:
+                    cf_ips_seen[key] = item
+                    cf_cnt += 1
+            log.info("频道 %s 提取去重优选 IP: %d 条", channel, cf_cnt)
+
+    save_and_notify(proxies_seen, cf_ips_seen)
+
+
+async def run_telethon():
+    from telethon import TelegramClient
+    from telethon.sessions import StringSession
+    from telethon.errors import FloodWaitError
+
+    log.info("=" * 50)
+    log.info("模式: 【Telegram 官方 API 模式】（Telethon MTProto）")
     log.info("抓取时间范围: 最近 %d 天", FETCH_DAYS)
     log.info("代理抓取频道: %s", ", ".join(PROXY_CHANNELS))
     log.info("优选 IP 抓取频道: %s", ", ".join(CF_IP_CHANNELS))
@@ -285,8 +434,8 @@ async def main():
     )
 
     all_channels = sorted(list(set(PROXY_CHANNELS + CF_IP_CHANNELS)))
-    proxies_seen = {}  # key -> url
-    cf_ips_seen = {}   # key -> dict
+    proxies_seen = {}
+    cf_ips_seen = {}
 
     try:
         await client.connect()
@@ -316,7 +465,6 @@ async def main():
             cf_count = 0
 
             try:
-                # Telethon 默认从最新向最旧遍历
                 async for msg in client.iter_messages(entity):
                     msg_count += 1
                     if msg.date and msg.date < cutoff:
@@ -326,19 +474,16 @@ async def main():
                     if not msg.text:
                         continue
 
-                    # 提取代理（包含 socks5, http, https, turn, 通报格式, 以及 tg://socks 直连链接）
                     if is_proxy_target:
                         for url, key in extract_proxies(msg.text):
                             if key not in proxies_seen:
                                 proxies_seen[key] = url
                                 proxy_count += 1
 
-                    # 提取优选 IP
                     if is_cf_target:
                         cf_data = parse_cf_ip(msg.text, default_channel=channel_name)
                         if cf_data:
                             cf_key = f"{cf_data['ip']}:{cf_data['port']}"
-                            # 首次遇到即为该 IP:Port 的最新记录
                             if cf_key not in cf_ips_seen:
                                 if not cf_data["tested_at"] and msg.date:
                                     cf_data["tested_at"] = msg.date.strftime("%Y-%m-%d %H:%M:%S")
@@ -349,40 +494,23 @@ async def main():
 
             log.info("频道 %s 扫描完毕: 消息 %d 条, 新增代理 %d 个, 新增优选IP %d 个", channel_name, msg_count, proxy_count, cf_count)
 
-        log.info("=" * 50)
-        log.info("全部频道扫描完成: 去重代理总数 %d, 去重优选IP总数 %d", len(proxies_seen), len(cf_ips_seen))
-
-        # 写入 socks5.txt
-        with open(OUTPUT_PROXY_FILE, "w", encoding="utf-8") as f:
-            for node in proxies_seen.values():
-                f.write(node + "\n")
-        log.info("已写入代理文件: %s (%d 个节点)", OUTPUT_PROXY_FILE, len(proxies_seen))
-
-        # 写入 cf_ips.csv（UTF-8-SIG 兼容 Excel 打开不乱码，按测速时间倒序排序）
-        sorted_cf_ips = sorted(
-            cf_ips_seen.values(),
-            key=lambda item: item.get("tested_at", ""),
-            reverse=True,
-        )
-        with open(OUTPUT_CF_FILE, "w", encoding="utf-8-sig", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=CF_CSV_FIELDS)
-            writer.writeheader()
-            for row in sorted_cf_ips:
-                writer.writerow(row)
-        log.info("已写入优选IP文件: %s (%d 条记录)", OUTPUT_CF_FILE, len(sorted_cf_ips))
-
-        # 发送 Telegram 机器人通知
-        send_tg_notification(len(proxies_seen), len(sorted_cf_ips))
-
-        log.info("=" * 50)
-        if not proxies_seen and not cf_ips_seen:
-            log.warning("本次运行未提取到任何代理或优选 IP")
-        else:
-            log.info("抓取、保存与通知任务全部顺利完成！")
+        save_and_notify(proxies_seen, cf_ips_seen)
 
     finally:
         await client.disconnect()
 
 
+def main():
+    if TG_API_ID and TG_API_HASH and TG_SESSION_STR:
+        try:
+            import telethon
+            asyncio.run(run_telethon())
+            return
+        except ImportError:
+            log.warning("检测到已配置 TG_API 凭据，但当前 Python 环境未安装 telethon，自动降级为【免登录 Web 模式】")
+
+    run_web_scraper()
+
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
