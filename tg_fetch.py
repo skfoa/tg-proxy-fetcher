@@ -47,6 +47,7 @@ CF_IP_CHANNELS = ["@otcfxq", "@danfeng2"]
 
 OUTPUT_PROXY_FILE = "socks5.txt"
 OUTPUT_CF_FILE = "cf_ips.csv"
+OUTPUT_CF_TXT = "cf_ips.txt"  # 纯净 IP:端口 文本列表，专供 edgetunnel / 各种优选工具一键复制导入
 # ============================================
 
 ANNOUNCE_PROXY_RE = re.compile(
@@ -400,6 +401,12 @@ def save_and_notify(final_proxies: dict, final_cf_ips: dict, new_proxies_count: 
         for row in sorted_cf_ips:
             writer.writerow(row)
     log.info("已保存优选IP文件: %s (%d 条全量累积记录)", OUTPUT_CF_FILE, len(sorted_cf_ips))
+
+    # 写入 cf_ips.txt（纯净 IP:Port，方便一键全选复制导入 edgetunnel 等）
+    with open(OUTPUT_CF_TXT, "w", encoding="utf-8") as f:
+        for row in sorted_cf_ips:
+            f.write(f"{row['ip']}:{row['port']}\n")
+    log.info("已保存优选IP纯文本: %s (%d 行 IP:Port)", OUTPUT_CF_TXT, len(sorted_cf_ips))
 
     send_tg_notification(len(final_proxies), len(sorted_cf_ips), new_proxies=new_proxies_count, new_cf=new_cf_count)
 
