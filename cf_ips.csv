@@ -1,6 +1,19 @@
 ﻿ip,port,tls,delay_ms,speed_kbs,colo,cf_location,isp,asn,tested_at,channel
+23.249.18.144,8581,true,2,89086,HKG,亚太 · 香港,Prime Security Corp.,AS400618 Prime Security Corp.,2026-09-13 18:00:33,@danfeng_chat
+142.248.139.237,51982,true,48,19722,NRT,亚太 · 日本东京,JT TELECOM INTERNATIONAL PTE.LTD.,AS137535 JT TELECOM INTERNATIONAL PTE.LTD.,2026-09-13 12:00:29,@danfeng_chat
+38.59.230.210,14338,true,188,40770,AMS,欧洲 · 荷兰阿姆斯特丹,Kirino LLC,AS41378 Kirino LLC,2026-09-13 06:00:28,@danfeng_chat
+45.89.234.48,40128,true,49,52982,NRT,亚太 · 日本东京,xTom Japan Corporation,AS3258 xTom Japan Corporation,2026-09-13 00:00:28,@danfeng_chat
+116.206.178.154,19436,true,3,11064,HKG,亚太 · 香港,Xnnet LLC,AS6134 XNNET LLC,2026-09-12 18:00:31,@danfeng_chat
+185.200.65.176,10443,true,48,49154,NRT,亚太 · 日本东京,xTom Japan Corporation,AS3258 xTom Japan Corporation,2026-09-12 12:00:28,@danfeng_chat
+216.24.184.56,443,true,139,13508,LAX,北美洲 · 美国洛杉矶,IT7 Networks Inc,AS25820 IT7 Networks Inc,2026-09-12 06:00:35,@danfeng_chat
+108.165.255.238,2038,true,1,29802,HKG,亚太 · 香港,Ace Data Centers,AS149440 Evoxt Sdn. Bhd.,2026-09-12 00:00:28,@danfeng_chat
+95.169.10.15,443,true,143,13493,SJC,北美洲 · 美国圣何塞,IT7 Networks Inc,AS25820 IT7 Networks Inc,2026-09-11 18:00:33,@danfeng_chat
+216.236.1.34,1891,true,57,56551,NRT,亚太 · 日本东京,Eons Data Communications Limited,AS138997 Eons Data Communications Limited,2026-09-11 12:00:27,@danfeng_chat
 154.31.115.118,14702,true,88,125,NRT,亚洲 · 日本东京,DMIT Cloud Services,AS906,2026-09-11 06:52:50,@otcfxq
+154.12.176.78,25301,true,1,41141,FRA,欧洲 · 德国法兰克福,DMIT Cloud Services,AS906 DMIT Cloud Services,2026-09-11 06:00:32,@danfeng_chat
+154.26.182.126,39445,true,143,26290,LAX,北美洲 · 美国洛杉矶,DMIT Cloud Services,AS906 DMIT Cloud Services,2026-09-11 00:00:34,@danfeng_chat
 154.31.114.46,12632,true,7250,62,NRT,亚洲 · 日本东京,DMIT Cloud Services,AS906,2026-09-10 20:06:12,@otcfxq
+154.3.35.193,2053,true,1,60775,HKG,亚太 · 香港,DMIT Cloud Services,AS906 DMIT Cloud Services,2026-09-10 19:07:09,@danfeng_chat
 154.31.112.237,26418,true,116,125,NRT,亚洲 · 日本东京,DMIT Cloud Services,AS906,2026-09-10 10:28:04,@otcfxq
 64.186.234.87,15984,true,238,175,SJC,北美洲 · 美国圣何塞,GTT Communications Inc.,AS3257,2026-09-10 00:42:09,@otcfxq
 64.186.234.81,25218,true,150,612,SJC,北美洲 · 美国圣何塞,GTT Communications Inc.,AS3257,2026-09-10 00:34:58,@otcfxq

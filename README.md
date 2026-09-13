@@ -1,6 +1,6 @@
 # TG-Proxy-Fetcher —— Telegram 代理与 Cloudflare 优选 IP 同步工具
 
-从 Telegram 公开频道（[@otcfxq](https://t.me/otcfxq)、[@danfeng_chat](https://t.me/danfeng_chat)）自动获取多协议代理节点与 Cloudflare 优选 IP，按键覆盖去重，保存为纯净代理列表与结构化表格，并通过 GitHub Actions 每天定时自动执行并推送到仓库。
+从 Telegram 公开频道（[@otcfxq](https://t.me/otcfxq)、[@danfeng2](https://t.me/danfeng2)）自动获取多协议代理节点与 Cloudflare 优选 IP，按键覆盖去重，保存为纯净代理列表与结构化表格，并通过 GitHub Actions 每天定时自动执行并推送到仓库。
 
 > 🌟 **核心特性：支持「免登录 / 零密钥模式」与「官方 API 模式」双模驱动**
 > - **免登录 Web 模式（默认 / 零配置）**：无需任何 Telegram API 账号、密钥或验证码，Fork 后直接运行，开箱即用！
@@ -15,7 +15,7 @@
                    │   (代理 + 优选IP)  │
 tg_fetch.py ───────┤                    ├────► 提取与去重 ──────┬───► socks5.txt (纯净代理节点)
 (支持免登录/API双模) │                    │                       ├───► cf_ips.csv (Cloudflare 优选 IP 表格)
-                   └─── @danfeng_chat ──┘                       └───► Telegram Bot 每日卡片推送 (可选)
+                   └─── @danfeng2 ──────┘                       └───► Telegram Bot 每日卡片推送 (可选)
                         (优选IP 专属)
 ```
 
@@ -83,7 +83,7 @@ tg_fetch.py ───────┤                    ├────► 提�
 | `isp` | 字符串 | 网络运营商 | `DMIT Cloud Services` |
 | `asn` | 字符串 | ASN 编号与组织 | `AS906` |
 | `tested_at` | 时间字符串 | 测试/发布时间 | `2026-09-10 18:00:36` |
-| `channel` | 字符串 | 来源频道 | `@danfeng_chat` / `@otcfxq` |
+| `channel` | 字符串 | 来源频道 | `@danfeng2` / `@otcfxq` |
 
 ---
 

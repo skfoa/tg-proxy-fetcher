@@ -41,7 +41,7 @@ TG_BOT_TOKEN = os.getenv("TG_BOT_TOKEN") or ""
 TG_CHAT_ID = os.getenv("TG_CHAT_ID") or ""
 
 PROXY_CHANNELS = ["@otcfxq"]
-CF_IP_CHANNELS = ["@otcfxq", "@danfeng_chat"]
+CF_IP_CHANNELS = ["@otcfxq", "@danfeng2"]
 
 OUTPUT_PROXY_FILE = "socks5.txt"
 OUTPUT_CF_FILE = "cf_ips.csv"
@@ -207,7 +207,7 @@ def send_tg_notification(proxies_count: int, cf_ips_count: int):
         f"📅 <b>时间</b>：{date_str} (北京时间)\n"
         f"📥 <b>可用代理</b>：<code>{proxies_count}</code> 个（已存入 socks5.txt）\n"
         f"🌐 <b>优选 IP</b>：<code>{cf_ips_count}</code> 条（已存入 cf_ips.csv）\n"
-        f"📡 <b>目标频道</b>：@otcfxq, @danfeng_chat\n"
+        f"📡 <b>目标频道</b>：@otcfxq, @danfeng2\n"
         f"------------------------------------\n"
         f"✅ <b>状态</b>：最新数据已自动去重并更新提交！"
     )
