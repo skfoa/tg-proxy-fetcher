@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """
-TG 频道代理与 Cloudflare 优选 IP 抓取脚本
-支持双模式：
-1. 【免登录 Web 模式】（默认 / 零配置）：直接通过公开 Web 频道预览抓取，无需 API 密钥、会话与账号！
-2. 【官方 API 模式】（可选）：配置 TG_API_ID / TG_SESSION_STR 后使用 Telethon 客户端抓取。
+TG 频道代理与 Cloudflare 优选 IP 同步工具
+核心特性：
+1. 【永久增量持久化】：历史抓取到的节点与优选 IP 全量保留，只增不减，绝不草率淘汰！
+2. 【智能更新去重】：同一 host:port 或 ip:port 再次出现时，自动以最新配置与测速数据覆盖刷新。
+3. 【双模驱动】：
+   - 免登录 Web 模式（默认）：直接抓取公开频道预览，无需任何 Telegram API 密钥或账号登录。
+   - 官方 API 模式（可选）：配置 TG_API_ID / TG_SESSION_STR 后自动启用 Telethon MTProto 客户端。
 """
 
 import os
@@ -23,7 +26,6 @@ from datetime import datetime, timedelta, timezone
 # Windows 事件循环策略
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-    # 避免 Windows 终端输出 UTF-8 字符（如 Emoji）时编码崩溃
     try:
         sys.stdout.reconfigure(encoding="utf-8")
         sys.stderr.reconfigure(encoding="utf-8")
@@ -191,7 +193,45 @@ def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
     }
 
 
-def send_tg_notification(proxies_count: int, cf_ips_count: int):
+def load_existing_proxies(filepath: str = OUTPUT_PROXY_FILE) -> dict:
+    """读取本地已保存的代理列表，保留历史累积节点（只增不减）"""
+    existing = {}
+    if not os.path.exists(filepath):
+        return existing
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            for line in f:
+                line_s = line.strip()
+                if not line_s or line_s.startswith("#"):
+                    continue
+                for url, key in extract_proxies(line_s):
+                    existing[key] = url
+        log.info("已加载本地已存代理节点: %d 个（历史节点全部保留）", len(existing))
+    except Exception as e:
+        log.warning("读取已有代理文件失败: %s", e)
+    return existing
+
+
+def load_existing_cf_ips(filepath: str = OUTPUT_CF_FILE) -> dict:
+    """读取本地已保存的优选 IP，保留历史累积数据（只增不减）"""
+    existing = {}
+    if not os.path.exists(filepath):
+        return existing
+    try:
+        with open(filepath, "r", encoding="utf-8-sig") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                ip = row.get("ip", "").strip()
+                port = row.get("port", "").strip()
+                if ip and port:
+                    existing[f"{ip}:{port}"] = row
+        log.info("已加载本地已存优选 IP 记录: %d 条（历史记录全部保留）", len(existing))
+    except Exception as e:
+        log.warning("读取已有优选 IP 文件失败: %s", e)
+    return existing
+
+
+def send_tg_notification(proxies_count: int, cf_ips_count: int, new_proxies: int = 0, new_cf: int = 0):
     token = TG_BOT_TOKEN
     chat_id = TG_CHAT_ID
     if not token or not chat_id:
@@ -202,14 +242,14 @@ def send_tg_notification(proxies_count: int, cf_ips_count: int):
     date_str = bjt.strftime("%Y年%m月%d日 %H:%M:%S")
 
     message = (
-        f"🚀 <b>节点与优选 IP 抓取完成</b>\n"
+        f"🚀 <b>节点与优选 IP 增量同步完成</b>\n"
         f"------------------------------------\n"
         f"📅 <b>时间</b>：{date_str} (北京时间)\n"
-        f"📥 <b>可用代理</b>：<code>{proxies_count}</code> 个（已存入 socks5.txt）\n"
-        f"🌐 <b>优选 IP</b>：<code>{cf_ips_count}</code> 条（已存入 cf_ips.csv）\n"
+        f"📥 <b>可用代理</b>：总计 <code>{proxies_count}</code> 个（本次新增/更新: {new_proxies}）\n"
+        f"🌐 <b>优选 IP</b>：总计 <code>{cf_ips_count}</code> 条（本次新增/更新: {new_cf}）\n"
         f"📡 <b>目标频道</b>：@otcfxq, @danfeng2\n"
         f"------------------------------------\n"
-        f"✅ <b>状态</b>：最新数据已自动去重并更新提交！"
+        f"✅ <b>持久化策略</b>：只增不减，历史节点全量保留，重复节点智能更新！"
     )
 
     url = f"https://api.telegram.org/bot{token}/sendMessage"
@@ -274,7 +314,7 @@ def scrape_channel_web(channel: str, cutoff: datetime, proxy: str = "") -> tuple
     
     url = base_url
     page_num = 1
-    max_pages = 20
+    max_pages = 25
 
     while url and page_num <= max_pages:
         log.info("频道 %s 正在抓取第 %d 页: %s", channel, page_num, url)
@@ -343,14 +383,14 @@ def scrape_channel_web(channel: str, cutoff: datetime, proxy: str = "") -> tuple
     return proxies_found, cf_ips_found
 
 
-def save_and_notify(proxies_seen: dict, cf_ips_seen: dict):
+def save_and_notify(final_proxies: dict, final_cf_ips: dict, new_proxies_count: int = 0, new_cf_count: int = 0):
     with open(OUTPUT_PROXY_FILE, "w", encoding="utf-8") as f:
-        for node in proxies_seen.values():
+        for node in final_proxies.values():
             f.write(node + "\n")
-    log.info("已写入代理文件: %s (%d 个节点)", OUTPUT_PROXY_FILE, len(proxies_seen))
+    log.info("已保存代理文件: %s (%d 个全量累积节点)", OUTPUT_PROXY_FILE, len(final_proxies))
 
     sorted_cf_ips = sorted(
-        cf_ips_seen.values(),
+        final_cf_ips.values(),
         key=lambda item: item.get("tested_at", ""),
         reverse=True,
     )
@@ -359,21 +399,18 @@ def save_and_notify(proxies_seen: dict, cf_ips_seen: dict):
         writer.writeheader()
         for row in sorted_cf_ips:
             writer.writerow(row)
-    log.info("已写入优选IP文件: %s (%d 条记录)", OUTPUT_CF_FILE, len(sorted_cf_ips))
+    log.info("已保存优选IP文件: %s (%d 条全量累积记录)", OUTPUT_CF_FILE, len(sorted_cf_ips))
 
-    send_tg_notification(len(proxies_seen), len(sorted_cf_ips))
+    send_tg_notification(len(final_proxies), len(sorted_cf_ips), new_proxies=new_proxies_count, new_cf=new_cf_count)
 
     log.info("=" * 50)
-    if not proxies_seen and not cf_ips_seen:
-        log.warning("本次运行未提取到任何代理或优选 IP")
-    else:
-        log.info("抓取、去重、保存与通知任务全部顺利完成！")
+    log.info("抓取、增量合并、保存与通知任务全部顺利完成！")
 
 
 def run_web_scraper():
     log.info("=" * 50)
     log.info("模式: 【免登录 Web 抓取模式】（公开 Web 频道预览，无需 API ID / 会话密钥）")
-    log.info("抓取时间范围: 最近 %d 天", FETCH_DAYS)
+    log.info("本次增量回溯: 最近 %d 天", FETCH_DAYS)
     log.info("代理抓取频道: %s", ", ".join(PROXY_CHANNELS))
     log.info("优选 IP 抓取频道: %s", ", ".join(CF_IP_CHANNELS))
     
@@ -383,11 +420,15 @@ def run_web_scraper():
     else:
         log.info("网络连接: 直连 (Direct)")
 
+    # 1. 预先加载本地已保存的历史节点（永久保留，只增不减！）
+    existing_proxies = load_existing_proxies(OUTPUT_PROXY_FILE)
+    existing_cf_ips = load_existing_cf_ips(OUTPUT_CF_FILE)
+
     cutoff = datetime.now(timezone.utc) - timedelta(days=FETCH_DAYS)
     all_channels = sorted(list(set(PROXY_CHANNELS + CF_IP_CHANNELS)))
 
-    proxies_seen = {}
-    cf_ips_seen = {}
+    scraped_proxies = {}
+    scraped_cf_ips = {}
 
     for channel in all_channels:
         is_proxy_target = channel in PROXY_CHANNELS
@@ -401,8 +442,8 @@ def run_web_scraper():
         if is_proxy_target:
             p_cnt = 0
             for url, key in raw_proxies:
-                if key not in proxies_seen:
-                    proxies_seen[key] = url
+                if key not in scraped_proxies:
+                    scraped_proxies[key] = url
                     p_cnt += 1
             log.info("频道 %s 提取去重代理节点: %d 个", channel, p_cnt)
 
@@ -410,12 +451,28 @@ def run_web_scraper():
             cf_cnt = 0
             for item in raw_cf_ips:
                 key = f"{item['ip']}:{item['port']}"
-                if key not in cf_ips_seen:
-                    cf_ips_seen[key] = item
+                if key not in scraped_cf_ips:
+                    scraped_cf_ips[key] = item
                     cf_cnt += 1
             log.info("频道 %s 提取去重优选 IP: %d 条", channel, cf_cnt)
 
-    save_and_notify(proxies_seen, cf_ips_seen)
+    # 2. 智能增量合并：历史保留，重复更新，新增追加
+    new_proxy_cnt = sum(1 for k in scraped_proxies if k not in existing_proxies)
+    updated_proxy_cnt = sum(1 for k in scraped_proxies if k in existing_proxies)
+    
+    new_cf_cnt = sum(1 for k in scraped_cf_ips if k not in existing_cf_ips)
+    updated_cf_cnt = sum(1 for k in scraped_cf_ips if k in existing_cf_ips)
+
+    final_proxies = {**existing_proxies, **scraped_proxies}
+    final_cf_ips = {**existing_cf_ips, **scraped_cf_ips}
+
+    log.info("=" * 50)
+    log.info("代理节点增量合并: 历史保留 %d 个, 本次新增 %d 个, 本次更新 %d 个 -> 全量总计 %d 个", 
+             len(existing_proxies) - updated_proxy_cnt, new_proxy_cnt, updated_proxy_cnt, len(final_proxies))
+    log.info("优选 IP 增量合并: 历史保留 %d 条, 本次新增 %d 条, 本次更新 %d 条 -> 全量总计 %d 条", 
+             len(existing_cf_ips) - updated_cf_cnt, new_cf_cnt, updated_cf_cnt, len(final_cf_ips))
+
+    save_and_notify(final_proxies, final_cf_ips, new_proxies_count=new_proxy_cnt + updated_proxy_cnt, new_cf_count=new_cf_cnt + updated_cf_cnt)
 
 
 async def run_telethon():
@@ -425,17 +482,21 @@ async def run_telethon():
 
     log.info("=" * 50)
     log.info("模式: 【Telegram 官方 API 模式】（Telethon MTProto）")
-    log.info("抓取时间范围: 最近 %d 天", FETCH_DAYS)
+    log.info("本次增量回溯: 最近 %d 天", FETCH_DAYS)
     log.info("代理抓取频道: %s", ", ".join(PROXY_CHANNELS))
     log.info("优选 IP 抓取频道: %s", ", ".join(CF_IP_CHANNELS))
+
+    # 1. 预先加载本地已保存的历史节点（永久保留，只增不减！）
+    existing_proxies = load_existing_proxies(OUTPUT_PROXY_FILE)
+    existing_cf_ips = load_existing_cf_ips(OUTPUT_CF_FILE)
 
     client = TelegramClient(
         StringSession(TG_SESSION_STR), int(TG_API_ID), TG_API_HASH
     )
 
     all_channels = sorted(list(set(PROXY_CHANNELS + CF_IP_CHANNELS)))
-    proxies_seen = {}
-    cf_ips_seen = {}
+    scraped_proxies = {}
+    scraped_cf_ips = {}
 
     try:
         await client.connect()
@@ -476,25 +537,41 @@ async def run_telethon():
 
                     if is_proxy_target:
                         for url, key in extract_proxies(msg.text):
-                            if key not in proxies_seen:
-                                proxies_seen[key] = url
+                            if key not in scraped_proxies:
+                                scraped_proxies[key] = url
                                 proxy_count += 1
 
                     if is_cf_target:
                         cf_data = parse_cf_ip(msg.text, default_channel=channel_name)
                         if cf_data:
                             cf_key = f"{cf_data['ip']}:{cf_data['port']}"
-                            if cf_key not in cf_ips_seen:
+                            if cf_key not in scraped_cf_ips:
                                 if not cf_data["tested_at"] and msg.date:
                                     cf_data["tested_at"] = msg.date.strftime("%Y-%m-%d %H:%M:%S")
-                                cf_ips_seen[cf_key] = cf_data
+                                scraped_cf_ips[cf_key] = cf_data
                                 cf_count += 1
             except FloodWaitError as e:
                 log.warning("频道 %s 扫描时触发 Telegram 频控限制 (等待 %d 秒): %s", channel_name, e.seconds, e)
 
             log.info("频道 %s 扫描完毕: 消息 %d 条, 新增代理 %d 个, 新增优选IP %d 个", channel_name, msg_count, proxy_count, cf_count)
 
-        save_and_notify(proxies_seen, cf_ips_seen)
+        # 2. 智能增量合并
+        new_proxy_cnt = sum(1 for k in scraped_proxies if k not in existing_proxies)
+        updated_proxy_cnt = sum(1 for k in scraped_proxies if k in existing_proxies)
+        
+        new_cf_cnt = sum(1 for k in scraped_cf_ips if k not in existing_cf_ips)
+        updated_cf_cnt = sum(1 for k in scraped_cf_ips if k in existing_cf_ips)
+
+        final_proxies = {**existing_proxies, **scraped_proxies}
+        final_cf_ips = {**existing_cf_ips, **scraped_cf_ips}
+
+        log.info("=" * 50)
+        log.info("代理节点增量合并: 历史保留 %d 个, 本次新增 %d 个, 本次更新 %d 个 -> 全量总计 %d 个", 
+                 len(existing_proxies) - updated_proxy_cnt, new_proxy_cnt, updated_proxy_cnt, len(final_proxies))
+        log.info("优选 IP 增量合并: 历史保留 %d 条, 本次新增 %d 条, 本次更新 %d 条 -> 全量总计 %d 条", 
+                 len(existing_cf_ips) - updated_cf_cnt, new_cf_cnt, updated_cf_cnt, len(final_cf_ips))
+
+        save_and_notify(final_proxies, final_cf_ips, new_proxies_count=new_proxy_cnt + updated_proxy_cnt, new_cf_count=new_cf_cnt + updated_cf_cnt)
 
     finally:
         await client.disconnect()
