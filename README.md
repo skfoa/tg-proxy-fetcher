@@ -39,6 +39,8 @@ tg_fetch.py ──────────┤                    ├────
 | **`scan_ips.txt`** | 扫描测速总清单（按 ASN 分组） | 所有扫描附件的优选 IP 汇总，带 `# ASxxx` 分组注释 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips.txt` |
 | **`scan_ips/*.txt`** | 独立 ASN 纯文本列表（单文件） | 如 `scan_ips/AS906.txt`，纯净 `IP:端口` 无注释，便于按 ASN 订阅 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips/{ASN}.txt` |
 | **`scan_ips.csv`** | 扫描测速优选 IP（数据表） | 包含机房、ASN、运营商等指标，按 ASN 聚合排序 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips.csv` |
+| **`proxyip.txt`** | 反代 ProxyIP 清单（纯文本） | 每行一个 `IP:端口`，直接供 edgetunnel / Workers 等反代配置 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/proxyip.txt` |
+| **`proxyip.csv`** | 反代 ProxyIP 详细数据表 | 包含地理位置、延迟、数据中心等详细指标 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/proxyip.csv` |
 
 ---
 
@@ -87,11 +89,17 @@ tg_fetch.py ──────────┤                    ├────
   2. **独立 ASN 文本（`scan_ips/ASxxx.txt`）**：在 `scan_ips/` 目录下按 ASN 拆分生成独立文件（如 `scan_ips/AS906.txt`、`scan_ips/AS8167.txt`），内容为 100% 纯净的 `IP:端口`，无任何注释，方便单独导入或远程订阅。
   3. **结构化总表（`scan_ips.csv`）**：按 ASN 字母序聚合排序，方便通过 Excel 集中筛选分析。
 
-### 4. 本地文件批量导入支持（可选）
+### 4. `proxyip.txt` / `proxyip.csv`（反代 ProxyIP 专属池）
+* **独立反代池**：专门收录来自频道发布的反代文件（如 `Global-proxyip-443.csv`、`Global-proxyip-8443.csv` 等）及放置在 `import_proxyip/` 目录中的文件。
+* **纯净即用**：`proxyip.txt` 导出纯净 `IP:端口`，可直接复制或配置于 edgetunnel / Cloudflare Workers 作为反代地址。
+* **结构化数据**：`proxyip.csv` 保留延迟、数据中心与落地位置等关键信息。
+
+### 5. 本地文件批量导入支持（可选）
 * **`import_proxies/` 目录**：将下载的代理 txt 附件（如 `http_proxies.txt`、`turn_proxies.txt`）放置在此目录，运行后自动解析并去重合并入 `socks5.txt`。
 * **`import_ips/` 目录**：将下载的优选扫描附件（支持 OTC 的 `OTC_SCAN_YX_*.txt` 与 DanFeng 的 `AS*.csv` 等）放置在此目录，运行后自动解析并按 ASN 分组生成 `scan_ips.txt` 与 `scan_ips/` 独立文件。
+* **`import_proxyip/` 目录**：将下载的反代附件（如 `Global-proxyip-443.csv`、`Global-proxyip-8443.csv`）放置在此目录，运行后自动解析并去重生成 `proxyip.txt` 与 `proxyip.csv`。
 
-### 5. 数据表通用字段说明
+### 6. 数据表通用字段说明
 * 采用 `UTF-8-SIG` 编码，Windows Excel 直接双击打开不乱码。
 * 包含完整指标，数值字段（`delay_ms`, `speed_kbs`）均为纯数字，并在保存时按 **`tested_at`（测速时间）倒序排序**：
 

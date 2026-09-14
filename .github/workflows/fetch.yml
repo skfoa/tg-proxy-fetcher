@@ -45,7 +45,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ -f socks5.txt ] || [ -f cf_ips.csv ] || [ -f cf_ips.txt ] || [ -f scan_ips.txt ]; then
+          if [ -f socks5.txt ] || [ -f cf_ips.csv ] || [ -f cf_ips.txt ] || [ -f scan_ips.txt ] || [ -f proxyip.txt ]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add socks5.txt cf_ips.csv cf_ips.txt
@@ -54,6 +54,9 @@ jobs:
             fi
             if [ -d scan_ips ]; then
               git add scan_ips/
+            fi
+            if [ -f proxyip.txt ]; then
+              git add proxyip.txt proxyip.csv
             fi
             if git diff --cached --quiet; then
               echo "⏭️ 节点与优选 IP 无新变化，跳过提交"
