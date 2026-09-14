@@ -3,3 +3,7 @@ __pycache__/
 .env
 *.session
 *.session-journal
+
+# 忽略本地放入 import_* 文件夹下的临时导入文件，保留目录占位符 .gitkeep
+import_*/*
+!import_*/**/.gitkeep
