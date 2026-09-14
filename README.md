@@ -80,7 +80,7 @@ tg_fetch.py ──────────┤                    ├────
 * `cf_ips.csv` 为 UTF-8-SIG 结构化表格，可直接用 Excel 查看。
 
 ### 3. 扫描文件优选 IP（按 ASN 智能去重与分组）
-* **与单条日常 IP 物理隔离**：独立收录来自测速扫描附件（如 `OTC_SCAN_YX_*.txt`）以及放置在 `import_ips/` 文件夹中的批量优选 IP。
+* **与单条日常 IP 物理隔离**：独立收录来自测速扫描附件（如 OTC 的 `OTC_SCAN_YX_*.txt`、DanFeng 的 `AS*.csv` 等）以及放置在 `import_ips/` 文件夹中的批量优选文件。
 * **按 ASN 聚合去重**：同一 ASN 下多次抓取到的重复 `IP:端口` 自动去重更新。
 * **双模导出输出**：
   1. **总汇总清单（`scan_ips.txt`）**：将所有 ASN 分组整合在一起，带有清晰的 ASN 标题注释（如 `# AS906 (DMIT Cloud Services) - 15 个`）。
@@ -89,7 +89,7 @@ tg_fetch.py ──────────┤                    ├────
 
 ### 4. 本地文件批量导入支持（可选）
 * **`import_proxies/` 目录**：将下载的代理 txt 附件（如 `http_proxies.txt`、`turn_proxies.txt`）放置在此目录，运行后自动解析并去重合并入 `socks5.txt`。
-* **`import_ips/` 目录**：将下载的优选扫描 txt 附件（如 `OTC_SCAN_YX_*.txt`）放置在此目录，运行后自动解析并按 ASN 分组生成 `scan_ips.txt` 与 `scan_ips/` 独立文件。
+* **`import_ips/` 目录**：将下载的优选扫描附件（支持 OTC 的 `OTC_SCAN_YX_*.txt` 与 DanFeng 的 `AS*.csv` 等）放置在此目录，运行后自动解析并按 ASN 分组生成 `scan_ips.txt` 与 `scan_ips/` 独立文件。
 
 ### 5. 数据表通用字段说明
 * 采用 `UTF-8-SIG` 编码，Windows Excel 直接双击打开不乱码。

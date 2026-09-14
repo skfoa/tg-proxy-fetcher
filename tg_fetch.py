@@ -200,6 +200,140 @@ def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
     }
 
 
+def parse_cf_csv_content(
+    text: str,
+    default_channel: str = "@danfeng2",
+    filename: str = "",
+    dt_str: str = "",
+) -> list[dict]:
+    """解析 Cloudflare 优选测速 CSV 格式内容（支持 DanFeng、CloudflareSpeedTest 及通用格式）"""
+    fn_asn = ""
+    fn_isp = ""
+    fn_time = dt_str
+    if filename:
+        m_fn = re.search(r"(?P<asn>AS\d+)_(?P<isp>[^_]+)(?:_(?P<date>\d{8})_(?P<time>\d{6}))?", filename, re.IGNORECASE)
+        if m_fn:
+            fn_asn = m_fn.group("asn").upper()
+            fn_isp = m_fn.group("isp").replace("-", " ")
+            if m_fn.group("date") and m_fn.group("time") and not fn_time:
+                d = m_fn.group("date")
+                t = m_fn.group("time")
+                fn_time = f"{d[:4]}-{d[4:6]}-{d[6:8]} {t[:2]}:{t[2:4]}:{t[4:6]}"
+
+    results = []
+    # 移除 BOM 并按行解析
+    clean_text = text.lstrip("\ufeff").strip()
+    if not clean_text:
+        return results
+
+    try:
+        reader = csv.DictReader(clean_text.splitlines())
+        if not reader.fieldnames:
+            return results
+
+        # 标准化列名映射
+        field_map = {}
+        for col in reader.fieldnames:
+            if not col:
+                continue
+            c_clean = col.strip().lower().replace(" ", "").replace("_", "")
+            if c_clean in ("ip地址", "ip", "ipaddress"):
+                field_map["ip"] = col
+            elif c_clean in ("端口号", "端口", "port"):
+                field_map["port"] = col
+            elif c_clean in ("tls", "istls"):
+                field_map["tls"] = col
+            elif c_clean in ("网络延迟", "延迟", "平均延迟", "delay", "latency", "delayms"):
+                field_map["delay"] = col
+            elif c_clean in ("下载速度", "速度", "speed", "speedkbs", "下载速度(mb/s)"):
+                field_map["speed"] = col
+            elif c_clean in ("数据中心", "机房", "colo"):
+                field_map["colo"] = col
+            elif c_clean in ("源ip位置", "位置", "location", "cflocation"):
+                field_map["loc"] = col
+            elif c_clean in ("地区", "region"):
+                field_map["region"] = col
+            elif c_clean in ("城市", "city"):
+                field_map["city"] = col
+            elif c_clean in ("asn号码", "asn编号", "asn", "as"):
+                field_map["asn"] = col
+            elif c_clean in ("asn组织", "运营商", "isp", "org", "organization"):
+                field_map["isp"] = col
+            elif c_clean in ("时间", "测速时间", "testedat", "time"):
+                field_map["time"] = col
+
+        for row in reader:
+            raw_ip = row.get(field_map.get("ip", ""), "").strip()
+            raw_port = row.get(field_map.get("port", ""), "").strip()
+            if not raw_ip or not raw_port or not is_valid_host(raw_ip) or not raw_port.isdigit():
+                continue
+            port = int(raw_port)
+            if not (1 <= port <= 65535):
+                continue
+
+            raw_tls = row.get(field_map.get("tls", ""), "").strip().lower()
+            tls = "true" if raw_tls in ("true", "1", "yes") else ("false" if raw_tls in ("false", "0", "no") else "unknown")
+            if tls == "unknown" and port in (443, 8443, 2053, 2083, 2087, 2096):
+                tls = "true"
+
+            raw_delay = row.get(field_map.get("delay", ""), "").strip()
+            delay_ms = ""
+            m_delay = re.search(r"(\d+(?:\.\d+)?)", raw_delay)
+            if m_delay:
+                delay_ms = int(float(m_delay.group(1)))
+
+            raw_speed = row.get(field_map.get("speed", ""), "").strip()
+            speed_kbs = ""
+            m_speed = re.search(r"(\d+(?:\.\d+)?)\s*([kKmMgG]?[bB]/s)?", raw_speed)
+            if m_speed:
+                val = float(m_speed.group(1))
+                unit = (m_speed.group(2) or "kb/s").lower()
+                if "m" in unit:
+                    val *= 1024
+                elif "g" in unit:
+                    val *= 1024 * 1024
+                speed_kbs = int(val)
+
+            colo = row.get(field_map.get("colo", ""), "").strip()
+
+            loc_parts = []
+            for key in ("region", "city", "loc"):
+                val = row.get(field_map.get(key, ""), "").strip()
+                if val and val != "-" and val not in loc_parts:
+                    loc_parts.append(val)
+            cf_location = " · ".join(loc_parts)
+
+            raw_asn = row.get(field_map.get("asn", ""), "").strip()
+            if not raw_asn or raw_asn == "-":
+                raw_asn = fn_asn
+            m_asn = re.search(r"(AS\d+)", raw_asn, re.IGNORECASE)
+            asn_clean = m_asn.group(1).upper() if m_asn else raw_asn
+
+            raw_isp = row.get(field_map.get("isp", ""), "").strip()
+            if not raw_isp or raw_isp == "-":
+                raw_isp = fn_isp
+
+            tested_at = row.get(field_map.get("time", ""), "").strip() or fn_time
+
+            results.append({
+                "ip": raw_ip,
+                "port": str(port),
+                "tls": tls,
+                "delay_ms": delay_ms,
+                "speed_kbs": speed_kbs,
+                "colo": colo,
+                "cf_location": cf_location,
+                "isp": raw_isp,
+                "asn": asn_clean,
+                "tested_at": tested_at,
+                "channel": default_channel,
+            })
+    except Exception as e:
+        log.warning("解析 CSV 优选数据异常: %s", e)
+
+    return results
+
+
 def parse_otc_scan_content(text: str, default_channel: str = "@otcfxq", dt_str: str = "") -> list[dict]:
     """解析 OTC 优选扫描导出的 CSV 格式文件内容 (OTC_SCAN_YX_*.txt)"""
     results = []
@@ -323,19 +457,22 @@ def load_local_import_proxies(import_dir: str = "import_proxies") -> dict:
 
 
 def load_local_import_ips(import_dir: str = "import_ips") -> dict:
-    """扫描本地 import_ips 目录或项目根目录下的 OTC_SCAN_*.txt 文件并自动解析导入"""
+    """扫描本地 import_ips 目录或项目根目录下的优选测速文件（支持 .txt 与 .csv）并自动解析导入"""
     imported = {}
     files_to_check = set()
 
-    # 1. 检查 import_ips 文件夹
+    # 1. 检查 import_ips 文件夹（支持 .txt 与 .csv）
     if os.path.isdir(import_dir):
         for fname in os.listdir(import_dir):
-            if fname.lower().endswith(".txt"):
+            fname_lower = fname.lower()
+            if fname_lower.endswith(".txt") or fname_lower.endswith(".csv"):
                 files_to_check.add(os.path.join(import_dir, fname))
 
-    # 2. 检查根目录下匹配 OTC_SCAN*.txt 的文件
+    # 2. 检查根目录下匹配 OTC_SCAN*.txt 或 AS*.csv 的文件
     for fname in os.listdir("."):
-        if fname.startswith("OTC_SCAN") and fname.lower().endswith(".txt"):
+        fname_lower = fname.lower()
+        if (fname.startswith("OTC_SCAN") and fname_lower.endswith(".txt")) or \
+           (fname.startswith("AS") and fname_lower.endswith(".csv")):
             files_to_check.add(fname)
 
     for fpath in files_to_check:
@@ -344,14 +481,18 @@ def load_local_import_ips(import_dir: str = "import_ips") -> dict:
                 content = f.read()
             mtime = datetime.fromtimestamp(os.path.getmtime(fpath), timezone.utc)
             mtime_bjt = mtime.astimezone(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
-            items = parse_otc_scan_content(content, default_channel="@otcfxq", dt_str=mtime_bjt)
+            base_fname = os.path.basename(fpath)
+            if base_fname.lower().endswith(".csv"):
+                items = parse_cf_csv_content(content, default_channel="@danfeng2", filename=base_fname, dt_str=mtime_bjt)
+            else:
+                items = parse_otc_scan_content(content, default_channel="@otcfxq", dt_str=mtime_bjt)
             for item in items:
                 key = f"{item['ip']}:{item['port']}"
                 imported[key] = item
             if items:
-                log.info("从本地文件 %s 中导入 %d 条优选 IP 记录", fpath, len(items))
+                log.info("从本地优选文件 %s 中导入 %d 条优选 IP 记录", fpath, len(items))
         except Exception as e:
-            log.warning("读取本地文件 %s 失败: %s", fpath, e)
+            log.warning("读取本地优选文件 %s 失败: %s", fpath, e)
 
     return imported
 
@@ -860,24 +1001,43 @@ async def run_telethon():
                                     scraped_cf_ips[cf_key] = cf_data
                                     cf_count += 1
 
-                        # 支持自动下载并解析 .txt 附件 (如 OTC_SCAN_YX_*.txt，独立归入扫描 IP 集合)
-                        if msg.file and msg.file.name and msg.file.name.lower().endswith(".txt"):
-                            try:
-                                doc_bytes = await client.download_media(msg, file=bytes)
-                                if doc_bytes:
-                                    doc_text = doc_bytes.decode("utf-8", errors="ignore")
-                                    doc_date_str = msg.date.strftime("%Y-%m-%d %H:%M:%S") if msg.date else ""
-                                    doc_items = parse_otc_scan_content(doc_text, default_channel=channel_name, dt_str=doc_date_str)
-                                    doc_added = 0
-                                    for cf_item in doc_items:
-                                        cf_key = f"{cf_item['ip']}:{cf_item['port']}"
-                                        if cf_key not in scraped_scan_ips:
-                                            scraped_scan_ips[cf_key] = cf_item
-                                            scan_count += 1
-                                            doc_added += 1
-                                    log.info("从频道 %s 附件 %s 中提取 %d 条扫描优选 IP", channel_name, msg.file.name, doc_added)
-                            except Exception as e:
-                                log.warning("下载/解析频道 %s 附件 %s 失败: %s", channel_name, msg.file.name, e)
+                        # 支持自动下载并解析优选扫描附件 (如 OTC_SCAN_YX_*.txt 与 DanFeng AS*.csv，独立归入扫描 IP 集合)
+                        if msg.file and msg.file.name:
+                            fname_lower = msg.file.name.lower()
+                            if fname_lower.endswith(".csv"):
+                                try:
+                                    doc_bytes = await client.download_media(msg, file=bytes)
+                                    if doc_bytes:
+                                        doc_text = doc_bytes.decode("utf-8", errors="ignore")
+                                        doc_date_str = msg.date.strftime("%Y-%m-%d %H:%M:%S") if msg.date else ""
+                                        doc_items = parse_cf_csv_content(doc_text, default_channel=channel_name, filename=msg.file.name, dt_str=doc_date_str)
+                                        doc_added = 0
+                                        for cf_item in doc_items:
+                                            cf_key = f"{cf_item['ip']}:{cf_item['port']}"
+                                            if cf_key not in scraped_scan_ips:
+                                                scraped_scan_ips[cf_key] = cf_item
+                                                scan_count += 1
+                                                doc_added += 1
+                                        log.info("从频道 %s CSV 附件 %s 中提取 %d 条扫描优选 IP", channel_name, msg.file.name, doc_added)
+                                except Exception as e:
+                                    log.warning("下载/解析频道 %s CSV 附件 %s 失败: %s", channel_name, msg.file.name, e)
+                            elif fname_lower.endswith(".txt") and "otc_scan" in fname_lower:
+                                try:
+                                    doc_bytes = await client.download_media(msg, file=bytes)
+                                    if doc_bytes:
+                                        doc_text = doc_bytes.decode("utf-8", errors="ignore")
+                                        doc_date_str = msg.date.strftime("%Y-%m-%d %H:%M:%S") if msg.date else ""
+                                        doc_items = parse_otc_scan_content(doc_text, default_channel=channel_name, dt_str=doc_date_str)
+                                        doc_added = 0
+                                        for cf_item in doc_items:
+                                            cf_key = f"{cf_item['ip']}:{cf_item['port']}"
+                                            if cf_key not in scraped_scan_ips:
+                                                scraped_scan_ips[cf_key] = cf_item
+                                                scan_count += 1
+                                                doc_added += 1
+                                        log.info("从频道 %s TXT 附件 %s 中提取 %d 条扫描优选 IP", channel_name, msg.file.name, doc_added)
+                                except Exception as e:
+                                    log.warning("下载/解析频道 %s TXT 附件 %s 失败: %s", channel_name, msg.file.name, e)
             except FloodWaitError as e:
                 log.warning("频道 %s 扫描时触发 Telegram 频控限制 (等待 %d 秒): %s", channel_name, e.seconds, e)
 
