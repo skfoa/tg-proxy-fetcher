@@ -45,17 +45,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ -f socks5.txt ] || [ -f cf_ips.csv ] || [ -f cf_ips.txt ]; then
+          if [ -f socks5.txt ] || [ -f cf_ips.csv ] || [ -f cf_ips.txt ] || [ -f scan_ips.txt ]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add socks5.txt cf_ips.csv cf_ips.txt
+            if [ -f scan_ips.txt ]; then
+              git add scan_ips.txt scan_ips.csv
+            fi
             if git diff --cached --quiet; then
               echo "⏭️ 节点与优选 IP 无新变化，跳过提交"
             else
               git commit -m "🔄 chore(update): refresh socks5 proxies and cf_ips [skip ci]"
               git pull --rebase origin main || true
               git push
-              echo "✅ 已成功提交并推送 socks5.txt、cf_ips.csv 与 cf_ips.txt"
+              echo "✅ 已成功提交并推送节点与优选 IP 数据"
             fi
           else
             echo "⚠️ 目标文件未生成，请检查上一步运行日志"

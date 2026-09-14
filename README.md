@@ -34,8 +34,10 @@ tg_fetch.py ──────────┤                    ├────
 | 文件名 | 内容说明 | 适用场景 / 客户端 | GitHub Raw 永久直链（点击即可导入） |
 | :--- | :--- | :--- | :--- |
 | **`socks5.txt`** | 纯净多协议代理清单 | Clash、v2rayN、Sing-box、Shadowrocket 等 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/socks5.txt` |
-| **`cf_ips.txt`** | 优选 IP 纯文本列表 | 每行一个 `IP:端口`，便于直接复制或作为远程 IP 列表导入 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/cf_ips.txt` |
-| **`cf_ips.csv`** | 结构化优选 IP 数据表 | Excel 排序筛选、二次数据分析 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/cf_ips.csv` |
+| **`cf_ips.txt`** | 频道日常单条优选 IP（纯文本） | 每行一个 `IP:端口`，来自频道每日单条通报消息 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/cf_ips.txt` |
+| **`cf_ips.csv`** | 频道日常单条优选 IP（数据表） | Excel 排序筛选、结构化详细数据 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/cf_ips.csv` |
+| **`scan_ips.txt`** | 扫描测速文件优选 IP（纯文本） | 每行一个 `IP:端口`，来自测速附件/本地导入文件 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips.txt` |
+| **`scan_ips.csv`** | 扫描测速文件优选 IP（数据表） | 包含机房、ASN、运营商等指标，与单条隔离存放 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips.csv` |
 
 ---
 
@@ -68,13 +70,17 @@ tg_fetch.py ──────────┤                    ├────
 * **纯净即用**：纯文本每行一个有效 URL，可直接导入各大代理客户端。
 * **合规校验机制**：自动校验端口范围（1~65535）与 IP/域名有效性，彻底杜绝畸变脏数据。
 
-### 2. `cf_ips.txt`（优选 IP 纯文本列表）
-* 纯文本格式，每行一个 `IP:端口`（如 `23.249.18.144:8581`）。
-* 使用方式：
-  1. **复制使用**：打开该文件直接复制文本内容，粘贴到所需的测速工具或面板中使用。
-  2. **远程订阅**：直接使用 GitHub Raw 直链作为远程 IP 列表导入。
+### 2. `cf_ips.txt` / `cf_ips.csv`（频道日常单条优选 IP）
+* 仅收录频道日常消息正文中发布的单条优选 IP（如 `@danfeng2`、`@otcfxq` 的实时测速通报）。
+* `cf_ips.txt` 为纯文本格式，每行一个 `IP:端口`。
+* `cf_ips.csv` 为 UTF-8-SIG 结构化表格，可直接用 Excel 查看。
 
-### 3. `cf_ips.csv`（Cloudflare 优选 IP 结构化表格）
+### 3. `scan_ips.txt` / `scan_ips.csv`（扫描文件批量优选 IP，独立隔离）
+* 独立收录来自测速扫描附件（如 `OTC_SCAN_YX_*.txt`）以及放置在 `import_ips/` 文件夹中的批量优选 IP。
+* 与单条日常优选 IP 彻底物理隔离，互不干扰、各自独立增量持久化。
+* `scan_ips.txt` 为纯文本 `IP:端口`，`scan_ips.csv` 包含机房、ASN、运营商、地理位置等字段。
+
+### 4. 数据表通用字段说明
 * 采用 `UTF-8-SIG` 编码，Windows Excel 直接双击打开不乱码。
 * 包含完整指标，数值字段（`delay_ms`, `speed_kbs`）均为纯数字，并在保存时按 **`tested_at`（测速时间）倒序排序**：
 
