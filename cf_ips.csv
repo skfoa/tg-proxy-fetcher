@@ -1,4 +1,5 @@
 ﻿ip,port,tls,delay_ms,speed_kbs,colo,cf_location,isp,asn,tested_at,channel
+191.40.11.102,1891,true,183,26614,FRA,欧洲 · 德国法兰克福,Eons Data Communications Limited,AS138997 Eons Data Communications Limited,2026-09-15 00:00:32,@danfeng_chat
 103.47.186.47,52492,true,46,14405,NRT,亚太 · 日本东京,xTom Japan Corporation,AS3258 xTom Japan Corporation,2026-09-14 18:00:32,@danfeng_chat
 147.78.246.169,22658,true,46,54600,NRT,亚太 · 日本东京,VIRMACH,AS3258 xTom Japan Corporation,2026-09-14 12:00:33,@danfeng_chat
 98.85.241.163,443,true,187,12129,IAD,北美洲 · 美国阿什伯恩,"Amazon.com, Inc.","AS14618 Amazon.com, Inc.",2026-09-14 06:00:33,@danfeng_chat
