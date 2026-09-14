@@ -205,25 +205,96 @@ def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
 
 
 KNOWN_CLOUD_PROVIDERS = {
+    # 头部公有云与 CDN 服务
+    "cloudflare": ("AS13335", "Cloudflare"),
+    "cf": ("AS13335", "Cloudflare"),
+    "fastly": ("AS54113", "Fastly"),
     "aliyun": ("AS45102", "Alibaba Cloud"),
     "alibaba": ("AS45102", "Alibaba Cloud"),
+    "alicloud": ("AS45102", "Alibaba Cloud"),
     "tencent": ("AS132203", "Tencent Cloud"),
+    "qcloud": ("AS132203", "Tencent Cloud"),
     "hwcloud": ("AS136907", "Huawei Cloud"),
     "huawei": ("AS136907", "Huawei Cloud"),
+    "huaweicloud": ("AS136907", "Huawei Cloud"),
     "ucloud": ("AS138915", "UCloud"),
+    "baidu": ("AS38365", "Baidu Cloud"),
+    "bce": ("AS38365", "Baidu Cloud"),
+    "volcengine": ("AS138699", "ByteDance Volcengine"),
+    "bytedance": ("AS138699", "ByteDance Volcengine"),
+    "jdcloud": ("AS44907", "JD Cloud"),
+    "jcloud": ("AS44907", "JD Cloud"),
+    "ksyun": ("AS45062", "Kingsoft Cloud"),
+    "kingsoft": ("AS45062", "Kingsoft Cloud"),
+    "qiniu": ("AS136907", "Qiniu Cloud"),
+
+    # 国际主流公有云
+    "aws": ("AS16509", "Amazon AWS"),
+    "amazon": ("AS16509", "Amazon AWS"),
+    "lightsail": ("AS16509", "Amazon Lightsail"),
+    "azure": ("AS8075", "Microsoft Azure"),
+    "microsoft": ("AS8075", "Microsoft Azure"),
+    "gcp": ("AS15169", "Google Cloud"),
+    "google": ("AS15169", "Google Cloud"),
     "oracle": ("AS31898", "Oracle Cloud"),
     "oci": ("AS31898", "Oracle Cloud"),
     "digitalocean": ("AS14061", "DigitalOcean"),
-    "aws": ("AS16509", "Amazon AWS"),
-    "amazon": ("AS16509", "Amazon AWS"),
-    "azure": ("AS8075", "Microsoft Azure"),
-    "gcp": ("AS15169", "Google Cloud"),
-    "google": ("AS15169", "Google Cloud"),
     "vultr": ("AS20473", "Vultr"),
-    "linode": ("AS63949", "Linode"),
+    "choopa": ("AS20473", "Vultr"),
+    "linode": ("AS63949", "Linode Akamai"),
+    "akamai": ("AS63949", "Linode Akamai"),
     "hetzner": ("AS24940", "Hetzner"),
     "ovh": ("AS16276", "OVH"),
+    "scaleway": ("AS12876", "Scaleway"),
+    "leaseweb": ("AS60781", "Leaseweb"),
+    "kamatera": ("AS35838", "Kamatera"),
+
+    # 热门 VPS / 优选反代服务商 (圈内高频出现)
+    "akile": ("AS61112", "AkileCloud"),
+    "akilecloud": ("AS61112", "AkileCloud"),
+    "dmit": ("AS906", "DMIT"),
+    "bandwagon": ("AS25820", "BandwagonHost"),
+    "bwg": ("AS25820", "BandwagonHost"),
+    "it7": ("AS25820", "BandwagonHost"),
+    "claw": ("AS45102", "Claw Cloud"),
+    "clawcloud": ("AS45102", "Claw Cloud"),
+    "vmiss": ("AS147049", "VMISS"),
+    "contabo": ("AS51167", "Contabo"),
+    "netcup": ("AS197540", "Netcup"),
+    "racknerd": ("AS36352", "RackNerd"),
+    "buyvm": ("AS53667", "BuyVM FranTech"),
+    "frantech": ("AS53667", "BuyVM FranTech"),
+    "hostdare": ("AS397373", "HostDare"),
+    "misaka": ("AS54600", "Misaka"),
+    "kurun": ("AS13768", "Kurun Cloud"),
+    "spartan": ("AS201106", "SpartanHost"),
+    "spartanhost": ("AS201106", "SpartanHost"),
+    "wap": ("AS149798", "WAP.ac"),
+    "bagevm": ("AS14061", "BageVM"),
+    "netlab": ("AS979", "NetLab"),
+    "zenlayer": ("AS21859", "Zenlayer"),
+    "hostinger": ("AS47583", "Hostinger"),
+    "m247": ("AS9009", "M247"),
+    "datacamp": ("AS60068", "Datacamp Limited"),
+
+    # 运营商骨干与出海线路
+    "hinet": ("AS3462", "Chunghwa Telecom HiNet"),
+    "cmi": ("AS58453", "China Mobile CMI"),
+    "chinamobile": ("AS58453", "China Mobile CMI"),
+    "cug": ("AS10099", "China Unicom CUG"),
+    "chinaunicom": ("AS10099", "China Unicom CUG"),
+    "ctg": ("AS4134", "China Telecom CTG"),
+    "chinatelecom": ("AS4134", "China Telecom 163"),
+    "cn2": ("AS4809", "China Telecom CN2"),
+    "9929": ("AS9929", "China Unicom 9929"),
+    "cmin2": ("AS58807", "China Mobile CMIN2"),
 }
+
+# ASN 到标准服务商名称反查表
+ASN_TO_PROVIDER = {}
+for _k, (_asn, _isp) in KNOWN_CLOUD_PROVIDERS.items():
+    if _asn not in ASN_TO_PROVIDER:
+        ASN_TO_PROVIDER[_asn] = _isp
 
 
 def parse_cf_csv_content(
@@ -244,17 +315,18 @@ def parse_cf_csv_content(
         m_fn = re.search(r"(?P<asn>AS\d+)_(?P<isp>[^_]+)(?:_(?P<date>\d{8})_(?P<time>\d{6}))?", filename, re.IGNORECASE)
         if m_fn:
             fn_asn = m_fn.group("asn").upper()
-            fn_isp = m_fn.group("isp").replace("-", " ")
+            raw_captured_isp = m_fn.group("isp").replace("-", " ")
+            fn_isp = re.sub(r"\.(?:csv|txt)$", "", raw_captured_isp, flags=re.IGNORECASE).strip()
             if m_fn.group("date") and m_fn.group("time") and not fn_time:
                 d = m_fn.group("date")
                 t = m_fn.group("time")
                 fn_time = f"{d[:4]}-{d[4:6]}-{d[6:8]} {t[:2]}:{t[2:4]}:{t[4:6]}"
         else:
-            # 2. 从老版云服务器文件名推断 ASN 与 ISP (如 Aliyun.csv, Tencent.csv, HWCloud.csv, Ucloud.csv)
-            for key, (k_asn, k_isp) in KNOWN_CLOUD_PROVIDERS.items():
-                if key in fn_lower:
-                    fn_asn = k_asn
-                    fn_isp = k_isp
+            # 2. 从常见云服务器/VPS文件名推断 ASN 与 ISP (如 Aliyun.csv, Tencent.csv, DMIT.csv, Akile.csv 等)
+            for key in sorted(KNOWN_CLOUD_PROVIDERS.keys(), key=len, reverse=True):
+                pattern = rf"(?i)(?:^|[^a-z0-9]){re.escape(key)}(?:[^a-z0-9]|$)"
+                if re.search(pattern, fn_lower) or (len(key) >= 4 and key in fn_lower):
+                    fn_asn, fn_isp = KNOWN_CLOUD_PROVIDERS[key]
                     break
 
         m_port = re.search(r"proxyip[-_](\d{2,5})", filename, re.IGNORECASE)
@@ -407,11 +479,26 @@ def parse_cf_csv_content(
             if not raw_asn or raw_asn == "-":
                 raw_asn = fn_asn
             m_asn = re.search(r"(AS\d+)", raw_asn, re.IGNORECASE)
-            asn_clean = m_asn.group(1).upper() if m_asn else raw_asn
+            asn_clean = m_asn.group(1).upper() if m_asn else (raw_asn if raw_asn and raw_asn != "-" else "")
 
             raw_isp = row.get(field_map.get("isp", ""), "").strip()
             if not raw_isp or raw_isp == "-":
                 raw_isp = fn_isp
+
+            # 智能补全：若数据行缺少 ASN，但 ISP 匹配已知服务商，自动推断补全 ASN
+            if (not asn_clean or asn_clean == "AS_UNKNOWN") and raw_isp:
+                isp_lower = raw_isp.lower()
+                for key in sorted(KNOWN_CLOUD_PROVIDERS.keys(), key=len, reverse=True):
+                    if key in isp_lower:
+                        asn_clean, default_isp = KNOWN_CLOUD_PROVIDERS[key]
+                        if not raw_isp:
+                            raw_isp = default_isp
+                        break
+
+            # 智能补全：若已有 ASN 但缺少 ISP，从 ASN 反查知名服务商名称
+            if asn_clean and asn_clean != "AS_UNKNOWN" and not raw_isp:
+                if asn_clean in ASN_TO_PROVIDER:
+                    raw_isp = ASN_TO_PROVIDER[asn_clean]
 
             tested_at = row.get(field_map.get("time", ""), "").strip() or fn_time
 
@@ -942,6 +1029,8 @@ def save_and_notify(
             for asn_name in sorted(asn_groups.keys()):
                 group = asn_groups[asn_name]
                 isp_name = next((r.get("isp") for r in group if r.get("isp")), "")
+                if not isp_name and asn_name in ASN_TO_PROVIDER:
+                    isp_name = ASN_TO_PROVIDER[asn_name]
                 header = f"# {asn_name}" + (f" ({isp_name})" if isp_name else "") + f" - {len(group)} 个"
                 f.write(f"{header}\n")
                 for r in sorted(group, key=lambda x: (x.get("ip", ""), int(x.get("port", 0)))):

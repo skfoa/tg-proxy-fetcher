@@ -82,7 +82,7 @@ tg_fetch.py ──────────┤                    ├────
 * `cf_ips.csv` 为 UTF-8-SIG 结构化表格，可直接用 Excel 查看。
 
 ### 3. 扫描文件优选 IP（按 ASN 智能去重与分组）
-* **与单条日常 IP 物理隔离**：独立收录来自测速扫描附件（如 OTC 的 `OTC_SCAN_YX_*.txt`、DanFeng 的 `AS*.csv` 与云厂商测速 `Aliyun.csv`/`Tencent.csv` 等）以及放置在 `import_ips/` 文件夹中的批量优选文件。
+* **与单条日常 IP 物理隔离**：独立收录来自测速扫描附件（如 OTC 的 `OTC_SCAN_YX_*.txt`、DanFeng 的 `AS*.csv` 与云厂商测速 `Aliyun.csv`/`Tencent.csv`/`DMIT.csv`/`Akile.csv` 等常见云厂商及 VPS）以及放置在 `import_ips/` 文件夹中的批量优选文件。
 * **按 ASN 聚合去重**：同一 ASN 下多次抓取到的重复 `IP:端口` 自动去重更新。
 * **双模导出输出**：
   1. **总汇总清单（`scan_ips.txt`）**：将所有 ASN 分组整合在一起，带有清晰的 ASN 标题注释（如 `# AS906 (DMIT Cloud Services) - 15 个`）。
@@ -96,7 +96,7 @@ tg_fetch.py ──────────┤                    ├────
 
 ### 5. 本地文件批量导入支持（可选）
 * **`import_proxies/` 目录**：将下载的代理 txt 附件（如 `http_proxies.txt`、`turn_proxies.txt`）放置在此目录，运行后自动解析并去重合并入 `socks5.txt`。
-* **`import_ips/` 目录**：将下载的优选扫描附件（支持 OTC 的 `OTC_SCAN_YX_*.txt`、DanFeng 的 `AS*.csv` 及云厂商测速 `Aliyun.csv`/`Tencent.csv`/`HWCloud.csv`/`Ucloud.csv` 等）放置在此目录，运行后自动解析并按 ASN 分组生成 `scan_ips.txt` 与 `scan_ips/` 独立文件。
+* **`import_ips/` 目录**：将下载的优选扫描附件（支持 OTC 的 `OTC_SCAN_YX_*.txt`、DanFeng 的 `AS*.csv` 及云厂商测速 `Aliyun.csv`/`Tencent.csv`/`HWCloud.csv`/`Ucloud.csv`/`DMIT.csv`/`Akile.csv`/`RackNerd.csv` 等常见云厂商及 VPS）放置在此目录，运行后自动解析并按 ASN 分组生成 `scan_ips.txt` 与 `scan_ips/` 独立文件。
 * **`import_proxyip/` 目录**：将下载的反代附件（如 `Global-proxyip-443.csv`、`Global-proxyip-8443.csv`）放置在此目录，运行后自动解析并去重生成 `proxyip.txt` 与 `proxyip.csv`。
 
 ### 6. 数据表通用字段说明
