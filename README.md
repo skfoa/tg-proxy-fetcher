@@ -31,13 +31,14 @@ tg_fetch.py ──────────┤                    ├────
 
 ## 产物清单与订阅直链
 
-| 文件名 | 内容说明 | 适用场景 / 客户端 | GitHub Raw 永久直链（点击即可导入） |
+| 文件名 | 内容说明 | 适用场景 / 说明 | GitHub Raw 永久直链（点击即可导入） |
 | :--- | :--- | :--- | :--- |
 | **`socks5.txt`** | 纯净多协议代理清单 | Clash、v2rayN、Sing-box、Shadowrocket 等 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/socks5.txt` |
 | **`cf_ips.txt`** | 频道日常单条优选 IP（纯文本） | 每行一个 `IP:端口`，来自频道每日单条通报消息 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/cf_ips.txt` |
 | **`cf_ips.csv`** | 频道日常单条优选 IP（数据表） | Excel 排序筛选、结构化详细数据 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/cf_ips.csv` |
-| **`scan_ips.txt`** | 扫描测速文件优选 IP（纯文本） | 每行一个 `IP:端口`，来自测速附件/本地导入文件 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips.txt` |
-| **`scan_ips.csv`** | 扫描测速文件优选 IP（数据表） | 包含机房、ASN、运营商等指标，与单条隔离存放 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips.csv` |
+| **`scan_ips.txt`** | 扫描测速总清单（按 ASN 分组） | 所有扫描附件的优选 IP 汇总，带 `# ASxxx` 分组注释 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips.txt` |
+| **`scan_ips/*.txt`** | 独立 ASN 纯文本列表（单文件） | 如 `scan_ips/AS906.txt`，纯净 `IP:端口` 无注释，便于按 ASN 订阅 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips/{ASN}.txt` |
+| **`scan_ips.csv`** | 扫描测速优选 IP（数据表） | 包含机房、ASN、运营商等指标，按 ASN 聚合排序 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips.csv` |
 
 ---
 
@@ -75,10 +76,13 @@ tg_fetch.py ──────────┤                    ├────
 * `cf_ips.txt` 为纯文本格式，每行一个 `IP:端口`。
 * `cf_ips.csv` 为 UTF-8-SIG 结构化表格，可直接用 Excel 查看。
 
-### 3. `scan_ips.txt` / `scan_ips.csv`（扫描文件批量优选 IP，独立隔离）
-* 独立收录来自测速扫描附件（如 `OTC_SCAN_YX_*.txt`）以及放置在 `import_ips/` 文件夹中的批量优选 IP。
-* 与单条日常优选 IP 彻底物理隔离，互不干扰、各自独立增量持久化。
-* `scan_ips.txt` 为纯文本 `IP:端口`，`scan_ips.csv` 包含机房、ASN、运营商、地理位置等字段。
+### 3. 扫描文件优选 IP（按 ASN 智能去重与分组）
+* **与单条日常 IP 物理隔离**：独立收录来自测速扫描附件（如 `OTC_SCAN_YX_*.txt`）以及放置在 `import_ips/` 文件夹中的批量优选 IP。
+* **按 ASN 聚合去重**：同一 ASN 下多次抓取到的重复 `IP:端口` 自动去重更新。
+* **双模导出输出**：
+  1. **总汇总清单（`scan_ips.txt`）**：将所有 ASN 分组整合在一起，带有清晰的 ASN 标题注释（如 `# AS906 (DMIT Cloud Services) - 15 个`）。
+  2. **独立 ASN 文本（`scan_ips/ASxxx.txt`）**：在 `scan_ips/` 目录下按 ASN 拆分生成独立文件（如 `scan_ips/AS906.txt`、`scan_ips/AS8167.txt`），内容为 100% 纯净的 `IP:端口`，无任何注释，方便单独导入或远程订阅。
+  3. **结构化总表（`scan_ips.csv`）**：按 ASN 字母序聚合排序，方便通过 Excel 集中筛选分析。
 
 ### 4. 数据表通用字段说明
 * 采用 `UTF-8-SIG` 编码，Windows Excel 直接双击打开不乱码。

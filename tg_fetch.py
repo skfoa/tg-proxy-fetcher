@@ -20,6 +20,7 @@ import logging
 import asyncio
 import subprocess
 import urllib.request
+from collections import defaultdict
 from urllib.parse import parse_qs
 from datetime import datetime, timedelta, timezone
 
@@ -49,9 +50,10 @@ OUTPUT_PROXY_FILE = "socks5.txt"
 OUTPUT_CF_FILE = "cf_ips.csv"
 OUTPUT_CF_TXT = "cf_ips.txt"
 
-# 扫描文件/附件提取的批量优选 IP 独立保存文件（与单条 IP 隔离）
+# 扫描文件/附件提取的批量优选 IP 独立保存文件（与单条 IP 隔离，按 ASN 分组）
 OUTPUT_SCAN_FILE = "scan_ips.csv"
 OUTPUT_SCAN_TXT = "scan_ips.txt"
+OUTPUT_SCAN_DIR = "scan_ips"
 # ============================================
 
 ANNOUNCE_PROXY_RE = re.compile(
@@ -321,6 +323,7 @@ def send_tg_notification(
     proxies_count: int,
     cf_ips_count: int,
     scan_ips_count: int = 0,
+    asn_count: int = 0,
     new_proxies: int = 0,
     updated_proxies: int = 0,
     new_cf: int = 0,
@@ -339,7 +342,8 @@ def send_tg_notification(
 
     scan_line = ""
     if scan_ips_count > 0:
-        scan_line = f"📁 <b>扫描优选 IP</b>：总计 <code>{scan_ips_count}</code> 条 (新增: {new_scan}, 刷新: {updated_scan})\n"
+        asn_desc = f", 分 {asn_count} 个 ASN 组" if asn_count > 0 else ""
+        scan_line = f"📁 <b>扫描优选 IP</b>：总计 <code>{scan_ips_count}</code> 条 (新增: {new_scan}, 刷新: {updated_scan}{asn_desc})\n"
 
     message = (
         f"🚀 <b>节点与优选 IP 增量同步完成</b>\n"
@@ -519,31 +523,63 @@ def save_and_notify(
             f.write(f"{row['ip']}:{row['port']}\n")
     log.info("已保存单条优选IP纯文本: %s (%d 行 IP:Port)", OUTPUT_CF_TXT, len(sorted_cf_ips))
 
-    # 3. 保存文件/扫描优选 IP（独立保存，不与单条混杂）
+    # 3. 保存文件/扫描优选 IP（按 ASN 智能去重、分组归类与独立拆分）
     scan_ips_total = 0
+    asn_groups_total = 0
     if final_scan_ips:
-        sorted_scan_ips = sorted(
-            final_scan_ips.values(),
-            key=lambda item: item.get("tested_at", ""),
-            reverse=True,
-        )
+        os.makedirs(OUTPUT_SCAN_DIR, exist_ok=True)
+
+        # 按 ASN 进行聚合分组与单 IP 去重
+        asn_groups = defaultdict(list)
+        for row in final_scan_ips.values():
+            raw_asn = (row.get("asn") or "").strip()
+            m = re.search(r"(AS\d+)", raw_asn, re.IGNORECASE)
+            asn_clean = m.group(1).upper() if m else (raw_asn if raw_asn else "AS_UNKNOWN")
+            asn_groups[asn_clean].append(row)
+
+        asn_groups_total = len(asn_groups)
+
+        # 3.1 写入 scan_ips.csv（按 ASN 字母序及时间倒序排序）
+        all_sorted_scan_rows = []
+        for asn_name in sorted(asn_groups.keys()):
+            group_rows = sorted(asn_groups[asn_name], key=lambda x: x.get("tested_at", ""), reverse=True)
+            all_sorted_scan_rows.extend(group_rows)
+
         with open(OUTPUT_SCAN_FILE, "w", encoding="utf-8-sig", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=CF_CSV_FIELDS)
             writer.writeheader()
-            for row in sorted_scan_ips:
+            for row in all_sorted_scan_rows:
                 writer.writerow(row)
-        log.info("已保存扫描优选IP文件: %s (%d 条全量累积记录)", OUTPUT_SCAN_FILE, len(sorted_scan_ips))
+        log.info("已保存扫描优选IP表格: %s (%d 条全量累积记录)", OUTPUT_SCAN_FILE, len(all_sorted_scan_rows))
 
+        # 3.2 写入汇总纯文本 scan_ips.txt（按 ASN 分组排列展示）
         with open(OUTPUT_SCAN_TXT, "w", encoding="utf-8") as f:
-            for row in sorted_scan_ips:
-                f.write(f"{row['ip']}:{row['port']}\n")
-        log.info("已保存扫描优选IP纯文本: %s (%d 行 IP:Port)", OUTPUT_SCAN_TXT, len(sorted_scan_ips))
-        scan_ips_total = len(sorted_scan_ips)
+            for asn_name in sorted(asn_groups.keys()):
+                group = asn_groups[asn_name]
+                isp_name = next((r.get("isp") for r in group if r.get("isp")), "")
+                header = f"# {asn_name}" + (f" ({isp_name})" if isp_name else "") + f" - {len(group)} 个"
+                f.write(f"{header}\n")
+                # 组内按 IP 及端口排序
+                for r in sorted(group, key=lambda x: (x.get("ip", ""), int(x.get("port", 0)))):
+                    f.write(f"{r['ip']}:{r['port']}\n")
+                f.write("\n")
+        log.info("已保存扫描优选IP汇总文本: %s (共 %d 个 ASN 分组，%d 行 IP:Port)", OUTPUT_SCAN_TXT, asn_groups_total, len(all_sorted_scan_rows))
+
+        # 3.3 写入各个独立的 ASN 纯文本文件（如 scan_ips/AS906.txt，纯净 IP:Port 无注释）
+        for asn_name, group in asn_groups.items():
+            asn_file = os.path.join(OUTPUT_SCAN_DIR, f"{asn_name}.txt")
+            with open(asn_file, "w", encoding="utf-8") as f:
+                for r in sorted(group, key=lambda x: (x.get("ip", ""), int(x.get("port", 0)))):
+                    f.write(f"{r['ip']}:{r['port']}\n")
+        log.info("已在 %s/ 目录下生成 %d 个独立 ASN 纯文本列表", OUTPUT_SCAN_DIR, asn_groups_total)
+
+        scan_ips_total = len(all_sorted_scan_rows)
 
     send_tg_notification(
         len(final_proxies),
         len(sorted_cf_ips),
         scan_ips_count=scan_ips_total,
+        asn_count=asn_groups_total,
         new_proxies=new_proxies_count,
         updated_proxies=updated_proxies_count,
         new_cf=new_cf_count,
