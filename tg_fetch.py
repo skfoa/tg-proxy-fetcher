@@ -194,6 +194,87 @@ def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
     }
 
 
+def parse_otc_scan_content(text: str, default_channel: str = "@otcfxq", dt_str: str = "") -> list[dict]:
+    """解析 OTC 优选扫描导出的 CSV 格式文件内容 (OTC_SCAN_YX_*.txt)"""
+    results = []
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        parts = [p.strip() for p in line.split(",")]
+        if len(parts) < 6:
+            continue
+        ip = parts[0]
+        port_str = parts[1]
+        if not is_valid_host(ip) or not port_str.isdigit():
+            continue
+        port = int(port_str)
+        if not (1 <= port <= 65535):
+            continue
+
+        asn = parts[3]
+        isp = parts[4]
+        colo_loc = parts[5]
+
+        colo = ""
+        loc = colo_loc
+        m = re.match(r"^([A-Z]{3})\s*\((.*?)\)", colo_loc)
+        if m:
+            colo = m.group(1)
+            loc = m.group(2)
+
+        tls = "true" if port in (443, 8443, 2053, 2083, 2087, 2096) else "false"
+
+        results.append({
+            "ip": ip,
+            "port": str(port),
+            "tls": tls,
+            "delay_ms": "",
+            "speed_kbs": "",
+            "colo": colo,
+            "cf_location": loc,
+            "isp": isp,
+            "asn": asn,
+            "tested_at": dt_str,
+            "channel": default_channel,
+        })
+    return results
+
+
+def load_local_import_ips(import_dir: str = "import_ips") -> dict:
+    """扫描本地 import_ips 目录或项目根目录下的 OTC_SCAN_*.txt 文件并自动解析导入"""
+    imported = {}
+    files_to_check = set()
+
+    # 1. 检查 import_ips 文件夹
+    if os.path.isdir(import_dir):
+        for fname in os.listdir(import_dir):
+            if fname.lower().endswith(".txt"):
+                files_to_check.add(os.path.join(import_dir, fname))
+
+    # 2. 检查根目录下匹配 OTC_SCAN*.txt 的文件
+    for fname in os.listdir("."):
+        if fname.startswith("OTC_SCAN") and fname.lower().endswith(".txt"):
+            files_to_check.add(fname)
+
+    for fpath in files_to_check:
+        try:
+            with open(fpath, "r", encoding="utf-8", errors="ignore") as f:
+                content = f.read()
+            mtime = datetime.fromtimestamp(os.path.getmtime(fpath), timezone.utc)
+            mtime_bjt = mtime.astimezone(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
+            items = parse_otc_scan_content(content, default_channel="@otcfxq", dt_str=mtime_bjt)
+            for item in items:
+                key = f"{item['ip']}:{item['port']}"
+                imported[key] = item
+            if items:
+                log.info("从本地文件 %s 中导入 %d 条优选 IP 记录", fpath, len(items))
+        except Exception as e:
+            log.warning("读取本地文件 %s 失败: %s", fpath, e)
+
+    return imported
+
+
 def load_existing_proxies(filepath: str = OUTPUT_PROXY_FILE) -> dict:
     """读取本地已保存的代理列表，保留历史累积节点（只增不减）"""
     existing = {}
@@ -484,6 +565,11 @@ def run_web_scraper():
                     cf_cnt += 1
             log.info("频道 %s 提取去重优选 IP: %d 条", channel, cf_cnt)
 
+    # 1.5 加载本地待导入文件（若有 OTC_SCAN*.txt 等）
+    local_imported_ips = load_local_import_ips()
+    if local_imported_ips:
+        scraped_cf_ips = {**scraped_cf_ips, **local_imported_ips}
+
     # 2. 智能增量合并：历史保留，重复更新，新增追加
     new_proxy_cnt = sum(1 for k in scraped_proxies if k not in existing_proxies)
     updated_proxy_cnt = sum(1 for k in scraped_proxies if k in existing_proxies)
@@ -577,18 +663,43 @@ async def run_telethon():
                                 proxy_count += 1
 
                     if is_cf_target:
-                        cf_data = parse_cf_ip(msg.text, default_channel=channel_name)
-                        if cf_data:
-                            cf_key = f"{cf_data['ip']}:{cf_data['port']}"
-                            if cf_key not in scraped_cf_ips:
-                                if not cf_data["tested_at"] and msg.date:
-                                    cf_data["tested_at"] = msg.date.strftime("%Y-%m-%d %H:%M:%S")
-                                scraped_cf_ips[cf_key] = cf_data
-                                cf_count += 1
+                        if msg.text:
+                            cf_data = parse_cf_ip(msg.text, default_channel=channel_name)
+                            if cf_data:
+                                cf_key = f"{cf_data['ip']}:{cf_data['port']}"
+                                if cf_key not in scraped_cf_ips:
+                                    if not cf_data["tested_at"] and msg.date:
+                                        cf_data["tested_at"] = msg.date.strftime("%Y-%m-%d %H:%M:%S")
+                                    scraped_cf_ips[cf_key] = cf_data
+                                    cf_count += 1
+
+                        # 支持自动下载并解析 .txt 附件 (如 OTC_SCAN_YX_*.txt)
+                        if msg.file and msg.file.name and msg.file.name.lower().endswith(".txt"):
+                            try:
+                                doc_bytes = await client.download_media(msg, file=bytes)
+                                if doc_bytes:
+                                    doc_text = doc_bytes.decode("utf-8", errors="ignore")
+                                    doc_date_str = msg.date.strftime("%Y-%m-%d %H:%M:%S") if msg.date else ""
+                                    doc_items = parse_otc_scan_content(doc_text, default_channel=channel_name, dt_str=doc_date_str)
+                                    doc_added = 0
+                                    for cf_item in doc_items:
+                                        cf_key = f"{cf_item['ip']}:{cf_item['port']}"
+                                        if cf_key not in scraped_cf_ips:
+                                            scraped_cf_ips[cf_key] = cf_item
+                                            cf_count += 1
+                                            doc_added += 1
+                                    log.info("从频道 %s 附件 %s 中提取 %d 条优选 IP", channel_name, msg.file.name, doc_added)
+                            except Exception as e:
+                                log.warning("下载/解析频道 %s 附件 %s 失败: %s", channel_name, msg.file.name, e)
             except FloodWaitError as e:
                 log.warning("频道 %s 扫描时触发 Telegram 频控限制 (等待 %d 秒): %s", channel_name, e.seconds, e)
 
             log.info("频道 %s 扫描完毕: 消息 %d 条, 新增代理 %d 个, 新增优选IP %d 个", channel_name, msg_count, proxy_count, cf_count)
+
+        # 1.5 加载本地待导入文件（若有 OTC_SCAN*.txt 等）
+        local_imported_ips = load_local_import_ips()
+        if local_imported_ips:
+            scraped_cf_ips = {**scraped_cf_ips, **local_imported_ips}
 
         # 2. 智能增量合并
         new_proxy_cnt = sum(1 for k in scraped_proxies if k not in existing_proxies)
