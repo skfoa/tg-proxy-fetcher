@@ -204,18 +204,43 @@ def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
     }
 
 
+KNOWN_CLOUD_PROVIDERS = {
+    "aliyun": ("AS45102", "Alibaba Cloud"),
+    "alibaba": ("AS45102", "Alibaba Cloud"),
+    "tencent": ("AS132203", "Tencent Cloud"),
+    "hwcloud": ("AS136907", "Huawei Cloud"),
+    "huawei": ("AS136907", "Huawei Cloud"),
+    "ucloud": ("AS138915", "UCloud"),
+    "oracle": ("AS31898", "Oracle Cloud"),
+    "oci": ("AS31898", "Oracle Cloud"),
+    "digitalocean": ("AS14061", "DigitalOcean"),
+    "aws": ("AS16509", "Amazon AWS"),
+    "amazon": ("AS16509", "Amazon AWS"),
+    "azure": ("AS8075", "Microsoft Azure"),
+    "gcp": ("AS15169", "Google Cloud"),
+    "google": ("AS15169", "Google Cloud"),
+    "vultr": ("AS20473", "Vultr"),
+    "linode": ("AS63949", "Linode"),
+    "hetzner": ("AS24940", "Hetzner"),
+    "ovh": ("AS16276", "OVH"),
+}
+
+
 def parse_cf_csv_content(
     text: str,
     default_channel: str = "@danfeng2",
     filename: str = "",
     dt_str: str = "",
 ) -> list[dict]:
-    """解析 Cloudflare 优选测速与反代 ProxyIP CSV 格式内容（支持 DanFeng、CheckProxyIP、CloudflareSpeedTest 等）"""
+    """解析 Cloudflare 优选测速与反代 ProxyIP CSV 格式内容（支持 DanFeng、CheckProxyIP、云厂商测速等）"""
     fn_asn = ""
     fn_isp = ""
     fn_port = ""
     fn_time = dt_str
+
     if filename:
+        fn_lower = filename.lower()
+        # 1. 优先从文件名正则匹配 AS 编号与 ISP (如 AS979_NetLab_20260906_102236.csv)
         m_fn = re.search(r"(?P<asn>AS\d+)_(?P<isp>[^_]+)(?:_(?P<date>\d{8})_(?P<time>\d{6}))?", filename, re.IGNORECASE)
         if m_fn:
             fn_asn = m_fn.group("asn").upper()
@@ -224,6 +249,14 @@ def parse_cf_csv_content(
                 d = m_fn.group("date")
                 t = m_fn.group("time")
                 fn_time = f"{d[:4]}-{d[4:6]}-{d[6:8]} {t[:2]}:{t[2:4]}:{t[4:6]}"
+        else:
+            # 2. 从老版云服务器文件名推断 ASN 与 ISP (如 Aliyun.csv, Tencent.csv, HWCloud.csv, Ucloud.csv)
+            for key, (k_asn, k_isp) in KNOWN_CLOUD_PROVIDERS.items():
+                if key in fn_lower:
+                    fn_asn = k_asn
+                    fn_isp = k_isp
+                    break
+
         m_port = re.search(r"proxyip[-_](\d{2,5})", filename, re.IGNORECASE)
         if m_port:
             fn_port = m_port.group(1)
@@ -234,11 +267,63 @@ def parse_cf_csv_content(
         return results
 
     try:
-        reader = csv.DictReader(clean_text.splitlines())
+        lines = clean_text.splitlines()
+        first_line = lines[0].strip() if lines else ""
+        if not first_line:
+            return results
+
+        # 检测首行是否为无标题数据行 (例如首列直接是 IP 地址)
+        first_parts = [p.strip().strip('"') for p in first_line.split(",")]
+        is_headerless = False
+        if first_parts and (is_valid_host(first_parts[0]) or ":" in first_parts[0]):
+            is_headerless = True
+
+        if is_headerless:
+            reader_rows = csv.reader(lines)
+            for row in reader_rows:
+                if not row or not row[0].strip():
+                    continue
+                raw_ip = row[0].strip()
+                raw_port = row[1].strip() if len(row) > 1 else ""
+                if not raw_port and fn_port:
+                    raw_port = fn_port
+                if ":" in raw_ip:
+                    ip_c, p_c = raw_ip.split(":", 1)
+                    if is_valid_host(ip_c) and p_c.isdigit():
+                        raw_ip, raw_port = ip_c, p_c
+                if not raw_ip or not raw_port or not is_valid_host(raw_ip) or not raw_port.isdigit():
+                    continue
+                port = int(raw_port)
+                if not (1 <= port <= 65535):
+                    continue
+
+                raw_delay = row[2].strip() if len(row) > 2 else ""
+                delay_ms = ""
+                m_delay = re.search(r"(\d+(?:\.\d+)?)", raw_delay)
+                if m_delay:
+                    delay_ms = int(float(m_delay.group(1)))
+
+                results.append({
+                    "ip": raw_ip,
+                    "port": str(port),
+                    "tls": "true" if port in (443, 8443, 2053, 2083, 2087, 2096) else "false",
+                    "delay_ms": delay_ms,
+                    "speed_kbs": "",
+                    "colo": "",
+                    "cf_location": "",
+                    "isp": fn_isp,
+                    "asn": fn_asn or "AS_UNKNOWN",
+                    "tested_at": fn_time,
+                    "channel": default_channel,
+                })
+            return results
+
+        reader = csv.DictReader(lines)
         if not reader.fieldnames:
             return results
 
         field_map = {}
+        speed_unit_is_mb = False
         for col in reader.fieldnames:
             if not col:
                 continue
@@ -251,8 +336,10 @@ def parse_cf_csv_content(
                 field_map["tls"] = col
             elif c_clean in ("网络延迟", "延迟", "平均延迟", "delay", "latency", "delayms", "ipv4connectms", "connectms"):
                 field_map["delay"] = col
-            elif c_clean in ("下载速度", "速度", "speed", "speedkbs", "下载速度(mb/s)"):
+            elif c_clean in ("下载速度", "速度", "speed", "speedkbs", "下载速度(mb/s)", "下载速度(kb/s)"):
                 field_map["speed"] = col
+                if "mb" in c_clean:
+                    speed_unit_is_mb = True
             elif c_clean in ("数据中心", "机房", "colo", "ipv4exitcolo"):
                 field_map["colo"] = col
             elif c_clean in ("源ip位置", "位置", "location", "cflocation", "country", "ipv4exitcountry"):
@@ -300,8 +387,8 @@ def parse_cf_csv_content(
             m_speed = re.search(r"(\d+(?:\.\d+)?)\s*([kKmMgG]?[bB]/s)?", raw_speed)
             if m_speed:
                 val = float(m_speed.group(1))
-                unit = (m_speed.group(2) or "kb/s").lower()
-                if "m" in unit:
+                unit = (m_speed.group(2) or "").lower()
+                if "m" in unit or (not unit and speed_unit_is_mb):
                     val *= 1024
                 elif "g" in unit:
                     val *= 1024 * 1024
@@ -337,7 +424,7 @@ def parse_cf_csv_content(
                 "colo": colo,
                 "cf_location": cf_location,
                 "isp": raw_isp,
-                "asn": asn_clean,
+                "asn": asn_clean or "AS_UNKNOWN",
                 "tested_at": tested_at,
                 "channel": default_channel,
             })
@@ -527,7 +614,7 @@ def load_local_import_proxyips(import_dir: str = "import_proxyip") -> dict:
 
 
 def load_local_import_ips(import_dir: str = "import_ips") -> dict:
-    """扫描本地 import_ips 目录或项目根目录下的优选测速文件（支持 .txt 与 .csv，过滤 ProxyIP 文件）并自动解析导入"""
+    """扫描本地 import_ips 目录或项目根目录下的优选测速文件（支持 .txt 与 .csv，自动识别云厂商测速）并自动解析导入"""
     imported = {}
     files_to_check = set()
 
@@ -538,13 +625,15 @@ def load_local_import_ips(import_dir: str = "import_ips") -> dict:
             if (fname_lower.endswith(".txt") or fname_lower.endswith(".csv")) and "proxyip" not in fname_lower:
                 files_to_check.add(os.path.join(import_dir, fname))
 
-    # 2. 检查根目录下匹配 OTC_SCAN*.txt 或 AS*.csv 的文件（过滤 proxyip 文件）
+    # 2. 检查根目录下匹配的优选文件（如 OTC_SCAN*.txt、AS*.csv、云服务器测速 *.csv 等，过滤 proxyip 文件）
     for fname in os.listdir("."):
         fname_lower = fname.lower()
         if "proxyip" in fname_lower:
             continue
+        if fname in (OUTPUT_CF_FILE, OUTPUT_SCAN_FILE, OUTPUT_PROXYIP_FILE, OUTPUT_CF_TXT, OUTPUT_SCAN_TXT, OUTPUT_PROXYIP_TXT, OUTPUT_PROXY_FILE):
+            continue
         if (fname.startswith("OTC_SCAN") and fname_lower.endswith(".txt")) or \
-           (fname.startswith("AS") and fname_lower.endswith(".csv")):
+           fname_lower.endswith(".csv"):
             files_to_check.add(fname)
 
     for fpath in files_to_check:
