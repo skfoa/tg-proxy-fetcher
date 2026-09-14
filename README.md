@@ -58,7 +58,10 @@ tg_fetch.py ──────────┤                    ├────
    - `[发现开放 SOCKS5 代理] IP:Port` ➔ 自动补全为 `socks5://IP:Port`
    - `[发现开放 TURN 代理/服务] IP:Port 或 turn://IP:Port` ➔ 自动提取为 `turn://IP:Port`
    - 🛡️ **防污染机制**：通报消息后半段附带的第三方 SNI 测试目标域名（如 `域名:https://hf.molikuaiyin.com:443...`）会被自动精准过滤，确保代理库 100% 纯净。
-5. **Cloudflare 优选 IP**：
+5. **代理附件文件自动解析（HTTP / HTTPS / TURN / SOCKS5）**：
+   - 自动识别频道发布的代理附件文件（如 `http_proxies.txt`、`https_proxies.txt`、`turn_proxies.txt` 等）或本地 `import_proxies/` 目录中的文件。
+   - 自动提取行首有效节点与认证信息，过滤后续测速说明与反向 PTR 域名别名，统一去重合并至 `socks5.txt`。
+6. **Cloudflare 优选 IP**：
    - 提取包含 IP、端口、TLS、网络延迟（纯数值 ms）、下载速度（纯数值 kB/s）、数据中心（Colo）、落地位置、ASN、运营商、测速时间等全量指标。
 
 ---
@@ -84,7 +87,11 @@ tg_fetch.py ──────────┤                    ├────
   2. **独立 ASN 文本（`scan_ips/ASxxx.txt`）**：在 `scan_ips/` 目录下按 ASN 拆分生成独立文件（如 `scan_ips/AS906.txt`、`scan_ips/AS8167.txt`），内容为 100% 纯净的 `IP:端口`，无任何注释，方便单独导入或远程订阅。
   3. **结构化总表（`scan_ips.csv`）**：按 ASN 字母序聚合排序，方便通过 Excel 集中筛选分析。
 
-### 4. 数据表通用字段说明
+### 4. 本地文件批量导入支持（可选）
+* **`import_proxies/` 目录**：将下载的代理 txt 附件（如 `http_proxies.txt`、`turn_proxies.txt`）放置在此目录，运行后自动解析并去重合并入 `socks5.txt`。
+* **`import_ips/` 目录**：将下载的优选扫描 txt 附件（如 `OTC_SCAN_YX_*.txt`）放置在此目录，运行后自动解析并按 ASN 分组生成 `scan_ips.txt` 与 `scan_ips/` 独立文件。
+
+### 5. 数据表通用字段说明
 * 采用 `UTF-8-SIG` 编码，Windows Excel 直接双击打开不乱码。
 * 包含完整指标，数值字段（`delay_ms`, `speed_kbs`）均为纯数字，并在保存时按 **`tested_at`（测速时间）倒序排序**：
 

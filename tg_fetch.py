@@ -247,6 +247,81 @@ def parse_otc_scan_content(text: str, default_channel: str = "@otcfxq", dt_str: 
     return results
 
 
+def parse_proxy_attachment_content(text: str) -> list[tuple[str, str]]:
+    """解析频道代理附件内容 (如 http_proxies.txt, https_proxies.txt, turn_proxies.txt 等)"""
+    results = []
+    seen = set()
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        # 1. 优先匹配行首标准代理格式（提取最真实的认证与节点信息，忽略后续 PTR 别名和中文评注）
+        m = re.match(
+            r"^(?P<url>(?P<proto>socks5|http|https|turn)://(?:[^\s#@]+@[^@\s#]+@|[^\s#@]+@)?(?P<host>(?:\d{1,3}\.){3}\d{1,3}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}):(?P<port>\d{1,5}))",
+            line,
+            re.IGNORECASE,
+        )
+        if m:
+            host = m.group("host")
+            port = m.group("port")
+            if is_valid_host(host) and 1 <= int(port) <= 65535:
+                url = m.group("url")
+                key = f"{host}:{port}"
+                if key not in seen:
+                    seen.add(key)
+                    results.append((url, key))
+                continue
+
+        # 2. 回退普通提取（容错）
+        m_any = re.search(
+            r"(?P<url>(?P<proto>socks5|http|https|turn)://(?:[^\s#@]+@)?(?P<host>(?:\d{1,3}\.){3}\d{1,3}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}):(?P<port>\d{1,5}))",
+            line,
+            re.IGNORECASE,
+        )
+        if m_any:
+            host = m_any.group("host")
+            port = m_any.group("port")
+            if is_valid_host(host) and 1 <= int(port) <= 65535:
+                url = m_any.group("url")
+                key = f"{host}:{port}"
+                if key not in seen:
+                    seen.add(key)
+                    results.append((url, key))
+
+    return results
+
+
+def load_local_import_proxies(import_dir: str = "import_proxies") -> dict:
+    """扫描本地 import_proxies 目录或项目根目录下的各类代理 txt 文件并自动解析导入"""
+    imported = {}
+    files_to_check = set()
+
+    if os.path.isdir(import_dir):
+        for fname in os.listdir(import_dir):
+            if fname.lower().endswith(".txt"):
+                files_to_check.add(os.path.join(import_dir, fname))
+
+    for fname in os.listdir("."):
+        fname_lower = fname.lower()
+        if fname_lower.endswith(".txt") and not fname_lower.startswith("otc_scan") and any(k in fname_lower for k in ("proxy", "proxies", "http", "turn", "socks")):
+            if fname not in (OUTPUT_PROXY_FILE, OUTPUT_CF_TXT, OUTPUT_SCAN_TXT):
+                files_to_check.add(fname)
+
+    for fpath in files_to_check:
+        try:
+            with open(fpath, "r", encoding="utf-8", errors="ignore") as f:
+                content = f.read()
+            items = parse_proxy_attachment_content(content)
+            for url, key in items:
+                imported[key] = url
+            if items:
+                log.info("从本地代理文件 %s 中导入 %d 个节点", fpath, len(items))
+        except Exception as e:
+            log.warning("读取本地代理文件 %s 失败: %s", fpath, e)
+
+    return imported
+
+
 def load_local_import_ips(import_dir: str = "import_ips") -> dict:
     """扫描本地 import_ips 目录或项目根目录下的 OTC_SCAN_*.txt 文件并自动解析导入"""
     imported = {}
@@ -642,6 +717,12 @@ def run_web_scraper():
                     cf_cnt += 1
             log.info("频道 %s 提取单条优选 IP: %d 条", channel, cf_cnt)
 
+    # 1.4 加载本地代理待导入文件（若有 http/https/turn/socks 等代理 txt）
+    local_imported_proxies = load_local_import_proxies()
+    for k, v in local_imported_proxies.items():
+        if k not in scraped_proxies:
+            scraped_proxies[k] = v
+
     # 1.5 加载本地待导入文件（若有 OTC_SCAN*.txt 等，放入独立扫描 IP 集合）
     scraped_scan_ips = load_local_import_ips()
 
@@ -742,11 +823,31 @@ async def run_telethon():
                         break
 
                     # 提取代理（包含 socks5, http, https, turn, 通报格式, 以及 tg://socks 直连链接）
-                    if is_proxy_target and msg.text:
-                        for url, key in extract_proxies(msg.text):
-                            if key not in scraped_proxies:
-                                scraped_proxies[key] = url
-                                proxy_count += 1
+                    if is_proxy_target:
+                        if msg.text:
+                            for url, key in extract_proxies(msg.text):
+                                if key not in scraped_proxies:
+                                    scraped_proxies[key] = url
+                                    proxy_count += 1
+
+                        # 支持自动下载并解析代理文件附件 (如 http_proxies.txt, https_proxies.txt, turn_proxies.txt 等)
+                        if msg.file and msg.file.name and msg.file.name.lower().endswith(".txt"):
+                            fname_lower = msg.file.name.lower()
+                            if not fname_lower.startswith("otc_scan") and any(k in fname_lower for k in ("proxy", "proxies", "http", "turn", "socks")):
+                                try:
+                                    doc_bytes = await client.download_media(msg, file=bytes)
+                                    if doc_bytes:
+                                        doc_text = doc_bytes.decode("utf-8", errors="ignore")
+                                        doc_proxies = parse_proxy_attachment_content(doc_text)
+                                        doc_added = 0
+                                        for url, key in doc_proxies:
+                                            if key not in scraped_proxies:
+                                                scraped_proxies[key] = url
+                                                proxy_count += 1
+                                                doc_added += 1
+                                        log.info("从频道 %s 附件 %s 中提取 %d 个代理节点", channel_name, msg.file.name, doc_added)
+                                except Exception as e:
+                                    log.warning("下载/解析频道 %s 代理附件 %s 失败: %s", channel_name, msg.file.name, e)
 
                     if is_cf_target:
                         if msg.text:
@@ -782,6 +883,12 @@ async def run_telethon():
 
             log.info("频道 %s 扫描完毕: 消息 %d 条, 新增代理 %d 个, 单条优选IP %d 个, 扫描优选IP %d 个", 
                      channel_name, msg_count, proxy_count, cf_count, scan_count)
+
+        # 1.4 加载本地代理待导入文件（若有 http/https/turn/socks 等代理 txt）
+        local_imported_proxies = load_local_import_proxies()
+        for k, v in local_imported_proxies.items():
+            if k not in scraped_proxies:
+                scraped_proxies[k] = v
 
         # 1.5 加载本地待导入文件（若有 OTC_SCAN*.txt 等，放入独立扫描 IP 集合）
         local_imported_ips = load_local_import_ips()
