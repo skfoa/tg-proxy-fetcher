@@ -356,20 +356,40 @@ def parse_cf_csv_content(
                 if not row or not row[0].strip():
                     continue
                 raw_ip = row[0].strip()
-                raw_port = row[1].strip() if len(row) > 1 else ""
-                if not raw_port and fn_port:
-                    raw_port = fn_port
+                raw_port = ""
+                raw_delay = ""
                 if ":" in raw_ip:
                     ip_c, p_c = raw_ip.split(":", 1)
                     if is_valid_host(ip_c) and p_c.isdigit():
                         raw_ip, raw_port = ip_c, p_c
+
+                if len(row) == 1:
+                    raw_port = raw_port or fn_port
+                elif len(row) == 2:
+                    # 只有两列 [IP, 第二列]: 若文件名已指定端口(如 ProxyIP-8443)，则第二列通常是延迟
+                    if fn_port:
+                        raw_port = raw_port or fn_port
+                        raw_delay = row[1].strip()
+                    else:
+                        val = row[1].strip()
+                        # 常见端口优先作为端口，否则作为延迟
+                        if val.isdigit() and int(val) in (80, 443, 8080, 8443, 2052, 2053, 2082, 2083, 2086, 2087, 2095, 2096, 1080):
+                            raw_port = val
+                        else:
+                            raw_port = raw_port or fn_port
+                            raw_delay = val
+                elif len(row) >= 3:
+                    raw_port = raw_port or row[1].strip() or fn_port
+                    raw_delay = row[2].strip()
+
+                if not raw_port and fn_port:
+                    raw_port = fn_port
+
                 if not raw_ip or not raw_port or not is_valid_host(raw_ip) or not raw_port.isdigit():
                     continue
                 port = int(raw_port)
                 if not (1 <= port <= 65535):
                     continue
-
-                raw_delay = row[2].strip() if len(row) > 2 else ""
                 delay_ms = ""
                 m_delay = re.search(r"(\d+(?:\.\d+)?)", raw_delay)
                 if m_delay:
@@ -400,31 +420,31 @@ def parse_cf_csv_content(
             if not col:
                 continue
             c_clean = col.strip().lower().replace(" ", "").replace("_", "")
-            if c_clean in ("ip地址", "ip", "ipaddress", "proxyip"):
+            if any(k in c_clean for k in ("ip地址", "ipaddress", "proxyip")) or c_clean == "ip":
                 field_map["ip"] = col
-            elif c_clean in ("端口号", "端口", "port", "portremote"):
+            elif any(k in c_clean for k in ("端口", "port")):
                 field_map["port"] = col
-            elif c_clean in ("tls", "istls"):
+            elif any(k in c_clean for k in ("tls", "istls", "ssl")):
                 field_map["tls"] = col
-            elif c_clean in ("网络延迟", "延迟", "平均延迟", "delay", "latency", "delayms", "ipv4connectms", "connectms"):
+            elif any(k in c_clean for k in ("延迟", "delay", "latency", "connectms")):
                 field_map["delay"] = col
-            elif c_clean in ("下载速度", "速度", "speed", "speedkbs", "下载速度(mb/s)", "下载速度(kb/s)"):
+            elif any(k in c_clean for k in ("速度", "speed", "带宽", "bandwidth")):
                 field_map["speed"] = col
                 if "mb" in c_clean:
                     speed_unit_is_mb = True
-            elif c_clean in ("数据中心", "机房", "colo", "ipv4exitcolo"):
+            elif any(k in c_clean for k in ("数据中心", "机房", "colo")):
                 field_map["colo"] = col
-            elif c_clean in ("源ip位置", "位置", "location", "cflocation", "country", "ipv4exitcountry"):
+            elif any(k in c_clean for k in ("位置", "location", "country", "国家")):
                 field_map["loc"] = col
-            elif c_clean in ("地区", "region", "ipv4exitregion"):
+            elif any(k in c_clean for k in ("地区", "省份", "region", "province")):
                 field_map["region"] = col
-            elif c_clean in ("城市", "city", "ipv4exitcity"):
+            elif any(k in c_clean for k in ("城市", "city")):
                 field_map["city"] = col
-            elif c_clean in ("asn号码", "asn编号", "asn", "as", "ipv4exitasn"):
+            elif any(k in c_clean for k in ("asn", "as编号", "as号码")):
                 field_map["asn"] = col
-            elif c_clean in ("asn组织", "运营商", "isp", "org", "organization", "ipv4exitorg"):
+            elif any(k in c_clean for k in ("运营商", "组织", "org", "isp", "company")):
                 field_map["isp"] = col
-            elif c_clean in ("时间", "测速时间", "testedat", "time"):
+            elif any(k in c_clean for k in ("时间", "time", "date")):
                 field_map["time"] = col
 
         for row in reader:
@@ -529,7 +549,7 @@ def parse_otc_scan_content(text: str, default_channel: str = "@otcfxq", dt_str: 
         if not line or line.startswith("#"):
             continue
         parts = [p.strip() for p in line.split(",")]
-        if len(parts) < 6:
+        if len(parts) < 2:
             continue
         ip = parts[0]
         port_str = parts[1]
@@ -539,9 +559,22 @@ def parse_otc_scan_content(text: str, default_channel: str = "@otcfxq", dt_str: 
         if not (1 <= port <= 65535):
             continue
 
-        asn = parts[3]
-        isp = parts[4]
-        colo_loc = parts[5]
+        asn = ""
+        isp = ""
+        colo_loc = ""
+        # 依次探测 ASN 编号 (ASxxxx)
+        for idx in range(2, len(parts)):
+            p_val = parts[idx]
+            m_a = re.search(r"(AS\d+)", p_val, re.IGNORECASE)
+            if m_a and not asn:
+                asn = m_a.group(1).upper()
+            elif "(" in p_val and ")" in p_val and not colo_loc:
+                colo_loc = p_val
+            elif not isp and idx in (3, 4) and not m_a and len(p_val) > 1:
+                isp = p_val
+
+        if not asn:
+            asn = "AS13335"
 
         colo = ""
         loc = colo_loc
@@ -604,6 +637,20 @@ def parse_proxy_attachment_content(text: str) -> list[tuple[str, str]]:
             port = m_any.group("port")
             if is_valid_host(host) and 1 <= int(port) <= 65535:
                 url = m_any.group("url")
+                key = f"{host}:{port}"
+                if key not in seen:
+                    seen.add(key)
+                    results.append((url, key))
+                continue
+
+        # 3. 支持无 URL 协议头纯 IP:Port 或 IP:Port@proto 格式 (如 1.1.1.1:8080 或 2.2.2.2:1080@socks5)
+        m_raw = re.match(r"^((?:\d{1,3}\.){3}\d{1,3}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}):(\d{1,5})(?:@([a-zA-Z0-9]+))?", line)
+        if m_raw:
+            host = m_raw.group(1)
+            port = m_raw.group(2)
+            proto = (m_raw.group(3) or "socks5").lower()
+            if is_valid_host(host) and 1 <= int(port) <= 65535:
+                url = f"{proto}://{host}:{port}"
                 key = f"{host}:{port}"
                 if key not in seen:
                     seen.add(key)
