@@ -1,4 +1,8 @@
 ﻿ip,port,tls,delay_ms,speed_kbs,colo,cf_location,isp,asn,tested_at,channel
+103.47.186.47,52492,true,46,14405,NRT,亚太 · 日本东京,xTom Japan Corporation,AS3258 xTom Japan Corporation,2026-09-14 18:00:32,@danfeng_chat
+147.78.246.169,22658,true,46,54600,NRT,亚太 · 日本东京,VIRMACH,AS3258 xTom Japan Corporation,2026-09-14 12:00:33,@danfeng_chat
+98.85.241.163,443,true,187,12129,IAD,北美洲 · 美国阿什伯恩,"Amazon.com, Inc.","AS14618 Amazon.com, Inc.",2026-09-14 06:00:33,@danfeng_chat
+154.21.85.197,39257,true,143,23225,LAX,北美洲 · 美国洛杉矶,DMIT Cloud Services,AS906 DMIT Cloud Services,2026-09-14 00:00:30,@danfeng_chat
 23.249.18.144,8581,true,2,89086,HKG,亚太 · 香港,Prime Security Corp.,AS400618 Prime Security Corp.,2026-09-13 18:00:33,@danfeng_chat
 142.248.139.237,51982,true,48,19722,NRT,亚太 · 日本东京,JT TELECOM INTERNATIONAL PTE.LTD.,AS137535 JT TELECOM INTERNATIONAL PTE.LTD.,2026-09-13 12:00:29,@danfeng_chat
 38.59.230.210,14338,true,188,40770,AMS,欧洲 · 荷兰阿姆斯特丹,Kirino LLC,AS41378 Kirino LLC,2026-09-13 06:00:28,@danfeng_chat
