@@ -330,7 +330,7 @@ def parse_cf_csv_content(
                 d = m_fn.group("date")
                 t = m_fn.group("time")
                 fn_time = f"{d[:4]}-{d[4:6]}-{d[6:8]} {t[:2]}:{t[2:4]}:{t[4:6]}"
-        else:
+        elif not any(bad in fn_lower for bad in ("nsb", "results", "speedtest", "benchmark", "warp", "tunnel")):
             # 2. 从常见云服务器/VPS文件名推断 ASN 与 ISP (如 Aliyun.csv, Tencent.csv, DMIT.csv, Akile.csv 等)
             for key in sorted(KNOWN_CLOUD_PROVIDERS.keys(), key=len, reverse=True):
                 pattern = rf"(?i)(?:^|[^a-z0-9]){re.escape(key)}(?:[^a-z0-9]|$)"
@@ -429,6 +429,8 @@ def parse_cf_csv_content(
             if not col:
                 continue
             c_clean = col.strip().lower().replace(" ", "").replace("_", "")
+            if any(k in c_clean for k in ("出站", "egress", "tunnel", "warp", "gateway")):
+                continue
             if any(k in c_clean for k in ("ip地址", "ipaddress", "proxyip")) or c_clean == "ip":
                 field_map["ip"] = col
             elif any(k in c_clean for k in ("端口", "port")):
@@ -818,35 +820,57 @@ def load_local_import_proxyips(import_dir: str = "import_proxyip") -> dict:
     return imported
 
 
-def load_local_import_ips(import_dir: str = "import_ips") -> dict:
-    """扫描本地 import_ips 目录、Telegram 下载目录或项目根目录下的优选测速文件（自动识别云厂商测速）并自动解析导入"""
+def load_local_import_ips(import_dir: str = "import_ips", cutoff_days: int = FETCH_DAYS) -> dict:
+    """扫描本地 import_ips 目录、Telegram 下载目录及当前目录下的测速文件（严格时间窗口与文件名规范过滤）"""
     imported = {}
     files_to_check = set()
+    cutoff_dt = datetime.now(timezone.utc) - timedelta(days=cutoff_days)
+    cutoff_ts = cutoff_dt.timestamp()
 
-    # 1. 检查 import_ips 及 Telegram 客户端下载文件夹（自动过滤 proxyip 专属文件）
-    scan_dirs = [import_dir] + get_telegram_download_dirs()
-    for d in scan_dirs:
+    # 1. 扫描专门导入目录 import_ips（支持 .csv 和 .txt）
+    if os.path.isdir(import_dir):
+        for fname in os.listdir(import_dir):
+            fname_lower = fname.lower()
+            if "proxyip" in fname_lower:
+                continue
+            if fname_lower.endswith(".txt") or fname_lower.endswith(".csv"):
+                files_to_check.add(os.path.join(import_dir, fname))
+
+    # 2. 扫描 Telegram 客户端下载文件夹（严格限制自 2026 年 7 月以来的文件，严禁引入杂乱基准测试）
+    for d in get_telegram_download_dirs():
         if os.path.isdir(d):
             for fname in os.listdir(d):
                 fname_lower = fname.lower()
-                if "proxyip" in fname_lower:
+                if "proxyip" in fname_lower or any(bad in fname_lower for bad in ("nsb", "results", "speedtest", "benchmark")):
                     continue
-                if d == import_dir and (fname_lower.endswith(".txt") or fname_lower.endswith(".csv")):
-                    files_to_check.add(os.path.join(d, fname))
-                elif fname_lower.endswith(".csv") or (fname_lower.startswith("otc_scan") and fname_lower.endswith(".txt")):
-                    # 识别来自 Telegram 下载的测速文件 (如 AS*.csv, OTC_SCAN*.txt, 或已知云厂商/VPS测速)
-                    if fname_lower.startswith("as") or fname_lower.startswith("otc_scan") or any(k in fname_lower for k in KNOWN_CLOUD_PROVIDERS.keys()):
-                        files_to_check.add(os.path.join(d, fname))
+                fpath = os.path.join(d, fname)
+                try:
+                    mtime = os.path.getmtime(fpath)
+                except OSError:
+                    continue
+                if mtime < cutoff_ts:
+                    continue
 
-    # 2. 检查根目录下匹配的优选文件（如 OTC_SCAN*.txt、AS*.csv、云服务器测速 *.csv 等，过滤 proxyip 文件）
+                # 识别 DanFeng 规范文件: AS<ASN>_<ISP>_<DATE>_<TIME>.csv (或 .txt)
+                m_df = re.match(r"(?i)^AS\d+_.+?\.(?:csv|txt)$", fname)
+                if m_df:
+                    m_date = re.search(r"_(\d{8})_", fname)
+                    if m_date and m_date.group(1) < "20260701":
+                        continue
+                    files_to_check.add(fpath)
+                # 识别 OTC 测速规范文件: OTC_SCAN_*.txt
+                elif fname_lower.startswith("otc_scan") and fname_lower.endswith(".txt"):
+                    files_to_check.add(fpath)
+
+    # 3. 根目录下匹配测速文件（仅限 OTC_SCAN*.txt 或 AS*.csv）
     for fname in os.listdir("."):
         fname_lower = fname.lower()
-        if "proxyip" in fname_lower:
+        if "proxyip" in fname_lower or any(bad in fname_lower for bad in ("nsb", "results", "speedtest", "benchmark")):
             continue
         if fname in (OUTPUT_CF_FILE, OUTPUT_SCAN_FILE, OUTPUT_PROXYIP_FILE, OUTPUT_CF_TXT, OUTPUT_SCAN_TXT, OUTPUT_PROXYIP_TXT, OUTPUT_PROXY_FILE):
             continue
         if (fname.startswith("OTC_SCAN") and fname_lower.endswith(".txt")) or \
-           fname_lower.endswith(".csv"):
+           (fname_lower.startswith("as") and fname_lower.endswith(".csv")):
             files_to_check.add(fname)
 
     for fpath in files_to_check:
