@@ -892,30 +892,6 @@ def load_existing_cf_ips(filepath: str = OUTPUT_CF_FILE) -> dict:
                 ip = row.get("ip", "").strip()
                 port = row.get("port", "").strip()
                 if ip and port:
-                    # 自动修复历史数据中因纯数字 ASN 误判为 AS13335 的历史记录
-                    row_asn = row.get("asn", "").strip()
-                    row_isp = row.get("isp", "").strip()
-                    if row_asn == "AS13335":
-                        if row_isp.isdigit():
-                            row["asn"] = f"AS{row_isp}"
-                            row["isp"] = ""
-                        elif ip.startswith("69.8."):
-                            row["asn"] = "AS212336"
-                            row["isp"] = ""
-
-                    # 按批次时间戳与目标扫描文件对齐权威机房 ASN（消除扫描器离线库脏数据导致的碎片化）
-                    row_time = row.get("tested_at", "").strip()
-                    row_channel = row.get("channel", "").strip()
-                    time_to_target_asn = {
-                        "2026-09-15 01:51:13": "AS210644",  # OTC_SCAN_YX_AS210644.txt
-                        "2026-09-14 01:37:21": "AS906",     # OTC_SCAN_YX_AS906.txt
-                        "2026-09-14 01:57:47": "AS212336",  # OTC_SCAN_YX_AS212336.txt
-                        "2026-09-14 03:11:07": "AS134835",  # OTC_SCAN_YX_AS134835.txt
-                        "2026-09-14 02:27:18": "AS216211",  # OTC_SCAN_YX_AS216211.txt
-                        "2026-09-14 02:42:21": "AS209554",  # OTC_SCAN_YX_AS209554.txt
-                    }
-                    if row_channel == "@otcfxq" and row_time in time_to_target_asn:
-                        row["asn"] = time_to_target_asn[row_time]
                     existing[f"{ip}:{port}"] = row
         log.info("已加载本地已存优选 IP 记录: %d 条（历史记录全部保留）", len(existing))
     except Exception as e:
