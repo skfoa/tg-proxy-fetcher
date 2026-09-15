@@ -10,6 +10,7 @@ TG 频道代理与 Cloudflare 优选 IP 同步工具
 """
 
 import os
+import time
 import re
 import csv
 import sys
@@ -32,6 +33,8 @@ if sys.platform == "win32":
         sys.stderr.reconfigure(encoding="utf-8")
     except Exception:
         pass
+
+START_TIME = time.time()
 
 # ================= 配置区域 =================
 TG_API_ID = os.getenv("TG_API_ID") or ""
@@ -913,6 +916,8 @@ def send_tg_notification(
     updated_scan: int = 0,
     new_proxyips: int = 0,
     updated_proxyips: int = 0,
+    top_providers: list = None,
+    elapsed_seconds: float = 0.0,
 ):
     token = TG_BOT_TOKEN
     chat_id = TG_CHAT_ID
@@ -921,28 +926,80 @@ def send_tg_notification(
         return
 
     bjt = datetime.now(timezone(timedelta(hours=8)))
-    date_str = bjt.strftime("%Y年%m月%d日 %H:%M:%S")
+    date_str = bjt.strftime("%Y-%m-%d %H:%M:%S")
+
+    def format_diff(new_c: int, upd_c: int) -> str:
+        parts = []
+        if new_c > 0:
+            parts.append(f"🟢 <b>+{new_c}</b> 新增")
+        if upd_c > 0:
+            parts.append(f"🔄 {upd_c} 刷新")
+        if not parts:
+            return "保持最新"
+        return " · ".join(parts)
+
+    total_new = new_proxies + new_cf + new_scan + new_proxyips
+    total_updated = updated_proxies + updated_cf + updated_scan + updated_proxyips
+
+    if total_new > 0:
+        header = f"🚀 <b>节点与优选 IP 同步完成</b> (🟢 发现 <b>+{total_new}</b> 条新数据)"
+    elif total_updated > 0:
+        header = f"🚀 <b>节点与优选 IP 同步完成</b> (🔄 刷新 {total_updated} 条数据)"
+    else:
+        header = "⚡ <b>节点与优选 IP 同步完成</b> (数据已全部为最新)"
+
+    div = "━━━━━━━━━━━━━━━━━━━━"
 
     scan_line = ""
     if scan_ips_count > 0:
-        asn_desc = f", 分 {asn_count} 个 ASN 组" if asn_count > 0 else ""
-        scan_line = f"📁 <b>扫描优选 IP</b>：总计 <code>{scan_ips_count}</code> 条 (新增: {new_scan}, 刷新: {updated_scan}{asn_desc})\n"
+        asn_suffix = f" · {asn_count} 个 ASN" if asn_count > 0 else ""
+        scan_diff = format_diff(new_scan, updated_scan)
+        scan_line = f"📁 <b>扫描优选</b>：<code>{scan_ips_count}</code> 条 ({scan_diff}{asn_suffix})\n"
+        if top_providers:
+            prov_preview = ", ".join(top_providers[:4])
+            if len(top_providers) > 4:
+                prov_preview += " 等"
+            scan_line += f"   └ <i>涵盖: {prov_preview}</i>\n"
 
     proxyip_line = ""
     if proxyips_count > 0:
-        proxyip_line = f"🛡️ <b>反代 ProxyIP</b>：总计 <code>{proxyips_count}</code> 条 (新增: {new_proxyips}, 刷新: {updated_proxyips})\n"
+        proxyip_diff = format_diff(new_proxyips, updated_proxyips)
+        proxyip_line = f"🛡️ <b>反代 ProxyIP</b>：<code>{proxyips_count}</code> 条 ({proxyip_diff})\n"
+
+    all_channels = []
+    for ch in PROXY_CHANNELS + CF_IP_CHANNELS:
+        if ch not in all_channels:
+            all_channels.append(ch)
+    channels_str = ", ".join(all_channels)
+
+    # 识别 GitHub Actions 运行时环境链接
+    github_server = os.getenv("GITHUB_SERVER_URL", "https://github.com")
+    github_repo = os.getenv("GITHUB_REPOSITORY")
+    github_run_id = os.getenv("GITHUB_RUN_ID")
+    github_run_number = os.getenv("GITHUB_RUN_NUMBER")
+
+    footer_parts = []
+    if elapsed_seconds > 0:
+        footer_parts.append(f"⚡ <b>耗时</b>: {elapsed_seconds:.1f}s")
+    if github_repo:
+        repo_url = f"{github_server}/{github_repo}"
+        if github_run_id:
+            run_label = f"Action #{github_run_number}" if github_run_number else "Action 日志"
+            footer_parts.append(f'🔗 <a href="{repo_url}/actions/runs/{github_run_id}">{run_label}</a>')
+        footer_parts.append(f'📦 <a href="{repo_url}">产物仓库</a>')
+
+    footer_line = f"\n{div}\n" + " · ".join(footer_parts) if footer_parts else ""
 
     message = (
-        f"🚀 <b>节点与优选 IP 增量同步完成</b>\n"
-        f"------------------------------------\n"
+        f"{header}\n"
+        f"{div}\n"
         f"📅 <b>时间</b>：{date_str} (北京时间)\n"
-        f"📫 <b>可用代理</b>：总计 <code>{proxies_count}</code> 个 (新增: {new_proxies}, 刷新: {updated_proxies})\n"
-        f"🌐 <b>单条优选 IP</b>：总计 <code>{cf_ips_count}</code> 条 (新增: {new_cf}, 刷新: {updated_cf})\n"
+        f"📫 <b>可用代理</b>：<code>{proxies_count}</code> 个 ({format_diff(new_proxies, updated_proxies)})\n"
+        f"🌐 <b>单条优选</b>：<code>{cf_ips_count}</code> 条 ({format_diff(new_cf, updated_cf)})\n"
         f"{scan_line}"
         f"{proxyip_line}"
-        f"📡 <b>目标频道</b>：@otcfxq, @danfeng2\n"
-        f"------------------------------------\n"
-        f"✅ <b>持久化策略</b>：只增不减，历史全量保留，多类产物清晰隔离！"
+        f"📡 <b>频道来源</b>：{channels_str}"
+        f"{footer_line}"
     )
 
     url = f"https://api.telegram.org/bot{token}/sendMessage"
@@ -1200,6 +1257,23 @@ def save_and_notify(
 
         proxyip_total = len(sorted_proxyips)
 
+    top_providers = []
+    if final_scan_ips and 'asn_groups' in locals() and asn_groups:
+        sorted_groups = sorted(asn_groups.items(), key=lambda item: len(item[1]), reverse=True)
+        seen_names = set()
+        for asn_name, group in sorted_groups:
+            isp_name = ASN_TO_PROVIDER.get(asn_name, "")
+            if not isp_name:
+                isp_name = next((r.get("isp") for r in group if r.get("isp")), "")
+            raw_name = isp_name if isp_name else asn_name
+            clean_name = re.sub(r'\b(LLC|Inc|Limited|Ltd|OU|GmbH|Co)\b\.?', '', raw_name, flags=re.IGNORECASE).strip()
+            name = clean_name if clean_name else raw_name
+            if name and name not in seen_names:
+                seen_names.add(name)
+                top_providers.append(name)
+
+    elapsed_sec = time.time() - START_TIME if 'START_TIME' in globals() else 0.0
+
     send_tg_notification(
         len(final_proxies),
         len(sorted_cf_ips),
@@ -1214,6 +1288,8 @@ def save_and_notify(
         updated_scan=updated_scan_count,
         new_proxyips=new_proxyips_count,
         updated_proxyips=updated_proxyips_count,
+        top_providers=top_providers,
+        elapsed_seconds=elapsed_sec,
     )
 
     log.info("=" * 50)
