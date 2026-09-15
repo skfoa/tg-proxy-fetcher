@@ -711,8 +711,11 @@ def get_telegram_download_dirs() -> list[str]:
     home = os.path.expanduser("~")
     candidates = [
         os.path.join(home, "Downloads", "Telegram Desktop"),
+        os.path.join(home, "Documents", "Telegram Desktop"),
         r"C:\Users\ASUS\Downloads\Telegram Desktop",
+        r"C:\Users\ASUS\Documents\Telegram Desktop",
         r"D:\Users\ASUS\Downloads\Telegram Desktop",
+        r"D:\Users\ASUS\Documents\Telegram Desktop",
     ]
     for p in candidates:
         if os.path.isdir(p) and p not in dirs:
@@ -1185,7 +1188,22 @@ def save_and_notify(
         for row in final_scan_ips.values():
             raw_asn = (row.get("asn") or "").strip()
             m = re.search(r"(AS\d+)", raw_asn, re.IGNORECASE)
-            asn_clean = m.group(1).upper() if m else (raw_asn if raw_asn else "AS_UNKNOWN")
+            if m:
+                asn_clean = m.group(1).upper()
+            else:
+                asn_clean = ""
+                r_low = (raw_asn + " " + (row.get("isp") or "")).lower()
+                for k in sorted(KNOWN_CLOUD_PROVIDERS.keys(), key=len, reverse=True):
+                    if k in r_low:
+                        asn_clean, _ = KNOWN_CLOUD_PROVIDERS[k]
+                        break
+                if not asn_clean:
+                    m_d = re.search(r"\b(\d{3,7})\b", raw_asn)
+                    if m_d:
+                        asn_clean = f"AS{m_d.group(1)}"
+                    else:
+                        asn_clean = "AS_UNKNOWN"
+            row["asn"] = asn_clean
             asn_groups[asn_clean].append(row)
 
         asn_groups_total = len(asn_groups)
