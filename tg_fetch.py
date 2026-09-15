@@ -280,7 +280,7 @@ KNOWN_CLOUD_PROVIDERS = {
     "bytevirt": ("AS212336", "ByteVirt"),
     "starry": ("AS134835", "Starry Network"),
     "cyberverse": ("AS216211", "Cyberverse"),
-    "isif": ("AS209554", "ISIF OU"),
+    "isif": ("AS209554", "ISIF"),
 
     # 运营商骨干与出海线路
     "hinet": ("AS3462", "Chunghwa Telecom HiNet"),
@@ -1168,9 +1168,9 @@ def save_and_notify(
         with open(OUTPUT_SCAN_TXT, "w", encoding="utf-8") as f:
             for asn_name in sorted(asn_groups.keys()):
                 group = asn_groups[asn_name]
-                isp_name = next((r.get("isp") for r in group if r.get("isp")), "")
-                if not isp_name and asn_name in ASN_TO_PROVIDER:
-                    isp_name = ASN_TO_PROVIDER[asn_name]
+                isp_name = ASN_TO_PROVIDER.get(asn_name, "")
+                if not isp_name:
+                    isp_name = next((r.get("isp") for r in group if r.get("isp")), "")
                 header = f"# {asn_name}" + (f" ({isp_name})" if isp_name else "") + f" - {len(group)} 个"
                 f.write(f"{header}\n")
                 for r in sorted(group, key=lambda x: (x.get("ip", ""), int(x.get("port", 0)))):
@@ -1178,19 +1178,27 @@ def save_and_notify(
                 f.write("\n")
         log.info("已保存扫描优选IP汇总文本: %s (共 %d 个 ASN 分组，%d 行 IP:Port)", OUTPUT_SCAN_TXT, asn_groups_total, len(all_sorted_scan_rows))
 
+        active_files = set()
         for asn_name, group in asn_groups.items():
-            asn_file = os.path.join(OUTPUT_SCAN_DIR, f"{asn_name}.txt")
+            isp_name = ASN_TO_PROVIDER.get(asn_name, "")
+            if not isp_name:
+                isp_name = next((r.get("isp") for r in group if r.get("isp")), "")
+            clean_isp = re.sub(r'[^a-zA-Z0-9]', '', isp_name) if isp_name else ""
+            fname = f"{asn_name}_{clean_isp}.txt" if clean_isp else f"{asn_name}.txt"
+            asn_file = os.path.join(OUTPUT_SCAN_DIR, fname)
             with open(asn_file, "w", encoding="utf-8") as f:
                 for r in sorted(group, key=lambda x: (x.get("ip", ""), int(x.get("port", 0)))):
                     f.write(f"{r['ip']}:{r['port']}\n")
-        # 清理已不存在的分组文件（例如已被纠偏移除的 AS13335.txt）
+            active_files.add(fname)
+
+        # 清理已不存在或旧命名格式的分组文件
         for old_f in os.listdir(OUTPUT_SCAN_DIR):
-            if old_f.endswith(".txt") and old_f[:-4] not in asn_groups:
+            if old_f.endswith(".txt") and old_f not in active_files:
                 try:
                     os.remove(os.path.join(OUTPUT_SCAN_DIR, old_f))
                 except OSError:
                     pass
-        log.info("已在 %s/ 目录下生成 %d 个独立 ASN 纯文本列表", OUTPUT_SCAN_DIR, asn_groups_total)
+        log.info("已在 %s/ 目录下生成 %d 个独立 ASN 纯文本列表", OUTPUT_SCAN_DIR, len(active_files))
 
         scan_ips_total = len(all_sorted_scan_rows)
 
