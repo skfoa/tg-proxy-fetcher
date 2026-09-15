@@ -4,20 +4,40 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
 
-每天自动从 Telegram 优质公开频道（[@otcfxq](https://t.me/otcfxq)、[@danfeng2](https://t.me/danfeng2)）抓取多协议代理节点与 Cloudflare 优选 IP。具备**永久增量持久化（只增不减）**与**全局智能去重**机制，自动生成通用代理列表、纯净 `IP:端口` 文本列表以及结构化测速数据表格，并通过 GitHub Actions 每天定时自动提交并推送到仓库。
+每天自动从 Telegram 优质公开频道（[@otcfxq](https://t.me/otcfxq)、[@danfeng2](https://t.me/danfeng2)）抓取多协议代理节点、Cloudflare 优选 IP 以及反代 ProxyIP。系统具备**永久增量持久化（只增不减）**与**全局智能去重**机制，自动导出通用代理列表、纯净 `IP:端口` 文本列表以及结构化测速数据表格，并通过 GitHub Actions 每天定时自动提交并推送到仓库。
 
-> 🌟 **核心特性亮点**
-> - **🚀 免登录 / 零密钥模式（开箱即用）**：基于公开 Web 频道预览机制，**无需注册 Telegram API、无需配置任何 Secret 密钥、无需手机号或验证码**！Fork 或 Clone 即可直接跑通！
-> - **🛡️ 官方 API 模式（可选兼容）**：配置 `TG_API_ID` 与 `TG_SESSION_STR` 后自动无感升级为 Telethon MTProto 客户端协议。
-> - **📦 永久增量持久化（绝不超时淘汰）**：历史抓取的有效节点全部永久留存，新节点自动追加，重复节点按最新配置/测速实时更新覆盖，节点池只增不减、越用越丰富！
-> - **🔍 跨文件严格唯一去重**：以 `IP:端口` 为全局唯一主键，新老文件重复提取自动刷新覆盖，绝无重复行；IP 归属更正时自动迁移所属 ASN 文件。
-> - **📁 智能 ASN 分组与命名**：
->   - **DanFeng 测速**：CSV 内部无 ASN 列时自动从文件名（如 `AS45102_CNNICALIBABACNNETAP_*.csv`）解析归类。
->   - **OTC 优选扫描**：单 ASN 文件以文件名目标 ASN 为准；混合扫描文件（如 `OTC_SCAN_YX_杂.txt`）自动逐行提取具体 ASN 与 ISP 拆分归类。
-> - **⚡ 纯净 IP:端口 列表导出**：自动导出纯文本格式的 `IP:端口` 列表（`cf_ips.txt`、`scan_ips/*.txt`、`proxyip.txt`），方便直接复制或作为远程订阅导入。
-> - **📱 极简高亮 Telegram 运行卡片**：锁屏即知变动摘要、变动数据绿色加粗高亮、涵盖 Top 服务商预览、运行耗时统计与 Actions 日志直链。
-> - **🌐 Windows 本地智能环境自适应**：本地运行自动读取 Windows 系统代理（如 v2rayN 等），无缝突破网络限制。
-> - **🧹 自动维护与构建瘦身**：每次运行自动清理 GitHub Actions 历史记录，始终**仅保留最近 5 次运行记录**，告别冗余历史堆积！
+---
+
+## ⚡ 运行模式与能力对比
+
+系统采用**双引擎驱动 + 本地导入补充**架构。了解不同模式的能力边界，有助于按需选择配置：
+
+| 特性 / 产物 | 🚀 免登录 Web 模式<br>(零门槛开箱即用) | 🛡️ 官方 API 模式<br>(全功能完整版 · 强烈推荐) | 📂 本地导入模式<br>(离线补充) |
+| :--- | :---: | :---: | :---: |
+| **运行门槛** | **无需任何密钥或账号**<br>Fork / Clone 即可直接运行 | **需配置 3 项 Secret**<br>`TG_API_ID`、`TG_API_HASH`、`TG_SESSION_STR` | 本地放文件即可<br>放入 `import_*` 目录 |
+| **底层原理** | 爬取 Telegram 公开网页预览 (`t.me/s/`) | 启用 Telethon 客户端直连 MTProto 协议 | 本地文件解析器自动监听合并 |
+| **正文通用代理 (`socks5.txt`)** | ✅ 支持自动抓取 | ✅ 支持自动抓取 | ✅ 支持放入 `import_proxies/` |
+| **频道正文单条优选 (`cf_ips.*`)** | ✅ 支持自动抓取 | ✅ 支持自动抓取 | — |
+| **频道附件下载能力** | ❌ **不支持**（网页接口无法下载文件） | ✅ **完全支持自动下载解析** | — |
+| **批量扫描大池 (`scan_ips/`)** | ❌ 无法自动下载（产物为 0） | ✅ 自动下载解析 OTC/DanFeng 附件 | ✅ 支持放入 `import_ips/` |
+| **反代 ProxyIP 池 (`proxyip.*`)** | ❌ 无法自动下载（产物为 0） | ✅ 自动下载解析反代文件附件 | ✅ 支持放入 `import_proxyip/` |
+| **适用场景** | 快速验证、仅需基础正文代理与单条 IP | 正式部署、需要海量机房扫描池与反代池 | 无 API 账号但有手动下载的测速包 |
+
+---
+
+## 🌟 核心特性亮点
+
+- **🚀 免登录基础模式**：未配置 API 凭据时自动启用，零门槛抓取频道消息正文中的通用代理与单条优选 IP。
+- **🛡️ 官方 API 全功能模式**：配置 `TG_API_ID`、`TG_API_HASH` 与 `TG_SESSION_STR` 后自动激活，解锁频道附件自动下载，获取千条级机房扫描 IP 与反代池。
+- **📦 永久增量持久化（只增不减）**：历史抓取的有效节点全部永久留存，新节点自动追加，绝不草率淘汰。
+- **🔍 跨文件严格唯一去重**：以 `IP:端口` 为全局主键，新老文件重复提取自动刷新覆盖，绝无重复行；IP 归属更正时自动迁移所属 ASN 文件。
+- **📁 智能 ASN 分组与命名**：
+  - **DanFeng 测速**：CSV 内部无 ASN 列时自动从文件名（如 `AS45102_CNNICALIBABACNNETAP_*.csv`）解析归类。
+  - **OTC 优选扫描**：单 ASN 文件以文件名目标 ASN 为准；混合扫描文件（如 `OTC_SCAN_YX_杂.txt`）自动逐行提取具体 ASN 与 ISP 拆分归类。
+- **⚡ 纯净 IP:端口 列表导出**：自动导出纯文本格式的 `IP:端口` 列表（`cf_ips.txt`、`scan_ips/*.txt`、`proxyip.txt`），方便直接复制或作为远程订阅导入。
+- **📱 极简高亮 Telegram 运行卡片**：锁屏即知变动摘要、变动数据绿色加粗高亮、涵盖 Top 服务商预览、运行耗时统计与 Actions 日志直链。
+- **🌐 Windows 本地智能环境自适应**：本地运行自动读取 Windows 系统代理（如 v2rayN 等），无缝突破网络限制。
+- **🧹 自动维护与构建瘦身**：每次运行自动清理 GitHub Actions 历史记录，始终**仅保留最近 5 次运行记录**，告别冗余历史堆积！
 
 ---
 
@@ -28,30 +48,32 @@
                       │   (代理 + 优选IP)  │
 tg_fetch.py ──────────┤                    ├────► 增量抓取 & 全局智能去重 ──┬──► socks5.txt (通用多协议代理节点)
 (免登录/官方API双模)   │                    │                               ├──► cf_ips.txt / cf_ips.csv (单条优选 IP)
-                      └─── @danfeng2 ──────┘                               ├──► scan_ips.txt / scan_ips.csv (扫描优选 IP 汇总)
-                           (优选IP 专属)                                     ├──► scan_ips/AS{ASN}_{ISP}.txt (独立机房纯文本)
-                                                                            ├──► proxyip.txt / proxyip.csv (反代 ProxyIP 专属池)
+                      └─── @danfeng2 ──────┘                               ├──► scan_ips.txt / scan_ips.csv (扫描优选 IP 汇总) *
+                           (优选IP 专属)                                     ├──► scan_ips/AS{ASN}_{ISP}.txt (独立机房纯文本) *
+                                                                            ├──► proxyip.txt / proxyip.csv (反代 ProxyIP 专属池) *
                                                                             └──► Telegram Bot 运行卡片推送 (可选)
+
+* 注：标记 * 的扫描机房大池与反代池需配置【官方 API 模式】或使用【本地导入模式】方可获取。
 ```
 
 ---
 
 ## 产物清单与订阅直链
 
-| 文件名 | 内容说明 | 适用场景 / 说明 | GitHub Raw 永久直链（点击即可导入） |
-| :--- | :--- | :--- | :--- |
-| **`socks5.txt`** | 纯净多协议代理清单 | Clash、v2rayN、Sing-box、Shadowrocket 等 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/socks5.txt` |
-| **`cf_ips.txt`** | 频道日常单条优选 IP（纯文本） | 每行一个 `IP:端口`，来自频道每日单条通报消息 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/cf_ips.txt` |
-| **`cf_ips.csv`** | 频道日常单条优选 IP（数据表） | Excel 排序筛选、结构化详细数据 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/cf_ips.csv` |
-| **`scan_ips.txt`** | 扫描测速总清单（按 ASN 分组） | 所有扫描附件的优选 IP 汇总，带 `# ASxxx (厂商) - N个` 分组注释 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips.txt` |
-| **`scan_ips/*.txt`** | 独立 ASN + 厂商纯文本列表（单文件） | 如 `scan_ips/AS906_DMIT.txt`、`scan_ips/AS210644_Aeza.txt`，纯净 `IP:端口` 无注释，便于按机房订阅 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips/{ASN}_{ISP}.txt` |
-| **`scan_ips.csv`** | 扫描测速优选 IP（数据表） | 包含机房、ASN、运营商等指标，按 ASN 聚合排序 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips.csv` |
-| **`proxyip.txt`** | 反代 ProxyIP 清单（纯文本） | 每行一个 `IP:端口`，直接供 edgetunnel / Workers 等反代配置 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/proxyip.txt` |
-| **`proxyip.csv`** | 反代 ProxyIP 详细数据表 | 包含地理位置、延迟、数据中心等详细指标 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/proxyip.csv` |
+| 文件名 | 内容说明 | 生成条件 | GitHub Raw 永久直链（点击即可导入） |
+| :--- | :--- | :---: | :--- |
+| **`socks5.txt`** | 纯净多协议代理清单 | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/socks5.txt` |
+| **`cf_ips.txt`** | 频道日常单条优选 IP（纯文本） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/cf_ips.txt` |
+| **`cf_ips.csv`** | 频道日常单条优选 IP（数据表） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/cf_ips.csv` |
+| **`scan_ips.txt`** | 扫描测速总清单（按 ASN 分组） | 需 API 模式 / 导入 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips.txt` |
+| **`scan_ips/*.txt`** | 独立 ASN + 厂商纯文本列表（单文件） | 需 API 模式 / 导入 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips/{ASN}_{ISP}.txt` |
+| **`scan_ips.csv`** | 扫描测速优选 IP（数据表） | 需 API 模式 / 导入 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips.csv` |
+| **`proxyip.txt`** | 反代 ProxyIP 清单（纯文本） | 需 API 模式 / 导入 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/proxyip.txt` |
+| **`proxyip.csv`** | 反代 ProxyIP 详细数据表 | 需 API 模式 / 导入 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/proxyip.csv` |
 
 ---
 
-## 支持提取的节点类型
+## 支持提取的节点与内容类型
 
 1. **通用标准代理 URL**：
    - `socks5://...`、`http://...`、`https://...`（兼容免密与带账号密码认证）
@@ -67,10 +89,10 @@ tg_fetch.py ──────────┤                    ├────
    - `[发现开放 SOCKS5 代理] IP:Port` ➔ 自动补全为 `socks5://IP:Port`
    - `[发现开放 TURN 代理/服务] IP:Port 或 turn://IP:Port` ➔ 自动提取为 `turn://IP:Port`
    - 🛡️ **防污染机制**：通报消息后半段附带的第三方 SNI 测试目标域名（如 `域名:https://hf.molikuaiyin.com:443...`）会被自动精准过滤，确保代理库 100% 纯净。
-5. **代理附件文件自动解析（HTTP / HTTPS / TURN / SOCKS5）**：
+5. **代理附件文件自动解析（需 API 模式或本地导入）**：
    - 自动识别频道发布的代理附件文件（如 `http_proxies.txt`、`https_proxies.txt`、`turn_proxies.txt` 等）或本地 `import_proxies/` 目录中的文件。
    - 自动提取行首有效节点与认证信息，过滤后续测速说明与反向 PTR 域名别名，统一去重合并至 `socks5.txt`。
-6. **Cloudflare 优选 IP**：
+6. **Cloudflare 优选 IP 与反代池（需 API 模式或本地导入）**：
    - 提取包含 IP、端口、TLS、网络延迟（纯数值 ms）、下载速度（纯数值 kB/s）、数据中心（Colo）、落地位置、ASN、运营商、测速时间等全量指标。
 
 ---
@@ -138,19 +160,28 @@ tg_fetch.py ──────────┤                    ├────
 
 ## 环境变量配置
 
-> 💡 **零配置声明**：默认采用**免登录 Web 模式**，**无需配置任何必填 Secret**，开箱即可直接运行！
+在 GitHub 仓库 **Settings -> Secrets and variables -> Actions** 中进行配置：
 
-若需要启用官方 API 模式或 TG 机器人通知，可在 GitHub 仓库 **Settings -> Secrets and variables -> Actions** 中配置以下变量：
+### 1. Repository Secrets（密钥配置）
 
-| 变量名 | 用途 | 是否必填 | 默认值 / 说明 |
+> 💡 **启用官方 API 模式必须同时配置前三项**（`TG_API_ID`、`TG_API_HASH`、`TG_SESSION_STR`），任一缺失将自动降级为免登录 Web 模式。
+
+| 变量名 | 用途 | 适用模式 | 说明 |
 | :--- | :--- | :---: | :--- |
-| `TG_API_ID` | Telegram API ID（纯数字） | 否 | 留空则使用免登录 Web 模式 |
-| `TG_API_HASH` | Telegram API Hash（32位字符） | 否 | 留空则使用免登录 Web 模式 |
-| `TG_SESSION_STR` | Telethon 会话字符串（由 `gen_session.py` 生成） | 否 | 留空则使用免登录 Web 模式 |
-| `FETCH_DAYS` | 单次增量回溯天数（扫描窗口） | 否 | 默认 `3` 天（可在 Variables 中自定义） |
-| `PROXY` | 本地抓取代理（如 `socks5h://127.0.0.1:10808`） | 否 | Windows 本地运行可自动读取系统代理设置 |
-| `TG_BOT_TOKEN` | TG 通知机器人 Token | 否 | 用于抓取完成后推送精致运行结果卡片 |
-| `TG_CHAT_ID` | TG 通知接收人的 Chat ID 或频道/群组 ID | 否 | 用于抓取完成后推送精致运行结果卡片 |
+| `TG_API_ID` | Telegram API ID（纯数字） | 官方 API 模式 | 从 [my.telegram.org](https://my.telegram.org) 获取 |
+| `TG_API_HASH` | Telegram API Hash（32位字符） | 官方 API 模式 | 从 [my.telegram.org](https://my.telegram.org) 获取 |
+| `TG_SESSION_STR` | Telethon 会话认证字符串 | 官方 API 模式 | 本地运行 `python gen_session.py` 登录生成 |
+| `TG_BOT_TOKEN` | Telegram 通知机器人 Token | 可选（通知推送） | 从 [@BotFather](https://t.me/BotFather) 获取 |
+| `TG_CHAT_ID` | 通知接收人 / 频道 / 群组 ID | 可选（通知推送） | 机器人的目标推送聊天 ID |
+
+### 2. Repository Variables（常规变量配置）
+
+可在 **Settings -> Secrets and variables -> Actions -> Variables** 中配置：
+
+| 变量名 | 用途 | 默认值 | 说明 |
+| :--- | :--- | :---: | :--- |
+| `FETCH_DAYS` | 单次增量回溯天数（扫描时间窗口） | `3` | 增量模式下只读取最近 N 天频道消息，加快运行速度 |
+| `PROXY` | 抓取代理设置 | 留空 | 本地 Windows 运行会自动读取系统代理；Linux 环境可按需设置 |
 
 ---
 
@@ -180,12 +211,12 @@ tg_fetch.py ──────────┤                    ├────
 
 ## 本地运行
 
-### 1. 直接运行（免登录 Web 模式，推荐）
-本地无需安装 Telethon，直接运行脚本即可：
+### 1. 免登录 Web 模式运行（基础体验）
+本地无需安装 Telethon，直接运行脚本即可抓取正文代理与单条 IP：
 ```bash
 python tg_fetch.py
 ```
-> 💡 Windows 运行环境会自动识别系统代理设置（如 v2rayN 等）。如果需要显式指定代理，可设置环境变量：
+> 💡 Windows 运行环境会自动识别系统代理设置（如 v2rayN 等）。若需要显式指定代理，可设置环境变量：
 > ```bash
 > # Windows PowerShell
 > $env:PROXY="socks5h://127.0.0.1:10808"; python tg_fetch.py
@@ -194,14 +225,21 @@ python tg_fetch.py
 > PROXY="socks5h://127.0.0.1:10808" python tg_fetch.py
 > ```
 
-### 2. 官方 API 模式运行（可选）
-如果拥有 Telegram API 凭据，可生成 Session 字符串：
+### 2. 官方 API 全功能模式运行（推荐）
+如果你需要自动下载频道扫描附件（获取千条级机房优选大池与反代池），请生成 Session 字符串：
 ```bash
 pip install -r requirements.txt
 python gen_session.py
 ```
-按终端提示输入凭据并生成 Session 字符串后，配置环境变量即可运行：
+按终端交互提示输入 API ID、API Hash 与验证码后，脚本会生成一串 Session 字符串。随后配置环境变量即可运行：
 ```bash
+# Windows PowerShell
+$env:TG_API_ID="你的API_ID"
+$env:TG_API_HASH="你的API_HASH"
+$env:TG_SESSION_STR="你的Session字符串"
+python tg_fetch.py
+
+# Linux / macOS
 export TG_API_ID="你的API_ID"
 export TG_API_HASH="你的API_HASH"
 export TG_SESSION_STR="你的Session字符串"
@@ -215,11 +253,13 @@ python tg_fetch.py
 工作流文件位于 `.github/workflows/fetch.yml`。
 
 每天 **北京时间 18:05（UTC 10:05）** 自动执行：
-- 默认无需配置任何 Secrets，开箱即可通过 Web 模式自动抓取。
-- 智能增量合并更新 `socks5.txt`、`cf_ips.txt` 与 `cf_ips.csv`，历史节点永久留存。
+- **未配置 API 密钥时**：自动使用 Web 模式抓取正文中的基础代理与单条 IP。
+- **配置了 API 密钥后**：自动解锁全功能，下载扫描附件与反代池附件。
+- 智能增量合并更新历史数据，历史节点永久留存（只增不减）。
 - 具备并发互斥锁（`concurrency`）与 `git pull --rebase` 自动防冲突机制。
 - 具备 `if: always()` 容错提交机制与存在性校验，有变动自动提交并推送回仓库。
 - 执行完成后（若配置了机器人凭据）自动向 Telegram 发送精致运行统计卡片。
+- 自动清理工作流运行历史，始终**仅保留最近 5 次记录**，避免仓库膨胀。
 - 支持在 GitHub 仓库 **Actions** 页面随时点击 **Run workflow** 手动触发立即更新。
 
 ---
