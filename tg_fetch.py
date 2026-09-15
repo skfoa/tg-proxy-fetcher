@@ -319,11 +319,12 @@ def parse_cf_csv_content(
 
     if filename:
         fn_lower = filename.lower()
-        # 1. 优先从文件名正则匹配 AS 编号与 ISP (如 AS979_NetLab_20260906_102236.csv)
-        m_fn = re.search(r"(?P<asn>AS\d+)_(?P<isp>[^_]+)(?:_(?P<date>\d{8})_(?P<time>\d{6}))?", filename, re.IGNORECASE)
+        # 1. 优先从文件名正则匹配 AS 编号与 ISP (支持 DanFeng 命名规范，如 AS45102_CNNICALIBABACNNETAP_20260906_190653.csv, AS61112_AkileCloud_Network_20260831_012345.csv)
+        base_fn = os.path.basename(filename)
+        m_fn = re.search(r"(?i)(?P<asn>AS\d+)_(?P<isp>.+?)(?:_(?P<date>\d{8})_(?P<time>\d{6}))?\.(?:csv|txt)$", base_fn)
         if m_fn:
             fn_asn = m_fn.group("asn").upper()
-            raw_captured_isp = m_fn.group("isp").replace("-", " ")
+            raw_captured_isp = m_fn.group("isp").replace("-", " ").replace("_", " ")
             fn_isp = re.sub(r"\.(?:csv|txt)$", "", raw_captured_isp, flags=re.IGNORECASE).strip()
             if m_fn.group("date") and m_fn.group("time") and not fn_time:
                 d = m_fn.group("date")
@@ -605,18 +606,21 @@ def parse_otc_scan_content(
                 colo_loc = p_val
                 continue
 
-            # 4. 识别 ISP 运营商名称
-            if not isp and idx in (3, 4, 5) and len(p_val) > 1:
-                isp = p_val
+            # 4. 识别 ISP 运营商名称 (排除 IPv6、机房位置括号、纯数字及短国家码)
+            if not isp and ":" not in p_val and "(" not in p_val and not p_val.isdigit():
+                if len(p_val) > 2 and not p_val.startswith("仅"):
+                    isp = p_val
 
         # 核心 ASN 判定规则：
-        # 若文件名明确指定了扫描目标 ASN（如 OTC_SCAN_YX_AS210644.txt），
-        # 则该文件内所有节点均以文件名中的目标 ASN 为准（如 AS210644）。
-        # 这彻底避免了作者扫描工具因本地离线 GeoIP 库过时，将该机房新购/租赁的网段误标为老旧上游历史 ASN（如 AS200019, AS207461, AS208185 等）
+        # 1. 若文件名明确指定了目标 ASN（如 OTC_SCAN_YX_AS210644.txt），全文件统一以文件名中目标 ASN 为准；
+        # 2. 若文件名没有 ASN（如混合文件 OTC_SCAN_YX_杂.txt），则直接以该行数据中具体的 ASN 与 ISP 为准；
         if fn_asn:
             asn = fn_asn
         elif not asn:
             asn = "AS_UNKNOWN"
+
+        if not isp and asn and asn != "AS_UNKNOWN" and asn in ASN_TO_PROVIDER:
+            isp = ASN_TO_PROVIDER[asn]
 
         colo = ""
         loc = colo_loc
