@@ -659,15 +659,33 @@ def parse_proxy_attachment_content(text: str) -> list[tuple[str, str]]:
     return results
 
 
+def get_telegram_download_dirs() -> list[str]:
+    """获取常见 Telegram Desktop 下载目录，支持直接读取客户端已下载的测速与代理文件"""
+    dirs = []
+    home = os.path.expanduser("~")
+    candidates = [
+        os.path.join(home, "Downloads", "Telegram Desktop"),
+        r"C:\Users\ASUS\Downloads\Telegram Desktop",
+        r"D:\Users\ASUS\Downloads\Telegram Desktop",
+    ]
+    for p in candidates:
+        if os.path.isdir(p) and p not in dirs:
+            dirs.append(p)
+    return dirs
+
+
 def load_local_import_proxies(import_dir: str = "import_proxies") -> dict:
-    """扫描本地 import_proxies 目录或项目根目录下的各类代理 txt 文件并自动解析导入"""
+    """扫描本地 import_proxies 目录、Telegram 下载目录或项目根目录下的各类代理 txt 文件并自动解析导入"""
     imported = {}
     files_to_check = set()
 
-    if os.path.isdir(import_dir):
-        for fname in os.listdir(import_dir):
-            if fname.lower().endswith(".txt"):
-                files_to_check.add(os.path.join(import_dir, fname))
+    scan_dirs = [import_dir] + get_telegram_download_dirs()
+    for d in scan_dirs:
+        if os.path.isdir(d):
+            for fname in os.listdir(d):
+                fname_lower = fname.lower()
+                if fname_lower.endswith(".txt") and (d == import_dir or any(k in fname_lower for k in ("proxy", "proxies", "http", "turn", "socks"))):
+                    files_to_check.add(os.path.join(d, fname))
 
     for fname in os.listdir("."):
         fname_lower = fname.lower()
@@ -691,15 +709,19 @@ def load_local_import_proxies(import_dir: str = "import_proxies") -> dict:
 
 
 def load_local_import_proxyips(import_dir: str = "import_proxyip") -> dict:
-    """扫描本地 import_proxyip 目录或项目根目录下的 proxyip 文件（支持 .txt 与 .csv）并自动解析导入"""
+    """扫描本地 import_proxyip 目录、Telegram 下载目录或项目根目录下的 proxyip 文件（支持 .txt 与 .csv）并自动解析导入"""
     imported = {}
     files_to_check = set()
 
-    if os.path.isdir(import_dir):
-        for fname in os.listdir(import_dir):
-            fname_lower = fname.lower()
-            if fname_lower.endswith(".txt") or fname_lower.endswith(".csv"):
-                files_to_check.add(os.path.join(import_dir, fname))
+    scan_dirs = [import_dir] + get_telegram_download_dirs()
+    for d in scan_dirs:
+        if os.path.isdir(d):
+            for fname in os.listdir(d):
+                fname_lower = fname.lower()
+                if "proxyip" in fname_lower and (fname_lower.endswith(".txt") or fname_lower.endswith(".csv")):
+                    files_to_check.add(os.path.join(d, fname))
+                elif d == import_dir and (fname_lower.endswith(".txt") or fname_lower.endswith(".csv")):
+                    files_to_check.add(os.path.join(d, fname))
 
     for fname in os.listdir("."):
         fname_lower = fname.lower()
@@ -748,16 +770,24 @@ def load_local_import_proxyips(import_dir: str = "import_proxyip") -> dict:
 
 
 def load_local_import_ips(import_dir: str = "import_ips") -> dict:
-    """扫描本地 import_ips 目录或项目根目录下的优选测速文件（支持 .txt 与 .csv，自动识别云厂商测速）并自动解析导入"""
+    """扫描本地 import_ips 目录、Telegram 下载目录或项目根目录下的优选测速文件（自动识别云厂商测速）并自动解析导入"""
     imported = {}
     files_to_check = set()
 
-    # 1. 检查 import_ips 文件夹（支持 .txt 与 .csv，过滤 proxyip 文件）
-    if os.path.isdir(import_dir):
-        for fname in os.listdir(import_dir):
-            fname_lower = fname.lower()
-            if (fname_lower.endswith(".txt") or fname_lower.endswith(".csv")) and "proxyip" not in fname_lower:
-                files_to_check.add(os.path.join(import_dir, fname))
+    # 1. 检查 import_ips 及 Telegram 客户端下载文件夹（自动过滤 proxyip 专属文件）
+    scan_dirs = [import_dir] + get_telegram_download_dirs()
+    for d in scan_dirs:
+        if os.path.isdir(d):
+            for fname in os.listdir(d):
+                fname_lower = fname.lower()
+                if "proxyip" in fname_lower:
+                    continue
+                if d == import_dir and (fname_lower.endswith(".txt") or fname_lower.endswith(".csv")):
+                    files_to_check.add(os.path.join(d, fname))
+                elif fname_lower.endswith(".csv") or (fname_lower.startswith("otc_scan") and fname_lower.endswith(".txt")):
+                    # 识别来自 Telegram 下载的测速文件 (如 AS*.csv, OTC_SCAN*.txt, 或已知云厂商/VPS测速)
+                    if fname_lower.startswith("as") or fname_lower.startswith("otc_scan") or any(k in fname_lower for k in KNOWN_CLOUD_PROVIDERS.keys()):
+                        files_to_check.add(os.path.join(d, fname))
 
     # 2. 检查根目录下匹配的优选文件（如 OTC_SCAN*.txt、AS*.csv、云服务器测速 *.csv 等，过滤 proxyip 文件）
     for fname in os.listdir("."):
