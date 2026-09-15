@@ -276,6 +276,11 @@ KNOWN_CLOUD_PROVIDERS = {
     "hostinger": ("AS47583", "Hostinger"),
     "m247": ("AS9009", "M247"),
     "datacamp": ("AS60068", "Datacamp Limited"),
+    "aeza": ("AS210644", "Aeza"),
+    "bytevirt": ("AS212336", "ByteVirt"),
+    "starry": ("AS134835", "Starry Network"),
+    "cyberverse": ("AS216211", "Cyberverse"),
+    "isif": ("AS209554", "ISIF OU"),
 
     # 运营商骨干与出海线路
     "hinet": ("AS3462", "Chunghwa Telecom HiNet"),
