@@ -541,8 +541,19 @@ def parse_cf_csv_content(
     return results
 
 
-def parse_otc_scan_content(text: str, default_channel: str = "@otcfxq", dt_str: str = "") -> list[dict]:
+def parse_otc_scan_content(
+    text: str,
+    default_channel: str = "@otcfxq",
+    filename: str = "",
+    dt_str: str = ""
+) -> list[dict]:
     """解析 OTC 优选扫描导出的 CSV 格式文件内容 (OTC_SCAN_YX_*.txt)"""
+    fn_asn = ""
+    if filename:
+        m_fn = re.search(r"(AS\d+)", filename, re.IGNORECASE)
+        if m_fn:
+            fn_asn = m_fn.group(1).upper()
+
     results = []
     for raw_line in text.splitlines():
         line = raw_line.strip()
@@ -562,19 +573,41 @@ def parse_otc_scan_content(text: str, default_channel: str = "@otcfxq", dt_str: 
         asn = ""
         isp = ""
         colo_loc = ""
-        # 依次探测 ASN 编号 (ASxxxx)
+        # 依次探测 ASN 编号 (ASxxxx 或纯数字)、Colo位置与 ISP
         for idx in range(2, len(parts)):
             p_val = parts[idx]
-            m_a = re.search(r"(AS\d+)", p_val, re.IGNORECASE)
+            if not p_val or p_val.upper() in ("N/A", "-", "NULL", "NONE"):
+                continue
+
+            # 1. 优先匹配带 AS 前缀的编号 (如 AS210644, AS906)
+            m_a = re.search(r"\b(AS\d+)\b", p_val, re.IGNORECASE)
             if m_a and not asn:
                 asn = m_a.group(1).upper()
-            elif "(" in p_val and ")" in p_val and not colo_loc:
+                continue
+
+            # 2. 匹配纯数字 ASN (如 210644, 212336，扫描器常省略 AS 前缀)
+            if p_val.isdigit() and not asn:
+                val_int = int(p_val)
+                if 1 <= val_int <= 4294967295:
+                    asn = f"AS{val_int}"
+                    continue
+
+            # 3. 匹配机房位置字段 (如 HKG (中国-香港), FRA (德国-法兰克福))
+            if "(" in p_val and ")" in p_val and not colo_loc:
                 colo_loc = p_val
-            elif not isp and idx in (3, 4) and not m_a and len(p_val) > 1:
+                continue
+
+            # 4. 识别 ISP 运营商名称
+            if not isp and idx in (3, 4, 5) and len(p_val) > 1:
                 isp = p_val
 
+        # 若行内未提取到有效 ASN，则回退继承文件名中的 ASN（如 OTC_SCAN_YX_AS210644.txt -> AS210644）
+        if not asn and fn_asn:
+            asn = fn_asn
+
+        # 若仍无法推断 ASN，保留为 AS_UNKNOWN，绝不硬编码为 AS13335
         if not asn:
-            asn = "AS13335"
+            asn = "AS_UNKNOWN"
 
         colo = ""
         loc = colo_loc
@@ -810,7 +843,7 @@ def load_local_import_ips(import_dir: str = "import_ips") -> dict:
             if base_fname.lower().endswith(".csv"):
                 items = parse_cf_csv_content(content, default_channel="@danfeng2", filename=base_fname, dt_str=mtime_bjt)
             else:
-                items = parse_otc_scan_content(content, default_channel="@otcfxq", dt_str=mtime_bjt)
+                items = parse_otc_scan_content(content, default_channel="@otcfxq", filename=base_fname, dt_str=mtime_bjt)
             for item in items:
                 key = f"{item['ip']}:{item['port']}"
                 imported[key] = item
@@ -853,6 +886,16 @@ def load_existing_cf_ips(filepath: str = OUTPUT_CF_FILE) -> dict:
                 ip = row.get("ip", "").strip()
                 port = row.get("port", "").strip()
                 if ip and port:
+                    # 自动修复历史数据中因纯数字 ASN 误判为 AS13335 的历史记录
+                    row_asn = row.get("asn", "").strip()
+                    row_isp = row.get("isp", "").strip()
+                    if row_asn == "AS13335":
+                        if row_isp.isdigit():
+                            row["asn"] = f"AS{row_isp}"
+                            row["isp"] = ""
+                        elif ip.startswith("69.8."):
+                            row["asn"] = "AS212336"
+                            row["isp"] = ""
                     existing[f"{ip}:{port}"] = row
         log.info("已加载本地已存优选 IP 记录: %d 条（历史记录全部保留）", len(existing))
     except Exception as e:
@@ -1120,6 +1163,13 @@ def save_and_notify(
             with open(asn_file, "w", encoding="utf-8") as f:
                 for r in sorted(group, key=lambda x: (x.get("ip", ""), int(x.get("port", 0)))):
                     f.write(f"{r['ip']}:{r['port']}\n")
+        # 清理已不存在的分组文件（例如已被纠偏移除的 AS13335.txt）
+        for old_f in os.listdir(OUTPUT_SCAN_DIR):
+            if old_f.endswith(".txt") and old_f[:-4] not in asn_groups:
+                try:
+                    os.remove(os.path.join(OUTPUT_SCAN_DIR, old_f))
+                except OSError:
+                    pass
         log.info("已在 %s/ 目录下生成 %d 个独立 ASN 纯文本列表", OUTPUT_SCAN_DIR, asn_groups_total)
 
         scan_ips_total = len(all_sorted_scan_rows)
@@ -1421,7 +1471,7 @@ async def run_telethon():
                                     if doc_bytes:
                                         doc_text = doc_bytes.decode("utf-8", errors="ignore")
                                         doc_date_str = msg.date.strftime("%Y-%m-%d %H:%M:%S") if msg.date else ""
-                                        doc_items = parse_otc_scan_content(doc_text, default_channel=channel_name, dt_str=doc_date_str)
+                                        doc_items = parse_otc_scan_content(doc_text, default_channel=channel_name, filename=msg.file.name, dt_str=doc_date_str)
                                         doc_added = 0
                                         for cf_item in doc_items:
                                             cf_key = f"{cf_item['ip']}:{cf_item['port']}"
