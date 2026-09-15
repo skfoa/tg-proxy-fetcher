@@ -4,13 +4,18 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
 
-每天自动从 Telegram 优质公开频道（[@otcfxq](https://t.me/otcfxq)、[@danfeng2](https://t.me/danfeng2)）抓取多协议代理节点与 Cloudflare 优选 IP。具备**永久增量持久化（只增不减）**与**智能去重**机制，自动生成通用代理列表、纯净 `IP:端口` 文本列表以及结构化测速数据表格，并通过 GitHub Actions 每天定时自动提交并推送到仓库。
+每天自动从 Telegram 优质公开频道（[@otcfxq](https://t.me/otcfxq)、[@danfeng2](https://t.me/danfeng2)）抓取多协议代理节点与 Cloudflare 优选 IP。具备**永久增量持久化（只增不减）**与**全局智能去重**机制，自动生成通用代理列表、纯净 `IP:端口` 文本列表以及结构化测速数据表格，并通过 GitHub Actions 每天定时自动提交并推送到仓库。
 
 > 🌟 **核心特性亮点**
 > - **🚀 免登录 / 零密钥模式（开箱即用）**：基于公开 Web 频道预览机制，**无需注册 Telegram API、无需配置任何 Secret 密钥、无需手机号或验证码**！Fork 或 Clone 即可直接跑通！
 > - **🛡️ 官方 API 模式（可选兼容）**：配置 `TG_API_ID` 与 `TG_SESSION_STR` 后自动无感升级为 Telethon MTProto 客户端协议。
 > - **📦 永久增量持久化（绝不超时淘汰）**：历史抓取的有效节点全部永久留存，新节点自动追加，重复节点按最新配置/测速实时更新覆盖，节点池只增不减、越用越丰富！
-> - **⚡ 纯净 IP:端口 列表导出**：自动导出纯文本格式的 `IP:端口` 列表（`cf_ips.txt`），方便直接复制或作为远程 IP 列表导入。
+> - **🔍 跨文件严格唯一去重**：以 `IP:端口` 为全局唯一主键，新老文件重复提取自动刷新覆盖，绝无重复行；IP 归属更正时自动迁移所属 ASN 文件。
+> - **📁 智能 ASN 分组与命名**：
+>   - **DanFeng 测速**：CSV 内部无 ASN 列时自动从文件名（如 `AS45102_CNNICALIBABACNNETAP_*.csv`）解析归类。
+>   - **OTC 优选扫描**：单 ASN 文件以文件名目标 ASN 为准；混合扫描文件（如 `OTC_SCAN_YX_杂.txt`）自动逐行提取具体 ASN 与 ISP 拆分归类。
+> - **⚡ 纯净 IP:端口 列表导出**：自动导出纯文本格式的 `IP:端口` 列表（`cf_ips.txt`、`scan_ips/*.txt`、`proxyip.txt`），方便直接复制或作为远程订阅导入。
+> - **📱 极简高亮 Telegram 运行卡片**：锁屏即知变动摘要、变动数据绿色加粗高亮、涵盖 Top 服务商预览、运行耗时统计与 Actions 日志直链。
 > - **🌐 Windows 本地智能环境自适应**：本地运行自动读取 Windows 系统代理（如 v2rayN 等），无缝突破网络限制。
 > - **🧹 自动维护与构建瘦身**：每次运行自动清理 GitHub Actions 历史记录，始终**仅保留最近 5 次运行记录**，告别冗余历史堆积！
 
@@ -21,10 +26,12 @@
 ```text
                       ┌─── @otcfxq ────────┐
                       │   (代理 + 优选IP)  │
-tg_fetch.py ──────────┤                    ├────► 增量抓取 & 智能去重 ──┬──► socks5.txt (通用多协议代理节点)
-(免登录/官方API双模)   │                    │                           ├──► cf_ips.txt (纯文本 IP:端口 列表)
-                      └─── @danfeng2 ──────┘                           ├──► cf_ips.csv (Cloudflare 优选 IP 详细表格)
-                           (优选IP 专属)                                 └──► Telegram Bot 运行卡片推送 (可选)
+tg_fetch.py ──────────┤                    ├────► 增量抓取 & 全局智能去重 ──┬──► socks5.txt (通用多协议代理节点)
+(免登录/官方API双模)   │                    │                               ├──► cf_ips.txt / cf_ips.csv (单条优选 IP)
+                      └─── @danfeng2 ──────┘                               ├──► scan_ips.txt / scan_ips.csv (扫描优选 IP 汇总)
+                           (优选IP 专属)                                     ├──► scan_ips/AS{ASN}_{ISP}.txt (独立机房纯文本)
+                                                                            ├──► proxyip.txt / proxyip.csv (反代 ProxyIP 专属池)
+                                                                            └──► Telegram Bot 运行卡片推送 (可选)
 ```
 
 ---
@@ -36,7 +43,7 @@ tg_fetch.py ──────────┤                    ├────
 | **`socks5.txt`** | 纯净多协议代理清单 | Clash、v2rayN、Sing-box、Shadowrocket 等 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/socks5.txt` |
 | **`cf_ips.txt`** | 频道日常单条优选 IP（纯文本） | 每行一个 `IP:端口`，来自频道每日单条通报消息 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/cf_ips.txt` |
 | **`cf_ips.csv`** | 频道日常单条优选 IP（数据表） | Excel 排序筛选、结构化详细数据 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/cf_ips.csv` |
-| **`scan_ips.txt`** | 扫描测速总清单（按 ASN 分组） | 所有扫描附件的优选 IP 汇总，带 `# ASxxx` 分组注释 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips.txt` |
+| **`scan_ips.txt`** | 扫描测速总清单（按 ASN 分组） | 所有扫描附件的优选 IP 汇总，带 `# ASxxx (厂商) - N个` 分组注释 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips.txt` |
 | **`scan_ips/*.txt`** | 独立 ASN + 厂商纯文本列表（单文件） | 如 `scan_ips/AS906_DMIT.txt`、`scan_ips/AS210644_Aeza.txt`，纯净 `IP:端口` 无注释，便于按机房订阅 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips/{ASN}_{ISP}.txt` |
 | **`scan_ips.csv`** | 扫描测速优选 IP（数据表） | 包含机房、ASN、运营商等指标，按 ASN 聚合排序 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips.csv` |
 | **`proxyip.txt`** | 反代 ProxyIP 清单（纯文本） | 每行一个 `IP:端口`，直接供 edgetunnel / Workers 等反代配置 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/proxyip.txt` |
@@ -68,7 +75,7 @@ tg_fetch.py ──────────┤                    ├────
 
 ---
 
-## 输出产物详细说明
+## 输出产物与去重规则详细说明
 
 ### 1. `socks5.txt`（代理节点清单）
 * **永久累积（只增不减）**：每次抓取优先读取历史文件，已存在的有效节点永久保留，绝不会因为时间推移被误删。
@@ -83,10 +90,20 @@ tg_fetch.py ──────────┤                    ├────
 
 ### 3. 扫描文件优选 IP（按 ASN 智能去重与分组）
 * **与单条日常 IP 物理隔离**：独立收录来自测速扫描附件（如 OTC 的 `OTC_SCAN_YX_*.txt`、DanFeng 的 `AS*.csv` 与云厂商测速 `Aliyun.csv`/`Tencent.csv`/`DMIT.csv`/`Akile.csv` 等常见云厂商及 VPS）以及放置在 `import_ips/` 文件夹中的批量优选文件。
-* **按 ASN 聚合去重**：同一 ASN 下多次抓取到的重复 `IP:端口` 自动去重更新。
-* **双模导出输出**：
-  1. **总汇总清单（`scan_ips.txt`）**：将所有 ASN 分组整合在一起，带有清晰的 ASN 标题注释（如 `# AS906 (DMIT Cloud Services) - 15 个`）。
-  2. **独立机房厂商文本（`scan_ips/ASxxx_厂商.txt`）**：在 `scan_ips/` 目录下按 ASN 及厂商名拆分生成独立文件（如 `scan_ips/AS906_DMIT.txt`、`scan_ips/AS210644_Aeza.txt`、`scan_ips/AS212336_ByteVirt.txt`），内容为 100% 纯净的 `IP:端口`，无任何注释，方便单独导入或远程订阅。
+* **智能归类与解析规则**：
+  1. **DanFeng 命名规范（`AS{ASN}_{ISP}_{DATE}_{TIME}.csv`）**：
+     - DanFeng 导出的 CSV 文件内部只有 `IP地址,端口,TLS,数据中心,地区,城市,网络延迟`，**内部无 ASN 与 ISP 列**。
+     - 脚本原生支持从**文件名**中直接读取权威目标 ASN、服务商名称及测速时间，并自动规范化。
+  2. **OTC 扫描文件（`OTC_SCAN_YX_*.txt`）**：
+     - **文件名含目标 ASN 时**（如 `OTC_SCAN_YX_AS210644.txt`）：全文件节点以文件名中的目标 ASN 为准，避免扫描端本地过时 GeoIP 离线库误标老旧上游历史 AS。
+     - **文件名无目标 ASN 时**（如混合扫描文件 `OTC_SCAN_YX_杂.txt`）：自动逐行读取探测每条具体的实际 ASN 与 ISP，分别归入对应机房组。
+* **跨文件严格去重与时效刷新**：
+  - **全局唯一**：无论新老文件，均以 `IP:端口` 为全局主键，**绝对不会在任何产物中出现重复 IP 行**。
+  - **时效覆盖**：新文件中的最新延迟、更新时间与配置自动覆盖刷新老旧数据。
+  - **归属迁移**：若某 IP 在新文件中被修正了归属机房，它会自动迁移至新机房的 `scan_ips/AS{新ASN}_{厂商}.txt`，旧分组中自动清除，绝不跨组重复。
+* **三模导出输出**：
+  1. **总汇总清单（`scan_ips.txt`）**：将所有 ASN 分组整合在一起，带有清晰的 ASN 标题注释（如 `# AS906 (DMIT) - 15 个`）。
+  2. **独立机房厂商文本（`scan_ips/ASxxx_厂商.txt`）**：在 `scan_ips/` 目录下按 ASN 及厂商名拆分生成独立文件（如 `scan_ips/AS906_DMIT.txt`、`scan_ips/AS210644_Aeza.txt`、`scan_ips/AS212336_ByteVirt.txt`），内容为 100% 纯净的 `IP:端口`，无任何注释，方便单独导入或按机房远程订阅。
   3. **结构化总表（`scan_ips.csv`）**：按 ASN 字母序聚合排序，方便通过 Excel 集中筛选分析。
 
 ### 4. `proxyip.txt` / `proxyip.csv`（反代 ProxyIP 专属池）
@@ -96,7 +113,7 @@ tg_fetch.py ──────────┤                    ├────
 
 ### 5. 本地文件批量导入支持（可选）
 * **`import_proxies/` 目录**：将下载的代理 txt 附件（如 `http_proxies.txt`、`turn_proxies.txt`）放置在此目录，运行后自动解析并去重合并入 `socks5.txt`。
-* **`import_ips/` 目录**：将下载的优选扫描附件（支持 OTC 的 `OTC_SCAN_YX_*.txt`、DanFeng 的 `AS*.csv` 及云厂商测速 `Aliyun.csv`/`Tencent.csv`/`HWCloud.csv`/`Ucloud.csv`/`DMIT.csv`/`Akile.csv`/`RackNerd.csv` 等常见云厂商及 VPS）放置在此目录，运行后自动解析并按 ASN 分组生成 `scan_ips.txt` 与 `scan_ips/` 独立文件。
+* **`import_ips/` 目录**：将下载的优选扫描附件（支持 OTC 的 `OTC_SCAN_YX_*.txt`、DanFeng 的 `AS*.csv` 及云厂商测速 `Aliyun.csv`/`Tencent.csv`/`HWCloud.csv`/`Ucloud.csv`/`DMIT.csv`/`Akile.csv`/`RackNerd.csv` 等常见云厂商及 VPS）放置在此目录，运行后自动解析并按 ASN 分组生成 `scan_ips.txt` 与 `scan_ips/` 独立文件。自动按文件修改时间排序，新文件自动覆盖老数据。
 * **`import_proxyip/` 目录**：将下载的反代附件（如 `Global-proxyip-443.csv`、`Global-proxyip-8443.csv`）放置在此目录，运行后自动解析并去重生成 `proxyip.txt` 与 `proxyip.csv`。
 
 ### 6. 数据表通用字段说明
@@ -132,8 +149,32 @@ tg_fetch.py ──────────┤                    ├────
 | `TG_SESSION_STR` | Telethon 会话字符串（由 `gen_session.py` 生成） | 否 | 留空则使用免登录 Web 模式 |
 | `FETCH_DAYS` | 单次增量回溯天数（扫描窗口） | 否 | 默认 `3` 天（可在 Variables 中自定义） |
 | `PROXY` | 本地抓取代理（如 `socks5h://127.0.0.1:10808`） | 否 | Windows 本地运行可自动读取系统代理设置 |
-| `TG_BOT_TOKEN` | TG 通知机器人 Token | 否 | 用于抓取完成后推送运行结果卡片 |
-| `TG_CHAT_ID` | TG 通知接收人的 Chat ID 或频道/群组 ID | 否 | 用于抓取完成后推送运行结果卡片 |
+| `TG_BOT_TOKEN` | TG 通知机器人 Token | 否 | 用于抓取完成后推送精致运行结果卡片 |
+| `TG_CHAT_ID` | TG 通知接收人的 Chat ID 或频道/群组 ID | 否 | 用于抓取完成后推送精致运行结果卡片 |
+
+---
+
+## 📱 Telegram 运行通知卡片示例
+
+配置 `TG_BOT_TOKEN` 与 `TG_CHAT_ID` 后，每次运行完成后会自动发送现代精简风的统计卡片：
+
+```text
+🚀 节点与优选 IP 同步完成 (🟢 发现 +1181 条新数据)
+━━━━━━━━━━━━━━━━━━━━
+📅 时间：2026-09-15 19:25:30 (北京时间)
+📫 可用代理：74 个 (保持最新)
+🌐 单条优选：36 条 (🟢 +2 新增 · 🔄 10 刷新)
+📁 扫描优选：1179 条 (🟢 +1179 新增 · 20 个 ASN)
+   └ 涵盖: Aeza, DMIT, ByteVirt, Starry Network 等
+📡 频道来源：@otcfxq, @danfeng2
+━━━━━━━━━━━━━━━━━━━━
+⚡ 耗时: 4.2s · 🔗 Action #28 · 📦 产物仓库
+```
+
+* **锁屏即知变动**：首行直接显示 `(🟢 发现 +N 条新数据)` 或 `(数据已全部为最新)`，免解锁即可了解运行状况。
+* **增量绿色高亮**：关键新增项鲜明高亮，无更新品类自动归整为 `保持最新`。
+* **厂商覆盖一览**：自动统计展示覆盖的主力机房与服务商。
+* **一键直达日志**：自动带上对应的 GitHub Action 运行记录与仓库文件直达超链接。
 
 ---
 
@@ -178,7 +219,7 @@ python tg_fetch.py
 - 智能增量合并更新 `socks5.txt`、`cf_ips.txt` 与 `cf_ips.csv`，历史节点永久留存。
 - 具备并发互斥锁（`concurrency`）与 `git pull --rebase` 自动防冲突机制。
 - 具备 `if: always()` 容错提交机制与存在性校验，有变动自动提交并推送回仓库。
-- 执行完成后（若配置了机器人凭据）自动向 Telegram 发送运行统计卡片。
+- 执行完成后（若配置了机器人凭据）自动向 Telegram 发送精致运行统计卡片。
 - 支持在 GitHub 仓库 **Actions** 页面随时点击 **Run workflow** 手动触发立即更新。
 
 ---
