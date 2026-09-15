@@ -3,6 +3,8 @@ __pycache__/
 .env
 *.session
 *.session-journal
+.idea/
+.vscode/
 
 # 忽略本地放入 import_* 文件夹下的临时导入文件，保留目录占位符 .gitkeep
 import_*/*

@@ -129,7 +129,7 @@ tg_fetch.py ──────────┤                    ├────
 | :--- | :--- | :---: | :--- |
 | `TG_API_ID` | Telegram API ID（纯数字） | 否 | 留空则使用免登录 Web 模式 |
 | `TG_API_HASH` | Telegram API Hash（32位字符） | 否 | 留空则使用免登录 Web 模式 |
-| `TG_SESSION_STR` | Telethon 会话字符串（由 `tg_session.py` 生成） | 否 | 留空则使用免登录 Web 模式 |
+| `TG_SESSION_STR` | Telethon 会话字符串（由 `gen_session.py` 生成） | 否 | 留空则使用免登录 Web 模式 |
 | `FETCH_DAYS` | 单次增量回溯天数（扫描窗口） | 否 | 默认 `3` 天（可在 Variables 中自定义） |
 | `PROXY` | 本地抓取代理（如 `socks5h://127.0.0.1:10808`） | 否 | Windows 本地运行可自动读取系统代理设置 |
 | `TG_BOT_TOKEN` | TG 通知机器人 Token | 否 | 用于抓取完成后推送运行结果卡片 |
@@ -157,7 +157,7 @@ python tg_fetch.py
 如果拥有 Telegram API 凭据，可生成 Session 字符串：
 ```bash
 pip install -r requirements.txt
-python tg_session.py
+python gen_session.py
 ```
 按终端提示输入凭据并生成 Session 字符串后，配置环境变量即可运行：
 ```bash
