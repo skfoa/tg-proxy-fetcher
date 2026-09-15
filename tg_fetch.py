@@ -601,12 +601,13 @@ def parse_otc_scan_content(
             if not isp and idx in (3, 4, 5) and len(p_val) > 1:
                 isp = p_val
 
-        # 若行内未提取到有效 ASN，则回退继承文件名中的 ASN（如 OTC_SCAN_YX_AS210644.txt -> AS210644）
-        if not asn and fn_asn:
+        # 核心 ASN 判定规则：
+        # 若文件名明确指定了扫描目标 ASN（如 OTC_SCAN_YX_AS210644.txt），
+        # 则该文件内所有节点均以文件名中的目标 ASN 为准（如 AS210644）。
+        # 这彻底避免了作者扫描工具因本地离线 GeoIP 库过时，将该机房新购/租赁的网段误标为老旧上游历史 ASN（如 AS200019, AS207461, AS208185 等）
+        if fn_asn:
             asn = fn_asn
-
-        # 若仍无法推断 ASN，保留为 AS_UNKNOWN，绝不硬编码为 AS13335
-        if not asn:
+        elif not asn:
             asn = "AS_UNKNOWN"
 
         colo = ""
@@ -896,6 +897,20 @@ def load_existing_cf_ips(filepath: str = OUTPUT_CF_FILE) -> dict:
                         elif ip.startswith("69.8."):
                             row["asn"] = "AS212336"
                             row["isp"] = ""
+
+                    # 按批次时间戳与目标扫描文件对齐权威机房 ASN（消除扫描器离线库脏数据导致的碎片化）
+                    row_time = row.get("tested_at", "").strip()
+                    row_channel = row.get("channel", "").strip()
+                    time_to_target_asn = {
+                        "2026-09-15 01:51:13": "AS210644",  # OTC_SCAN_YX_AS210644.txt
+                        "2026-09-14 01:37:21": "AS906",     # OTC_SCAN_YX_AS906.txt
+                        "2026-09-14 01:57:47": "AS212336",  # OTC_SCAN_YX_AS212336.txt
+                        "2026-09-14 03:11:07": "AS134835",  # OTC_SCAN_YX_AS134835.txt
+                        "2026-09-14 02:27:18": "AS216211",  # OTC_SCAN_YX_AS216211.txt
+                        "2026-09-14 02:42:21": "AS209554",  # OTC_SCAN_YX_AS209554.txt
+                    }
+                    if row_channel == "@otcfxq" and row_time in time_to_target_asn:
+                        row["asn"] = time_to_target_asn[row_time]
                     existing[f"{ip}:{port}"] = row
         log.info("已加载本地已存优选 IP 记录: %d 条（历史记录全部保留）", len(existing))
     except Exception as e:
