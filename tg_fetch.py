@@ -1482,7 +1482,14 @@ def run_web_scraper():
     final_proxies = {**existing_proxies, **scraped_proxies}
     final_cf_ips = {**existing_cf_ips, **scraped_cf_ips}
     final_scan_ips = {**existing_scan_ips, **scraped_scan_ips}
-    final_proxyips = {**existing_proxyips, **scraped_proxyips}
+    final_proxyips = dict(existing_proxyips)
+    for k, v in scraped_proxyips.items():
+        if k in final_proxyips:
+            if not v.get("cf_clean") and final_proxyips[k].get("cf_clean"):
+                v["cf_clean"] = final_proxyips[k]["cf_clean"]
+            final_proxyips[k].update(v)
+        else:
+            final_proxyips[k] = v
 
     log.info("=" * 50)
     log.info("代理节点增量合并: 历史保留 %d 个, 本次新增 %d 个, 本次更新 %d 个 -> 全量总计 %d 个", 
@@ -1707,7 +1714,14 @@ async def run_telethon():
         final_proxies = {**existing_proxies, **scraped_proxies}
         final_cf_ips = {**existing_cf_ips, **scraped_cf_ips}
         final_scan_ips = {**existing_scan_ips, **scraped_scan_ips}
-        final_proxyips = {**existing_proxyips, **scraped_proxyips}
+        final_proxyips = dict(existing_proxyips)
+        for k, v in scraped_proxyips.items():
+            if k in final_proxyips:
+                if not v.get("cf_clean") and final_proxyips[k].get("cf_clean"):
+                    v["cf_clean"] = final_proxyips[k]["cf_clean"]
+                final_proxyips[k].update(v)
+            else:
+                final_proxyips[k] = v
 
         log.info("=" * 50)
         log.info("代理节点增量合并: 历史保留 %d 个, 本次新增 %d 个, 本次更新 %d 个 -> 全量总计 %d 个", 

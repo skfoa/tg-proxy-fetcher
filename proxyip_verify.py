@@ -237,8 +237,14 @@ def save_proxyip(
     # 稳定双重排序：先按 tested_at 降序（最新优先），再按 (fail_count, delay_ms) 升序
     rows.sort(key=lambda r: r.get("tested_at", ""), reverse=True)
 
+    def _get_fc(r):
+        try:
+            return int(r.get("fail_count") or 0)
+        except (ValueError, TypeError):
+            return 0
+
     def _sort_key(r):
-        fc = int(r.get("fail_count", 0))
+        fc = _get_fc(r)
         try:
             delay = int(r.get("delay_ms") or 99999)
         except (ValueError, TypeError):
@@ -262,7 +268,7 @@ def save_proxyip(
     # 提纯双料优选反代节点 (cf_clean=true 且 fail_count=0)
     cf_clean_rows = [
         r for r in rows
-        if r.get("cf_clean") == "true" and int(r.get("fail_count", 0)) == 0
+        if r.get("cf_clean") == "true" and _get_fc(r) == 0
     ]
     with open(cf_txt_path, "w", encoding="utf-8") as f:
         for r in cf_clean_rows:
@@ -298,6 +304,12 @@ async def verify_proxyips(
     indices = list(range(total))
     random.shuffle(indices)
 
+    def _get_fc(r):
+        try:
+            return int(r.get("fail_count") or 0)
+        except (ValueError, TypeError):
+            return 0
+
     async def _check(idx: int):
         nonlocal pass_count, fail_count_total, cf_clean_count, completed
         row = rows[idx]
@@ -311,7 +323,7 @@ async def verify_proxyips(
         ip = (row.get("ip") or "").strip()
         if not ip or port <= 0 or port > 65535:
             completed += 1
-            fc = int(row.get("fail_count", 0))
+            fc = _get_fc(row)
             row["fail_count"] = fc + 1
             row["cf_clean"] = "false"
             fail_count_total += 1
@@ -328,7 +340,7 @@ async def verify_proxyips(
                 )
 
         completed += 1
-        fc = int(row.get("fail_count", 0))
+        fc = _get_fc(row)
         if alive:
             row["fail_count"] = 0
             row["delay_ms"] = latency
@@ -343,9 +355,9 @@ async def verify_proxyips(
             row["cf_clean"] = "false"
             fail_count_total += 1
 
-        if completed % 2000 == 0 or completed == total:
+        if completed % 1000 == 0 or completed == total:
             log.info(
-                "[ProxyIP 质检] 进度: %d/%d (%.1f%%) - 存活: %d (🌟优选双料: %d), 标记: %d",
+                "[ProxyIP 质检进度] %d/%d (%.1f%%) - 存活: %d (🌟优选双料: %d), 标记: %d",
                 completed, total, completed / total * 100, pass_count, cf_clean_count, fail_count_total,
             )
 
@@ -474,11 +486,17 @@ async def async_main(args):
         http_timeout=args.http_timeout,
     )
 
-    pass_count = sum(1 for r in rows if int(r.get("fail_count", 0)) == 0)
+    def _get_fc(r):
+        try:
+            return int(r.get("fail_count") or 0)
+        except (ValueError, TypeError):
+            return 0
+
+    pass_count = sum(1 for r in rows if _get_fc(r) == 0)
     fail_count = total - pass_count
 
     # 物理淘汰连续失败达到阈值的节点
-    survivors = [r for r in rows if int(r.get("fail_count", 0)) < args.max_fails]
+    survivors = [r for r in rows if _get_fc(r) < args.max_fails]
     eliminated = total - len(survivors)
     survivors_len = len(survivors)
 
