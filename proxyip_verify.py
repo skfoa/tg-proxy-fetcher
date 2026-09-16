@@ -177,6 +177,10 @@ async def probe_cf_clean(
             asyncio.open_connection(ip, port, ssl=SSL_CTX_CF, server_hostname=PROBE_HOST_CF),
             timeout=connect_timeout,
         )
+    except Exception:
+        return False
+
+    try:
         req = (
             f"GET / HTTP/1.1\r\n"
             f"Host: {PROBE_HOST_CF}\r\n"

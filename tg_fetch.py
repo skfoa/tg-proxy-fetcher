@@ -104,6 +104,7 @@ CF_CSV_FIELDS = [
     "channel",
     "fail_count",
 ]
+PROXYIP_CSV_FIELDS = CF_CSV_FIELDS + ["cf_clean"]
 
 logging.basicConfig(
     level=logging.INFO,
@@ -1348,10 +1349,11 @@ def save_and_notify(
             reverse=True,
         )
         with open(OUTPUT_PROXYIP_FILE, "w", encoding="utf-8-sig", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=CF_CSV_FIELDS, extrasaction="ignore")
+            writer = csv.DictWriter(f, fieldnames=PROXYIP_CSV_FIELDS, extrasaction="ignore")
             writer.writeheader()
             for row in sorted_proxyips:
                 row.setdefault("fail_count", 0)
+                row.setdefault("cf_clean", "")
                 writer.writerow(row)
         log.info("已保存反代 ProxyIP 表格: %s (%d 条全量累积记录)", OUTPUT_PROXYIP_FILE, len(sorted_proxyips))
 
