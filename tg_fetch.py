@@ -757,14 +757,19 @@ def load_local_import_proxies(import_dir: str = "import_proxies") -> dict:
         if os.path.isdir(d):
             for fname in os.listdir(d):
                 fname_lower = fname.lower()
+                if "proxyip" in fname_lower:
+                    continue
                 if fname_lower.endswith(".txt") and (d == import_dir or any(k in fname_lower for k in ("proxy", "proxies", "http", "turn", "socks"))):
                     files_to_check.add(os.path.join(d, fname))
 
     for fname in os.listdir("."):
         fname_lower = fname.lower()
-        if fname_lower.endswith(".txt") and not fname_lower.startswith("otc_scan") and any(k in fname_lower for k in ("proxy", "proxies", "http", "turn", "socks")):
-            if fname not in (OUTPUT_PROXY_FILE, OUTPUT_CF_TXT, OUTPUT_SCAN_TXT):
-                files_to_check.add(fname)
+        if "proxyip" in fname_lower or fname_lower.startswith("otc_scan"):
+            continue
+        if fname in (OUTPUT_PROXY_FILE, OUTPUT_CF_TXT, OUTPUT_SCAN_TXT, OUTPUT_PROXYIP_TXT, OUTPUT_PROXYIP_FILE, "proxyip_cf.txt"):
+            continue
+        if fname_lower.endswith(".txt") and any(k in fname_lower for k in ("proxy", "proxies", "http", "turn", "socks")):
+            files_to_check.add(fname)
 
     for fpath in files_to_check:
         try:
@@ -1592,7 +1597,7 @@ async def run_telethon():
                         # 支持自动下载并解析代理文件附件 (如 http_proxies.txt, https_proxies.txt, turn_proxies.txt 等)
                         if msg.file and msg.file.name and msg.file.name.lower().endswith(".txt"):
                             fname_lower = msg.file.name.lower()
-                            if not fname_lower.startswith("otc_scan") and any(k in fname_lower for k in ("proxy", "proxies", "http", "turn", "socks")):
+                            if not fname_lower.startswith("otc_scan") and "proxyip" not in fname_lower and any(k in fname_lower for k in ("proxy", "proxies", "http", "turn", "socks")):
                                 try:
                                     doc_bytes = await client.download_media(msg, file=bytes)
                                     if doc_bytes:
