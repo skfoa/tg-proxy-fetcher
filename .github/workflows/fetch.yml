@@ -7,9 +7,9 @@ on:
   workflow_dispatch: # 支持在 GitHub 页面手动点击触发运行
     inputs:
       fetch_days:
-        description: "回溯天数 (默认 85 天，覆盖 7 月以来的全量历史文件)"
+        description: "回溯天数 (默认 3 天)"
         required: false
-        default: "85"
+        default: "3"
 
 concurrency:
   group: fetch-proxies
@@ -42,7 +42,7 @@ jobs:
           TG_SESSION_STR: ${{ secrets.TG_SESSION_STR }}
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
-          FETCH_DAYS: ${{ inputs.fetch_days || vars.FETCH_DAYS || '85' }}
+          FETCH_DAYS: ${{ inputs.fetch_days || vars.FETCH_DAYS || '3' }}
         run: python tg_fetch.py
 
       - name: 📄 提交并推送数据

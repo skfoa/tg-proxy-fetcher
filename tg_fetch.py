@@ -57,7 +57,7 @@ if os.path.isfile(_env_path):
 TG_API_ID = os.getenv("TG_API_ID") or ""
 TG_API_HASH = os.getenv("TG_API_HASH") or ""
 TG_SESSION_STR = os.getenv("TG_SESSION_STR") or ""
-FETCH_DAYS = int(os.getenv("FETCH_DAYS") or "85")
+FETCH_DAYS = int(os.getenv("FETCH_DAYS") or "3")
 PROXY = os.getenv("PROXY") or os.getenv("ALL_PROXY") or os.getenv("HTTPS_PROXY") or ""
 
 TG_BOT_TOKEN = os.getenv("TG_BOT_TOKEN") or ""
