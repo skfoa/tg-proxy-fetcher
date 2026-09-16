@@ -6,7 +6,7 @@ Cloudflare 优选 IP 两阶段主动校验与淘汰引擎
   阶段一：TLS 握手 + CA 证书校验（server_hostname=crypto.cloudflare.com）
   阶段二：同一连接发送 HTTP 请求，验证返回 301 且 Server: cloudflare
 
-连续失败达到阈值（默认 3 次）的死节点，将全面从以下所有产物中永久删除：
+连续失败达到阈值（默认 2 次）的死节点，将全面从以下所有产物中永久删除：
   1. scan_ips.csv、scan_ips.txt、scan_ips/*.txt (独立机房分组文本)
   2. cf_ips.csv、cf_ips.txt (单条优选数据表与纯文本清单)
 """
@@ -607,7 +607,7 @@ async def async_main(args):
 def main():
     parser = argparse.ArgumentParser(description="Cloudflare 优选 IP 两阶段主动校验与淘汰引擎")
     parser.add_argument("--concurrency", type=int, default=250, help="并发探测协程数 (默认 250)")
-    parser.add_argument("--max-fails", type=int, default=3, help="连续失败淘汰阈值 (默认 3)")
+    parser.add_argument("--max-fails", type=int, default=2, help="连续失败淘汰阈值 (默认 2)")
     parser.add_argument("--timeout", type=float, default=TIMEOUT, help="单节点连接与 TLS 握手超时秒数 (默认 3.0)")
     parser.add_argument("--http-timeout", type=float, default=HTTP_TIMEOUT, help="单节点 HTTP 校验超时秒数 (默认 2.0)")
     args = parser.parse_args()

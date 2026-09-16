@@ -50,7 +50,7 @@ jobs:
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
-        run: python cf_verify.py --concurrency 250 --max-fails 3 --timeout 3.0
+        run: python cf_verify.py --concurrency 250 --max-fails 2 --timeout 3.0
 
       - name: 📄 提交并推送数据
         if: always()
