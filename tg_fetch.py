@@ -37,10 +37,27 @@ if sys.platform == "win32":
 START_TIME = time.time()
 
 # ================= 配置区域 =================
+# 自动加载本地 .env 文件（若存在）
+_env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+if os.path.isfile(_env_path):
+    try:
+        with open(_env_path, "r", encoding="utf-8") as _ef:
+            for _line in _ef:
+                _line = _line.strip()
+                if not _line or _line.startswith("#") or "=" not in _line:
+                    continue
+                _k, _v = _line.split("=", 1)
+                _k = _k.strip()
+                _v = _v.strip().strip("'").strip('"')
+                if _k and _k not in os.environ:
+                    os.environ[_k] = _v
+    except Exception:
+        pass
+
 TG_API_ID = os.getenv("TG_API_ID") or ""
 TG_API_HASH = os.getenv("TG_API_HASH") or ""
 TG_SESSION_STR = os.getenv("TG_SESSION_STR") or ""
-FETCH_DAYS = int(os.getenv("FETCH_DAYS") or "3")
+FETCH_DAYS = int(os.getenv("FETCH_DAYS") or "85")
 PROXY = os.getenv("PROXY") or os.getenv("ALL_PROXY") or os.getenv("HTTPS_PROXY") or ""
 
 TG_BOT_TOKEN = os.getenv("TG_BOT_TOKEN") or ""
