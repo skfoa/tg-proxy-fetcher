@@ -341,10 +341,7 @@ def send_verify_notification(
     bjt = datetime.now(timezone(timedelta(hours=8)))
     date_str = bjt.strftime("%Y-%m-%d %H:%M:%S")
 
-    total_eliminated = cf_eliminated + scan_eliminated
-    total_survivors = cf_survivors + scan_survivors
-
-    # 检查是否存在 tg_fetch 暂存的抓取统计
+    # 检查是否存在 tg_fetch 暂存的抓取统计及 proxyip_verify 质检统计
     fetch_stats_file = ".fetch_stats.json"
     fetch_stats = None
     if os.path.isfile(fetch_stats_file):
@@ -353,6 +350,17 @@ def send_verify_notification(
                 fetch_stats = json.load(sf)
         except Exception as e:
             log.warning("读取暂存抓取统计 %s 失败: %s", fetch_stats_file, e)
+
+    proxyip_verified = False
+    proxyip_eliminated = 0
+    proxyip_survivors = 0
+    if fetch_stats and fetch_stats.get("proxyip_verified"):
+        proxyip_verified = True
+        proxyip_eliminated = fetch_stats.get("proxyip_eliminated", 0)
+        proxyip_survivors = fetch_stats.get("proxyip_survivors", 0)
+
+    total_eliminated = cf_eliminated + scan_eliminated + proxyip_eliminated
+    total_survivors = cf_survivors + scan_survivors + proxyip_survivors
 
     def format_diff(new_c: int, upd_c: int) -> str:
         parts = []
@@ -375,6 +383,7 @@ def send_verify_notification(
     total_elapsed = elapsed_verify
     if fetch_stats:
         total_elapsed += fetch_stats.get("elapsed_seconds", 0.0)
+        total_elapsed += fetch_stats.get("proxyip_elapsed", 0.0)
     footer_parts.append(f"⚡ <b>总耗时</b>: {total_elapsed:.1f}s")
     if github_repo:
         repo_url = f"{github_server}/{github_repo}"
@@ -432,14 +441,28 @@ def send_verify_notification(
             scan_line += f"   └ <i>涵盖: {prov_preview}</i>\n"
 
         proxyip_line = ""
-        if proxyips_count > 0:
+        if proxyip_verified:
+            p_pass = fetch_stats.get("proxyip_pass", 0)
+            p_fail = fetch_stats.get("proxyip_fail", 0)
+            p_surv = fetch_stats.get("proxyip_survivors", proxyips_count)
+            p_status = f"✅ {p_pass} 存活" + (f" · ⚠️ {p_fail} 标记" if p_fail > 0 else "")
+            proxyip_line = f"🛡️ <b>反代 ProxyIP</b>：<code>{p_surv}</code> 条 ({p_status})\n"
+        elif proxyips_count > 0:
             proxyip_line = f"🛡️ <b>反代 ProxyIP</b>：<code>{proxyips_count}</code> 条 ({format_diff(new_proxyips, updated_proxyips)})\n"
 
-        verify_block = (
-            f"🛡️ <b>主动鉴真淘汰</b>：\n"
-            f"   • 检验规格：TLS 握手 + HTTP 301 ({concurrency} 并发)\n"
-            f"   • 淘汰死节点：{elim_str}\n"
-        )
+        if proxyip_verified:
+            verify_block = (
+                f"🛡️ <b>主动鉴真淘汰</b>：\n"
+                f"   • 优选检验：TLS 握手 + HTTP 301 ({concurrency} 并发)\n"
+                f"   • 反代检验：/cdn-cgi/trace 深度穿透\n"
+                f"   • 淘汰死节点：{elim_str}\n"
+            )
+        else:
+            verify_block = (
+                f"🛡️ <b>主动鉴真淘汰</b>：\n"
+                f"   • 检验规格：TLS 握手 + HTTP 301 ({concurrency} 并发)\n"
+                f"   • 淘汰死节点：{elim_str}\n"
+            )
 
         channels_str = ", ".join(dict.fromkeys(channels))
 

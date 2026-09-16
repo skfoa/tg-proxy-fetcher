@@ -1,0 +1,457 @@
+#!/usr/bin/env python3
+"""
+Cloudflare 反代 ProxyIP 穿透质检与淘汰引擎 (proxyip_verify.py)
+
+专门针对反代 ProxyIP（proxyip.csv / proxyip.txt）执行深层应用层协议穿透探测：
+  1. TCP 三次握手 + TLS ClientHello（SNI: speed.cloudflare.com, 跳过反代非官方证书校验）
+  2. HTTP/1.1 GET /cdn-cgi/trace 探针请求（浏览器伪装 UA, Connection: close）
+  3. 严格三维校验：HTTP 200 + Server: cloudflare + 正则解析有效 colo 机房码
+  4. 优雅四次挥手关闭连接（writer.close + wait_closed），杜绝 RST 异常
+
+淘汰与排序机制：
+  - 存活节点：fail_count 重置为 0，回填实时 delay_ms 与 colo 机房码
+  - 失败节点：fail_count 递增 +1
+  - 物理淘汰：连续失败达到阈值（默认 2 次）的死节点从 proxyip.csv 与 proxyip.txt 中永久删除
+  - 排序落盘：存活优先（fail_count 升序），延迟升序（delay_ms 升序），最新测试降序
+"""
+
+import argparse
+import asyncio
+import csv
+import json
+import logging
+import os
+import random
+import re
+import ssl
+import sys
+import time
+import urllib.request
+from datetime import datetime, timezone, timedelta
+
+# 自动加载本地 .env 文件（若存在）
+_env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+if os.path.isfile(_env_path):
+    try:
+        with open(_env_path, "r", encoding="utf-8") as _ef:
+            for _line in _ef:
+                _line = _line.strip()
+                if not _line or _line.startswith("#") or "=" not in _line:
+                    continue
+                _k, _v = _line.split("=", 1)
+                _k = _k.strip()
+                _v = _v.strip().strip("'").strip('"')
+                if _k and _k not in os.environ:
+                    os.environ[_k] = _v
+    except Exception:
+        pass
+
+TG_BOT_TOKEN = os.getenv("TG_BOT_TOKEN") or ""
+TG_CHAT_ID = os.getenv("TG_CHAT_ID") or ""
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+log = logging.getLogger("proxyip-verify")
+
+# Windows 异步事件循环策略与 UTF-8 输出
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+        sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
+# ---------- 常量与配置 ----------
+PROXYIP_CSV = "proxyip.csv"
+PROXYIP_TXT = "proxyip.txt"
+
+PROBE_HOST = "speed.cloudflare.com"
+PROBE_PATH = "/cdn-cgi/trace"
+TIMEOUT = 2.0
+HTTP_TIMEOUT = 2.5
+CONCURRENCY = 300
+MAX_FAILS = 2
+
+# 与 tg_fetch.py 保持 100% 兼容的 12 字段
+CSV_FIELDS = [
+    "ip", "port", "tls", "delay_ms", "speed_kbs",
+    "colo", "cf_location", "isp", "asn",
+    "tested_at", "channel", "fail_count",
+]
+
+# 反代服务器证书通常是自签名或非 Cloudflare 官方证书，必须跳过证书链校验
+SSL_CTX = ssl.create_default_context()
+SSL_CTX.check_hostname = False
+SSL_CTX.verify_mode = ssl.CERT_NONE
+
+
+# ---------- 核心探测函数 ----------
+async def probe_proxyip(
+    ip: str,
+    port: int,
+    connect_timeout: float = TIMEOUT,
+    http_timeout: float = HTTP_TIMEOUT,
+) -> tuple[bool, int, str]:
+    """
+    对单个 ProxyIP 节点执行 TLS 穿透 + /cdn-cgi/trace 鉴真。
+
+    返回 (is_alive, latency_ms, colo):
+        is_alive=True  -> 探测成功，latency_ms 为握手延迟，colo 为解析到的机房代号
+        is_alive=False -> 探测失败，latency_ms 为 0，colo 为空字符串
+    """
+    t0 = asyncio.get_event_loop().time()
+    try:
+        reader, writer = await asyncio.wait_for(
+            asyncio.open_connection(ip, port, ssl=SSL_CTX, server_hostname=PROBE_HOST),
+            timeout=connect_timeout,
+        )
+        t1 = asyncio.get_event_loop().time()
+        latency_ms = max(1, int((t1 - t0) * 1000))
+    except Exception:
+        return False, 0, ""
+
+    try:
+        req = (
+            f"GET {PROBE_PATH} HTTP/1.1\r\n"
+            f"Host: {PROBE_HOST}\r\n"
+            f"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36\r\n"
+            f"Accept: */*\r\n"
+            f"Connection: close\r\n"
+            f"\r\n"
+        ).encode("latin1")
+        writer.write(req)
+        await asyncio.wait_for(writer.drain(), timeout=http_timeout)
+
+        resp = await asyncio.wait_for(reader.read(2048), timeout=http_timeout)
+        resp_text = resp.decode("utf-8", errors="ignore")
+
+        # 严格三维校验：
+        # 1. HTTP 状态码 200
+        lines = resp_text.splitlines()
+        first_line = lines[0] if lines else ""
+        is_200 = "200" in first_line
+
+        # 2. Server 响应头包含 cloudflare
+        is_cf = "server: cloudflare" in resp_text.lower()
+
+        # 3. /cdn-cgi/trace 响应体包含有效的 colo=XXX
+        colo_match = re.search(r"\bcolo=([A-Za-z0-9]+)\b", resp_text)
+        colo = colo_match.group(1).upper() if colo_match else ""
+
+        is_alive = is_200 and is_cf and bool(colo)
+        return is_alive, latency_ms, colo
+    except Exception:
+        return False, 0, ""
+    finally:
+        try:
+            writer.close()
+            await writer.wait_closed()
+        except Exception:
+            pass
+
+
+# ---------- 数据加载与保存 ----------
+def load_proxyip_csv(path: str) -> list:
+    """读取 proxyip.csv，自动处理 utf-8-sig BOM 并自动补齐缺失的 fail_count 列"""
+    if not os.path.exists(path):
+        return []
+    rows = []
+    with open(path, "r", encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f)
+        for r in reader:
+            if "fail_count" not in r or not str(r.get("fail_count", "")).strip():
+                r["fail_count"] = 0
+            else:
+                try:
+                    r["fail_count"] = int(r["fail_count"])
+                except (ValueError, TypeError):
+                    r["fail_count"] = 0
+            rows.append(r)
+    return rows
+
+
+def save_proxyip(rows: list, csv_path: str = PROXYIP_CSV, txt_path: str = PROXYIP_TXT):
+    """
+    覆写保存 proxyip.csv 与 proxyip.txt。
+    自动按质量排序：存活节点优先（fail_count 升序），低延迟优先（delay_ms 升序）。
+    """
+    # 稳定双重排序：先按 tested_at 降序（最新优先），再按 (fail_count, delay_ms) 升序
+    rows.sort(key=lambda r: r.get("tested_at", ""), reverse=True)
+
+    def _sort_key(r):
+        fc = int(r.get("fail_count", 0))
+        try:
+            delay = int(r.get("delay_ms") or 99999)
+        except (ValueError, TypeError):
+            delay = 99999
+        return (fc, delay)
+
+    rows.sort(key=_sort_key)
+
+    with open(csv_path, "w", encoding="utf-8-sig", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
+        writer.writeheader()
+        for row in rows:
+            writer.writerow(row)
+    log.info("已覆写保存 %s: %d 条记录 (含 fail_count 列)", csv_path, len(rows))
+
+    with open(txt_path, "w", encoding="utf-8") as f:
+        for r in rows:
+            f.write(f"{r['ip']}:{r['port']}\n")
+    log.info("已覆写保存 %s: %d 行 IP:Port", txt_path, len(rows))
+
+
+# ---------- 批量质检调度器 ----------
+async def verify_proxyips(
+    rows: list,
+    concurrency: int = CONCURRENCY,
+    timeout: float = TIMEOUT,
+    http_timeout: float = HTTP_TIMEOUT,
+) -> list:
+    """
+    并发调度对所有 ProxyIP 进行 /cdn-cgi/trace 穿透鉴真。
+    打乱执行顺序以将同 IP 多端口请求自然散列，防止突发流量触发对端防护。
+    原地更新 fail_count、delay_ms 与 colo。
+    """
+    total = len(rows)
+    if total == 0:
+        return rows
+
+    sem = asyncio.Semaphore(concurrency)
+    pass_count = 0
+    fail_count_total = 0
+    completed = 0
+
+    # 创建乱序执行队列，保护同 IP 多端口节点
+    indices = list(range(total))
+    random.shuffle(indices)
+
+    async def _check(idx: int):
+        nonlocal pass_count, fail_count_total, completed
+        row = rows[idx]
+
+        port_raw = row.get("port", 0)
+        try:
+            port = int(port_raw)
+        except (ValueError, TypeError):
+            port = 0
+
+        ip = (row.get("ip") or "").strip()
+        if not ip or port <= 0 or port > 65535:
+            completed += 1
+            fc = int(row.get("fail_count", 0))
+            row["fail_count"] = fc + 1
+            fail_count_total += 1
+            return
+
+        async with sem:
+            alive, latency, colo = await probe_proxyip(
+                ip, port, connect_timeout=timeout, http_timeout=http_timeout
+            )
+
+        completed += 1
+        fc = int(row.get("fail_count", 0))
+        if alive:
+            row["fail_count"] = 0
+            row["delay_ms"] = latency
+            if colo:
+                row["colo"] = colo
+            pass_count += 1
+        else:
+            row["fail_count"] = fc + 1
+            fail_count_total += 1
+
+        if completed % 2000 == 0 or completed == total:
+            log.info(
+                "[ProxyIP 质检] 进度: %d/%d (%.1f%%) - 存活: %d, 标记: %d",
+                completed, total, completed / total * 100, pass_count, fail_count_total,
+            )
+
+    tasks = [_check(i) for i in indices]
+    await asyncio.gather(*tasks)
+
+    log.info(
+        "[ProxyIP 质检] 校验完成: 共 %d 条 | 存活通过 %d 条 (%.1f%%), 失败标记 %d 条",
+        total, pass_count, (pass_count / total * 100) if total else 0, fail_count_total,
+    )
+    return rows
+
+
+# ---------- Telegram 质检通知 ----------
+def send_proxyip_notification(
+    total: int,
+    pass_count: int,
+    fail_count: int,
+    eliminated: int,
+    survivors: int,
+    concurrency: int,
+    max_fails: int,
+    elapsed: float,
+):
+    """推送独立的 ProxyIP 穿透质检统计 TG 卡片"""
+    token = TG_BOT_TOKEN
+    chat_id = TG_CHAT_ID
+
+    if not token or not chat_id:
+        log.info("未配置 TG_BOT_TOKEN / TG_CHAT_ID，跳过 Telegram 质检通知推送")
+        return
+
+    tz_bj = timezone(timedelta(hours=8))
+    now = datetime.now(tz_bj)
+    date_str = now.strftime("%Y-%m-%d %H:%M")
+    div = "━━━━━━━━━━━━━━━━━━━━"
+
+    elim_str = (
+        f"<code>{eliminated}</code> 条 (连续失败 ≥ {max_fails} 次)"
+        if eliminated > 0
+        else "无 (全部在存活阈值内)"
+    )
+
+    header = (
+        f"🛡️ <b>ProxyIP 穿透质检完成</b> (🗑️ 剔除 <b>{eliminated}</b> 死节点)"
+        if eliminated > 0
+        else f"🛡️ <b>ProxyIP 穿透质检完成</b> (✅ 存活 <b>{pass_count}</b> 条)"
+    )
+
+    status_line = f"✅ <b>{pass_count}</b> 存活"
+    if fail_count > 0:
+        status_line += f" · ⚠️ <b>{fail_count}</b> 失败标记"
+
+    github_server = os.getenv("GITHUB_SERVER_URL", "https://github.com")
+    github_repo = os.getenv("GITHUB_REPOSITORY")
+    github_run_id = os.getenv("GITHUB_RUN_ID")
+    github_run_number = os.getenv("GITHUB_RUN_NUMBER")
+
+    footer_parts = [f"⚡ <b>耗时</b>: {elapsed:.1f}s"]
+    if github_repo:
+        repo_url = f"{github_server}/{github_repo}"
+        if github_run_id:
+            run_label = f"Action #{github_run_number}" if github_run_number else "Action 日志"
+            footer_parts.append(f'🔗 <a href="{repo_url}/actions/runs/{github_run_id}">{run_label}</a>')
+        footer_parts.append(f'📦 <a href="{repo_url}">产物仓库</a>')
+
+    footer_line = f"\n{div}\n" + " · ".join(footer_parts)
+
+    message = (
+        f"{header}\n"
+        f"{div}\n"
+        f"📅 <b>时间</b>：{date_str} (北京时间)\n"
+        f"🛡️ <b>池内节点</b>：<code>{survivors}</code> 条 ({status_line})\n"
+        f"🗑️ <b>淘汰死节点</b>：{elim_str}\n"
+        f"⚙️ <b>质检规格</b>：/cdn-cgi/trace 穿透 · {concurrency} 并发\n"
+        f"{footer_line}"
+    )
+
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    payload = json.dumps({
+        "chat_id": chat_id,
+        "text": message,
+        "parse_mode": "HTML",
+        "disable_web_page_preview": True,
+    }).encode("utf-8")
+
+    try:
+        req = urllib.request.Request(
+            url,
+            data=payload,
+            headers={"Content-Type": "application/json"},
+        )
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            if data.get("ok"):
+                log.info("✅ ProxyIP 质检 Telegram 统计卡片已成功发送！")
+            else:
+                log.warning("Telegram 消息发送失败: %s", data)
+    except Exception as e:
+        log.warning("发送 Telegram 消息时出现异常: %s", e)
+
+
+# ---------- 主流程入口 ----------
+async def async_main(args):
+    t_start = time.time()
+
+    if not os.path.isfile(PROXYIP_CSV):
+        log.info(">>> 未找到 %s 文件，跳过 ProxyIP 质检", PROXYIP_CSV)
+        return
+
+    rows = load_proxyip_csv(PROXYIP_CSV)
+    total = len(rows)
+    log.info(">>> 开始执行 ProxyIP 穿透质检 (%s): 共 %d 条记录...", PROXYIP_CSV, total)
+
+    await verify_proxyips(
+        rows,
+        concurrency=args.concurrency,
+        timeout=args.timeout,
+        http_timeout=args.http_timeout,
+    )
+
+    pass_count = sum(1 for r in rows if int(r.get("fail_count", 0)) == 0)
+    fail_count = total - pass_count
+
+    # 物理淘汰连续失败达到阈值的节点
+    survivors = [r for r in rows if int(r.get("fail_count", 0)) < args.max_fails]
+    eliminated = total - len(survivors)
+    survivors_len = len(survivors)
+
+    if eliminated > 0:
+        log.info("[ProxyIP 淘汰] 剔除 %d 条连续失败 >= %d 次的死节点", eliminated, args.max_fails)
+    else:
+        log.info("[ProxyIP 淘汰] 本次无节点达到连续失败 %d 次的淘汰阈值", args.max_fails)
+
+    save_proxyip(survivors, PROXYIP_CSV, PROXYIP_TXT)
+
+    elapsed = time.time() - t_start
+    log.info("ProxyIP 穿透质检流程执行完毕，总耗时 %.2f 秒", elapsed)
+
+    # 若存在 tg_fetch 暂存的抓取统计，将 ProxyIP 质检结果并入其中，由后续统一卡片推送
+    fetch_stats_file = ".fetch_stats.json"
+    has_fetch_stats = os.path.isfile(fetch_stats_file)
+    if has_fetch_stats:
+        try:
+            with open(fetch_stats_file, "r", encoding="utf-8") as f:
+                stats = json.load(f)
+            stats["proxyip_verified"] = True
+            stats["proxyip_pass"] = pass_count
+            stats["proxyip_fail"] = fail_count
+            stats["proxyip_eliminated"] = eliminated
+            stats["proxyip_survivors"] = survivors_len
+            stats["proxyip_elapsed"] = elapsed
+            with open(fetch_stats_file, "w", encoding="utf-8") as f:
+                json.dump(stats, f, ensure_ascii=False, indent=2)
+            log.info("已将 ProxyIP 质检统计写入 %s (并入统一卡片)", fetch_stats_file)
+        except Exception as e:
+            log.warning("写入 %s 失败: %s", fetch_stats_file, e)
+
+    if not args.no_notify and not has_fetch_stats:
+        send_proxyip_notification(
+            total=total,
+            pass_count=pass_count,
+            fail_count=fail_count,
+            eliminated=eliminated,
+            survivors=survivors_len,
+            concurrency=args.concurrency,
+            max_fails=args.max_fails,
+            elapsed=elapsed,
+        )
+    else:
+        log.info("已并入流水线或指定了 --no-notify，跳过独立卡片推送，由统一卡片汇总发送")
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Cloudflare 反代 ProxyIP 穿透质检与淘汰引擎")
+    parser.add_argument("--concurrency", type=int, default=CONCURRENCY, help=f"并发探测协程数 (默认 {CONCURRENCY})")
+    parser.add_argument("--max-fails", type=int, default=MAX_FAILS, help=f"连续失败淘汰阈值 (默认 {MAX_FAILS})")
+    parser.add_argument("--timeout", type=float, default=TIMEOUT, help=f"单节点连接与 TLS 握手超时秒数 (默认 {TIMEOUT})")
+    parser.add_argument("--http-timeout", type=float, default=HTTP_TIMEOUT, help=f"单节点 HTTP 校验超时秒数 (默认 {HTTP_TIMEOUT})")
+    parser.add_argument("--no-notify", action="store_true", help="静默模式，不单独发送 Telegram 质检通知（供流水线协同使用）")
+    args = parser.parse_args()
+
+    asyncio.run(async_main(args))
+
+
+if __name__ == "__main__":
+    main()
