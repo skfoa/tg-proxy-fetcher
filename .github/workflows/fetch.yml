@@ -45,6 +45,9 @@ jobs:
           FETCH_DAYS: ${{ inputs.fetch_days || vars.FETCH_DAYS || '3' }}
         run: python tg_fetch.py
 
+      - name: 🛡️ 优选 IP 两阶段主动校验（TLS + 301）
+        run: python cf_verify.py --concurrency 500 --max-fails 3 --timeout 3.0
+
       - name: 📄 提交并推送数据
         if: always()
         env:

@@ -102,6 +102,7 @@ CF_CSV_FIELDS = [
     "asn",
     "tested_at",
     "channel",
+    "fail_count",
 ]
 
 logging.basicConfig(
@@ -221,6 +222,7 @@ def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
         "asn": asn_m.group(1).strip() if asn_m else "",
         "tested_at": time_m.group(1).strip() if time_m else "",
         "channel": source_m.group(1).strip() if source_m else default_channel,
+        "fail_count": 0,
     }
 
 
@@ -562,6 +564,7 @@ def parse_cf_csv_content(
                 "asn": asn_clean or "AS_UNKNOWN",
                 "tested_at": tested_at,
                 "channel": default_channel,
+                "fail_count": 0,
             })
     except Exception as e:
         log.warning("解析 CSV 优选/ProxyIP 数据异常: %s", e)
@@ -662,6 +665,7 @@ def parse_otc_scan_content(
             "asn": asn,
             "tested_at": dt_str,
             "channel": default_channel,
+            "fail_count": 0,
         })
     return results
 
@@ -943,6 +947,13 @@ def load_existing_cf_ips(filepath: str = OUTPUT_CF_FILE) -> dict:
                 ip = row.get("ip", "").strip()
                 port = row.get("port", "").strip()
                 if ip and port:
+                    if "fail_count" not in row or not str(row.get("fail_count", "")).strip():
+                        row["fail_count"] = 0
+                    else:
+                        try:
+                            row["fail_count"] = int(row["fail_count"])
+                        except ValueError:
+                            row["fail_count"] = 0
                     existing[f"{ip}:{port}"] = row
         log.info("已加载本地已存优选 IP 记录: %d 条（历史记录全部保留）", len(existing))
     except Exception as e:
@@ -1208,9 +1219,10 @@ def save_and_notify(
         reverse=True,
     )
     with open(OUTPUT_CF_FILE, "w", encoding="utf-8-sig", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=CF_CSV_FIELDS)
+        writer = csv.DictWriter(f, fieldnames=CF_CSV_FIELDS, extrasaction="ignore")
         writer.writeheader()
         for row in sorted_cf_ips:
+            row.setdefault("fail_count", 0)
             writer.writerow(row)
     log.info("已保存单条优选IP文件: %s (%d 条全量累积记录)", OUTPUT_CF_FILE, len(sorted_cf_ips))
 
@@ -1255,9 +1267,10 @@ def save_and_notify(
             all_sorted_scan_rows.extend(group_rows)
 
         with open(OUTPUT_SCAN_FILE, "w", encoding="utf-8-sig", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=CF_CSV_FIELDS)
+            writer = csv.DictWriter(f, fieldnames=CF_CSV_FIELDS, extrasaction="ignore")
             writer.writeheader()
             for row in all_sorted_scan_rows:
+                row.setdefault("fail_count", 0)
                 writer.writerow(row)
         log.info("已保存扫描优选IP表格: %s (%d 条全量累积记录)", OUTPUT_SCAN_FILE, len(all_sorted_scan_rows))
 
@@ -1307,9 +1320,10 @@ def save_and_notify(
             reverse=True,
         )
         with open(OUTPUT_PROXYIP_FILE, "w", encoding="utf-8-sig", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=CF_CSV_FIELDS)
+            writer = csv.DictWriter(f, fieldnames=CF_CSV_FIELDS, extrasaction="ignore")
             writer.writeheader()
             for row in sorted_proxyips:
+                row.setdefault("fail_count", 0)
                 writer.writerow(row)
         log.info("已保存反代 ProxyIP 表格: %s (%d 条全量累积记录)", OUTPUT_PROXYIP_FILE, len(sorted_proxyips))
 
