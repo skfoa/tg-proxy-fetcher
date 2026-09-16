@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """
-Cloudflare 优选 IP 两阶段主动校验引擎
+Cloudflare 优选 IP 两阶段主动校验与淘汰引擎
 
-阶段一：TLS 握手 + CA 证书校验（server_hostname=crypto.cloudflare.com）
-阶段二：同一连接发送 HTTP 请求，验证返回 301 且 Server: cloudflare
+只要是优选 IP（涵盖 scan_ips 与 cf_ips 全线产物），全部统一执行：
+  阶段一：TLS 握手 + CA 证书校验（server_hostname=crypto.cloudflare.com）
+  阶段二：同一连接发送 HTTP 请求，验证返回 301 且 Server: cloudflare
 
-连续失败 N 次（默认 3 次）的 IP 从 scan_ips.csv、scan_ips.txt 和 scan_ips/ 中永久淘汰。
-未达阈值的失败 IP 保留并累计 fail_count；成功 IP 的 fail_count 归零并更新实测延迟。
+连续失败达到阈值（默认 3 次）的死节点，将全面从以下所有产物中永久删除：
+  1. scan_ips.csv、scan_ips.txt、scan_ips/*.txt (独立机房分组文本)
+  2. cf_ips.csv、cf_ips.txt (单条优选数据表与纯文本清单)
 """
 
 import argparse
@@ -35,6 +37,10 @@ if sys.platform == "win32":
 SCAN_CSV = "scan_ips.csv"
 SCAN_TXT = "scan_ips.txt"
 SCAN_DIR = "scan_ips"
+
+CF_CSV = "cf_ips.csv"
+CF_TXT = "cf_ips.txt"
+
 PROBE_HOST = "crypto.cloudflare.com"
 TIMEOUT = 3.0
 CSV_FIELDS = [
@@ -108,36 +114,37 @@ async def probe_ip(ip: str, port: int, timeout: float = TIMEOUT) -> tuple[bool, 
 
 async def verify_all(
     rows: list,
-    concurrency: int = 500,
+    tag: str = "优选 IP",
+    concurrency: int = 250,
     timeout: float = TIMEOUT,
 ) -> list:
     """
-    并发探测所有节点，原地更新 fail_count 与 delay_ms。
+    对传入的所有优选 IP 节点无差别执行阶段一与阶段二探测。
+    无论端口与元数据如何，全部执行 TLS 握手与 301 重定向鉴真。
+    原地更新 fail_count 与 delay_ms。
     """
     sem = asyncio.Semaphore(concurrency)
-    tls_count = 0
-    skip_count = 0
     pass_count = 0
     fail_count_total = 0
     completed = 0
     total = len(rows)
 
     async def _check(row: dict):
-        nonlocal tls_count, skip_count, pass_count, fail_count_total, completed
+        nonlocal pass_count, fail_count_total, completed
         port_raw = row.get("port", 0)
         try:
             port = int(port_raw)
         except (ValueError, TypeError):
             port = 0
 
-        # 优选 IP 是否支持 TLS 与端口号完全无关，严格依据数据自身的 tls 字段判断
-        if str(row.get("tls", "")).strip().lower() == "false":
-            skip_count += 1
+        ip = (row.get("ip") or "").strip()
+        if not ip or port <= 0 or port > 65535:
             completed += 1
+            fc = int(row.get("fail_count") or 0)
+            row["fail_count"] = fc + 1
+            fail_count_total += 1
             return
 
-        tls_count += 1
-        ip = row.get("ip", "").strip()
         async with sem:
             alive, rtt = await probe_ip(ip, port, timeout)
 
@@ -152,15 +159,15 @@ async def verify_all(
             fail_count_total += 1
 
         if completed % 1000 == 0 or completed == total:
-            log.info("进度: %d/%d (%.1f%%) - 通过: %d, 失败: %d, 跳过: %d",
-                     completed, total, completed / total * 100, pass_count, fail_count_total, skip_count)
+            log.info("[%s] 进度: %d/%d (%.1f%%) - 通过: %d, 失败: %d",
+                     tag, completed, total, completed / total * 100, pass_count, fail_count_total)
 
     tasks = [_check(r) for r in rows]
     await asyncio.gather(*tasks)
 
     log.info(
-        "校验完成: 共 %d 条 | TLS 端口 %d 个 (通过 %d, 失败 %d) | 非 TLS 跳过 %d 个",
-        total, tls_count, pass_count, fail_count_total, skip_count,
+        "[%s] 校验完成: 共 %d 条 | 验证通过 %d 条, 验证失败 %d 条",
+        tag, total, pass_count, fail_count_total,
     )
     return rows
 
@@ -182,10 +189,9 @@ def clean_asn(raw_asn: str, isp: str = "") -> str:
     return raw_asn if raw_asn else "AS_UNKNOWN"
 
 
-def load_scan_csv(path: str = SCAN_CSV) -> list:
-    """读取 scan_ips.csv，自动解析 BOM 格式及兼容历史 fail_count 字段"""
+def load_csv(path: str) -> list:
+    """读取优选 IP CSV 文件，自动兼容 BOM 及旧版本缺少 fail_count 字段的情况"""
     if not os.path.exists(path):
-        log.warning("输入文件不存在: %s", path)
         return []
     rows = []
     with open(path, "r", encoding="utf-8-sig") as f:
@@ -199,12 +205,28 @@ def load_scan_csv(path: str = SCAN_CSV) -> list:
                 except ValueError:
                     r["fail_count"] = 0
             rows.append(r)
-    log.info("已成功读取 %s: %d 条优选 IP 记录", path, len(rows))
     return rows
 
 
+# --- 单条优选 IP 保存逻辑 ---
+def save_cf_ips(rows: list, csv_path: str = CF_CSV, txt_path: str = CF_TXT):
+    """覆写 cf_ips.csv 与 cf_ips.txt（仅保留存活节点，剔除死节点）"""
+    with open(csv_path, "w", encoding="utf-8-sig", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
+        writer.writeheader()
+        for row in rows:
+            writer.writerow(row)
+    log.info("已覆写保存 %s: %d 条记录", csv_path, len(rows))
+
+    with open(txt_path, "w", encoding="utf-8") as f:
+        for r in rows:
+            f.write(f"{r['ip']}:{r['port']}\n")
+    log.info("已覆写保存 %s: %d 行 IP:Port", txt_path, len(rows))
+
+
+# --- 扫描测速优选 IP 保存逻辑 ---
 def save_scan_csv(rows: list, path: str = SCAN_CSV):
-    """覆写 scan_ips.csv（按 ASN 升序、测速时间降序排列）"""
+    """覆写 scan_ips.csv（仅保留存活节点，剔除死节点）"""
     with open(path, "w", encoding="utf-8-sig", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
         writer.writeheader()
@@ -214,7 +236,7 @@ def save_scan_csv(rows: list, path: str = SCAN_CSV):
 
 
 def save_scan_txt(asn_groups: dict, path: str = SCAN_TXT):
-    """覆写 scan_ips.txt（按 ASN 分组汇总，带标题注释）"""
+    """覆写 scan_ips.txt（按 ASN 分组汇总，仅包含存活节点）"""
     total_ips = sum(len(g) for g in asn_groups.values())
     with open(path, "w", encoding="utf-8") as f:
         for asn_name in sorted(asn_groups.keys()):
@@ -231,7 +253,11 @@ def save_scan_txt(asn_groups: dict, path: str = SCAN_TXT):
 
 
 def save_scan_dir(asn_groups: dict, scan_dir: str = SCAN_DIR):
-    """覆写 scan_ips/ 目录下的独立 ASN 纯文本文件（无注释 IP:端口）"""
+    """
+    覆写 scan_ips/ 目录下的独立 ASN 纯文本文件（无注释 IP:端口）。
+    死节点被淘汰后，其对应的 ASN 文件会即时同步删除该 IP；
+    若某个 ASN 旗下所有 IP 全部死亡淘汰，该 ASN 文本文件也会被自动清除删除。
+    """
     os.makedirs(scan_dir, exist_ok=True)
 
     active_files = set()
@@ -247,8 +273,10 @@ def save_scan_dir(asn_groups: dict, scan_dir: str = SCAN_DIR):
                 f.write(f"{r['ip']}:{r['port']}\n")
         active_files.add(fname)
 
-    # 移除已无活跃 IP 的旧分组文件
+    # 移除已无活跃 IP 的旧分组文件（保留 .gitkeep 保持目录结构）
     for old_f in os.listdir(scan_dir):
+        if old_f == ".gitkeep":
+            continue
         if old_f.endswith(".txt") and old_f not in active_files:
             try:
                 os.remove(os.path.join(scan_dir, old_f))
@@ -260,7 +288,7 @@ def save_scan_dir(asn_groups: dict, scan_dir: str = SCAN_DIR):
 
 # ---------- 主流程 ----------
 def main():
-    parser = argparse.ArgumentParser(description="Cloudflare 优选 IP 两阶段主动校验")
+    parser = argparse.ArgumentParser(description="Cloudflare 优选 IP 两阶段主动校验与淘汰引擎")
     parser.add_argument("--concurrency", type=int, default=250, help="并发探测协程数 (默认 250)")
     parser.add_argument("--max-fails", type=int, default=3, help="连续失败淘汰阈值 (默认 3)")
     parser.add_argument("--timeout", type=float, default=TIMEOUT, help="单节点探测超时秒数 (默认 3.0)")
@@ -268,58 +296,58 @@ def main():
 
     t_start = time.time()
 
-    # 1. 加载数据
-    rows = load_scan_csv(SCAN_CSV)
-    if not rows:
-        log.info("scan_ips.csv 无数据，跳过校验流程")
-        return
+    # ================= 1. 校验单条优选 IP (cf_ips) =================
+    cf_rows = load_csv(CF_CSV)
+    if cf_rows:
+        total_cf = len(cf_rows)
+        log.info(">>> 开始校验单条优选 IP (%s): 共 %d 条...", CF_CSV, total_cf)
+        asyncio.run(verify_all(cf_rows, tag="单条优选", concurrency=args.concurrency, timeout=args.timeout))
 
-    total_before = len(rows)
-
-    # 2. 执行并发两阶段校验
-    log.info(
-        "开始主动校验 %d 条优选 IP (并发=%d, 单节点超时=%.1fs, 连续失败淘汰阈值=%d)...",
-        total_before, args.concurrency, args.timeout, args.max_fails,
-    )
-    asyncio.run(verify_all(rows, concurrency=args.concurrency, timeout=args.timeout))
-
-    # 3. 淘汰判定：连续失败 fail_count >= max_fails 的节点永久移除
-    survivors = []
-    eliminated_count = 0
-    for r in rows:
-        fc = int(r.get("fail_count", 0))
-        if fc < args.max_fails:
-            survivors.append(r)
+        cf_survivors = [r for r in cf_rows if int(r.get("fail_count", 0)) < args.max_fails]
+        cf_eliminated = total_cf - len(cf_survivors)
+        if cf_eliminated > 0:
+            log.info("[单条优选] 淘汰剔除 %d 条连续失败 >= %d 次的死节点", cf_eliminated, args.max_fails)
         else:
-            eliminated_count += 1
+            log.info("[单条优选] 本次无节点达到连续失败 %d 次的淘汰阈值", args.max_fails)
 
-    if eliminated_count > 0:
-        log.info("淘汰剔除 %d 条连续失败 >= %d 次的死节点", eliminated_count, args.max_fails)
+        cf_survivors.sort(key=lambda x: x.get("tested_at", ""), reverse=True)
+        save_cf_ips(cf_survivors, CF_CSV, CF_TXT)
     else:
-        log.info("本次暂无节点达到连续失败 %d 次的淘汰阈值", args.max_fails)
+        log.info(">>> %s 文件不存在或无数据，跳过单条优选校验", CF_CSV)
 
-    # 4. 按 ASN 重新智能归类与排序（与 tg_fetch 逻辑严格保持一致）
-    asn_groups = defaultdict(list)
-    for row in survivors:
-        asn_clean = clean_asn(row.get("asn", ""), row.get("isp", ""))
-        row["asn"] = asn_clean
-        asn_groups[asn_clean].append(row)
+    # ================= 2. 校验扫描优选 IP (scan_ips) =================
+    scan_rows = load_csv(SCAN_CSV)
+    if scan_rows:
+        total_scan = len(scan_rows)
+        log.info(">>> 开始校验扫描优选 IP (%s): 共 %d 条...", SCAN_CSV, total_scan)
+        asyncio.run(verify_all(scan_rows, tag="扫描优选", concurrency=args.concurrency, timeout=args.timeout))
 
-    all_sorted_rows = []
-    for asn_name in sorted(asn_groups.keys()):
-        group_rows = sorted(asn_groups[asn_name], key=lambda x: x.get("tested_at", ""), reverse=True)
-        all_sorted_rows.extend(group_rows)
+        scan_survivors = [r for r in scan_rows if int(r.get("fail_count", 0)) < args.max_fails]
+        scan_eliminated = total_scan - len(scan_survivors)
+        if scan_eliminated > 0:
+            log.info("[扫描优选] 淘汰剔除 %d 条连续失败 >= %d 次的死节点", scan_eliminated, args.max_fails)
+        else:
+            log.info("[扫描优选] 本次无节点达到连续失败 %d 次的淘汰阈值", args.max_fails)
 
-    # 5. 全面覆写保存
-    save_scan_csv(all_sorted_rows, SCAN_CSV)
-    save_scan_txt(asn_groups, SCAN_TXT)
-    save_scan_dir(asn_groups, SCAN_DIR)
+        asn_groups = defaultdict(list)
+        for row in scan_survivors:
+            asn_clean = clean_asn(row.get("asn", ""), row.get("isp", ""))
+            row["asn"] = asn_clean
+            asn_groups[asn_clean].append(row)
+
+        all_sorted_scan = []
+        for asn_name in sorted(asn_groups.keys()):
+            group_rows = sorted(asn_groups[asn_name], key=lambda x: x.get("tested_at", ""), reverse=True)
+            all_sorted_scan.extend(group_rows)
+
+        save_scan_csv(all_sorted_scan, SCAN_CSV)
+        save_scan_txt(asn_groups, SCAN_TXT)
+        save_scan_dir(asn_groups, SCAN_DIR)
+    else:
+        log.info(">>> %s 文件不存在或无数据，跳过扫描优选校验", SCAN_CSV)
 
     elapsed = time.time() - t_start
-    log.info(
-        "全部校验流程圆满完成: 校验前 %d 条 -> 保留 %d 条 (淘汰 %d 条), 总耗时 %.2f 秒",
-        total_before, len(all_sorted_rows), eliminated_count, elapsed,
-    )
+    log.info("全部优选 IP 两阶段校验流程圆满完成，总耗时 %.2f 秒", elapsed)
 
 
 if __name__ == "__main__":
