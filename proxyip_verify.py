@@ -68,25 +68,33 @@ if sys.platform == "win32":
 # ---------- 常量与配置 ----------
 PROXYIP_CSV = "proxyip.csv"
 PROXYIP_TXT = "proxyip.txt"
+PROXYIP_CF_TXT = "proxyip_cf.txt"
 
 PROBE_HOST = "speed.cloudflare.com"
 PROBE_PATH = "/cdn-cgi/trace"
+PROBE_HOST_CF = "crypto.cloudflare.com"
+
 TIMEOUT = 2.0
 HTTP_TIMEOUT = 2.5
 CONCURRENCY = 300
 MAX_FAILS = 2
 
-# 与 tg_fetch.py 保持 100% 兼容的 12 字段
+# 包含 cf_clean 双能标记的完整字段定义
 CSV_FIELDS = [
     "ip", "port", "tls", "delay_ms", "speed_kbs",
     "colo", "cf_location", "isp", "asn",
-    "tested_at", "channel", "fail_count",
+    "tested_at", "channel", "fail_count", "cf_clean",
 ]
 
-# 反代服务器证书通常是自签名或非 Cloudflare 官方证书，必须跳过证书链校验
+# 1. 反代穿透上下文：跳过证书链校验（用于反代服务器）
 SSL_CTX = ssl.create_default_context()
 SSL_CTX.check_hostname = False
 SSL_CTX.verify_mode = ssl.CERT_NONE
+
+# 2. 官方优选上下文：严格校验 Cloudflare 官方 CA 证书链（用于验证是否具备优选直连能力）
+SSL_CTX_CF = ssl.create_default_context()
+SSL_CTX_CF.check_hostname = True
+SSL_CTX_CF.verify_mode = ssl.CERT_REQUIRED
 
 
 # ---------- 核心探测函数 ----------
@@ -154,6 +162,44 @@ async def probe_proxyip(
             pass
 
 
+async def probe_cf_clean(
+    ip: str,
+    port: int,
+    connect_timeout: float = 1.8,
+    http_timeout: float = 1.8,
+) -> bool:
+    """
+    针对已确认穿透存活的 ProxyIP 节点，进一步鉴真其是否兼具 Cloudflare 官方优选直连能力。
+    判据：连接 crypto.cloudflare.com 必须通过官方 CA 证书链校验，且发送 GET / 返回 HTTP 301。
+    """
+    try:
+        reader, writer = await asyncio.wait_for(
+            asyncio.open_connection(ip, port, ssl=SSL_CTX_CF, server_hostname=PROBE_HOST_CF),
+            timeout=connect_timeout,
+        )
+        req = (
+            f"GET / HTTP/1.1\r\n"
+            f"Host: {PROBE_HOST_CF}\r\n"
+            f"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36\r\n"
+            f"Connection: close\r\n\r\n"
+        ).encode("latin1")
+        writer.write(req)
+        await asyncio.wait_for(writer.drain(), timeout=http_timeout)
+
+        resp = await asyncio.wait_for(reader.read(512), timeout=http_timeout)
+        resp_text = resp.decode("utf-8", errors="ignore")
+        first_line = resp_text.splitlines()[0] if resp_text else ""
+        return ("301" in first_line) and ("server: cloudflare" in resp_text.lower())
+    except Exception:
+        return False
+    finally:
+        try:
+            writer.close()
+            await writer.wait_closed()
+        except Exception:
+            pass
+
+
 # ---------- 数据加载与保存 ----------
 def load_proxyip_csv(path: str) -> list:
     """读取 proxyip.csv，自动处理 utf-8-sig BOM 并自动补齐缺失的 fail_count 列"""
@@ -174,9 +220,14 @@ def load_proxyip_csv(path: str) -> list:
     return rows
 
 
-def save_proxyip(rows: list, csv_path: str = PROXYIP_CSV, txt_path: str = PROXYIP_TXT):
+def save_proxyip(
+    rows: list,
+    csv_path: str = PROXYIP_CSV,
+    txt_path: str = PROXYIP_TXT,
+    cf_txt_path: str = PROXYIP_CF_TXT,
+):
     """
-    覆写保存 proxyip.csv 与 proxyip.txt。
+    覆写保存 proxyip.csv 与 proxyip.txt，并提纯导出兼具优选直连能力的 proxyip_cf.txt。
     自动按质量排序：存活节点优先（fail_count 升序），低延迟优先（delay_ms 升序）。
     """
     # 稳定双重排序：先按 tested_at 降序（最新优先），再按 (fail_count, delay_ms) 升序
@@ -197,12 +248,22 @@ def save_proxyip(rows: list, csv_path: str = PROXYIP_CSV, txt_path: str = PROXYI
         writer.writeheader()
         for row in rows:
             writer.writerow(row)
-    log.info("已覆写保存 %s: %d 条记录 (含 fail_count 列)", csv_path, len(rows))
+    log.info("已覆写保存 %s: %d 条记录 (含 fail_count, cf_clean 列)", csv_path, len(rows))
 
     with open(txt_path, "w", encoding="utf-8") as f:
         for r in rows:
             f.write(f"{r['ip']}:{r['port']}\n")
     log.info("已覆写保存 %s: %d 行 IP:Port", txt_path, len(rows))
+
+    # 提纯双料优选反代节点 (cf_clean=true 且 fail_count=0)
+    cf_clean_rows = [
+        r for r in rows
+        if r.get("cf_clean") == "true" and int(r.get("fail_count", 0)) == 0
+    ]
+    with open(cf_txt_path, "w", encoding="utf-8") as f:
+        for r in cf_clean_rows:
+            f.write(f"{r['ip']}:{r['port']}\n")
+    log.info("已提纯保存双料优选反代清单 %s: %d 行 IP:Port", cf_txt_path, len(cf_clean_rows))
 
 
 # ---------- 批量质检调度器 ----------
@@ -211,19 +272,22 @@ async def verify_proxyips(
     concurrency: int = CONCURRENCY,
     timeout: float = TIMEOUT,
     http_timeout: float = HTTP_TIMEOUT,
-) -> list:
+) -> tuple[list, int]:
     """
     并发调度对所有 ProxyIP 进行 /cdn-cgi/trace 穿透鉴真。
+    对存活节点同步进行 crypto.cloudflare.com 官方 CA 证书优选能力检验。
     打乱执行顺序以将同 IP 多端口请求自然散列，防止突发流量触发对端防护。
-    原地更新 fail_count、delay_ms 与 colo。
+    原地更新 fail_count、delay_ms、colo 与 cf_clean。
+    返回 (rows, cf_clean_count)。
     """
     total = len(rows)
     if total == 0:
-        return rows
+        return rows, 0
 
     sem = asyncio.Semaphore(concurrency)
     pass_count = 0
     fail_count_total = 0
+    cf_clean_count = 0
     completed = 0
 
     # 创建乱序执行队列，保护同 IP 多端口节点
@@ -231,7 +295,7 @@ async def verify_proxyips(
     random.shuffle(indices)
 
     async def _check(idx: int):
-        nonlocal pass_count, fail_count_total, completed
+        nonlocal pass_count, fail_count_total, cf_clean_count, completed
         row = rows[idx]
 
         port_raw = row.get("port", 0)
@@ -245,6 +309,7 @@ async def verify_proxyips(
             completed += 1
             fc = int(row.get("fail_count", 0))
             row["fail_count"] = fc + 1
+            row["cf_clean"] = "false"
             fail_count_total += 1
             return
 
@@ -252,6 +317,11 @@ async def verify_proxyips(
             alive, latency, colo = await probe_proxyip(
                 ip, port, connect_timeout=timeout, http_timeout=http_timeout
             )
+            is_cf = False
+            if alive:
+                is_cf = await probe_cf_clean(
+                    ip, port, connect_timeout=min(timeout, 1.8), http_timeout=min(http_timeout, 1.8)
+                )
 
         completed += 1
         fc = int(row.get("fail_count", 0))
@@ -260,25 +330,29 @@ async def verify_proxyips(
             row["delay_ms"] = latency
             if colo:
                 row["colo"] = colo
+            row["cf_clean"] = "true" if is_cf else "false"
             pass_count += 1
+            if is_cf:
+                cf_clean_count += 1
         else:
             row["fail_count"] = fc + 1
+            row["cf_clean"] = "false"
             fail_count_total += 1
 
         if completed % 2000 == 0 or completed == total:
             log.info(
-                "[ProxyIP 质检] 进度: %d/%d (%.1f%%) - 存活: %d, 标记: %d",
-                completed, total, completed / total * 100, pass_count, fail_count_total,
+                "[ProxyIP 质检] 进度: %d/%d (%.1f%%) - 存活: %d (🌟优选双料: %d), 标记: %d",
+                completed, total, completed / total * 100, pass_count, cf_clean_count, fail_count_total,
             )
 
     tasks = [_check(i) for i in indices]
     await asyncio.gather(*tasks)
 
     log.info(
-        "[ProxyIP 质检] 校验完成: 共 %d 条 | 存活通过 %d 条 (%.1f%%), 失败标记 %d 条",
-        total, pass_count, (pass_count / total * 100) if total else 0, fail_count_total,
+        "[ProxyIP 质检] 校验完成: 共 %d 条 | 存活通过 %d 条 (%.1f%%, 🌟优选双料: %d 条), 失败标记 %d 条",
+        total, pass_count, (pass_count / total * 100) if total else 0, cf_clean_count, fail_count_total,
     )
-    return rows
+    return rows, cf_clean_count
 
 
 # ---------- Telegram 质检通知 ----------
@@ -288,6 +362,7 @@ def send_proxyip_notification(
     fail_count: int,
     eliminated: int,
     survivors: int,
+    cf_clean_count: int,
     concurrency: int,
     max_fails: int,
     elapsed: float,
@@ -321,6 +396,12 @@ def send_proxyip_notification(
     if fail_count > 0:
         status_line += f" · ⚠️ <b>{fail_count}</b> 失败标记"
 
+    dual_line = (
+        f"\n   └ <i>🌟 兼具优选直连: <code>{cf_clean_count}</code> 条 (已导出 proxyip_cf.txt)</i>"
+        if cf_clean_count > 0
+        else ""
+    )
+
     github_server = os.getenv("GITHUB_SERVER_URL", "https://github.com")
     github_repo = os.getenv("GITHUB_REPOSITORY")
     github_run_id = os.getenv("GITHUB_RUN_ID")
@@ -340,9 +421,9 @@ def send_proxyip_notification(
         f"{header}\n"
         f"{div}\n"
         f"📅 <b>时间</b>：{date_str} (北京时间)\n"
-        f"🛡️ <b>池内节点</b>：<code>{survivors}</code> 条 ({status_line})\n"
+        f"🛡️ <b>池内节点</b>：<code>{survivors}</code> 条 ({status_line}){dual_line}\n"
         f"🗑️ <b>淘汰死节点</b>：{elim_str}\n"
-        f"⚙️ <b>质检规格</b>：/cdn-cgi/trace 穿透 · {concurrency} 并发\n"
+        f"⚙️ <b>质检规格</b>：/cdn-cgi/trace 穿透 + 优选双能检验 · {concurrency} 并发\n"
         f"{footer_line}"
     )
 
@@ -382,7 +463,7 @@ async def async_main(args):
     total = len(rows)
     log.info(">>> 开始执行 ProxyIP 穿透质检 (%s): 共 %d 条记录...", PROXYIP_CSV, total)
 
-    await verify_proxyips(
+    rows, cf_clean_count = await verify_proxyips(
         rows,
         concurrency=args.concurrency,
         timeout=args.timeout,
@@ -402,12 +483,12 @@ async def async_main(args):
     else:
         log.info("[ProxyIP 淘汰] 本次无节点达到连续失败 %d 次的淘汰阈值", args.max_fails)
 
-    save_proxyip(survivors, PROXYIP_CSV, PROXYIP_TXT)
+    save_proxyip(survivors, PROXYIP_CSV, PROXYIP_TXT, PROXYIP_CF_TXT)
 
     elapsed = time.time() - t_start
-    log.info("ProxyIP 穿透质检流程执行完毕，总耗时 %.2f 秒", elapsed)
+    log.info("ProxyIP 穿透质检流程执行完毕，总耗时 %.2f 秒 (🌟兼具优选直连: %d 条)", elapsed, cf_clean_count)
 
-    # 若存在 tg_fetch 暂存的抓取统计，将 ProxyIP 质检结果并入其中，由后续统一卡片推送
+    # 若存在 tg_fetch 暂存的抓取统计，将 ProxyIP 质检与优选双料结果并入其中，由后续统一卡片推送
     fetch_stats_file = ".fetch_stats.json"
     has_fetch_stats = os.path.isfile(fetch_stats_file)
     if has_fetch_stats:
@@ -419,6 +500,7 @@ async def async_main(args):
             stats["proxyip_fail"] = fail_count
             stats["proxyip_eliminated"] = eliminated
             stats["proxyip_survivors"] = survivors_len
+            stats["proxyip_cf_clean"] = cf_clean_count
             stats["proxyip_elapsed"] = elapsed
             with open(fetch_stats_file, "w", encoding="utf-8") as f:
                 json.dump(stats, f, ensure_ascii=False, indent=2)
@@ -433,6 +515,7 @@ async def async_main(args):
             fail_count=fail_count,
             eliminated=eliminated,
             survivors=survivors_len,
+            cf_clean_count=cf_clean_count,
             concurrency=args.concurrency,
             max_fails=args.max_fails,
             elapsed=elapsed,

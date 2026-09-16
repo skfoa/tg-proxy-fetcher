@@ -445,8 +445,10 @@ def send_verify_notification(
             p_pass = fetch_stats.get("proxyip_pass", 0)
             p_fail = fetch_stats.get("proxyip_fail", 0)
             p_surv = fetch_stats.get("proxyip_survivors", proxyips_count)
+            p_cf = fetch_stats.get("proxyip_cf_clean", 0)
             p_status = f"✅ {p_pass} 存活" + (f" · ⚠️ {p_fail} 标记" if p_fail > 0 else "")
-            proxyip_line = f"🛡️ <b>反代 ProxyIP</b>：<code>{p_surv}</code> 条 ({p_status})\n"
+            cf_extra = f"\n   └ <i>🌟 兼具优选直连: <code>{p_cf}</code> 条 (已提纯 proxyip_cf.txt)</i>" if p_cf > 0 else ""
+            proxyip_line = f"🛡️ <b>反代 ProxyIP</b>：<code>{p_surv}</code> 条 ({p_status}){cf_extra}\n"
         elif proxyips_count > 0:
             proxyip_line = f"🛡️ <b>反代 ProxyIP</b>：<code>{proxyips_count}</code> 条 ({format_diff(new_proxyips, updated_proxyips)})\n"
 
@@ -454,7 +456,7 @@ def send_verify_notification(
             verify_block = (
                 f"🛡️ <b>主动鉴真淘汰</b>：\n"
                 f"   • 优选检验：TLS 握手 + HTTP 301 ({concurrency} 并发)\n"
-                f"   • 反代检验：/cdn-cgi/trace 深度穿透\n"
+                f"   • 反代检验：/cdn-cgi/trace 穿透 + 优选双能检测\n"
                 f"   • 淘汰死节点：{elim_str}\n"
             )
         else:
