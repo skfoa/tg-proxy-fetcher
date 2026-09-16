@@ -36,7 +36,7 @@ SCAN_CSV = "scan_ips.csv"
 SCAN_TXT = "scan_ips.txt"
 SCAN_DIR = "scan_ips"
 PROBE_HOST = "crypto.cloudflare.com"
-TLS_PORTS = {443, 8443, 2053, 2083, 2087, 2096}
+PLAIN_HTTP_PORTS = {80, 8080, 8880, 2052, 2082, 2086, 2095}
 TIMEOUT = 3.0
 CSV_FIELDS = [
     "ip", "port", "tls", "delay_ms", "speed_kbs",
@@ -131,8 +131,12 @@ async def verify_all(
         except (ValueError, TypeError):
             port = 0
 
-        # 非 TLS 端口跳过探测，保留原样
-        if port not in TLS_PORTS:
+        # 判断是否为纯明文 HTTP（显式标注 tls=false 或知名明文端口），纯 HTTP 跳过 TLS 探测保留原样
+        is_plain_http = (
+            str(row.get("tls", "")).lower() == "false"
+            or port in PLAIN_HTTP_PORTS
+        )
+        if is_plain_http:
             skip_count += 1
             completed += 1
             return
@@ -262,7 +266,7 @@ def save_scan_dir(asn_groups: dict, scan_dir: str = SCAN_DIR):
 # ---------- 主流程 ----------
 def main():
     parser = argparse.ArgumentParser(description="Cloudflare 优选 IP 两阶段主动校验")
-    parser.add_argument("--concurrency", type=int, default=500, help="并发探测协程数 (默认 500)")
+    parser.add_argument("--concurrency", type=int, default=100, help="并发探测协程数 (默认 100)")
     parser.add_argument("--max-fails", type=int, default=3, help="连续失败淘汰阈值 (默认 3)")
     parser.add_argument("--timeout", type=float, default=TIMEOUT, help="单节点探测超时秒数 (默认 3.0)")
     args = parser.parse_args()
