@@ -14,13 +14,36 @@ Cloudflare 优选 IP 两阶段主动校验与淘汰引擎
 import argparse
 import asyncio
 import csv
+import json
 import logging
 import os
 import re
 import ssl
 import sys
 import time
+import urllib.request
 from collections import defaultdict
+from datetime import datetime, timezone, timedelta
+
+# 自动加载本地 .env 文件（若存在）
+_env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+if os.path.isfile(_env_path):
+    try:
+        with open(_env_path, "r", encoding="utf-8") as _ef:
+            for _line in _ef:
+                _line = _line.strip()
+                if not _line or _line.startswith("#") or "=" not in _line:
+                    continue
+                _k, _v = _line.split("=", 1)
+                _k = _k.strip()
+                _v = _v.strip().strip("'").strip('"')
+                if _k and _k not in os.environ:
+                    os.environ[_k] = _v
+    except Exception:
+        pass
+
+TG_BOT_TOKEN = os.getenv("TG_BOT_TOKEN") or ""
+TG_CHAT_ID = os.getenv("TG_CHAT_ID") or ""
 
 logging.basicConfig(
     level=logging.INFO,
@@ -43,6 +66,7 @@ CF_TXT = "cf_ips.txt"
 
 PROBE_HOST = "crypto.cloudflare.com"
 TIMEOUT = 3.0
+HTTP_TIMEOUT = 2.0
 CSV_FIELDS = [
     "ip", "port", "tls", "delay_ms", "speed_kbs",
     "colo", "cf_location", "isp", "asn",
@@ -64,20 +88,27 @@ except ImportError:
 
 
 # ---------- 核心探测函数 ----------
-async def probe_ip(ip: str, port: int, timeout: float = TIMEOUT) -> tuple[bool, int]:
+async def probe_ip(
+    ip: str,
+    port: int,
+    connect_timeout: float = TIMEOUT,
+    http_timeout: float = HTTP_TIMEOUT,
+) -> tuple[bool, int]:
     """
     对单个 IP:Port 执行 TLS 握手 + HTTP 301 校验。
 
-    返回 (is_alive, rtt_ms):
-        is_alive=True  -> 校验通过，rtt_ms 为实测网络延迟
-        is_alive=False -> 校验失败，rtt_ms 为 0
+    返回 (is_alive, latency_ms):
+        is_alive=True  -> 校验通过，latency_ms 为 TLS 握手与连接延迟 (RTT)
+        is_alive=False -> 校验失败，latency_ms 为 0
     """
     t0 = asyncio.get_event_loop().time()
     try:
         reader, writer = await asyncio.wait_for(
             asyncio.open_connection(ip, port, ssl=SSL_CTX, server_hostname=PROBE_HOST),
-            timeout=timeout,
+            timeout=connect_timeout,
         )
+        t1 = asyncio.get_event_loop().time()
+        latency_ms = max(1, int((t1 - t0) * 1000))
     except Exception:
         return False, 0
 
@@ -90,18 +121,16 @@ async def probe_ip(ip: str, port: int, timeout: float = TIMEOUT) -> tuple[bool, 
             f"\r\n"
         ).encode("latin1")
         writer.write(req)
-        await writer.drain()
+        await asyncio.wait_for(writer.drain(), timeout=http_timeout)
 
-        resp = await asyncio.wait_for(reader.read(512), timeout=timeout)
-        t1 = asyncio.get_event_loop().time()
-        rtt_ms = int((t1 - t0) * 1000)
+        resp = await asyncio.wait_for(reader.read(512), timeout=http_timeout)
 
         resp_text = resp.decode("utf-8", errors="ignore")
         first_line = resp_text.splitlines()[0] if resp_text else ""
         is_301 = "301" in first_line
         is_cf = "server: cloudflare" in resp_text.lower()
 
-        return (is_301 and is_cf), rtt_ms
+        return (is_301 and is_cf), latency_ms
     except Exception:
         return False, 0
     finally:
@@ -117,6 +146,7 @@ async def verify_all(
     tag: str = "优选 IP",
     concurrency: int = 250,
     timeout: float = TIMEOUT,
+    http_timeout: float = HTTP_TIMEOUT,
 ) -> list:
     """
     对传入的所有优选 IP 节点无差别执行阶段一与阶段二探测。
@@ -146,13 +176,13 @@ async def verify_all(
             return
 
         async with sem:
-            alive, rtt = await probe_ip(ip, port, timeout)
+            alive, latency = await probe_ip(ip, port, connect_timeout=timeout, http_timeout=http_timeout)
 
         completed += 1
         fc = int(row.get("fail_count") or 0)
         if alive:
             row["fail_count"] = 0
-            row["delay_ms"] = rtt
+            row["delay_ms"] = latency
             pass_count += 1
         else:
             row["fail_count"] = fc + 1
@@ -286,25 +316,219 @@ def save_scan_dir(asn_groups: dict, scan_dir: str = SCAN_DIR):
     log.info("已覆写更新 %s/ 目录: %d 个独立 ASN 纯文本文件", scan_dir, len(active_files))
 
 
-# ---------- 主流程 ----------
-def main():
-    parser = argparse.ArgumentParser(description="Cloudflare 优选 IP 两阶段主动校验与淘汰引擎")
-    parser.add_argument("--concurrency", type=int, default=250, help="并发探测协程数 (默认 250)")
-    parser.add_argument("--max-fails", type=int, default=3, help="连续失败淘汰阈值 (默认 3)")
-    parser.add_argument("--timeout", type=float, default=TIMEOUT, help="单节点探测超时秒数 (默认 3.0)")
-    args = parser.parse_args()
+# ---------- Telegram 结果卡片推送 ----------
+def send_verify_notification(
+    cf_total: int,
+    cf_pass: int,
+    cf_fail: int,
+    cf_eliminated: int,
+    cf_survivors: int,
+    scan_total: int,
+    scan_pass: int,
+    scan_fail: int,
+    scan_eliminated: int,
+    scan_survivors: int,
+    concurrency: int,
+    max_fails: int,
+    elapsed_verify: float,
+):
+    token = TG_BOT_TOKEN
+    chat_id = TG_CHAT_ID
+    if not token or not chat_id:
+        log.info("未配置 TG_BOT_TOKEN 或 TG_CHAT_ID，跳过 Telegram 推送")
+        return
 
+    bjt = datetime.now(timezone(timedelta(hours=8)))
+    date_str = bjt.strftime("%Y-%m-%d %H:%M:%S")
+
+    total_eliminated = cf_eliminated + scan_eliminated
+    total_survivors = cf_survivors + scan_survivors
+
+    # 检查是否存在 tg_fetch 暂存的抓取统计
+    fetch_stats_file = ".fetch_stats.json"
+    fetch_stats = None
+    if os.path.isfile(fetch_stats_file):
+        try:
+            with open(fetch_stats_file, "r", encoding="utf-8") as sf:
+                fetch_stats = json.load(sf)
+        except Exception as e:
+            log.warning("读取暂存抓取统计 %s 失败: %s", fetch_stats_file, e)
+
+    def format_diff(new_c: int, upd_c: int) -> str:
+        parts = []
+        if new_c > 0:
+            parts.append(f"🟢 <b>+{new_c}</b> 新增")
+        if upd_c > 0:
+            parts.append(f"🔄 {upd_c} 刷新")
+        if not parts:
+            return "保持最新"
+        return " · ".join(parts)
+
+    div = "━━━━━━━━━━━━━━━━━━━━"
+
+    github_server = os.getenv("GITHUB_SERVER_URL", "https://github.com")
+    github_repo = os.getenv("GITHUB_REPOSITORY")
+    github_run_id = os.getenv("GITHUB_RUN_ID")
+    github_run_number = os.getenv("GITHUB_RUN_NUMBER")
+
+    footer_parts = []
+    total_elapsed = elapsed_verify
+    if fetch_stats:
+        total_elapsed += fetch_stats.get("elapsed_seconds", 0.0)
+    footer_parts.append(f"⚡ <b>总耗时</b>: {total_elapsed:.1f}s")
+    if github_repo:
+        repo_url = f"{github_server}/{github_repo}"
+        if github_run_id:
+            run_label = f"Action #{github_run_number}" if github_run_number else "Action 日志"
+            footer_parts.append(f'🔗 <a href="{repo_url}/actions/runs/{github_run_id}">{run_label}</a>')
+        footer_parts.append(f'📦 <a href="{repo_url}">产物仓库</a>')
+
+    footer_line = f"\n{div}\n" + " · ".join(footer_parts)
+
+    cf_status = f"✅ {cf_pass} 存活" + (f" · ⚠️ {cf_fail} 标记" if cf_fail > 0 else "")
+    scan_status = f"✅ {scan_pass} 存活" + (f" · ⚠️ {scan_fail} 标记" if scan_fail > 0 else "")
+    elim_str = f"<code>{total_eliminated}</code> 条 (连续失败 ≥ {max_fails} 次)" if total_eliminated > 0 else "无 (全部在存活阈值内)"
+
+    if fetch_stats:
+        # 联合完整流水线卡片
+        proxies_count = fetch_stats.get("proxies_count", 0)
+        new_proxies = fetch_stats.get("new_proxies", 0)
+        updated_proxies = fetch_stats.get("updated_proxies", 0)
+
+        proxyips_count = fetch_stats.get("proxyips_count", 0)
+        new_proxyips = fetch_stats.get("new_proxyips", 0)
+        updated_proxyips = fetch_stats.get("updated_proxyips", 0)
+
+        new_cf = fetch_stats.get("new_cf", 0)
+        updated_cf = fetch_stats.get("updated_cf", 0)
+
+        new_scan = fetch_stats.get("new_scan", 0)
+        updated_scan = fetch_stats.get("updated_scan", 0)
+        asn_count = fetch_stats.get("asn_count", 0)
+        top_providers = fetch_stats.get("top_providers", [])
+        channels = fetch_stats.get("channels", ["@otcfxq", "@danfeng2"])
+
+        total_new = new_proxies + new_cf + new_scan + new_proxyips
+        total_updated = updated_proxies + updated_cf + updated_scan + updated_proxyips
+
+        if total_eliminated > 0:
+            header = f"🚀 <b>节点与优选 IP 同步完成</b> (🗑️ 剔除 <b>{total_eliminated}</b> 死节点)"
+        elif total_new > 0:
+            header = f"🚀 <b>节点与优选 IP 同步完成</b> (🟢 发现 <b>+{total_new}</b> 条新数据)"
+        elif total_updated > 0:
+            header = f"🚀 <b>节点与优选 IP 同步完成</b> (🔄 刷新 {total_updated} 条数据)"
+        else:
+            header = "⚡ <b>节点与优选 IP 同步完成</b> (数据已全部为最新)"
+
+        proxy_line = f"📫 <b>可用代理</b>：<code>{proxies_count}</code> 个 ({format_diff(new_proxies, updated_proxies)})\n"
+        cf_line = f"🌐 <b>单条优选</b>：<code>{cf_survivors}</code> 条 ({cf_status})\n"
+
+        asn_suffix = f" · {asn_count} 个 ASN" if asn_count > 0 else ""
+        scan_line = f"📁 <b>扫描优选</b>：<code>{scan_survivors}</code> 条 ({scan_status}{asn_suffix})\n"
+        if top_providers:
+            prov_preview = ", ".join(top_providers[:4])
+            if len(top_providers) > 4:
+                prov_preview += " 等"
+            scan_line += f"   └ <i>涵盖: {prov_preview}</i>\n"
+
+        proxyip_line = ""
+        if proxyips_count > 0:
+            proxyip_line = f"🛡️ <b>反代 ProxyIP</b>：<code>{proxyips_count}</code> 条 ({format_diff(new_proxyips, updated_proxyips)})\n"
+
+        verify_block = (
+            f"🛡️ <b>主动鉴真淘汰</b>：\n"
+            f"   • 检验规格：TLS 握手 + HTTP 301 ({concurrency} 并发)\n"
+            f"   • 淘汰死节点：{elim_str}\n"
+        )
+
+        channels_str = ", ".join(dict.fromkeys(channels))
+
+        message = (
+            f"{header}\n"
+            f"{div}\n"
+            f"📅 <b>时间</b>：{date_str} (北京时间)\n"
+            f"{proxy_line}"
+            f"{cf_line}"
+            f"{scan_line}"
+            f"{proxyip_line}"
+            f"{div}\n"
+            f"{verify_block}"
+            f"📡 <b>频道来源</b>：{channels_str}"
+            f"{footer_line}"
+        )
+    else:
+        # 独立校验卡片
+        header = f"🛡️ <b>优选 IP 两阶段鉴真完成</b> (✅ 存活 <b>{total_survivors}</b> 条)"
+        cf_line = f"🌐 <b>单条优选</b>：<code>{cf_survivors}</code> 条 ({cf_status})\n"
+        scan_line = f"📁 <b>扫描优选</b>：<code>{scan_survivors}</code> 条 ({scan_status})\n"
+        message = (
+            f"{header}\n"
+            f"{div}\n"
+            f"📅 <b>时间</b>：{date_str} (北京时间)\n"
+            f"{cf_line}"
+            f"{scan_line}"
+            f"🗑️ <b>淘汰死节点</b>：{elim_str}\n"
+            f"⚙️ <b>检测规格</b>：TLS 握手 + HTTP 301 · {concurrency} 并发\n"
+            f"{footer_line}"
+        )
+
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    payload = json.dumps({
+        "chat_id": chat_id,
+        "text": message,
+        "parse_mode": "HTML",
+        "disable_web_page_preview": True,
+    }).encode("utf-8")
+
+    try:
+        req = urllib.request.Request(
+            url,
+            data=payload,
+            headers={"Content-Type": "application/json"}
+        )
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            if data.get("ok"):
+                log.info("✅ Telegram 统计卡片已成功发送！")
+            else:
+                log.warning("Telegram 消息发送失败: %s", data)
+    except Exception as e:
+        log.warning("发送 Telegram 消息时出现异常: %s", e)
+    finally:
+        if os.path.isfile(fetch_stats_file):
+            try:
+                os.remove(fetch_stats_file)
+            except OSError:
+                pass
+
+
+# ---------- 主流程 ----------
+async def async_main(args):
     t_start = time.time()
 
     # ================= 1. 校验单条优选 IP (cf_ips) =================
     cf_rows = load_csv(CF_CSV)
-    if cf_rows:
-        total_cf = len(cf_rows)
-        log.info(">>> 开始校验单条优选 IP (%s): 共 %d 条...", CF_CSV, total_cf)
-        asyncio.run(verify_all(cf_rows, tag="单条优选", concurrency=args.concurrency, timeout=args.timeout))
+    cf_total = len(cf_rows)
+    cf_pass = 0
+    cf_fail = 0
+    cf_eliminated = 0
+    cf_survivors_len = 0
 
+    if cf_rows:
+        log.info(">>> 开始校验单条优选 IP (%s): 共 %d 条...", CF_CSV, cf_total)
+        await verify_all(
+            cf_rows,
+            tag="单条优选",
+            concurrency=args.concurrency,
+            timeout=args.timeout,
+            http_timeout=args.http_timeout,
+        )
+
+        cf_pass = sum(1 for r in cf_rows if int(r.get("fail_count", 0)) == 0)
+        cf_fail = cf_total - cf_pass
         cf_survivors = [r for r in cf_rows if int(r.get("fail_count", 0)) < args.max_fails]
-        cf_eliminated = total_cf - len(cf_survivors)
+        cf_eliminated = cf_total - len(cf_survivors)
+        cf_survivors_len = len(cf_survivors)
         if cf_eliminated > 0:
             log.info("[单条优选] 淘汰剔除 %d 条连续失败 >= %d 次的死节点", cf_eliminated, args.max_fails)
         else:
@@ -317,13 +541,27 @@ def main():
 
     # ================= 2. 校验扫描优选 IP (scan_ips) =================
     scan_rows = load_csv(SCAN_CSV)
-    if scan_rows:
-        total_scan = len(scan_rows)
-        log.info(">>> 开始校验扫描优选 IP (%s): 共 %d 条...", SCAN_CSV, total_scan)
-        asyncio.run(verify_all(scan_rows, tag="扫描优选", concurrency=args.concurrency, timeout=args.timeout))
+    scan_total = len(scan_rows)
+    scan_pass = 0
+    scan_fail = 0
+    scan_eliminated = 0
+    scan_survivors_len = 0
 
+    if scan_rows:
+        log.info(">>> 开始校验扫描优选 IP (%s): 共 %d 条...", SCAN_CSV, scan_total)
+        await verify_all(
+            scan_rows,
+            tag="扫描优选",
+            concurrency=args.concurrency,
+            timeout=args.timeout,
+            http_timeout=args.http_timeout,
+        )
+
+        scan_pass = sum(1 for r in scan_rows if int(r.get("fail_count", 0)) == 0)
+        scan_fail = scan_total - scan_pass
         scan_survivors = [r for r in scan_rows if int(r.get("fail_count", 0)) < args.max_fails]
-        scan_eliminated = total_scan - len(scan_survivors)
+        scan_eliminated = scan_total - len(scan_survivors)
+        scan_survivors_len = len(scan_survivors)
         if scan_eliminated > 0:
             log.info("[扫描优选] 淘汰剔除 %d 条连续失败 >= %d 次的死节点", scan_eliminated, args.max_fails)
         else:
@@ -348,6 +586,33 @@ def main():
 
     elapsed = time.time() - t_start
     log.info("全部优选 IP 两阶段校验流程圆满完成，总耗时 %.2f 秒", elapsed)
+
+    send_verify_notification(
+        cf_total=cf_total,
+        cf_pass=cf_pass,
+        cf_fail=cf_fail,
+        cf_eliminated=cf_eliminated,
+        cf_survivors=cf_survivors_len,
+        scan_total=scan_total,
+        scan_pass=scan_pass,
+        scan_fail=scan_fail,
+        scan_eliminated=scan_eliminated,
+        scan_survivors=scan_survivors_len,
+        concurrency=args.concurrency,
+        max_fails=args.max_fails,
+        elapsed_verify=elapsed,
+    )
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Cloudflare 优选 IP 两阶段主动校验与淘汰引擎")
+    parser.add_argument("--concurrency", type=int, default=250, help="并发探测协程数 (默认 250)")
+    parser.add_argument("--max-fails", type=int, default=3, help="连续失败淘汰阈值 (默认 3)")
+    parser.add_argument("--timeout", type=float, default=TIMEOUT, help="单节点连接与 TLS 握手超时秒数 (默认 3.0)")
+    parser.add_argument("--http-timeout", type=float, default=HTTP_TIMEOUT, help="单节点 HTTP 校验超时秒数 (默认 2.0)")
+    args = parser.parse_args()
+
+    asyncio.run(async_main(args))
 
 
 if __name__ == "__main__":

@@ -978,6 +978,34 @@ def send_tg_notification(
     top_providers: list = None,
     elapsed_seconds: float = 0.0,
 ):
+    # 若设置了 DEFER_NOTIFY=1（如在 GitHub Actions 完整流水线中），则将抓取统计暂存至 .fetch_stats.json，由后续的 cf_verify 生成联合卡片
+    if os.getenv("DEFER_NOTIFY") == "1":
+        stats_data = {
+            "proxies_count": proxies_count,
+            "cf_ips_count": cf_ips_count,
+            "scan_ips_count": scan_ips_count,
+            "asn_count": asn_count,
+            "proxyips_count": proxyips_count,
+            "new_proxies": new_proxies,
+            "updated_proxies": updated_proxies,
+            "new_cf": new_cf,
+            "updated_cf": updated_cf,
+            "new_scan": new_scan,
+            "updated_scan": updated_scan,
+            "new_proxyips": new_proxyips,
+            "updated_proxyips": updated_proxyips,
+            "top_providers": top_providers or [],
+            "elapsed_seconds": elapsed_seconds,
+            "channels": [ch for ch in PROXY_CHANNELS + CF_IP_CHANNELS if ch],
+        }
+        try:
+            with open(".fetch_stats.json", "w", encoding="utf-8") as sf:
+                json.dump(stats_data, sf, ensure_ascii=False, indent=2)
+            log.info("已将抓取阶段统计暂存至 .fetch_stats.json (等待优选 IP 校验后统一推送)")
+            return
+        except Exception as e:
+            log.warning("暂存 .fetch_stats.json 失败，将直接尝试推送: %s", e)
+
     token = TG_BOT_TOKEN
     chat_id = TG_CHAT_ID
     if not token or not chat_id:
