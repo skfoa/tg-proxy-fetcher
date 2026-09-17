@@ -78,13 +78,8 @@ SSL_CTX = ssl.create_default_context()
 SSL_CTX.check_hostname = True
 SSL_CTX.verify_mode = ssl.CERT_REQUIRED
 
-# 尝试导入 tg_fetch 中的映射表
-ASN_TO_PROVIDER = {}
-KNOWN_CLOUD_PROVIDERS = {}
-try:
-    from tg_fetch import ASN_TO_PROVIDER, KNOWN_CLOUD_PROVIDERS
-except ImportError:
-    pass
+# 导入云服务商与 ASN 规范化映射表
+from providers import ASN_TO_PROVIDER, KNOWN_CLOUD_PROVIDERS
 
 
 # ---------- 核心探测函数 ----------

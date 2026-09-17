@@ -23,7 +23,6 @@ import logging
 import os
 import random
 import re
-import ssl
 import struct
 import sys
 import time
@@ -129,8 +128,8 @@ async def probe_socks5(
             writer.write(b"\x05\x01\x00")
         await asyncio.wait_for(writer.drain(), timeout=connect_timeout)
 
-        resp = await asyncio.wait_for(reader.read(2), timeout=connect_timeout)
-        if len(resp) < 2 or resp[0] != 0x05:
+        resp = await asyncio.wait_for(reader.readexactly(2), timeout=connect_timeout)
+        if resp[0] != 0x05:
             return False, 0, "bad_handshake", ""
 
         method = resp[1]
@@ -145,8 +144,8 @@ async def probe_socks5(
             auth_req = b"\x01" + bytes([len(u_b)]) + u_b + bytes([len(p_b)]) + p_b
             writer.write(auth_req)
             await asyncio.wait_for(writer.drain(), timeout=connect_timeout)
-            auth_resp = await asyncio.wait_for(reader.read(2), timeout=connect_timeout)
-            if len(auth_resp) < 2 or auth_resp[1] != 0x00:
+            auth_resp = await asyncio.wait_for(reader.readexactly(2), timeout=connect_timeout)
+            if auth_resp[1] != 0x00:
                 return False, 0, "auth_fail", ""
         elif method != 0x00:
             return False, 0, "unsupported_method", ""
@@ -162,19 +161,19 @@ async def probe_socks5(
         writer.write(conn_req)
         await asyncio.wait_for(writer.drain(), timeout=connect_timeout)
 
-        conn_resp = await asyncio.wait_for(reader.read(4), timeout=connect_timeout)
-        if len(conn_resp) < 4 or conn_resp[0] != 0x05 or conn_resp[1] != 0x00:
+        conn_resp = await asyncio.wait_for(reader.readexactly(4), timeout=connect_timeout)
+        if conn_resp[0] != 0x05 or conn_resp[1] != 0x00:
             return False, 0, "connect_fail", ""
 
-        # 排空 BND.ADDR / BND.PORT
+        # 排空 BND.ADDR / BND.PORT (RFC 1928 严谨读取)
         atyp = conn_resp[3]
-        if atyp == 0x01:  # IPv4
-            await asyncio.wait_for(reader.read(6), timeout=connect_timeout)
-        elif atyp == 0x03:  # Domain
-            dlen = (await asyncio.wait_for(reader.read(1), timeout=connect_timeout))[0]
-            await asyncio.wait_for(reader.read(dlen + 2), timeout=connect_timeout)
-        elif atyp == 0x04:  # IPv6
-            await asyncio.wait_for(reader.read(18), timeout=connect_timeout)
+        if atyp == 0x01:  # IPv4: 4 字节 IP + 2 字节端口
+            await asyncio.wait_for(reader.readexactly(6), timeout=connect_timeout)
+        elif atyp == 0x03:  # Domain: 1 字节长度 + N 字节域名 + 2 字节端口
+            dlen = (await asyncio.wait_for(reader.readexactly(1), timeout=connect_timeout))[0]
+            await asyncio.wait_for(reader.readexactly(dlen + 2), timeout=connect_timeout)
+        elif atyp == 0x04:  # IPv6: 16 字节 IP + 2 字节端口
+            await asyncio.wait_for(reader.readexactly(18), timeout=connect_timeout)
 
         # 步骤 5: HTTP GET /cdn-cgi/trace
         http_req = (
@@ -272,7 +271,18 @@ async def probe_http(
             if "200" in (http_text.splitlines()[0] if http_text else "") and colo:
                 return True, lat, "alive", colo
 
-        # 回退至直接正向代理 Forward GET
+        # 回退至直接正向代理 Forward GET（安全重连以避免原连接被代理端关闭/重置）
+        try:
+            writer.close()
+            await writer.wait_closed()
+        except Exception:
+            pass
+
+        reader, writer = await asyncio.wait_for(
+            asyncio.open_connection(host, port),
+            timeout=connect_timeout,
+        )
+
         direct_req = (
             f"GET http://{PROBE_HOST}{PROBE_PATH} HTTP/1.1\r\n"
             f"Host: {PROBE_HOST}\r\n"

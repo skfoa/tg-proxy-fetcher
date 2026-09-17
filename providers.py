@@ -1,0 +1,102 @@
+#!/usr/bin/env python3
+"""
+云厂商、CDN 与 ASN 规范化全局映射表
+供 tg_fetch.py 与 cf_verify.py 共享使用，避免模块循环依赖与冗余硬编码。
+"""
+
+KNOWN_CLOUD_PROVIDERS = {
+    # 头部公有云与 CDN 服务
+    "cloudflare": ("AS13335", "Cloudflare"),
+    "cf": ("AS13335", "Cloudflare"),
+    "fastly": ("AS54113", "Fastly"),
+    "aliyun": ("AS45102", "Alibaba Cloud"),
+    "alibaba": ("AS45102", "Alibaba Cloud"),
+    "alicloud": ("AS45102", "Alibaba Cloud"),
+    "tencent": ("AS132203", "Tencent Cloud"),
+    "qcloud": ("AS132203", "Tencent Cloud"),
+    "hwcloud": ("AS136907", "Huawei Cloud"),
+    "huawei": ("AS136907", "Huawei Cloud"),
+    "huaweicloud": ("AS136907", "Huawei Cloud"),
+    "ucloud": ("AS138915", "UCloud"),
+    "baidu": ("AS38365", "Baidu Cloud"),
+    "bce": ("AS38365", "Baidu Cloud"),
+    "volcengine": ("AS138699", "ByteDance Volcengine"),
+    "bytedance": ("AS138699", "ByteDance Volcengine"),
+    "jdcloud": ("AS44907", "JD Cloud"),
+    "jcloud": ("AS44907", "JD Cloud"),
+    "ksyun": ("AS45062", "Kingsoft Cloud"),
+    "kingsoft": ("AS45062", "Kingsoft Cloud"),
+    "qiniu": ("AS136907", "Qiniu Cloud"),
+
+    # 国际主流公有云
+    "aws": ("AS16509", "Amazon AWS"),
+    "amazon": ("AS16509", "Amazon AWS"),
+    "lightsail": ("AS16509", "Amazon Lightsail"),
+    "azure": ("AS8075", "Microsoft Azure"),
+    "microsoft": ("AS8075", "Microsoft Azure"),
+    "gcp": ("AS15169", "Google Cloud"),
+    "google": ("AS15169", "Google Cloud"),
+    "oracle": ("AS31898", "Oracle Cloud"),
+    "oci": ("AS31898", "Oracle Cloud"),
+    "digitalocean": ("AS14061", "DigitalOcean"),
+    "vultr": ("AS20473", "Vultr"),
+    "choopa": ("AS20473", "Vultr"),
+    "linode": ("AS63949", "Linode Akamai"),
+    "akamai": ("AS63949", "Linode Akamai"),
+    "hetzner": ("AS24940", "Hetzner"),
+    "ovh": ("AS16276", "OVH"),
+    "scaleway": ("AS12876", "Scaleway"),
+    "leaseweb": ("AS60781", "Leaseweb"),
+    "kamatera": ("AS35838", "Kamatera"),
+
+    # 热门 VPS / 优选反代服务商 (圈内高频出现)
+    "akile": ("AS61112", "AkileCloud"),
+    "akilecloud": ("AS61112", "AkileCloud"),
+    "dmit": ("AS906", "DMIT"),
+    "bandwagon": ("AS25820", "BandwagonHost"),
+    "bwg": ("AS25820", "BandwagonHost"),
+    "it7": ("AS25820", "BandwagonHost"),
+    "claw": ("AS45102", "Claw Cloud"),
+    "clawcloud": ("AS45102", "Claw Cloud"),
+    "vmiss": ("AS147049", "VMISS"),
+    "contabo": ("AS51167", "Contabo"),
+    "netcup": ("AS197540", "Netcup"),
+    "racknerd": ("AS36352", "RackNerd"),
+    "buyvm": ("AS53667", "BuyVM FranTech"),
+    "frantech": ("AS53667", "BuyVM FranTech"),
+    "hostdare": ("AS397373", "HostDare"),
+    "misaka": ("AS54600", "Misaka"),
+    "kurun": ("AS13768", "Kurun Cloud"),
+    "spartan": ("AS201106", "SpartanHost"),
+    "spartanhost": ("AS201106", "SpartanHost"),
+    "wap": ("AS149798", "WAP.ac"),
+    "bagevm": ("AS14061", "BageVM"),
+    "netlab": ("AS979", "NetLab"),
+    "zenlayer": ("AS21859", "Zenlayer"),
+    "hostinger": ("AS47583", "Hostinger"),
+    "m247": ("AS9009", "M247"),
+    "datacamp": ("AS60068", "Datacamp Limited"),
+    "aeza": ("AS210644", "Aeza"),
+    "bytevirt": ("AS212336", "ByteVirt"),
+    "starry": ("AS134835", "Starry Network"),
+    "cyberverse": ("AS216211", "Cyberverse"),
+    "isif": ("AS209554", "ISIF"),
+
+    # 运营商骨干与出海线路
+    "hinet": ("AS3462", "Chunghwa Telecom HiNet"),
+    "cmi": ("AS58453", "China Mobile CMI"),
+    "chinamobile": ("AS58453", "China Mobile CMI"),
+    "cug": ("AS10099", "China Unicom CUG"),
+    "chinaunicom": ("AS10099", "China Unicom CUG"),
+    "ctg": ("AS4134", "China Telecom CTG"),
+    "chinatelecom": ("AS4134", "China Telecom 163"),
+    "cn2": ("AS4809", "China Telecom CN2"),
+    "9929": ("AS9929", "China Unicom 9929"),
+    "cmin2": ("AS58807", "China Mobile CMIN2"),
+}
+
+# ASN 到标准服务商名称反查表
+ASN_TO_PROVIDER = {}
+for _k, (_asn, _isp) in KNOWN_CLOUD_PROVIDERS.items():
+    if _asn not in ASN_TO_PROVIDER:
+        ASN_TO_PROVIDER[_asn] = _isp
