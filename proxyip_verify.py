@@ -29,25 +29,10 @@ import time
 import urllib.request
 from datetime import datetime, timezone, timedelta
 
-# 自动加载本地 .env 文件（若存在）
-_env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
-if os.path.isfile(_env_path):
-    try:
-        with open(_env_path, "r", encoding="utf-8") as _ef:
-            for _line in _ef:
-                _line = _line.strip()
-                if not _line or _line.startswith("#") or "=" not in _line:
-                    continue
-                _k, _v = _line.split("=", 1)
-                _k = _k.strip()
-                _v = _v.strip().strip("'").strip('"')
-                if _k and _k not in os.environ:
-                    os.environ[_k] = _v
-    except Exception:
-        pass
+from providers import load_dotenv, safe_int, send_tg_message, TG_BOT_TOKEN, TG_CHAT_ID
 
-TG_BOT_TOKEN = os.getenv("TG_BOT_TOKEN") or ""
-TG_CHAT_ID = os.getenv("TG_CHAT_ID") or ""
+# 确保本地 .env 加载
+load_dotenv()
 
 logging.basicConfig(
     level=logging.INFO,
@@ -213,13 +198,7 @@ def load_proxyip_csv(path: str) -> list:
     with open(path, "r", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         for r in reader:
-            if "fail_count" not in r or not str(r.get("fail_count", "")).strip():
-                r["fail_count"] = 0
-            else:
-                try:
-                    r["fail_count"] = int(r["fail_count"])
-                except (ValueError, TypeError):
-                    r["fail_count"] = 0
+            r["fail_count"] = safe_int(r.get("fail_count"), 0)
             rows.append(r)
     return rows
 
@@ -237,18 +216,9 @@ def save_proxyip(
     # 稳定双重排序：先按 tested_at 降序（最新优先），再按 (fail_count, delay_ms) 升序
     rows.sort(key=lambda r: r.get("tested_at", ""), reverse=True)
 
-    def _get_fc(r):
-        try:
-            return int(r.get("fail_count") or 0)
-        except (ValueError, TypeError):
-            return 0
-
     def _sort_key(r):
-        fc = _get_fc(r)
-        try:
-            delay = int(r.get("delay_ms") or 99999)
-        except (ValueError, TypeError):
-            delay = 99999
+        fc = safe_int(r.get("fail_count"), 0)
+        delay = safe_int(r.get("delay_ms") or 99999, 99999)
         return (fc, delay)
 
     rows.sort(key=_sort_key)
@@ -304,11 +274,7 @@ async def verify_proxyips(
     indices = list(range(total))
     random.shuffle(indices)
 
-    def _get_fc(r):
-        try:
-            return int(r.get("fail_count") or 0)
-        except (ValueError, TypeError):
-            return 0
+    _get_fc = lambda r: safe_int(r.get("fail_count"), 0)
 
     async def _check(idx: int):
         nonlocal pass_count, fail_count_total, cf_clean_count, completed
@@ -443,26 +409,8 @@ def send_proxyip_notification(
         f"{footer_line}"
     )
 
-    url = f"https://api.telegram.org/bot{token}/sendMessage"
-    payload = json.dumps({
-        "chat_id": chat_id,
-        "text": message,
-        "parse_mode": "HTML",
-        "disable_web_page_preview": True,
-    }).encode("utf-8")
-
     try:
-        req = urllib.request.Request(
-            url,
-            data=payload,
-            headers={"Content-Type": "application/json"},
-        )
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            if data.get("ok"):
-                log.info("✅ ProxyIP 质检 Telegram 统计卡片已成功发送！")
-            else:
-                log.warning("Telegram 消息发送失败: %s", data)
+        send_tg_message(message, token=token, chat_id=chat_id, tag="proxyip-verify")
     except Exception as e:
         log.warning("发送 Telegram 消息时出现异常: %s", e)
 
@@ -486,11 +434,7 @@ async def async_main(args):
         http_timeout=args.http_timeout,
     )
 
-    def _get_fc(r):
-        try:
-            return int(r.get("fail_count") or 0)
-        except (ValueError, TypeError):
-            return 0
+    _get_fc = lambda r: safe_int(r.get("fail_count"), 0)
 
     pass_count = sum(1 for r in rows if _get_fc(r) == 0)
     fail_count = total - pass_count

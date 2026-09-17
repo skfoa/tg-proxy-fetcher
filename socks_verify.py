@@ -30,25 +30,10 @@ import urllib.parse
 import urllib.request
 from datetime import datetime, timezone, timedelta
 
-# 自动加载本地 .env 文件（若存在）
-_env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
-if os.path.isfile(_env_path):
-    try:
-        with open(_env_path, "r", encoding="utf-8") as _ef:
-            for _line in _ef:
-                _line = _line.strip()
-                if not _line or _line.startswith("#") or "=" not in _line:
-                    continue
-                _k, _v = _line.split("=", 1)
-                _k = _k.strip()
-                _v = _v.strip().strip("'").strip('"')
-                if _k and _k not in os.environ:
-                    os.environ[_k] = _v
-    except Exception:
-        pass
+from providers import load_dotenv, safe_int, send_tg_message, TG_BOT_TOKEN, TG_CHAT_ID
 
-TG_BOT_TOKEN = os.getenv("TG_BOT_TOKEN") or ""
-TG_CHAT_ID = os.getenv("TG_CHAT_ID") or ""
+# 确保本地 .env 加载
+load_dotenv()
 
 logging.basicConfig(
     level=logging.INFO,
@@ -74,8 +59,8 @@ PROBE_HOST = "speed.cloudflare.com"
 PROBE_PATH = "/cdn-cgi/trace"
 PROBE_PORT = 80
 
-TIMEOUT = 2.5
-HTTP_TIMEOUT = 2.0
+TIMEOUT = 3.0
+HTTP_TIMEOUT = 2.5
 CONCURRENCY = 300
 MAX_FAILS = 2
 
@@ -389,7 +374,7 @@ async def probe_single(
         now_str = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
         row["tested_at"] = now_str
 
-        fc = int(row.get("fail_count", 0))
+        fc = safe_int(row.get("fail_count"), 0)
         if is_alive:
             row["fail_count"] = 0
             row["delay_ms"] = delay_ms
@@ -453,17 +438,8 @@ def load_socks_data(
                     parsed = parse_proxy_url(url)
                     if not parsed:
                         continue
-                    try:
-                        fc = int(r.get("fail_count", 0))
-                    except (ValueError, TypeError):
-                        fc = 0
-                    try:
-                        dms = int(r.get("delay_ms", 0))
-                    except (ValueError, TypeError):
-                        dms = 0
-
-                    parsed["fail_count"] = fc
-                    parsed["delay_ms"] = dms
+                    parsed["fail_count"] = safe_int(r.get("fail_count"), 0)
+                    parsed["delay_ms"] = safe_int(r.get("delay_ms"), 0)
                     parsed["status"] = r.get("status", "pending")
                     parsed["colo"] = r.get("colo", "")
                     parsed["tested_at"] = r.get("tested_at", "")
@@ -504,8 +480,8 @@ def save_socks_data(
     覆写 socks5.txt 与 socks5.csv。
     """
     def _sort_key(r):
-        fc = int(r.get("fail_count", 0))
-        dms = int(r.get("delay_ms", 0))
+        fc = safe_int(r.get("fail_count"), 0)
+        dms = safe_int(r.get("delay_ms"), 0)
         # 0 delay 视作未测通或失败，排在后面
         if dms <= 0:
             dms = 99999
@@ -573,26 +549,8 @@ def send_socks_notification(
         f"⏱️ <b>质检耗时</b>：{elapsed:.1f}s\n"
     )
 
-    url = f"https://api.telegram.org/bot{token}/sendMessage"
-    payload = json.dumps({
-        "chat_id": chat_id,
-        "text": message,
-        "parse_mode": "HTML",
-        "disable_web_page_preview": True,
-    }).encode("utf-8")
-
     try:
-        req = urllib.request.Request(
-            url,
-            data=payload,
-            headers={"Content-Type": "application/json"},
-        )
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            if data.get("ok"):
-                log.info("✅ Telegram 代理质检卡片已成功发送！")
-            else:
-                log.warning("Telegram 消息发送失败: %s", data)
+        send_tg_message(message, token=token, chat_id=chat_id, tag="socks-verify")
     except Exception as e:
         log.warning("发送 Telegram 消息时出现异常: %s", e)
 
@@ -667,7 +625,7 @@ async def async_main(args):
     results = await asyncio.gather(*tasks)
 
     # 幸存者筛选
-    survivors = [r for r in results if int(r.get("fail_count", 0)) < args.max_fails]
+    survivors = [r for r in results if safe_int(r.get("fail_count"), 0) < args.max_fails]
     eliminated = total - len(survivors)
     survivors_len = len(survivors)
 

@@ -25,25 +25,19 @@ import urllib.request
 from collections import defaultdict
 from datetime import datetime, timezone, timedelta
 
-# 自动加载本地 .env 文件（若存在）
-_env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
-if os.path.isfile(_env_path):
-    try:
-        with open(_env_path, "r", encoding="utf-8") as _ef:
-            for _line in _ef:
-                _line = _line.strip()
-                if not _line or _line.startswith("#") or "=" not in _line:
-                    continue
-                _k, _v = _line.split("=", 1)
-                _k = _k.strip()
-                _v = _v.strip().strip("'").strip('"')
-                if _k and _k not in os.environ:
-                    os.environ[_k] = _v
-    except Exception:
-        pass
+from providers import (
+    load_dotenv,
+    safe_int,
+    clean_asn,
+    send_tg_message,
+    ASN_TO_PROVIDER,
+    KNOWN_CLOUD_PROVIDERS,
+    TG_BOT_TOKEN,
+    TG_CHAT_ID,
+)
 
-TG_BOT_TOKEN = os.getenv("TG_BOT_TOKEN") or ""
-TG_CHAT_ID = os.getenv("TG_CHAT_ID") or ""
+# 确保本地 .env 加载
+load_dotenv()
 
 logging.basicConfig(
     level=logging.INFO,
@@ -78,8 +72,7 @@ SSL_CTX = ssl.create_default_context()
 SSL_CTX.check_hostname = True
 SSL_CTX.verify_mode = ssl.CERT_REQUIRED
 
-# 导入云服务商与 ASN 规范化映射表
-from providers import ASN_TO_PROVIDER, KNOWN_CLOUD_PROVIDERS
+
 
 
 # ---------- 核心探测函数 ----------
@@ -198,22 +191,6 @@ async def verify_all(
 
 
 # ---------- 数据读写与 ASN 智能聚合 ----------
-def clean_asn(raw_asn: str, isp: str = "") -> str:
-    """提取规范化 ASN 编号 (如 AS979，支持从知名服务商名称智能反推)"""
-    raw_asn = (raw_asn or "").strip()
-    m = re.search(r"(AS\d+)", raw_asn, re.IGNORECASE)
-    if m:
-        return m.group(1).upper()
-    r_low = (raw_asn + " " + (isp or "")).lower()
-    for k in sorted(KNOWN_CLOUD_PROVIDERS.keys(), key=len, reverse=True):
-        if k in r_low:
-            return KNOWN_CLOUD_PROVIDERS[k][0]
-    m_d = re.search(r"\b(\d{3,7})\b", raw_asn)
-    if m_d:
-        return f"AS{m_d.group(1)}"
-    return raw_asn if raw_asn else "AS_UNKNOWN"
-
-
 def load_csv(path: str) -> list:
     """读取优选 IP CSV 文件，自动兼容 BOM 及旧版本缺少 fail_count 字段的情况"""
     if not os.path.exists(path):
@@ -222,13 +199,7 @@ def load_csv(path: str) -> list:
     with open(path, "r", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         for r in reader:
-            if "fail_count" not in r or not str(r.get("fail_count", "")).strip():
-                r["fail_count"] = 0
-            else:
-                try:
-                    r["fail_count"] = int(r["fail_count"])
-                except ValueError:
-                    r["fail_count"] = 0
+            r["fail_count"] = safe_int(r.get("fail_count"), 0)
             rows.append(r)
     return rows
 
@@ -524,26 +495,8 @@ def send_verify_notification(
             f"{footer_line}"
         )
 
-    url = f"https://api.telegram.org/bot{token}/sendMessage"
-    payload = json.dumps({
-        "chat_id": chat_id,
-        "text": message,
-        "parse_mode": "HTML",
-        "disable_web_page_preview": True,
-    }).encode("utf-8")
-
     try:
-        req = urllib.request.Request(
-            url,
-            data=payload,
-            headers={"Content-Type": "application/json"}
-        )
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            if data.get("ok"):
-                log.info("✅ Telegram 统计卡片已成功发送！")
-            else:
-                log.warning("Telegram 消息发送失败: %s", data)
+        send_tg_message(message, token=token, chat_id=chat_id, tag="cf-verify")
     except Exception as e:
         log.warning("发送 Telegram 消息时出现异常: %s", e)
     finally:
