@@ -66,18 +66,20 @@ TG_CHAT_ID = os.getenv("TG_CHAT_ID") or ""
 PROXY_CHANNELS = ["@otcfxq"]
 CF_IP_CHANNELS = ["@otcfxq", "@danfeng2"]
 
-OUTPUT_PROXY_FILE = "socks5.txt"
-OUTPUT_CF_FILE = "cf_ips.csv"
-OUTPUT_CF_TXT = "cf_ips.txt"
+DATA_DIR = "data"
+OUTPUT_PROXY_FILE = os.path.join(DATA_DIR, "socks5.txt")
+OUTPUT_CF_FILE = os.path.join(DATA_DIR, "cf_ips.csv")
+OUTPUT_CF_TXT = os.path.join(DATA_DIR, "cf_ips.txt")
 
 # 扫描文件/附件提取的批量优选 IP 独立保存文件（与单条 IP 隔离，按 ASN 分组）
-OUTPUT_SCAN_FILE = "scan_ips.csv"
-OUTPUT_SCAN_TXT = "scan_ips.txt"
-OUTPUT_SCAN_DIR = "scan_ips"
+OUTPUT_SCAN_FILE = os.path.join(DATA_DIR, "scan_ips.csv")
+OUTPUT_SCAN_TXT = os.path.join(DATA_DIR, "scan_ips.txt")
+OUTPUT_SCAN_DIR = os.path.join(DATA_DIR, "scan_ips")
 
 # 反代 ProxyIP 专属保存文件（独立反代池，供 edgetunnel / Workers 等使用）
-OUTPUT_PROXYIP_FILE = "proxyip.csv"
-OUTPUT_PROXYIP_TXT = "proxyip.txt"
+OUTPUT_PROXYIP_FILE = os.path.join(DATA_DIR, "proxyip.csv")
+OUTPUT_PROXYIP_TXT = os.path.join(DATA_DIR, "proxyip.txt")
+FETCH_STATS_FILE = os.path.join(DATA_DIR, ".fetch_stats.json")
 # ============================================
 
 ANNOUNCE_PROXY_RE = re.compile(
@@ -717,12 +719,12 @@ def send_tg_notification(
             "channels": [ch for ch in PROXY_CHANNELS + CF_IP_CHANNELS if ch],
         }
         try:
-            with open(".fetch_stats.json", "w", encoding="utf-8") as sf:
+            with open(FETCH_STATS_FILE, "w", encoding="utf-8") as sf:
                 json.dump(stats_data, sf, ensure_ascii=False, indent=2)
-            log.info("已将抓取阶段统计暂存至 .fetch_stats.json (等待优选 IP 校验后统一推送)")
+            log.info("已将抓取阶段统计暂存至 %s (等待优选 IP 校验后统一推送)", FETCH_STATS_FILE)
             return
         except Exception as e:
-            log.warning("暂存 .fetch_stats.json 失败，将直接尝试推送: %s", e)
+            log.warning("暂存 %s 失败，将直接尝试推送: %s", FETCH_STATS_FILE, e)
 
     token = TG_BOT_TOKEN
     chat_id = TG_CHAT_ID
@@ -954,6 +956,7 @@ def save_and_notify(
     updated_proxyips_count: int = 0,
 ):
     # 1. 保存代理节点
+    os.makedirs(DATA_DIR, exist_ok=True)
     with open(OUTPUT_PROXY_FILE, "w", encoding="utf-8") as f:
         for node in final_proxies.values():
             f.write(node + "\n")

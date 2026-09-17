@@ -56,13 +56,13 @@ log = logging.getLogger("cf-verify")
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-# ---------- 常量与配置 ----------
-SCAN_CSV = "scan_ips.csv"
-SCAN_TXT = "scan_ips.txt"
-SCAN_DIR = "scan_ips"
+DATA_DIR = "data"
+SCAN_CSV = os.path.join(DATA_DIR, "scan_ips.csv")
+SCAN_TXT = os.path.join(DATA_DIR, "scan_ips.txt")
+SCAN_DIR = os.path.join(DATA_DIR, "scan_ips")
 
-CF_CSV = "cf_ips.csv"
-CF_TXT = "cf_ips.txt"
+CF_CSV = os.path.join(DATA_DIR, "cf_ips.csv")
+CF_TXT = os.path.join(DATA_DIR, "cf_ips.txt")
 
 PROBE_HOST = "crypto.cloudflare.com"
 TIMEOUT = 3.0
@@ -337,7 +337,7 @@ def send_verify_notification(
     date_str = bjt.strftime("%Y-%m-%d %H:%M:%S")
 
     # 检查是否存在 tg_fetch 暂存的抓取统计及 proxyip_verify 质检统计
-    fetch_stats_file = ".fetch_stats.json"
+    fetch_stats_file = os.path.join(DATA_DIR, ".fetch_stats.json")
     fetch_stats = None
     if os.path.isfile(fetch_stats_file):
         try:

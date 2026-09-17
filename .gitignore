@@ -7,3 +7,4 @@ __pycache__/
 .vscode/
 
 .fetch_stats.json
+data/.fetch_stats.json

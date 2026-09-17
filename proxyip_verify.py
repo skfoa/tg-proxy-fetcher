@@ -65,10 +65,10 @@ if sys.platform == "win32":
     except Exception:
         pass
 
-# ---------- 常量与配置 ----------
-PROXYIP_CSV = "proxyip.csv"
-PROXYIP_TXT = "proxyip.txt"
-PROXYIP_CF_TXT = "proxyip_cf.txt"
+DATA_DIR = "data"
+PROXYIP_CSV = os.path.join(DATA_DIR, "proxyip.csv")
+PROXYIP_TXT = os.path.join(DATA_DIR, "proxyip.txt")
+PROXYIP_CF_TXT = os.path.join(DATA_DIR, "proxyip_cf.txt")
 
 PROBE_HOST = "speed.cloudflare.com"
 PROBE_PATH = "/cdn-cgi/trace"
@@ -511,7 +511,7 @@ async def async_main(args):
     log.info("ProxyIP 穿透质检流程执行完毕，总耗时 %.2f 秒 (🌟兼具优选直连: %d 条)", elapsed, cf_clean_count)
 
     # 若存在 tg_fetch 暂存的抓取统计，将 ProxyIP 质检与优选双料结果并入其中，由后续统一卡片推送
-    fetch_stats_file = ".fetch_stats.json"
+    fetch_stats_file = os.path.join(DATA_DIR, ".fetch_stats.json")
     has_fetch_stats = os.path.isfile(fetch_stats_file)
     if has_fetch_stats:
         try:

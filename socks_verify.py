@@ -66,9 +66,9 @@ if sys.platform == "win32":
     except Exception:
         pass
 
-# ---------- 常量与配置 ----------
-SOCKS_TXT = "socks5.txt"
-SOCKS_CSV = "socks5.csv"
+DATA_DIR = "data"
+SOCKS_TXT = os.path.join(DATA_DIR, "socks5.txt")
+SOCKS_CSV = os.path.join(DATA_DIR, "socks5.csv")
 
 PROBE_HOST = "speed.cloudflare.com"
 PROBE_PATH = "/cdn-cgi/trace"
@@ -688,7 +688,7 @@ async def async_main(args):
     log.info("代理连通性质检流程执行完毕，总耗时 %.2f 秒 (✅ 存活: %d | 均延: %dms)", elapsed, pass_count, avg_delay)
 
     # 若存在 tg_fetch 暂存的抓取统计，将 SOCKS5 质检结果并入其中，由后续统一卡片推送
-    fetch_stats_file = ".fetch_stats.json"
+    fetch_stats_file = os.path.join(DATA_DIR, ".fetch_stats.json")
     has_fetch_stats = os.path.isfile(fetch_stats_file)
     if has_fetch_stats:
         try:
