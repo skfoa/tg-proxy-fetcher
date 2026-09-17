@@ -10,18 +10,18 @@
 
 ## ⚡ 运行模式与能力对比
 
-系统采用**双引擎驱动 + 本地导入补充**架构。了解不同模式的能力边界，有助于按需选择配置：
+系统采用**双引擎驱动**架构。了解不同模式的能力边界，有助于按需选择配置：
 
-| 特性 / 产物 | 🚀 免登录 Web 模式<br>(零门槛开箱即用) | 🛡️ 官方 API 模式<br>(全功能完整版 · 强烈推荐) | 📂 本地导入模式<br>(离线补充) |
-| :--- | :---: | :---: | :---: |
-| **运行门槛** | **无需任何密钥或账号**<br>Fork / Clone 即可直接运行 | **需配置 3 项 Secret**<br>`TG_API_ID`、`TG_API_HASH`、`TG_SESSION_STR` | 本地放文件即可<br>放入 `import_*` 目录 |
-| **底层原理** | 爬取 Telegram 公开网页预览 (`t.me/s/`) | 启用 Telethon 客户端直连 MTProto 协议 | 本地文件解析器自动监听合并 |
-| **正文通用代理 (`socks5.txt`)** | ✅ 支持自动抓取 | ✅ 支持自动抓取 | ✅ 支持放入 `import_proxies/` |
-| **频道正文单条优选 (`cf_ips.*`)** | ✅ 支持自动抓取 | ✅ 支持自动抓取 | — |
-| **频道附件下载能力** | ❌ **不支持**（网页接口无法下载文件） | ✅ **完全支持自动下载解析** | — |
-| **批量扫描大池 (`scan_ips/`)** | ❌ 无法自动下载（产物为 0） | ✅ 自动下载解析 OTC/DanFeng 附件 | ✅ 支持放入 `import_ips/` |
-| **反代 ProxyIP 池 (`proxyip.*`)** | ❌ 无法自动下载（产物为 0） | ✅ 自动下载解析反代文件附件 | ✅ 支持放入 `import_proxyip/` |
-| **适用场景** | 快速验证、仅需基础正文代理与单条 IP | 正式部署、需要海量机房扫描池与反代池 | 无 API 账号但有手动下载的测速包 |
+| 特性 / 产物 | 🚀 免登录 Web 模式<br>(零门槛开箱即用) | 🛡️ 官方 API 模式<br>(全功能完整版 · 强烈推荐) |
+| :--- | :---: | :---: |
+| **运行门槛** | **无需任何密钥或账号**<br>Fork / Clone 即可直接运行 | **需配置 3 项 Secret**<br>`TG_API_ID`、`TG_API_HASH`、`TG_SESSION_STR` |
+| **底层原理** | 爬取 Telegram 公开网页预览 (`t.me/s/`) | 启用 Telethon 客户端直连 MTProto 协议 |
+| **正文通用代理 (`socks5.txt`)** | ✅ 支持自动抓取 | ✅ 支持自动抓取 |
+| **频道正文单条优选 (`cf_ips.*`)** | ✅ 支持自动抓取 | ✅ 支持自动抓取 |
+| **频道附件自动下载解析** | ❌ **不支持**（网页端无附件下载接口） | ✅ **完全支持自动下载解析** |
+| **批量扫描大池 (`scan_ips/`)** | ❌ 无法自动下载（产物为 0） | ✅ 自动下载解析 OTC/DanFeng 测速附件 |
+| **反代 ProxyIP 池 (`proxyip.*`)** | ❌ 无法自动下载（产物为 0） | ✅ 自动下载解析反代文件附件 |
+| **适用场景** | 快速验证、仅需基础正文代理与单条 IP | 正式部署、需要海量机房扫描池与反代池 |
 
 ---
 
@@ -60,7 +60,7 @@ socks_verify.py         proxyip_verify.py         cf_verify.py              Tele
 SOCKS5/HTTP/TURN        /cdn-cgi/trace 穿透       TLS 握手 + HTTP 301       四合一精美统计卡片
 RFC 1928 全协议质检     + TLS 优选双能鉴真        全线优选 IP 鉴真淘汰      锁屏即知健康变动
 
-* 注：标记 * 的扫描机房大池与反代池需配置【官方 API 模式】或使用【本地导入模式】方可获取。
+* 注：标记 * 的扫描机房大池与反代池需配置【官方 API 模式】方可自动下载获取。
 ```
 
 ---
@@ -73,12 +73,12 @@ RFC 1928 全协议质检     + TLS 优选双能鉴真        全线优选 IP 鉴
 | **`socks5.csv`** | 代理质检数据表（协议/延迟/fail_count/机房） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/socks5.csv` |
 | **`cf_ips.txt`** | 频道日常单条优选 IP（纯文本） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/cf_ips.txt` |
 | **`cf_ips.csv`** | 频道日常单条优选 IP（数据表） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/cf_ips.csv` |
-| **`scan_ips.txt`** | 扫描测速总清单（按 ASN 分组） | 需 API 模式 / 导入 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips.txt` |
-| **`scan_ips/*.txt`** | 独立 ASN + 厂商纯文本列表（单文件） | 需 API 模式 / 导入 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips/{ASN}_{ISP}.txt` |
-| **`scan_ips.csv`** | 扫描测速优选 IP（数据表） | 需 API 模式 / 导入 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips.csv` |
-| **`proxyip.txt`** | 反代 ProxyIP 清单（纯文本） | 需 API 模式 / 导入 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/proxyip.txt` |
-| **`proxyip.csv`** | 反代 ProxyIP 详细数据表 | 需 API 模式 / 导入 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/proxyip.csv` |
-| **`proxyip_cf.txt`** | 兼具优选直连特性的提纯反代清单 | 需 API 模式 / 导入 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/proxyip_cf.txt` |
+| **`scan_ips.txt`** | 扫描测速总清单（按 ASN 分组） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips.txt` |
+| **`scan_ips/*.txt`** | 独立 ASN + 厂商纯文本列表（单文件） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips/{ASN}_{ISP}.txt` |
+| **`scan_ips.csv`** | 扫描测速优选 IP（数据表） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips.csv` |
+| **`proxyip.txt`** | 反代 ProxyIP 清单（纯文本） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/proxyip.txt` |
+| **`proxyip.csv`** | 反代 ProxyIP 详细数据表 | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/proxyip.csv` |
+| **`proxyip_cf.txt`** | 兼具优选直连特性的提纯反代清单 | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/proxyip_cf.txt` |
 
 ---
 
@@ -98,10 +98,10 @@ RFC 1928 全协议质检     + TLS 优选双能鉴真        全线优选 IP 鉴
    - `[发现开放 SOCKS5 代理] IP:Port` ➔ 自动补全为 `socks5://IP:Port`
    - `[发现开放 TURN 代理/服务] IP:Port 或 turn://IP:Port` ➔ 自动提取为 `turn://IP:Port`
    - 🛡️ **防污染机制**：通报消息后半段附带的第三方 SNI 测试目标域名（如 `域名:https://hf.molikuaiyin.com:443...`）会被自动精准过滤，确保代理库 100% 纯净。
-5. **代理附件文件自动解析（需 API 模式或本地导入）**：
-   - 自动识别频道发布的代理附件文件（如 `http_proxies.txt`、`https_proxies.txt`、`turn_proxies.txt` 等）或本地 `import_proxies/` 目录中的文件。
+5. **代理附件文件自动解析（需官方 API 模式）**：
+   - 自动识别频道发布的代理附件文件（如 `http_proxies.txt`、`https_proxies.txt`、`turn_proxies.txt` 等）。
    - 自动提取行首有效节点与认证信息，过滤后续测速说明与反向 PTR 域名别名，统一去重合并至 `socks5.txt`。
-6. **Cloudflare 优选 IP 与反代池（需 API 模式或本地导入）**：
+6. **Cloudflare 优选 IP 与反代池（需官方 API 模式）**：
    - 提取包含 IP、端口、TLS、网络延迟（纯数值 ms）、下载速度（纯数值 kB/s）、数据中心（Colo）、落地位置、ASN、运营商、测速时间等全量指标。
 
 ---
@@ -122,7 +122,7 @@ RFC 1928 全协议质检     + TLS 优选双能鉴真        全线优选 IP 鉴
 * `cf_ips.csv` 为 UTF-8-SIG 结构化表格，可直接用 Excel 查看。
 
 ### 3. 扫描文件优选 IP（按 ASN 智能去重与分组）
-* **与单条日常 IP 物理隔离**：独立收录来自测速扫描附件（如 OTC 的 `OTC_SCAN_YX_*.txt`、DanFeng 的 `AS*.csv` 与云厂商测速 `Aliyun.csv`/`Tencent.csv`/`DMIT.csv`/`Akile.csv` 等常见云厂商及 VPS）以及放置在 `import_ips/` 文件夹中的批量优选文件。
+* **与单条日常 IP 物理隔离**：独立收录来自测速扫描附件（如 OTC 的 `OTC_SCAN_YX_*.txt`、DanFeng 的 `AS*.csv` 与云厂商测速 `Aliyun.csv`/`Tencent.csv`/`DMIT.csv`/`Akile.csv` 等常见云厂商及 VPS）。
 * **智能归类与解析规则**：
   1. **DanFeng 命名规范（`AS{ASN}_{ISP}_{DATE}_{TIME}.csv`）**：
      - DanFeng 导出的 CSV 文件内部只有 `IP地址,端口,TLS,数据中心,地区,城市,网络延迟`，**内部无 ASN 与 ISP 列**。
@@ -140,16 +140,11 @@ RFC 1928 全协议质检     + TLS 优选双能鉴真        全线优选 IP 鉴
   3. **结构化总表（`scan_ips.csv`）**：按 ASN 字母序聚合排序，方便通过 Excel 集中筛选分析。
 
 ### 4. `proxyip.txt` / `proxyip.csv`（反代 ProxyIP 专属池）
-* **独立反代池**：专门收录来自频道发布的反代文件（如 `Global-proxyip-443.csv`、`Global-proxyip-8443.csv` 等）及放置在 `import_proxyip/` 目录中的文件。
+* **独立反代池**：专门收录来自频道发布的反代文件（如 `Global-proxyip-443.csv`、`Global-proxyip-8443.csv` 等）。
 * **纯净即用**：`proxyip.txt` 导出纯净 `IP:端口`，可直接复制或配置于 edgetunnel / Cloudflare Workers 作为反代地址。
 * **结构化数据**：`proxyip.csv` 保留延迟、数据中心与落地位置等关键信息。
 
-### 5. 本地文件批量导入支持（可选）
-* **`import_proxies/` 目录**：将下载的代理 txt 附件（如 `http_proxies.txt`、`turn_proxies.txt`）放置在此目录，运行后自动解析并去重合并入 `socks5.txt`。
-* **`import_ips/` 目录**：将下载的优选扫描附件（支持 OTC 的 `OTC_SCAN_YX_*.txt`、DanFeng 的 `AS*.csv` 及云厂商测速 `Aliyun.csv`/`Tencent.csv`/`HWCloud.csv`/`Ucloud.csv`/`DMIT.csv`/`Akile.csv`/`RackNerd.csv` 等常见云厂商及 VPS）放置在此目录，运行后自动解析并按 ASN 分组生成 `scan_ips.txt` 与 `scan_ips/` 独立文件。自动按文件修改时间排序，新文件自动覆盖老数据。
-* **`import_proxyip/` 目录**：将下载的反代附件（如 `Global-proxyip-443.csv`、`Global-proxyip-8443.csv`）放置在此目录，运行后自动解析并去重生成 `proxyip.txt` 与 `proxyip.csv`。
-
-### 6. 数据表通用字段说明
+### 5. 数据表通用字段说明
 * 采用 `UTF-8-SIG` 编码，Windows Excel 直接双击打开不乱码。
 * 包含完整指标，数值字段（`delay_ms`, `speed_kbs`）均为纯数字，并在保存时按 **`tested_at`（测速时间）倒序排序**：
 
