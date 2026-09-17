@@ -403,9 +403,9 @@ def send_proxyip_notification(
     )
 
     header = (
-        f"🛡️ <b>ProxyIP 穿透质检完成</b> (🗑️ 剔除 <b>{eliminated}</b> 死节点)"
+        f"🔀 <b>ProxyIP 穿透质检完成</b> (🗑️ 剔除 <b>{eliminated}</b> 死节点)"
         if eliminated > 0
-        else f"🛡️ <b>ProxyIP 穿透质检完成</b> (✅ 存活 <b>{pass_count}</b> 条)"
+        else f"🔀 <b>ProxyIP 穿透质检完成</b> (✅ 存活 <b>{pass_count}</b> 条)"
     )
 
     status_line = f"✅ <b>{pass_count}</b> 存活"
@@ -413,7 +413,7 @@ def send_proxyip_notification(
         status_line += f" · ⚠️ <b>{fail_count}</b> 失败标记"
 
     dual_line = (
-        f"\n   └ <i>🌟 兼具优选直连: <code>{cf_clean_count}</code> 条 (已导出 proxyip_cf.txt)</i>"
+        f"\n   └ <i>🌟 兼具优选直连: <code>{cf_clean_count}</code> 条 (已导出 data/proxyip_cf.txt)</i>"
         if cf_clean_count > 0
         else ""
     )

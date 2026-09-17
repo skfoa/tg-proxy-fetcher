@@ -266,8 +266,8 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 🌐 单条优选：37 条 (✅ 28 存活 · ⚠️ 9 缓冲)
 📁 扫描优选：5,015 条 (✅ 4,862 存活 · ⚠️ 153 缓冲 · 20 个 ASN)
    └ 涵盖: Aeza, DMIT, ByteVirt, Starry Network 等
-🛡️ 反代 ProxyIP：30,545 条 (✅ 29,820 存活 · ⚠️ 725 缓冲)
-   └ 🌟 兼具优选直连: 4,832 条 (已提纯 proxyip_cf.txt)
+🔀 反代 ProxyIP：30,545 条 (✅ 29,820 存活 · ⚠️ 725 缓冲)
+   └ 🌟 兼具优选直连: 4,832 条 (已提纯 data/proxyip_cf.txt)
 ━━━━━━━━━━━━━━━━━━━━
 🛡️ 主动鉴真淘汰：
    • 优选检验：TLS 握手 + HTTP 301 (250 并发)

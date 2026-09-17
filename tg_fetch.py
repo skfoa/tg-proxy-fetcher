@@ -771,7 +771,7 @@ def send_tg_notification(
     proxyip_line = ""
     if proxyips_count > 0:
         proxyip_diff = format_diff(new_proxyips, updated_proxyips)
-        proxyip_line = f"🛡️ <b>反代 ProxyIP</b>：<code>{proxyips_count}</code> 条 ({proxyip_diff})\n"
+        proxyip_line = f"🔀 <b>反代 ProxyIP</b>：<code>{proxyips_count}</code> 条 ({proxyip_diff})\n"
 
     all_channels = []
     for ch in PROXY_CHANNELS + CF_IP_CHANNELS:

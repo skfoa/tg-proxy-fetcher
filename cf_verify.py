@@ -478,10 +478,10 @@ def send_verify_notification(
             p_marked = max(0, p_surv - p_pass)
             p_cf = fetch_stats.get("proxyip_cf_clean", 0)
             p_status = f"✅ {p_pass} 存活" + (f" · ⚠️ {p_marked} 缓冲" if p_marked > 0 else "")
-            cf_extra = f"\n   └ <i>🌟 兼具优选直连: <code>{p_cf}</code> 条 (已提纯 proxyip_cf.txt)</i>" if p_cf > 0 else ""
-            proxyip_line = f"🛡️ <b>反代 ProxyIP</b>：<code>{p_surv}</code> 条 ({p_status}){cf_extra}\n"
+            cf_extra = f"\n   └ <i>🌟 兼具优选直连: <code>{p_cf}</code> 条 (已提纯 data/proxyip_cf.txt)</i>" if p_cf > 0 else ""
+            proxyip_line = f"🔀 <b>反代 ProxyIP</b>：<code>{p_surv}</code> 条 ({p_status}){cf_extra}\n"
         elif proxyips_count > 0:
-            proxyip_line = f"🛡️ <b>反代 ProxyIP</b>：<code>{proxyips_count}</code> 条 ({format_diff(new_proxyips, updated_proxyips)})\n"
+            proxyip_line = f"🔀 <b>反代 ProxyIP</b>：<code>{proxyips_count}</code> 条 ({format_diff(new_proxyips, updated_proxyips)})\n"
 
         verify_items = [
             f"   • 优选检验：TLS 握手 + HTTP 301 ({concurrency} 并发)",
