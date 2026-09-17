@@ -46,11 +46,11 @@ jobs:
           DEFER_NOTIFY: "1"
         run: python tg_fetch.py
 
-      - name: 🔍 ProxyIP 穿透存活质检
-        run: python proxyip_verify.py --concurrency 300 --max-fails 2 --no-notify
-
       - name: 🚀 SOCKS5 / 通用代理连通性质检
         run: python socks_verify.py --concurrency 300 --max-fails 2 --no-notify
+
+      - name: 🔍 ProxyIP 穿透存活质检
+        run: python proxyip_verify.py --concurrency 300 --max-fails 2 --no-notify
 
       - name: 🛡️ 优选 IP 两阶段主动校验（TLS + 301）
         env:
