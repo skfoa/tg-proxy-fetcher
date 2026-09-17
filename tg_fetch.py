@@ -803,6 +803,7 @@ def send_tg_notification(
         f"🌐 <b>单条优选</b>：<code>{cf_ips_count}</code> 条 ({format_diff(new_cf, updated_cf)})\n"
         f"{scan_line}"
         f"{proxyip_line}"
+        f"{div}\n"
         f"📡 <b>频道来源</b>：{channels_str}"
         f"{footer_line}"
     )

@@ -35,7 +35,8 @@
   - **DanFeng 测速**：CSV 内部无 ASN 列时自动从文件名（如 `AS45102_CNNICALIBABACNNETAP_*.csv`）解析归类。
   - **OTC 优选扫描**：单 ASN 文件以文件名目标 ASN 为准；混合扫描文件（如 `OTC_SCAN_YX_杂.txt`）自动逐行提取具体 ASN 与 ISP 拆分归类。
 - **⚡ 纯净 IP:端口 列表导出**：自动导出纯文本格式的 `IP:端口` 列表（`cf_ips.txt`、`scan_ips/*.txt`、`proxyip.txt`），方便直接复制或作为远程订阅导入。
-- **📱 极简高亮 Telegram 运行卡片**：锁屏即知变动摘要、变动数据绿色加粗高亮、涵盖 Top 服务商预览、运行耗时统计与 Actions 日志直链。
+- **🧩 模块化解耦与统一映射**：提取独立 `providers.py` 作为云厂商与 ASN 规范化字典的单一真相源（Single Source of Truth），保障校验脚本零依赖独立冷启动。
+- **📱 动态双状态 Telegram 运行卡片**：首行支持「🟢 发现新增 + 🗑️ 剔除死节点」双状态动态高亮呈现，底栏包含细分引擎淘汰明细 `[代理 X, 反代 Y, 扫描 Z]`，锁屏即知变动。
 - **🌐 Windows 本地智能环境自适应**：本地运行自动读取 Windows 系统代理（如 v2rayN 等），无缝突破网络限制。
 - **🧹 自动维护与构建瘦身**：每次运行自动清理 GitHub Actions 历史记录，始终**仅保留最近 5 次运行记录**，告别冗余历史堆积！
 
@@ -44,24 +45,40 @@
 ## 架构与工作流程
 
 ```text
-                      ┌─── @otcfxq ────────┐
-                      │   (代理 + 优选IP)  │
-tg_fetch.py ──────────┤                    ├────► 增量抓取 & 全局智能去重 ──┬──► socks5.txt / socks5.csv (通用多协议代理节点)
-(免登录/官方API双模)   │                    │                               ├──► cf_ips.txt / cf_ips.csv (单条优选 IP)
-                      └─── @danfeng2 ──────┘                               ├──► scan_ips.txt / scan_ips.csv (扫描优选 IP 汇总) *
-                           (优选IP 专属)                                     ├──► scan_ips/AS{ASN}_{ISP}.txt (独立机房纯文本) *
-                                                                            ├──► proxyip.txt / proxyip.csv (反代 ProxyIP 专属池) *
-                                                                            └──► proxyip_cf.txt (兼具优选直连特性的提纯反代清单) *
-
-                               流水线主动鉴真与淘汰引擎
+                                     Telegram 公开频道
+                          ┌─── @otcfxq ────────┐
+                          │   (代理 + 优选IP)  │
+    tg_fetch.py ──────────┤                    ├────► 增量抓取 & 全局智能去重 ──┬──► socks5.txt / socks5.csv (通用多协议代理节点)
+    (免登录/官方API双模)   │                    │                               ├──► cf_ips.txt / cf_ips.csv (单条优选 IP)
+                          └─── @danfeng2 ──────┘                               ├──► scan_ips.txt / scan_ips.csv (扫描优选 IP 汇总) *
+                               (优选IP 专属)                                     ├──► scan_ips/AS{ASN}_{ISP}.txt (独立机房纯文本) *
+                                                                                ├──► proxyip.txt / proxyip.csv (反代 ProxyIP 专属池) *
+                                    ▲                                           └──► proxyip_cf.txt (兼具优选直连特性的提纯反代清单) *
+                                    │ 统一接入公共映射
+                              providers.py
+                     (云厂商 & ASN 规范化单一真相源)
+                                    │ 统一接入公共映射
+                                    ▼
+                            四阶段流水线主动鉴真与淘汰引擎
   ┌───────────────────────┬─────────────────────────┬─────────────────────────┐
   ▼                       ▼                         ▼                         ▼
-socks_verify.py         proxyip_verify.py         cf_verify.py              Telegram Bot
-SOCKS5/HTTP/TURN        /cdn-cgi/trace 穿透       TLS 握手 + HTTP 301       四合一精美统计卡片
-RFC 1928 全协议质检     + TLS 优选双能鉴真        全线优选 IP 鉴真淘汰      锁屏即知健康变动
+Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step 4: cf_verify
+多协议增量抓取          RFC 1928 全协议质检       /cdn-cgi/trace 穿透       全量优选 TLS+301 鉴真
+全局唯一去重合并        SOCKS5/HTTP/TURN 穿透     + TLS 1.3 优选直连提纯    + 全局四合一 TG 统一卡片
 
 * 注：标记 * 的扫描机房大池与反代池需配置【官方 API 模式】方可自动下载获取。
 ```
+
+### 核心模块清单
+
+| 模块文件 | 定位与职责 |
+| :--- | :--- |
+| **`tg_fetch.py`** | **数据抓取与合并核心**：实现免登录 Web 爬虫与 Telethon API 双模抓取，跨文件全局唯一去重合并。 |
+| **`providers.py`** | **公共规范映射中心**：维护云厂商名称归一化规则与关键 ASN 映射表，作为全系统单一真相源（Single Source of Truth）。 |
+| **`socks_verify.py`** | **通用代理主动质检引擎**：基于 RFC 1928 (readexactly 精确字节读取)、RFC 5389 (STUN/TURN Binding) 与 HTTP CONNECT 穿透检验。 |
+| **`proxyip_verify.py`** | **反代 ProxyIP 质检引擎**：验证反代真实穿透能力，并提纯兼具 TLS 官方优选直连的极品清单 `proxyip_cf.txt`。 |
+| **`cf_verify.py`** | **全量优选 IP 鉴真与最终卡片推送**：执行 TLS 官方证书鉴真 + HTTP 301 重定向校验，汇总流水线所有阶段数据并推送统一 TG 统计卡片。 |
+| **`gen_session.py`** | **Telethon Session 辅助生成器**：本地运行快速交互登录 Telegram 并输出 Session 字符串，供 GitHub Actions 免交互调用。 |
 
 ---
 
@@ -221,7 +238,7 @@ RFC 1928 全协议质检     + TLS 优选双能鉴真        全线优选 IP 鉴
 配置 `TG_BOT_TOKEN` 与 `TG_CHAT_ID` 后，流水线运行完成会自动发送四维合一的现代精简风统计卡片：
 
 ```text
-🚀 节点与优选 IP 同步完成 (🗑️ 剔除 31 死节点)
+🚀 节点与优选 IP 同步完成 (🟢 发现 +25 新增 · 🗑️ 剔除 31 死节点)
 ━━━━━━━━━━━━━━━━━━━━
 📅 时间：2026-09-17 18:35:00 (北京时间)
 📫 可用代理：741 个 (✅ 698 存活 · ⚠️ 43 缓冲 · ⚡ 均延 520ms)
@@ -235,15 +252,16 @@ RFC 1928 全协议质检     + TLS 优选双能鉴真        全线优选 IP 鉴
    • 优选检验：TLS 握手 + HTTP 301 (250 并发)
    • 代理检验：RFC 1928 全协议穿透鉴真
    • 反代检验：/cdn-cgi/trace 穿透 + 优选双能
-   • 淘汰死节点：31 条 (连续失败 ≥ 2 次)
+   • 淘汰死节点：31 条 [代理 12, 反代 15, 扫描优选 4] (连续失败 ≥ 2 次)
 📡 频道来源：@danfeng2, @otcfxq
 ━━━━━━━━━━━━━━━━━━━━
 ⚡ 总耗时: 165.2s · 🔗 Action #35 · 📦 产物仓库
 ```
 
-* **锁屏即知变动**：首行直观呈现 `(🟢 发现 +N 条新数据)` 或 `(🗑️ 剔除 N 死节点)`。
+* **锁屏即知变动**：首行支持 `(🟢 发现 +N 新增 · 🗑️ 剔除 N 死节点)` 双状态动态高亮组合呈现，变动一目了然。
 * **增量与健康一览**：每类节点直观展示存活数量、缓冲标记与实测均延。
 * **主动鉴真审计**：实时汇报全协议穿透质检、TLS + 301 重定向鉴真与连续失败永久淘汰数量。
+* **细分淘汰明细**：底栏汇报各引擎分类淘汰数量 `[代理 X, 反代 Y, 扫描优选 Z]`，精准掌控全库死节点流失情况。
 * **厂商覆盖一览**：自动统计展示覆盖的主力机房与服务商。
 * **一键直达日志**：附带 GitHub Action 运行记录与产物仓库直达超链接。
 

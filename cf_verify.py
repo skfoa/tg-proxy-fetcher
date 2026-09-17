@@ -402,7 +402,17 @@ def send_verify_notification(
     scan_marked = max(0, scan_survivors - scan_pass)
     cf_status = f"✅ {cf_pass} 存活" + (f" · ⚠️ {cf_marked} 缓冲" if cf_marked > 0 else "")
     scan_status = f"✅ {scan_pass} 存活" + (f" · ⚠️ {scan_marked} 缓冲" if scan_marked > 0 else "")
-    elim_str = f"<code>{total_eliminated}</code> 条 (连续失败 ≥ {max_fails} 次)" if total_eliminated > 0 else "无 (全部在存活阈值内)"
+    elim_details = []
+    if socks_eliminated > 0:
+        elim_details.append(f"代理 {socks_eliminated}")
+    if proxyip_eliminated > 0:
+        elim_details.append(f"反代 {proxyip_eliminated}")
+    if cf_eliminated > 0:
+        elim_details.append(f"单条优选 {cf_eliminated}")
+    if scan_eliminated > 0:
+        elim_details.append(f"扫描优选 {scan_eliminated}")
+    detail_str = f" [{', '.join(elim_details)}]" if elim_details else ""
+    elim_str = f"<code>{total_eliminated}</code> 条{detail_str} (连续失败 ≥ {max_fails} 次)" if total_eliminated > 0 else "无 (全部在存活阈值内)"
 
     if fetch_stats:
         # 联合完整流水线卡片
@@ -426,12 +436,16 @@ def send_verify_notification(
         total_new = new_proxies + new_cf + new_scan + new_proxyips
         total_updated = updated_proxies + updated_cf + updated_scan + updated_proxyips
 
+        header_badges = []
+        if total_new > 0:
+            header_badges.append(f"🟢 发现 <b>+{total_new}</b> 新增")
         if total_eliminated > 0:
-            header = f"🚀 <b>节点与优选 IP 同步完成</b> (🗑️ 剔除 <b>{total_eliminated}</b> 死节点)"
-        elif total_new > 0:
-            header = f"🚀 <b>节点与优选 IP 同步完成</b> (🟢 发现 <b>+{total_new}</b> 条新数据)"
-        elif total_updated > 0:
-            header = f"🚀 <b>节点与优选 IP 同步完成</b> (🔄 刷新 {total_updated} 条数据)"
+            header_badges.append(f"🗑️ 剔除 <b>{total_eliminated}</b> 死节点")
+        elif total_updated > 0 and total_new == 0:
+            header_badges.append(f"🔄 刷新 {total_updated} 条数据")
+
+        if header_badges:
+            header = f"🚀 <b>节点与优选 IP 同步完成</b> ({' · '.join(header_badges)})"
         else:
             header = "⚡ <b>节点与优选 IP 同步完成</b> (数据已全部为最新)"
 
