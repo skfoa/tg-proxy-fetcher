@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
 
-每天自动从 Telegram 优质公开频道（[@otcfxq](https://t.me/otcfxq)、[@danfeng2](https://t.me/danfeng2)）抓取多协议代理节点、Cloudflare 优选 IP 以及反代 ProxyIP。系统具备**永久增量持久化（只增不减）**与**全局智能去重**机制，自动导出通用代理列表、纯净 `IP:端口` 文本列表以及结构化测速数据表格，并通过 GitHub Actions 每天定时自动提交并推送到仓库。
+每天自动从 Telegram 优质公开频道（[@otcfxq](https://t.me/otcfxq)、[@danfeng2](https://t.me/danfeng2)）抓取多协议代理节点、Cloudflare 优选 IP 以及反代 ProxyIP。系统具备**智能增量持久化**、**全局智能去重**与**三大主动质检淘汰机制**，自动导出通用代理列表、纯净 `IP:端口` 文本列表以及结构化测速数据表格，并通过 GitHub Actions 每天定时自动执行四阶段质检流水线并推送到仓库。
 
 ---
 
@@ -21,6 +21,7 @@
 | **频道附件自动下载解析** | ❌ **不支持**（网页端无附件下载接口） | ✅ **完全支持自动下载解析** |
 | **批量扫描大池 (`scan_ips/`)** | ❌ 无法自动下载（产物为 0） | ✅ 自动下载解析 OTC/DanFeng 测速附件 |
 | **反代 ProxyIP 池 (`proxyip.*`)** | ❌ 无法自动下载（产物为 0） | ✅ 自动下载解析反代文件附件 |
+| **全协议鉴真与缓冲淘汰** | ✅ 支持（对抓取到的正文节点鉴真） | ✅ 全量支持（覆盖正文与海量附件大池） |
 | **适用场景** | 快速验证、仅需基础正文代理与单条 IP | 正式部署、需要海量机房扫描池与反代池 |
 
 ---
@@ -29,7 +30,7 @@
 
 - **🚀 免登录基础模式**：未配置 API 凭据时自动启用，零门槛抓取频道消息正文中的通用代理与单条优选 IP。
 - **🛡️ 官方 API 全功能模式**：配置 `TG_API_ID`、`TG_API_HASH` 与 `TG_SESSION_STR` 后自动激活，解锁频道附件自动下载，获取千条级机房扫描 IP 与反代池。
-- **📦 永久增量持久化（只增不减）**：历史抓取的有效节点全部永久留存，新节点自动追加，绝不草率淘汰。
+- **📦 智能增量持久化与缓冲保护**：历史抓取的有效节点自动累积留存，新节点自动追加去重，同时引入公网抖动缓冲保护（连续 2 次全网不可达方才剔除死节点），兼顾大池沉淀与高可用纯净度。
 - **🔍 跨文件严格唯一去重**：以 `IP:端口` 为全局主键，新老文件重复提取自动刷新覆盖，绝无重复行；IP 归属更正时自动迁移所属 ASN 文件。
 - **📁 智能 ASN 分组与命名**：
   - **DanFeng 测速**：CSV 内部无 ASN 列时自动从文件名（如 `AS45102_CNNICALIBABACNNETAP_*.csv`）解析归类。
@@ -91,7 +92,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 | **`cf_ips.txt`** | 频道日常单条优选 IP（纯文本） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/cf_ips.txt` |
 | **`cf_ips.csv`** | 频道日常单条优选 IP（数据表） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/cf_ips.csv` |
 | **`scan_ips.txt`** | 扫描测速总清单（按 ASN 分组） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips.txt` |
-| **`scan_ips/*.txt`** | 独立 ASN + 厂商纯文本列表（单文件） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips/{ASN}_{ISP}.txt` |
+| **`scan_ips/*.txt`** | 独立 ASN + 厂商纯文本列表（单文件） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips/AS{ASN}_{ISP}.txt` |
 | **`scan_ips.csv`** | 扫描测速优选 IP（数据表） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips.csv` |
 | **`proxyip.txt`** | 反代 ProxyIP 清单（纯文本） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/proxyip.txt` |
 | **`proxyip.csv`** | 反代 ProxyIP 详细数据表 | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/proxyip.csv` |
@@ -156,14 +157,17 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
   2. **独立机房厂商文本（`scan_ips/ASxxx_厂商.txt`）**：在 `scan_ips/` 目录下按 ASN 及厂商名拆分生成独立文件（如 `scan_ips/AS906_DMIT.txt`、`scan_ips/AS210644_Aeza.txt`、`scan_ips/AS212336_ByteVirt.txt`），内容为 100% 纯净的 `IP:端口`，无任何注释，方便单独导入或按机房远程订阅。
   3. **结构化总表（`scan_ips.csv`）**：按 ASN 字母序聚合排序，方便通过 Excel 集中筛选分析。
 
-### 4. `proxyip.txt` / `proxyip.csv`（反代 ProxyIP 专属池）
+### 4. `proxyip.txt` / `proxyip.csv` / `proxyip_cf.txt`（反代 ProxyIP 专属池）
 * **独立反代池**：专门收录来自频道发布的反代文件（如 `Global-proxyip-443.csv`、`Global-proxyip-8443.csv` 等）。
 * **纯净即用**：`proxyip.txt` 导出纯净 `IP:端口`，可直接复制或配置于 edgetunnel / Cloudflare Workers 作为反代地址。
-* **结构化数据**：`proxyip.csv` 保留延迟、数据中心与落地位置等关键信息。
+* **双能提纯直连（`proxyip_cf.txt`）**：由质检引擎并发探测，自动筛选提纯出既能作为反代穿透、又兼具 Cloudflare 官方证书 TLS 握手直连特性的优质节点，是兼具双料特性的极品清单。
+* **结构化数据**：`proxyip.csv` 保留延迟、数据中心、落地位置与 `cf_clean` 优选标记等关键信息。
 
 ### 5. 数据表通用字段说明
 * 采用 `UTF-8-SIG` 编码，Windows Excel 直接双击打开不乱码。
-* 包含完整指标，数值字段（`delay_ms`, `speed_kbs`）均为纯数字，并在保存时按 **`tested_at`（测速时间）倒序排序**：
+* 数值字段（`delay_ms`, `speed_kbs`）均为纯数字，并在保存时按 **`tested_at`（测速时间）倒序排序**：
+
+#### ① 优选 IP 表（`cf_ips.csv`、`scan_ips.csv`）及 反代表（`proxyip.csv`）
 
 | 字段 | 类型 | 说明 | 示例 |
 | :--- | :--- | :--- | :--- |
@@ -179,6 +183,21 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 | `tested_at` | 时间字符串 | 测试/发布时间 | `2026-09-13 18:00:33` |
 | `channel` | 字符串 | 来源频道 | `@danfeng2` / `@otcfxq` |
 | `fail_count` | 整数 | 连续探测失败次数（默认 0，连续失败 ≥ 2 次自动淘汰剔除） | `0` |
+| `cf_clean` | 字符串 | *(仅 `proxyip.csv`)* 是否兼具官方优选直连能力 (`true`/`false`) | `true` |
+
+#### ② 代理质检表（`socks5.csv`）
+
+| 字段 | 类型 | 说明 | 示例 |
+| :--- | :--- | :--- | :--- |
+| `url` | 字符串 | 包含协议、账号密码、主机的完整代理 URL | `socks5://user:pass@1.2.3.4:1080` |
+| `proto` | 字符串 | 协议类型（`socks5`、`http`、`turn` 等） | `socks5` |
+| `host` | 字符串 | 节点域名或 IP 地址 | `1.2.3.4` |
+| `port` | 整数 | 服务端口 | `1080` |
+| `delay_ms` | 整数 | 穿透测速延迟（毫秒纯数值） | `320` |
+| `fail_count` | 整数 | 连续探测失败次数（连续失败 ≥ 2 次自动淘汰剔除） | `0` |
+| `status` | 字符串 | 探测状态（`alive` 或 `fail`） | `alive` |
+| `colo` | 字符串 | 通过该代理访问返回的 Cloudflare 数据中心三字代码 | `NRT` |
+| `tested_at` | 时间字符串 | 质检探测完成时间 | `2026-09-17 18:35:00` |
 
 ---
 
@@ -304,21 +323,43 @@ export TG_SESSION_STR="你的Session字符串"
 python tg_fetch.py
 ```
 
+### 3. 主动质检引擎本地运行（可选）
+本地测试或需要立即进行质量筛查时，可独立运行三大质检引擎（支持 `--sample` 参数抽样快速冒烟）：
+```bash
+# ① 运行通用代理连通性质检（支持抽样探测）
+python socks_verify.py --concurrency 100 --sample 50 --no-notify
+
+# ② 运行反代 ProxyIP 穿透与优选直连双料质检
+python proxyip_verify.py --concurrency 150 --sample 100 --no-notify
+
+# ③ 运行全量优选 IP 两阶段（TLS + HTTP 301）主动鉴真
+python cf_verify.py --concurrency 150 --sample 100 --timeout 3.0
+```
+
 ---
 
 ## 定时任务（GitHub Actions）
 
 工作流文件位于 `.github/workflows/fetch.yml`。
 
-每天 **北京时间 18:05（UTC 10:05）** 自动执行：
-- **未配置 API 密钥时**：自动使用 Web 模式抓取正文中的基础代理与单条 IP。
-- **配置了 API 密钥后**：自动解锁全功能，下载扫描附件与反代池附件。
-- 智能增量合并更新历史数据，历史节点永久留存（只增不减）。
-- 具备并发互斥锁（`concurrency`）与 `git pull --rebase` 自动防冲突机制。
-- 具备 `if: always()` 容错提交机制与存在性校验，有变动自动提交并推送回仓库。
-- 执行完成后（若配置了机器人凭据）自动向 Telegram 发送精致运行统计卡片。
-- 自动清理工作流运行历史，始终**仅保留最近 5 次记录**，避免仓库膨胀。
-- 支持在 GitHub 仓库 **Actions** 页面随时点击 **Run workflow** 手动触发立即更新。
+每天 **北京时间 18:05（UTC 10:05）** 自动执行完整的四阶段主动质检流水线：
+1. **📡 Step 1: 抓取 TG 代理与优选 IP (`tg_fetch.py`)**：
+   - 未配置 API 凭据时自动使用 Web 模式抓取正文中的基础代理与单条 IP。
+   - 配置 API 凭据后全速解锁全功能，自动下载解析扫描附件与反代池附件。
+   - 自动全局去重并增量合并，生成最新节点池暂存。
+2. **🚀 Step 2: SOCKS5 / 通用代理连通性质检 (`socks_verify.py`)**：
+   - 并发 300 执行 RFC 1928 / RFC 5389 / HTTP 真实网络穿透校验，累计连续失败次数，淘汰不可达死节点。
+3. **🔍 Step 3: ProxyIP 穿透存活质检 (`proxyip_verify.py`)**：
+   - 并发 300 执行 `/cdn-cgi/trace` 真实穿透质检，同时探测 TLS 1.3 优选直连特性，提纯导出 `proxyip_cf.txt`。
+4. **🛡️ Step 4: 优选 IP 两阶段主动鉴真 (`cf_verify.py`)**：
+   - 并发 250 执行 TLS 官方证书鉴真 + HTTP 301 重定向校验，淘汰死节点，并汇总全流水线数据向 Telegram 发送精美卡片。
+5. **📄 Step 5: 变动提交与推送**：
+   - 具备并发互斥锁（`concurrency`）与 `git pull --rebase` 自动防冲突机制。
+   - 仅在产物有实际变动时自动提交并推送回仓库，绝不产生无意义的空提交。
+6. **🧹 Step 6: 自动清理旧工作流**：
+   - 自动清理历史构建记录，始终**仅保留最近 5 次记录**，避免仓库历史膨胀。
+
+> 💡 同时也支持在 GitHub 仓库 **Actions** 页面随时点击 **Run workflow** 手动指定回溯天数立即触发。
 
 ---
 
