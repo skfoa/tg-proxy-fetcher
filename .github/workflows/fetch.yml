@@ -49,6 +49,9 @@ jobs:
       - name: 🔍 ProxyIP 穿透存活质检
         run: python proxyip_verify.py --concurrency 300 --max-fails 2 --no-notify
 
+      - name: 🚀 SOCKS5 / 通用代理连通性质检
+        run: python socks_verify.py --concurrency 300 --max-fails 2 --no-notify
+
       - name: 🛡️ 优选 IP 两阶段主动校验（TLS + 301）
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
@@ -63,7 +66,7 @@ jobs:
           if [ -f socks5.txt ] || [ -f cf_ips.csv ] || [ -f cf_ips.txt ] || [ -f scan_ips.txt ] || [ -f proxyip.txt ]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add socks5.txt cf_ips.csv cf_ips.txt
+            git add socks5.txt socks5.csv cf_ips.csv cf_ips.txt
             if [ -f scan_ips.txt ]; then
               git add scan_ips.txt scan_ips.csv
             fi

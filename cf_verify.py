@@ -359,8 +359,16 @@ def send_verify_notification(
         proxyip_eliminated = fetch_stats.get("proxyip_eliminated", 0)
         proxyip_survivors = fetch_stats.get("proxyip_survivors", 0)
 
-    total_eliminated = cf_eliminated + scan_eliminated + proxyip_eliminated
-    total_survivors = cf_survivors + scan_survivors + proxyip_survivors
+    socks_verified = False
+    socks_eliminated = 0
+    socks_survivors = 0
+    if fetch_stats and fetch_stats.get("socks_verified"):
+        socks_verified = True
+        socks_eliminated = fetch_stats.get("socks_eliminated", 0)
+        socks_survivors = fetch_stats.get("socks_survivors", 0)
+
+    total_eliminated = cf_eliminated + scan_eliminated + proxyip_eliminated + socks_eliminated
+    total_survivors = cf_survivors + scan_survivors + proxyip_survivors + socks_survivors
 
     def format_diff(new_c: int, upd_c: int) -> str:
         parts = []
@@ -384,6 +392,7 @@ def send_verify_notification(
     if fetch_stats:
         total_elapsed += fetch_stats.get("elapsed_seconds", 0.0)
         total_elapsed += fetch_stats.get("proxyip_elapsed", 0.0)
+        total_elapsed += fetch_stats.get("socks_elapsed", 0.0)
     footer_parts.append(f"⚡ <b>总耗时</b>: {total_elapsed:.1f}s")
     if github_repo:
         repo_url = f"{github_server}/{github_repo}"
@@ -394,8 +403,10 @@ def send_verify_notification(
 
     footer_line = f"\n{div}\n" + " · ".join(footer_parts)
 
-    cf_status = f"✅ {cf_pass} 存活" + (f" · ⚠️ {cf_fail} 标记" if cf_fail > 0 else "")
-    scan_status = f"✅ {scan_pass} 存活" + (f" · ⚠️ {scan_fail} 标记" if scan_fail > 0 else "")
+    cf_marked = max(0, cf_survivors - cf_pass)
+    scan_marked = max(0, scan_survivors - scan_pass)
+    cf_status = f"✅ {cf_pass} 存活" + (f" · ⚠️ {cf_marked} 缓冲" if cf_marked > 0 else "")
+    scan_status = f"✅ {scan_pass} 存活" + (f" · ⚠️ {scan_marked} 缓冲" if scan_marked > 0 else "")
     elim_str = f"<code>{total_eliminated}</code> 条 (连续失败 ≥ {max_fails} 次)" if total_eliminated > 0 else "无 (全部在存活阈值内)"
 
     if fetch_stats:
@@ -429,7 +440,18 @@ def send_verify_notification(
         else:
             header = "⚡ <b>节点与优选 IP 同步完成</b> (数据已全部为最新)"
 
-        proxy_line = f"📫 <b>可用代理</b>：<code>{proxies_count}</code> 个 ({format_diff(new_proxies, updated_proxies)})\n"
+        proxy_line = ""
+        if socks_verified:
+            s_pass = fetch_stats.get("socks_pass", 0)
+            s_surv = fetch_stats.get("socks_survivors", 0)
+            s_marked = max(0, s_surv - s_pass)
+            s_avg = fetch_stats.get("socks_avg_delay_ms", 0)
+            s_status = f"✅ {s_pass} 存活" + (f" · ⚠️ {s_marked} 缓冲" if s_marked > 0 else "")
+            avg_str = f" · ⚡ 均延 {s_avg}ms" if s_avg > 0 else ""
+            proxy_line = f"📫 <b>可用代理</b>：<code>{s_surv}</code> 个 ({s_status}{avg_str})\n"
+        elif proxies_count > 0:
+            proxy_line = f"📫 <b>可用代理</b>：<code>{proxies_count}</code> 个 ({format_diff(new_proxies, updated_proxies)})\n"
+
         cf_line = f"🌐 <b>单条优选</b>：<code>{cf_survivors}</code> 条 ({cf_status})\n"
 
         asn_suffix = f" · {asn_count} 个 ASN" if asn_count > 0 else ""
@@ -443,28 +465,24 @@ def send_verify_notification(
         proxyip_line = ""
         if proxyip_verified:
             p_pass = fetch_stats.get("proxyip_pass", 0)
-            p_fail = fetch_stats.get("proxyip_fail", 0)
             p_surv = fetch_stats.get("proxyip_survivors", proxyips_count)
+            p_marked = max(0, p_surv - p_pass)
             p_cf = fetch_stats.get("proxyip_cf_clean", 0)
-            p_status = f"✅ {p_pass} 存活" + (f" · ⚠️ {p_fail} 标记" if p_fail > 0 else "")
+            p_status = f"✅ {p_pass} 存活" + (f" · ⚠️ {p_marked} 缓冲" if p_marked > 0 else "")
             cf_extra = f"\n   └ <i>🌟 兼具优选直连: <code>{p_cf}</code> 条 (已提纯 proxyip_cf.txt)</i>" if p_cf > 0 else ""
             proxyip_line = f"🛡️ <b>反代 ProxyIP</b>：<code>{p_surv}</code> 条 ({p_status}){cf_extra}\n"
         elif proxyips_count > 0:
             proxyip_line = f"🛡️ <b>反代 ProxyIP</b>：<code>{proxyips_count}</code> 条 ({format_diff(new_proxyips, updated_proxyips)})\n"
 
+        verify_items = [
+            f"   • 优选检验：TLS 握手 + HTTP 301 ({concurrency} 并发)",
+        ]
+        if socks_verified:
+            verify_items.append("   • 代理检验：RFC 1928 全协议穿透鉴真")
         if proxyip_verified:
-            verify_block = (
-                f"🛡️ <b>主动鉴真淘汰</b>：\n"
-                f"   • 优选检验：TLS 握手 + HTTP 301 ({concurrency} 并发)\n"
-                f"   • 反代检验：/cdn-cgi/trace 穿透 + 优选双能检测\n"
-                f"   • 淘汰死节点：{elim_str}\n"
-            )
-        else:
-            verify_block = (
-                f"🛡️ <b>主动鉴真淘汰</b>：\n"
-                f"   • 检验规格：TLS 握手 + HTTP 301 ({concurrency} 并发)\n"
-                f"   • 淘汰死节点：{elim_str}\n"
-            )
+            verify_items.append("   • 反代检验：/cdn-cgi/trace 穿透 + 优选双能")
+        verify_items.append(f"   • 淘汰死节点：{elim_str}")
+        verify_block = "🛡️ <b>主动鉴真淘汰</b>：\n" + "\n".join(verify_items) + "\n"
 
         channels_str = ", ".join(dict.fromkeys(channels))
 
