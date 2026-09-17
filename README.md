@@ -46,12 +46,19 @@
 ```text
                       ┌─── @otcfxq ────────┐
                       │   (代理 + 优选IP)  │
-tg_fetch.py ──────────┤                    ├────► 增量抓取 & 全局智能去重 ──┬──► socks5.txt (通用多协议代理节点)
+tg_fetch.py ──────────┤                    ├────► 增量抓取 & 全局智能去重 ──┬──► socks5.txt / socks5.csv (通用多协议代理节点)
 (免登录/官方API双模)   │                    │                               ├──► cf_ips.txt / cf_ips.csv (单条优选 IP)
                       └─── @danfeng2 ──────┘                               ├──► scan_ips.txt / scan_ips.csv (扫描优选 IP 汇总) *
                            (优选IP 专属)                                     ├──► scan_ips/AS{ASN}_{ISP}.txt (独立机房纯文本) *
                                                                             ├──► proxyip.txt / proxyip.csv (反代 ProxyIP 专属池) *
-                                                                            └──► Telegram Bot 运行卡片推送 (可选)
+                                                                            └──► proxyip_cf.txt (兼具优选直连特性的提纯反代清单) *
+
+                               流水线主动鉴真与淘汰引擎
+  ┌───────────────────────┬─────────────────────────┬─────────────────────────┐
+  ▼                       ▼                         ▼                         ▼
+socks_verify.py         proxyip_verify.py         cf_verify.py              Telegram Bot
+SOCKS5/HTTP/TURN        /cdn-cgi/trace 穿透       TLS 握手 + HTTP 301       四合一精美统计卡片
+RFC 1928 全协议质检     + TLS 优选双能鉴真        全线优选 IP 鉴真淘汰      锁屏即知健康变动
 
 * 注：标记 * 的扫描机房大池与反代池需配置【官方 API 模式】或使用【本地导入模式】方可获取。
 ```
@@ -62,7 +69,8 @@ tg_fetch.py ──────────┤                    ├────
 
 | 文件名 | 内容说明 | 生成条件 | GitHub Raw 永久直链（点击即可导入） |
 | :--- | :--- | :---: | :--- |
-| **`socks5.txt`** | 纯净多协议代理清单 | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/socks5.txt` |
+| **`socks5.txt`** | 质检存活的多协议通用代理清单（纯文本） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/socks5.txt` |
+| **`socks5.csv`** | 代理质检数据表（协议/延迟/fail_count/机房） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/socks5.csv` |
 | **`cf_ips.txt`** | 频道日常单条优选 IP（纯文本） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/cf_ips.txt` |
 | **`cf_ips.csv`** | 频道日常单条优选 IP（数据表） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/cf_ips.csv` |
 | **`scan_ips.txt`** | 扫描测速总清单（按 ASN 分组） | 需 API 模式 / 导入 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips.txt` |
@@ -70,6 +78,7 @@ tg_fetch.py ──────────┤                    ├────
 | **`scan_ips.csv`** | 扫描测速优选 IP（数据表） | 需 API 模式 / 导入 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/scan_ips.csv` |
 | **`proxyip.txt`** | 反代 ProxyIP 清单（纯文本） | 需 API 模式 / 导入 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/proxyip.txt` |
 | **`proxyip.csv`** | 反代 ProxyIP 详细数据表 | 需 API 模式 / 导入 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/proxyip.csv` |
+| **`proxyip_cf.txt`** | 兼具优选直连特性的提纯反代清单 | 需 API 模式 / 导入 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/proxyip_cf.txt` |
 
 ---
 
@@ -99,11 +108,13 @@ tg_fetch.py ──────────┤                    ├────
 
 ## 输出产物与去重规则详细说明
 
-### 1. `socks5.txt`（代理节点清单）
-* **永久累积（只增不减）**：每次抓取优先读取历史文件，已存在的有效节点永久保留，绝不会因为时间推移被误删。
-* **智能覆盖更新**：以 `host:port` 为唯一标识。如果频道主重新发布了某个节点，自动以最新发布的认证密码与配置刷新覆盖。
-* **纯净即用**：纯文本每行一个有效 URL，可直接导入各大代理客户端。
-* **合规校验机制**：自动校验端口范围（1~65535）与 IP/域名有效性，彻底杜绝畸变脏数据。
+### 1. `socks5.txt` / `socks5.csv`（通用代理节点清单与质检表）
+* **智能增量合并**：每次抓取优先比对历史库，新发布的节点自动追加并去重，以 `host:port` 为唯一标识刷新认证与配置。
+* **主动质检淘汰（`socks_verify.py`）**：集成 RFC 1928（SOCKS5 协商/认证/CONNECT 隧道穿透）、RFC 5389（STUN/TURN Binding 鉴真）、HTTP CONNECT 穿透全套真实网络协议握手引擎。
+* **连续失败缓冲保护（`--max-fails 2`）**：首次探测失败标记缓冲（`fail_count=1`），连续 2 次全网不可达方才彻底剔除，避免公网抖动误杀。
+* **双模持久化**：
+  - `socks5.txt`：纯文本每行一个可用节点 URL，开箱即用。
+  - `socks5.csv`：结构化表格，包含协议类型、测速延迟（ms）、连续失败次数、Cloudflare Colo 数据中心与质检时间戳。
 
 ### 2. `cf_ips.txt` / `cf_ips.csv`（频道日常单条优选 IP）
 * 仅收录频道日常消息正文中发布的单条优选 IP（如 `@danfeng2`、`@otcfxq` 的实时测速通报）。
@@ -159,18 +170,27 @@ tg_fetch.py ──────────┤                    ├────
 
 ---
 
-### 7. 优选 IP 两阶段主动鉴真与淘汰机制（`cf_verify.py`）
-为防止长期累积的节点死灰或被封禁失效，系统配备异步高并发两阶段主动鉴真探测引擎：
+### 7. 全线三大异步主动鉴真与缓冲淘汰体系
+为防止长期累积的节点失效或死灰复燃，系统配备了三套独立的高并发主动质检探测引擎：
+
+#### ① 代理连通性质检引擎（`socks_verify.py`）
+* **全协议真实握手**：
+  * **SOCKS5**：RFC 1928 握手协商（无密 `0x00` / 账密 `0x02` RFC 1929）➔ 发送 CONNECT 指令 ➔ 穿透请求 `/cdn-cgi/trace` 检验 200 与机房。
+  * **HTTP / HTTPS**：CONNECT 隧道穿透 + 正向代理回退双路径校验。
+  * **TURN / STUN**：构造 RFC 5389 STUN Binding Request 二进制包，严格校验 Magic Cookie (`0x2112A442`) 与 Transaction ID。
+* **淘汰机制**：连续失败达到阈值（默认 2 次）彻底从 `socks5.txt` 与 `socks5.csv` 永久删除。
+
+#### ② 反代 ProxyIP 穿透质检引擎（`proxyip_verify.py`）
+* **穿透与优选双能探测**：
+  * **穿透鉴真**：通过反代向 `speed.cloudflare.com:80` 发起真实 GET 请求，验证 `/cdn-cgi/trace` 穿透成功。
+  * **优选直连探测**：并发探测该节点是否同时支持作为直连优选 IP（TLS 1.3 握手成功），自动生成兼具双料特性的 `proxyip_cf.txt` 极品清单。
+* **淘汰机制**：连续失败 ≥ 2 次从 `proxyip.txt`、`proxyip.csv` 永久删除。
+
+#### ③ 优选 IP 两阶段主动鉴真引擎（`cf_verify.py`）
 * **全量优选 IP 覆盖**：无论来源，**只要是优选 IP（涵盖 `scan_ips` 扫描测速与 `cf_ips` 每日单条全线产物），一律全部执行阶段一与阶段二探测**：
   * **阶段一（TLS 握手 + 证书鉴真）**：建立 TLS 握手并验证 `crypto.cloudflare.com` 官方证书有效性。
   * **阶段二（HTTP 301 重定向 + 服务头验证）**：同一连接请求根路径，验证返回 `301 Moved Permanently` 且响应头包含 `Server: cloudflare`。
-* **淘汰保护机制**：
-  * **校验通过**：更新实测网络延迟 `delay_ms`，并将 `fail_count` 重置为 `0`。
-  * **校验失败**：`fail_count` 累加 `1`，连续失败达到阈值（默认 2 次）时判定为失效节点。
-* **全产物联动删除剔除**：达到淘汰阈值的死节点，将同步从以下所有产物中**彻底永久删除**：
-  1. `scan_ips.csv`、`scan_ips.txt` 及 `scan_ips/*.txt`（各独立 ASN 机房文本，若某 ASN 旗下节点全死则自动移除该文件）
-  2. `cf_ips.csv` 及 `cf_ips.txt`（单条优选数据表与纯文本）
-* **工作流联动**：GitHub Actions 每日定时运行抓取后自动执行全线优选 IP 校验与同步剔除，保持所有优选产物高度纯净。
+* **全产物联动删除剔除**：达到淘汰阈值的死节点，同步从 `scan_ips.csv`、`scan_ips.txt`、`scan_ips/*.txt`、`cf_ips.csv`、`cf_ips.txt` 中**彻底永久删除**。
 
 ---
 
@@ -203,29 +223,32 @@ tg_fetch.py ──────────┤                    ├────
 
 ## 📱 Telegram 运行通知卡片示例
 
-配置 `TG_BOT_TOKEN` 与 `TG_CHAT_ID` 后，每次流水线运行完成后会自动发送现代精简风的统计卡片，全面涵盖节点抓取与主动鉴真淘汰全景：
+配置 `TG_BOT_TOKEN` 与 `TG_CHAT_ID` 后，流水线运行完成会自动发送四维合一的现代精简风统计卡片：
 
 ```text
-🚀 节点与优选 IP 同步完成 (🟢 发现 +1181 条新数据)
+🚀 节点与优选 IP 同步完成 (🗑️ 剔除 31 死节点)
 ━━━━━━━━━━━━━━━━━━━━
-📅 时间：2026-09-16 18:35:00 (北京时间)
-📫 可用代理：74 个 (保持最新)
-🌐 单条优选：37 条 (✅ 28 存活 · ⚠️ 9 标记)
-📁 扫描优选：5,015 条 (✅ 4,862 存活 · ⚠️ 153 标记 · 20 个 ASN)
+📅 时间：2026-09-17 18:35:00 (北京时间)
+📫 可用代理：741 个 (✅ 698 存活 · ⚠️ 43 缓冲 · ⚡ 均延 520ms)
+🌐 单条优选：37 条 (✅ 28 存活 · ⚠️ 9 缓冲)
+📁 扫描优选：5,015 条 (✅ 4,862 存活 · ⚠️ 153 缓冲 · 20 个 ASN)
    └ 涵盖: Aeza, DMIT, ByteVirt, Starry Network 等
-🛡️ 反代 ProxyIP：30,545 条 (保持最新)
+🛡️ 反代 ProxyIP：30,545 条 (✅ 29,820 存活 · ⚠️ 725 缓冲)
+   └ 🌟 兼具优选直连: 4,832 条 (已提纯 proxyip_cf.txt)
 ━━━━━━━━━━━━━━━━━━━━
 🛡️ 主动鉴真淘汰：
-   • 检验规格：TLS 握手 + HTTP 301 (250 并发)
-   • 淘汰死节点：12 条 (连续失败 ≥ 2 次)
-📡 频道来源：@danfeng_chat, @otcfxq
+   • 优选检验：TLS 握手 + HTTP 301 (250 并发)
+   • 代理检验：RFC 1928 全协议穿透鉴真
+   • 反代检验：/cdn-cgi/trace 穿透 + 优选双能
+   • 淘汰死节点：31 条 (连续失败 ≥ 2 次)
+📡 频道来源：@danfeng2, @otcfxq
 ━━━━━━━━━━━━━━━━━━━━
-⚡ 总耗时: 56.5s · 🔗 Action #29 · 📦 产物仓库
+⚡ 总耗时: 165.2s · 🔗 Action #35 · 📦 产物仓库
 ```
 
 * **锁屏即知变动**：首行直观呈现 `(🟢 发现 +N 条新数据)` 或 `(🗑️ 剔除 N 死节点)`。
-* **增量与健康一览**：每类优选 IP 直观展示存活状态与标记数量。
-* **主动鉴真审计**：实时汇报当次 TLS + 301 重定向鉴真与 2 次失败永久淘汰数量。
+* **增量与健康一览**：每类节点直观展示存活数量、缓冲标记与实测均延。
+* **主动鉴真审计**：实时汇报全协议穿透质检、TLS + 301 重定向鉴真与连续失败永久淘汰数量。
 * **厂商覆盖一览**：自动统计展示覆盖的主力机房与服务商。
 * **一键直达日志**：附带 GitHub Action 运行记录与产物仓库直达超链接。
 

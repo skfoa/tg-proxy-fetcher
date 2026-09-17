@@ -669,7 +669,10 @@ async def async_main(args):
     else:
         log.info("[SOCKS5 淘汰] 本次无节点达到连续失败 %d 次的淘汰阈值", args.max_fails)
 
-    save_socks_data(survivors, SOCKS_TXT, SOCKS_CSV)
+    if args.sample and args.sample > 0:
+        log.info("[采样模式] 本次为抽样质检 (%d 条)，跳过持久化文件覆写以保护全量库", total)
+    else:
+        save_socks_data(survivors, SOCKS_TXT, SOCKS_CSV)
 
     elapsed = time.time() - t_start
     log.info("代理连通性质检流程执行完毕，总耗时 %.2f 秒 (✅ 存活: %d | 均延: %dms)", elapsed, pass_count, avg_delay)
