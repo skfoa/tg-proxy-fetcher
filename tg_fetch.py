@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """
-TG 频道代理与 Cloudflare 优选 IP 同步工具
+TG 频道代理与 Cloudflare 优选 IP 同步工具 (tg_fetch.py)
+
 核心特性：
-1. 【永久增量持久化】：历史抓取到的节点与优选 IP 全量保留，只增不减，绝不草率淘汰！
-2. 【智能更新去重】：同一 host:port 或 ip:port 再次出现时，自动以最新配置与测速数据覆盖刷新。
-3. 【双模驱动】：
-   - 免登录 Web 模式（默认）：直接抓取公开频道预览，无需任何 Telegram API 密钥或账号登录。
-   - 官方 API 模式（可选）：配置 TG_API_ID / TG_SESSION_STR 后自动启用 Telethon MTProto 客户端。
+  1. 【增量持久化】：历史抓取的有效节点与优选 IP 全量保留并自动去重，交由后续质检引擎执行缓冲淘汰。
+  2. 【时效覆盖刷新】：同一 host:port 或 ip:port 再次出现时，自动以最新配置与测速数据覆盖刷新。
+  3. 【双模驱动架构】：
+     - 免登录 Web 模式（默认）：直接抓取公开频道网页预览，无需任何 Telegram API 密钥或账号登录。
+     - 官方 API 模式（可选）：配置 TG_API_ID / TG_SESSION_STR 后激活 Telethon MTProto 客户端，解锁频道测速附件与反代池附件自动下载。
 """
 
 import os

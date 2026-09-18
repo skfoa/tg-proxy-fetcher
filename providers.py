@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 """
-云厂商、CDN 与 ASN 规范化全局映射表
-供 tg_fetch.py 与 cf_verify.py 共享使用，避免模块循环依赖与冗余硬编码。
+云厂商、CDN 与 ASN 规范化全局映射表及公共工具模块 (providers.py)
+作为全系统单一真相源（Single Source of Truth），供全线抓取与质检脚本共享使用：
+  1. KNOWN_CLOUD_PROVIDERS / ASN_TO_PROVIDER: 维护主流公有云、CDN、热门 VPS 与骨干网 ASN 标准名称。
+  2. clean_asn(): 统一 ASN 与服务商清洗格式化。
+  3. load_dotenv() / safe_int(): 本地环境加载与安全类型转换。
+  4. send_tg_message() / send_ci_failure_alert(): 统一 Telegram 消息推送与 Actions CI 失败秒级告警。
 """
 
 KNOWN_CLOUD_PROVIDERS = {

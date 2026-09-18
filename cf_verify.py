@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 """
-Cloudflare 优选 IP 两阶段主动校验与淘汰引擎
+Cloudflare 优选 IP 两阶段主动校验与淘汰引擎 (cf_verify.py)
 
 只要是优选 IP（涵盖 scan_ips 与 cf_ips 全线产物），全部统一执行：
-  阶段一：TLS 握手 + CA 证书校验（server_hostname=crypto.cloudflare.com）
-  阶段二：同一连接发送 HTTP 请求，验证返回 301 且 Server: cloudflare
+  阶段一：TLS 握手 + CA 证书鉴真（server_hostname=crypto.cloudflare.com 官方证书链）
+  阶段二：同一连接发送 HTTP 请求，验证返回 301 Moved Permanently 且 Server: cloudflare
 
-连续失败达到阈值（默认 2 次）的死节点，将全面从以下所有产物中永久删除：
-  1. scan_ips.csv、scan_ips.txt、scan_ips/*.txt (独立机房分组文本)
-  2. cf_ips.csv、cf_ips.txt (单条优选数据表与纯文本清单)
+淘汰与全流水线汇总机制：
+  1. 物理淘汰：连续失败达到阈值（默认 2 次）的死节点，全面从所有产物中永久删除：
+     - scan_ips.csv、scan_ips.txt、scan_ips/*.txt (独立机房分组文本)
+     - cf_ips.csv、cf_ips.txt (单条优选数据表与纯文本清单)
+  2. 四维合一卡片推送：流水线末尾自动聚合 tg_fetch、socks_verify、proxyip_verify 与自身结果，
+     向 Telegram 发送全流水线统一统计与淘汰卡片。
 """
 
 import argparse

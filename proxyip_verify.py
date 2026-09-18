@@ -2,17 +2,19 @@
 """
 Cloudflare 反代 ProxyIP 穿透质检与淘汰引擎 (proxyip_verify.py)
 
-专门针对反代 ProxyIP（proxyip.csv / proxyip.txt）执行深层应用层协议穿透探测：
-  1. TCP 三次握手 + TLS ClientHello（SNI: speed.cloudflare.com, 跳过反代非官方证书校验）
+专门针对反代 ProxyIP（proxyip.csv / proxyip.txt / proxyip_cf.txt）执行深层应用层协议穿透探测：
+  1. TCP 三次握手 + TLS ClientHello（SNI: speed.cloudflare.com，跳过反代非官方证书校验）
   2. HTTP/1.1 GET /cdn-cgi/trace 探针请求（浏览器伪装 UA, Connection: close）
-  3. 严格三维校验：HTTP 200 + Server: cloudflare + 正则解析有效 colo 机房码
-  4. 优雅四次挥手关闭连接（writer.close + wait_closed），杜绝 RST 异常
+  3. 严格三维校验：HTTP 200 + Server: cloudflare + 正则解析提取有效 colo 机房代号
+  4. 官方优选直连能力检验（crypto.cloudflare.com 官方 CA 证书链校验 + HTTP 301 重定向）
+  5. 优雅四次挥手关闭连接（writer.close + wait_closed），杜绝 RST 异常
 
 淘汰与排序机制：
-  - 存活节点：fail_count 重置为 0，回填实时 delay_ms 与 colo 机房码
-  - 失败节点：fail_count 递增 +1
-  - 物理淘汰：连续失败达到阈值（默认 2 次）的死节点从 proxyip.csv 与 proxyip.txt 中永久删除
-  - 排序落盘：存活优先（fail_count 升序），延迟升序（delay_ms 升序），最新测试降序
+  - 存活节点：fail_count 重置为 0，回填实时 delay_ms、colo 机房码并标记 cf_clean 属性
+  - 失败节点：fail_count 递增 +1，标记 cf_clean="false"
+  - 物理淘汰：连续失败达到阈值（默认 2 次）的死节点从 proxyip.csv 与 proxyip.txt 中永久物理删除
+  - 双料提纯：自动筛选兼具 Cloudflare 官方优选直连能力的极品反代节点导出至 data/proxyip_cf.txt
+  - 排序落盘：存活优先（fail_count 升序），低延迟优先（delay_ms 升序），最新测试时间降序
 """
 
 import argparse
