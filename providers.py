@@ -232,6 +232,29 @@ def send_tg_message(text: str, token: str = "", chat_id: str = "", tag: str = "T
         return False
 
 
+def send_ci_failure_alert(step_name: str = "") -> bool:
+    """
+    GitHub Actions 流水线失败时发送即时 Telegram 告警卡片。
+    自动提取 Actions 环境变量生成直接跳转运行日志的超链接。
+    """
+    server = os.getenv("GITHUB_SERVER_URL", "https://github.com")
+    repo = os.getenv("GITHUB_REPOSITORY", "")
+    run_id = os.getenv("GITHUB_RUN_ID", "")
+    run_num = os.getenv("GITHUB_RUN_NUMBER", "")
+
+    run_url = f"{server}/{repo}/actions/runs/{run_id}" if repo and run_id else ""
+    link = f'<a href="{run_url}">Action #{run_num} 运行日志</a>' if run_url else "请登录 GitHub 查看日志"
+    step_hint = f"\n   └ <i>中断阶段: {step_name}</i>" if step_name else ""
+
+    msg = (
+        "🚨 <b>GitHub Actions 流水线执行失败！</b>\n"
+        "━━━━━━━━━━━━━━━━━━━━\n"
+        f"⚠️ 节点抓取或质检过程中触发了异常中断。{step_hint}\n"
+        f"🔗 <b>排查链接</b>: {link}"
+    )
+    return send_tg_message(msg, tag="CI-Failure-Alert")
+
+
 def get_asn_conflicts() -> list:
     """检测多厂商/多别名映射至同一 ASN 的情况，返回 (asn, primary_isp, alias_isp, alias_key) 列表"""
     seen = {}
