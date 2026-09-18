@@ -203,6 +203,10 @@ def load_proxyip_csv(path: str) -> list:
     return rows
 
 
+def _get_fc(r: dict) -> int:
+    return safe_int(r.get("fail_count"), 0)
+
+
 def save_proxyip(
     rows: list,
     csv_path: str = PROXYIP_CSV,
@@ -217,7 +221,7 @@ def save_proxyip(
     rows.sort(key=lambda r: r.get("tested_at", ""), reverse=True)
 
     def _sort_key(r):
-        fc = safe_int(r.get("fail_count"), 0)
+        fc = _get_fc(r)
         delay = safe_int(r.get("delay_ms") or 99999, 99999)
         return (fc, delay)
 
@@ -273,8 +277,6 @@ async def verify_proxyips(
     # 创建乱序执行队列，保护同 IP 多端口节点
     indices = list(range(total))
     random.shuffle(indices)
-
-    _get_fc = lambda r: safe_int(r.get("fail_count"), 0)
 
     async def _check(idx: int):
         nonlocal pass_count, fail_count_total, cf_clean_count, completed
@@ -433,8 +435,6 @@ async def async_main(args):
         timeout=args.timeout,
         http_timeout=args.http_timeout,
     )
-
-    _get_fc = lambda r: safe_int(r.get("fail_count"), 0)
 
     pass_count = sum(1 for r in rows if _get_fc(r) == 0)
     fail_count = total - pass_count
