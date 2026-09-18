@@ -14,7 +14,7 @@
 
 | 特性 / 产物 | 🚀 免登录 Web 模式<br>(零门槛开箱即用) | 🛡️ 官方 API 模式<br>(全功能完整版 · 强烈推荐) |
 | :--- | :---: | :---: |
-| **运行门槛** | **无需任何密钥或账号**<br>Fork / Clone 即可直接运行 | **需配置 3 项 Secret**<br>`TG_API_ID`、`TG_API_HASH`、`TG_SESSION_STR` |
+| **运行门槛** | **无需任何密钥或账号**<br>Fork 仓库开启 Actions 即可全自动运行 | **需配置 3 项 Secret**<br>`TG_API_ID`、`TG_API_HASH`、`TG_SESSION_STR` |
 | **底层原理** | 爬取 Telegram 公开网页预览 (`t.me/s/`) | 启用 Telethon 客户端直连 MTProto 协议 |
 | **正文通用代理 (`data/socks5.txt`)** | ✅ 支持自动抓取 | ✅ 支持自动抓取 |
 | **频道正文单条优选 (`data/cf_ips.*`)** | ✅ 支持自动抓取 | ✅ 支持自动抓取 |
@@ -38,7 +38,7 @@
 - **⚡ 纯净 IP:端口 列表导出**：自动导出纯文本格式的 `IP:端口` 列表（`data/cf_ips.txt`、`data/scan_ips/*.txt`、`data/proxyip.txt`），方便直接复制或作为远程订阅导入。
 - **🧩 模块化解耦与统一映射**：提取独立 `providers.py` 作为云厂商与 ASN 规范化字典的单一真相源（Single Source of Truth），保障校验脚本零依赖独立冷启动。
 - **📱 动态双状态 Telegram 运行卡片**：首行支持「🟢 发现新增 + 🗑️ 剔除死节点」双状态动态高亮呈现，底栏包含细分引擎淘汰明细 `[代理 X, 反代 Y, 扫描 Z]`，锁屏即知变动。
-- **🌐 Windows 本地智能环境自适应**：本地运行自动读取 Windows 系统代理（如 v2rayN 等），无缝突破网络限制。
+- **🛡️ 静态安全门禁与故障秒级告警**：工作流启动 1 秒内通过 `py_compile` 与 `ruff` 拦截未定义变量与语法错误；若流水线任何环节异常中断，自动秒级推送 Telegram 告警卡片并附带日志直链。
 - **🧹 自动维护与构建瘦身**：每次运行自动清理 GitHub Actions 历史记录，始终**仅保留最近 5 次运行记录**，告别冗余历史堆积！
 
 ---
@@ -251,7 +251,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 | 变量名 | 用途 | 默认值 | 说明 |
 | :--- | :--- | :---: | :--- |
 | `FETCH_DAYS` | 单次增量回溯天数（扫描时间窗口） | `3` | 增量模式下只读取最近 N 天频道消息，加快运行速度 |
-| `PROXY` | 抓取代理设置 | 留空 | 本地 Windows 运行会自动读取系统代理；Linux 环境可按需设置 |
+| `PROXY` | 抓取代理设置 | 留空 | 可选。GitHub Actions 默认直连 Telegram 无需配置；自建私有 Runner 或特殊网络时可按需配置 |
 
 ---
 
