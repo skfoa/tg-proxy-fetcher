@@ -216,9 +216,9 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 
 #### ② 反代 ProxyIP 穿透质检引擎（`proxyip_verify.py`）
 * **穿透与优选双能探测**：
-  * **穿透鉴真**：通过反代向 `speed.cloudflare.com:80` 发起真实 GET 请求，验证 `/cdn-cgi/trace` 穿透成功。
-  * **优选直连探测**：并发探测该节点是否同时支持作为直连优选 IP（TLS 1.3 握手成功），自动生成兼具双料特性的 `data/proxyip_cf.txt` 极品清单。
-* **淘汰机制**：连续失败 ≥ 2 次从 `data/proxyip.txt`、`data/proxyip.csv` 永久删除。
+  * **穿透鉴真**：向反代节点发起 TLS ClientHello 握手（SNI: `speed.cloudflare.com`，跳过非官方证书校验），发送 HTTP/1.1 GET `/cdn-cgi/trace` 探针请求，严格校验 `HTTP 200` + `Server: cloudflare` + 有效 `colo` 机房代号。
+  * **优选直连探测**：并发探测存活节点是否同时支持作为直连优选 IP（`crypto.cloudflare.com` 官方 CA 证书鉴真与 HTTP 301 重定向校验），自动提纯生成兼具双料特性的 `data/proxyip_cf.txt` 极品清单。
+* **淘汰机制**：连续失败达到阈值（默认 2 次）彻底从 `data/proxyip.txt`、`data/proxyip.csv` 永久物理删除。
 
 #### ③ 优选 IP 两阶段主动鉴真引擎（`cf_verify.py`）
 * **全量优选 IP 覆盖**：无论来源，**只要是优选 IP（涵盖 `data/scan_ips` 扫描测速与 `data/cf_ips` 每日单条全线产物），一律全部执行阶段一与阶段二探测**：
@@ -289,80 +289,76 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 
 ---
 
-## 本地运行
+## 🚀 云端自动化部署指南（推荐 · 3步极简托管）
 
-### 1. 免登录 Web 模式运行（基础体验）
-本地无需安装 Telethon，直接运行脚本即可抓取正文代理与单条 IP：
-```bash
-python tg_fetch.py
-```
-> 💡 Windows 运行环境会自动识别系统代理设置（如 v2rayN 等）。若需要显式指定代理，可设置环境变量：
-> ```bash
-> # Windows PowerShell
-> $env:PROXY="socks5h://127.0.0.1:10808"; python tg_fetch.py
-> 
-> # Linux / macOS
-> PROXY="socks5h://127.0.0.1:10808" python tg_fetch.py
-> ```
+本项目设计为 **100% 托管于 GitHub Actions** 的全自动云端系统，所有抓取、质检、推送到 `data/` 及日志维护完全在云端完成，**日常使用无需在本地电脑运行脚本，也无需自备服务器**。
 
-### 2. 官方 API 全功能模式运行（推荐）
-如果你需要自动下载频道扫描附件（获取千条级机房优选大池与反代池），请生成 Session 字符串：
-```bash
-pip install -r requirements.txt
-python gen_session.py
-```
-按终端交互提示输入 API ID、API Hash 与验证码后，脚本会生成一串 Session 字符串。随后配置环境变量即可运行：
-```bash
-# Windows PowerShell
-$env:TG_API_ID="你的API_ID"
-$env:TG_API_HASH="你的API_HASH"
-$env:TG_SESSION_STR="你的Session字符串"
-python tg_fetch.py
+### 第一步：Fork 本仓库
+点击仓库右上角 **Fork** 按钮，将本项目完整复制到您的个人 GitHub 账号下。
 
-# Linux / macOS
-export TG_API_ID="你的API_ID"
-export TG_API_HASH="你的API_HASH"
-export TG_SESSION_STR="你的Session字符串"
-python tg_fetch.py
-```
+### 第二步：配置 GitHub Secrets（按需选择模式）
+进入您的 Fork 仓库，点击 **Settings -> Secrets and variables -> Actions**，添加 Repository secret：
 
-### 3. 主动质检引擎本地运行（可选）
-本地测试或需要立即进行质量筛查时，可独立运行三大质检引擎：
-```bash
-# ① 运行通用代理连通性质检（支持 --sample 抽样快速冒烟）
-python socks_verify.py --concurrency 100 --sample 50 --no-notify
+#### 方案 A：🚀 零门槛免登录模式（开箱即用）
+* **无需配置任何密钥**！
+* 保持 Secrets 留空即可，系统自动以 Web 免登录模式运行，定时同步公开频道消息正文中的通用代理与单条优选 IP。
 
-# ② 运行反代 ProxyIP 穿透与优选直连双料质检
-python proxyip_verify.py --concurrency 150 --no-notify
+#### 方案 B：🛡️ 官方 API 全功能模式（强烈推荐 · 解锁机房大池与反代池）
+若需要自动下载附件（获取 DanFeng CSV、OTC 测速扫描 TXT、ProxyIP 反代池等万级大池）：
+1. 访问 [my.telegram.org](https://my.telegram.org) 登录获取 `API ID` 与 `API Hash`。
+2. **（仅需在本地运行一次）** 生成认证字符串（因 Telegram 登录需交互式输入手机验证码）：
+   ```bash
+   pip install telethon
+   python gen_session.py
+   ```
+   按终端提示输入手机号与验证码后，控制台将输出一串 Session 字符串。
+3. 在 GitHub Secrets 中填入对应 3 项：
+   - `TG_API_ID`：你的 API ID（纯数字）
+   - `TG_API_HASH`：你的 API Hash（32 位字符）
+   - `TG_SESSION_STR`：生成的 Session 字符串
 
-# ③ 运行全量优选 IP 两阶段（TLS + HTTP 301）主动鉴真
-python cf_verify.py --concurrency 150 --timeout 3.0
-```
+#### 方案 C：📱 Telegram 统计卡片与即时告警（可选）
+若希望每天收到漂亮的汇总统计卡片，并在流水线故障时 1 秒内收到警报：
+- `TG_BOT_TOKEN`：Telegram 机器人 Token（从 [@BotFather](https://t.me/BotFather) 获取）
+- `TG_CHAT_ID`：目标接收人 / 频道 / 群组 ID
 
 ---
 
-## 定时任务（GitHub Actions）
+### 第三步：启用 Actions 定时任务
+1. 打开仓库的 **Actions** 标签页，点击绿色按钮开启工作流权限（*“I understand my workflows, go ahead and enable them”*）。
+2. **自动定时调度**：每天 **北京时间 18:05（UTC 10:05）** 自动执行完整的流水线（含语法预检、三级主动质检、数据去重提交与旧记录清理）。
+3. **手动随时触发**：在 Actions 页面左侧点击 **Fetch Proxies and CF IPs** ➔ **Run workflow**，即可按需随时触发一次同步。
 
-工作流文件位于 `.github/workflows/fetch.yml`。
+---
 
-每天 **北京时间 18:05（UTC 10:05）** 自动执行完整的四阶段主动质检流水线：
-1. **📡 Step 1: 抓取 TG 代理与优选 IP (`tg_fetch.py`)**：
-   - 未配置 API 凭据时自动使用 Web 模式抓取正文中的基础代理与单条 IP。
-   - 配置 API 凭据后全速解锁全功能，自动下载解析扫描附件与反代池附件。
-   - 自动全局去重并增量合并，生成最新节点池暂存。
-2. **🚀 Step 2: SOCKS5 / 通用代理连通性质检 (`socks_verify.py`)**：
-   - 并发 300 执行 RFC 1928 / RFC 5389 / HTTP 真实网络穿透校验，累计连续失败次数，淘汰不可达死节点。
-3. **🔍 Step 3: ProxyIP 穿透存活质检 (`proxyip_verify.py`)**：
-   - 并发 300 执行 `/cdn-cgi/trace` 真实穿透质检，同时探测 TLS 1.3 优选直连特性，提纯导出 `data/proxyip_cf.txt`。
-4. **🛡️ Step 4: 优选 IP 两阶段主动鉴真 (`cf_verify.py`)**：
-   - 并发 250 执行 TLS 官方证书鉴真 + HTTP 301 重定向校验，淘汰死节点，并汇总全流水线数据向 Telegram 发送精美卡片。
-5. **📄 Step 5: 变动提交与推送**：
-   - 具备并发互斥锁（`concurrency`）与 `git pull --rebase` 自动防冲突机制。
-   - 仅在产物有实际变动时自动提交并推送回仓库，绝不产生无意义的空提交。
-6. **🧹 Step 6: 自动清理旧工作流**：
-   - 自动清理历史构建记录，始终**仅保留最近 5 次记录**，避免仓库历史膨胀。
+## 🛠️ 开发者指南与本地离线调试（可选）
 
-> 💡 同时也支持在 GitHub 仓库 **Actions** 页面随时点击 **Run workflow** 手动指定回溯天数立即触发。
+> 💡 **普通使用者无需阅读本节**。仅供希望修改爬虫规则、二次开发或本地排查问题的开发者参考。
+
+### 本地环境配置
+```bash
+git clone https://github.com/你的用户名/tg-proxy-fetcher.git
+cd tg-proxy-fetcher
+pip install -r requirements.txt
+```
+*注：若在中国大陆本地开发，脚本会自动尝试读取系统代理设置（如 v2rayN）；或通过 `$env:PROXY="socks5h://127.0.0.1:10808"` 显式指定代理。*
+
+### 本地回归校验与测试命令
+```bash
+# ① 语法与静态变量检查（与 GitHub Actions 门禁一致，0.5秒拦截未定义变量）
+python -m py_compile *.py
+pip install ruff
+ruff check . --select F82
+
+# ② 通用代理连通性质检（支持 --sample 抽样快速冒烟）
+python socks_verify.py --concurrency 100 --sample 50 --no-notify
+
+# ③ 反代 ProxyIP 穿透与优选直连双料质检
+python proxyip_verify.py --concurrency 150 --no-notify
+
+# ④ 全量优选 IP 两阶段（TLS + HTTP 301）主动鉴真
+python cf_verify.py --concurrency 150 --timeout 3.0
+```
 
 ---
 

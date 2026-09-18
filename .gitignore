@@ -8,3 +8,4 @@ __pycache__/
 
 .fetch_stats.json
 data/.fetch_stats.json
+.ruff_cache/
