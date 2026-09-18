@@ -1,43 +1,42 @@
 ﻿ip,port,tls,delay_ms,speed_kbs,colo,cf_location,isp,asn,tested_at,channel,fail_count
-176.122.179.172,443,true,,,LAX,北美洲 · 美国洛杉矶,IT7 Networks Inc,`AS25820 IT7 Networks Inc`,2026-09-17 18:00:32,@danfeng_chat,0
-216.195.221.139,1891,true,,,FRA,欧洲 · 德国法兰克福,Eons Data Communications Limited,`AS138997 Eons Data Communications Limited`,2026-09-17 12:00:33,@danfeng_chat,0
-154.17.27.150,51888,true,,,LAX,北美洲 · 美国洛杉矶,DMIT Cloud Services,`AS906 DMIT Cloud Services`,2026-09-17 06:00:33,@danfeng_chat,0
-64.83.37.198,20096,true,,,NRT,亚太 · 日本东京,NetLab Global,`AS979 NetLab Global`,2026-09-17 00:00:28,@danfeng_chat,0
-144.34.169.73,443,true,,,LAX,北美洲 · 美国洛杉矶,IT7 Networks Inc,`AS25820 IT7 Networks Inc`,2026-09-16 18:00:28,@danfeng_chat,0
-179.255.116.154,47492,true,,,SJC,北美洲 · 美国圣何塞,NetCrew,`AS906 DMIT Cloud Services`,2026-09-16 12:00:32,@danfeng_chat,0
-38.22.94.79,33879,true,,,HKG,亚太 · 香港,NetLab Global,`AS979 NetLab Global`,2026-09-16 06:00:32,@danfeng_chat,0
-23.149.108.112,62668,true,,,NRT,亚太 · 日本东京,Neburst Networks,`AS8143 Neburst LLC`,2026-09-16 00:00:24,@danfeng_chat,0
-89.208.251.252,443,true,,,LAX,北美洲 · 美国洛杉矶,IT7 Networks Inc,`AS25820 IT7 Networks Inc`,2026-09-15 18:00:26,@danfeng_chat,0
-166.88.100.64,22222,true,,,KIX,亚太 · 大阪,Ace Data Centers II,`AS149440 Evoxt Sdn. Bhd.`,2026-09-15 12:00:28,@danfeng_chat,0
-179.255.105.77,17950,true,,,LAX,北美洲 · 美国洛杉矶,NetCrew,`AS906 DMIT Cloud Services`,2026-09-15 06:00:31,@danfeng_chat,0
-191.40.11.102,1891,true,,,FRA,欧洲 · 德国法兰克福,Eons Data Communications Limited,`AS138997 Eons Data Communications Limited`,2026-09-15 00:00:32,@danfeng_chat,0
+176.122.179.172,443,true,106,,LAX,北美洲 · 美国洛杉矶,IT7 Networks Inc,`AS25820 IT7 Networks Inc`,2026-09-17 18:00:32,@danfeng_chat,0
+216.195.221.139,1891,true,529,,FRA,欧洲 · 德国法兰克福,Eons Data Communications Limited,`AS138997 Eons Data Communications Limited`,2026-09-17 12:00:33,@danfeng_chat,0
+154.17.27.150,51888,true,126,,LAX,北美洲 · 美国洛杉矶,DMIT Cloud Services,`AS906 DMIT Cloud Services`,2026-09-17 06:00:33,@danfeng_chat,0
+64.83.37.198,20096,true,403,,NRT,亚太 · 日本东京,NetLab Global,`AS979 NetLab Global`,2026-09-17 00:00:28,@danfeng_chat,0
+144.34.169.73,443,true,112,,LAX,北美洲 · 美国洛杉矶,IT7 Networks Inc,`AS25820 IT7 Networks Inc`,2026-09-16 18:00:28,@danfeng_chat,0
+179.255.116.154,47492,true,151,,SJC,北美洲 · 美国圣何塞,NetCrew,`AS906 DMIT Cloud Services`,2026-09-16 12:00:32,@danfeng_chat,0
+38.22.94.79,33879,true,388,,HKG,亚太 · 香港,NetLab Global,`AS979 NetLab Global`,2026-09-16 06:00:32,@danfeng_chat,0
+23.149.108.112,62668,true,497,,NRT,亚太 · 日本东京,Neburst Networks,`AS8143 Neburst LLC`,2026-09-16 00:00:24,@danfeng_chat,0
+89.208.251.252,443,true,126,,LAX,北美洲 · 美国洛杉矶,IT7 Networks Inc,`AS25820 IT7 Networks Inc`,2026-09-15 18:00:26,@danfeng_chat,0
+166.88.100.64,22222,true,316,,KIX,亚太 · 大阪,Ace Data Centers II,`AS149440 Evoxt Sdn. Bhd.`,2026-09-15 12:00:28,@danfeng_chat,0
+179.255.105.77,17950,true,107,,LAX,北美洲 · 美国洛杉矶,NetCrew,`AS906 DMIT Cloud Services`,2026-09-15 06:00:31,@danfeng_chat,0
+191.40.11.102,1891,true,524,,FRA,欧洲 · 德国法兰克福,Eons Data Communications Limited,`AS138997 Eons Data Communications Limited`,2026-09-15 00:00:32,@danfeng_chat,0
 103.47.186.47,52492,true,316,,NRT,亚太 · 日本东京,xTom Japan Corporation,`AS3258 xTom Japan Corporation`,2026-09-14 18:00:32,@danfeng_chat,0
-147.78.246.169,22658,true,338,,NRT,亚太 · 日本东京,VIRMACH,`AS3258 xTom Japan Corporation`,2026-09-14 12:00:33,@danfeng_chat,0
-98.85.241.163,443,true,18,,IAD,北美洲 · 美国阿什伯恩,"Amazon.com, Inc.","`AS14618 Amazon.com, Inc.`",2026-09-14 06:00:33,@danfeng_chat,0
-154.21.85.197,39257,true,154,,LAX,北美洲 · 美国洛杉矶,DMIT Cloud Services,`AS906 DMIT Cloud Services`,2026-09-14 00:00:30,@danfeng_chat,0
-23.249.18.144,8581,true,440,,HKG,亚太 · 香港,Prime Security Corp.,`AS400618 Prime Security Corp.`,2026-09-13 18:00:33,@danfeng_chat,0
-142.248.139.237,51982,true,347,,NRT,亚太 · 日本东京,JT TELECOM INTERNATIONAL PTE.LTD.,`AS137535 JT TELECOM INTERNATIONAL PTE.LTD.`,2026-09-13 12:00:29,@danfeng_chat,0
-38.59.230.210,14338,true,212,,AMS,欧洲 · 荷兰阿姆斯特丹,Kirino LLC,`AS41378 Kirino LLC`,2026-09-13 06:00:28,@danfeng_chat,0
-116.206.178.154,19436,true,451,,HKG,亚太 · 香港,Xnnet LLC,`AS6134 XNNET LLC`,2026-09-12 18:00:31,@danfeng_chat,0
-185.200.65.176,10443,true,347,,NRT,亚太 · 日本东京,xTom Japan Corporation,`AS3258 xTom Japan Corporation`,2026-09-12 12:00:28,@danfeng_chat,0
-216.24.184.56,443,true,153,,LAX,北美洲 · 美国洛杉矶,IT7 Networks Inc,`AS25820 IT7 Networks Inc`,2026-09-12 06:00:35,@danfeng_chat,0
-95.169.10.15,443,true,156,,SJC,北美洲 · 美国圣何塞,IT7 Networks Inc,`AS25820 IT7 Networks Inc`,2026-09-11 18:00:33,@danfeng_chat,0
-216.236.1.34,1891,true,352,,NRT,亚太 · 日本东京,Eons Data Communications Limited,`AS138997 Eons Data Communications Limited`,2026-09-11 12:00:27,@danfeng_chat,0
-154.31.115.118,14702,true,337,,NRT,亚洲 · 日本东京,DMIT Cloud Services,`AS906`,2026-09-11 06:52:50,@otcfxq,0
-154.12.176.78,25301,true,599,,FRA,欧洲 · 德国法兰克福,DMIT Cloud Services,`AS906 DMIT Cloud Services`,2026-09-11 06:00:32,@danfeng_chat,0
-154.26.182.126,39445,true,154,,LAX,北美洲 · 美国洛杉矶,DMIT Cloud Services,`AS906 DMIT Cloud Services`,2026-09-11 00:00:34,@danfeng_chat,0
-154.31.114.46,12632,true,329,,NRT,亚洲 · 日本东京,DMIT Cloud Services,`AS906`,2026-09-10 20:06:12,@otcfxq,0
-154.3.35.193,2053,true,311,,HKG,亚太 · 香港,DMIT Cloud Services,`AS906 DMIT Cloud Services`,2026-09-10 19:07:09,@danfeng_chat,1
-154.31.112.237,26418,true,347,,NRT,亚洲 · 日本东京,DMIT Cloud Services,`AS906`,2026-09-10 10:28:04,@otcfxq,0
-64.186.234.87,15984,true,156,,SJC,北美洲 · 美国圣何塞,GTT Communications Inc.,`AS3257`,2026-09-10 00:42:09,@otcfxq,0
-64.186.234.81,25218,true,153,,SJC,北美洲 · 美国圣何塞,GTT Communications Inc.,`AS3257`,2026-09-10 00:34:58,@otcfxq,0
-69.63.202.156,13377,true,153,,LAX,北美洲 · 美国洛杉矶,DMIT Cloud Services,`AS906`,2026-09-09 20:36:56,@otcfxq,0
-69.63.202.130,24685,true,153,,SJC,北美洲 · 美国圣何塞,DMIT Cloud Services,`AS906`,2026-09-09 20:07:18,@otcfxq,0
-69.63.202.75,17640,true,166,,LAX,北美洲 · 美国洛杉矶,DMIT Cloud Services,`AS906`,2026-09-09 19:04:23,@otcfxq,0
-69.63.221.116,25517,true,156,,LAX,北美洲 · 美国洛杉矶,DMIT Cloud Services,`AS906`,2026-09-09 16:08:23,@otcfxq,0
-179.253.240.117,15496,true,156,,SJC,北美洲 · 美国圣何塞,V tal,`AS8167`,2026-09-09 11:01:53,@otcfxq,0
-96.9.212.206,60093,true,510,,SIN,亚洲 · 新加坡新加坡,xTom Pty Ltd,`AS8888`,2026-09-09 10:59:23,@otcfxq,0
-179.255.148.94,44046,true,153,,SJC,北美洲 · 美国圣何塞,V tal,`AS8167`,2026-09-08 17:01:21,@otcfxq,0
-103.135.249.108,8443,true,436,,HKG,亚洲 · 中国香港,DMIT Cloud Services,`AS906`,2026-09-08 16:46:35,@otcfxq,0
-154.31.115.104,8443,true,328,,NRT,亚洲 · 日本东京,DMIT Cloud Services,`AS906`,2026-09-08 16:40:04,@otcfxq,0
-154.31.114.162,8443,true,328,,NRT,亚洲 · 日本东京,DMIT Cloud Services,`AS906`,2026-09-08 16:34:36,@otcfxq,0
+147.78.246.169,22658,true,322,,NRT,亚太 · 日本东京,VIRMACH,`AS3258 xTom Japan Corporation`,2026-09-14 12:00:33,@danfeng_chat,0
+98.85.241.163,443,true,126,,IAD,北美洲 · 美国阿什伯恩,"Amazon.com, Inc.","`AS14618 Amazon.com, Inc.`",2026-09-14 06:00:33,@danfeng_chat,0
+154.21.85.197,39257,true,124,,LAX,北美洲 · 美国洛杉矶,DMIT Cloud Services,`AS906 DMIT Cloud Services`,2026-09-14 00:00:30,@danfeng_chat,0
+23.249.18.144,8581,true,403,,HKG,亚太 · 香港,Prime Security Corp.,`AS400618 Prime Security Corp.`,2026-09-13 18:00:33,@danfeng_chat,0
+142.248.139.237,51982,true,310,,NRT,亚太 · 日本东京,JT TELECOM INTERNATIONAL PTE.LTD.,`AS137535 JT TELECOM INTERNATIONAL PTE.LTD.`,2026-09-13 12:00:29,@danfeng_chat,0
+38.59.230.210,14338,true,308,,AMS,欧洲 · 荷兰阿姆斯特丹,Kirino LLC,`AS41378 Kirino LLC`,2026-09-13 06:00:28,@danfeng_chat,0
+116.206.178.154,19436,true,421,,HKG,亚太 · 香港,Xnnet LLC,`AS6134 XNNET LLC`,2026-09-12 18:00:31,@danfeng_chat,0
+185.200.65.176,10443,true,319,,NRT,亚太 · 日本东京,xTom Japan Corporation,`AS3258 xTom Japan Corporation`,2026-09-12 12:00:28,@danfeng_chat,0
+216.24.184.56,443,true,208,,LAX,北美洲 · 美国洛杉矶,IT7 Networks Inc,`AS25820 IT7 Networks Inc`,2026-09-12 06:00:35,@danfeng_chat,0
+95.169.10.15,443,true,105,,SJC,北美洲 · 美国圣何塞,IT7 Networks Inc,`AS25820 IT7 Networks Inc`,2026-09-11 18:00:33,@danfeng_chat,0
+216.236.1.34,1891,true,310,,NRT,亚太 · 日本东京,Eons Data Communications Limited,`AS138997 Eons Data Communications Limited`,2026-09-11 12:00:27,@danfeng_chat,0
+154.31.115.118,14702,true,309,,NRT,亚洲 · 日本东京,DMIT Cloud Services,`AS906`,2026-09-11 06:52:50,@otcfxq,0
+154.12.176.78,25301,true,567,,FRA,欧洲 · 德国法兰克福,DMIT Cloud Services,`AS906 DMIT Cloud Services`,2026-09-11 06:00:32,@danfeng_chat,0
+154.26.182.126,39445,true,126,,LAX,北美洲 · 美国洛杉矶,DMIT Cloud Services,`AS906 DMIT Cloud Services`,2026-09-11 00:00:34,@danfeng_chat,0
+154.31.114.46,12632,true,309,,NRT,亚洲 · 日本东京,DMIT Cloud Services,`AS906`,2026-09-10 20:06:12,@otcfxq,0
+154.31.112.237,26418,true,309,,NRT,亚洲 · 日本东京,DMIT Cloud Services,`AS906`,2026-09-10 10:28:04,@otcfxq,0
+64.186.234.87,15984,true,124,,SJC,北美洲 · 美国圣何塞,GTT Communications Inc.,`AS3257`,2026-09-10 00:42:09,@otcfxq,0
+64.186.234.81,25218,true,126,,SJC,北美洲 · 美国圣何塞,GTT Communications Inc.,`AS3257`,2026-09-10 00:34:58,@otcfxq,0
+69.63.202.156,13377,true,124,,LAX,北美洲 · 美国洛杉矶,DMIT Cloud Services,`AS906`,2026-09-09 20:36:56,@otcfxq,0
+69.63.202.130,24685,true,117,,SJC,北美洲 · 美国圣何塞,DMIT Cloud Services,`AS906`,2026-09-09 20:07:18,@otcfxq,0
+69.63.202.75,17640,true,170,,LAX,北美洲 · 美国洛杉矶,DMIT Cloud Services,`AS906`,2026-09-09 19:04:23,@otcfxq,0
+69.63.221.116,25517,true,130,,LAX,北美洲 · 美国洛杉矶,DMIT Cloud Services,`AS906`,2026-09-09 16:08:23,@otcfxq,0
+179.253.240.117,15496,true,126,,SJC,北美洲 · 美国圣何塞,V tal,`AS8167`,2026-09-09 11:01:53,@otcfxq,0
+96.9.212.206,60093,true,487,,SIN,亚洲 · 新加坡新加坡,xTom Pty Ltd,`AS8888`,2026-09-09 10:59:23,@otcfxq,0
+179.255.148.94,44046,true,122,,SJC,北美洲 · 美国圣何塞,V tal,`AS8167`,2026-09-08 17:01:21,@otcfxq,0
+103.135.249.108,8443,true,402,,HKG,亚洲 · 中国香港,DMIT Cloud Services,`AS906`,2026-09-08 16:46:35,@otcfxq,0
+154.31.115.104,8443,true,309,,NRT,亚洲 · 日本东京,DMIT Cloud Services,`AS906`,2026-09-08 16:40:04,@otcfxq,0
+154.31.114.162,8443,true,309,,NRT,亚洲 · 日本东京,DMIT Cloud Services,`AS906`,2026-09-08 16:34:36,@otcfxq,0
