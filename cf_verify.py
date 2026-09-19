@@ -299,17 +299,22 @@ def send_verify_notification(
     max_fails: int,
     elapsed_verify: float,
 ):
+    fetch_stats_file = os.path.join(DATA_DIR, ".fetch_stats.json")
     token = TG_BOT_TOKEN
     chat_id = TG_CHAT_ID
     if not token or not chat_id:
         log.info("未配置 TG_BOT_TOKEN 或 TG_CHAT_ID，跳过 Telegram 推送")
+        if os.path.isfile(fetch_stats_file):
+            try:
+                os.remove(fetch_stats_file)
+            except OSError:
+                pass
         return
 
     bjt = datetime.now(timezone(timedelta(hours=8)))
     date_str = bjt.strftime("%Y-%m-%d %H:%M:%S")
 
     # 检查是否存在 tg_fetch 暂存的抓取统计及 proxyip_verify 质检统计
-    fetch_stats_file = os.path.join(DATA_DIR, ".fetch_stats.json")
     fetch_stats = None
     if os.path.isfile(fetch_stats_file):
         try:
