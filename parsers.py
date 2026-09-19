@@ -340,9 +340,7 @@ def parse_cf_csv_content(
                 isp_lower = raw_isp.lower()
                 for key in sorted(KNOWN_CLOUD_PROVIDERS.keys(), key=len, reverse=True):
                     if key in isp_lower:
-                        asn_clean, default_isp = KNOWN_CLOUD_PROVIDERS[key]
-                        if not raw_isp:
-                            raw_isp = default_isp
+                        asn_clean = KNOWN_CLOUD_PROVIDERS[key][0]
                         break
 
             # 智能补全：若已有 ASN 但缺少 ISP，从 ASN 反查知名服务商名称
