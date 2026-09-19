@@ -469,6 +469,19 @@ def send_verify_notification(
 
         channels_str = ", ".join(dict.fromkeys(channels))
 
+        unrecorded_asns = fetch_stats.get("unrecorded_asns", [])
+        unmatched_block = ""
+        if unrecorded_asns:
+            items = []
+            for item in unrecorded_asns[:4]:
+                c = item.get("asn", "")
+                o = item.get("org", "").strip()
+                cnt = item.get("count", 0)
+                name_str = f" {o}" if o else ""
+                items.append(f"   • <code>{c}</code>{name_str} ({cnt} 条)")
+            suffix = f"\n   └ <i>共 {len(unrecorded_asns)} 个待确认归属</i>" if len(unrecorded_asns) > 4 else ""
+            unmatched_block = "💡 <b>发现未收录 ASN (可补充入库)</b>：\n" + "\n".join(items) + suffix + "\n"
+
         message = (
             f"{header}\n"
             f"{div}\n"
@@ -477,6 +490,7 @@ def send_verify_notification(
             f"{cf_line}"
             f"{scan_line}"
             f"{proxyip_line}"
+            f"{unmatched_block}"
             f"{div}\n"
             f"{verify_block}"
             f"📡 <b>频道来源</b>：{channels_str}"

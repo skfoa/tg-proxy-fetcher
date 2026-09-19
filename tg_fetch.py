@@ -50,6 +50,8 @@ from providers import (
     format_categorized_proxyip_txt,
     save_proxyip_by_country,
     classify_asn,
+    is_asn_recorded,
+    _extract_asn_code,
 )
 from parsers import (
     is_valid_host,
@@ -195,6 +197,7 @@ def send_tg_notification(
     updated_proxyips: int = 0,
     top_providers: list = None,
     elapsed_seconds: float = 0.0,
+    unrecorded_asns: list = None,
 ):
     # 若设置了 DEFER_NOTIFY=1（如在 GitHub Actions 完整流水线中），则将抓取统计暂存至 .fetch_stats.json，由后续的 cf_verify 生成联合卡片
     if os.getenv("DEFER_NOTIFY") == "1":
@@ -213,6 +216,7 @@ def send_tg_notification(
             "new_proxyips": new_proxyips,
             "updated_proxyips": updated_proxyips,
             "top_providers": top_providers or [],
+            "unrecorded_asns": unrecorded_asns or [],
             "elapsed_seconds": elapsed_seconds,
             "channels": [ch for ch in PROXY_CHANNELS + CF_IP_CHANNELS if ch],
         }
@@ -271,6 +275,18 @@ def send_tg_notification(
         proxyip_diff = format_diff(new_proxyips, updated_proxyips)
         proxyip_line = f"🔀 <b>反代 ProxyIP</b>：<code>{proxyips_count}</code> 条 ({proxyip_diff})\n"
 
+    unmatched_block = ""
+    if unrecorded_asns:
+        items = []
+        for item in unrecorded_asns[:4]:
+            c = item.get("asn", "")
+            o = item.get("org", "").strip()
+            cnt = item.get("count", 0)
+            name_str = f" {o}" if o else ""
+            items.append(f"   • <code>{c}</code>{name_str} ({cnt} 条)")
+        suffix = f"\n   └ <i>共 {len(unrecorded_asns)} 个待确认归属</i>" if len(unrecorded_asns) > 4 else ""
+        unmatched_block = "💡 <b>发现未收录 ASN (可补充入库)</b>：\n" + "\n".join(items) + suffix + "\n"
+
     all_channels = []
     for ch in PROXY_CHANNELS + CF_IP_CHANNELS:
         if ch not in all_channels:
@@ -303,6 +319,7 @@ def send_tg_notification(
         f"🌐 <b>单条优选</b>：<code>{cf_ips_count}</code> 条 ({format_diff(new_cf, updated_cf)})\n"
         f"{scan_line}"
         f"{proxyip_line}"
+        f"{unmatched_block}"
         f"{div}\n"
         f"📡 <b>频道来源</b>：{channels_str}"
         f"{footer_line}"
@@ -434,6 +451,7 @@ def save_and_notify(
     updated_scan_count: int = 0,
     new_proxyips_count: int = 0,
     updated_proxyips_count: int = 0,
+    unrecorded_asns: list = None,
 ):
     # 1. 保存代理节点
     os.makedirs(DATA_DIR, exist_ok=True)
@@ -585,6 +603,7 @@ def save_and_notify(
         updated_proxyips=updated_proxyips_count,
         top_providers=top_providers,
         elapsed_seconds=elapsed_sec,
+        unrecorded_asns=unrecorded_asns,
     )
 
     log.info("=" * 50)
@@ -666,6 +685,51 @@ def merge_and_save(
             len(final_proxyips),
         )
 
+    # 统计本次新增的未收录 ASN (Mode A: 仅在新抓取到的新增节点中检测)
+    from collections import Counter
+    unrecorded_counts = Counter()
+    unrecorded_orgs = {}
+
+    for k, v in scraped_scan_ips.items():
+        if k not in existing_scan_ips:
+            c = _extract_asn_code(v.get("asn"), v.get("isp"))
+            if c and not is_asn_recorded(c):
+                unrecorded_counts[c] += 1
+                if c not in unrecorded_orgs:
+                    org = v.get("isp") or v.get("asn") or ""
+                    org = re.sub(r"^AS\d+\s*", "", org, flags=re.IGNORECASE).strip()
+                    unrecorded_orgs[c] = org
+
+    for k, v in scraped_cf_ips.items():
+        if k not in existing_cf_ips:
+            c = _extract_asn_code(v.get("asn"), v.get("isp"))
+            if c and not is_asn_recorded(c):
+                unrecorded_counts[c] += 1
+                if c not in unrecorded_orgs:
+                    org = v.get("isp") or v.get("asn") or ""
+                    org = re.sub(r"^AS\d+\s*", "", org, flags=re.IGNORECASE).strip()
+                    unrecorded_orgs[c] = org
+
+    for k, v in scraped_proxyips.items():
+        if k not in existing_proxyips:
+            c = _extract_asn_code(v.get("asn"), v.get("isp"))
+            if c and not is_asn_recorded(c):
+                unrecorded_counts[c] += 1
+                if c not in unrecorded_orgs:
+                    org = v.get("isp") or v.get("asn") or ""
+                    org = re.sub(r"^AS\d+\s*", "", org, flags=re.IGNORECASE).strip()
+                    unrecorded_orgs[c] = org
+
+    unrecorded_asns = []
+    for c, cnt in unrecorded_counts.most_common():
+        unrecorded_asns.append({
+            "asn": c,
+            "org": unrecorded_orgs.get(c, ""),
+            "count": cnt,
+        })
+    if unrecorded_asns:
+        log.info("本次新增节点中检测到 %d 个未收录 ASN: %s", len(unrecorded_asns), ", ".join(f"{x['asn']}({x['count']})" for x in unrecorded_asns[:5]))
+
     save_and_notify(
         final_proxies,
         final_cf_ips,
@@ -679,6 +743,7 @@ def merge_and_save(
         updated_scan_count=updated_scan_cnt,
         new_proxyips_count=new_proxyip_cnt,
         updated_proxyips_count=updated_proxyip_cnt,
+        unrecorded_asns=unrecorded_asns,
     )
 
 

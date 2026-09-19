@@ -641,6 +641,23 @@ ASN_EXACT_NET_TYPE = {
     "AS147049": "datacenter",  # VMISS
 }
 
+# 自动将 KNOWN_CLOUD_PROVIDERS 中未单独显式指定类型的知名云厂商/机房补充进入 ASN_EXACT_NET_TYPE 默认为 datacenter
+for _asn in ASN_TO_PROVIDER:
+    if _asn not in ASN_EXACT_NET_TYPE:
+        ASN_EXACT_NET_TYPE[_asn] = "datacenter"
+
+
+def is_asn_recorded(asn_str: str | None, isp_str: str | None = "") -> bool:
+    """
+    判断给定的 ASN 是否已被内置权威对照表（ASN_EXACT_NET_TYPE 或 ASN_TO_PROVIDER）精确收录。
+    返回 True 表示已收录，False 表示属于未收录的新自治系统。
+    若无法从文本中提取出有效 AS 编号（例如纯机构名），返回 True（不作为未收录 ASN 触发告警）。
+    """
+    code = _extract_asn_code(asn_str, isp_str)
+    if not code:
+        return True
+    return code in ASN_EXACT_NET_TYPE or code in ASN_TO_PROVIDER
+
 
 def classify_asn(asn_str: str | None, isp_str: str | None = "") -> str:
     """
