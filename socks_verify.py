@@ -12,7 +12,7 @@ SOCKS5 / 通用代理连通性质检与淘汰引擎 (socks_verify.py)
   - 缓冲容错模式 (--max-fails 2，默认): 允许节点偶发失败 1 次作为缓冲，连续失败达到阈值时物理淘汰
   - 存活节点: fail_count 立即重置为 0，回填实时 delay_ms 与 colo 机房码
   - 排序落盘: 存活优先 (fail_count 升序)，低延迟优先 (delay_ms 升序)
-  - 结果聚合: 支持将质检结果回写至 stats_tg_fetch.json，由流水线终点 cf_verify 聚合发送四维合一总览卡片
+  - 结果聚合: 支持将质检结果回写至 .fetch_stats.json，由流水线终点 cf_verify 聚合发送四维合一总览卡片
 """
 
 import argparse
