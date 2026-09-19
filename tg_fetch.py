@@ -37,6 +37,7 @@ if sys.platform == "win32":
         pass
 
 START_TIME = time.time()
+TZ_BJT = timezone(timedelta(hours=8))
 
 # ================= 配置区域 =================
 from providers import (
@@ -235,7 +236,7 @@ def send_tg_notification(
         log.info("未配置 TG_BOT_TOKEN 或 TG_CHAT_ID，跳过机器人消息推送")
         return
 
-    bjt = datetime.now(timezone(timedelta(hours=8)))
+    bjt = datetime.now(TZ_BJT)
     date_str = bjt.strftime("%Y-%m-%d %H:%M:%S")
 
     def format_diff(new_c: int, upd_c: int) -> str:
@@ -430,7 +431,7 @@ def scrape_channel_web(channel: str, cutoff: datetime, proxy: str = "") -> tuple
             cf_data = parse_cf_ip(cleaned_text, default_channel=channel)
             if cf_data:
                 if not cf_data["tested_at"] and dt:
-                    cf_data["tested_at"] = dt.strftime("%Y-%m-%d %H:%M:%S")
+                    cf_data["tested_at"] = dt.astimezone(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S")
                 cf_ips_found.append(cf_data)
 
         if reached_cutoff or not earliest_id:
@@ -487,6 +488,7 @@ def save_and_notify(
     # 3. 保存文件/扫描优选 IP（按 ASN 智能去重、分组归类与独立拆分）
     scan_ips_total = 0
     asn_groups_total = 0
+    asn_groups = {}
     if final_scan_ips:
         os.makedirs(OUTPUT_SCAN_DIR, exist_ok=True)
 
@@ -576,7 +578,7 @@ def save_and_notify(
         proxyip_total = len(sorted_proxyips)
 
     top_providers = []
-    if final_scan_ips and 'asn_groups' in locals() and asn_groups:
+    if asn_groups:
         sorted_groups = sorted(asn_groups.items(), key=lambda item: len(item[1]), reverse=True)
         seen_names = set()
         for asn_name, group in sorted_groups:
@@ -590,7 +592,7 @@ def save_and_notify(
                 seen_names.add(name)
                 top_providers.append(name)
 
-    elapsed_sec = time.time() - START_TIME if 'START_TIME' in globals() else 0.0
+    elapsed_sec = time.time() - START_TIME
 
     send_tg_notification(
         len(final_proxies),
@@ -916,7 +918,7 @@ async def run_telethon():
                                 cf_key = f"{cf_data['ip']}:{cf_data['port']}"
                                 if cf_key not in scraped_cf_ips:
                                     if not cf_data["tested_at"] and msg.date:
-                                        cf_data["tested_at"] = msg.date.strftime("%Y-%m-%d %H:%M:%S")
+                                        cf_data["tested_at"] = msg.date.astimezone(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S")
                                     scraped_cf_ips[cf_key] = cf_data
                                     cf_count += 1
 
@@ -929,7 +931,7 @@ async def run_telethon():
                                     doc_bytes = await client.download_media(msg, file=bytes)
                                     if doc_bytes:
                                         doc_text = doc_bytes.decode("utf-8", errors="ignore")
-                                        doc_date_str = msg.date.strftime("%Y-%m-%d %H:%M:%S") if msg.date else ""
+                                        doc_date_str = msg.date.astimezone(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S") if msg.date else ""
                                         doc_items = parse_cf_csv_content(doc_text, default_channel=channel_name, filename=msg.file.name, dt_str=doc_date_str)
                                         doc_added = 0
                                         for cf_item in doc_items:
@@ -947,7 +949,7 @@ async def run_telethon():
                                     doc_bytes = await client.download_media(msg, file=bytes)
                                     if doc_bytes:
                                         doc_text = doc_bytes.decode("utf-8", errors="ignore")
-                                        doc_date_str = msg.date.strftime("%Y-%m-%d %H:%M:%S") if msg.date else ""
+                                        doc_date_str = msg.date.astimezone(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S") if msg.date else ""
                                         doc_items = parse_cf_csv_content(doc_text, default_channel=channel_name, filename=msg.file.name, dt_str=doc_date_str)
                                         doc_added = 0
                                         for cf_item in doc_items:
@@ -965,7 +967,7 @@ async def run_telethon():
                                     doc_bytes = await client.download_media(msg, file=bytes)
                                     if doc_bytes:
                                         doc_text = doc_bytes.decode("utf-8", errors="ignore")
-                                        doc_date_str = msg.date.strftime("%Y-%m-%d %H:%M:%S") if msg.date else ""
+                                        doc_date_str = msg.date.astimezone(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S") if msg.date else ""
                                         doc_items = parse_otc_scan_content(doc_text, default_channel=channel_name, filename=msg.file.name, dt_str=doc_date_str)
                                         doc_added = 0
                                         for cf_item in doc_items:

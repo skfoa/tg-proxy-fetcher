@@ -233,7 +233,17 @@ def normalize_timestamp(val, default: str = "") -> str:
     if re.match(r"^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}$", val_str):
         return val_str
 
-    # 3. 兼容解析各类标准日期格式 (如 YYYY/MM/DD, ISO 8601 YYYY-MM-DDTHH:MM:SS 等)
+    # 3. 尝试解析 ISO 8601 带时区时间字符串并转换为北京时间
+    if "T" in val_str or "+" in val_str or val_str.endswith("Z"):
+        try:
+            iso_str = val_str.replace("Z", "+00:00")
+            dt = datetime.fromisoformat(iso_str)
+            if dt.tzinfo is not None:
+                return dt.astimezone(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
+        except (ValueError, TypeError):
+            pass
+
+    # 4. 兼容解析各类标准日期格式 (如 YYYY/MM/DD, ISO 8601 YYYY-MM-DDTHH:MM:SS 等)
     m = re.match(r"^(\d{4})[/-](\d{1,2})[/-](\d{1,2})(?:[T\s](\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?", val_str)
     if m:
         year, month, day, hour, minute, second = m.groups()
