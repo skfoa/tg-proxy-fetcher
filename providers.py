@@ -441,36 +441,57 @@ def extract_country(cf_location: str | None, colo: str | None) -> str:
             return "美国"
         if name in ("TW", "Taiwan"):
             return "台湾"
+        if "香港" in name:
+            return "香港"
+        if "澳门" in name:
+            return "澳门"
         if "巴基斯坦" in name:
             return "巴基斯坦"
         if "多明尼加" in name or "多米尼加" in name:
             return "多米尼加"
         return name
 
-    # 1. 优先解析 cf_location 结构
+    parts = [p.strip() for p in cf_location.split("·") if p.strip()] if cf_location else []
+
+    # 1. 三段式或以上结构优先取末段（通常为国家/地区名，如 '北美洲 · 洛杉矶 · 美国'）
+    if len(parts) >= 3:
+        return _normalize_name(parts[-1])
+
+    # 2. 两段式结构（如 '欧洲 · 德国' 或 '北美洲 · 洛杉矶'）
+    if len(parts) == 2:
+        loc = _normalize_name(parts[1])
+        if loc in COUNTRY_FLAGS:
+            return loc
+        if loc in CITY_TO_COUNTRY:
+            return CITY_TO_COUNTRY[loc]
+        if loc in ("新加坡", "香港", "台湾", "澳门", "中国"):
+            return loc
+
+    # 3. 单段式直接匹配国家或城市（如 '日本' 或 '东京'）
+    if len(parts) == 1:
+        loc = _normalize_name(parts[0])
+        if loc in COUNTRY_FLAGS:
+            return loc
+        if loc in CITY_TO_COUNTRY:
+            return CITY_TO_COUNTRY[loc]
+        if loc in ("新加坡", "香港", "台湾", "澳门", "中国"):
+            return loc
+
+    # 4. cf_location 文本中包含已知城市名
     if cf_location:
-        parts = [p.strip() for p in cf_location.split("·") if p.strip()]
-        if len(parts) >= 3:
-            return _normalize_name(parts[-1])
-        if len(parts) == 2:
-            city = parts[1]
-            if city in CITY_TO_COUNTRY:
-                return CITY_TO_COUNTRY[city]
-            if city in ["新加坡", "香港", "台湾", "澳门"]:
-                return city
         for city, c in CITY_TO_COUNTRY.items():
             if city in cf_location:
                 return c
 
-    # 2. 回退到 colo 机房代码映射
+    # 5. 回退到 colo 机房代码映射
     if colo in COLO_TO_COUNTRY:
         return COLO_TO_COUNTRY[colo]
 
-    # 3. 兜底解析 parts 中提取的名称
-    if cf_location:
-        parts = [p.strip() for p in cf_location.split("·") if p.strip()]
-        if len(parts) >= 2:
-            return _normalize_name(parts[1])
+    # 6. 两段式/单段式兜底（若未匹配到已知表，直接规范化作为地区名）
+    if len(parts) >= 2:
+        return _normalize_name(parts[1])
+    if len(parts) == 1:
+        return _normalize_name(parts[0])
 
     return "其他地区"
 
@@ -780,6 +801,9 @@ def save_proxyip_by_country(rows: list, output_dir: str) -> int:
     方便用户直接在编辑器中全选复制（Ctrl+A / Ctrl+C）或按国家/属性独立订阅。
     自动清理目录中已不存在的旧地区文件，返回生成的独立文件数量。
     """
+    if not rows:
+        return 0
+
     os.makedirs(output_dir, exist_ok=True)
     groups: dict[str, list] = {}
     type_groups: dict[str, list] = {}
@@ -788,8 +812,8 @@ def save_proxyip_by_country(rows: list, output_dir: str) -> int:
         country = extract_country(r.get("cf_location"), r.get("colo"))
         groups.setdefault(country, []).append(r)
 
-        # 打标网络属性分类
-        nt = classify_asn(r.get("asn", ""), r.get("isp", ""))
+        # 复用已打标属性，缺失时兜底补齐
+        nt = r.get("net_type") or classify_asn(r.get("asn", ""), r.get("isp", ""))
         r["net_type"] = nt
         if nt in SPECIAL_NET_TYPE_FILES:
             type_groups.setdefault(nt, []).append(r)
@@ -798,35 +822,41 @@ def save_proxyip_by_country(rows: list, output_dir: str) -> int:
 
     # 1. 导出各国家/地区独立清单
     for country, members in groups.items():
+        lines = [
+            f"{(r.get('ip') or '').strip()}:{r.get('port')}\n"
+            for r in members
+            if (r.get("ip") or "").strip() and r.get("port")
+        ]
+        if not lines:
+            continue
         safe_country = re.sub(r'[\\/:*?"<>|]', "_", country).strip() or "其他地区"
         fname = f"{safe_country}.txt"
         filepath = os.path.join(output_dir, fname)
         with open(filepath, "w", encoding="utf-8") as f:
-            for r in members:
-                ip = (r.get("ip") or "").strip()
-                port = r.get("port", "")
-                if ip and port:
-                    f.write(f"{ip}:{port}\n")
+            f.writelines(lines)
         active_files.add(fname)
 
     # 2. 导出高价值特殊网络属性清单（运营商宽带、企业专线、高校教育、政务公用）
     for nt, fname in SPECIAL_NET_TYPE_FILES.items():
         members = type_groups.get(nt, [])
-        if members:
-            filepath = os.path.join(output_dir, fname)
-            with open(filepath, "w", encoding="utf-8") as f:
-                for r in members:
-                    ip = (r.get("ip") or "").strip()
-                    port = r.get("port", "")
-                    if ip and port:
-                        f.write(f"{ip}:{port}\n")
-            active_files.add(fname)
+        lines = [
+            f"{(r.get('ip') or '').strip()}:{r.get('port')}\n"
+            for r in members
+            if (r.get("ip") or "").strip() and r.get("port")
+        ]
+        if not lines:
+            continue
+        filepath = os.path.join(output_dir, fname)
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.writelines(lines)
+        active_files.add(fname)
 
     # 清理已不存在或旧命名格式的 .txt 文件（保留 .gitkeep 等非 txt 标记文件）
     for old_f in os.listdir(output_dir):
-        if old_f.endswith(".txt") and old_f not in active_files:
+        fpath = os.path.join(output_dir, old_f)
+        if os.path.isfile(fpath) and old_f.endswith(".txt") and old_f not in active_files:
             try:
-                os.remove(os.path.join(output_dir, old_f))
+                os.remove(fpath)
             except OSError:
                 pass
 
