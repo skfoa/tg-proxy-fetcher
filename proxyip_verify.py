@@ -39,6 +39,7 @@ from providers import (
     TG_CHAT_ID,
     format_categorized_proxyip_txt,
     save_proxyip_by_country,
+    classify_asn,
 )
 
 # 确保本地 .env 加载
@@ -80,7 +81,7 @@ MAX_FAILS = 2
 CSV_FIELDS = [
     "ip", "port", "tls", "delay_ms", "speed_kbs",
     "colo", "cf_location", "isp", "asn",
-    "tested_at", "channel", "fail_count", "cf_clean",
+    "tested_at", "channel", "fail_count", "cf_clean", "net_type",
 ]
 
 # 1. 反代穿透上下文：跳过证书链校验（用于反代服务器）
@@ -242,12 +243,15 @@ def save_proxyip(
 
     rows.sort(key=_sort_key)
 
+    for row in rows:
+        row["net_type"] = classify_asn(row.get("asn", ""), row.get("isp", ""))
+
     with open(csv_path, "w", encoding="utf-8-sig", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
         writer.writeheader()
         for row in rows:
             writer.writerow(row)
-    log.info("已覆写保存 %s: %d 条记录 (含 fail_count, cf_clean 列)", csv_path, len(rows))
+    log.info("已覆写保存 %s: %d 条记录 (含 fail_count, cf_clean, net_type 列)", csv_path, len(rows))
 
     with open(txt_path, "w", encoding="utf-8") as f:
         f.write(format_categorized_proxyip_txt(rows))

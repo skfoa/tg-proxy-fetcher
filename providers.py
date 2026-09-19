@@ -445,20 +445,121 @@ def format_categorized_proxyip_txt(rows: list) -> str:
     return "\n".join(lines).rstrip() + "\n" if lines else ""
 
 
+# ============================================================
+# 网络属性（ISP宽带 / 商业专线 / 高校教育 / 政务公共）识别引擎 (方案 A)
+# ============================================================
+
+HOSTING_EXCLUSIONS = (
+    "host", "server", "cloud", "vps", "datacenter", "data center",
+    "colo", "nodes", "compute", "dedicated", "transit", "voxility",
+    "ovh", "hetzner", "digitalocean", "linode", "vultr", "choopa",
+    "akamai", "fastly", "cloudflare", "amazon", "alibaba", "tencent",
+    "leaseweb", "cogent", "level 3", "lumen", "telia company ab",
+    "gtt", "hurricane electric", "he.net", "global connectivity",
+    "brainoza", "timeweb", "green floid", "cgi global", "mitelis",
+    "globaltelehost", "bytefilter", "globaltech", "perfecto mobile",
+    "u1 digital", "serv.host", "it7 networks", "aeza", "netcup",
+    "layeronline", "m247", "datacamp", "clouvider", "contabo",
+)
+
+EDU_PATTERNS = (
+    "university", "college", "school", "education", "cernet",
+    "academician research", "academic", "institute of technology",
+    "polytechnic", "edunet", "research network", "renater", "dfn", "surfnet",
+)
+
+GOV_PATTERNS = (
+    "ministry of", "department of", "parliament", "municipality",
+    "federal government", "state government", "public administration",
+    "beltelecom",
+)
+
+ISP_RES_PATTERNS = (
+    "comcast", "charter communications", "spectrum", "cox communications",
+    "hkt limited", "hong kong broadband network", "korea telecom", "sk broadband",
+    "singapore telecommunications", "deutsche telekom", "vodafone", "orange",
+    "shaw communications", "british telecommunications", "kazakhtelecom",
+    "transtelecom", "vietnam posts and telecommunications", "softbank corp",
+    "chunghwa telecom", "kddi", "bell canada", "rogers communications",
+    "frontier communications", "windstream", "centurylink", "lumen technologies",
+    "swisscom", "proximus", "kpn", "telenor", "telia sonera",
+    "virgin media", "o2 czech", "turkcell", "turk telekom",
+    "china telecom", "china unicom", "china mobile", "wave broadband",
+)
+
+BIZ_PATTERNS = (
+    "pccw business", "data communication business", "at&t enterprises",
+    "enterprise", "corporate", "commercial", "business internet",
+)
+
+SPECIAL_NET_TYPE_FILES = {
+    "isp": "【ISP_运营商原生宽带】.txt",
+    "business": "【BIZ_商业企业专线】.txt",
+    "education": "【EDU_高校教育科研】.txt",
+    "government": "【GOV_政务公共网络】.txt",
+}
+
+
+def classify_asn(asn_str: str | None, isp_str: str | None = "") -> str:
+    """
+    根据 BGP 广播的 ASN 机构名称与 ISP 归属进行多维度网络类型属性分类（方案 A 离线规则清洗）：
+      - education: 高校与学术科研网
+      - government: 政府政务与国家公共网
+      - isp: 电信民用原生宽带（非机房资产，信誉拟真度高）
+      - business: 商业固定专线与商务光纤
+      - datacenter: 常规云主机与数据中心机房（默认）
+    """
+    text = f"{asn_str or ''} {isp_str or ''}".lower().strip()
+    if not text:
+        return "datacenter"
+
+    # 1. 优先识别教育网
+    if any(p in text for p in EDU_PATTERNS):
+        return "education"
+
+    # 2. 识别政务公用网
+    if any(p in text for p in GOV_PATTERNS):
+        return "government"
+
+    # 3. 排除机房/主机商
+    is_hosting = any(h in text for h in HOSTING_EXCLUSIONS)
+
+    # 4. 识别商业专线
+    if any(p in text for p in BIZ_PATTERNS) and not is_hosting:
+        return "business"
+
+    # 5. 识别电信运营商原生宽带
+    if any(p in text for p in ISP_RES_PATTERNS) and not is_hosting:
+        return "isp"
+
+    return "datacenter"
+
+
 def save_proxyip_by_country(rows: list, output_dir: str) -> int:
     """
     将 ProxyIP 列表按国家/地区拆分输出为独立的纯文本文件（如 美国.txt、日本.txt）。
+    同时自动提取高价值稀缺属性节点导出为独立专用清单（如 【ISP_运营商原生宽带】.txt 等）。
     每个文件内容仅包含纯净的 IP:端口（保留传入时的原始质量排序，无任何注释头），
-    方便用户直接在编辑器中全选复制（Ctrl+A / Ctrl+C）或按国家独立订阅。
+    方便用户直接在编辑器中全选复制（Ctrl+A / Ctrl+C）或按国家/属性独立订阅。
     自动清理目录中已不存在的旧地区文件，返回生成的独立文件数量。
     """
     os.makedirs(output_dir, exist_ok=True)
     groups: dict[str, list] = {}
+    type_groups: dict[str, list] = {}
+
     for r in rows:
         country = extract_country(r.get("cf_location"), r.get("colo"))
         groups.setdefault(country, []).append(r)
 
+        # 打标网络属性分类
+        nt = classify_asn(r.get("asn", ""), r.get("isp", ""))
+        r["net_type"] = nt
+        if nt in SPECIAL_NET_TYPE_FILES:
+            type_groups.setdefault(nt, []).append(r)
+
     active_files = set()
+
+    # 1. 导出各国家/地区独立清单
     for country, members in groups.items():
         safe_country = re.sub(r'[\\/:*?"<>|]', "_", country).strip() or "其他地区"
         fname = f"{safe_country}.txt"
@@ -470,6 +571,19 @@ def save_proxyip_by_country(rows: list, output_dir: str) -> int:
                 if ip and port:
                     f.write(f"{ip}:{port}\n")
         active_files.add(fname)
+
+    # 2. 导出高价值特殊网络属性清单（运营商宽带、企业专线、高校教育、政务公用）
+    for nt, fname in SPECIAL_NET_TYPE_FILES.items():
+        members = type_groups.get(nt, [])
+        if members:
+            filepath = os.path.join(output_dir, fname)
+            with open(filepath, "w", encoding="utf-8") as f:
+                for r in members:
+                    ip = (r.get("ip") or "").strip()
+                    port = r.get("port", "")
+                    if ip and port:
+                        f.write(f"{ip}:{port}\n")
+            active_files.add(fname)
 
     # 清理已不存在或旧命名格式的 .txt 文件（保留 .gitkeep 等非 txt 标记文件）
     for old_f in os.listdir(output_dir):

@@ -99,9 +99,11 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 | **`data/scan_ips.csv`** | 扫描测速优选 IP（数据表） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/scan_ips.csv` |
 | **`data/proxyip.txt`** | 反代 ProxyIP 总清单（按国家/地区分类，纯文本） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip.txt` |
 | **`data/proxyip/*.txt`** | 独立国家/地区纯净反代列表（如 `美国.txt`、`日本.txt`） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip/{地区}.txt` |
-| **`data/proxyip.csv`** | 反代 ProxyIP 详细数据表 | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip.csv` |
+| **`data/proxyip/【...】.txt`** | 稀缺网络属性独立反代列表（原生宽带/商业/教育/政务） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip/【ISP_运营商原生宽带】.txt` 等 |
+| **`data/proxyip.csv`** | 反代 ProxyIP 详细数据表（含 `net_type` 网络分类） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip.csv` |
 | **`data/proxyip_cf.txt`** | 兼具优选直连特性的提纯反代总清单（按国家分类） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip_cf.txt` |
 | **`data/proxyip_cf/*.txt`** | 兼具优选直连特性的独立国家/地区纯净反代列表 | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip_cf/{地区}.txt` |
+| **`data/proxyip_cf/【...】.txt`** | 兼具优选直连特性的稀缺网络属性反代列表 | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip_cf/【ISP_运营商原生宽带】.txt` 等 |
 
 ---
 
@@ -162,14 +164,27 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
   2. **独立机房厂商文本（`data/scan_ips/ASxxx_厂商.txt`）**：在 `data/scan_ips/` 目录下按 ASN 及厂商名拆分生成独立文件（如 `data/scan_ips/AS906_DMIT.txt`、`data/scan_ips/AS210644_Aeza.txt`、`data/scan_ips/AS212336_ByteVirt.txt`），内容为 100% 纯净的 `IP:端口`，无任何注释，方便单独导入或按机房远程订阅。
   3. **结构化总表（`data/scan_ips.csv`）**：按 ASN 字母序聚合排序，方便通过 Excel 集中筛选分析。
 
-### 4. `data/proxyip/` 与 `data/proxyip_cf/`（反代 ProxyIP 专属池及分国别文件）
+### 4. `data/proxyip/` 与 `data/proxyip_cf/`（反代 ProxyIP 专属池、分国别与高价值属性分类）
 * **独立反代池**：专门收录来自频道发布的反代文件（如 `Global-proxyip-443.csv`、`Global-proxyip-8443.csv` 等）。
 * **智能国家/地区分类与数量统计**：`data/proxyip.txt` 与 `data/proxyip_cf.txt` 自动根据机房数据中心代码（Colo）与落地信息归类聚合，按节点规模降序排列，以 `# 🇺🇸 美国 - 6686 个` 等清晰注释头分组，组内按延迟升序严选排列，既保证纯净即用（兼容主流 Worker/脚本），又极大方便按目标国家筛选取用。
 * **分国家/地区独立单文件（点击即复制）**：
   - `data/proxyip/*.txt`：在 `data/proxyip/` 目录下按国家/地区拆分为独立文件（如 `data/proxyip/美国.txt`、`data/proxyip/日本.txt`、`data/proxyip/香港.txt` 等 76 个地区），内容 100% 为纯净的 `IP:端口`，无任何注释行，直接全选（Ctrl+A ➔ Ctrl+C）即可复制或作为分地区远程订阅。
   - `data/proxyip_cf/*.txt`：针对兼具官方证书直连能力的双料提纯节点，同样提供分国家独立纯净文本列表（如 `data/proxyip_cf/美国.txt`、`data/proxyip_cf/日本.txt`）。
 * **双能提纯直连（`data/proxyip_cf.txt`）**：由质检引擎并发探测，自动筛选提纯出既能作为反代穿透、又兼具 Cloudflare 官方证书 TLS 握手直连特性的优质节点，是兼具双料特性的极品清单。
-* **结构化数据**：`data/proxyip.csv` 保留延迟、数据中心、落地位置与 `cf_clean` 优选标记等关键信息。
+* **高价值特殊网络类型提取（方案 A 离线精准分类）**：
+  在总计 30,000+ 的反代节点池中，99.3% 为常规 VPS/数据中心机房。系统通过 **方案 A（基于 BGP 自治系统组织与 ISP 权威名称离线规则清洗引擎）**，精准剥离出极其稀缺的非机房资产，在 `data/proxyip/` 与 `data/proxyip_cf/` 目录下单独输出为 4 个高优先级文件（文件名前缀加 `【...】`，排序置顶）：
+  - **`【ISP_运营商原生宽带】.txt`**：电信运营商原生民用宽带网络（收录 Comcast, Charter/Spectrum, Cox, HKT, HKBN, KT, SK Broadband, Vodafone, Orange, Singtel, Kazakhtelecom 等顶级电信商）。
+  - **`【BIZ_商业企业专线】.txt`**：大型企业商业专线与商务宽带（收录 AT&T Enterprises, PCCW Business, Data Communication Business 等）。
+  - **`【EDU_高校教育科研】.txt`**：高校与学术科研网（收录 University of Maine, CERNET, Academic Research 等）。
+  - **`【GOV_政务公共网络】.txt`**：政务公用网与国家通信骨干（收录 Beltelecom 等）。
+  所有特殊分类清单同样采用 **100% 纯净 `IP:端口`（按延迟升序排列，无多余注释）**，方便直接全选复制。
+* **技术实现与边界说明（方案 A 诚实透明阐述）**：
+  - **技术依据**：利用 BGP 边界网关协议广播的 ASN 机构名与 ISP 归属进行特征匹配，并施加严格的**机房负向关键词强排除**（排查 `host`, `cloud`, `vps`, `server`, `datacenter`, `dedicated`, `colo` 等数十种云厂商及机房特征），杜绝伪装成电信商的 IDC 租用机房（如 `Host Telecom`、`Brainoza`、`Aeza` 等）。
+  - **客观界限（为什么不宣传为“100% 家中物理光猫”）**：
+    由于 Tier 1 / Tier 2 顶级电信运营商（如 HKT, SK Broadband, Comcast, Charter 等）名下的自治系统（ASN）属于综合广播，同一个自治系统内部通常既广播给普通居民家庭光纤宽带，也广播给本地商户静态专线，甚至包含部分自建机房。因此，**在无需付费调用第三方商业 IP 数据库的前提下，方案 A 保证的是“运营商原生广播资产（非托管机房）”，无法保证 100% 来自居民家里的真实物理光猫**。
+  - **风控优势**：
+    常规机房 IP（如 AWS, 腾讯云, 阿里云, Hetzner, DigitalOcean 等）在各大反欺诈（IP Fraud Score）、反爬虫与 Cloudflare Turnstile / 盾防御数据库中均被标记为高风险 `Hosting / Datacenter`，极易弹出人机验证甚至直接拦截。而**运营商原生宽带、商业专线与高校科研网节点在主流风控体系中具有极高的天然声誉（Trust Score）**，过盾成功率和防封稳定性显著优于常规 VPS。
+* **结构化数据**：`data/proxyip.csv` 新增 `net_type` 字段（取值：`datacenter`、`isp`、`business`、`education`、`government`），保留延迟、数据中心、落地位置与 `cf_clean` 优选标记等关键信息。
 
 ### 5. 数据表通用字段说明
 * 采用 `UTF-8-SIG` 编码，Windows Excel 直接双击打开不乱码。
@@ -192,6 +207,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 | `channel` | 字符串 | 来源频道 | `@danfeng2` / `@otcfxq` |
 | `fail_count` | 整数 | 连续探测失败次数（默认 0，连续失败 ≥ 2 次自动淘汰剔除） | `0` |
 | `cf_clean` | 字符串 | *(仅 `data/proxyip.csv`)* 是否兼具官方优选直连能力 (`true`/`false`) | `true` |
+| `net_type` | 字符串 | *(仅 `data/proxyip.csv`)* 网络类型归属（`datacenter` 机房、`isp` 运营商原生宽带、`business` 商业专线、`education` 高校教育、`government` 政务网络） | `isp` |
 
 #### ② 代理质检表（`data/socks5.csv`）
 

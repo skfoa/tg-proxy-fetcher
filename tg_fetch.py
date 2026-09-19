@@ -49,6 +49,7 @@ from providers import (
     TG_CHAT_ID,
     format_categorized_proxyip_txt,
     save_proxyip_by_country,
+    classify_asn,
 )
 from parsers import (
     is_valid_host,
@@ -104,7 +105,7 @@ CF_CSV_FIELDS = [
     "channel",
     "fail_count",
 ]
-PROXYIP_CSV_FIELDS = CF_CSV_FIELDS + ["cf_clean"]
+PROXYIP_CSV_FIELDS = CF_CSV_FIELDS + ["cf_clean", "net_type"]
 
 logging.basicConfig(
     level=logging.INFO,
@@ -538,6 +539,7 @@ def save_and_notify(
             for row in sorted_proxyips:
                 row.setdefault("fail_count", 0)
                 row.setdefault("cf_clean", "")
+                row["net_type"] = classify_asn(row.get("asn", ""), row.get("isp", ""))
                 writer.writerow(row)
         log.info("已保存反代 ProxyIP 表格: %s (%d 条全量累积记录)", OUTPUT_PROXYIP_FILE, len(sorted_proxyips))
 
