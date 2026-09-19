@@ -320,7 +320,6 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 | `--concurrency` | 校验脚本 | `250` ~ `300` | `100` ~ `150` | 质检异步并发协程数，数值越大质检越快 |
 | `--max-fails` | 校验脚本 | `2` | `2` | 连续失败物理淘汰阈值（设为 `1` 即为严格无缓冲模式） |
 | `--timeout` | 校验脚本 | `3.0` | `5.0` | 单节点连接建立与 TLS 握手超时秒数 |
-| `--sample` | `socks_verify.py` | 全量 (`0`) | `0` | 抽样快速冒烟测试节点数量（本地调试推荐 `50`） |
 | `--no-notify` | 校验脚本 | 流水线静默 | 关闭 | 不单独推送各引擎卡片，由流水线终点聚合为四合一卡片 |
 | `DEFER_NOTIFY` | `tg_fetch.py` | `1` | `0` | 延迟 Telegram 推送标记，确保四合一卡片聚合完整 |
 
@@ -426,8 +425,8 @@ python -m py_compile *.py
 pip install ruff
 ruff check . --select F82
 
-# ② 通用代理连通性质检（支持 --sample 抽样快速冒烟）
-python socks_verify.py --concurrency 100 --sample 50 --no-notify
+# ② 通用代理连通性质检
+python socks_verify.py --concurrency 100 --no-notify
 
 # ③ 反代 ProxyIP 穿透与优选直连双料质检
 python proxyip_verify.py --concurrency 150 --no-notify

@@ -565,11 +565,6 @@ async def async_main(args):
         log.warning("未加载到任何待检代理节点，流程结束")
         return
 
-    if args.sample and args.sample > 0:
-        rows = rows[: args.sample]
-        total = len(rows)
-        log.info("已启用 --sample 采样模式，本次仅检测前 %d 条", total)
-
     # 乱序执行，打散同目标并发
     random.shuffle(rows)
 
@@ -637,10 +632,7 @@ async def async_main(args):
     else:
         log.info("[SOCKS5 淘汰] 本次无节点达到连续失败 %d 次的淘汰阈值", args.max_fails)
 
-    if args.sample and args.sample > 0:
-        log.info("[采样模式] 本次为抽样质检 (%d 条)，跳过持久化文件覆写以保护全量库", total)
-    else:
-        save_socks_data(survivors, SOCKS_TXT, SOCKS_CSV)
+    save_socks_data(survivors, SOCKS_TXT, SOCKS_CSV)
 
     elapsed = time.time() - t_start
     log.info("代理连通性质检流程执行完毕，总耗时 %.2f 秒 (✅ 存活: %d | 均延: %dms)", elapsed, pass_count, avg_delay)
@@ -691,7 +683,6 @@ def main():
     parser.add_argument("--strict", action="store_true", help="极致纯净模式 (只要失败 1 次立即剔除，等价于 --max-fails 1)")
     parser.add_argument("--timeout", type=float, default=TIMEOUT, help=f"单节点握手超时秒数 (默认 {TIMEOUT})")
     parser.add_argument("--http-timeout", type=float, default=HTTP_TIMEOUT, help=f"单节点 HTTP 穿透校验超时秒数 (默认 {HTTP_TIMEOUT})")
-    parser.add_argument("--sample", type=int, default=0, help="抽样质检前 N 条节点 (0 表示全量)")
     parser.add_argument("--no-notify", action="store_true", help="静默模式，不单独发送 Telegram 质检通知")
     args = parser.parse_args()
 
