@@ -52,6 +52,7 @@ from providers import (
     classify_asn,
     is_asn_recorded,
     _extract_asn_code,
+    normalize_timestamp,
 )
 from parsers import (
     extract_proxies,
@@ -173,6 +174,7 @@ def load_existing_cf_ips(filepath: str = OUTPUT_CF_FILE) -> dict:
                 port = row.get("port", "").strip()
                 if ip and port:
                     row["fail_count"] = safe_int(row.get("fail_count"), 0)
+                    row["tested_at"] = normalize_timestamp(row.get("tested_at", ""))
                     existing[f"{ip}:{port}"] = row
         log.info("已加载本地已存优选 IP 记录: %d 条（历史记录全部保留）", len(existing))
     except Exception as e:

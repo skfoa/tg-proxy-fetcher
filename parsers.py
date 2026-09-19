@@ -14,7 +14,7 @@ import os
 import re
 from urllib.parse import parse_qs
 
-from providers import KNOWN_CLOUD_PROVIDERS, ASN_TO_PROVIDER
+from providers import KNOWN_CLOUD_PROVIDERS, ASN_TO_PROVIDER, normalize_timestamp
 
 log = logging.getLogger("parsers")
 
@@ -118,7 +118,7 @@ def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
         "cf_location": cf_loc_m.group(1).strip() if cf_loc_m else "",
         "isp": isp_m.group(1).strip() if isp_m else "",
         "asn": asn_m.group(1).strip() if asn_m else "",
-        "tested_at": time_m.group(1).strip() if time_m else "",
+        "tested_at": normalize_timestamp(time_m.group(1).strip() if time_m else ""),
         "channel": source_m.group(1).strip() if source_m else default_channel,
         "fail_count": 0,
     }
@@ -350,7 +350,8 @@ def parse_cf_csv_content(
                 if asn_clean in ASN_TO_PROVIDER:
                     raw_isp = ASN_TO_PROVIDER[asn_clean]
 
-            tested_at = row.get(field_map.get("time", ""), "").strip() or fn_time
+            raw_time = row.get(field_map.get("time", ""), "").strip()
+            tested_at = normalize_timestamp(raw_time, fn_time)
 
             results.append({
                 "ip": raw_ip,

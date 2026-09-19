@@ -42,6 +42,7 @@ from providers import (
     format_categorized_proxyip_txt,
     save_proxyip_by_country,
     classify_asn,
+    normalize_timestamp,
 )
 
 # 确保本地 .env 加载
@@ -214,6 +215,7 @@ def load_proxyip_csv(path: str) -> list:
         reader = csv.DictReader(f)
         for r in reader:
             r["fail_count"] = safe_int(r.get("fail_count"), 0)
+            r["tested_at"] = normalize_timestamp(r.get("tested_at", ""))
             rows.append(r)
     return rows
 

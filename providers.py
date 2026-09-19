@@ -157,6 +157,7 @@ import logging
 import os
 import re
 import urllib.request
+from datetime import datetime, timezone, timedelta
 
 log = logging.getLogger("providers")
 
@@ -204,6 +205,44 @@ def safe_int(value, default: int = 0) -> int:
         return int(s) if s else default
     except (ValueError, TypeError):
         return default
+
+
+def normalize_timestamp(val, default: str = "") -> str:
+    """
+    规范化测试与获取时间戳为标准格式 YYYY-MM-DD HH:MM:SS（北京时间）。
+    自动识别并转换 Unix 秒级/毫秒级时间戳 (如 1785149364.000) 以及各类非标准日期字符串。
+    """
+    if val is None:
+        return default
+    val_str = str(val).strip()
+    if not val_str or val_str in ("-", "null", "none"):
+        return default
+
+    # 1. 尝试解析为数字（Unix 秒级/毫秒级时间戳）
+    try:
+        ts = float(val_str)
+        if ts > 1e11:  # 毫秒级时间戳
+            ts /= 1000.0
+        if 1e8 <= ts <= 2.5e9:  # 合理 Unix 时间戳范围 (1973年 ~ 2049年)
+            dt = datetime.fromtimestamp(ts, timezone(timedelta(hours=8)))
+            return dt.strftime("%Y-%m-%d %H:%M:%S")
+    except (ValueError, TypeError):
+        pass
+
+    # 2. 若已是标准格式 YYYY-MM-DD HH:MM:SS 直接返回
+    if re.match(r"^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}$", val_str):
+        return val_str
+
+    # 3. 兼容解析各类标准日期格式 (如 YYYY/MM/DD, ISO 8601 YYYY-MM-DDTHH:MM:SS 等)
+    m = re.match(r"^(\d{4})[/-](\d{1,2})[/-](\d{1,2})(?:[T\s](\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?", val_str)
+    if m:
+        year, month, day, hour, minute, second = m.groups()
+        hour = hour or "00"
+        minute = minute or "00"
+        second = second or "00"
+        return f"{int(year):04d}-{int(month):02d}-{int(day):02d} {int(hour):02d}:{int(minute):02d}:{int(second):02d}"
+
+    return val_str
 
 
 def clean_asn(raw_asn: str, isp: str = "") -> str:
