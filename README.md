@@ -36,7 +36,7 @@
   - **DanFeng 测速**：CSV 内部无 ASN 列时自动从文件名（如 `AS45102_CNNICALIBABACNNETAP_*.csv`）解析归类。
   - **OTC 优选扫描**：单 ASN 文件以文件名目标 ASN 为准；混合扫描文件（如 `OTC_SCAN_YX_杂.txt`）自动逐行提取具体 ASN 与 ISP 拆分归类。
 - **⚡ 纯净 IP:端口 列表导出**：自动导出纯文本格式的 `IP:端口` 列表（`data/cf_ips.txt`、`data/scan_ips/*.txt`、`data/proxyip.txt`），方便直接复制或作为远程订阅导入。
-- **🧩 模块化解耦与统一映射**：提取独立 `providers.py` 作为云厂商与 ASN 规范化字典的单一真相源（Single Source of Truth），保障校验脚本零依赖独立冷启动。
+- **🧩 模块化解耦与确定性分段锁**：提取独立 `providers.py` 作为云厂商与 ASN 规范化字典的单一真相源（Single Source of Truth）；内置基于 `zlib.crc32` 的 2048 桶位确定性哈希分段锁池（`get_keyed_lock`），保证同 IP 严格互斥防风控、异 IP 高并发并行，且内存严格维持在常数级 $O(1)$（约 300KB），杜绝无界增长。
 - **💡 未收录 ASN 动态发现与自适应预警**：增量抓取遇外部新自治系统时，自动比对内置权威对照库；若发现未收录 ASN，将在 Telegram 卡片中动态高亮提示并展示待确认明细，方便一键入库；若无未知 ASN 则 0 噪音完全隐藏。
 - **📱 动态双状态 Telegram 运行卡片**：首行支持「🟢 发现新增 + 🗑️ 剔除死节点」双状态动态高亮呈现，底栏包含细分引擎淘汰明细 `[代理 X, 反代 Y, 扫描 Z]`，锁屏即知变动。
 - **🛡️ 静态安全门禁与故障秒级告警**：工作流启动 1 秒内通过 `py_compile` 与 `ruff` 拦截未定义变量与语法错误；若流水线任何环节异常中断，自动秒级推送 Telegram 告警卡片并附带日志直链。
@@ -174,14 +174,14 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 * **双能提纯直连（`data/proxyip_cf.txt`）**：由质检引擎并发探测，自动筛选提纯出既能作为反代穿透、又兼具 Cloudflare 官方证书 TLS 握手直连特性的优质节点，是兼具双料特性的极品清单。
 * **高价值特殊网络类型提取（方案 A 离线精准分类）**：
   在总计 30,000+ 的反代节点池中，99.3% 为常规 VPS/数据中心机房。系统通过 **方案 A（基于 BGP 自治系统组织与 ISP 权威名称离线规则清洗引擎）**，精准剥离出极其稀缺的非机房资产，在 `data/proxyip/` 与 `data/proxyip_cf/` 目录下单独输出为 4 个高优先级文件（文件名前缀加 `【...】`，排序置顶）：
-  - **`【ISP_运营商原生宽带】.txt`**：电信运营商原生民用宽带网络（收录 Comcast, Charter/Spectrum, Cox, HKT, HKBN, KT, SK Broadband, Vodafone, Orange, Singtel, Kazakhtelecom 等顶级电信商）。
+  - **`【ISP_运营商原生宽带】.txt`**：电信运营商原生宽带与精品线路网络（收录 中国电信 CN2、中国联通 9929/CUG、中国移动 CMIN2，以及 Comcast, Charter/Spectrum, Cox, HKT, HKBN, KT, SK Broadband, Vodafone, Orange, Singtel, Kazakhtelecom 等顶级电信商与骨干）。
   - **`【BIZ_商业企业专线】.txt`**：大型企业商业专线与商务宽带（收录 AT&T Enterprises, PCCW Business, Data Communication Business 等）。
   - **`【EDU_高校教育科研】.txt`**：高校与学术科研网（收录 University of Maine, CERNET, Academic Research 等）。
   - **`【GOV_政务公共网络】.txt`**：政务公用网与国家通信骨干（收录 Beltelecom 等）。
   所有特殊分类清单同样采用 **100% 纯净 `IP:端口`（按延迟升序排列，无多余注释）**，方便直接全选复制。
 * **技术实现与边界说明（方案 A+ 两级分层分类体系）**：
   - **两级架构执行逻辑**：
-    1. **Tier 1（内置权威精准对照，Fast-path Lookup）**：智能正则提取 AS 编号（支持 `AS4760`、`AS 4760`、`as4760` 以及纯数字 `701`、`4760` 等各种格式），优先与内置核心 ASN 映射字典比对（涵盖 HKT、HKBN、Comcast、Charter、Cox、KT、SK Broadband、Verizon、AT&T、Orange、Vodafone、CERNET 等顶级自治系统，以及 Cloudflare、AWS、Azure、Alibaba 等机房强锁定），命中即确定网络类型，纳秒级高精度定性；
+    1. **Tier 1（内置权威精准对照，Fast-path Lookup）**：智能正则提取 AS 编号（支持 `AS4760`、`AS 4760`、`as4760` 以及纯数字 `701`、`4760` 等各种格式），优先与内置核心 ASN 映射字典比对（涵盖电信 CN2 AS4809、联通 9929 AS9929、联通 CUG AS10099、移动 CMIN2 AS58807 以及 HKT、HKBN、Comcast、Charter、Cox、KT、SK Broadband、Verizon、AT&T、Orange、Vodafone、CERNET 等顶级自治系统，以及 Cloudflare、AWS、Azure、Alibaba 等机房强锁定），命中即确定网络类型，纳秒级高精度定性；
     2. **Tier 2（启发式词根规则智能匹配，Pattern Fallback）**：针对对照表中未收录的冷门/新出现 ASN，或上游仅提供文本名称的数据行，自动进入词根模式识别（优先识别教育与政务网，严密排除 `host`/`cloud`/`vps`/`datacenter`/`dedicated` 等数十种机房关键词，随后识别商业专线与运营商原生宽带）；
     3. **Tier 3（安全降级兜底，Default Fallback）**：两级均未命中的未知节点，稳妥归入 `datacenter` 机房，确保特殊资产清单的绝对高纯度，同时保证不丢失任何一个有效节点。
   - **全库 100% 映射自查基线**：
@@ -355,7 +355,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 ```
 
 * **锁屏即知变动**：首行支持 `(🟢 发现 +N 新增 · 🗑️ 剔除 N 死节点)` 双状态动态高亮组合呈现，变动一目了然。
-* **增量与健康一览**：每类节点直观展示存活数量、缓冲标记与实测均延。
+* **增量与健康一览**：每类节点直观展示存活数量、缓冲标记与实测均延（均延仅计算实测存活节点，排除处于容忍缓冲期失败节点的历史旧延迟污染）。
 * **自适应未知预警**：遇未收录新自治系统时动态展示 `💡 发现未收录 ASN (可补充入库)` 明细（展示前 4 个及待确认总数），全量命中时自动隐藏，0 视觉噪音。
 * **主动鉴真审计**：实时汇报全协议穿透质检、TLS + 301 重定向鉴真与连续失败永久淘汰数量。
 * **细分淘汰明细**：底栏汇报各引擎分类淘汰数量 `[代理 X, 反代 Y, 扫描优选 Z]`，精准掌控全库死节点流失情况。
