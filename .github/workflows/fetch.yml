@@ -56,7 +56,7 @@ jobs:
         run: python tg_fetch.py
 
       - name: 🚀 SOCKS5 / 通用代理连通性质检
-        run: python socks_verify.py --concurrency 300 --max-fails 2 --no-notify
+        run: python socks_verify.py --concurrency 300 --max-fails 3 --no-notify
 
       - name: 🔍 ProxyIP 穿透存活质检
         run: python proxyip_verify.py --concurrency 300 --max-fails 2 --no-notify

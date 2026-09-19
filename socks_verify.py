@@ -9,7 +9,7 @@ SOCKS5 / 通用代理连通性质检与淘汰引擎 (socks_verify.py)
 
 淘汰与状态聚合机制：
   - 极致纯净模式 (--strict 或 --max-fails 1): 仅保留 100% 测试通过的存活节点，一次失败即彻底剔除
-  - 缓冲容错模式 (--max-fails 2，默认): 允许节点偶发失败 1 次作为缓冲，连续失败达到阈值时物理淘汰
+  - 缓冲容错模式 (--max-fails 3，默认): 允许节点偶发失败 1~2 次作为缓冲，连续失败达到阈值时物理淘汰
   - 存活节点: fail_count 立即重置为 0，回填实时 delay_ms 与 colo 机房码
   - 排序落盘: 存活优先 (fail_count 升序)，低延迟优先 (delay_ms 升序)
   - 结果聚合: 支持将质检结果回写至 .fetch_stats.json，由流水线终点 cf_verify 聚合发送四维合一总览卡片
@@ -63,7 +63,7 @@ PROBE_PORT = 80
 TIMEOUT = 3.0
 HTTP_TIMEOUT = 2.5
 CONCURRENCY = 300
-MAX_FAILS = 2
+MAX_FAILS = 3
 
 CSV_FIELDS = [
     "url",

@@ -137,7 +137,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 ### 1. `data/socks5.txt` / `data/socks5.csv`（通用代理节点清单与质检表）
 * **智能增量合并**：每次抓取优先比对历史库，新发布的节点自动追加并去重，以 `host:port` 为唯一标识刷新认证与配置。
 * **主动质检淘汰（`socks_verify.py`）**：集成 RFC 1928（SOCKS5 协商/认证/CONNECT 隧道穿透）、RFC 5389（STUN/TURN Binding 鉴真）、HTTP CONNECT 穿透全套真实网络协议握手引擎。
-* **连续失败缓冲保护（`--max-fails 2`）**：首次探测失败标记缓冲（`fail_count=1`），连续 2 次全网不可达方才彻底剔除，避免公网抖动误杀。
+* **连续失败缓冲保护（`--max-fails 3`）**：首次探测失败标记缓冲（`fail_count=1`），连续 3 次全网不可达方才彻底剔除，避免公网抖动误杀。
 * **双模持久化**：
   - `data/socks5.txt`：纯文本每行一个可用节点 URL，开箱即用。
   - `data/socks5.csv`：结构化表格，包含协议类型、测速延迟（ms）、连续失败次数、Cloudflare Colo 数据中心与质检时间戳。
@@ -252,7 +252,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 | `host` | 字符串 | 节点域名或 IP 地址 | `1.2.3.4` |
 | `port` | 整数 | 服务端口 | `1080` |
 | `delay_ms` | 整数 | RFC 1928 握手与穿透测速延迟（毫秒纯数值） | `320` |
-| `fail_count` | 整数 | 连续探测失败次数（连续失败 ≥ 2 次自动淘汰剔除） | `0` |
+| `fail_count` | 整数 | 连续探测失败次数（连续失败 ≥ 3 次自动淘汰剔除） | `0` |
 | `status` | 字符串 | 探测状态（`alive` 存活 或 `fail` 失败） | `alive` |
 | `colo` | 字符串 | 通过该代理中继访问返回的 Cloudflare 机房代号 | `NRT` |
 | `tested_at` | 时间字符串 | 质检探测完成时间 | `2026-09-19 18:35:00` |
@@ -267,7 +267,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
   * **SOCKS5**：RFC 1928 握手协商（无密 `0x00` / 账密 `0x02` RFC 1929）➔ 发送 CONNECT 指令 ➔ 穿透请求 `/cdn-cgi/trace` 检验 200 与机房。
   * **HTTP / HTTPS**：CONNECT 隧道穿透 + 正向代理回退双路径校验。
   * **TURN / STUN**：构造 RFC 5389 STUN Binding Request 二进制包，严格校验 Magic Cookie (`0x2112A442`) 与 Transaction ID。
-* **淘汰机制**：连续失败达到阈值（默认 2 次）彻底从 `data/socks5.txt` 与 `data/socks5.csv` 永久删除。
+* **淘汰机制**：连续失败达到阈值（默认 3 次）彻底从 `data/socks5.txt` 与 `data/socks5.csv` 永久删除。
 
 #### ② 反代 ProxyIP 穿透质检引擎（`proxyip_verify.py`）
 * **穿透与优选双能探测**：
