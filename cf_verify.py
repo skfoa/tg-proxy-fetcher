@@ -20,6 +20,7 @@ import csv
 import json
 import logging
 import os
+import random
 import re
 import ssl
 import sys
@@ -143,11 +144,19 @@ async def verify_all(
     无论端口与元数据如何，全部执行 TLS 握手与 301 重定向鉴真。
     原地更新 fail_count 与 delay_ms。
     """
+    if not rows:
+        return rows
+
     sem = asyncio.Semaphore(concurrency)
+    ip_locks = defaultdict(asyncio.Lock)
     pass_count = 0
     fail_count_total = 0
     completed = 0
     total = len(rows)
+
+    # 创建乱序执行队列，打散任务调度
+    indices = list(range(total))
+    random.shuffle(indices)
 
     async def _check(row: dict):
         nonlocal pass_count, fail_count_total, completed
@@ -165,8 +174,9 @@ async def verify_all(
             fail_count_total += 1
             return
 
-        async with sem:
-            alive, latency = await probe_ip(ip, port, connect_timeout=timeout, http_timeout=http_timeout)
+        async with ip_locks[ip]:
+            async with sem:
+                alive, latency = await probe_ip(ip, port, connect_timeout=timeout, http_timeout=http_timeout)
 
         completed += 1
         fc = int(row.get("fail_count") or 0)
@@ -182,7 +192,7 @@ async def verify_all(
             log.info("[%s] 进度: %d/%d (%.1f%%) - 通过: %d, 失败: %d",
                      tag, completed, total, completed / total * 100, pass_count, fail_count_total)
 
-    tasks = [_check(r) for r in rows]
+    tasks = [_check(rows[i]) for i in indices]
     await asyncio.gather(*tasks)
 
     log.info(

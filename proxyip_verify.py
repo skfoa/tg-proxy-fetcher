@@ -31,6 +31,7 @@ import re
 import ssl
 import sys
 import time
+from collections import defaultdict
 from datetime import datetime, timezone, timedelta
 
 from providers import (
@@ -296,6 +297,7 @@ async def verify_proxyips(
         return rows, 0
 
     sem = asyncio.Semaphore(concurrency)
+    ip_locks = defaultdict(asyncio.Lock)
     pass_count = 0
     fail_count_total = 0
     cf_clean_count = 0
@@ -324,15 +326,16 @@ async def verify_proxyips(
             fail_count_total += 1
             return
 
-        async with sem:
-            alive, latency, colo = await probe_proxyip(
-                ip, port, connect_timeout=timeout, http_timeout=http_timeout
-            )
-            is_cf = False
-            if alive:
-                is_cf = await probe_cf_clean(
-                    ip, port, connect_timeout=min(timeout, 1.8), http_timeout=min(http_timeout, 1.8)
+        async with ip_locks[ip]:
+            async with sem:
+                alive, latency, colo = await probe_proxyip(
+                    ip, port, connect_timeout=timeout, http_timeout=http_timeout
                 )
+                is_cf = False
+                if alive:
+                    is_cf = await probe_cf_clean(
+                        ip, port, connect_timeout=min(timeout, 1.8), http_timeout=min(http_timeout, 1.8)
+                    )
 
         completed += 1
         fc = _get_fc(row)
