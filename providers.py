@@ -649,6 +649,10 @@ ASN_EXACT_NET_TYPE = {
     "AS4837": "isp",     # China Unicom Backbone
     "AS9808": "isp",     # China Mobile Guangdong
     "AS58453": "isp",    # China Mobile International
+    "AS4809": "isp",     # China Telecom CN2
+    "AS9929": "isp",     # China Unicom 9929
+    "AS10099": "isp",    # China Unicom CUG
+    "AS58807": "isp",    # China Mobile CMIN2
 
     # ----------------------------------------------------
     # 2. 商业固定专线与商务宽带 (business)
