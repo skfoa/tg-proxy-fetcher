@@ -50,6 +50,8 @@ jobs:
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
           FETCH_DAYS: ${{ inputs.fetch_days || vars.FETCH_DAYS || '3' }}
           PROXY: ${{ vars.PROXY }}
+          PROXY_CHANNELS: ${{ vars.PROXY_CHANNELS }}
+          CF_IP_CHANNELS: ${{ vars.CF_IP_CHANNELS }}
           DEFER_NOTIFY: "1"
         run: python tg_fetch.py
 

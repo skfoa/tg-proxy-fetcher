@@ -310,6 +310,8 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 | :--- | :--- | :---: | :---: | :--- |
 | `FETCH_DAYS` | 单次增量回溯天数（扫描时间窗口） | `3` | 可选 | 增量模式下只读取最近 N 天频道消息，加快运行速度 |
 | `PROXY` | 抓取代理设置 | 留空 | 可选 | GitHub Actions 云端默认直连 Telegram 无需配置；自建私有 Runner 或特殊网络时可按需配置 |
+| `PROXY_CHANNELS` | 代理抓取目标频道（逗号/空格分隔） | `@otcfxq` | 可选 | 自定义抓取通用代理的 Telegram 公开频道列表 |
+| `CF_IP_CHANNELS` | 优选 IP 抓取目标频道（逗号/空格分隔） | `@otcfxq, @danfeng2` | 可选 | 自定义抓取 Cloudflare 优选 IP 与测速附件的大池频道列表 |
 
 ### 3. 高级调优参数与本地调试对照（可选）
 

@@ -72,8 +72,26 @@ TG_SESSION_STR = os.getenv("TG_SESSION_STR") or ""
 FETCH_DAYS = int(os.getenv("FETCH_DAYS") or "3")
 PROXY = os.getenv("PROXY") or os.getenv("ALL_PROXY") or os.getenv("HTTPS_PROXY") or ""
 
-PROXY_CHANNELS = ["@otcfxq"]
-CF_IP_CHANNELS = ["@otcfxq", "@danfeng2"]
+def _parse_channels(env_name: str, default: list[str]) -> list[str]:
+    raw_val = (os.getenv(env_name) or "").strip()
+    if not raw_val and env_name in ("PROXY_CHANNELS", "CF_IP_CHANNELS"):
+        raw_val = (os.getenv("CHANNELS") or "").strip()
+    if not raw_val:
+        return default
+    channels = []
+    for item in re.split(r"[,;\s]+", raw_val):
+        item = item.strip()
+        if not item:
+            continue
+        if not item.startswith("@") and not item.startswith("https://") and not item.startswith("t.me/"):
+            item = f"@{item}"
+        if item not in channels:
+            channels.append(item)
+    return channels if channels else default
+
+
+PROXY_CHANNELS = _parse_channels("PROXY_CHANNELS", ["@otcfxq"])
+CF_IP_CHANNELS = _parse_channels("CF_IP_CHANNELS", ["@otcfxq", "@danfeng2"])
 
 DATA_DIR = "data"
 OUTPUT_PROXY_FILE = os.path.join(DATA_DIR, "socks5.txt")
