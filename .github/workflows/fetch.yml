@@ -49,6 +49,7 @@ jobs:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
           FETCH_DAYS: ${{ inputs.fetch_days || vars.FETCH_DAYS || '3' }}
+          PROXY: ${{ vars.PROXY }}
           DEFER_NOTIFY: "1"
         run: python tg_fetch.py
 

@@ -194,9 +194,11 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 
 ### 5. 数据表通用字段说明
 * 采用 `UTF-8-SIG` 编码，Windows Excel 直接双击打开不乱码。
-* 数值字段（`delay_ms`, `speed_kbs`）均为纯数字，并在保存时按 **`tested_at`（测速时间）倒序排序**：
+* 数值字段（`delay_ms`, `speed_kbs`）均为纯数字，并在保存时按 **`tested_at`（测速/探测时间）倒序排序**。
+* 全项目共有 4 个核心 CSV 数据表，按用途与结构分为以下 3 大规范体系：
 
-#### ① 优选 IP 表（`data/cf_ips.csv`、`data/scan_ips.csv`）及 反代表（`data/proxyip.csv`）
+#### ① 优选 IP 测速数据表（`data/cf_ips.csv`、`data/scan_ips.csv`）
+*共 12 个字段，记录 Cloudflare 优选 IP 的真实测速指标与机房归属：*
 
 | 字段 | 类型 | 说明 | 示例 |
 | :--- | :--- | :--- | :--- |
@@ -207,27 +209,53 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 | `speed_kbs` | 整数 | 下载速度（kB/s 纯数值，便于排序） | `89086` |
 | `colo` | 字符串 | Cloudflare 数据中心三字代码 | `HKG`、`NRT`、`LAX` |
 | `cf_location` | 字符串 | Cloudflare 落地地理位置 | `亚太 · 香港` |
-| `isp` | 字符串 | 网络运营商 | `Prime Security Corp.` |
+| `isp` | 字符串 | 网络运营商 / 托管商名称 | `Prime Security Corp.` |
 | `asn` | 字符串 | ASN 编号与组织 | `AS400618 Prime Security Corp.` |
-| `tested_at` | 时间字符串 | 测试/发布时间 | `2026-09-13 18:00:33` |
+| `tested_at` | 时间字符串 | 测速与发布时间 | `2026-09-13 18:00:33` |
 | `channel` | 字符串 | 来源频道 | `@danfeng2` / `@otcfxq` |
 | `fail_count` | 整数 | 连续探测失败次数（默认 0，连续失败 ≥ 2 次自动淘汰剔除） | `0` |
-| `cf_clean` | 字符串 | *(仅 `data/proxyip.csv`)* 是否兼具官方优选直连能力 (`true`/`false`) | `true` |
-| `net_type` | 字符串 | *(仅 `data/proxyip.csv`)* 网络类型归属（`datacenter` 机房、`isp` 运营商原生宽带、`business` 商业专线、`education` 高校教育、`government` 政务网络） | `isp` |
 
-#### ② 代理质检表（`data/socks5.csv`）
+#### ② 反代 ProxyIP 穿透与网络属性数据表（`data/proxyip.csv`）
+*共 14 个字段，除基础网络字段外，独占 `cf_clean`（优选直连提纯）与 `net_type`（两级分层网络识别）两大核心资产属性：*
+
+| 字段 | 类型 | 说明 | 示例 |
+| :--- | :--- | :--- | :--- |
+| `ip` | 字符串 | 反代 IP 地址 | `104.16.132.229` |
+| `port` | 整数 | 反代端口 | `443` |
+| `tls` | 字符串 | 是否开启 TLS (`true`/`false`) | `true` |
+| `delay_ms` | 整数 | /cdn-cgi/trace 穿透响应延迟（毫秒） | `145` |
+| `speed_kbs` | 整数 | 下载速度（kB/s 纯数值，保留字段） | `0` |
+| `colo` | 字符串 | 穿透返回的 Cloudflare 实际处理机房三字码 | `HKG` |
+| `cf_location` | 字符串 | 落地地理位置 | `中国 · 香港特别行政区` |
+| `isp` | 字符串 | 自治系统组织 / 运营商名称 | `HKBN Hong Kong Broadband` |
+| `asn` | 字符串 | 规范化 ASN 编号与组织 | `AS9269 Hong Kong Broadband` |
+| `tested_at` | 时间字符串 | 穿透质检测试时间 | `2026-09-19 18:00:00` |
+| `channel` | 字符串 | 来源频道或附件源 | `@danfeng2` |
+| `fail_count` | 整数 | 连续探测失败次数（连续失败 ≥ 2 次永久物理删除） | `0` |
+| `cf_clean` | 字符串 | **【核心属性】** 是否兼具 Cloudflare 官方证书直连优选能力 (`true`/`false`) | `true` |
+| `net_type` | 字符串 | **【核心属性】** 网络类型归属（详见下方 5 类取值说明） | `isp` |
+
+> 📌 **`net_type` 网络分类取值与对应导出品**：
+> - `isp`：运营商原生民用宽带 ➔ 对应导出 `data/proxyip/【ISP_运营商原生宽带】.txt`
+> - `business`：商业专线与企业宽带 ➔ 对应导出 `data/proxyip/【BIZ_商业企业专线】.txt`
+> - `education`：高校教育科研网 ➔ 对应导出 `data/proxyip/【EDU_高校教育科研】.txt`
+> - `government`：政务公用网与国家骨干 ➔ 对应导出 `data/proxyip/【GOV_政务公共网络】.txt`
+> - `datacenter`：常规数据中心/托管机房 ➔ 归入各国家/地区常规列表
+
+#### ③ 通用代理质检数据表（`data/socks5.csv`）
+*共 9 个字段，记录 SOCKS5/HTTP/HTTPS/TURN 等通用代理应用层穿透结果：*
 
 | 字段 | 类型 | 说明 | 示例 |
 | :--- | :--- | :--- | :--- |
 | `url` | 字符串 | 包含协议、账号密码、主机的完整代理 URL | `socks5://user:pass@1.2.3.4:1080` |
-| `proto` | 字符串 | 协议类型（`socks5`、`http`、`turn` 等） | `socks5` |
+| `proto` | 字符串 | 协议类型（`socks5`、`http`、`https`、`turn`） | `socks5` |
 | `host` | 字符串 | 节点域名或 IP 地址 | `1.2.3.4` |
 | `port` | 整数 | 服务端口 | `1080` |
-| `delay_ms` | 整数 | 穿透测速延迟（毫秒纯数值） | `320` |
+| `delay_ms` | 整数 | RFC 1928 握手与穿透测速延迟（毫秒纯数值） | `320` |
 | `fail_count` | 整数 | 连续探测失败次数（连续失败 ≥ 2 次自动淘汰剔除） | `0` |
-| `status` | 字符串 | 探测状态（`alive` 或 `fail`） | `alive` |
-| `colo` | 字符串 | 通过该代理访问返回的 Cloudflare 数据中心三字代码 | `NRT` |
-| `tested_at` | 时间字符串 | 质检探测完成时间 | `2026-09-17 18:35:00` |
+| `status` | 字符串 | 探测状态（`alive` 存活 或 `fail` 失败） | `alive` |
+| `colo` | 字符串 | 通过该代理中继访问返回的 Cloudflare 机房代号 | `NRT` |
+| `tested_at` | 时间字符串 | 质检探测完成时间 | `2026-09-19 18:35:00` |
 
 ---
 
@@ -259,26 +287,42 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 
 在 GitHub 仓库 **Settings -> Secrets and variables -> Actions** 中进行配置：
 
-### 1. Repository Secrets（密钥配置）
+### 1. Repository Secrets（机密密钥 · 位于 Secrets 标签页）
 
-> 💡 **启用官方 API 模式必须同时配置前三项**（`TG_API_ID`、`TG_API_HASH`、`TG_SESSION_STR`），任一缺失将自动降级为免登录 Web 模式。
+> 💡 **项目只需这 5 项敏感凭据，绝无遗漏**：
+> - 启用**全功能官方 API 模式**只需配置前 3 项；
+> - 启用 **Telegram 消息推送**只需配置后 2 项；
+> - `GITHUB_TOKEN` 为 GitHub Actions 官方内置，无需手动添加。
 
-| 变量名 | 用途 | 适用模式 | 说明 |
-| :--- | :--- | :---: | :--- |
-| `TG_API_ID` | Telegram API ID（纯数字） | 官方 API 模式 | 从 [my.telegram.org](https://my.telegram.org) 获取 |
-| `TG_API_HASH` | Telegram API Hash（32位字符） | 官方 API 模式 | 从 [my.telegram.org](https://my.telegram.org) 获取 |
-| `TG_SESSION_STR` | Telethon 会话认证字符串 | 官方 API 模式 | 本地运行 `python gen_session.py` 登录生成 |
-| `TG_BOT_TOKEN` | Telegram 通知机器人 Token | 可选（通知推送） | 从 [@BotFather](https://t.me/BotFather) 获取 |
-| `TG_CHAT_ID` | 通知接收人 / 频道 / 群组 ID | 可选（通知推送） | 机器人的目标推送聊天 ID |
+| 变量名 | 用途 | 适用模式 | 必要性 | 说明 |
+| :--- | :--- | :---: | :---: | :--- |
+| `TG_API_ID` | Telegram API ID（纯数字） | 官方 API 模式 | API 必填 | 从 [my.telegram.org](https://my.telegram.org) 获取 |
+| `TG_API_HASH` | Telegram API Hash（32位字符） | 官方 API 模式 | API 必填 | 从 [my.telegram.org](https://my.telegram.org) 获取 |
+| `TG_SESSION_STR` | Telethon 会话认证字符串 | 官方 API 模式 | API 必填 | 本地运行 `python gen_session.py` 登录生成 |
+| `TG_BOT_TOKEN` | Telegram 通知机器人 Token | 推送卡片 | 可选 | 从 [@BotFather](https://t.me/BotFather) 获取 |
+| `TG_CHAT_ID` | 通知接收人 / 频道 / 群组 ID | 推送卡片 | 可选 | 机器人的目标推送聊天 ID |
 
-### 2. Repository Variables（常规变量配置）
+### 2. Repository Variables（常规运行变量 · 位于 Variables 标签页 · 全可选）
 
-可在 **Settings -> Secrets and variables -> Actions -> Variables** 中配置：
+> 💡 **Variables 默认全部留空也能 100% 正常运行！** 系统已内置经过实测的最佳默认值，仅在有特殊调优需求时选填：
 
-| 变量名 | 用途 | 默认值 | 说明 |
-| :--- | :--- | :---: | :--- |
-| `FETCH_DAYS` | 单次增量回溯天数（扫描时间窗口） | `3` | 增量模式下只读取最近 N 天频道消息，加快运行速度 |
-| `PROXY` | 抓取代理设置 | 留空 | 可选。GitHub Actions 默认直连 Telegram 无需配置；自建私有 Runner 或特殊网络时可按需配置 |
+| 变量名 | 用途 | 默认值 | 必要性 | 说明 |
+| :--- | :--- | :---: | :---: | :--- |
+| `FETCH_DAYS` | 单次增量回溯天数（扫描时间窗口） | `3` | 可选 | 增量模式下只读取最近 N 天频道消息，加快运行速度 |
+| `PROXY` | 抓取代理设置 | 留空 | 可选 | GitHub Actions 云端默认直连 Telegram 无需配置；自建私有 Runner 或特殊网络时可按需配置 |
+
+### 3. 高级调优参数与本地调试对照（可选）
+
+各引擎脚本还支持以下高级命令行参数，可在本地开发或工作流调整时使用（GitHub Actions 默认已自动配置最优参数）：
+
+| 参数名 / 选项 | 对应脚本 | CI 预设值 | 默认值 | 说明 |
+| :--- | :--- | :---: | :---: | :--- |
+| `--concurrency` | 校验脚本 | `250` ~ `300` | `100` ~ `150` | 质检异步并发协程数，数值越大质检越快 |
+| `--max-fails` | 校验脚本 | `2` | `2` | 连续失败物理淘汰阈值（设为 `1` 即为严格无缓冲模式） |
+| `--timeout` | 校验脚本 | `3.0` | `5.0` | 单节点连接建立与 TLS 握手超时秒数 |
+| `--sample` | `socks_verify.py` | 全量 (`0`) | `0` | 抽样快速冒烟测试节点数量（本地调试推荐 `50`） |
+| `--no-notify` | 校验脚本 | 流水线静默 | 关闭 | 不单独推送各引擎卡片，由流水线终点聚合为四合一卡片 |
+| `DEFER_NOTIFY` | `tg_fetch.py` | `1` | `0` | 延迟 Telegram 推送标记，确保四合一卡片聚合完整 |
 
 ---
 
