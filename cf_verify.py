@@ -527,16 +527,24 @@ def send_verify_notification(
             f"{footer_line}"
         )
 
+    sent = False
     try:
-        send_tg_message(message, token=token, chat_id=chat_id, tag="cf-verify")
+        sent = send_tg_message(message, token=token, chat_id=chat_id, tag="cf-verify")
     except Exception as e:
         log.warning("发送 Telegram 消息时出现异常: %s", e)
-    finally:
+        sent = False
+
+    if sent:
         if os.path.isfile(fetch_stats_file):
             try:
                 os.remove(fetch_stats_file)
-            except OSError:
-                pass
+                log.info("Telegram 统计卡片已成功发送，已清理暂存抓取统计: %s", fetch_stats_file)
+            except OSError as e:
+                log.warning("清理暂存抓取统计 %s 失败: %s", fetch_stats_file, e)
+    else:
+        log.warning("Telegram 统计卡片发送未成功，保留暂存统计文件 %s 供后续重试或排查", fetch_stats_file)
+
+    return sent
 
 
 # ---------- 主流程 ----------
