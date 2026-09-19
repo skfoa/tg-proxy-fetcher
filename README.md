@@ -97,9 +97,11 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 | **`data/scan_ips.txt`** | 扫描测速总清单（按 ASN 分组） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/scan_ips.txt` |
 | **`data/scan_ips/*.txt`** | 独立 ASN + 厂商纯文本列表（单文件） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/scan_ips/AS{ASN}_{ISP}.txt` |
 | **`data/scan_ips.csv`** | 扫描测速优选 IP（数据表） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/scan_ips.csv` |
-| **`data/proxyip.txt`** | 反代 ProxyIP 清单（按国家/地区与数量分类，纯文本） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip.txt` |
+| **`data/proxyip.txt`** | 反代 ProxyIP 总清单（按国家/地区分类，纯文本） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip.txt` |
+| **`data/proxyip/*.txt`** | 独立国家/地区纯净反代列表（如 `美国.txt`、`日本.txt`） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip/{地区}.txt` |
 | **`data/proxyip.csv`** | 反代 ProxyIP 详细数据表 | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip.csv` |
-| **`data/proxyip_cf.txt`** | 兼具优选直连特性的提纯反代清单（按国家/地区分类） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip_cf.txt` |
+| **`data/proxyip_cf.txt`** | 兼具优选直连特性的提纯反代总清单（按国家分类） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip_cf.txt` |
+| **`data/proxyip_cf/*.txt`** | 兼具优选直连特性的独立国家/地区纯净反代列表 | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip_cf/{地区}.txt` |
 
 ---
 
@@ -160,9 +162,12 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
   2. **独立机房厂商文本（`data/scan_ips/ASxxx_厂商.txt`）**：在 `data/scan_ips/` 目录下按 ASN 及厂商名拆分生成独立文件（如 `data/scan_ips/AS906_DMIT.txt`、`data/scan_ips/AS210644_Aeza.txt`、`data/scan_ips/AS212336_ByteVirt.txt`），内容为 100% 纯净的 `IP:端口`，无任何注释，方便单独导入或按机房远程订阅。
   3. **结构化总表（`data/scan_ips.csv`）**：按 ASN 字母序聚合排序，方便通过 Excel 集中筛选分析。
 
-### 4. `data/proxyip.txt` / `data/proxyip.csv` / `data/proxyip_cf.txt`（反代 ProxyIP 专属池）
+### 4. `data/proxyip/` 与 `data/proxyip_cf/`（反代 ProxyIP 专属池及分国别文件）
 * **独立反代池**：专门收录来自频道发布的反代文件（如 `Global-proxyip-443.csv`、`Global-proxyip-8443.csv` 等）。
 * **智能国家/地区分类与数量统计**：`data/proxyip.txt` 与 `data/proxyip_cf.txt` 自动根据机房数据中心代码（Colo）与落地信息归类聚合，按节点规模降序排列，以 `# 🇺🇸 美国 - 6686 个` 等清晰注释头分组，组内按延迟升序严选排列，既保证纯净即用（兼容主流 Worker/脚本），又极大方便按目标国家筛选取用。
+* **分国家/地区独立单文件（点击即复制）**：
+  - `data/proxyip/*.txt`：在 `data/proxyip/` 目录下按国家/地区拆分为独立文件（如 `data/proxyip/美国.txt`、`data/proxyip/日本.txt`、`data/proxyip/香港.txt` 等 76 个地区），内容 100% 为纯净的 `IP:端口`，无任何注释行，直接全选（Ctrl+A ➔ Ctrl+C）即可复制或作为分地区远程订阅。
+  - `data/proxyip_cf/*.txt`：针对兼具官方证书直连能力的双料提纯节点，同样提供分国家独立纯净文本列表（如 `data/proxyip_cf/美国.txt`、`data/proxyip_cf/日本.txt`）。
 * **双能提纯直连（`data/proxyip_cf.txt`）**：由质检引擎并发探测，自动筛选提纯出既能作为反代穿透、又兼具 Cloudflare 官方证书 TLS 握手直连特性的优质节点，是兼具双料特性的极品清单。
 * **结构化数据**：`data/proxyip.csv` 保留延迟、数据中心、落地位置与 `cf_clean` 优选标记等关键信息。
 

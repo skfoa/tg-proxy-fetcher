@@ -38,6 +38,7 @@ from providers import (
     TG_BOT_TOKEN,
     TG_CHAT_ID,
     format_categorized_proxyip_txt,
+    save_proxyip_by_country,
 )
 
 # 确保本地 .env 加载
@@ -62,7 +63,9 @@ if sys.platform == "win32":
 DATA_DIR = "data"
 PROXYIP_CSV = os.path.join(DATA_DIR, "proxyip.csv")
 PROXYIP_TXT = os.path.join(DATA_DIR, "proxyip.txt")
+PROXYIP_DIR = os.path.join(DATA_DIR, "proxyip")
 PROXYIP_CF_TXT = os.path.join(DATA_DIR, "proxyip_cf.txt")
+PROXYIP_CF_DIR = os.path.join(DATA_DIR, "proxyip_cf")
 
 PROBE_HOST = "speed.cloudflare.com"
 PROBE_PATH = "/cdn-cgi/trace"
@@ -220,10 +223,13 @@ def save_proxyip(
     rows: list,
     csv_path: str = PROXYIP_CSV,
     txt_path: str = PROXYIP_TXT,
+    dir_path: str = PROXYIP_DIR,
     cf_txt_path: str = PROXYIP_CF_TXT,
+    cf_dir_path: str = PROXYIP_CF_DIR,
 ):
     """
     覆写保存 proxyip.csv 与 proxyip.txt，并提纯导出兼具优选直连能力的 proxyip_cf.txt。
+    同时将全量反代与双料优选按国家/地区分别拆分至 data/proxyip/ 与 data/proxyip_cf/ 独立目录。
     自动按质量排序：存活节点优先（fail_count 升序），低延迟优先（delay_ms 升序）。
     """
     # 稳定双重排序：先按 tested_at 降序（最新优先），再按 (fail_count, delay_ms) 升序
@@ -247,6 +253,9 @@ def save_proxyip(
         f.write(format_categorized_proxyip_txt(rows))
     log.info("已按国家地区分类保存 %s: %d 条记录", txt_path, len(rows))
 
+    split_cnt = save_proxyip_by_country(rows, dir_path)
+    log.info("已在 %s/ 目录下生成 %d 个独立国家/地区纯文本文件", dir_path, split_cnt)
+
     # 提纯双料优选反代节点 (cf_clean=true 且 fail_count=0)
     cf_clean_rows = [
         r for r in rows
@@ -255,6 +264,9 @@ def save_proxyip(
     with open(cf_txt_path, "w", encoding="utf-8") as f:
         f.write(format_categorized_proxyip_txt(cf_clean_rows))
     log.info("已按国家地区分类提纯保存双料优选反代清单 %s: %d 条记录", cf_txt_path, len(cf_clean_rows))
+
+    cf_split_cnt = save_proxyip_by_country(cf_clean_rows, cf_dir_path)
+    log.info("已在 %s/ 目录下生成 %d 个独立国家/地区双料优选纯文本文件", cf_dir_path, cf_split_cnt)
 
 
 # ---------- 批量质检调度器 ----------

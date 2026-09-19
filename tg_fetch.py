@@ -48,6 +48,7 @@ from providers import (
     TG_BOT_TOKEN,
     TG_CHAT_ID,
     format_categorized_proxyip_txt,
+    save_proxyip_by_country,
 )
 from parsers import (
     is_valid_host,
@@ -83,6 +84,7 @@ OUTPUT_SCAN_DIR = os.path.join(DATA_DIR, "scan_ips")
 # 反代 ProxyIP 专属保存文件（独立反代池，供 edgetunnel / Workers 等使用）
 OUTPUT_PROXYIP_FILE = os.path.join(DATA_DIR, "proxyip.csv")
 OUTPUT_PROXYIP_TXT = os.path.join(DATA_DIR, "proxyip.txt")
+OUTPUT_PROXYIP_DIR = os.path.join(DATA_DIR, "proxyip")
 FETCH_STATS_FILE = os.path.join(DATA_DIR, ".fetch_stats.json")
 # ============================================
 
@@ -542,6 +544,9 @@ def save_and_notify(
         with open(OUTPUT_PROXYIP_TXT, "w", encoding="utf-8") as f:
             f.write(format_categorized_proxyip_txt(sorted_proxyips))
         log.info("已保存反代 ProxyIP 纯文本: %s (%d 行/条记录，已按国家地区分类)", OUTPUT_PROXYIP_TXT, len(sorted_proxyips))
+
+        proxyip_split_cnt = save_proxyip_by_country(sorted_proxyips, OUTPUT_PROXYIP_DIR)
+        log.info("已在 %s/ 目录下生成 %d 个独立国家/地区纯文本文件", OUTPUT_PROXYIP_DIR, proxyip_split_cnt)
 
         proxyip_total = len(sorted_proxyips)
 

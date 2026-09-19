@@ -445,6 +445,43 @@ def format_categorized_proxyip_txt(rows: list) -> str:
     return "\n".join(lines).rstrip() + "\n" if lines else ""
 
 
+def save_proxyip_by_country(rows: list, output_dir: str) -> int:
+    """
+    将 ProxyIP 列表按国家/地区拆分输出为独立的纯文本文件（如 美国.txt、日本.txt）。
+    每个文件内容仅包含纯净的 IP:端口（保留传入时的原始质量排序，无任何注释头），
+    方便用户直接在编辑器中全选复制（Ctrl+A / Ctrl+C）或按国家独立订阅。
+    自动清理目录中已不存在的旧地区文件，返回生成的独立文件数量。
+    """
+    os.makedirs(output_dir, exist_ok=True)
+    groups: dict[str, list] = {}
+    for r in rows:
+        country = extract_country(r.get("cf_location"), r.get("colo"))
+        groups.setdefault(country, []).append(r)
+
+    active_files = set()
+    for country, members in groups.items():
+        safe_country = re.sub(r'[\\/:*?"<>|]', "_", country).strip() or "其他地区"
+        fname = f"{safe_country}.txt"
+        filepath = os.path.join(output_dir, fname)
+        with open(filepath, "w", encoding="utf-8") as f:
+            for r in members:
+                ip = (r.get("ip") or "").strip()
+                port = r.get("port", "")
+                if ip and port:
+                    f.write(f"{ip}:{port}\n")
+        active_files.add(fname)
+
+    # 清理已不存在或旧命名格式的 .txt 文件（保留 .gitkeep 等非 txt 标记文件）
+    for old_f in os.listdir(output_dir):
+        if old_f.endswith(".txt") and old_f not in active_files:
+            try:
+                os.remove(os.path.join(output_dir, old_f))
+            except OSError:
+                pass
+
+    return len(active_files)
+
+
 if __name__ == "__main__":
     print(f"Known cloud provider aliases: {len(KNOWN_CLOUD_PROVIDERS)}")
     print(f"Unique mapped ASNs: {len(ASN_TO_PROVIDER)}")
