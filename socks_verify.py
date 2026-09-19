@@ -622,12 +622,17 @@ async def async_main(args):
     tasks = [_worker(r) for r in rows]
     results = await asyncio.gather(*tasks)
 
-    # 幸存者筛选
+    # 幸存者筛选（包含本次探测存活节点 + 处于连续失败容忍缓冲期内的节点）
     survivors = [r for r in results if safe_int(r.get("fail_count"), 0) < args.max_fails]
     eliminated = total - len(survivors)
     survivors_len = len(survivors)
 
-    alive_delays = [int(r.get("delay_ms", 0)) for r in survivors if r.get("delay_ms", 0) > 0]
+    # 仅统计本次实测存活节点的网络延迟（排除处于缓冲期但本次已连通失败节点的旧延迟）
+    alive_delays = [
+        int(r.get("delay_ms", 0))
+        for r in results
+        if r.get("is_alive") and safe_int(r.get("delay_ms"), 0) > 0
+    ]
     avg_delay = int(sum(alive_delays) / len(alive_delays)) if alive_delays else 0
 
     if eliminated > 0:

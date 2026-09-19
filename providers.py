@@ -147,6 +147,9 @@ for _k, (_asn, _isp) in KNOWN_CLOUD_PROVIDERS.items():
     if _asn not in ASN_TO_PROVIDER:
         ASN_TO_PROVIDER[_asn] = _isp
 
+# 预先按名称长度倒序排好知名云厂商别名，避免在 clean_asn() 等高频调用循环中重复排序
+SORTED_CLOUD_PROVIDER_KEYS = tuple(sorted(KNOWN_CLOUD_PROVIDERS.keys(), key=len, reverse=True))
+
 
 # =====================================================================
 # 公共实用工具：环境加载、类型转换、ASN 清洗、Telegram 推送与自检
@@ -294,7 +297,7 @@ def clean_asn(raw_asn: str, isp: str = "") -> str:
     if m:
         return m.group(1).upper()
     r_low = (raw_asn + " " + (isp or "")).lower()
-    for k in sorted(KNOWN_CLOUD_PROVIDERS.keys(), key=len, reverse=True):
+    for k in SORTED_CLOUD_PROVIDER_KEYS:
         if k in r_low:
             return KNOWN_CLOUD_PROVIDERS[k][0]
     m_d = re.search(r"\b(\d{3,7})\b", raw_asn)
@@ -779,9 +782,10 @@ for _asn in ASN_TO_PROVIDER:
 
 def is_asn_recorded(asn_str: str | None, isp_str: str | None = "") -> bool:
     """
-    判断给定的 ASN 是否已被内置权威对照表（ASN_EXACT_NET_TYPE 或 ASN_TO_PROVIDER）精确收录。
-    返回 True 表示已收录，False 表示属于未收录的新自治系统。
-    若无法从文本中提取出有效 AS 编号（例如纯机构名），返回 True（不作为未收录 ASN 触发告警）。
+    判断目标节点是否免于触发『未收录 ASN 补库告警』：
+    - 返回 True：该 AS 编号已被权威对照表收录，或节点本身无有效 AS 编号（无需作为新 ASN 告警）。
+    - 返回 False：提取到了有效 AS 编号，但该编号尚未被内置库收录（需上报至统计卡片，提示补充）。
+    注：无有效 ASN 编号时返回 True，是为避免将缺少 ASN 元数据的正常节点误报为待补充的新自治系统。
     """
     code = _extract_asn_code(asn_str, isp_str)
     if not code:

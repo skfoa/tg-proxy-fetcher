@@ -14,7 +14,12 @@ import os
 import re
 from urllib.parse import parse_qs
 
-from providers import KNOWN_CLOUD_PROVIDERS, ASN_TO_PROVIDER, normalize_timestamp
+from providers import (
+    KNOWN_CLOUD_PROVIDERS,
+    ASN_TO_PROVIDER,
+    SORTED_CLOUD_PROVIDER_KEYS,
+    normalize_timestamp,
+)
 
 log = logging.getLogger("parsers")
 
@@ -94,16 +99,33 @@ def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
     colo_m = re.search(r"数据中心[:：]\s*([A-Za-z0-9]+)", text)
     cf_loc_m = re.search(r"CF落地位置[:：].*?🌐\s*([^\r\n]+)", text, re.DOTALL)
     delay_m = re.search(r"网络延迟[:：]\s*(\d+(?:\.\d+)?)\s*ms", text)
-    speed_m = re.search(r"下载速度[:：]\s*(\d+(?:\.\d+)?)\s*([kKmMgG]?[bB]/s)?", text)
+    speed_m = re.search(r"(?:下载)?速度[:：]\s*(\d+(?:\.\d+)?)\s*([a-zA-Z/]+)?", text)
     speed_kbs = ""
     if speed_m:
         val = float(speed_m.group(1))
-        unit = (speed_m.group(2) or "kB/s").lower()
-        if "m" in unit:
-            val *= 1024
-        elif "g" in unit:
+        unit = (speed_m.group(2) or "").lower().strip()
+        if not unit:
+            # 缺乏单位时启发式判定：主流 CF 测速工具（如 CloudflareST）小数值 (< 500) 通常为 MB/s，大数值通常为 kB/s
+            unit = "mb/s" if val < 500 else "kb/s"
+
+        if "gb" in unit or unit == "g":
             val *= 1024 * 1024
-        speed_kbs = int(val)
+        elif "gbps" in unit or "gb/s" in unit:
+            val *= (1024 * 1024) / 8 if "bps" in unit else (1024 * 1024)
+        elif "mbps" in unit:
+            val *= 1024 / 8
+        elif "mb" in unit or unit == "m":
+            val *= 1024
+        elif "kbps" in unit:
+            val /= 8
+        elif "kb" in unit or unit == "k":
+            pass
+        elif "bps" in unit:
+            val /= (1024 * 8)
+        elif "b/s" in unit or "byte" in unit or unit == "b":
+            val /= 1024
+
+        speed_kbs = max(0, int(val))
 
     time_m = re.search(r"(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})", text)
     source_m = re.search(r"IP来源[:：]\s*([@\w]+)", text)
@@ -151,7 +173,7 @@ def parse_cf_csv_content(
                 fn_time = f"{d[:4]}-{d[4:6]}-{d[6:8]} {t[:2]}:{t[2:4]}:{t[4:6]}"
         elif not any(bad in fn_lower for bad in ("nsb", "results", "speedtest", "benchmark", "warp", "tunnel")):
             # 2. 从常见云服务器/VPS文件名推断 ASN 与 ISP (如 Aliyun.csv, Tencent.csv, DMIT.csv, Akile.csv 等)
-            for key in sorted(KNOWN_CLOUD_PROVIDERS.keys(), key=len, reverse=True):
+            for key in SORTED_CLOUD_PROVIDER_KEYS:
                 pattern = rf"(?i)(?:^|[^a-z0-9]){re.escape(key)}(?:[^a-z0-9]|$)"
                 if re.search(pattern, fn_lower) or (len(key) >= 4 and key in fn_lower):
                     fn_asn, fn_isp = KNOWN_CLOUD_PROVIDERS[key]
