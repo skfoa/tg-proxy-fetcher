@@ -413,6 +413,7 @@ def scrape_channel_web(channel: str, cutoff: datetime, proxy: str = "") -> tuple
                         dt = dt.astimezone(timezone.utc)
                     if dt < cutoff:
                         reached_cutoff = True
+                        break
                 except Exception:
                     pass
 
