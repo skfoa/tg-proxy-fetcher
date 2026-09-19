@@ -47,6 +47,7 @@ from providers import (
     ASN_TO_PROVIDER,
     TG_BOT_TOKEN,
     TG_CHAT_ID,
+    format_categorized_proxyip_txt,
 )
 from parsers import (
     is_valid_host,
@@ -539,9 +540,8 @@ def save_and_notify(
         log.info("已保存反代 ProxyIP 表格: %s (%d 条全量累积记录)", OUTPUT_PROXYIP_FILE, len(sorted_proxyips))
 
         with open(OUTPUT_PROXYIP_TXT, "w", encoding="utf-8") as f:
-            for row in sorted_proxyips:
-                f.write(f"{row['ip']}:{row['port']}\n")
-        log.info("已保存反代 ProxyIP 纯文本: %s (%d 行 IP:Port)", OUTPUT_PROXYIP_TXT, len(sorted_proxyips))
+            f.write(format_categorized_proxyip_txt(sorted_proxyips))
+        log.info("已保存反代 ProxyIP 纯文本: %s (%d 行/条记录，已按国家地区分类)", OUTPUT_PROXYIP_TXT, len(sorted_proxyips))
 
         proxyip_total = len(sorted_proxyips)
 

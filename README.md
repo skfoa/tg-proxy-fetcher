@@ -97,9 +97,9 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 | **`data/scan_ips.txt`** | 扫描测速总清单（按 ASN 分组） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/scan_ips.txt` |
 | **`data/scan_ips/*.txt`** | 独立 ASN + 厂商纯文本列表（单文件） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/scan_ips/AS{ASN}_{ISP}.txt` |
 | **`data/scan_ips.csv`** | 扫描测速优选 IP（数据表） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/scan_ips.csv` |
-| **`data/proxyip.txt`** | 反代 ProxyIP 清单（纯文本） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip.txt` |
+| **`data/proxyip.txt`** | 反代 ProxyIP 清单（按国家/地区与数量分类，纯文本） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip.txt` |
 | **`data/proxyip.csv`** | 反代 ProxyIP 详细数据表 | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip.csv` |
-| **`data/proxyip_cf.txt`** | 兼具优选直连特性的提纯反代清单 | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip_cf.txt` |
+| **`data/proxyip_cf.txt`** | 兼具优选直连特性的提纯反代清单（按国家/地区分类） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip_cf.txt` |
 
 ---
 
@@ -162,7 +162,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 
 ### 4. `data/proxyip.txt` / `data/proxyip.csv` / `data/proxyip_cf.txt`（反代 ProxyIP 专属池）
 * **独立反代池**：专门收录来自频道发布的反代文件（如 `Global-proxyip-443.csv`、`Global-proxyip-8443.csv` 等）。
-* **纯净即用**：`data/proxyip.txt` 导出纯净 `IP:端口`，可直接复制或配置于 edgetunnel / Cloudflare Workers 作为反代地址。
+* **智能国家/地区分类与数量统计**：`data/proxyip.txt` 与 `data/proxyip_cf.txt` 自动根据机房数据中心代码（Colo）与落地信息归类聚合，按节点规模降序排列，以 `# 🇺🇸 美国 - 6686 个` 等清晰注释头分组，组内按延迟升序严选排列，既保证纯净即用（兼容主流 Worker/脚本），又极大方便按目标国家筛选取用。
 * **双能提纯直连（`data/proxyip_cf.txt`）**：由质检引擎并发探测，自动筛选提纯出既能作为反代穿透、又兼具 Cloudflare 官方证书 TLS 握手直连特性的优质节点，是兼具双料特性的极品清单。
 * **结构化数据**：`data/proxyip.csv` 保留延迟、数据中心、落地位置与 `cf_clean` 优选标记等关键信息。
 

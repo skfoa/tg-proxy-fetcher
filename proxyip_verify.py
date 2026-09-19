@@ -31,7 +31,14 @@ import time
 import urllib.request
 from datetime import datetime, timezone, timedelta
 
-from providers import load_dotenv, safe_int, send_tg_message, TG_BOT_TOKEN, TG_CHAT_ID
+from providers import (
+    load_dotenv,
+    safe_int,
+    send_tg_message,
+    TG_BOT_TOKEN,
+    TG_CHAT_ID,
+    format_categorized_proxyip_txt,
+)
 
 # 确保本地 .env 加载
 load_dotenv()
@@ -237,9 +244,8 @@ def save_proxyip(
     log.info("已覆写保存 %s: %d 条记录 (含 fail_count, cf_clean 列)", csv_path, len(rows))
 
     with open(txt_path, "w", encoding="utf-8") as f:
-        for r in rows:
-            f.write(f"{r['ip']}:{r['port']}\n")
-    log.info("已覆写保存 %s: %d 行 IP:Port", txt_path, len(rows))
+        f.write(format_categorized_proxyip_txt(rows))
+    log.info("已按国家地区分类保存 %s: %d 条记录", txt_path, len(rows))
 
     # 提纯双料优选反代节点 (cf_clean=true 且 fail_count=0)
     cf_clean_rows = [
@@ -247,9 +253,8 @@ def save_proxyip(
         if r.get("cf_clean") == "true" and _get_fc(r) == 0
     ]
     with open(cf_txt_path, "w", encoding="utf-8") as f:
-        for r in cf_clean_rows:
-            f.write(f"{r['ip']}:{r['port']}\n")
-    log.info("已提纯保存双料优选反代清单 %s: %d 行 IP:Port", cf_txt_path, len(cf_clean_rows))
+        f.write(format_categorized_proxyip_txt(cf_clean_rows))
+    log.info("已按国家地区分类提纯保存双料优选反代清单 %s: %d 条记录", cf_txt_path, len(cf_clean_rows))
 
 
 # ---------- 批量质检调度器 ----------
