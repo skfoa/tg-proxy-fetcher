@@ -20,7 +20,7 @@ log = logging.getLogger("parsers")
 
 # 通用代理匹配正则表达式
 ANNOUNCE_PROXY_RE = re.compile(
-    r"\[发现开放\s*(?P<proto>HTTP|SOCKS5|SOCKS4|HTTPS|TURN)\s*(?:代理|服务)?\]\s*(?:(?:https?|socks5|socks4|turn)://)?(?P<ip>\d{1,3}(?:\.\d{1,3}){3}):(?P<port>\d{1,5})"
+    r"\[发现开放\s*(?P<proto>HTTP|SOCKS5|HTTPS|TURN)\s*(?:代理|服务)?\]\s*(?:(?:https?|socks5|turn)://)?(?P<ip>\d{1,3}(?:\.\d{1,3}){3}):(?P<port>\d{1,5})"
 )
 TG_SOCKS_RE = re.compile(
     r"(?:tg://socks|https?://(?:t\.me|telegram\.me)/socks)\?(?P<query>[^\s#]+)"
