@@ -406,6 +406,10 @@ def scrape_channel_web(channel: str, cutoff: datetime, proxy: str = "") -> tuple
             if t_m:
                 try:
                     dt = datetime.fromisoformat(t_m.group(1).replace("Z", "+00:00"))
+                    if dt.tzinfo is None:
+                        dt = dt.replace(tzinfo=timezone.utc)
+                    else:
+                        dt = dt.astimezone(timezone.utc)
                     if dt < cutoff:
                         reached_cutoff = True
                 except Exception:
