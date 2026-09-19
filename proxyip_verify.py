@@ -473,7 +473,14 @@ async def async_main(args):
     else:
         log.info("[ProxyIP 淘汰] 本次无节点达到连续失败 %d 次的淘汰阈值", args.max_fails)
 
-    save_proxyip(survivors, PROXYIP_CSV, PROXYIP_TXT, PROXYIP_CF_TXT)
+    save_proxyip(
+        survivors,
+        csv_path=PROXYIP_CSV,
+        txt_path=PROXYIP_TXT,
+        dir_path=PROXYIP_DIR,
+        cf_txt_path=PROXYIP_CF_TXT,
+        cf_dir_path=PROXYIP_CF_DIR,
+    )
 
     elapsed = time.time() - t_start
     log.info("ProxyIP 穿透质检流程执行完毕，总耗时 %.2f 秒 (🌟兼具优选直连: %d 条)", elapsed, cf_clean_count)
