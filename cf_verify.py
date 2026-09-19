@@ -11,7 +11,7 @@ Cloudflare 优选 IP 两阶段主动校验与淘汰引擎 (cf_verify.py)
      - scan_ips.csv、scan_ips.txt、scan_ips/*.txt (独立机房分组文本)
      - cf_ips.csv、cf_ips.txt (单条优选数据表与纯文本清单)
   2. 四维合一卡片推送：流水线末尾自动聚合 tg_fetch、socks_verify、proxyip_verify 与自身结果，
-     向 Telegram 发送全流水线统一统计与淘汰卡片。
+     向 Telegram 发送全流水线统一统计、淘汰明细以及动态未收录 ASN 提示卡片。
 """
 
 import argparse
@@ -24,7 +24,6 @@ import re
 import ssl
 import sys
 import time
-import urllib.request
 from collections import defaultdict
 from datetime import datetime, timezone, timedelta
 
@@ -34,7 +33,6 @@ from providers import (
     clean_asn,
     send_tg_message,
     ASN_TO_PROVIDER,
-    KNOWN_CLOUD_PROVIDERS,
     TG_BOT_TOKEN,
     TG_CHAT_ID,
 )

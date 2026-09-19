@@ -9,11 +9,13 @@ Cloudflare 反代 ProxyIP 穿透质检与淘汰引擎 (proxyip_verify.py)
   4. 官方优选直连能力检验（crypto.cloudflare.com 官方 CA 证书链校验 + HTTP 301 重定向）
   5. 优雅四次挥手关闭连接（writer.close + wait_closed），杜绝 RST 异常
 
-淘汰与排序机制：
+淘汰、属性打标与分层导出机制：
   - 存活节点：fail_count 重置为 0，回填实时 delay_ms、colo 机房码并标记 cf_clean 属性
   - 失败节点：fail_count 递增 +1，标记 cf_clean="false"
   - 物理淘汰：连续失败达到阈值（默认 2 次）的死节点从 proxyip.csv 与 proxyip.txt 中永久物理删除
   - 双料提纯：自动筛选兼具 Cloudflare 官方优选直连能力的极品反代节点导出至 data/proxyip_cf.txt
+  - 网络属性打标：落盘前调用 classify_asn 计算 net_type（isp/business/education/government/datacenter）
+  - 分类分国导出：自动输出分国家独立纯文本文件及【ISP_运营商原生宽带】等 4 类特殊资产纯净列表
   - 排序落盘：存活优先（fail_count 升序），低延迟优先（delay_ms 升序），最新测试时间降序
 """
 
@@ -28,7 +30,6 @@ import re
 import ssl
 import sys
 import time
-import urllib.request
 from datetime import datetime, timezone, timedelta
 
 from providers import (

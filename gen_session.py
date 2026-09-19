@@ -79,7 +79,7 @@ async def main():
     if detected:
         p_type, p_host, p_port = detected
         print(f"\n🔍 检测到本地代理可用: {p_type}://{p_host}:{p_port}")
-        choice = input(f"是否直接使用该代理？[Y/n/自定义输入其他端口]: ").strip()
+        choice = input("是否直接使用该代理？[Y/n/自定义输入其他端口]: ").strip()
         if choice.lower() in ('', 'y', 'yes'):
             proxy = (p_type, p_host, p_port)
         elif choice.lower() == 'n':

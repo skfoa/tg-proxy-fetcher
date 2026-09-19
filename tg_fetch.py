@@ -8,6 +8,8 @@ TG 频道代理与 Cloudflare 优选 IP 同步工具 (tg_fetch.py)
   3. 【双模驱动架构】：
      - 免登录 Web 模式（默认）：直接抓取公开频道网页预览，无需任何 Telegram API 密钥或账号登录。
      - 官方 API 模式（可选）：配置 TG_API_ID / TG_SESSION_STR 后激活 Telethon MTProto 客户端，解锁频道测速附件与反代池附件自动下载。
+  4. 【未收录 ASN 动态发现（模式 A）】：
+     自动巡检本次新增节点，遇未在权威对照表中收录的新自治系统时，动态生成 Telegram 卡片提醒并支持一键入库。
 """
 
 import os
@@ -23,7 +25,6 @@ import asyncio
 import subprocess
 import urllib.request
 from collections import defaultdict
-from urllib.parse import parse_qs
 from datetime import datetime, timedelta, timezone
 
 # Windows 事件循环策略
@@ -43,7 +44,6 @@ from providers import (
     safe_int,
     clean_asn,
     send_tg_message,
-    KNOWN_CLOUD_PROVIDERS,
     ASN_TO_PROVIDER,
     TG_BOT_TOKEN,
     TG_CHAT_ID,
@@ -54,7 +54,6 @@ from providers import (
     _extract_asn_code,
 )
 from parsers import (
-    is_valid_host,
     extract_proxies,
     parse_cf_ip,
     parse_cf_csv_content,
@@ -995,12 +994,11 @@ async def run_telethon():
 
 def main():
     if TG_API_ID and TG_API_HASH and TG_SESSION_STR:
-        try:
-            import telethon
+        import importlib.util
+        if importlib.util.find_spec("telethon") is not None:
             asyncio.run(run_telethon())
             return
-        except ImportError:
-            log.warning("检测到已配置 TG_API 凭据，但当前 Python 环境未安装 telethon，自动降级为【免登录 Web 模式】")
+        log.warning("检测到已配置 TG_API 凭据，但当前 Python 环境未安装 telethon，自动降级为【免登录 Web 模式】")
 
     run_web_scraper()
 
