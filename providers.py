@@ -499,16 +499,168 @@ SPECIAL_NET_TYPE_FILES = {
     "government": "【GOV_政务公共网络】.txt",
 }
 
+# ----------------------------------------------------
+# ASN 正则提取与内置权威精确对照表 (Tier 1)
+# ----------------------------------------------------
+_ASN_WITH_PREFIX_RE = re.compile(r"\bAS\s*(\d+)\b", re.IGNORECASE)
+_PURE_NUMBER_RE = re.compile(r"^\s*(\d+)\s*$")
+
+
+def _extract_asn_code(asn_str: str | None, isp_str: str | None = "") -> str | None:
+    """
+    智能提取规范的 AS 编号 (如 AS4760)：
+    - 支持前缀格式：AS4760、as4760、AS 4760、as 4760
+    - 支持纯数字编号：4760、" 4760 "
+    - 优先检查 asn_str，随后检查 isp_str
+    """
+    for s in (asn_str, isp_str):
+        if not s:
+            continue
+        s = str(s)
+
+        m = _ASN_WITH_PREFIX_RE.search(s)
+        if m:
+            return f"AS{m.group(1)}"
+
+        m = _PURE_NUMBER_RE.match(s)
+        if m:
+            return f"AS{m.group(1)}"
+
+    return None
+
+
+ASN_EXACT_NET_TYPE = {
+    # ----------------------------------------------------
+    # 1. 知名电信民用原生宽带 ASN (isp)
+    # ----------------------------------------------------
+    # 香港
+    "AS4760": "isp",     # HKT Limited (PCCW)
+    "AS9269": "isp",     # Hong Kong Broadband Network (HKBN)
+    # 韩国
+    "AS4766": "isp",     # Korea Telecom (KT)
+    "AS9318": "isp",     # SK Broadband
+    "AS3786": "isp",     # LG Uplus (LG U+)
+    # 北美 (美国 / 加拿大)
+    "AS7922": "isp",     # Comcast Cable Communications
+    "AS20115": "isp",    # Charter Communications (Spectrum)
+    "AS22773": "isp",    # Cox Communications
+    "AS11404": "isp",    # Wave Broadband / Astound
+    "AS852": "isp",      # TELUS Communications
+    "AS812": "isp",      # Rogers Communications
+    "AS577": "isp",      # Bell Canada
+    "AS701": "isp",      # Verizon
+    "AS7018": "isp",     # AT&T Services
+    "AS5650": "isp",     # Frontier Communications
+    "AS7029": "isp",     # Windstream
+    "AS209": "isp",      # CenturyLink
+    # 欧洲
+    "AS3320": "isp",     # Deutsche Telekom
+    "AS5607": "isp",     # Sky UK (Vodafone / Sky)
+    "AS12576": "isp",    # Orange France
+    "AS3215": "isp",     # Orange
+    "AS2856": "isp",     # British Telecommunications (BT)
+    "AS6830": "isp",     # Liberty Global (Virgin Media)
+    "AS3303": "isp",     # Swisscom
+    "AS12322": "isp",    # Free SAS (Iliad)
+    "AS1241": "isp",     # Vodafone Spain
+    "AS30722": "isp",    # Vodafone Italy
+    "AS6805": "isp",     # Telefonica Germany (O2)
+    "AS3352": "isp",     # Iberbanda / Telefonica de Espana
+    "AS5410": "isp",     # Bouygues Telecom
+    "AS254": "isp",      # KPN (Netherlands)
+    "AS5466": "isp",     # Eir / Eircom (Ireland)
+    # 亚太、中亚与其他
+    "AS4657": "isp",     # Singapore Telecommunications (Singtel)
+    "AS17676": "isp",    # SoftBank Corp.
+    "AS2516": "isp",     # KDDI Corporation
+    "AS4713": "isp",     # NTT Communications (OCN residential)
+    "AS3462": "isp",     # Data Communication Business Group (Hinet/Chunghwa Telecom)
+    "AS9198": "isp",     # Kazakhtelecom
+    "AS3468": "isp",     # Transtelecom
+    "AS45899": "isp",    # VNPT (Vietnam Posts and Telecommunications)
+    "AS7552": "isp",     # Viettel Group
+    "AS18403": "isp",    # FPT Telecom
+    "AS9121": "isp",     # Turk Telekom
+    "AS16135": "isp",    # Turkcell Superonline
+    "AS4134": "isp",     # China Telecom Backbone
+    "AS4837": "isp",     # China Unicom Backbone
+    "AS9808": "isp",     # China Mobile Guangdong
+    "AS58453": "isp",    # China Mobile International
+
+    # ----------------------------------------------------
+    # 2. 商业固定专线与商务宽带 (business)
+    # ----------------------------------------------------
+    "AS286": "business",   # KPN Business Internet
+    "AS174": "business",   # Cogent Communications Enterprise
+
+    # ----------------------------------------------------
+    # 3. 高校教育科研网 (education)
+    # ----------------------------------------------------
+    "AS11246": "education",  # University of Maine System
+    "AS4538": "education",   # CERNET (China Education and Research Network)
+    "AS20965": "education",  # GÉANT (European academic research network)
+    "AS1103": "education",   # SURFnet (Netherlands higher education)
+    "AS2200": "education",   # RENATER (French academic network)
+    "AS680": "education",    # DFN (German research network)
+    "AS786": "education",    # Janet (UK higher education network)
+
+    # ----------------------------------------------------
+    # 4. 国家政务公用网 (government)
+    # ----------------------------------------------------
+    "AS6697": "government",  # Republican Unitary Enterprise Beltelecom (白俄罗斯政务网络)
+
+    # ----------------------------------------------------
+    # 5. 知名云服务商与数据中心机房强锁定 (datacenter)
+    #    (防止名称包含 telecom/broadband 或别名时被规则误判)
+    # ----------------------------------------------------
+    "AS13335": "datacenter",   # Cloudflare
+    "AS16509": "datacenter",   # Amazon AWS
+    "AS8075": "datacenter",    # Microsoft Azure
+    "AS15169": "datacenter",   # Google Cloud
+    "AS45102": "datacenter",   # Alibaba Cloud
+    "AS132203": "datacenter",  # Tencent Cloud
+    "AS136907": "datacenter",  # Huawei Cloud
+    "AS20473": "datacenter",   # Vultr / Choopa
+    "AS14061": "datacenter",   # DigitalOcean
+    "AS24940": "datacenter",   # Hetzner Online
+    "AS16276": "datacenter",   # OVH
+    "AS51167": "datacenter",   # Contabo
+    "AS197540": "datacenter",  # Netcup
+    "AS60068": "datacenter",   # Datacamp Limited
+    "AS9009": "datacenter",    # M247
+    "AS25820": "datacenter",   # BandwagonHost / IT7 Networks
+    "AS63949": "datacenter",   # Linode Akamai
+    "AS61112": "datacenter",   # AkileCloud
+    "AS906": "datacenter",     # DMIT
+    "AS210644": "datacenter",  # Aeza
+    "AS212336": "datacenter",  # ByteVirt
+    "AS36352": "datacenter",   # RackNerd
+    "AS53667": "datacenter",   # BuyVM FranTech
+    "AS47583": "datacenter",   # Hostinger
+    "AS21859": "datacenter",   # Zenlayer
+    "AS147049": "datacenter",  # VMISS
+}
+
 
 def classify_asn(asn_str: str | None, isp_str: str | None = "") -> str:
     """
-    根据 BGP 广播的 ASN 机构名称与 ISP 归属进行多维度网络类型属性分类（方案 A 离线规则清洗）：
+    根据 BGP 广播的 ASN 编号、机构名称与 ISP 归属进行多维度网络类型属性分类（方案 A+ 两级分层体系）：
+      [Tier 1] 内置权威精准对照：提取 AS 编号优先查表，秒级高精度定性
+      [Tier 2] 启发式词根智能匹配：教育、政务、排除机房、商业专线、运营商宽带
+      [Tier 3] 安全降级兜底：未命中任何已知特征的全新节点归为 datacenter 机房
+    返回类型：
       - education: 高校与学术科研网
       - government: 政府政务与国家公共网
       - isp: 电信民用原生宽带（非机房资产，信誉拟真度高）
       - business: 商业固定专线与商务光纤
       - datacenter: 常规云主机与数据中心机房（默认）
     """
+    # [Tier 1] 内置权威精准对照 (Fast-path Lookup)
+    asn_code = _extract_asn_code(asn_str, isp_str)
+    if asn_code and asn_code in ASN_EXACT_NET_TYPE:
+        return ASN_EXACT_NET_TYPE[asn_code]
+
+    # [Tier 2] 启发式词根规则智能匹配 (Pattern Fallback)
     text = f"{asn_str or ''} {isp_str or ''}".lower().strip()
     if not text:
         return "datacenter"
@@ -532,6 +684,7 @@ def classify_asn(asn_str: str | None, isp_str: str | None = "") -> str:
     if any(p in text for p in ISP_RES_PATTERNS) and not is_hosting:
         return "isp"
 
+    # [Tier 3] 安全降级兜底 (Default Fallback)
     return "datacenter"
 
 

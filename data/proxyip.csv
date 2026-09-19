@@ -6340,7 +6340,7 @@
 209.200.246.218,8443,true,305,,YYZ,北美洲 · 多伦多,,Regxa Company for Information Technology Ltd,1785149330.000,@danfeng2,0,true,datacenter
 199.19.224.145,8443,true,305,,DEN,北美洲 · 拉斯维加斯,,FranTech Solutions,1785149304.000,@danfeng2,0,true,datacenter
 76.223.77.48,443,true,305,,DUB,欧洲 · 都柏林 · 爱尔兰,,"Amazon.com, Inc.",1784903685.000,@danfeng2,0,true,datacenter
-72.89.224.82,9443,unknown,306,,EWR,New York · New York City · US,Verizon Business,701,2026-08-29 15:50:24,@danfeng2,0,true,datacenter
+72.89.224.82,9443,unknown,306,,EWR,New York · New York City · US,Verizon Business,701,2026-08-29 15:50:24,@danfeng2,0,true,isp
 96.44.152.207,443,true,306,,YYZ,北美洲 · 多伦多 · 加拿大,,"BrainStorm Network, Inc",1789519027.000,@danfeng2,0,true,datacenter
 66.154.102.59,443,true,306,,ORD,北美洲 · 芝加哥 · 美国,,"CYBERCON, INC.",1789518804.000,@danfeng2,0,true,datacenter
 45.77.213.118,443,true,306,,SEA,北美洲 · 西雅图 · 美国,,"The Constant Company, LLC",1789518676.000,@danfeng2,0,true,datacenter
@@ -6589,7 +6589,7 @@
 91.108.254.70,8443,true,330,,LHR,欧洲 · 伦敦,,Baxet Group Inc.,1785149943.000,@danfeng2,0,true,datacenter
 57.128.183.35,8443,true,330,,LHR,欧洲 · 伦敦,,OVH SAS,1785149634.000,@danfeng2,0,true,datacenter
 144.225.6.102,443,true,330,,LAX,北美洲 · 洛杉矶 · 美国,,CNServer LLC,1784900569.000,@danfeng2,0,true,datacenter
-72.89.201.11,30776,unknown,331,,EWR,New York · New York City · US,Verizon Business,701,2026-08-29 15:50:24,@danfeng2,0,true,datacenter
+72.89.201.11,30776,unknown,331,,EWR,New York · New York City · US,Verizon Business,701,2026-08-29 15:50:24,@danfeng2,0,true,isp
 95.85.11.110,443,true,331,,AMS,欧洲 · 阿姆斯特丹 · 荷兰,,"DigitalOcean, LLC",1789519016.000,@danfeng2,0,true,datacenter
 216.23.122.8,443,true,331,,NRT,亚洲 · 东京 · 日本,,Zouter Limited,1789518447.000,@danfeng2,0,true,datacenter
 67.207.80.155,443,true,332,,LHR,欧洲 · 伦敦 · 英国,,"DigitalOcean, LLC",1789518808.000,@danfeng2,0,true,datacenter
