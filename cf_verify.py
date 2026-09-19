@@ -34,6 +34,7 @@ from providers import (
     clean_asn,
     send_tg_message,
     normalize_timestamp,
+    get_keyed_lock,
     ASN_TO_PROVIDER,
     TG_BOT_TOKEN,
     TG_CHAT_ID,
@@ -148,7 +149,6 @@ async def verify_all(
         return rows
 
     sem = asyncio.Semaphore(concurrency)
-    ip_locks = defaultdict(asyncio.Lock)
     pass_count = 0
     fail_count_total = 0
     completed = 0
@@ -174,7 +174,7 @@ async def verify_all(
             fail_count_total += 1
             return
 
-        async with ip_locks[ip]:
+        async with get_keyed_lock(ip):
             async with sem:
                 alive, latency = await probe_ip(ip, port, connect_timeout=timeout, http_timeout=http_timeout)
 

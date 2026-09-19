@@ -152,11 +152,13 @@ for _k, (_asn, _isp) in KNOWN_CLOUD_PROVIDERS.items():
 # 公共实用工具：环境加载、类型转换、ASN 清洗、Telegram 推送与自检
 # =====================================================================
 
+import asyncio
 import json
 import logging
 import os
 import re
 import urllib.request
+import zlib
 from datetime import datetime, timezone, timedelta
 
 log = logging.getLogger("providers")
@@ -194,6 +196,36 @@ load_dotenv()
 
 TG_BOT_TOKEN = os.getenv("TG_BOT_TOKEN") or ""
 TG_CHAT_ID = os.getenv("TG_CHAT_ID") or ""
+
+
+# =====================================================================
+# 确定性哈希分段锁池 (Striped Locks)
+# 解决同 IP/Host 互斥探测需求，且内存常数级 O(1)，无字典无界增长隐患
+# =====================================================================
+_LOCK_POOL_SIZE = 2048
+_LOCK_POOL_MASK = _LOCK_POOL_SIZE - 1
+_LOCK_POOL: list[asyncio.Lock] | None = None
+_LOCK_POOL_LOOP: asyncio.AbstractEventLoop | None = None
+
+
+def get_keyed_lock(key: str) -> asyncio.Lock:
+    """
+    返回与 key (IP/Host) 绑定的确定性分段锁。
+    采用 zlib.crc32 保证跨进程/跨运行哈希一致（避免 PYTHONHASHSEED 随机化干扰）。
+    同 key 必同锁，不同 key 在 2048 桶位下碰撞率极低，且内存严格常数级 O(1)，杜绝无界增长。
+    """
+    global _LOCK_POOL, _LOCK_POOL_LOOP
+    try:
+        current_loop = asyncio.get_running_loop()
+    except RuntimeError:
+        current_loop = None
+
+    if _LOCK_POOL is None or _LOCK_POOL_LOOP != current_loop:
+        _LOCK_POOL = [asyncio.Lock() for _ in range(_LOCK_POOL_SIZE)]
+        _LOCK_POOL_LOOP = current_loop
+
+    idx = zlib.crc32(str(key).encode("utf-8")) & _LOCK_POOL_MASK
+    return _LOCK_POOL[idx]
 
 
 def safe_int(value, default: int = 0) -> int:

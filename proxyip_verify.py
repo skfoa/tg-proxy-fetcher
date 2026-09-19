@@ -38,6 +38,7 @@ from providers import (
     load_dotenv,
     safe_int,
     send_tg_message,
+    get_keyed_lock,
     TG_BOT_TOKEN,
     TG_CHAT_ID,
     format_categorized_proxyip_txt,
@@ -297,7 +298,6 @@ async def verify_proxyips(
         return rows, 0
 
     sem = asyncio.Semaphore(concurrency)
-    ip_locks = defaultdict(asyncio.Lock)
     pass_count = 0
     fail_count_total = 0
     cf_clean_count = 0
@@ -326,7 +326,7 @@ async def verify_proxyips(
             fail_count_total += 1
             return
 
-        async with ip_locks[ip]:
+        async with get_keyed_lock(ip):
             async with sem:
                 alive, latency, colo = await probe_proxyip(
                     ip, port, connect_timeout=timeout, http_timeout=http_timeout

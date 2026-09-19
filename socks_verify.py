@@ -31,7 +31,7 @@ import urllib.parse
 from collections import defaultdict
 from datetime import datetime, timezone, timedelta
 
-from providers import load_dotenv, safe_int, send_tg_message, TG_BOT_TOKEN, TG_CHAT_ID
+from providers import load_dotenv, safe_int, send_tg_message, get_keyed_lock, TG_BOT_TOKEN, TG_CHAT_ID
 
 # 确保本地 .env 加载
 load_dotenv()
@@ -570,7 +570,6 @@ async def async_main(args):
     random.shuffle(rows)
 
     sem = asyncio.Semaphore(args.concurrency)
-    host_locks = defaultdict(asyncio.Lock)
     completed = 0
     pass_count = 0
     fail_count = 0
@@ -589,7 +588,7 @@ async def async_main(args):
     async def _worker(r):
         nonlocal completed, pass_count, fail_count, min_delay
         host = r.get("host", "")
-        async with host_locks[host]:
+        async with get_keyed_lock(host):
             res = await probe_single(r, sem, args.timeout, args.http_timeout)
         completed += 1
 
