@@ -5,8 +5,8 @@ Cloudflare 反代 ProxyIP 穿透质检与淘汰引擎 (proxyip_verify.py)
 专门针对反代 ProxyIP（proxyip.csv / proxyip.txt / proxyip_cf.txt）执行深层应用层协议穿透探测：
   1. TCP 三次握手 + TLS ClientHello（SNI: speed.cloudflare.com，跳过反代非官方证书校验）
   2. HTTP/1.1 GET /cdn-cgi/trace 探针请求（浏览器伪装 UA, Connection: close）
-  3. 严格三维校验：HTTP 200 + Server: cloudflare + 正则解析提取有效 colo 机房代号
-  4. 官方优选直连能力检验（crypto.cloudflare.com 官方 CA 证书链校验 + HTTP 301 重定向）
+  3. 严格三维校验：统一 deadline 循环读取（上限 4096B），Header 与 Body 物理隔离，Header 严格校验 HTTP 200 + Server: cloudflare，Body 正则提取有效 colo 机房代号
+  4. 官方优选直连能力检验（crypto.cloudflare.com 官方 CA 证书链校验 + HTTP 301 重定向抗截断精确校验）
   5. 优雅四次挥手关闭连接（writer.close + wait_closed），杜绝 RST 异常
 
 淘汰、属性打标与分层导出机制：

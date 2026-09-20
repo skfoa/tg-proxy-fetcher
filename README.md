@@ -39,6 +39,7 @@
 - **🧩 模块化解耦与确定性分段锁**：提取独立 `providers.py` 作为云厂商与 ASN 规范化字典的单一真相源（Single Source of Truth）；内置基于 `zlib.crc32` 的 2048 桶位确定性哈希分段锁池（`get_keyed_lock`），保证同 IP 严格互斥防风控、异 IP 高并发并行，且内存严格维持在常数级 $O(1)$（约 300KB），杜绝无界增长。
 - **💡 未收录 ASN 动态发现与自适应预警**：增量抓取遇外部新自治系统时，自动比对内置权威对照库；若发现未收录 ASN，将在 Telegram 卡片中动态高亮提示并展示待确认明细，方便一键入库；若无未知 ASN 则 0 噪音完全隐藏。
 - **📱 动态双状态 Telegram 运行卡片**：首行支持「🟢 发现新增 + 🗑️ 剔除死节点」双状态动态高亮呈现，底栏包含细分引擎淘汰明细 `[代理 X, 反代 Y, 扫描 Z]`，锁屏即知变动。
+- **🛡️ 工业级防截断与精准协议鉴真**：质检引擎采用统一 Deadline 超时控制与 4096 字节安全余量循环读取（`_read_full_response`），彻底消除 TCP 分包分片及长 Cookie/安全标头导致的报文截断假阴性误杀；严格切分 Header 与 Body 区域，结合字节级正则精准锚定状态行（`301`/`200`）与 `Server: cloudflare`，杜绝任何假阳性误判。
 - **🛡️ 静态安全门禁与故障秒级告警**：工作流启动 1 秒内通过 `py_compile` 与 `ruff` 拦截未定义变量与语法错误；若流水线任何环节异常中断，自动秒级推送 Telegram 告警卡片并附带日志直链。
 - **🧹 自动维护与构建瘦身**：每次运行自动清理 GitHub Actions 历史记录，始终**仅保留最近 5 次运行记录**，告别冗余历史堆积！
 
@@ -79,8 +80,8 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 | **`parsers.py`** | **文本与协议解析器模块**：提取通用代理正则、单条优选卡片、测速 CSV 附件、OTC 扫描清单等解析规则，全面解耦数据提取与业务流。 |
 | **`providers.py`** | **公共规范与网络分类中心**：全系统单一真相源（Single Source of Truth），维护云厂商与关键 ASN 映射表、两级分层网络分类引擎（Tier 1 权威对照 + Tier 2 词根规则）、未收录 ASN 检测，以及 ProxyIP 分国别与特殊网络分类导出工具。 |
 | **`socks_verify.py`** | **通用代理主动质检引擎**：基于 RFC 1928 (readexactly 精确字节读取)、RFC 5389 (STUN/TURN Binding) 与 HTTP CONNECT 穿透检验。 |
-| **`proxyip_verify.py`** | **反代 ProxyIP 质检引擎**：验证反代真实穿透能力，并提纯兼具 TLS 官方优选直连的极品清单 `data/proxyip_cf.txt`。 |
-| **`cf_verify.py`** | **全量优选 IP 鉴真与最终卡片推送**：执行 TLS 官方证书鉴真 + HTTP 301 重定向校验，汇总流水线所有阶段数据并推送统一 TG 统计卡片。 |
+| **`proxyip_verify.py`** | **反代 ProxyIP 质检引擎**：抗分包/防截断（Header/Body 隔离），验证反代真实穿透能力，并提纯兼具 TLS 官方优选直连的极品清单 `data/proxyip_cf.txt`。 |
+| **`cf_verify.py`** | **全量优选 IP 鉴真与最终卡片推送**：执行 TLS 官方证书鉴真 + HTTP 301 重定向抗截断精准校验，汇总流水线所有阶段数据并推送统一 TG 统计卡片。 |
 | **`gen_session.py`** | **Telethon Session 辅助生成器**：本地运行快速交互登录 Telegram 并输出 Session 字符串，供 GitHub Actions 免交互调用。 |
 
 ---
@@ -271,14 +272,14 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 
 #### ② 反代 ProxyIP 穿透质检引擎（`proxyip_verify.py`）
 * **穿透与优选双能探测**：
-  * **穿透鉴真**：向反代节点发起 TLS ClientHello 握手（SNI: `speed.cloudflare.com`，跳过非官方证书校验），发送 HTTP/1.1 GET `/cdn-cgi/trace` 探针请求，严格校验 `HTTP 200` + `Server: cloudflare` + 有效 `colo` 机房代号。
-  * **优选直连探测**：并发探测存活节点是否同时支持作为直连优选 IP（`crypto.cloudflare.com` 官方 CA 证书鉴真与 HTTP 301 重定向校验），自动提纯生成兼具双料特性的 `data/proxyip_cf.txt` 极品清单。
+  * **穿透鉴真**：向反代节点发起 TLS ClientHello 握手（SNI: `speed.cloudflare.com`，跳过非官方证书校验），发送 HTTP/1.1 GET `/cdn-cgi/trace` 探针请求。采用统一 Deadline 超时控制与 4096B 上限循环读取，双兼容分隔符严格切分 Header 与 Body 区域：Header 字节级精确匹配 `HTTP 200` 与 `Server: cloudflare`，Body 独立正则提取有效 `colo` 机房代号，杜绝 Body 污染与 TCP 分片提前退出造成的误判。
+  * **优选直连探测**：并发探测存活节点是否同时支持作为直连优选 IP（`crypto.cloudflare.com` 官方 CA 证书鉴真与 HTTP 301 重定向抗截断校验），自动提纯生成兼具双料特性的 `data/proxyip_cf.txt` 极品清单。
 * **淘汰机制**：连续失败达到阈值（默认 2 次）彻底从 `data/proxyip.txt`、`data/proxyip.csv` 永久物理删除。
 
 #### ③ 优选 IP 两阶段主动鉴真引擎（`cf_verify.py`）
 * **全量优选 IP 覆盖**：无论来源，**只要是优选 IP（涵盖 `data/scan_ips` 扫描测速与 `data/cf_ips` 每日单条全线产物），一律全部执行阶段一与阶段二探测**：
-  * **阶段一（TLS 握手 + 证书鉴真）**：建立 TLS 握手并验证 `crypto.cloudflare.com` 官方证书有效性。
-  * **阶段二（HTTP 301 重定向 + 服务头验证）**：同一连接请求根路径，验证返回 `301 Moved Permanently` 且响应头包含 `Server: cloudflare`。
+  * **阶段一（TLS 握手 + 证书鉴真）**：建立 TLS 握手并验证 `crypto.cloudflare.com` 官方证书有效性（底层强制校验 CA 根证书链与主机名 SAN 匹配）。
+  * **阶段二（同一连接 HTTP 301 重定向 + 服务头验证）**：在同一连接发送 GET 请求，通过统一 Deadline 超时控制与 4096B 动态余量循环读取，双兼容分隔符严格切分 Header 区域，零 Decode 字节匹配首行 `HTTP/X.X 301` 与单行 `Server: cloudflare`，彻底解决长 Cookie/安全头截断导致的假阴性误杀，并杜绝非 301 与伪装头假阳性。
 * **全产物联动删除剔除**：达到淘汰阈值（默认 2 次）的死节点，同步从 `data/scan_ips.csv`、`data/scan_ips.txt`、`data/scan_ips/*.txt`、`data/cf_ips.csv`、`data/cf_ips.txt` 中**彻底永久删除**。
 
 ---

@@ -3,8 +3,9 @@
 Cloudflare 优选 IP 两阶段主动校验与淘汰引擎 (cf_verify.py)
 
 只要是优选 IP（涵盖 scan_ips 与 cf_ips 全线产物），全部统一执行：
-  阶段一：TLS 握手 + CA 证书鉴真（server_hostname=crypto.cloudflare.com 官方证书链）
-  阶段二：同一连接发送 HTTP 请求，验证返回 301 Moved Permanently 且 Server: cloudflare
+  阶段一：TLS 握手 + CA 证书鉴真（server_hostname=crypto.cloudflare.com 官方证书链，底层校验 Root CA 与 SAN 匹配）
+  阶段二：同一连接发送 HTTP 请求，基于统一 deadline 与 4096B 上限循环读取，经双兼容分隔符严格隔离 Header 与 Body，
+          字节级正则精准匹配状态行 HTTP/X.X 301 与单行 Server: cloudflare（抗报文截断假阴性与伪装头假阳性）
 
 淘汰与全流水线汇总机制：
   1. 物理淘汰：连续失败达到阈值（优选与反代默认 2 次，通用代理默认 3 次）的死节点，全面从所有产物中永久删除：
