@@ -282,6 +282,15 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
   * **阶段二（同一连接 HTTP 301 重定向 + 服务头验证）**：在同一连接发送 GET 请求，通过统一 Deadline 超时控制与 4096B 动态余量循环读取，双兼容分隔符严格切分 Header 区域，零 Decode 字节匹配首行 `HTTP/X.X 301` 与单行 `Server: cloudflare`，彻底解决长 Cookie/安全头截断导致的假阴性误杀，并杜绝非 301 与伪装头假阳性。
 * **全产物联动删除剔除**：达到淘汰阈值（默认 2 次）的死节点，同步从 `data/scan_ips.csv`、`data/scan_ips.txt`、`data/scan_ips/*.txt`、`data/cf_ips.csv`、`data/cf_ips.txt` 中**彻底永久删除**。
 
+#### ④ 淘汰死节点墓地冷却机制与生命周期闭环（`data/tombstone.json`）
+* **痛点根治**：
+  * **阻断死节点复活回流（Resurrection Loop）**：由于抓取工具存在历史回溯窗口（默认 3 天），若仅在质检时物理删除节点，下一次抓取时频道历史消息中的死节点会被当成“全新节点”再次抓回复活。
+  * **失败计数防抹除（Anti-Wipeout）**：解决不稳定节点在缓冲期（`fail_count=1`）被频道重复抓取时覆盖重置为 0 的缺陷，严格保护并继承既有失败计数。
+* **工业级墓地记忆库**：
+  * **跨 CI 运行持久化**：被淘汰的死节点自动规范化提取键名（`canonical_key`，如 `host:port`），登记入 `data/tombstone.json`，受 Git 跟踪并由 Actions 工作流自动提交推送，跨容器保持全局记忆。
+  * **7 天隔离期与自动修剪（TTL Pruning）**：默认设置 7 天冷却隔离期，完全覆盖 3 天回溯抓取窗口。在每次读取与登记时自动清除超过 7 天的陈旧记录，确保墓地文件轻量高效。
+  * **全链路源头拦截**：`tg_fetch.py` 在加载本地历史、抓取正文消息及解析附件时，全流程匹配墓地黑名单并 $O(1)$ 丢弃拦截，彻底杜绝死节点回流入库。
+
 ---
 
 ## 环境变量配置

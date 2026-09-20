@@ -12,6 +12,8 @@ TG 频道代理与 Cloudflare 优选 IP 同步工具 (tg_fetch.py)
      自动巡检本次新增节点，遇未在权威对照表中收录的新自治系统时，动态生成 Telegram 卡片提醒并支持一键入库。
 """
 
+from __future__ import annotations
+
 import os
 import time
 import re
@@ -54,6 +56,10 @@ from providers import (
     is_asn_recorded,
     _extract_asn_code,
     normalize_timestamp,
+    load_tombstone,
+    record_tombstone,
+    is_tombstoned,
+    canonical_key,
 )
 from parsers import (
     extract_proxies,
@@ -162,10 +168,11 @@ def get_system_proxy() -> str:
 
 
 def load_existing_proxies(filepath: str = OUTPUT_PROXY_FILE) -> dict:
-    """读取本地已保存的代理列表，保留历史累积节点（只增不减）"""
+    """读取本地已保存的代理列表，保留历史累积有效节点（已淘汰进入墓地的节点跳过）"""
     existing = {}
     if not os.path.exists(filepath):
         return existing
+    tombstone = load_tombstone()
     try:
         with open(filepath, "r", encoding="utf-8") as f:
             for line in f:
@@ -173,18 +180,20 @@ def load_existing_proxies(filepath: str = OUTPUT_PROXY_FILE) -> dict:
                 if not line_s or line_s.startswith("#"):
                     continue
                 for url, key in extract_proxies(line_s):
-                    existing[key] = url
-        log.info("已加载本地已存代理节点: %d 个（历史节点全部保留）", len(existing))
+                    if not is_tombstoned(key, tombstone):
+                        existing[key] = url
+        log.info("已加载本地已存代理节点: %d 个（历史有效节点全部保留）", len(existing))
     except Exception as e:
         log.warning("读取已有代理文件失败: %s", e)
     return existing
 
 
 def load_existing_cf_ips(filepath: str = OUTPUT_CF_FILE) -> dict:
-    """读取本地已保存的优选 IP，保留历史累积数据（只增不减）"""
+    """读取本地已保存的优选 IP，保留历史累积数据（已淘汰进入墓地的节点跳过）"""
     existing = {}
     if not os.path.exists(filepath):
         return existing
+    tombstone = load_tombstone()
     try:
         with open(filepath, "r", encoding="utf-8-sig") as f:
             reader = csv.DictReader(f)
@@ -192,10 +201,12 @@ def load_existing_cf_ips(filepath: str = OUTPUT_CF_FILE) -> dict:
                 ip = row.get("ip", "").strip()
                 port = row.get("port", "").strip()
                 if ip and port:
-                    row["fail_count"] = safe_int(row.get("fail_count"), 0)
-                    row["tested_at"] = normalize_timestamp(row.get("tested_at", ""))
-                    existing[f"{ip}:{port}"] = row
-        log.info("已加载本地已存优选 IP 记录: %d 条（历史记录全部保留）", len(existing))
+                    key = f"{ip}:{port}"
+                    if not is_tombstoned(key, tombstone):
+                        row["fail_count"] = safe_int(row.get("fail_count"), 0)
+                        row["tested_at"] = normalize_timestamp(row.get("tested_at", ""))
+                        existing[key] = row
+        log.info("已加载本地已存优选 IP 记录: %d 条（历史有效记录全部保留）", len(existing))
     except Exception as e:
         log.warning("读取已有优选 IP 文件失败: %s", e)
     return existing
@@ -655,6 +666,14 @@ def merge_and_save(
     existing_proxyips = existing_proxyips or {}
     scraped_proxyips = scraped_proxyips or {}
 
+    tombstone = load_tombstone()
+
+    # 1. 过滤掉命中墓地的节点 (双重防御，杜绝死节点进入待存集合)
+    scraped_proxies = {k: v for k, v in scraped_proxies.items() if not is_tombstoned(k, tombstone)}
+    scraped_cf_ips = {k: v for k, v in scraped_cf_ips.items() if not is_tombstoned(k, tombstone)}
+    scraped_scan_ips = {k: v for k, v in scraped_scan_ips.items() if not is_tombstoned(k, tombstone)}
+    scraped_proxyips = {k: v for k, v in scraped_proxyips.items() if not is_tombstoned(k, tombstone)}
+
     new_proxy_cnt = sum(1 for k in scraped_proxies if k not in existing_proxies)
     updated_proxy_cnt = sum(1 for k in scraped_proxies if k in existing_proxies)
 
@@ -667,14 +686,40 @@ def merge_and_save(
     new_proxyip_cnt = sum(1 for k in scraped_proxyips if k not in existing_proxyips)
     updated_proxyip_cnt = sum(1 for k in scraped_proxyips if k in existing_proxyips)
 
+    # 2. 合并：严格保护历史 fail_count 与元数据，防止被新抓取结果抹除为 0
     final_proxies = {**existing_proxies, **scraped_proxies}
-    final_cf_ips = {**existing_cf_ips, **scraped_cf_ips}
-    final_scan_ips = {**existing_scan_ips, **scraped_scan_ips}
+
+    final_cf_ips = dict(existing_cf_ips)
+    for k, v in scraped_cf_ips.items():
+        if k in final_cf_ips:
+            # 关键修复：保留已有质检 fail_count，不被抓取默认的 0 抹除
+            v["fail_count"] = final_cf_ips[k].get("fail_count", 0)
+            if not v.get("tested_at") and final_cf_ips[k].get("tested_at"):
+                v["tested_at"] = final_cf_ips[k]["tested_at"]
+            final_cf_ips[k].update(v)
+        else:
+            final_cf_ips[k] = v
+
+    final_scan_ips = dict(existing_scan_ips)
+    for k, v in scraped_scan_ips.items():
+        if k in final_scan_ips:
+            # 关键修复：保留已有扫描 IP 失败计数
+            v["fail_count"] = final_scan_ips[k].get("fail_count", 0)
+            if not v.get("tested_at") and final_scan_ips[k].get("tested_at"):
+                v["tested_at"] = final_scan_ips[k]["tested_at"]
+            final_scan_ips[k].update(v)
+        else:
+            final_scan_ips[k] = v
+
     final_proxyips = dict(existing_proxyips)
     for k, v in scraped_proxyips.items():
         if k in final_proxyips:
+            # 关键修复：保留已有 ProxyIP 失败计数与双料提纯标记
+            v["fail_count"] = final_proxyips[k].get("fail_count", 0)
             if not v.get("cf_clean") and final_proxyips[k].get("cf_clean"):
                 v["cf_clean"] = final_proxyips[k]["cf_clean"]
+            if not v.get("tested_at") and final_proxyips[k].get("tested_at"):
+                v["tested_at"] = final_proxyips[k]["tested_at"]
             final_proxyips[k].update(v)
         else:
             final_proxyips[k] = v
@@ -792,6 +837,9 @@ def run_web_scraper():
     existing_scan_ips = load_existing_cf_ips(OUTPUT_SCAN_FILE)
     existing_proxyips = load_existing_cf_ips(OUTPUT_PROXYIP_FILE)
 
+    tombstone = load_tombstone()
+    log.info("已加载墓地黑名单: %d 个冷却中死节点（7天内淘汰）", len(tombstone))
+
     cutoff = datetime.now(timezone.utc) - timedelta(days=FETCH_DAYS)
     all_channels = sorted(list(set(PROXY_CHANNELS + CF_IP_CHANNELS)))
 
@@ -810,6 +858,8 @@ def run_web_scraper():
         if is_proxy_target:
             p_cnt = 0
             for url, key in raw_proxies:
+                if is_tombstoned(key, tombstone):
+                    continue
                 if key not in scraped_proxies:
                     scraped_proxies[key] = url
                     p_cnt += 1
@@ -819,6 +869,8 @@ def run_web_scraper():
             cf_cnt = 0
             for item in raw_cf_ips:
                 key = f"{item['ip']}:{item['port']}"
+                if is_tombstoned(key, tombstone):
+                    continue
                 if key not in scraped_cf_ips:
                     scraped_cf_ips[key] = item
                     cf_cnt += 1
@@ -856,6 +908,9 @@ async def run_telethon():
     existing_cf_ips = load_existing_cf_ips(OUTPUT_CF_FILE)
     existing_scan_ips = load_existing_cf_ips(OUTPUT_SCAN_FILE)
     existing_proxyips = load_existing_cf_ips(OUTPUT_PROXYIP_FILE)
+
+    tombstone = load_tombstone()
+    log.info("已加载墓地黑名单: %d 个冷却中死节点（7天内淘汰）", len(tombstone))
 
     client = TelegramClient(
         StringSession(TG_SESSION_STR), int(TG_API_ID), TG_API_HASH
@@ -907,6 +962,8 @@ async def run_telethon():
                     if is_proxy_target:
                         if msg.text:
                             for url, key in extract_proxies(msg.text):
+                                if is_tombstoned(key, tombstone):
+                                    continue
                                 if key not in scraped_proxies:
                                     scraped_proxies[key] = url
                                     proxy_count += 1
@@ -922,6 +979,8 @@ async def run_telethon():
                                         doc_proxies = parse_proxy_attachment_content(doc_text)
                                         doc_added = 0
                                         for url, key in doc_proxies:
+                                            if is_tombstoned(key, tombstone):
+                                                continue
                                             if key not in scraped_proxies:
                                                 scraped_proxies[key] = url
                                                 proxy_count += 1
@@ -935,11 +994,12 @@ async def run_telethon():
                             cf_data = parse_cf_ip(msg.text, default_channel=channel_name)
                             if cf_data:
                                 cf_key = f"{cf_data['ip']}:{cf_data['port']}"
-                                if cf_key not in scraped_cf_ips:
-                                    if not cf_data["tested_at"] and msg.date:
-                                        cf_data["tested_at"] = msg.date.astimezone(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S")
-                                    scraped_cf_ips[cf_key] = cf_data
-                                    cf_count += 1
+                                if not is_tombstoned(cf_key, tombstone):
+                                    if cf_key not in scraped_cf_ips:
+                                        if not cf_data["tested_at"] and msg.date:
+                                            cf_data["tested_at"] = msg.date.astimezone(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S")
+                                        scraped_cf_ips[cf_key] = cf_data
+                                        cf_count += 1
 
                         # 支持自动下载并解析优选扫描附件与反代 ProxyIP 附件 (独立归入各自集合)
                         if msg.file and msg.file.name:
@@ -955,6 +1015,8 @@ async def run_telethon():
                                         doc_added = 0
                                         for cf_item in doc_items:
                                             cf_key = f"{cf_item['ip']}:{cf_item['port']}"
+                                            if is_tombstoned(cf_key, tombstone):
+                                                continue
                                             if cf_key not in scraped_proxyips:
                                                 scraped_proxyips[cf_key] = cf_item
                                                 proxyip_count += 1
@@ -973,6 +1035,8 @@ async def run_telethon():
                                         doc_added = 0
                                         for cf_item in doc_items:
                                             cf_key = f"{cf_item['ip']}:{cf_item['port']}"
+                                            if is_tombstoned(cf_key, tombstone):
+                                                continue
                                             if cf_key not in scraped_scan_ips:
                                                 scraped_scan_ips[cf_key] = cf_item
                                                 scan_count += 1
@@ -991,6 +1055,8 @@ async def run_telethon():
                                         doc_added = 0
                                         for cf_item in doc_items:
                                             cf_key = f"{cf_item['ip']}:{cf_item['port']}"
+                                            if is_tombstoned(cf_key, tombstone):
+                                                continue
                                             if cf_key not in scraped_scan_ips:
                                                 scraped_scan_ips[cf_key] = cf_item
                                                 scan_count += 1

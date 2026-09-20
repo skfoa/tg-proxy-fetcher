@@ -15,6 +15,8 @@ Cloudflare 优选 IP 两阶段主动校验与淘汰引擎 (cf_verify.py)
      向 Telegram 发送全流水线统一统计、分引擎淘汰明细以及动态未收录 ASN 提示卡片。
 """
 
+from __future__ import annotations
+
 import argparse
 import asyncio
 import csv
@@ -39,6 +41,8 @@ from providers import (
     ASN_TO_PROVIDER,
     TG_BOT_TOKEN,
     TG_CHAT_ID,
+    record_tombstone,
+    canonical_key,
 )
 
 # 确保本地 .env 加载
@@ -683,6 +687,17 @@ async def async_main(args):
         save_scan_dir(asn_groups, SCAN_DIR)
     else:
         log.info(">>> %s 文件不存在或无数据，跳过扫描优选校验", SCAN_CSV)
+
+    # 统一登记淘汰死节点入墓地冷却库
+    all_dead = []
+    if cf_rows:
+        all_dead.extend([r for r in cf_rows if safe_int(r.get("fail_count"), 0) >= args.max_fails])
+    if scan_rows:
+        all_dead.extend([r for r in scan_rows if safe_int(r.get("fail_count"), 0) >= args.max_fails])
+    if all_dead:
+        all_dead_keys = [canonical_key(r.get("ip", ""), r.get("port", 0)) for r in all_dead]
+        newly_tombstoned = record_tombstone(all_dead_keys)
+        log.info("[优选 IP 墓地] 已登记 %d 个淘汰死节点至墓地冷却库 (新增: %d 个, 隔离期 7 天)", len(all_dead_keys), newly_tombstoned)
 
     elapsed = time.time() - t_start
     log.info("全部优选 IP 两阶段校验流程圆满完成，总耗时 %.2f 秒", elapsed)

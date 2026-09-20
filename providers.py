@@ -10,7 +10,11 @@
      ProxyIP 按国家/地区聚合分组及稀缺高价值网络专线纯文本分类导出。
   5. load_dotenv() / safe_int(): 本地环境加载与安全类型转换。
   6. send_tg_message() / send_ci_failure_alert(): 统一 Telegram 消息推送与 Actions CI 失败秒级告警。
+  7. canonical_key() / load_tombstone() / record_tombstone() / is_tombstoned():
+     全生命周期淘汰死节点墓地记忆库与隔离冷却机制（默认 7 天自动修剪）。
 """
+
+from __future__ import annotations
 
 KNOWN_CLOUD_PROVIDERS = {
     # 头部公有云与 CDN 服务
@@ -160,6 +164,7 @@ import json
 import logging
 import os
 import re
+import time
 import urllib.request
 import zlib
 from datetime import datetime, timezone, timedelta
@@ -907,6 +912,109 @@ def save_proxyip_by_country(rows: list, output_dir: str) -> int:
                 pass
 
     return len(active_files)
+
+
+# =====================================================================
+# 墓地机制 (Tombstone): 淘汰死节点记忆库与隔离冷却管理
+# =====================================================================
+
+TOMBSTONE_FILE = os.path.join("data", "tombstone.json")
+TOMBSTONE_MAX_AGE_DAYS = 7
+
+
+def canonical_key(host_or_ip: str, port: int | str) -> str:
+    """生成标准化节点去重/墓地键 (小写 host/ip + 规范纯数字端口)"""
+    h = str(host_or_ip).strip().lower()
+    try:
+        p = int(str(port).strip())
+    except (ValueError, TypeError):
+        p = str(port).strip()
+    return f"{h}:{p}"
+
+
+def load_tombstone(filepath: str | None = None, max_age_days: int = TOMBSTONE_MAX_AGE_DAYS) -> dict[str, int]:
+    """
+    读取墓地黑名单 (已被淘汰的死节点记忆库)。
+    自动过滤/清理超过 max_age_days 天的过期记录，确保黑名单体积极简轻量。
+    返回 {canonical_key: eliminated_timestamp}。
+    """
+    if filepath is None:
+        filepath = TOMBSTONE_FILE
+    if not os.path.isfile(filepath):
+        return {}
+    now = int(time.time())
+    max_age_sec = max_age_days * 86400
+    valid: dict[str, int] = {}
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        if isinstance(data, dict):
+            for k, ts in data.items():
+                if isinstance(ts, (int, float)) and (now - int(ts)) < max_age_sec:
+                    valid[str(k).strip().lower()] = int(ts)
+    except Exception as e:
+        log.warning("读取墓地文件 %s 失败: %s", filepath, e)
+    return valid
+
+
+def record_tombstone(
+    keys: list[str] | set[str],
+    filepath: str | None = None,
+    max_age_days: int = TOMBSTONE_MAX_AGE_DAYS,
+) -> int:
+    """
+    将新淘汰的死节点 canonical_key 批量登记至墓地持久化文件。
+    登记时间为当前 Unix 时间戳，同时自动修剪超过 max_age_days 的历史陈旧死节点。
+    采用原子写入 (.tmp -> os.replace) 防止并发损坏。
+    返回本次新增登记的节点数量。
+    """
+    if not keys:
+        return 0
+    if filepath is None:
+        filepath = TOMBSTONE_FILE
+    now = int(time.time())
+    tombstone = load_tombstone(filepath=filepath, max_age_days=max_age_days)
+    new_count = 0
+    for k in keys:
+        if not k:
+            continue
+        clean_k = str(k).strip().lower()
+        if clean_k not in tombstone:
+            new_count += 1
+        tombstone[clean_k] = now
+
+    dir_name = os.path.dirname(os.path.abspath(filepath))
+    if dir_name:
+        os.makedirs(dir_name, exist_ok=True)
+    tmp_path = f"{filepath}.tmp"
+    try:
+        with open(tmp_path, "w", encoding="utf-8") as f:
+            json.dump(tombstone, f, ensure_ascii=False, indent=2)
+        os.replace(tmp_path, filepath)
+    except Exception as e:
+        log.warning("写入墓地文件 %s 失败: %s", filepath, e)
+        if os.path.exists(tmp_path):
+            try:
+                os.remove(tmp_path)
+            except OSError:
+                pass
+    return new_count
+
+
+def is_tombstoned(
+    key: str,
+    tombstone: dict[str, int],
+    max_age_days: int = TOMBSTONE_MAX_AGE_DAYS,
+) -> bool:
+    """检查节点是否处于墓地冷却隔离期内 (O(1) 判定)"""
+    if not key or not tombstone:
+        return False
+    clean_k = str(key).strip().lower()
+    ts = tombstone.get(clean_k)
+    if ts is None:
+        return False
+    now = int(time.time())
+    return (now - ts) < (max_age_days * 86400)
 
 
 if __name__ == "__main__":

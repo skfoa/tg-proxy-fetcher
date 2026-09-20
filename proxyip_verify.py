@@ -20,6 +20,8 @@ Cloudflare 反代 ProxyIP 穿透质检与淘汰引擎 (proxyip_verify.py)
   - 结果聚合：支持将质检与双料优选统计回写至 .fetch_stats.json，由流水线终点 cf_verify 聚合发送四维合一总览卡片
 """
 
+from __future__ import annotations
+
 import argparse
 import asyncio
 import csv
@@ -45,6 +47,8 @@ from providers import (
     save_proxyip_by_country,
     classify_asn,
     normalize_timestamp,
+    record_tombstone,
+    canonical_key,
 )
 
 # 确保本地 .env 加载
@@ -517,6 +521,10 @@ async def async_main(args):
 
     if eliminated > 0:
         log.info("[ProxyIP 淘汰] 剔除 %d 条连续失败 >= %d 次的死节点", eliminated, args.max_fails)
+        dead_nodes = [r for r in rows if _get_fc(r) >= args.max_fails]
+        dead_keys = [canonical_key(r.get("ip", ""), r.get("port", 0)) for r in dead_nodes]
+        newly_tombstoned = record_tombstone(dead_keys)
+        log.info("[ProxyIP 墓地] 已登记 %d 个淘汰死节点至墓地冷却库 (新增: %d 个, 隔离期 7 天)", len(dead_keys), newly_tombstoned)
     else:
         log.info("[ProxyIP 淘汰] 本次无节点达到连续失败 %d 次的淘汰阈值", args.max_fails)
 
