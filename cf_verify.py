@@ -7,11 +7,11 @@ Cloudflare 优选 IP 两阶段主动校验与淘汰引擎 (cf_verify.py)
   阶段二：同一连接发送 HTTP 请求，验证返回 301 Moved Permanently 且 Server: cloudflare
 
 淘汰与全流水线汇总机制：
-  1. 物理淘汰：连续失败达到阈值（默认 2 次）的死节点，全面从所有产物中永久删除：
+  1. 物理淘汰：连续失败达到阈值（优选与反代默认 2 次，通用代理默认 3 次）的死节点，全面从所有产物中永久删除：
      - scan_ips.csv、scan_ips.txt、scan_ips/*.txt (独立机房分组文本)
      - cf_ips.csv、cf_ips.txt (单条优选数据表与纯文本清单)
-  2. 四维合一卡片推送：流水线末尾自动聚合 tg_fetch、socks_verify、proxyip_verify 与自身结果，
-     向 Telegram 发送全流水线统一统计、淘汰明细以及动态未收录 ASN 提示卡片。
+  2. 四维合一卡片推送：流水线末尾自动聚合 tg_fetch、socks_verify（通用代理 ≥3 次淘汰）、proxyip_verify（反代 ≥2 次淘汰）与自身结果，
+     向 Telegram 发送全流水线统一统计、分引擎淘汰明细以及动态未收录 ASN 提示卡片。
 """
 
 import argparse
@@ -401,7 +401,18 @@ def send_verify_notification(
     if scan_eliminated > 0:
         elim_details.append(f"扫描优选 {scan_eliminated}")
     detail_str = f" [{', '.join(elim_details)}]" if elim_details else ""
-    elim_str = f"<code>{total_eliminated}</code> 条{detail_str} (连续失败 ≥ {max_fails} 次)" if total_eliminated > 0 else "无 (全部在存活阈值内)"
+    socks_max_fails = fetch_stats.get("socks_max_fails", 3) if fetch_stats else 3
+    if total_eliminated > 0:
+        if socks_eliminated > 0 and socks_max_fails != max_fails:
+            if socks_eliminated == total_eliminated:
+                threshold_desc = f"(连续失败 ≥ {socks_max_fails} 次)"
+            else:
+                threshold_desc = f"(代理 ≥ {socks_max_fails} 次 · 其余 ≥ {max_fails} 次)"
+        else:
+            threshold_desc = f"(连续失败 ≥ {max_fails} 次)"
+        elim_str = f"<code>{total_eliminated}</code> 条{detail_str} {threshold_desc}"
+    else:
+        elim_str = "无 (全部在存活阈值内)"
 
     if fetch_stats:
         # 联合完整流水线卡片

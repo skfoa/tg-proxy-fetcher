@@ -505,6 +505,7 @@ async def async_main(args):
             stats["proxyip_survivors"] = survivors_len
             stats["proxyip_cf_clean"] = cf_clean_count
             stats["proxyip_elapsed"] = elapsed
+            stats["proxyip_max_fails"] = args.max_fails
             with open(fetch_stats_file, "w", encoding="utf-8") as f:
                 json.dump(stats, f, ensure_ascii=False, indent=2)
             log.info("已将 ProxyIP 质检统计写入 %s (并入统一卡片)", fetch_stats_file)

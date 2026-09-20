@@ -30,7 +30,7 @@
 
 - **🚀 免登录基础模式**：未配置 API 凭据时自动启用，零门槛抓取频道消息正文中的通用代理与单条优选 IP。
 - **🛡️ 官方 API 全功能模式**：配置 `TG_API_ID`、`TG_API_HASH` 与 `TG_SESSION_STR` 后自动激活，解锁频道附件自动下载，获取千条级机房扫描 IP 与反代池。
-- **📦 智能增量持久化与缓冲保护**：历史抓取的有效节点自动累积留存，新节点自动追加去重，同时引入公网抖动缓冲保护（连续 2 次全网不可达方才剔除死节点），兼顾大池沉淀与高可用纯净度。
+- **📦 智能增量持久化与缓冲保护**：历史抓取的有效节点自动累积留存，新节点自动追加去重，同时引入公网抖动缓冲保护（通用代理连续 3 次、优选与反代连续 2 次全网不可达方才剔除死节点），兼顾大池沉淀与高可用纯净度。
 - **🔍 跨文件严格唯一去重**：以 `IP:端口` 为全局主键，新老文件重复提取自动刷新覆盖，绝无重复行；IP 归属更正时自动迁移所属 ASN 文件。
 - **📁 智能 ASN 分组与命名**：
   - **DanFeng 测速**：CSV 内部无 ASN 列时自动从文件名（如 `AS45102_CNNICALIBABACNNETAP_*.csv`）解析归类。
@@ -137,7 +137,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 ### 1. `data/socks5.txt` / `data/socks5.csv`（通用代理节点清单与质检表）
 * **智能增量合并**：每次抓取优先比对历史库，新发布的节点自动追加并去重，以 `host:port` 为唯一标识刷新认证与配置。
 * **主动质检淘汰（`socks_verify.py`）**：集成 RFC 1928（SOCKS5 协商/认证/CONNECT 隧道穿透）、RFC 5389（STUN/TURN Binding 鉴真）、HTTP CONNECT 穿透全套真实网络协议握手引擎。
-* **连续失败缓冲保护（`--max-fails 3`）**：首次探测失败标记缓冲（`fail_count=1`），连续 3 次全网不可达方才彻底剔除，避免公网抖动误杀。
+* **连续失败缓冲保护（`--max-fails 3`）**：探测失败标记缓冲（`fail_count=1~2` 为缓冲期），连续 3 次全网不可达方才彻底剔除，避免公网抖动误杀。
 * **双模持久化**：
   - `data/socks5.txt`：纯文本每行一个可用节点 URL，开箱即用。
   - `data/socks5.csv`：结构化表格，包含协议类型、测速延迟（ms）、连续失败次数、Cloudflare Colo 数据中心与质检时间戳。
@@ -279,7 +279,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 * **全量优选 IP 覆盖**：无论来源，**只要是优选 IP（涵盖 `data/scan_ips` 扫描测速与 `data/cf_ips` 每日单条全线产物），一律全部执行阶段一与阶段二探测**：
   * **阶段一（TLS 握手 + 证书鉴真）**：建立 TLS 握手并验证 `crypto.cloudflare.com` 官方证书有效性。
   * **阶段二（HTTP 301 重定向 + 服务头验证）**：同一连接请求根路径，验证返回 `301 Moved Permanently` 且响应头包含 `Server: cloudflare`。
-* **全产物联动删除剔除**：达到淘汰阈值的死节点，同步从 `data/scan_ips.csv`、`data/scan_ips.txt`、`data/scan_ips/*.txt`、`data/cf_ips.csv`、`data/cf_ips.txt` 中**彻底永久删除**。
+* **全产物联动删除剔除**：达到淘汰阈值（默认 2 次）的死节点，同步从 `data/scan_ips.csv`、`data/scan_ips.txt`、`data/scan_ips/*.txt`、`data/cf_ips.csv`、`data/cf_ips.txt` 中**彻底永久删除**。
 
 ---
 
@@ -320,7 +320,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 | 参数名 / 选项 | 对应脚本 | CI 预设值 | 默认值 | 说明 |
 | :--- | :--- | :---: | :---: | :--- |
 | `--concurrency` | 校验脚本 | `250` ~ `300` | `100` ~ `150` | 质检异步并发协程数，数值越大质检越快 |
-| `--max-fails` | 校验脚本 | `2` | `2` | 连续失败物理淘汰阈值（设为 `1` 即为严格无缓冲模式） |
+| `--max-fails` | 校验脚本 | `代理 3 / 其余 2` | `代理 3 / 其余 2` | 连续失败物理淘汰阈值（通用代理默认 3 次，优选/反代默认 2 次；设为 `1` 即为严格无缓冲模式） |
 | `--timeout` | 校验脚本 | `3.0` | `5.0` | 单节点连接建立与 TLS 握手超时秒数 |
 | `--no-notify` | 校验脚本 | 流水线静默 | 关闭 | 不单独推送各引擎卡片，由流水线终点聚合为四合一卡片 |
 | `DEFER_NOTIFY` | `tg_fetch.py` | `1` | `0` | 延迟 Telegram 推送标记，确保四合一卡片聚合完整 |
@@ -350,7 +350,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
    • 优选检验：TLS 握手 + HTTP 301 (250 并发)
    • 代理检验：RFC 1928 全协议穿透鉴真
    • 反代检验：/cdn-cgi/trace 穿透 + 优选双能
-   • 淘汰死节点：31 条 [代理 12, 反代 15, 扫描优选 4] (连续失败 ≥ 2 次)
+   • 淘汰死节点：31 条 [代理 12, 反代 15, 扫描优选 4] (代理 ≥ 3 次 · 其余 ≥ 2 次)
 📡 频道来源：@danfeng2, @otcfxq
 ━━━━━━━━━━━━━━━━━━━━
 ⚡ 总耗时: 165.2s · 🔗 Action #35 · 📦 产物仓库

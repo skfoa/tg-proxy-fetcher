@@ -622,7 +622,7 @@ async def async_main(args):
     tasks = [_worker(r) for r in rows]
     results = await asyncio.gather(*tasks)
 
-    # 幸存者筛选（包含本次探测存活节点 + 处于连续失败容忍缓冲期内的节点）
+    # 幸存者筛选（包含本次探测存活节点 + 处于连续失败容忍缓冲期内的节点：fail_count < args.max_fails，默认连续失败 < 3 次保留，允许 1~2 次失败缓冲）
     survivors = [r for r in results if safe_int(r.get("fail_count"), 0) < args.max_fails]
     eliminated = total - len(survivors)
     survivors_len = len(survivors)
@@ -661,6 +661,7 @@ async def async_main(args):
             stats["socks_avg_delay_ms"] = avg_delay
             stats["socks_elapsed"] = elapsed
             stats["socks_proto_breakdown"] = proto_stats
+            stats["socks_max_fails"] = args.max_fails
             with open(fetch_stats_file, "w", encoding="utf-8") as f:
                 json.dump(stats, f, ensure_ascii=False, indent=2)
             log.info("已将 SOCKS5 质检统计写入 %s (并入统一卡片)", fetch_stats_file)
