@@ -100,6 +100,49 @@ SSL_CTX_CF.check_hostname = True
 SSL_CTX_CF.verify_mode = ssl.CERT_REQUIRED
 
 
+# 预编译正则，高并发下零重复编译开销
+RE_HTTP_200 = re.compile(rb"^HTTP/\d\.\d\s+200\b")
+RE_HTTP_301 = re.compile(rb"^HTTP/\d\.\d\s+301\b")
+RE_SERVER_CF = re.compile(rb"(?im)^server:\s*cloudflare\s*$")
+RE_COLO = re.compile(rb"colo=([A-Za-z0-9]+)", re.IGNORECASE)
+
+
+async def _read_full_response(reader, http_timeout: float, max_bytes: int = 4096) -> bytes:
+    """
+    循环读取直到拿到完整的 HTTP 响应头（遇到 \r\n\r\n 或 \n\n）或达到 max_bytes 硬上限。
+    用统一 deadline 控制总耗时，避免多次循环导致累计超时远超 http_timeout。
+    单次 read() 动态计算剩余可用空间，避免读取超出 max_bytes 上限。
+    """
+    loop = asyncio.get_event_loop()
+    deadline = loop.time() + http_timeout
+    resp_bytes = b""
+    while len(resp_bytes) < max_bytes:
+        remaining = deadline - loop.time()
+        if remaining <= 0:
+            break
+        chunk = await asyncio.wait_for(
+            reader.read(min(1024, max_bytes - len(resp_bytes))),
+            timeout=remaining,
+        )
+        if not chunk:
+            break
+        resp_bytes += chunk
+        if b"\r\n\r\n" in resp_bytes or b"\n\n" in resp_bytes:
+            break
+    return resp_bytes
+
+
+def _split_header_body(resp_bytes: bytes) -> tuple[bytes, bytes]:
+    """按 \r\n\r\n 优先、\n\n 兜底切分 Header 与 Body 区域。"""
+    idx = resp_bytes.find(b"\r\n\r\n")
+    if idx != -1:
+        return resp_bytes[:idx], resp_bytes[idx + 4:]
+    idx = resp_bytes.find(b"\n\n")
+    if idx != -1:
+        return resp_bytes[:idx], resp_bytes[idx + 2:]
+    return resp_bytes, b""
+
+
 # ---------- 核心探测函数 ----------
 async def probe_proxyip(
     ip: str,
@@ -108,7 +151,7 @@ async def probe_proxyip(
     http_timeout: float = HTTP_TIMEOUT,
 ) -> tuple[bool, int, str]:
     """
-    对单个 ProxyIP 节点执行 TLS 穿透 + /cdn-cgi/trace 鉴真。
+    对单个 ProxyIP 节点执行 TLS 穿透 + /cdn-cgi/trace 鉴真（修复版 v2）。
 
     返回 (is_alive, latency_ms, colo):
         is_alive=True  -> 探测成功，latency_ms 为握手延迟，colo 为解析到的机房代号
@@ -137,21 +180,15 @@ async def probe_proxyip(
         writer.write(req)
         await asyncio.wait_for(writer.drain(), timeout=http_timeout)
 
-        resp = await asyncio.wait_for(reader.read(2048), timeout=http_timeout)
-        resp_text = resp.decode("utf-8", errors="ignore")
+        resp_bytes = await _read_full_response(reader, http_timeout)
+        header_part, body_part = _split_header_body(resp_bytes)
 
-        # 严格三维校验：
-        # 1. HTTP 状态码 200
-        lines = resp_text.splitlines()
-        first_line = lines[0] if lines else ""
-        is_200 = "200" in first_line
+        is_200 = bool(RE_HTTP_200.match(header_part))
+        is_cf = bool(RE_SERVER_CF.search(header_part))
 
-        # 2. Server 响应头包含 cloudflare
-        is_cf = "server: cloudflare" in resp_text.lower()
-
-        # 3. /cdn-cgi/trace 响应体包含有效的 colo=XXX
-        colo_match = re.search(r"\bcolo=([A-Za-z0-9]+)\b", resp_text)
-        colo = colo_match.group(1).upper() if colo_match else ""
+        # colo 字段在响应 Body 里（/cdn-cgi/trace 返回纯文本键值对），不在 Header
+        colo_match = RE_COLO.search(body_part)
+        colo = colo_match.group(1).decode().upper() if colo_match else ""
 
         is_alive = is_200 and is_cf and bool(colo)
         return is_alive, latency_ms, colo
@@ -172,8 +209,8 @@ async def probe_cf_clean(
     http_timeout: float = 1.8,
 ) -> bool:
     """
-    针对已确认穿透存活的 ProxyIP 节点，进一步鉴真其是否兼具 Cloudflare 官方优选直连能力。
-    判据：连接 crypto.cloudflare.com 必须通过官方 CA 证书链校验，且发送 GET / 返回 HTTP 301。
+    针对已确认穿透存活的 ProxyIP 节点，进一步鉴真其是否兼具 Cloudflare 官方优选直连能力（修复版 v2）。
+    判据：连接 crypto.cloudflare.com 必须通过官方 CA 证书链校验，且发送 GET / 返回 HTTP 301 + Server: cloudflare。
     """
     try:
         reader, writer = await asyncio.wait_for(
@@ -188,15 +225,19 @@ async def probe_cf_clean(
             f"GET / HTTP/1.1\r\n"
             f"Host: {PROBE_HOST_CF}\r\n"
             f"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36\r\n"
-            f"Connection: close\r\n\r\n"
+            f"Connection: close\r\n"
+            f"\r\n"
         ).encode("latin1")
         writer.write(req)
         await asyncio.wait_for(writer.drain(), timeout=http_timeout)
 
-        resp = await asyncio.wait_for(reader.read(512), timeout=http_timeout)
-        resp_text = resp.decode("utf-8", errors="ignore")
-        first_line = resp_text.splitlines()[0] if resp_text else ""
-        return ("301" in first_line) and ("server: cloudflare" in resp_text.lower())
+        resp_bytes = await _read_full_response(reader, http_timeout)
+        header_part, _ = _split_header_body(resp_bytes)
+
+        is_301 = bool(RE_HTTP_301.match(header_part))
+        is_cf = bool(RE_SERVER_CF.search(header_part))
+
+        return is_301 and is_cf
     except Exception:
         return False
     finally:

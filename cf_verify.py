@@ -79,6 +79,47 @@ SSL_CTX.verify_mode = ssl.CERT_REQUIRED
 
 
 
+# 预编译正则，高并发下零重复编译开销
+RE_HTTP_301 = re.compile(rb"^HTTP/\d\.\d\s+301\b")
+RE_SERVER_CF = re.compile(rb"(?im)^server:\s*cloudflare\s*$")
+
+
+async def _read_full_response(reader, http_timeout: float, max_bytes: int = 4096) -> bytes:
+    """
+    循环读取直到拿到完整的 HTTP 响应头（遇到 \r\n\r\n 或 \n\n）或达到 max_bytes 硬上限。
+    用统一 deadline 控制总耗时，避免多次循环导致累计超时远超 http_timeout。
+    单次 read() 动态计算剩余可用空间，避免读取超出 max_bytes 上限。
+    """
+    loop = asyncio.get_event_loop()
+    deadline = loop.time() + http_timeout
+    resp_bytes = b""
+    while len(resp_bytes) < max_bytes:
+        remaining = deadline - loop.time()
+        if remaining <= 0:
+            break
+        chunk = await asyncio.wait_for(
+            reader.read(min(1024, max_bytes - len(resp_bytes))),
+            timeout=remaining,
+        )
+        if not chunk:
+            break
+        resp_bytes += chunk
+        if b"\r\n\r\n" in resp_bytes or b"\n\n" in resp_bytes:
+            break
+    return resp_bytes
+
+
+def _split_header_body(resp_bytes: bytes) -> tuple[bytes, bytes]:
+    """按 \r\n\r\n 优先、\n\n 兜底切分 Header 与 Body 区域。"""
+    idx = resp_bytes.find(b"\r\n\r\n")
+    if idx != -1:
+        return resp_bytes[:idx], resp_bytes[idx + 4:]
+    idx = resp_bytes.find(b"\n\n")
+    if idx != -1:
+        return resp_bytes[:idx], resp_bytes[idx + 2:]
+    return resp_bytes, b""
+
+
 # ---------- 核心探测函数 ----------
 async def probe_ip(
     ip: str,
@@ -87,7 +128,7 @@ async def probe_ip(
     http_timeout: float = HTTP_TIMEOUT,
 ) -> tuple[bool, int]:
     """
-    对单个 IP:Port 执行 TLS 握手 + HTTP 301 校验。
+    对单个 IP:Port 执行 TLS 握手 + HTTP 301 校验（修复版 v2）。
 
     返回 (is_alive, latency_ms):
         is_alive=True  -> 校验通过，latency_ms 为 TLS 握手与连接延迟 (RTT)
@@ -115,12 +156,11 @@ async def probe_ip(
         writer.write(req)
         await asyncio.wait_for(writer.drain(), timeout=http_timeout)
 
-        resp = await asyncio.wait_for(reader.read(512), timeout=http_timeout)
+        resp_bytes = await _read_full_response(reader, http_timeout)
+        header_part, _ = _split_header_body(resp_bytes)
 
-        resp_text = resp.decode("utf-8", errors="ignore")
-        first_line = resp_text.splitlines()[0] if resp_text else ""
-        is_301 = "301" in first_line
-        is_cf = "server: cloudflare" in resp_text.lower()
+        is_301 = bool(RE_HTTP_301.match(header_part))
+        is_cf = bool(RE_SERVER_CF.search(header_part))
 
         return (is_301 and is_cf), latency_ms
     except Exception:
