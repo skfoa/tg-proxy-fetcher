@@ -3,8 +3,8 @@
 Cloudflare 反代 ProxyIP 穿透质检与淘汰引擎 (proxyip_verify.py)
 
 专门针对反代 ProxyIP（proxyip.csv / proxyip.txt / proxyip_cf.txt）执行深层应用层协议穿透探测：
-  1. TCP 三次握手 + TLS ClientHello（SNI: speed.cloudflare.com，跳过反代非官方证书校验）
-  2. HTTP/1.1 GET /cdn-cgi/trace 探针请求（浏览器伪装 UA, Connection: close）
+  1. TCP 三次握手 + TLS ClientHello（SNI: speed.cloudflare.com，跳过反代非官方证书校验，超时 4.0s 充分兼容跨洲网络延迟）
+  2. HTTP/1.1 GET /cdn-cgi/trace 探针请求（浏览器伪装 UA, Connection: close，读取超时 3.5s）
   3. 严格三维校验：统一 deadline 循环读取（上限 4096B），Header 与 Body 物理隔离，Header 严格校验 HTTP 200 + Server: cloudflare，Body 正则提取有效 colo 机房代号
   4. 官方优选直连能力检验（crypto.cloudflare.com 官方 CA 证书链校验 + HTTP 301 重定向抗截断精确校验）
   5. 优雅四次挥手关闭连接（writer.close + wait_closed），杜绝 RST 异常
@@ -12,7 +12,7 @@ Cloudflare 反代 ProxyIP 穿透质检与淘汰引擎 (proxyip_verify.py)
 淘汰、属性打标与分层导出机制：
   - 存活节点：fail_count 重置为 0，回填实时 delay_ms、colo 机房码并标记 cf_clean 属性
   - 失败节点：fail_count 递增 +1，标记 cf_clean="false"
-  - 物理淘汰：连续失败达到阈值（默认 2 次）的死节点从 proxyip.csv 与 proxyip.txt 中永久物理删除
+  - 物理淘汰：连续失败达到阈值（默认 2 次）的死节点从 proxyip.csv 与 proxyip.txt 中永久物理删除，并登入墓地（data/tombstone.json）防止回流
   - 双料提纯：自动筛选兼具 Cloudflare 官方优选直连能力的极品反代节点导出至 data/proxyip_cf.txt
   - 网络属性打标：落盘前调用 classify_asn 计算 net_type（isp/business/education/government/banking/datacenter）
   - 分类分国导出：自动输出分国家独立纯文本文件及【ISP_运营商原生宽带】、【BANK_银行金融专网】等 5 类特殊资产纯净列表
@@ -33,7 +33,6 @@ import re
 import ssl
 import sys
 import time
-from collections import defaultdict
 from datetime import datetime, timezone, timedelta
 
 from providers import (
@@ -81,10 +80,11 @@ PROBE_HOST = "speed.cloudflare.com"
 PROBE_PATH = "/cdn-cgi/trace"
 PROBE_HOST_CF = "crypto.cloudflare.com"
 
-TIMEOUT = 2.0
-HTTP_TIMEOUT = 2.5
-CONCURRENCY = 300
-MAX_FAILS = 2
+# 质检调优核心参数（兼顾跨洲网络高延迟与抗误杀设计）
+TIMEOUT = 4.0        # TCP 建立连接与 TLS 握手超时（实测 4.0s 显著降低跨洲远距离/家庭宽带假死误杀率）
+HTTP_TIMEOUT = 3.5   # HTTP /cdn-cgi/trace 读取统一 deadline 超时
+CONCURRENCY = 250    # 异步探测协程池并发上限（平滑并发，兼顾速度与对端防刷限流）
+MAX_FAILS = 2        # 连续失败物理淘汰阈值（第 1 次缓冲容错，连续 2 次全网不可达永久淘汰）
 
 # 包含 cf_clean 双能标记的完整字段定义
 CSV_FIELDS = [

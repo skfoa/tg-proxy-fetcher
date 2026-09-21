@@ -30,7 +30,6 @@ import struct
 import sys
 import time
 import urllib.parse
-from collections import defaultdict
 from datetime import datetime, timezone, timedelta
 
 from providers import (

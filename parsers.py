@@ -8,6 +8,8 @@ Telegram 消息与文件解析器模块 (parsers.py)
   4. 代理附件解析：识别并提取各类文本代理附件文件中的有效节点。
 """
 
+from __future__ import annotations
+
 import csv
 import logging
 import os

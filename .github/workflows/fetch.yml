@@ -59,7 +59,7 @@ jobs:
         run: python socks_verify.py --concurrency 300 --max-fails 3 --no-notify
 
       - name: 🔍 ProxyIP 穿透存活质检
-        run: python proxyip_verify.py --concurrency 300 --max-fails 2 --no-notify
+        run: python proxyip_verify.py --concurrency 250 --max-fails 2 --no-notify
 
       - name: 🛡️ 优选 IP 两阶段主动校验（TLS + 301）
         env:

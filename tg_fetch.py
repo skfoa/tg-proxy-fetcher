@@ -57,9 +57,7 @@ from providers import (
     _extract_asn_code,
     normalize_timestamp,
     load_tombstone,
-    record_tombstone,
     is_tombstoned,
-    canonical_key,
 )
 from parsers import (
     extract_proxies,
@@ -652,10 +650,10 @@ def merge_and_save(
     scraped_proxies: dict,
     existing_cf_ips: dict,
     scraped_cf_ips: dict,
-    existing_scan_ips: dict = None,
-    scraped_scan_ips: dict = None,
-    existing_proxyips: dict = None,
-    scraped_proxyips: dict = None,
+    existing_scan_ips: dict | None = None,
+    scraped_scan_ips: dict | None = None,
+    existing_proxyips: dict | None = None,
+    scraped_proxyips: dict | None = None,
 ):
     """
     智能增量合并：历史保留，重复更新，新增追加，并持久化落盘与发送通知。

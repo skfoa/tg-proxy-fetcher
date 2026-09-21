@@ -275,7 +275,8 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 * **穿透与优选双能探测**：
   * **穿透鉴真**：向反代节点发起 TLS ClientHello 握手（SNI: `speed.cloudflare.com`，跳过非官方证书校验），发送 HTTP/1.1 GET `/cdn-cgi/trace` 探针请求。采用统一 Deadline 超时控制与 4096B 上限循环读取，双兼容分隔符严格切分 Header 与 Body 区域：Header 字节级精确匹配 `HTTP 200` 与 `Server: cloudflare`，Body 独立正则提取有效 `colo` 机房代号，杜绝 Body 污染与 TCP 分片提前退出造成的误判。
   * **优选直连探测**：并发探测存活节点是否同时支持作为直连优选 IP（`crypto.cloudflare.com` 官方 CA 证书鉴真与 HTTP 301 重定向抗截断校验），自动提纯生成兼具双料特性的 `data/proxyip_cf.txt` 极品清单。
-* **淘汰机制**：连续失败达到阈值（默认 2 次）彻底从 `data/proxyip.txt`、`data/proxyip.csv` 永久物理删除。
+* **高可用调优参数**：握手与连接超时设为 `4.0s`（HTTP 读取 `3.5s`），充分兼容南美、中东、非洲等跨洲骨干网与家庭宽带的高 RTT 握手延时，消除短超时假死误杀；默认并发控制为 `250` 协程，配合 IP 哈希分段锁池平滑调度，避免突发流量触发对端限流。
+* **淘汰机制**：连续失败达到阈值（默认 2 次）彻底从 `data/proxyip.txt`、`data/proxyip.csv` 永久物理删除，并登入墓地（`data/tombstone.json`）7 天冷却防回流。
 
 #### ③ 优选 IP 两阶段主动鉴真引擎（`cf_verify.py`）
 * **全量优选 IP 覆盖**：无论来源，**只要是优选 IP（涵盖 `data/scan_ips` 扫描测速与 `data/cf_ips` 每日单条全线产物），一律全部执行阶段一与阶段二探测**：
@@ -330,9 +331,10 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 
 | 参数名 / 选项 | 对应脚本 | CI 预设值 | 默认值 | 说明 |
 | :--- | :--- | :---: | :---: | :--- |
-| `--concurrency` | 校验脚本 | `250` ~ `300` | `100` ~ `150` | 质检异步并发协程数，数值越大质检越快 |
+| `--concurrency` | 校验脚本 | `反代/优选 250 · 代理 300` | `150` ~ `250` | 质检异步并发协程数，平滑并发兼顾探测速度与对端防刷 |
 | `--max-fails` | 校验脚本 | `代理 3 / 其余 2` | `代理 3 / 其余 2` | 连续失败物理淘汰阈值（通用代理默认 3 次，优选/反代默认 2 次；设为 `1` 即为严格无缓冲模式） |
-| `--timeout` | 校验脚本 | `3.0` | `5.0` | 单节点连接建立与 TLS 握手超时秒数 |
+| `--timeout` | 校验脚本 | `反代 4.0 / 优选 3.0` | `3.0` ~ `5.0` | 单节点连接建立与 TLS 握手超时秒数（反代默认 4.0s 充分兼容跨洲 RTT） |
+| `--http-timeout` | `proxyip_verify.py` | `3.5` | `3.5` | 反代 HTTP /cdn-cgi/trace 响应读取统一 deadline 超时秒数 |
 | `--no-notify` | 校验脚本 | 流水线静默 | 关闭 | 不单独推送各引擎卡片，由流水线终点聚合为四合一卡片 |
 | `DEFER_NOTIFY` | `tg_fetch.py` | `1` | `0` | 延迟 Telegram 推送标记，确保四合一卡片聚合完整 |
 
