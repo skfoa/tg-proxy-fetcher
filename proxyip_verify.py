@@ -14,8 +14,8 @@ Cloudflare 反代 ProxyIP 穿透质检与淘汰引擎 (proxyip_verify.py)
   - 失败节点：fail_count 递增 +1，标记 cf_clean="false"
   - 物理淘汰：连续失败达到阈值（默认 2 次）的死节点从 proxyip.csv 与 proxyip.txt 中永久物理删除
   - 双料提纯：自动筛选兼具 Cloudflare 官方优选直连能力的极品反代节点导出至 data/proxyip_cf.txt
-  - 网络属性打标：落盘前调用 classify_asn 计算 net_type（isp/business/education/government/datacenter）
-  - 分类分国导出：自动输出分国家独立纯文本文件及【ISP_运营商原生宽带】等 4 类特殊资产纯净列表
+  - 网络属性打标：落盘前调用 classify_asn 计算 net_type（isp/business/education/government/banking/datacenter）
+  - 分类分国导出：自动输出分国家独立纯文本文件及【ISP_运营商原生宽带】、【BANK_银行金融专网】等 5 类特殊资产纯净列表
   - 排序落盘：存活优先（fail_count 升序），低延迟优先（delay_ms 升序），最新测试时间降序
   - 结果聚合：支持将质检与双料优选统计回写至 .fetch_stats.json，由流水线终点 cf_verify 聚合发送四维合一总览卡片
 """

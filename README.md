@@ -191,7 +191,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
     由于 Tier 1 / Tier 2 顶级电信运营商（如 HKT, SK Broadband, Comcast, Charter 等）名下的自治系统（ASN）属于综合广播，同一个自治系统内部通常既广播给普通居民家庭光纤宽带，也广播给本地商户静态专线，甚至包含部分自建机房。因此，**在无需付费调用第三方商业 IP 数据库的前提下，方案 A+ 保证的是“运营商原生广播资产（非托管机房）”，无法保证 100% 来自居民家里的真实物理光猫**。
   - **风控优势**：
     常规机房 IP（如 AWS, 腾讯云, 阿里云, Hetzner, DigitalOcean 等）在各大反欺诈（IP Fraud Score）、反爬虫与 Cloudflare Turnstile / 盾防御数据库中均被标记为高风险 `Hosting / Datacenter`，极易弹出人机验证甚至直接拦截。而**运营商原生宽带、商业专线与高校科研网节点在主流风控体系中具有极高的天然声誉（Trust Score）**，过盾成功率和防封稳定性显著优于常规 VPS。
-* **结构化数据**：`data/proxyip.csv` 新增 `net_type` 字段（取值：`datacenter`、`isp`、`business`、`education`、`government`），保留延迟、数据中心、落地位置与 `cf_clean` 优选标记等关键信息。
+* **结构化数据**：`data/proxyip.csv` 新增 `net_type` 字段（取值：`datacenter`、`isp`、`business`、`education`、`government`、`banking`），保留延迟、数据中心、落地位置与 `cf_clean` 优选标记等关键信息。内置 1,780+ 权威 ASN 全量归一化映射，毫秒级定性。
 
 ### 5. 数据表通用字段说明
 * 采用 `UTF-8-SIG` 编码，Windows Excel 直接双击打开不乱码。
@@ -234,13 +234,14 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 | `channel` | 字符串 | 来源频道或附件源 | `@danfeng2` |
 | `fail_count` | 整数 | 连续探测失败次数（连续失败 ≥ 2 次永久物理删除） | `0` |
 | `cf_clean` | 字符串 | **【核心属性】** 是否兼具 Cloudflare 官方证书直连优选能力 (`true`/`false`) | `true` |
-| `net_type` | 字符串 | **【核心属性】** 网络类型归属（详见下方 5 类取值说明） | `isp` |
+| `net_type` | 字符串 | **【核心属性】** 网络类型归属（详见下方 6 类取值说明） | `isp` |
 
 > 📌 **`net_type` 网络分类取值与对应导出品**：
 > - `isp`：运营商原生民用宽带 ➔ 对应导出 `data/proxyip/【ISP_运营商原生宽带】.txt`
 > - `business`：商业专线与企业宽带 ➔ 对应导出 `data/proxyip/【BIZ_商业企业专线】.txt`
 > - `education`：高校教育科研网 ➔ 对应导出 `data/proxyip/【EDU_高校教育科研】.txt`
 > - `government`：政务公用网与国家骨干 ➔ 对应导出 `data/proxyip/【GOV_政务公共网络】.txt`
+> - `banking`：银行金融与中央银行专网 ➔ 对应导出 `data/proxyip/【BANK_银行金融专网】.txt`
 > - `datacenter`：常规数据中心/托管机房 ➔ 归入各国家/地区常规列表
 
 #### ③ 通用代理质检数据表（`data/socks5.csv`）
