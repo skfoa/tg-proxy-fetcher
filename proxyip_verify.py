@@ -42,6 +42,7 @@ from providers import (
     get_keyed_lock,
     TG_BOT_TOKEN,
     TG_CHAT_ID,
+    format_proxyip_txt,
     format_categorized_proxyip_txt,
     save_proxyip_by_country,
     classify_asn,
@@ -305,8 +306,8 @@ def save_proxyip(
     log.info("已覆写保存 %s: %d 条记录 (含 fail_count, cf_clean, net_type 列)", csv_path, len(rows))
 
     with open(txt_path, "w", encoding="utf-8") as f:
-        f.write(format_categorized_proxyip_txt(rows))
-    log.info("已按国家地区分类保存 %s: %d 条记录", txt_path, len(rows))
+        f.write(format_proxyip_txt(rows))
+    log.info("已按质检状态分层保存 %s: %d 条记录", txt_path, len(rows))
 
     split_cnt = save_proxyip_by_country(rows, dir_path)
     log.info("已在 %s/ 目录下生成 %d 个独立国家/地区纯文本文件", dir_path, split_cnt)

@@ -99,7 +99,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 | **`data/scan_ips.txt`** | 扫描测速总清单（按 ASN 分组） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/scan_ips.txt` |
 | **`data/scan_ips/*.txt`** | 独立 ASN + 厂商纯文本列表（单文件） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/scan_ips/AS{ASN}_{ISP}.txt` |
 | **`data/scan_ips.csv`** | 扫描测速优选 IP（数据表） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/scan_ips.csv` |
-| **`data/proxyip.txt`** | 反代 ProxyIP 总清单（按国家/地区分类，纯文本） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip.txt` |
+| **`data/proxyip.txt`** | 反代 ProxyIP 总清单（按存活/缓冲质检状态分层排序，纯文本） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip.txt` |
 | **`data/proxyip/*.txt`** | 独立国家/地区纯净反代列表（如 `美国.txt`、`日本.txt`） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip/{地区}.txt` |
 | **`data/proxyip/【...】.txt`** | 稀缺网络属性独立反代列表（原生宽带/商业/教育/政务） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip/【ISP_运营商原生宽带】.txt` 等 |
 | **`data/proxyip.csv`** | 反代 ProxyIP 详细数据表（含 `net_type` 网络分类） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip.csv` |
@@ -168,7 +168,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 
 ### 4. `data/proxyip/` 与 `data/proxyip_cf/`（反代 ProxyIP 专属池、分国别与高价值属性分类）
 * **独立反代池**：专门收录来自频道发布的反代文件（如 `Global-proxyip-443.csv`、`Global-proxyip-8443.csv` 等）。
-* **智能国家/地区分类与数量统计**：`data/proxyip.txt` 与 `data/proxyip_cf.txt` 自动根据机房数据中心代码（Colo）与落地信息归类聚合，按节点规模降序排列，以 `# 🇺🇸 美国 - 6686 个` 等清晰注释头分组，组内按延迟升序严选排列，既保证纯净即用（兼容主流 Worker/脚本），又极大方便按目标国家筛选取用。
+* **质检分层排序与分国专属列表**：`data/proxyip.txt` 专注于全量反代池的可用性质量分层，以 `# 存活节点 (无失败) - X 个` 与 `# 缓冲节点 (有失败) - Y 个` 清晰分段，段内按实测延迟严选升序排列；而各国家/地区专属分类则由 `data/proxyip/*.txt` 独立提供，各司其职无冗余。`data/proxyip_cf.txt` 则为兼具优选直连能力的提纯清单。
 * **分国家/地区独立单文件（点击即复制）**：
   - `data/proxyip/*.txt`：在 `data/proxyip/` 目录下按国家/地区拆分为独立文件（如 `data/proxyip/美国.txt`、`data/proxyip/日本.txt`、`data/proxyip/香港.txt` 等 76 个地区），内容 100% 为纯净的 `IP:端口`，无任何注释行，直接全选（Ctrl+A ➔ Ctrl+C）即可复制或作为分地区远程订阅。
   - `data/proxyip_cf/*.txt`：针对兼具官方证书直连能力的双料提纯节点，同样提供分国家独立纯净文本列表（如 `data/proxyip_cf/美国.txt`、`data/proxyip_cf/日本.txt`）。

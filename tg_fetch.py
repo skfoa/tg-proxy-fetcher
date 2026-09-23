@@ -50,7 +50,7 @@ from providers import (
     ASN_TO_PROVIDER,
     TG_BOT_TOKEN,
     TG_CHAT_ID,
-    format_categorized_proxyip_txt,
+    format_proxyip_txt,
     save_proxyip_by_country,
     classify_asn,
     is_asn_recorded,
@@ -597,8 +597,8 @@ def save_and_notify(
         log.info("已保存反代 ProxyIP 表格: %s (%d 条全量累积记录)", OUTPUT_PROXYIP_FILE, len(sorted_proxyips))
 
         with open(OUTPUT_PROXYIP_TXT, "w", encoding="utf-8") as f:
-            f.write(format_categorized_proxyip_txt(sorted_proxyips))
-        log.info("已保存反代 ProxyIP 纯文本: %s (%d 行/条记录，已按国家地区分类)", OUTPUT_PROXYIP_TXT, len(sorted_proxyips))
+            f.write(format_proxyip_txt(sorted_proxyips))
+        log.info("已保存反代 ProxyIP 纯文本: %s (%d 行/条记录，按质检状态分层)", OUTPUT_PROXYIP_TXT, len(sorted_proxyips))
 
         proxyip_split_cnt = save_proxyip_by_country(sorted_proxyips, OUTPUT_PROXYIP_DIR)
         log.info("已在 %s/ 目录下生成 %d 个独立国家/地区纯文本文件", OUTPUT_PROXYIP_DIR, proxyip_split_cnt)
