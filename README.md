@@ -30,7 +30,7 @@
 
 - **🚀 免登录基础模式**：未配置 API 凭据时自动启用，零门槛抓取频道消息正文中的通用代理与单条优选 IP。
 - **🛡️ 官方 API 全功能模式**：配置 `TG_API_ID`、`TG_API_HASH` 与 `TG_SESSION_STR` 后自动激活，解锁频道附件自动下载，获取千条级机房扫描 IP 与反代池。
-- **📦 智能增量持久化与缓冲保护**：历史抓取的有效节点自动累积留存，新节点自动追加去重，同时引入公网抖动缓冲保护（通用代理连续 3 次、优选与反代连续 2 次全网不可达方才剔除死节点），兼顾大池沉淀与高可用纯净度。
+- **📦 智能增量持久化与缓冲保护**：历史抓取的有效节点自动累积留存，新节点自动追加去重，同时引入公网抖动缓冲保护（全协议节点连续 3 次全网不可达方才剔除死节点），兼顾大池沉淀与高可用纯净度。
 - **🔍 跨文件严格唯一去重**：以 `IP:端口` 为全局主键，新老文件重复提取自动刷新覆盖，绝无重复行；IP 归属更正时自动迁移所属 ASN 文件。
 - **📁 智能 ASN 分组与命名**：
   - **DanFeng 测速**：CSV 内部无 ASN 列时自动从文件名（如 `AS45102_CNNICALIBABACNNETAP_*.csv`）解析归类。
@@ -214,7 +214,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 | `asn` | 字符串 | ASN 编号与组织 | `AS400618 Prime Security Corp.` |
 | `tested_at` | 时间字符串 | 测速与发布时间 | `2026-09-13 18:00:33` |
 | `channel` | 字符串 | 来源频道 | `@danfeng2` / `@otcfxq` |
-| `fail_count` | 整数 | 连续探测失败次数（默认 0，连续失败 ≥ 2 次自动淘汰剔除） | `0` |
+| `fail_count` | 整数 | 连续探测失败次数（默认 0，连续失败 ≥ 3 次自动淘汰剔除） | `0` |
 
 #### ② 反代 ProxyIP 穿透与网络属性数据表（`data/proxyip.csv`）
 *共 14 个字段，除基础网络字段外，独占 `cf_clean`（优选直连提纯）与 `net_type`（两级分层网络识别）两大核心资产属性：*
@@ -232,7 +232,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 | `asn` | 字符串 | 规范化 ASN 编号与组织 | `AS9269 Hong Kong Broadband` |
 | `tested_at` | 时间字符串 | 穿透质检测试时间 | `2026-09-19 18:00:00` |
 | `channel` | 字符串 | 来源频道或附件源 | `@danfeng2` |
-| `fail_count` | 整数 | 连续探测失败次数（连续失败 ≥ 2 次永久物理删除） | `0` |
+| `fail_count` | 整数 | 连续探测失败次数（连续失败 ≥ 3 次永久物理删除） | `0` |
 | `cf_clean` | 字符串 | **【核心属性】** 是否兼具 Cloudflare 官方证书直连优选能力 (`true`/`false`) | `true` |
 | `net_type` | 字符串 | **【核心属性】** 网络类型归属（详见下方 6 类取值说明） | `isp` |
 
@@ -276,13 +276,13 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
   * **穿透鉴真**：向反代节点发起 TLS ClientHello 握手（SNI: `speed.cloudflare.com`，跳过非官方证书校验），发送 HTTP/1.1 GET `/cdn-cgi/trace` 探针请求。采用统一 Deadline 超时控制与 4096B 上限循环读取，双兼容分隔符严格切分 Header 与 Body 区域：Header 字节级精确匹配 `HTTP 200` 与 `Server: cloudflare`，Body 独立正则提取有效 `colo` 机房代号，杜绝 Body 污染与 TCP 分片提前退出造成的误判。
   * **优选直连探测**：并发探测存活节点是否同时支持作为直连优选 IP（`crypto.cloudflare.com` 官方 CA 证书鉴真与 HTTP 301 重定向抗截断校验），自动提纯生成兼具双料特性的 `data/proxyip_cf.txt` 极品清单。
 * **高可用调优参数**：握手与连接超时设为 `4.0s`（HTTP 读取 `3.5s`），充分兼容南美、中东、非洲等跨洲骨干网与家庭宽带的高 RTT 握手延时，消除短超时假死误杀；默认并发控制为 `250` 协程，配合 IP 哈希分段锁池平滑调度，避免突发流量触发对端限流。
-* **淘汰机制**：连续失败达到阈值（默认 2 次）彻底从 `data/proxyip.txt`、`data/proxyip.csv` 永久物理删除，并登入墓地（`data/tombstone.json`）7 天冷却防回流。
+* **淘汰机制**：连续失败达到阈值（默认 3 次）彻底从 `data/proxyip.txt`、`data/proxyip.csv` 永久物理删除，并登入墓地（`data/tombstone.json`）7 天冷却防回流。
 
 #### ③ 优选 IP 两阶段主动鉴真引擎（`cf_verify.py`）
 * **全量优选 IP 覆盖**：无论来源，**只要是优选 IP（涵盖 `data/scan_ips` 扫描测速与 `data/cf_ips` 每日单条全线产物），一律全部执行阶段一与阶段二探测**：
   * **阶段一（TLS 握手 + 证书鉴真）**：建立 TLS 握手并验证 `crypto.cloudflare.com` 官方证书有效性（底层强制校验 CA 根证书链与主机名 SAN 匹配）。
   * **阶段二（同一连接 HTTP 301 重定向 + 服务头验证）**：在同一连接发送 GET 请求，通过统一 Deadline 超时控制与 4096B 动态余量循环读取，双兼容分隔符严格切分 Header 区域，零 Decode 字节匹配首行 `HTTP/X.X 301` 与单行 `Server: cloudflare`，彻底解决长 Cookie/安全头截断导致的假阴性误杀，并杜绝非 301 与伪装头假阳性。
-* **全产物联动删除剔除**：达到淘汰阈值（默认 2 次）的死节点，同步从 `data/scan_ips.csv`、`data/scan_ips.txt`、`data/scan_ips/*.txt`、`data/cf_ips.csv`、`data/cf_ips.txt` 中**彻底永久删除**。
+* **全产物联动删除剔除**：达到淘汰阈值（默认 3 次）的死节点，同步从 `data/scan_ips.csv`、`data/scan_ips.txt`、`data/scan_ips/*.txt`、`data/cf_ips.csv`、`data/cf_ips.txt` 中**彻底永久删除**。
 
 #### ④ 淘汰死节点墓地冷却机制与生命周期闭环（`data/tombstone.json`）
 * **痛点根治**：
@@ -332,7 +332,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 | 参数名 / 选项 | 对应脚本 | CI 预设值 | 默认值 | 说明 |
 | :--- | :--- | :---: | :---: | :--- |
 | `--concurrency` | 校验脚本 | `反代/优选 250 · 代理 300` | `150` ~ `250` | 质检异步并发协程数，平滑并发兼顾探测速度与对端防刷 |
-| `--max-fails` | 校验脚本 | `代理 3 / 其余 2` | `代理 3 / 其余 2` | 连续失败物理淘汰阈值（通用代理默认 3 次，优选/反代默认 2 次；设为 `1` 即为严格无缓冲模式） |
+| `--max-fails` | 校验脚本 | `全部引擎统一为 3` | `全部引擎统一为 3` | 连续失败物理淘汰阈值（全线引擎统一默认 3 次，允许 1~2 次网络抖动缓冲；设为 `1` 即为严格无缓冲模式） |
 | `--timeout` | 校验脚本 | `反代 4.0 / 优选 3.0` | `3.0` ~ `5.0` | 单节点连接建立与 TLS 握手超时秒数（反代默认 4.0s 充分兼容跨洲 RTT） |
 | `--http-timeout` | `proxyip_verify.py` | `3.5` | `3.5` | 反代 HTTP /cdn-cgi/trace 响应读取统一 deadline 超时秒数 |
 | `--no-notify` | 校验脚本 | 流水线静默 | 关闭 | 不单独推送各引擎卡片，由流水线终点聚合为四合一卡片 |
@@ -363,7 +363,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
    • 优选检验：TLS 握手 + HTTP 301 (250 并发)
    • 代理检验：RFC 1928 全协议穿透鉴真
    • 反代检验：/cdn-cgi/trace 穿透 + 优选双能
-   • 淘汰死节点：31 条 [代理 12, 反代 15, 扫描优选 4] (代理 ≥ 3 次 · 其余 ≥ 2 次)
+   • 淘汰死节点：31 条 [代理 12, 反代 15, 扫描优选 4] (连续失败 ≥ 3 次)
 📡 频道来源：@danfeng2, @otcfxq
 ━━━━━━━━━━━━━━━━━━━━
 ⚡ 总耗时: 165.2s · 🔗 Action #35 · 📦 产物仓库

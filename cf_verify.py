@@ -8,10 +8,10 @@ Cloudflare 优选 IP 两阶段主动校验与淘汰引擎 (cf_verify.py)
           字节级正则精准匹配状态行 HTTP/X.X 301 与单行 Server: cloudflare（抗报文截断假阴性与伪装头假阳性）
 
 淘汰与全流水线汇总机制：
-  1. 物理淘汰：连续失败达到阈值（优选与反代默认 2 次，通用代理默认 3 次）的死节点，全面从所有产物中永久删除：
+  1. 物理淘汰：连续失败达到阈值（默认 3 次）的死节点，全面从所有产物中永久删除：
      - scan_ips.csv、scan_ips.txt、scan_ips/*.txt (独立机房分组文本)
      - cf_ips.csv、cf_ips.txt (单条优选数据表与纯文本清单)
-  2. 四维合一卡片推送：流水线末尾自动聚合 tg_fetch、socks_verify（通用代理 ≥3 次淘汰）、proxyip_verify（反代 ≥2 次淘汰）与自身结果，
+  2. 四维合一卡片推送：流水线末尾自动聚合 tg_fetch、socks_verify、proxyip_verify（各引擎均为连续失败 ≥3 次淘汰）与自身结果，
      向 Telegram 发送全流水线统一统计、分引擎淘汰明细以及动态未收录 ASN 提示卡片。
 """
 
@@ -70,6 +70,7 @@ CF_TXT = os.path.join(DATA_DIR, "cf_ips.txt")
 PROBE_HOST = "crypto.cloudflare.com"
 TIMEOUT = 3.0
 HTTP_TIMEOUT = 2.0
+MAX_FAILS = 3
 CSV_FIELDS = [
     "ip", "port", "tls", "delay_ms", "speed_kbs",
     "colo", "cf_location", "isp", "asn",
@@ -722,7 +723,7 @@ async def async_main(args):
 def main():
     parser = argparse.ArgumentParser(description="Cloudflare 优选 IP 两阶段主动校验与淘汰引擎")
     parser.add_argument("--concurrency", type=int, default=250, help="并发探测协程数 (默认 250)")
-    parser.add_argument("--max-fails", type=int, default=2, help="连续失败淘汰阈值 (默认 2)")
+    parser.add_argument("--max-fails", type=int, default=MAX_FAILS, help=f"连续失败淘汰阈值 (默认 {MAX_FAILS})")
     parser.add_argument("--timeout", type=float, default=TIMEOUT, help="单节点连接与 TLS 握手超时秒数 (默认 3.0)")
     parser.add_argument("--http-timeout", type=float, default=HTTP_TIMEOUT, help="单节点 HTTP 校验超时秒数 (默认 2.0)")
     args = parser.parse_args()
