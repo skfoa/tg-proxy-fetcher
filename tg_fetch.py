@@ -94,8 +94,8 @@ def _parse_channels(env_name: str, default: list[str]) -> list[str]:
     return channels if channels else default
 
 
-PROXY_CHANNELS = _parse_channels("PROXY_CHANNELS", ["@otcfxq"])
-CF_IP_CHANNELS = _parse_channels("CF_IP_CHANNELS", ["@otcfxq", "@danfeng2"])
+PROXY_CHANNELS = _parse_channels("PROXY_CHANNELS", ["@otcfxq", "@danfeng_chat"])
+CF_IP_CHANNELS = _parse_channels("CF_IP_CHANNELS", ["@otcfxq", "@danfeng_chat"])
 
 DATA_DIR = "data"
 OUTPUT_PROXY_FILE = os.path.join(DATA_DIR, "socks5.txt")

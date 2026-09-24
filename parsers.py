@@ -150,7 +150,7 @@ def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
 
 def parse_cf_csv_content(
     text: str,
-    default_channel: str = "@danfeng2",
+    default_channel: str = "@danfeng_chat",
     filename: str = "",
     dt_str: str = "",
 ) -> list[dict]:

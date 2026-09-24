@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
 
-每天自动从 Telegram 优质公开频道（[@otcfxq](https://t.me/otcfxq)、[@danfeng2](https://t.me/danfeng2)）抓取多协议代理节点、Cloudflare 优选 IP 以及反代 ProxyIP。系统具备**智能增量持久化**、**全局智能去重**与**三大主动质检淘汰机制**，自动导出通用代理列表、纯净 `IP:端口` 文本列表以及结构化测速数据表格，并通过 GitHub Actions 每天定时自动执行四阶段质检流水线并推送到仓库。
+每天自动从 Telegram 优质公开频道与交流群（[@otcfxq](https://t.me/otcfxq)、[@danfeng_chat](https://t.me/danfeng_chat)）抓取多协议代理节点、Cloudflare 优选 IP 以及反代 ProxyIP。系统具备**智能增量持久化**、**全局智能去重**与**三大主动质检淘汰机制**，自动导出通用代理列表、纯净 `IP:端口` 文本列表以及结构化测速数据表格，并通过 GitHub Actions 每天定时自动执行四阶段质检流水线并推送到仓库。
 
 ---
 
@@ -53,7 +53,7 @@
                           │   (代理 + 优选IP)  │
     tg_fetch.py ──────────┤                    ├────► 增量抓取 & 全局智能去重 ──┬──► data/socks5.txt / socks5.csv
     (免登录/官方API双模)   │                    │                               ├──► data/cf_ips.txt / cf_ips.csv
-                          └─── @danfeng2 ──────┘                               ├──► data/scan_ips.txt / scan_ips.csv
+                          └─── @danfeng_chat ──┘                               ├──► data/scan_ips.txt / scan_ips.csv
                                (优选IP 专属)                                     ├──► data/scan_ips/AS{ASN}_{ISP}.txt *
                                                                                 ├──► data/proxyip.txt / proxyip.csv *
                                     ▲                                           └──► data/proxyip_cf.txt *
@@ -144,7 +144,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
   - `data/socks5.csv`：结构化表格，包含协议类型、测速延迟（ms）、连续失败次数、Cloudflare Colo 数据中心与质检时间戳。
 
 ### 2. `data/cf_ips.txt` / `data/cf_ips.csv`（频道日常单条优选 IP）
-* 仅收录频道日常消息正文中发布的单条优选 IP（如 `@danfeng2`、`@otcfxq` 的实时测速通报）。
+* 仅收录频道日常消息正文中发布的单条优选 IP（如 `@danfeng_chat`、`@otcfxq` 的实时测速通报）。
 * `data/cf_ips.txt` 为纯文本格式，每行一个 `IP:端口`。
 * `data/cf_ips.csv` 为 UTF-8-SIG 结构化表格，可直接用 Excel 查看。
 
@@ -213,7 +213,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 | `isp` | 字符串 | 网络运营商 / 托管商名称 | `Prime Security Corp.` |
 | `asn` | 字符串 | ASN 编号与组织 | `AS400618 Prime Security Corp.` |
 | `tested_at` | 时间字符串 | 测速与发布时间 | `2026-09-13 18:00:33` |
-| `channel` | 字符串 | 来源频道 | `@danfeng2` / `@otcfxq` |
+| `channel` | 字符串 | 来源频道 | `@danfeng_chat` / `@otcfxq` |
 | `fail_count` | 整数 | 连续探测失败次数（默认 0，连续失败 ≥ 3 次自动淘汰剔除） | `0` |
 
 #### ② 反代 ProxyIP 穿透与网络属性数据表（`data/proxyip.csv`）
@@ -231,7 +231,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 | `isp` | 字符串 | 自治系统组织 / 运营商名称 | `HKBN Hong Kong Broadband` |
 | `asn` | 字符串 | 规范化 ASN 编号与组织 | `AS9269 Hong Kong Broadband` |
 | `tested_at` | 时间字符串 | 穿透质检测试时间 | `2026-09-19 18:00:00` |
-| `channel` | 字符串 | 来源频道或附件源 | `@danfeng2` |
+| `channel` | 字符串 | 来源频道或附件源 | `@danfeng_chat` |
 | `fail_count` | 整数 | 连续探测失败次数（连续失败 ≥ 3 次永久物理删除） | `0` |
 | `cf_clean` | 字符串 | **【核心属性】** 是否兼具 Cloudflare 官方证书直连优选能力 (`true`/`false`) | `true` |
 | `net_type` | 字符串 | **【核心属性】** 网络类型归属（详见下方 6 类取值说明） | `isp` |
@@ -322,8 +322,8 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 | :--- | :--- | :---: | :---: | :--- |
 | `FETCH_DAYS` | 单次增量回溯天数（扫描时间窗口） | `3` | 可选 | 增量模式下只读取最近 N 天频道消息，加快运行速度 |
 | `PROXY` | 抓取代理设置 | 留空 | 可选 | GitHub Actions 云端默认直连 Telegram 无需配置；自建私有 Runner 或特殊网络时可按需配置 |
-| `PROXY_CHANNELS` | 代理抓取目标频道（逗号/空格分隔） | `@otcfxq` | 可选 | 自定义抓取通用代理的 Telegram 公开频道列表 |
-| `CF_IP_CHANNELS` | 优选 IP 抓取目标频道（逗号/空格分隔） | `@otcfxq, @danfeng2` | 可选 | 自定义抓取 Cloudflare 优选 IP 与测速附件的大池频道列表 |
+| `PROXY_CHANNELS` | 代理抓取目标频道/群组（逗号/空格分隔） | `@otcfxq, @danfeng_chat` | 可选 | 自定义抓取通用代理的 Telegram 公开频道/群组列表 |
+| `CF_IP_CHANNELS` | 优选 IP 抓取目标频道/群组（逗号/空格分隔） | `@otcfxq, @danfeng_chat` | 可选 | 自定义抓取 Cloudflare 优选 IP 与测速附件的大池频道/群组列表 |
 
 ### 3. 高级调优参数与本地调试对照（可选）
 
@@ -364,7 +364,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
    • 代理检验：RFC 1928 全协议穿透鉴真
    • 反代检验：/cdn-cgi/trace 穿透 + 优选双能
    • 淘汰死节点：31 条 [代理 12, 反代 15, 扫描优选 4] (连续失败 ≥ 3 次)
-📡 频道来源：@danfeng2, @otcfxq
+📡 频道来源：@danfeng_chat, @otcfxq
 ━━━━━━━━━━━━━━━━━━━━
 ⚡ 总耗时: 165.2s · 🔗 Action #35 · 📦 产物仓库
 ```
@@ -457,7 +457,7 @@ python cf_verify.py --concurrency 150 --timeout 3.0
 本项目节点与优选 IP 数据源来自以下 Telegram 公开频道，在此表示感谢：
 
 - [@otcfxq](https://t.me/otcfxq)
-- [@danfeng2](https://t.me/danfeng2)
+- [DanFeng 交流群 (@danfeng_chat)](https://t.me/danfeng_chat)
 
 ---
 
