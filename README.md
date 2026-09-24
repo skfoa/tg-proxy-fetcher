@@ -168,7 +168,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 
 ### 4. `data/proxyip/` 与 `data/proxyip_cf/`（反代 ProxyIP 专属池、分国别与高价值属性分类）
 * **独立反代池**：专门收录来自频道发布的反代文件（如 `Global-proxyip-443.csv`、`Global-proxyip-8443.csv` 等）。
-* **质检分层排序与分国专属列表**：`data/proxyip.txt` 专注于全量反代池的可用性质量分层，以 `# 存活节点 (无失败) - X 个` 与 `# 缓冲节点 (有失败) - Y 个` 清晰分段，段内按实测延迟严选升序排列；而各国家/地区专属分类则由 `data/proxyip/*.txt` 独立提供，各司其职无冗余。`data/proxyip_cf.txt` 则为兼具优选直连能力的提纯清单。
+* **质检分层排序与分国专属列表**：`data/proxyip.txt` 专注于全量反代池的可用性质量分层，以 `# 缓冲节点 (有失败) - X 个` 置顶优先排查、`# 存活节点 (无失败) - Y 个` 全量紧随清晰分段，段内按实测延迟严选升序排列；而各国家/地区专属分类则由 `data/proxyip/*.txt` 独立提供，各司其职无冗余。`data/proxyip_cf.txt` 则为兼具优选直连能力的提纯清单。
 * **分国家/地区独立单文件（点击即复制）**：
   - `data/proxyip/*.txt`：在 `data/proxyip/` 目录下按国家/地区拆分为独立文件（如 `data/proxyip/美国.txt`、`data/proxyip/日本.txt`、`data/proxyip/香港.txt` 等 76 个地区），内容 100% 为纯净的 `IP:端口`，无任何注释行，直接全选（Ctrl+A ➔ Ctrl+C）即可复制或作为分地区远程订阅。
   - `data/proxyip_cf/*.txt`：针对兼具官方证书直连能力的双料提纯节点，同样提供分国家独立纯净文本列表（如 `data/proxyip_cf/美国.txt`、`data/proxyip_cf/日本.txt`）。

@@ -550,8 +550,8 @@ def extract_country(cf_location: str | None, colo: str | None) -> str:
 def format_proxyip_txt(rows: list) -> str:
     """
     将 ProxyIP 列表按质检状态分层格式化输出：
-      - 没失败 (fail_count == 0 / 存活节点)：排在最前，按 delay_ms 升序（最低延迟优先）
-      - 有失败 (fail_count > 0 / 缓冲节点)：排在后部，按 (fail_count, delay_ms) 升序排列
+      - 有失败 (fail_count > 0 / 缓冲节点)：置顶排在最前，按 (fail_count, delay_ms) 升序排列，便于优先观测
+      - 没失败 (fail_count == 0 / 存活节点)：排在后部，按 delay_ms 升序（最低延迟优先）
     各国家/地区专属分类已由 save_proxyip_by_country() 导出至独立文件，此处专注于整体可用性质量分层。
     """
     alive_nodes: list[tuple[int, str]] = []
@@ -580,16 +580,16 @@ def format_proxyip_txt(rows: list) -> str:
     buffer_nodes.sort(key=lambda x: (x[0], x[1]))
 
     lines = []
-    if alive_nodes:
-        lines.append(f"# 存活节点 (无失败) - {len(alive_nodes)} 个")
-        for _, endpoint in alive_nodes:
-            lines.append(endpoint)
-
     if buffer_nodes:
-        if lines:
-            lines.append("")
         lines.append(f"# 缓冲节点 (有失败) - {len(buffer_nodes)} 个")
         for _, _, endpoint in buffer_nodes:
+            lines.append(endpoint)
+
+    if alive_nodes:
+        if lines:
+            lines.append("")
+        lines.append(f"# 存活节点 (无失败) - {len(alive_nodes)} 个")
+        for _, endpoint in alive_nodes:
             lines.append(endpoint)
 
     return "\n".join(lines).rstrip() + "\n" if lines else ""
