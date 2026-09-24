@@ -356,6 +356,8 @@ async def verify_proxyips(
     async def _check(idx: int):
         nonlocal pass_count, fail_count_total, cf_clean_count, completed
         row = rows[idx]
+        fc = _get_fc(row)
+        row["_old_fc"] = fc
 
         port_raw = row.get("port", 0)
         try:
@@ -366,7 +368,6 @@ async def verify_proxyips(
         ip = (row.get("ip") or "").strip()
         if not ip or port <= 0 or port > 65535:
             completed += 1
-            fc = _get_fc(row)
             row["fail_count"] = fc + 1
             row["cf_clean"] = "false"
             fail_count_total += 1
@@ -416,17 +417,27 @@ async def verify_proxyips(
 
 
 # ---------- Telegram 质检通知 ----------
-def format_buffer_badge(marked: int, f1: int = 0, f2: int = 0) -> str:
-    """格式化缓冲标签，带 1 次与 2 次失败细分"""
+def format_buffer_badge(marked: int, buf_new: int = 0, buf_rec: int = 0, f1: int = 0, f2: int = 0) -> str:
+    """格式化缓冲标签，带新增缓冲与取消缓冲动态"""
     if marked <= 0:
+        if buf_rec > 0:
+            return f" · ⚠️ <b>0</b> 缓冲 [{buf_rec} 取消]"
         return ""
-    breakdown = []
-    if f1 > 0:
-        breakdown.append(f"1次: {f1}")
-    if f2 > 0:
-        breakdown.append(f"2次: {f2}")
-    if breakdown:
-        return f" · ⚠️ <b>{marked}</b> 缓冲 [{(' · '.join(breakdown))}]"
+    changes = []
+    if buf_new > 0:
+        changes.append(f"+{buf_new} 新增")
+    if buf_rec > 0:
+        changes.append(f"{buf_rec} 取消")
+    if changes:
+        return f" · ⚠️ <b>{marked}</b> 缓冲 [{(' · '.join(changes))}]"
+    if f1 > 0 or f2 > 0:
+        breakdown = []
+        if f1 > 0:
+            breakdown.append(f"1次: {f1}")
+        if f2 > 0:
+            breakdown.append(f"2次: {f2}")
+        if breakdown:
+            return f" · ⚠️ <b>{marked}</b> 缓冲 [{(' · '.join(breakdown))}]"
     return f" · ⚠️ <b>{marked}</b> 缓冲"
 
 
@@ -442,6 +453,8 @@ def send_proxyip_notification(
     elapsed: float,
     fail_1: int = 0,
     fail_2: int = 0,
+    buf_new: int = 0,
+    buf_rec: int = 0,
 ):
     """推送独立的 ProxyIP 穿透质检统计 TG 卡片"""
     token = TG_BOT_TOKEN
@@ -468,7 +481,7 @@ def send_proxyip_notification(
         else f"🔀 <b>ProxyIP 穿透质检完成</b> (✅ 存活 <b>{pass_count}</b> 条)"
     )
 
-    buffer_badge = format_buffer_badge(fail_count, fail_1, fail_2)
+    buffer_badge = format_buffer_badge(fail_count, buf_new=buf_new, buf_rec=buf_rec, f1=fail_1, f2=fail_2)
     status_line = f"✅ <b>{pass_count}</b> 存活{buffer_badge}"
 
     dual_line = (
@@ -536,6 +549,14 @@ async def async_main(args):
     survivors_len = len(survivors)
     proxyip_f1 = sum(1 for r in survivors if _get_fc(r) == 1)
     proxyip_f2 = sum(1 for r in survivors if _get_fc(r) == 2)
+    proxyip_buf_new = sum(
+        1 for r in rows
+        if _get_fc(r) > 0 and _get_fc(r) < args.max_fails and safe_int(r.get("_old_fc"), 0) == 0
+    )
+    proxyip_buf_rec = sum(
+        1 for r in rows
+        if _get_fc(r) == 0 and safe_int(r.get("_old_fc"), 0) > 0
+    )
 
     if eliminated > 0:
         log.info("[ProxyIP 淘汰] 剔除 %d 条连续失败 >= %d 次的死节点", eliminated, args.max_fails)
@@ -556,7 +577,7 @@ async def async_main(args):
     )
 
     elapsed = time.time() - t_start
-    log.info("ProxyIP 穿透质检流程执行完毕，总耗时 %.2f 秒 (🌟兼具优选直连: %d 条)", elapsed, cf_clean_count)
+    log.info("ProxyIP 穿透质检流程执行完毕，总耗时 %.2f 秒 (🌟兼具优选直连: %d 条 | ⚠️ 缓冲: %d [新增: %d, 取消恢复: %d])", elapsed, cf_clean_count, (survivors_len - pass_count), proxyip_buf_new, proxyip_buf_rec)
 
     # 若存在 tg_fetch 暂存的抓取统计，将 ProxyIP 质检与优选双料结果并入其中，由后续统一卡片推送
     fetch_stats_file = os.path.join(DATA_DIR, ".fetch_stats.json")
@@ -570,6 +591,8 @@ async def async_main(args):
             stats["proxyip_fail"] = fail_count
             stats["proxyip_fail_1"] = proxyip_f1
             stats["proxyip_fail_2"] = proxyip_f2
+            stats["proxyip_buf_new"] = proxyip_buf_new
+            stats["proxyip_buf_rec"] = proxyip_buf_rec
             stats["proxyip_eliminated"] = eliminated
             stats["proxyip_survivors"] = survivors_len
             stats["proxyip_cf_clean"] = cf_clean_count
@@ -594,6 +617,8 @@ async def async_main(args):
             elapsed=elapsed,
             fail_1=proxyip_f1,
             fail_2=proxyip_f2,
+            buf_new=proxyip_buf_new,
+            buf_rec=proxyip_buf_rec,
         )
     else:
         log.info("已并入流水线或指定了 --no-notify，跳过独立卡片推送，由统一卡片汇总发送")

@@ -386,6 +386,7 @@ async def probe_single(
         row["tested_at"] = now_str
 
         fc = safe_int(row.get("fail_count"), 0)
+        row["_old_fc"] = fc
         if is_alive:
             row["fail_count"] = 0
             row["delay_ms"] = delay_ms
@@ -517,17 +518,27 @@ def save_socks_data(
 
 # ---------- Telegram 通知 ----------
 
-def format_buffer_badge(marked: int, f1: int = 0, f2: int = 0) -> str:
-    """格式化缓冲标签，带 1 次与 2 次失败细分"""
+def format_buffer_badge(marked: int, buf_new: int = 0, buf_rec: int = 0, f1: int = 0, f2: int = 0) -> str:
+    """格式化缓冲标签，带新增缓冲与取消缓冲动态"""
     if marked <= 0:
+        if buf_rec > 0:
+            return f" · ⚠️ 0 缓冲 [{buf_rec} 取消]"
         return ""
-    breakdown = []
-    if f1 > 0:
-        breakdown.append(f"1次: {f1}")
-    if f2 > 0:
-        breakdown.append(f"2次: {f2}")
-    if breakdown:
-        return f" · ⚠️ {marked} 缓冲 [{(' · '.join(breakdown))}]"
+    changes = []
+    if buf_new > 0:
+        changes.append(f"+{buf_new} 新增")
+    if buf_rec > 0:
+        changes.append(f"{buf_rec} 取消")
+    if changes:
+        return f" · ⚠️ {marked} 缓冲 [{(' · '.join(changes))}]"
+    if f1 > 0 or f2 > 0:
+        breakdown = []
+        if f1 > 0:
+            breakdown.append(f"1次: {f1}")
+        if f2 > 0:
+            breakdown.append(f"2次: {f2}")
+        if breakdown:
+            return f" · ⚠️ {marked} 缓冲 [{(' · '.join(breakdown))}]"
     return f" · ⚠️ {marked} 缓冲"
 
 
@@ -544,6 +555,8 @@ def send_socks_notification(
     elapsed: float,
     fail_1: int = 0,
     fail_2: int = 0,
+    buf_new: int = 0,
+    buf_rec: int = 0,
 ):
     """发送独立的 SOCKS5 代理质检报告卡片"""
     token = TG_BOT_TOKEN
@@ -561,7 +574,7 @@ def send_socks_notification(
     proto_str = "\n".join(proto_lines)
 
     elim_str = f"<code>{eliminated}</code> 条 (连续失败 ≥ {max_fails} 次)" if eliminated > 0 else "无 (全部在存活阈值内)"
-    buffer_badge = format_buffer_badge(fail_count, fail_1, fail_2)
+    buffer_badge = format_buffer_badge(fail_count, buf_new=buf_new, buf_rec=buf_rec, f1=fail_1, f2=fail_2)
     status_str = f"✅ {pass_count} 存活{buffer_badge}"
 
     message = (
@@ -655,6 +668,16 @@ async def async_main(args):
     survivors_len = len(survivors)
     socks_f1 = sum(1 for r in survivors if safe_int(r.get("fail_count"), 0) == 1)
     socks_f2 = sum(1 for r in survivors if safe_int(r.get("fail_count"), 0) == 2)
+    socks_buf_new = sum(
+        1 for r in results
+        if not r.get("is_alive")
+        and safe_int(r.get("_old_fc"), 0) == 0
+        and safe_int(r.get("fail_count"), 0) < args.max_fails
+    )
+    socks_buf_rec = sum(
+        1 for r in results
+        if r.get("is_alive") and safe_int(r.get("_old_fc"), 0) > 0
+    )
 
     # 仅统计本次实测存活节点的网络延迟（排除处于缓冲期但本次已连通失败节点的旧延迟）
     alive_delays = [
@@ -676,7 +699,7 @@ async def async_main(args):
     save_socks_data(survivors, SOCKS_TXT, SOCKS_CSV)
 
     elapsed = time.time() - t_start
-    log.info("代理连通性质检流程执行完毕，总耗时 %.2f 秒 (✅ 存活: %d | 均延: %dms)", elapsed, pass_count, avg_delay)
+    log.info("代理连通性质检流程执行完毕，总耗时 %.2f 秒 (✅ 存活: %d | 均延: %dms | ⚠️ 缓冲: %d [新增: %d, 取消恢复: %d])", elapsed, pass_count, avg_delay, (survivors_len - pass_count), socks_buf_new, socks_buf_rec)
 
     # 若存在 tg_fetch 暂存的抓取统计，将 SOCKS5 质检结果并入其中，由后续统一卡片推送
     fetch_stats_file = os.path.join(DATA_DIR, ".fetch_stats.json")
@@ -691,6 +714,8 @@ async def async_main(args):
             stats["socks_fail"] = fail_count
             stats["socks_fail_1"] = socks_f1
             stats["socks_fail_2"] = socks_f2
+            stats["socks_buf_new"] = socks_buf_new
+            stats["socks_buf_rec"] = socks_buf_rec
             stats["socks_eliminated"] = eliminated
             stats["socks_survivors"] = survivors_len
             stats["socks_avg_delay_ms"] = avg_delay
@@ -717,6 +742,8 @@ async def async_main(args):
             elapsed=elapsed,
             fail_1=socks_f1,
             fail_2=socks_f2,
+            buf_new=socks_buf_new,
+            buf_rec=socks_buf_rec,
         )
     else:
         log.info("已并入流水线或指定了 --no-notify，跳过独立卡片推送")

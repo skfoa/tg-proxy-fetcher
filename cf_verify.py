@@ -206,6 +206,9 @@ async def verify_all(
 
     async def _check(row: dict):
         nonlocal pass_count, fail_count_total, completed
+        fc = int(row.get("fail_count") or 0)
+        row["_old_fc"] = fc
+
         port_raw = row.get("port", 0)
         try:
             port = int(port_raw)
@@ -215,7 +218,6 @@ async def verify_all(
         ip = (row.get("ip") or "").strip()
         if not ip or port <= 0 or port > 65535:
             completed += 1
-            fc = int(row.get("fail_count") or 0)
             row["fail_count"] = fc + 1
             fail_count_total += 1
             return
@@ -225,7 +227,6 @@ async def verify_all(
                 alive, latency = await probe_ip(ip, port, connect_timeout=timeout, http_timeout=http_timeout)
 
         completed += 1
-        fc = int(row.get("fail_count") or 0)
         if alive:
             row["fail_count"] = 0
             row["delay_ms"] = latency
@@ -342,17 +343,33 @@ def save_scan_dir(asn_groups: dict, scan_dir: str = SCAN_DIR):
 
 
 # ---------- Telegram 结果卡片推送 ----------
-def format_buffer_badge(marked: int, f1: int = 0, f2: int = 0) -> str:
-    """格式化缓冲标签，带 1 次与 2 次失败细分"""
+def format_buffer_badge(
+    marked: int,
+    buf_new: int = 0,
+    buf_rec: int = 0,
+    f1: int = 0,
+    f2: int = 0,
+) -> str:
+    """格式化缓冲标签，带新增缓冲与取消缓冲动态"""
     if marked <= 0:
+        if buf_rec > 0:
+            return f" · ⚠️ 0 缓冲 [{buf_rec} 取消]"
         return ""
-    breakdown = []
-    if f1 > 0:
-        breakdown.append(f"1次: {f1}")
-    if f2 > 0:
-        breakdown.append(f"2次: {f2}")
-    if breakdown:
-        return f" · ⚠️ {marked} 缓冲 [{(' · '.join(breakdown))}]"
+    changes = []
+    if buf_new > 0:
+        changes.append(f"+{buf_new} 新增")
+    if buf_rec > 0:
+        changes.append(f"{buf_rec} 取消")
+    if changes:
+        return f" · ⚠️ {marked} 缓冲 [{(' · '.join(changes))}]"
+    if f1 > 0 or f2 > 0:
+        breakdown = []
+        if f1 > 0:
+            breakdown.append(f"1次: {f1}")
+        if f2 > 0:
+            breakdown.append(f"2次: {f2}")
+        if breakdown:
+            return f" · ⚠️ {marked} 缓冲 [{(' · '.join(breakdown))}]"
     return f" · ⚠️ {marked} 缓冲"
 
 
@@ -374,6 +391,10 @@ def send_verify_notification(
     cf_f2: int = 0,
     scan_f1: int = 0,
     scan_f2: int = 0,
+    cf_buf_new: int = 0,
+    cf_buf_rec: int = 0,
+    scan_buf_new: int = 0,
+    scan_buf_rec: int = 0,
 ):
     fetch_stats_file = os.path.join(DATA_DIR, ".fetch_stats.json")
     token = TG_BOT_TOKEN
@@ -453,8 +474,8 @@ def send_verify_notification(
 
     cf_marked = max(0, cf_survivors - cf_pass)
     scan_marked = max(0, scan_survivors - scan_pass)
-    cf_status = f"✅ {cf_pass} 存活" + format_buffer_badge(cf_marked, cf_f1, cf_f2)
-    scan_status = f"✅ {scan_pass} 存活" + format_buffer_badge(scan_marked, scan_f1, scan_f2)
+    cf_status = f"✅ {cf_pass} 存活" + format_buffer_badge(cf_marked, buf_new=cf_buf_new, buf_rec=cf_buf_rec, f1=cf_f1, f2=cf_f2)
+    scan_status = f"✅ {scan_pass} 存活" + format_buffer_badge(scan_marked, buf_new=scan_buf_new, buf_rec=scan_buf_rec, f1=scan_f1, f2=scan_f2)
     elim_details = []
     if socks_eliminated > 0:
         elim_details.append(f"代理 {socks_eliminated}")
@@ -520,8 +541,10 @@ def send_verify_notification(
             s_marked = max(0, s_surv - s_pass)
             s_f1 = fetch_stats.get("socks_fail_1", 0)
             s_f2 = fetch_stats.get("socks_fail_2", 0)
+            s_new = fetch_stats.get("socks_buf_new", 0)
+            s_rec = fetch_stats.get("socks_buf_rec", 0)
             s_avg = fetch_stats.get("socks_avg_delay_ms", 0)
-            s_status = f"✅ {s_pass} 存活" + format_buffer_badge(s_marked, s_f1, s_f2)
+            s_status = f"✅ {s_pass} 存活" + format_buffer_badge(s_marked, buf_new=s_new, buf_rec=s_rec, f1=s_f1, f2=s_f2)
             avg_str = f" · ⚡ 均延 {s_avg}ms" if s_avg > 0 else ""
             proxy_line = f"📫 <b>可用代理</b>：<code>{s_surv}</code> 个 ({s_status}{avg_str})\n"
         elif proxies_count > 0:
@@ -544,8 +567,10 @@ def send_verify_notification(
             p_marked = max(0, p_surv - p_pass)
             p_f1 = fetch_stats.get("proxyip_fail_1", 0)
             p_f2 = fetch_stats.get("proxyip_fail_2", 0)
+            p_new = fetch_stats.get("proxyip_buf_new", 0)
+            p_rec = fetch_stats.get("proxyip_buf_rec", 0)
             p_cf = fetch_stats.get("proxyip_cf_clean", 0)
-            p_status = f"✅ {p_pass} 存活" + format_buffer_badge(p_marked, p_f1, p_f2)
+            p_status = f"✅ {p_pass} 存活" + format_buffer_badge(p_marked, buf_new=p_new, buf_rec=p_rec, f1=p_f1, f2=p_f2)
             cf_extra = f"\n   └ <i>🌟 兼具优选直连: <code>{p_cf}</code> 条 (已提纯 data/proxyip_cf.txt)</i>" if p_cf > 0 else ""
             proxyip_line = f"🔀 <b>反代 ProxyIP</b>：<code>{p_surv}</code> 条 ({p_status}){cf_extra}\n"
         elif proxyips_count > 0:
@@ -558,6 +583,27 @@ def send_verify_notification(
             verify_items.append("   • 代理检验：RFC 1928 全协议穿透鉴真")
         if proxyip_verified:
             verify_items.append("   • 反代检验：/cdn-cgi/trace 穿透 + 优选双能")
+
+        total_buf_new = (
+            fetch_stats.get("socks_buf_new", 0)
+            + fetch_stats.get("proxyip_buf_new", 0)
+            + cf_buf_new
+            + scan_buf_new
+        )
+        total_buf_rec = (
+            fetch_stats.get("socks_buf_rec", 0)
+            + fetch_stats.get("proxyip_buf_rec", 0)
+            + cf_buf_rec
+            + scan_buf_rec
+        )
+        if total_buf_new > 0 or total_buf_rec > 0:
+            dyn_parts = []
+            if total_buf_new > 0:
+                dyn_parts.append(f"⚠️ 新增缓冲 {total_buf_new} 条")
+            if total_buf_rec > 0:
+                dyn_parts.append(f"♻️ 取消缓冲 {total_buf_rec} 条 (恢复健康)")
+            verify_items.append(f"   • 缓冲动态：{' · '.join(dyn_parts)}")
+
         verify_items.append(f"   • 淘汰死节点：{elim_str}")
         verify_block = "🛡️ <b>主动鉴真淘汰</b>：\n" + "\n".join(verify_items) + "\n"
 
@@ -595,12 +641,22 @@ def send_verify_notification(
         header = f"🛡️ <b>优选 IP 两阶段鉴真完成</b> (✅ 存活 <b>{total_survivors}</b> 条)"
         cf_line = f"🌐 <b>单条优选</b>：<code>{cf_survivors}</code> 条 ({cf_status})\n"
         scan_line = f"📁 <b>扫描优选</b>：<code>{scan_survivors}</code> 条 ({scan_status})\n"
+        dyn_parts = []
+        tot_new = cf_buf_new + scan_buf_new
+        tot_rec = cf_buf_rec + scan_buf_rec
+        if tot_new > 0:
+            dyn_parts.append(f"⚠️ 新增缓冲 {tot_new} 条")
+        if tot_rec > 0:
+            dyn_parts.append(f"♻️ 取消缓冲 {tot_rec} 条 (恢复健康)")
+        dyn_line = f"🛡️ <b>缓冲动态</b>：{' · '.join(dyn_parts)}\n" if dyn_parts else ""
+
         message = (
             f"{header}\n"
             f"{div}\n"
             f"📅 <b>时间</b>：{date_str} (北京时间)\n"
             f"{cf_line}"
             f"{scan_line}"
+            f"{dyn_line}"
             f"🗑️ <b>淘汰死节点</b>：{elim_str}\n"
             f"⚙️ <b>检测规格</b>：TLS 握手 + HTTP 301 · {concurrency} 并发\n"
             f"{footer_line}"
@@ -640,6 +696,8 @@ async def async_main(args):
 
     cf_f1 = 0
     cf_f2 = 0
+    cf_buf_new = 0
+    cf_buf_rec = 0
     if cf_rows:
         log.info(">>> 开始校验单条优选 IP (%s): 共 %d 条...", CF_CSV, cf_total)
         await verify_all(
@@ -657,6 +715,17 @@ async def async_main(args):
         cf_survivors_len = len(cf_survivors)
         cf_f1 = sum(1 for r in cf_survivors if safe_int(r.get("fail_count"), 0) == 1)
         cf_f2 = sum(1 for r in cf_survivors if safe_int(r.get("fail_count"), 0) == 2)
+        cf_buf_new = sum(
+            1 for r in cf_rows
+            if safe_int(r.get("fail_count"), 0) > 0
+            and safe_int(r.get("fail_count"), 0) < args.max_fails
+            and safe_int(r.get("_old_fc"), 0) == 0
+        )
+        cf_buf_rec = sum(
+            1 for r in cf_rows
+            if safe_int(r.get("fail_count"), 0) == 0
+            and safe_int(r.get("_old_fc"), 0) > 0
+        )
         if cf_eliminated > 0:
             log.info("[单条优选] 淘汰剔除 %d 条连续失败 >= %d 次的死节点", cf_eliminated, args.max_fails)
         else:
@@ -678,6 +747,8 @@ async def async_main(args):
     scan_survivors_len = 0
     scan_f1 = 0
     scan_f2 = 0
+    scan_buf_new = 0
+    scan_buf_rec = 0
 
     if scan_rows:
         log.info(">>> 开始校验扫描优选 IP (%s): 共 %d 条...", SCAN_CSV, scan_total)
@@ -696,6 +767,17 @@ async def async_main(args):
         scan_survivors_len = len(scan_survivors)
         scan_f1 = sum(1 for r in scan_survivors if safe_int(r.get("fail_count"), 0) == 1)
         scan_f2 = sum(1 for r in scan_survivors if safe_int(r.get("fail_count"), 0) == 2)
+        scan_buf_new = sum(
+            1 for r in scan_rows
+            if safe_int(r.get("fail_count"), 0) > 0
+            and safe_int(r.get("fail_count"), 0) < args.max_fails
+            and safe_int(r.get("_old_fc"), 0) == 0
+        )
+        scan_buf_rec = sum(
+            1 for r in scan_rows
+            if safe_int(r.get("fail_count"), 0) == 0
+            and safe_int(r.get("_old_fc"), 0) > 0
+        )
         if scan_eliminated > 0:
             log.info("[扫描优选] 淘汰剔除 %d 条连续失败 >= %d 次的死节点", scan_eliminated, args.max_fails)
         else:
@@ -731,7 +813,7 @@ async def async_main(args):
         log.info("[优选 IP 墓地] 已登记 %d 个淘汰死节点至墓地冷却库 (新增: %d 个, 隔离期 7 天)", len(all_dead_keys), newly_tombstoned)
 
     elapsed = time.time() - t_start
-    log.info("全部优选 IP 两阶段校验流程圆满完成，总耗时 %.2f 秒", elapsed)
+    log.info("全部优选 IP 两阶段校验流程圆满完成，总耗时 %.2f 秒 (单条缓冲: %d [新增: %d, 取消: %d] | 扫描缓冲: %d [新增: %d, 取消: %d])", elapsed, (cf_survivors_len - cf_pass), cf_buf_new, cf_buf_rec, (scan_survivors_len - scan_pass), scan_buf_new, scan_buf_rec)
 
     send_verify_notification(
         cf_total=cf_total,
@@ -751,6 +833,10 @@ async def async_main(args):
         cf_f2=cf_f2,
         scan_f1=scan_f1,
         scan_f2=scan_f2,
+        cf_buf_new=cf_buf_new,
+        cf_buf_rec=cf_buf_rec,
+        scan_buf_new=scan_buf_new,
+        scan_buf_rec=scan_buf_rec,
     )
 
 
