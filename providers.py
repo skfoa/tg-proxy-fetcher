@@ -131,6 +131,8 @@ KNOWN_CLOUD_PROVIDERS = {
     "nanoit": ("AS52173", "NanoIT"),
     "oneasiahost": ("AS59211", "OneAsiaHost"),
     "skbroadband": ("AS9318", "SK Broadband"),
+    "digitalvirt": ("AS11161", "DigitalVirt"),
+    "emagine": ("AS31972", "Emagine Concept"),
 
     # 运营商骨干与出海线路
     "hinet": ("AS3462", "Chunghwa Telecom HiNet"),
