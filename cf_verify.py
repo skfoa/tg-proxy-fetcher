@@ -43,6 +43,7 @@ from providers import (
     TG_CHAT_ID,
     record_tombstone,
     canonical_key,
+    format_scan_ips_txt,
 )
 
 # 确保本地 .env 加载
@@ -291,21 +292,22 @@ def save_scan_csv(rows: list, path: str = SCAN_CSV):
     log.info("已覆写保存 %s: %d 条记录", path, len(rows))
 
 
-def save_scan_txt(asn_groups: dict, path: str = SCAN_TXT):
-    """覆写 scan_ips.txt（按 ASN 分组汇总，仅包含存活节点）"""
-    total_ips = sum(len(g) for g in asn_groups.values())
+def save_scan_txt(rows_or_groups, path: str = SCAN_TXT):
+    """
+    覆写 scan_ips.txt（按质检可用性/缓冲状态分层输出：缓冲节点置顶，存活节点紧随）
+    具体机房/ASN 独立清单已由 save_scan_dir() 独立保存至 scan_ips/ 目录。
+    """
+    if isinstance(rows_or_groups, dict):
+        rows = []
+        for g in rows_or_groups.values():
+            rows.extend(g)
+    else:
+        rows = rows_or_groups
+
+    content = format_scan_ips_txt(rows)
     with open(path, "w", encoding="utf-8") as f:
-        for asn_name in sorted(asn_groups.keys()):
-            group = asn_groups[asn_name]
-            isp_name = ASN_TO_PROVIDER.get(asn_name, "")
-            if not isp_name:
-                isp_name = next((r.get("isp") for r in group if r.get("isp")), "")
-            header = f"# {asn_name}" + (f" ({isp_name})" if isp_name else "") + f" - {len(group)} 个"
-            f.write(f"{header}\n")
-            for r in sorted(group, key=lambda x: (x.get("ip", ""), int(x.get("port", 0)))):
-                f.write(f"{r['ip']}:{r['port']}\n")
-            f.write("\n")
-    log.info("已覆写保存 %s: 共 %d 个 ASN 分组，%d 行 IP:Port", path, len(asn_groups), total_ips)
+        f.write(content)
+    log.info("已按质检缓冲状态分层保存 %s: %d 条记录", path, len(rows))
 
 
 def save_scan_dir(asn_groups: dict, scan_dir: str = SCAN_DIR):
@@ -796,7 +798,7 @@ async def async_main(args):
             all_sorted_scan.extend(group_rows)
 
         save_scan_csv(all_sorted_scan, SCAN_CSV)
-        save_scan_txt(asn_groups, SCAN_TXT)
+        save_scan_txt(all_sorted_scan, SCAN_TXT)
         save_scan_dir(asn_groups, SCAN_DIR)
     else:
         log.info(">>> %s 文件不存在或无数据，跳过扫描优选校验", SCAN_CSV)

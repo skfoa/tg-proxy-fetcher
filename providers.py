@@ -6,8 +6,8 @@
   2. clean_asn() / _extract_asn_code(): 统一 ASN 编号与服务商提取清洗。
   3. ASN_EXACT_NET_TYPE / classify_asn() / is_asn_recorded():
      方案 A+ 两级分层网络类型（ISP/BIZ/EDU/GOV/BANK/机房）识别引擎与收录判定。
-  4. format_proxyip_txt() / format_categorized_proxyip_txt() / save_proxyip_by_country():
-     ProxyIP 按质检可用性分层输出、按国家/地区聚合分组及稀缺高价值网络专线纯文本分类导出。
+  4. format_buffer_nodes_txt() / format_proxyip_txt() / format_scan_ips_txt() / format_categorized_proxyip_txt() / save_proxyip_by_country():
+     节点按质检可用性/缓冲状态分层输出（缓冲节点置顶、存活节点紧随）、按国家/地区聚合分组及稀缺高价值网络专线纯文本分类导出。
   5. load_dotenv() / safe_int(): 本地环境加载与安全类型转换。
   6. send_tg_message() / send_ci_failure_alert(): 统一 Telegram 消息推送与 Actions CI 失败秒级告警。
   7. canonical_key() / load_tombstone() / record_tombstone() / is_tombstoned():
@@ -549,12 +549,12 @@ def extract_country(cf_location: str | None, colo: str | None) -> str:
     return "其他地区"
 
 
-def format_proxyip_txt(rows: list) -> str:
+def format_buffer_nodes_txt(rows: list) -> str:
     """
-    将 ProxyIP 列表按质检状态分层格式化输出：
+    将 IP 节点列表按质检可用性/缓冲状态分层格式化输出：
       - 有失败 (fail_count > 0 / 缓冲节点)：置顶排在最前，按 (fail_count, delay_ms) 升序排列，便于优先观测
       - 没失败 (fail_count == 0 / 存活节点)：排在后部，按 delay_ms 升序（最低延迟优先）
-    各国家/地区专属分类已由 save_proxyip_by_country() 导出至独立文件，此处专注于整体可用性质量分层。
+    适用于 scan_ips.txt 与 proxyip.txt 等全局汇总文本（机房与地区独立分类已由专属目录提供）。
     """
     alive_nodes: list[tuple[int, str]] = []
     buffer_nodes: list[tuple[int, int, str]] = []
@@ -595,6 +595,10 @@ def format_proxyip_txt(rows: list) -> str:
             lines.append(endpoint)
 
     return "\n".join(lines).rstrip() + "\n" if lines else ""
+
+
+format_proxyip_txt = format_buffer_nodes_txt
+format_scan_ips_txt = format_buffer_nodes_txt
 
 
 def format_categorized_proxyip_txt(rows: list) -> str:

@@ -51,6 +51,7 @@ from providers import (
     TG_BOT_TOKEN,
     TG_CHAT_ID,
     format_proxyip_txt,
+    format_scan_ips_txt,
     save_proxyip_by_country,
     classify_asn,
     is_asn_recorded,
@@ -542,17 +543,8 @@ def save_and_notify(
         log.info("已保存扫描优选IP表格: %s (%d 条全量累积记录)", OUTPUT_SCAN_FILE, len(all_sorted_scan_rows))
 
         with open(OUTPUT_SCAN_TXT, "w", encoding="utf-8") as f:
-            for asn_name in sorted(asn_groups.keys()):
-                group = asn_groups[asn_name]
-                isp_name = ASN_TO_PROVIDER.get(asn_name, "")
-                if not isp_name:
-                    isp_name = next((r.get("isp") for r in group if r.get("isp")), "")
-                header = f"# {asn_name}" + (f" ({isp_name})" if isp_name else "") + f" - {len(group)} 个"
-                f.write(f"{header}\n")
-                for r in sorted(group, key=lambda x: (x.get("ip", ""), int(x.get("port", 0)))):
-                    f.write(f"{r['ip']}:{r['port']}\n")
-                f.write("\n")
-        log.info("已保存扫描优选IP汇总文本: %s (共 %d 个 ASN 分组，%d 行 IP:Port)", OUTPUT_SCAN_TXT, asn_groups_total, len(all_sorted_scan_rows))
+            f.write(format_scan_ips_txt(all_sorted_scan_rows))
+        log.info("已按质检缓冲状态分层保存扫描优选IP汇总文本: %s (%d 行/条记录)", OUTPUT_SCAN_TXT, len(all_sorted_scan_rows))
 
         active_files = set()
         for asn_name, group in asn_groups.items():
