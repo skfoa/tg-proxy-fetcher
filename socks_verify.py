@@ -517,6 +517,20 @@ def save_socks_data(
 
 # ---------- Telegram 通知 ----------
 
+def format_buffer_badge(marked: int, f1: int = 0, f2: int = 0) -> str:
+    """格式化缓冲标签，带 1 次与 2 次失败细分"""
+    if marked <= 0:
+        return ""
+    breakdown = []
+    if f1 > 0:
+        breakdown.append(f"1次: {f1}")
+    if f2 > 0:
+        breakdown.append(f"2次: {f2}")
+    if breakdown:
+        return f" · ⚠️ {marked} 缓冲 [{(' · '.join(breakdown))}]"
+    return f" · ⚠️ {marked} 缓冲"
+
+
 def send_socks_notification(
     total: int,
     pass_count: int,
@@ -528,6 +542,8 @@ def send_socks_notification(
     concurrency: int,
     max_fails: int,
     elapsed: float,
+    fail_1: int = 0,
+    fail_2: int = 0,
 ):
     """发送独立的 SOCKS5 代理质检报告卡片"""
     token = TG_BOT_TOKEN
@@ -545,7 +561,8 @@ def send_socks_notification(
     proto_str = "\n".join(proto_lines)
 
     elim_str = f"<code>{eliminated}</code> 条 (连续失败 ≥ {max_fails} 次)" if eliminated > 0 else "无 (全部在存活阈值内)"
-    status_str = f"✅ {pass_count} 存活" + (f" · ⚠️ {fail_count} 标记" if fail_count > 0 else "")
+    buffer_badge = format_buffer_badge(fail_count, fail_1, fail_2)
+    status_str = f"✅ {pass_count} 存活{buffer_badge}"
 
     message = (
         f"🚀 <b>SOCKS5 / 通用代理连通性质检完成</b>\n"
@@ -636,6 +653,8 @@ async def async_main(args):
     survivors = [r for r in results if safe_int(r.get("fail_count"), 0) < args.max_fails]
     eliminated = total - len(survivors)
     survivors_len = len(survivors)
+    socks_f1 = sum(1 for r in survivors if safe_int(r.get("fail_count"), 0) == 1)
+    socks_f2 = sum(1 for r in survivors if safe_int(r.get("fail_count"), 0) == 2)
 
     # 仅统计本次实测存活节点的网络延迟（排除处于缓冲期但本次已连通失败节点的旧延迟）
     alive_delays = [
@@ -670,6 +689,8 @@ async def async_main(args):
             stats["socks_total"] = total
             stats["socks_pass"] = pass_count
             stats["socks_fail"] = fail_count
+            stats["socks_fail_1"] = socks_f1
+            stats["socks_fail_2"] = socks_f2
             stats["socks_eliminated"] = eliminated
             stats["socks_survivors"] = survivors_len
             stats["socks_avg_delay_ms"] = avg_delay
@@ -694,6 +715,8 @@ async def async_main(args):
             concurrency=args.concurrency,
             max_fails=args.max_fails,
             elapsed=elapsed,
+            fail_1=socks_f1,
+            fail_2=socks_f2,
         )
     else:
         log.info("已并入流水线或指定了 --no-notify，跳过独立卡片推送")

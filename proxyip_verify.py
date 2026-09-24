@@ -416,6 +416,20 @@ async def verify_proxyips(
 
 
 # ---------- Telegram 质检通知 ----------
+def format_buffer_badge(marked: int, f1: int = 0, f2: int = 0) -> str:
+    """格式化缓冲标签，带 1 次与 2 次失败细分"""
+    if marked <= 0:
+        return ""
+    breakdown = []
+    if f1 > 0:
+        breakdown.append(f"1次: {f1}")
+    if f2 > 0:
+        breakdown.append(f"2次: {f2}")
+    if breakdown:
+        return f" · ⚠️ <b>{marked}</b> 缓冲 [{(' · '.join(breakdown))}]"
+    return f" · ⚠️ <b>{marked}</b> 缓冲"
+
+
 def send_proxyip_notification(
     total: int,
     pass_count: int,
@@ -426,6 +440,8 @@ def send_proxyip_notification(
     concurrency: int,
     max_fails: int,
     elapsed: float,
+    fail_1: int = 0,
+    fail_2: int = 0,
 ):
     """推送独立的 ProxyIP 穿透质检统计 TG 卡片"""
     token = TG_BOT_TOKEN
@@ -452,9 +468,8 @@ def send_proxyip_notification(
         else f"🔀 <b>ProxyIP 穿透质检完成</b> (✅ 存活 <b>{pass_count}</b> 条)"
     )
 
-    status_line = f"✅ <b>{pass_count}</b> 存活"
-    if fail_count > 0:
-        status_line += f" · ⚠️ <b>{fail_count}</b> 失败标记"
+    buffer_badge = format_buffer_badge(fail_count, fail_1, fail_2)
+    status_line = f"✅ <b>{pass_count}</b> 存活{buffer_badge}"
 
     dual_line = (
         f"\n   └ <i>🌟 兼具优选直连: <code>{cf_clean_count}</code> 条 (已导出 data/proxyip_cf.txt)</i>"
@@ -519,6 +534,8 @@ async def async_main(args):
     survivors = [r for r in rows if _get_fc(r) < args.max_fails]
     eliminated = total - len(survivors)
     survivors_len = len(survivors)
+    proxyip_f1 = sum(1 for r in survivors if _get_fc(r) == 1)
+    proxyip_f2 = sum(1 for r in survivors if _get_fc(r) == 2)
 
     if eliminated > 0:
         log.info("[ProxyIP 淘汰] 剔除 %d 条连续失败 >= %d 次的死节点", eliminated, args.max_fails)
@@ -551,6 +568,8 @@ async def async_main(args):
             stats["proxyip_verified"] = True
             stats["proxyip_pass"] = pass_count
             stats["proxyip_fail"] = fail_count
+            stats["proxyip_fail_1"] = proxyip_f1
+            stats["proxyip_fail_2"] = proxyip_f2
             stats["proxyip_eliminated"] = eliminated
             stats["proxyip_survivors"] = survivors_len
             stats["proxyip_cf_clean"] = cf_clean_count
@@ -573,6 +592,8 @@ async def async_main(args):
             concurrency=args.concurrency,
             max_fails=args.max_fails,
             elapsed=elapsed,
+            fail_1=proxyip_f1,
+            fail_2=proxyip_f2,
         )
     else:
         log.info("已并入流水线或指定了 --no-notify，跳过独立卡片推送，由统一卡片汇总发送")
