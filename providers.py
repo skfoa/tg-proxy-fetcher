@@ -141,6 +141,7 @@ KNOWN_CLOUD_PROVIDERS = {
     "ctg": ("AS4134", "China Telecom CTG"),
     "chinatelecom": ("AS4134", "China Telecom 163"),
     "cn2": ("AS4809", "China Telecom CN2"),
+    "chinatelecom_group": ("AS4811", "China Telecom"),
     "9929": ("AS9929", "China Unicom 9929"),
     "cmin2": ("AS58807", "China Mobile CMIN2"),
 }
@@ -760,6 +761,8 @@ ASN_EXACT_NET_TYPE = {
         "AS12912": "isp", "AS25513": "isp", "AS12883": "isp", "AS52163": "isp", "AS199669": "isp",
         "AS60042": "isp", "AS62366": "isp", "AS51248": "isp", "AS6697": "isp", "AS4230": "isp", "AS10834": "isp",
         "AS52468": "isp", "AS4134": "isp", "AS4837": "isp", "AS9808": "isp", "AS58453": "isp", "AS4809": "isp",
+        "AS4811": "isp", "AS4812": "isp", "AS4813": "isp", "AS4816": "isp", "AS4847": "isp", "AS36678": "isp",
+        "AS58772": "isp", "AS56040": "isp",
         "AS9929": "isp", "AS4808": "isp", "AS270062": "isp", "AS3816": "isp", "AS269771": "isp", "AS274170": "isp",
         "AS264778": "isp", "AS208972": "isp", "AS61461": "isp", "AS22884": "isp", "AS3549": "isp", "AS131464": "isp",
         "AS45903": "isp", "AS263791": "isp", "AS272838": "isp", "AS146954": "isp", "AS138782": "isp", "AS270052": "isp",
