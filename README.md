@@ -316,14 +316,16 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 
 ### 2. Repository Variables（常规运行变量 · 位于 Variables 标签页 · 全可选）
 
-> 💡 **Variables 默认全部留空也能 100% 正常运行！** 系统已内置经过实测的最佳默认值，仅在有特殊调优需求时选填：
+> 💡 **自适应配置机制**：
+> - **Variables 默认全部留空也能 100% 自动运行！** 仓库代码内置了开箱即用的最优默认值。
+> - **覆盖优先级（网页配置优先）**：若在 GitHub 网页的 Variables 标签页中配置了自定义变量，系统将优先采用您自定义配置的频道或参数；若留空或未配置，则自动无缝回退至代码内置默认值（如未配置时自动抓取 `@otcfxq` 与 `@danfeng_chat`），完全无需手动干预。
 
 | 变量名 | 用途 | 默认值 | 必要性 | 说明 |
 | :--- | :--- | :---: | :---: | :--- |
 | `FETCH_DAYS` | 单次增量回溯天数（扫描时间窗口） | `3` | 可选 | 增量模式下只读取最近 N 天频道消息，加快运行速度 |
 | `PROXY` | 抓取代理设置 | 留空 | 可选 | GitHub Actions 云端默认直连 Telegram 无需配置；自建私有 Runner 或特殊网络时可按需配置 |
-| `PROXY_CHANNELS` | 代理抓取目标频道/群组（逗号/空格分隔） | `@otcfxq, @danfeng_chat` | 可选 | 自定义抓取通用代理的 Telegram 公开频道/群组列表 |
-| `CF_IP_CHANNELS` | 优选 IP 抓取目标频道/群组（逗号/空格分隔） | `@otcfxq, @danfeng_chat` | 可选 | 自定义抓取 Cloudflare 优选 IP 与测速附件的大池频道/群组列表 |
+| `PROXY_CHANNELS` | 代理抓取目标频道/群组（逗号/空格分隔） | `@otcfxq, @danfeng_chat` | 可选 | 自定义抓取通用代理的 Telegram 公开频道/群组列表（留空自动使用代码默认值） |
+| `CF_IP_CHANNELS` | 优选 IP 抓取目标频道/群组（逗号/空格分隔） | `@otcfxq, @danfeng_chat` | 可选 | 自定义抓取 Cloudflare 优选 IP 与测速附件的大池频道/群组列表（留空自动使用代码默认值） |
 
 ### 3. 高级调优参数与本地调试对照（可选）
 
