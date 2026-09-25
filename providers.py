@@ -133,6 +133,8 @@ KNOWN_CLOUD_PROVIDERS = {
     "skbroadband": ("AS9318", "SK Broadband"),
     "digitalvirt": ("AS11161", "DigitalVirt"),
     "emagine": ("AS31972", "Emagine Concept"),
+    "globalcommunication": ("AS152179", "Global Communication Network"),
+    "hkglobal": ("AS152179", "Global Communication Network"),
 
     # 运营商骨干与出海线路
     "hinet": ("AS3462", "Chunghwa Telecom HiNet"),
