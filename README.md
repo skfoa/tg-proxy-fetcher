@@ -140,7 +140,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 * **主动质检淘汰（`socks_verify.py`）**：集成 RFC 1928（SOCKS5 协商/认证/CONNECT 隧道穿透）、RFC 5389（STUN/TURN Binding 鉴真）、HTTP CONNECT 穿透全套真实网络协议握手引擎。
 * **连续失败缓冲保护（`--max-fails 3`）**：探测失败标记缓冲（`fail_count=1~2` 为缓冲期），连续 3 次全网不可达方才彻底剔除，避免公网抖动误杀。
 * **双模持久化**：
-  - `data/socks5.txt`：纯文本每行一个可用节点 URL，开箱即用。
+  - `data/socks5.txt`：纯文本每行一个可用节点 URL，按协议分段归类输出（`# SOCKS5 代理`、`# HTTP 代理`、`# TURN 协议` 等），段内按实测延迟严选升序排列，开箱即用不混杂。
   - `data/socks5.csv`：结构化表格，包含协议类型、测速延迟（ms）、连续失败次数、Cloudflare Colo 数据中心与质检时间戳。
 
 ### 2. `data/cf_ips.txt` / `data/cf_ips.csv`（频道日常单条优选 IP）

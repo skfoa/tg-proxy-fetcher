@@ -41,6 +41,7 @@ from providers import (
     TG_CHAT_ID,
     record_tombstone,
     canonical_key,
+    format_socks_txt,
 )
 
 # 确保本地 .env 加载
@@ -501,11 +502,10 @@ def save_socks_data(
 
     survivors.sort(key=_sort_key)
 
-    # 写入 socks5.txt (纯文本 URL 清单)
+    # 写入 socks5.txt (纯文本 URL 清单，按协议分段归类)
     with open(txt_path, "w", encoding="utf-8") as f:
-        for r in survivors:
-            f.write(f"{r['url']}\n")
-    log.info("已覆写保存 %s: %d 个高可用节点", txt_path, len(survivors))
+        f.write(format_socks_txt(survivors))
+    log.info("已按协议分段覆写保存 %s: %d 个高可用节点", txt_path, len(survivors))
 
     # 写入 socks5.csv (完整元数据表)
     with open(csv_path, "w", encoding="utf-8-sig", newline="") as f:

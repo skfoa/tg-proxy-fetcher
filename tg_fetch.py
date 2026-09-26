@@ -52,6 +52,7 @@ from providers import (
     TG_CHAT_ID,
     format_proxyip_txt,
     format_scan_ips_txt,
+    format_socks_txt,
     save_proxyip_by_country,
     classify_asn,
     is_asn_recorded,
@@ -488,12 +489,11 @@ def save_and_notify(
     updated_proxyips_count: int = 0,
     unrecorded_asns: list = None,
 ):
-    # 1. 保存代理节点
+    # 1. 保存代理节点（按协议分段归类）
     os.makedirs(DATA_DIR, exist_ok=True)
     with open(OUTPUT_PROXY_FILE, "w", encoding="utf-8") as f:
-        for node in final_proxies.values():
-            f.write(node + "\n")
-    log.info("已保存代理文件: %s (%d 个全量累积节点)", OUTPUT_PROXY_FILE, len(final_proxies))
+        f.write(format_socks_txt(list(final_proxies.values())))
+    log.info("已按协议分段保存代理文件: %s (%d 个全量累积节点)", OUTPUT_PROXY_FILE, len(final_proxies))
 
     # 2. 保存单条优选 IP
     sorted_cf_ips = sorted(

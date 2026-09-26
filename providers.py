@@ -6,8 +6,8 @@
   2. clean_asn() / _extract_asn_code(): 统一 ASN 编号与服务商提取清洗。
   3. ASN_EXACT_NET_TYPE / classify_asn() / is_asn_recorded():
      方案 A+ 两级分层网络类型（ISP/BIZ/EDU/GOV/BANK/机房）识别引擎与收录判定。
-  4. format_buffer_nodes_txt() / format_proxyip_txt() / format_scan_ips_txt() / format_categorized_proxyip_txt() / save_proxyip_by_country():
-     节点按质检可用性/缓冲状态分层输出（缓冲节点置顶、存活节点紧随）、按国家/地区聚合分组及稀缺高价值网络专线纯文本分类导出。
+  4. format_buffer_nodes_txt() / format_proxyip_txt() / format_scan_ips_txt() / format_socks_txt() / format_categorized_proxyip_txt() / save_proxyip_by_country():
+     节点按质检可用性/缓冲状态分层输出（缓冲节点置顶、存活节点紧随）、通用代理按协议分段归类输出、按国家/地区聚合分组及稀缺高价值网络专线纯文本分类导出。
   5. load_dotenv() / safe_int(): 本地环境加载与安全类型转换。
   6. send_tg_message() / send_ci_failure_alert(): 统一 Telegram 消息推送与 Actions CI 失败秒级告警。
   7. canonical_key() / load_tombstone() / record_tombstone() / is_tombstoned():
@@ -601,6 +601,71 @@ def format_buffer_nodes_txt(rows: list) -> str:
 
 format_proxyip_txt = format_buffer_nodes_txt
 format_scan_ips_txt = format_buffer_nodes_txt
+
+
+def format_socks_txt(rows: list) -> str:
+    """
+    将通用代理列表按协议类型分段归类输出：
+      - 优先按协议归类展示（SOCKS5 -> HTTP -> HTTPS -> TURN -> 其他）
+      - 各协议段内按 (fail_count 升序, delay_ms 升序) 排序
+      - 带有清晰的注释头部，避免各协议节点混杂穿插
+    """
+    PROTO_ORDER = ["socks5", "http", "https", "turn"]
+    PROTO_NAMES = {
+        "socks5": "SOCKS5 代理",
+        "http": "HTTP 代理",
+        "https": "HTTPS 代理",
+        "turn": "TURN 协议",
+    }
+
+    groups: dict[str, list] = {}
+    seen = set()
+
+    for item in rows:
+        if isinstance(item, dict):
+            url = (item.get("url") or "").strip()
+            proto = (item.get("proto") or "").strip().lower()
+            fc = safe_int(item.get("fail_count"), 0)
+            dms = safe_int(item.get("delay_ms"), 0)
+        else:
+            url = str(item).strip()
+            proto = ""
+            fc = 0
+            dms = 0
+
+        if not url or url.startswith("#"):
+            continue
+        if url in seen:
+            continue
+        seen.add(url)
+
+        if not proto:
+            proto = url.split("://", 1)[0].lower() if "://" in url else "other"
+
+        if dms <= 0:
+            dms = 99999
+
+        groups.setdefault(proto, []).append((fc, dms, url))
+
+    def _proto_sort_key(p: str) -> tuple[int, str]:
+        if p in PROTO_ORDER:
+            return (PROTO_ORDER.index(p), p)
+        return (len(PROTO_ORDER), p)
+
+    sorted_protos = sorted(groups.keys(), key=_proto_sort_key)
+
+    sections = []
+    for proto in sorted_protos:
+        nodes = groups[proto]
+        nodes.sort(key=lambda x: (x[0], x[1]))
+        title = PROTO_NAMES.get(proto, f"{proto.upper()} 代理")
+        header = f"# {title} - {len(nodes)} 个"
+        section_lines = [header]
+        for _, _, url in nodes:
+            section_lines.append(url)
+        sections.append("\n".join(section_lines))
+
+    return "\n\n".join(sections).rstrip() + "\n" if sections else ""
 
 
 def format_categorized_proxyip_txt(rows: list) -> str:
