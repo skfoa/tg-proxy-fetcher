@@ -135,6 +135,7 @@ KNOWN_CLOUD_PROVIDERS = {
     "emagine": ("AS31972", "Emagine Concept"),
     "globalcommunication": ("AS152179", "Global Communication Network"),
     "hkglobal": ("AS152179", "Global Communication Network"),
+    "halocloud": ("AS50385", "HaloCloud"),
 
     # 运营商骨干与出海线路
     "hinet": ("AS3462", "Chunghwa Telecom HiNet"),
