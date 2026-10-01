@@ -78,7 +78,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 | :--- | :--- |
 | **`tg_fetch.py`** | **数据抓取与合并核心**：实现免登录 Web 爬虫与 Telethon API 双模抓取，跨文件全局唯一去重合并保存至 `data/`。 |
 | **`parsers.py`** | **文本与协议解析器模块**：提取通用代理正则、单条优选卡片、测速 CSV 附件、OTC 扫描清单等解析规则，全面解耦数据提取与业务流。 |
-| **`providers.py`** | **公共规范与网络分类中心**：全系统单一真相源（Single Source of Truth），维护云厂商与关键 ASN 映射表、两级分层网络分类引擎（Tier 1 权威对照 + Tier 2 词根规则）、未收录 ASN 检测，以及 ProxyIP 分国别与特殊网络分类导出工具。 |
+| **`providers.py`** | **公共规范与网络分类中心**：全系统单一真相源（Single Source of Truth），维护云厂商与关键 ASN 映射表、两级分层网络分类引擎（Tier 1 权威对照 + Tier 2 词根规则）、未知 ASN 自动在线反查与动态持久化学习数据库（`data/asn_database.json`），以及 ProxyIP 分国别与特殊网络分类导出工具。 |
 | **`socks_verify.py`** | **通用代理主动质检引擎**：基于 RFC 1928 (readexactly 精确字节读取)、RFC 5389 (STUN/TURN Binding) 与 HTTP CONNECT 穿透检验。 |
 | **`proxyip_verify.py`** | **反代 ProxyIP 质检引擎**：抗分包/防截断（Header/Body 隔离），验证反代真实穿透能力，并提纯兼具 TLS 官方优选直连的极品清单 `data/proxyip_cf.txt`。 |
 | **`cf_verify.py`** | **全量优选 IP 鉴真与最终卡片推送**：执行 TLS 官方证书鉴真 + HTTP 301 重定向抗截断精准校验，汇总流水线所有阶段数据并推送统一 TG 统计卡片。 |

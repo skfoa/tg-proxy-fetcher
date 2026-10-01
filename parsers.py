@@ -21,6 +21,7 @@ from providers import (
     ASN_TO_PROVIDER,
     SORTED_CLOUD_PROVIDER_KEYS,
     normalize_timestamp,
+    resolve_ip_asn,
 )
 
 log = logging.getLogger("parsers")
@@ -143,18 +144,13 @@ def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
         if rem_isp:
             raw_isp = rem_isp
 
-    # 智能补全：若数据行缺少 ASN，但 ISP 匹配已知服务商，自动推断补全 ASN
-    if (not asn_clean or asn_clean == "AS_UNKNOWN") and raw_isp:
-        isp_lower = raw_isp.lower()
-        for key in sorted(KNOWN_CLOUD_PROVIDERS.keys(), key=len, reverse=True):
-            if key in isp_lower:
-                asn_clean = KNOWN_CLOUD_PROVIDERS[key][0]
-                break
-
-    # 智能补全：若已有 ASN 但缺少 ISP，从 ASN 反查知名服务商名称
-    if asn_clean and asn_clean != "AS_UNKNOWN" and not raw_isp:
-        if asn_clean in ASN_TO_PROVIDER:
-            raw_isp = ASN_TO_PROVIDER[asn_clean]
+    # 智能补全：若数据行缺少 ASN，查持久化库或在线反查并补充入库
+    if not asn_clean or asn_clean == "AS_UNKNOWN":
+        found_asn, found_isp = resolve_ip_asn(ip, raw_isp)
+        if found_asn:
+            asn_clean = found_asn
+            if not raw_isp and found_isp:
+                raw_isp = found_isp
 
     return {
         "ip": ip,
@@ -394,18 +390,13 @@ def parse_cf_csv_content(
                     raw_isp = raw_asn
                 asn_clean = ""
 
-            # 智能补全：若数据行缺少 ASN，但 ISP 匹配已知服务商，自动推断补全 ASN
-            if (not asn_clean or asn_clean == "AS_UNKNOWN") and raw_isp:
-                isp_lower = raw_isp.lower()
-                for key in sorted(KNOWN_CLOUD_PROVIDERS.keys(), key=len, reverse=True):
-                    if key in isp_lower:
-                        asn_clean = KNOWN_CLOUD_PROVIDERS[key][0]
-                        break
-
-            # 智能补全：若已有 ASN 但缺少 ISP，从 ASN 反查知名服务商名称
-            if asn_clean and asn_clean != "AS_UNKNOWN" and not raw_isp:
-                if asn_clean in ASN_TO_PROVIDER:
-                    raw_isp = ASN_TO_PROVIDER[asn_clean]
+            # 智能补全：若数据行缺少 ASN，查持久化库或在线反查并补充入库
+            if not asn_clean or asn_clean == "AS_UNKNOWN":
+                found_asn, found_isp = resolve_ip_asn(raw_ip, raw_isp)
+                if found_asn:
+                    asn_clean = found_asn
+                    if not raw_isp and found_isp:
+                        raw_isp = found_isp
 
             raw_time = row.get(field_map.get("time", ""), "").strip()
             tested_at = normalize_timestamp(raw_time, fn_time)
@@ -508,6 +499,13 @@ def parse_otc_scan_content(
         if m:
             colo = m.group(1)
             loc = m.group(2)
+
+        if not asn or asn == "AS_UNKNOWN":
+            found_asn, found_isp = resolve_ip_asn(ip, isp)
+            if found_asn:
+                asn = found_asn
+                if not isp and found_isp:
+                    isp = found_isp
 
         tls = "true" if port in (443, 8443, 2053, 2083, 2087, 2096) else "false"
 

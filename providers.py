@@ -180,6 +180,112 @@ from datetime import datetime, timezone, timedelta
 log = logging.getLogger("providers")
 
 
+# ---------- 持久化 ASN 数据库加载与在线动态解析补库 ----------
+
+def load_asn_database() -> tuple[dict[str, str], dict[str, str]]:
+    """从 data/asn_database.json 自动加载持久化 ASN/ISP 映射字典"""
+    candidates = [
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "asn_database.json"),
+        os.path.join("data", "asn_database.json"),
+    ]
+    for db_path in candidates:
+        if os.path.isfile(db_path):
+            try:
+                with open(db_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    return data.get("isp_to_asn", {}), data.get("asn_to_isp", {})
+            except Exception as e:
+                log.debug("读取 %s 异常: %s", db_path, e)
+    return {}, {}
+
+
+def save_asn_database(isp_to_asn: dict[str, str], asn_to_isp: dict[str, str]):
+    """持久化保存动态发现的 ASN/ISP 数据库"""
+    candidates = [
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "asn_database.json"),
+        os.path.join("data", "asn_database.json"),
+    ]
+    db_path = candidates[0]
+    try:
+        os.makedirs(os.path.dirname(db_path), exist_ok=True)
+        with open(db_path, "w", encoding="utf-8") as f:
+            json.dump({"isp_to_asn": isp_to_asn, "asn_to_isp": asn_to_isp}, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        log.warning("保存 asn_database.json 异常: %s", e)
+
+
+# 加载持久化 ASN 数据库并融合进公共字典
+ASN_DATABASE_ISP_TO_ASN, ASN_DATABASE_ASN_TO_ISP = load_asn_database()
+for _asn, _isp in ASN_DATABASE_ASN_TO_ISP.items():
+    if _asn not in ASN_TO_PROVIDER and _isp:
+        ASN_TO_PROVIDER[_asn] = _isp
+
+for _isp, _asn in ASN_DATABASE_ISP_TO_ASN.items():
+    clean_k = re.sub(r"[^a-z0-9]", "", _isp.lower())
+    if len(clean_k) >= 3 and clean_k not in KNOWN_CLOUD_PROVIDERS:
+        KNOWN_CLOUD_PROVIDERS[clean_k] = (_asn, _isp)
+
+# 动态扩展后重新生成排序别名元组
+SORTED_CLOUD_PROVIDER_KEYS = tuple(sorted(KNOWN_CLOUD_PROVIDERS.keys(), key=len, reverse=True))
+
+
+def resolve_asn_online(ip: str, isp_hint: str = "") -> tuple[str, str]:
+    """
+    当本地库完全无法识别 ASN 时，在线向权威 BGP 数据库实时反查并自动入库（实现『不知道就查，完善数据库』）：
+    返回 (clean_asn, clean_isp)。
+    """
+    if not ip or ip in ("AS_UNKNOWN", "unknown", "127.0.0.1"):
+        return "", ""
+    try:
+        url = f"http://ip-api.com/json/{ip}?fields=query,as,asname,org,isp"
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=3.5) as res:
+            data = json.loads(res.read())
+            as_str = data.get("as", "")
+            m = re.search(r"(AS\d+)", as_str, re.IGNORECASE)
+            if m:
+                clean_asn = m.group(1).upper()
+                clean_isp = data.get("isp") or data.get("org") or data.get("asname") or isp_hint or ""
+                # 动态补充进内存字典并持久化
+                if clean_isp:
+                    ASN_DATABASE_ISP_TO_ASN[clean_isp] = clean_asn
+                ASN_DATABASE_ASN_TO_ISP[clean_asn] = clean_isp or isp_hint
+                ASN_TO_PROVIDER[clean_asn] = clean_isp or isp_hint
+                save_asn_database(ASN_DATABASE_ISP_TO_ASN, ASN_DATABASE_ASN_TO_ISP)
+                log.info("【自动完善数据库】已在线反查 IP %s 并补充入库: %s -> %s", ip, clean_asn, clean_isp)
+                return clean_asn, clean_isp
+    except Exception as e:
+        log.debug("在线解析 IP %s 的 ASN 失败: %s", ip, e)
+    return "", ""
+
+
+def resolve_ip_asn(ip: str = "", isp_hint: str = "") -> tuple[str, str]:
+    """
+    智能解析/补全 ASN 与 ISP：
+    1. 优先查持久化数据库 (ASN_DATABASE_ISP_TO_ASN / KNOWN_CLOUD_PROVIDERS)
+    2. 若未知且存在有效 IP，在线向 BGP 路由库实时反查并写入数据库
+    """
+    clean_isp = isp_hint.strip()
+    if clean_isp and clean_isp in ASN_DATABASE_ISP_TO_ASN:
+        clean_asn = ASN_DATABASE_ISP_TO_ASN[clean_isp]
+        return clean_asn, clean_isp
+
+    if clean_isp:
+        isp_lower = clean_isp.lower()
+        for k in SORTED_CLOUD_PROVIDER_KEYS:
+            if k in isp_lower:
+                asn_code, std_name = KNOWN_CLOUD_PROVIDERS[k]
+                return asn_code, std_name
+
+    # 在线反查并入库
+    if ip and ip not in ("AS_UNKNOWN", "unknown"):
+        found_asn, found_isp = resolve_asn_online(ip, isp_hint)
+        if found_asn:
+            return found_asn, found_isp or clean_isp
+
+    return "", clean_isp
+
+
 def load_dotenv(env_path: str = None) -> dict:
     """
     自动加载本地 .env 文件至 os.environ（若存在）。
