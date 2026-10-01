@@ -67,9 +67,15 @@ if sys.platform == "win32":
         pass
 
 DATA_DIR = "data"
-SOCKS_TXT = os.path.join(DATA_DIR, "socks5.txt")
-SOCKS_CSV = os.path.join(DATA_DIR, "socks5.csv")
+PROXIES_TXT = os.path.join(DATA_DIR, "proxies.txt")
+PROXIES_CSV = os.path.join(DATA_DIR, "proxies.csv")
+COMPAT_SOCKS_TXT = os.path.join(DATA_DIR, "socks5.txt")
+COMPAT_SOCKS_CSV = os.path.join(DATA_DIR, "socks5.csv")
 PROXIES_DIR = os.path.join(DATA_DIR, "proxies")
+
+# 向后兼容别名
+SOCKS_TXT = PROXIES_TXT
+SOCKS_CSV = PROXIES_CSV
 
 PROBE_HOST = "speed.cloudflare.com"
 PROBE_PATH = "/cdn-cgi/trace"
@@ -495,20 +501,24 @@ def parse_proxy_url(url: str) -> dict | None:
 
 
 def load_socks_data(
-    txt_path: str = SOCKS_TXT,
-    csv_path: str = SOCKS_CSV,
+    txt_path: str = PROXIES_TXT,
+    csv_path: str = PROXIES_CSV,
 ) -> list[dict]:
     """
     加载待检代理节点：
-    1. 优先读取 socks5.csv（保留既有 fail_count 与历史统计）
-    2. 合并 socks5.txt 中新增的节点
+    1. 优先读取 proxies.csv（或兼容 socks5.csv，保留既有 fail_count 与历史统计）
+    2. 合并 proxies.txt（或兼容 socks5.txt）中新增的节点
     """
     url_map: dict[str, dict] = {}
 
+    target_csv = csv_path
+    if not os.path.isfile(target_csv) and os.path.isfile(COMPAT_SOCKS_CSV):
+        target_csv = COMPAT_SOCKS_CSV
+
     # 读取已有 CSV
-    if os.path.isfile(csv_path):
+    if os.path.isfile(target_csv):
         try:
-            with open(csv_path, "r", encoding="utf-8-sig") as f:
+            with open(target_csv, "r", encoding="utf-8-sig") as f:
                 reader = csv.DictReader(f)
                 for r in reader:
                     url = r.get("url", "").strip()
@@ -523,15 +533,19 @@ def load_socks_data(
                     parsed["colo"] = r.get("colo", "")
                     parsed["tested_at"] = r.get("tested_at", "")
                     url_map[url] = parsed
-            log.info("从 %s 加载已有记录 %d 条", csv_path, len(url_map))
+            log.info("从 %s 加载已有记录 %d 条", target_csv, len(url_map))
         except Exception as e:
-            log.warning("读取 %s 失败: %s", csv_path, e)
+            log.warning("读取 %s 失败: %s", target_csv, e)
 
-    # 合并 socks5.txt 中的新节点
-    if os.path.isfile(txt_path):
+    target_txt = txt_path
+    if not os.path.isfile(target_txt) and os.path.isfile(COMPAT_SOCKS_TXT):
+        target_txt = COMPAT_SOCKS_TXT
+
+    # 合并 proxies.txt / socks5.txt 中的新节点
+    if os.path.isfile(target_txt):
         txt_count = 0
         try:
-            with open(txt_path, "r", encoding="utf-8") as f:
+            with open(target_txt, "r", encoding="utf-8") as f:
                 for line in f:
                     line = line.strip()
                     if not line or line.startswith("#"):
@@ -541,23 +555,23 @@ def load_socks_data(
                         parsed = parse_proxy_url(line)
                         if parsed:
                             url_map[line] = parsed
-            log.info("从 %s 读取 %d 行，合并后待检节点共: %d 条", txt_path, txt_count, len(url_map))
+            log.info("从 %s 读取 %d 行，合并后待检节点共: %d 条", target_txt, txt_count, len(url_map))
         except Exception as e:
-            log.warning("读取 %s 失败: %s", txt_path, e)
+            log.warning("读取 %s 失败: %s", target_txt, e)
 
     return list(url_map.values())
 
 
 def save_socks_data(
     survivors: list[dict],
-    txt_path: str = SOCKS_TXT,
-    csv_path: str = SOCKS_CSV,
+    txt_path: str = PROXIES_TXT,
+    csv_path: str = PROXIES_CSV,
     proxies_dir: str = PROXIES_DIR,
 ):
     """
     保存质检幸存节点：
     按 (协议顺序, fail_count 升序, delay_ms 升序) 排序，确保在 CSV 与 TXT 中各协议严格分块独立，绝不交错混杂。
-    覆写 socks5.txt 与 socks5.csv，并按协议独立拆分保存至 proxies/ 子目录（包含 .txt 与 .csv 纯净单协议版）。
+    覆写 proxies.txt 与 proxies.csv（以及向后兼容 socks5.txt / socks5.csv），并按协议独立拆分保存至 proxies/ 子目录（包含 .txt 与 .csv 纯净单协议版）。
     """
     PROTO_ORDER = ["socks5", "http", "https", "turn", "sstp"]
 
@@ -573,22 +587,31 @@ def save_socks_data(
 
     survivors.sort(key=_sort_key)
 
-    # 写入 socks5.txt (纯文本 URL 清单，按协议分段归类)
-    with open(txt_path, "w", encoding="utf-8") as f:
-        f.write(format_socks_txt(survivors))
-    log.info("已按协议分段覆写保存 %s: %d 个高可用节点", txt_path, len(survivors))
+    # 写入 proxies.txt (纯文本 URL 清单，按协议分段归类) 及向后兼容 socks5.txt
+    formatted_txt = format_socks_txt(survivors)
+    for p_txt in (txt_path, COMPAT_SOCKS_TXT):
+        try:
+            with open(p_txt, "w", encoding="utf-8") as f:
+                f.write(formatted_txt)
+        except Exception as e:
+            log.warning("写入 %s 失败: %s", p_txt, e)
+    log.info("已按协议分段覆写保存 %s (及兼容 %s): %d 个高可用节点", txt_path, COMPAT_SOCKS_TXT, len(survivors))
 
     # 按协议拆分独立文件至 data/proxies/ 子目录 (.txt 与 .csv)
     proto_counts = save_proxies_by_protocol(survivors, proxies_dir)
     log.info("已在 %s/ 目录下同步覆写 %d 个独立协议文件: %s", proxies_dir, len(proto_counts), proto_counts)
 
-    # 写入 socks5.csv (完整元数据表，按协议分块严格隔离，不混杂)
-    with open(csv_path, "w", encoding="utf-8-sig", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
-        writer.writeheader()
-        for r in survivors:
-            writer.writerow(r)
-    log.info("已按协议分块覆写保存 %s: %d 条质检状态记录 (无交错混杂)", csv_path, len(survivors))
+    # 写入 proxies.csv (完整元数据表，按协议分块严格隔离，不混杂) 及向后兼容 socks5.csv
+    for p_csv in (csv_path, COMPAT_SOCKS_CSV):
+        try:
+            with open(p_csv, "w", encoding="utf-8-sig", newline="") as f:
+                writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
+                writer.writeheader()
+                for r in survivors:
+                    writer.writerow(r)
+        except Exception as e:
+            log.warning("写入 %s 失败: %s", p_csv, e)
+    log.info("已按协议分块覆写保存 %s (及兼容 %s): %d 条质检状态记录 (无交错混杂)", csv_path, COMPAT_SOCKS_CSV, len(survivors))
 
 
 # ---------- Telegram 通知 ----------

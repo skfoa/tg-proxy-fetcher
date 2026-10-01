@@ -116,7 +116,8 @@ def _parse_sub_urls() -> list[str]:
 SUB_URLS = _parse_sub_urls()
 
 DATA_DIR = "data"
-OUTPUT_PROXY_FILE = os.path.join(DATA_DIR, "socks5.txt")
+OUTPUT_PROXY_FILE = os.path.join(DATA_DIR, "proxies.txt")
+COMPAT_PROXY_FILE = os.path.join(DATA_DIR, "socks5.txt")
 OUTPUT_PROXIES_DIR = os.path.join(DATA_DIR, "proxies")
 OUTPUT_CF_FILE = os.path.join(DATA_DIR, "cf_ips.csv")
 OUTPUT_CF_TXT = os.path.join(DATA_DIR, "cf_ips.txt")
@@ -185,13 +186,16 @@ def get_system_proxy() -> str:
 
 
 def load_existing_proxies(filepath: str = OUTPUT_PROXY_FILE) -> dict:
-    """读取本地已保存的代理列表，保留历史累积有效节点（已淘汰进入墓地的节点跳过）"""
+    """读取本地已保存的代理列表，保留历史累积有效节点（兼容 proxies.txt 与旧 socks5.txt）"""
     existing = {}
-    if not os.path.exists(filepath):
+    target = filepath
+    if not os.path.exists(target) and os.path.exists(COMPAT_PROXY_FILE):
+        target = COMPAT_PROXY_FILE
+    if not os.path.exists(target):
         return existing
     tombstone = load_tombstone()
     try:
-        with open(filepath, "r", encoding="utf-8") as f:
+        with open(target, "r", encoding="utf-8") as f:
             for line in f:
                 line_s = line.strip()
                 if not line_s or line_s.startswith("#"):
@@ -506,14 +510,21 @@ def save_and_notify(
     updated_proxyips_count: int = 0,
     unrecorded_asns: list = None,
 ):
-    # 1. 保存代理节点（按协议分段归类及拆分子目录）
+    # 1. 保存通用代理总表（proxies.txt 及向后兼容 socks5.txt）并按协议独立拆分
     os.makedirs(DATA_DIR, exist_ok=True)
+    formatted_proxies = format_socks_txt(list(final_proxies.values()))
     with open(OUTPUT_PROXY_FILE, "w", encoding="utf-8") as f:
-        f.write(format_socks_txt(list(final_proxies.values())))
-    log.info("已按协议分段保存代理文件: %s (%d 个全量累积节点)", OUTPUT_PROXY_FILE, len(final_proxies))
+        f.write(formatted_proxies)
+    log.info("已按协议分段保存通用代理总文件: %s (%d 个全量累积节点)", OUTPUT_PROXY_FILE, len(final_proxies))
+
+    try:
+        with open(COMPAT_PROXY_FILE, "w", encoding="utf-8") as f:
+            f.write(formatted_proxies)
+    except Exception as e:
+        log.warning("写入兼容代理文件 %s 失败: %s", COMPAT_PROXY_FILE, e)
 
     proto_counts = save_proxies_by_protocol(list(final_proxies.values()), OUTPUT_PROXIES_DIR)
-    log.info("已在 %s/ 目录下生成 %d 个独立协议纯文本文件: %s", OUTPUT_PROXIES_DIR, len(proto_counts), proto_counts)
+    log.info("已在 %s/ 目录下生成 %d 个独立协议文件: %s", OUTPUT_PROXIES_DIR, len(proto_counts), proto_counts)
 
     # 2. 保存单条优选 IP
     sorted_cf_ips = sorted(
