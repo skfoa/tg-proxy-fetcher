@@ -226,6 +226,12 @@ def load_existing_cf_ips(filepath: str = OUTPUT_CF_FILE) -> dict:
                     if not is_tombstoned(key, tombstone):
                         row["fail_count"] = safe_int(row.get("fail_count"), 0)
                         row["tested_at"] = normalize_timestamp(row.get("tested_at", ""))
+                        raw_asn = row.get("asn", "").replace("`", "").strip()
+                        m_asn = re.search(r"(AS\d+)", raw_asn, re.IGNORECASE)
+                        row["asn"] = m_asn.group(1).upper() if m_asn else raw_asn
+                        row["isp"] = row.get("isp", "").replace("`", "").strip()
+                        row["colo"] = row.get("colo", "").replace("`", "").strip()
+                        row["cf_location"] = row.get("cf_location", "").replace("`", "").strip()
                         existing[key] = row
         log.info("已加载本地已存优选 IP 记录: %d 条（历史有效记录全部保留）", len(existing))
     except Exception as e:

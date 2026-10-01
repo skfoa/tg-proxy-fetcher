@@ -132,16 +132,40 @@ def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
     time_m = re.search(r"(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})", text)
     source_m = re.search(r"IP来源[:：]\s*([@\w]+)", text)
 
+    raw_asn = asn_m.group(1).replace("`", "").strip() if asn_m else ""
+    m_asn = re.search(r"(AS\d+)", raw_asn, re.IGNORECASE)
+    asn_clean = m_asn.group(1).upper() if m_asn else (raw_asn if raw_asn and raw_asn != "-" else "")
+
+    raw_isp = isp_m.group(1).replace("`", "").strip() if isp_m else ""
+    # 若运营商未显式声明，尝试从 ASN 原文提取（如 `AS906 DMIT Cloud Services`）
+    if not raw_isp and m_asn:
+        rem_isp = raw_asn[m_asn.end():].strip().strip("-").strip()
+        if rem_isp:
+            raw_isp = rem_isp
+
+    # 智能补全：若数据行缺少 ASN，但 ISP 匹配已知服务商，自动推断补全 ASN
+    if (not asn_clean or asn_clean == "AS_UNKNOWN") and raw_isp:
+        isp_lower = raw_isp.lower()
+        for key in sorted(KNOWN_CLOUD_PROVIDERS.keys(), key=len, reverse=True):
+            if key in isp_lower:
+                asn_clean = KNOWN_CLOUD_PROVIDERS[key][0]
+                break
+
+    # 智能补全：若已有 ASN 但缺少 ISP，从 ASN 反查知名服务商名称
+    if asn_clean and asn_clean != "AS_UNKNOWN" and not raw_isp:
+        if asn_clean in ASN_TO_PROVIDER:
+            raw_isp = ASN_TO_PROVIDER[asn_clean]
+
     return {
         "ip": ip,
         "port": port,
         "tls": tls_m.group(1).lower() if tls_m else "unknown",
         "delay_ms": int(float(delay_m.group(1))) if delay_m else "",
         "speed_kbs": speed_kbs,
-        "colo": colo_m.group(1).strip() if colo_m else "",
-        "cf_location": cf_loc_m.group(1).strip() if cf_loc_m else "",
-        "isp": isp_m.group(1).strip() if isp_m else "",
-        "asn": asn_m.group(1).strip() if asn_m else "",
+        "colo": colo_m.group(1).replace("`", "").strip() if colo_m else "",
+        "cf_location": cf_loc_m.group(1).replace("`", "").strip() if cf_loc_m else "",
+        "isp": raw_isp,
+        "asn": asn_clean or "AS_UNKNOWN",
         "tested_at": normalize_timestamp(time_m.group(1).strip() if time_m else ""),
         "channel": source_m.group(1).strip() if source_m else default_channel,
         "fail_count": 0,

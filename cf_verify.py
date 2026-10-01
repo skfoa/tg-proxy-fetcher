@@ -261,6 +261,16 @@ def load_csv(path: str) -> list:
         for r in reader:
             r["fail_count"] = safe_int(r.get("fail_count"), 0)
             r["tested_at"] = normalize_timestamp(r.get("tested_at", ""))
+            if "asn" in r:
+                raw_asn = r["asn"].replace("`", "").strip()
+                m_asn = re.search(r"(AS\d+)", raw_asn, re.IGNORECASE)
+                r["asn"] = m_asn.group(1).upper() if m_asn else raw_asn
+            if "isp" in r:
+                r["isp"] = r["isp"].replace("`", "").strip()
+            if "colo" in r:
+                r["colo"] = r["colo"].replace("`", "").strip()
+            if "cf_location" in r:
+                r["cf_location"] = r["cf_location"].replace("`", "").strip()
             rows.append(r)
     return rows
 
