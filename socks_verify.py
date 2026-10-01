@@ -587,31 +587,23 @@ def save_socks_data(
 
     survivors.sort(key=_sort_key)
 
-    # 写入 proxies.txt (纯文本 URL 清单，按协议分段归类) 及向后兼容 socks5.txt
+    # 写入 proxies.txt (纯文本 URL 清单，按协议分段归类)
     formatted_txt = format_socks_txt(survivors)
-    for p_txt in (txt_path, COMPAT_SOCKS_TXT):
-        try:
-            with open(p_txt, "w", encoding="utf-8") as f:
-                f.write(formatted_txt)
-        except Exception as e:
-            log.warning("写入 %s 失败: %s", p_txt, e)
-    log.info("已按协议分段覆写保存 %s (及兼容 %s): %d 个高可用节点", txt_path, COMPAT_SOCKS_TXT, len(survivors))
+    with open(txt_path, "w", encoding="utf-8") as f:
+        f.write(formatted_txt)
+    log.info("已按协议分段覆写保存 %s: %d 个高可用节点", txt_path, len(survivors))
 
     # 按协议拆分独立文件至 data/proxies/ 子目录 (.txt 与 .csv)
     proto_counts = save_proxies_by_protocol(survivors, proxies_dir)
     log.info("已在 %s/ 目录下同步覆写 %d 个独立协议文件: %s", proxies_dir, len(proto_counts), proto_counts)
 
-    # 写入 proxies.csv (完整元数据表，按协议分块严格隔离，不混杂) 及向后兼容 socks5.csv
-    for p_csv in (csv_path, COMPAT_SOCKS_CSV):
-        try:
-            with open(p_csv, "w", encoding="utf-8-sig", newline="") as f:
-                writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
-                writer.writeheader()
-                for r in survivors:
-                    writer.writerow(r)
-        except Exception as e:
-            log.warning("写入 %s 失败: %s", p_csv, e)
-    log.info("已按协议分块覆写保存 %s (及兼容 %s): %d 条质检状态记录 (无交错混杂)", csv_path, COMPAT_SOCKS_CSV, len(survivors))
+    # 写入 proxies.csv (完整元数据表，按协议分块严格隔离，不混杂)
+    with open(csv_path, "w", encoding="utf-8-sig", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
+        writer.writeheader()
+        for r in survivors:
+            writer.writerow(r)
+    log.info("已按协议分块覆写保存 %s: %d 条质检状态记录 (无交错混杂)", csv_path, len(survivors))
 
 
 # ---------- Telegram 通知 ----------

@@ -51,7 +51,7 @@
                                      Telegram 公开频道
                           ┌─── @otcfxq ────────┐
                           │   (代理 + 优选IP)  │
-    tg_fetch.py ──────────┤                    ├────► 增量抓取 & 全局智能去重 ──┬──► data/proxies.txt / proxies.csv (兼容 socks5.*)
+    tg_fetch.py ──────────┤                    ├────► 增量抓取 & 全局智能去重 ──┬──► data/proxies.txt / proxies.csv
     (免登录/官方API双模)   │                    │                               ├──► data/cf_ips.txt / cf_ips.csv
                           └─── @danfeng_chat ──┘                               ├──► data/scan_ips.txt / scan_ips.csv
                                (优选IP 专属)                                     ├──► data/scan_ips/AS{ASN}_{ISP}.txt *
@@ -95,8 +95,6 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 | **`data/proxies.csv`** | 代理质检数据总表（按协议严格分块排列，杜绝不同协议交错混杂） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies.csv` |
 | **`data/proxies/*.txt`** | 按协议独立拆分的纯净单协议代理清单（如 `socks5.txt`、`turn.txt`、`sstp.txt`） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies/{协议}.txt` |
 | **`data/proxies/*.csv`** | 按协议独立拆分的纯净单协议结构化数据表（如 `socks5.csv`、`turn.csv`、`sstp.csv`） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies/{协议}.csv` |
-| **`data/socks5.txt`** *(兼容)* | 旧版通用代理链接（内容与 `proxies.txt` 完全同步，保障旧订阅不失效） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/socks5.txt` |
-| **`data/socks5.csv`** *(兼容)* | 旧版代理质检数据表（内容与 `proxies.csv` 完全同步） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/socks5.csv` |
 | **`data/cf_ips.txt`** | 频道日常单条优选 IP（纯文本） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/cf_ips.txt` |
 | **`data/cf_ips.csv`** | 频道日常单条优选 IP（数据表） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/cf_ips.csv` |
 | **`data/scan_ips.txt`** | 扫描测速总清单（按存活/缓冲质检状态分层排序，纯文本） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/scan_ips.txt` |
@@ -133,7 +131,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
    - 🛡️ **防污染机制**：通报消息后半段附带的第三方 SNI 测试目标域名（如 `域名:https://hf.molikuaiyin.com:443...`）会被自动精准过滤，确保代理库 100% 纯净。
 6. **代理附件文件自动解析（需官方 API 模式）**：
    - 自动识别频道发布的代理附件文件（如 `http_proxies.txt`、`https_proxies.txt`、`turn_proxies.txt` 等）。
-   - 自动提取行首有效节点与认证信息，过滤后续测速说明与反向 PTR 域名别名，统一去重合并至 `data/proxies.txt`（并同步兼容 `data/socks5.txt`）。
+   - 自动提取行首有效节点与认证信息，过滤后续测速说明与反向 PTR 域名别名，统一去重合并至 `data/proxies.txt`。
 7. **Cloudflare 优选 IP 与反代池（需官方 API 模式）**：
    - 提取包含 IP、端口、TLS、网络延迟（纯数值 ms）、下载速度（纯数值 kB/s）、数据中心（Colo）、落地位置、ASN、运营商、测速时间等全量指标。
 
@@ -146,8 +144,8 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 * **主动质检淘汰（`socks_verify.py`）**：集成 RFC 1928（SOCKS5 协商/认证/CONNECT 隧道穿透）、RFC 5389（STUN/TURN Binding 鉴真）、HTTP CONNECT 穿透、MS-SSTP 标准双工隧道握手全套真实网络协议握手引擎。
 * **连续失败缓冲保护（`--max-fails 3`）**：探测失败标记缓冲（`fail_count=1~2` 为缓冲期），连续 3 次全网不可达方才彻底剔除，避免公网抖动误杀。
 * **双模持久化与协议专属拆分（绝对杜绝协议混杂交错）**：
-  - `data/proxies.txt`（及兼容 `data/socks5.txt`）：全量代理汇总纯文本，按协议分段归类输出（`# SOCKS5 代理`、`# TURN 协议`、`# SSTP 协议` 等），段内按实测延迟严选升序排列，开箱即用不混杂。
-  - `data/proxies.csv`（及兼容 `data/socks5.csv`）：结构化质检总表，严格按协议大类分块聚集排序（SOCKS5 块 ➔ TURN 块 ➔ SSTP 块），行与行之间绝不再有交错混插现象。
+  - `data/proxies.txt`：全量代理汇总纯文本，按协议分段归类输出（`# SOCKS5 代理`、`# TURN 协议`、`# SSTP 协议` 等），段内按实测延迟严选升序排列，开箱即用不混杂。
+  - `data/proxies.csv`：结构化质检总表，严格按协议大类分块聚集排序（SOCKS5 块 ➔ TURN 块 ➔ SSTP 块），行与行之间绝不再有交错混插现象。
   - `data/proxies/`：专属单协议独立拆分子目录，提供纯净单协议 `.txt` 与 `.csv` 文件：
     - `data/proxies/socks5.txt` / `socks5.csv`：纯 SOCKS5 代理节点列表与表格（开箱直连 Telegram / Proxifier 等，100% 纯净无非 SOCKS5 记录）；
     - `data/proxies/turn.txt` / `turn.csv`：纯 TURN 穿透协议节点列表与表格；
@@ -281,7 +279,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
   * **HTTP / HTTPS**：CONNECT 隧道穿透 + 正向代理回退双路径校验。
   * **TURN / STUN**：构造 RFC 5389 STUN Binding Request 二进制包，严格校验 Magic Cookie (`0x2112A442`) 与 Transaction ID。
   * **SSTP**：MS-SSTP 标准双工隧道握手（TLS 握手 + `SSTP_DUPLEX_POST /sra_{BA195980-CD49-458b-9E23-C84EE0ADCD75}/` 校验 `HTTP/1.1 200 OK` 确认服务就绪）。
-* **淘汰机制**：连续失败达到阈值（默认 3 次）彻底从 `data/proxies.txt`、`data/proxies.csv`（及兼容 `socks5.txt` / `socks5.csv`）永久删除。
+* **淘汰机制**：连续失败达到阈值（默认 3 次）彻底从 `data/proxies.txt` 与 `data/proxies.csv` 永久删除。
 
 #### ② 反代 ProxyIP 穿透质检引擎（`proxyip_verify.py`）
 * **穿透与优选双能探测**：

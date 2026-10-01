@@ -523,12 +523,6 @@ def save_and_notify(
         f.write(formatted_proxies)
     log.info("已按协议分段保存通用代理总文件: %s (%d 个全量累积节点)", OUTPUT_PROXY_FILE, len(final_proxies))
 
-    try:
-        with open(COMPAT_PROXY_FILE, "w", encoding="utf-8") as f:
-            f.write(formatted_proxies)
-    except Exception as e:
-        log.warning("写入兼容代理文件 %s 失败: %s", COMPAT_PROXY_FILE, e)
-
     proto_counts = save_proxies_by_protocol(list(final_proxies.values()), OUTPUT_PROXIES_DIR)
     log.info("已在 %s/ 目录下生成 %d 个独立协议文件: %s", OUTPUT_PROXIES_DIR, len(proto_counts), proto_counts)
 
