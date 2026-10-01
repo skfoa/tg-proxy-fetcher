@@ -45,6 +45,7 @@ from providers import (
     canonical_key,
     format_socks_txt,
     save_proxies_by_protocol,
+    format_buffer_badge,
 )
 
 # 确保本地 .env 加载
@@ -69,13 +70,7 @@ if sys.platform == "win32":
 DATA_DIR = "data"
 PROXIES_TXT = os.path.join(DATA_DIR, "proxies.txt")
 PROXIES_CSV = os.path.join(DATA_DIR, "proxies.csv")
-COMPAT_SOCKS_TXT = os.path.join(DATA_DIR, "socks5.txt")
-COMPAT_SOCKS_CSV = os.path.join(DATA_DIR, "socks5.csv")
 PROXIES_DIR = os.path.join(DATA_DIR, "proxies")
-
-# 向后兼容别名
-SOCKS_TXT = PROXIES_TXT
-SOCKS_CSV = PROXIES_CSV
 
 PROBE_HOST = "speed.cloudflare.com"
 PROBE_PATH = "/cdn-cgi/trace"
@@ -506,14 +501,12 @@ def load_socks_data(
 ) -> list[dict]:
     """
     加载待检代理节点：
-    1. 优先读取 proxies.csv（或兼容 socks5.csv，保留既有 fail_count 与历史统计）
-    2. 合并 proxies.txt（或兼容 socks5.txt）中新增的节点
+    1. 优先读取 proxies.csv，保留既有 fail_count 与历史统计
+    2. 合并 proxies.txt 中新增的节点
     """
     url_map: dict[str, dict] = {}
 
     target_csv = csv_path
-    if not os.path.isfile(target_csv) and os.path.isfile(COMPAT_SOCKS_CSV):
-        target_csv = COMPAT_SOCKS_CSV
 
     # 读取已有 CSV
     if os.path.isfile(target_csv):
@@ -538,10 +531,8 @@ def load_socks_data(
             log.warning("读取 %s 失败: %s", target_csv, e)
 
     target_txt = txt_path
-    if not os.path.isfile(target_txt) and os.path.isfile(COMPAT_SOCKS_TXT):
-        target_txt = COMPAT_SOCKS_TXT
 
-    # 合并 proxies.txt / socks5.txt 中的新节点
+    # 合并 proxies.txt 中的新节点
     if os.path.isfile(target_txt):
         txt_count = 0
         try:
@@ -608,29 +599,6 @@ def save_socks_data(
 
 # ---------- Telegram 通知 ----------
 
-def format_buffer_badge(marked: int, buf_new: int = 0, buf_rec: int = 0, f1: int = 0, f2: int = 0) -> str:
-    """格式化缓冲标签，带新增缓冲与取消缓冲动态"""
-    if marked <= 0:
-        if buf_rec > 0:
-            return f" · ⚠️ 0 缓冲 [{buf_rec} 取消]"
-        return ""
-    changes = []
-    if buf_new > 0:
-        changes.append(f"+{buf_new} 新增")
-    if buf_rec > 0:
-        changes.append(f"{buf_rec} 取消")
-    if changes:
-        return f" · ⚠️ {marked} 缓冲 [{(' · '.join(changes))}]"
-    if f1 > 0 or f2 > 0:
-        breakdown = []
-        if f1 > 0:
-            breakdown.append(f"1次: {f1}")
-        if f2 > 0:
-            breakdown.append(f"2次: {f2}")
-        if breakdown:
-            return f" · ⚠️ {marked} 缓冲 [{(' · '.join(breakdown))}]"
-    return f" · ⚠️ {marked} 缓冲"
-
 
 def send_socks_notification(
     total: int,
@@ -690,7 +658,7 @@ def send_socks_notification(
 
 async def async_main(args):
     t_start = time.time()
-    rows = load_socks_data(SOCKS_TXT, SOCKS_CSV)
+    rows = load_socks_data(PROXIES_TXT, PROXIES_CSV)
     total = len(rows)
     if total == 0:
         log.warning("未加载到任何待检代理节点，流程结束")
@@ -786,7 +754,7 @@ async def async_main(args):
     else:
         log.info("[SOCKS5 淘汰] 本次无节点达到连续失败 %d 次的淘汰阈值", args.max_fails)
 
-    save_socks_data(survivors, SOCKS_TXT, SOCKS_CSV)
+    save_socks_data(survivors, PROXIES_TXT, PROXIES_CSV)
 
     elapsed = time.time() - t_start
     log.info("代理连通性质检流程执行完毕，总耗时 %.2f 秒 (✅ 存活: %d | 均延: %dms | ⚠️ 缓冲: %d [新增: %d, 取消恢复: %d])", elapsed, pass_count, avg_delay, (survivors_len - pass_count), socks_buf_new, socks_buf_rec)

@@ -38,12 +38,18 @@ from providers import (
     send_tg_message,
     normalize_timestamp,
     get_keyed_lock,
-    ASN_TO_PROVIDER,
     TG_BOT_TOKEN,
     TG_CHAT_ID,
     record_tombstone,
     canonical_key,
     format_scan_ips_txt,
+    RE_HTTP_301,
+    RE_SERVER_CF,
+    read_full_response,
+    split_header_body,
+    format_buffer_badge,
+    format_diff,
+    save_scan_ips_by_asn as save_scan_dir,
 )
 
 # 确保本地 .env 加载
@@ -86,45 +92,7 @@ SSL_CTX.verify_mode = ssl.CERT_REQUIRED
 
 
 
-# 预编译正则，高并发下零重复编译开销
-RE_HTTP_301 = re.compile(rb"^HTTP/\d\.\d\s+301\b")
-RE_SERVER_CF = re.compile(rb"(?im)^server:\s*cloudflare\s*$")
 
-
-async def _read_full_response(reader, http_timeout: float, max_bytes: int = 4096) -> bytes:
-    """
-    循环读取直到拿到完整的 HTTP 响应头（遇到 \r\n\r\n 或 \n\n）或达到 max_bytes 硬上限。
-    用统一 deadline 控制总耗时，避免多次循环导致累计超时远超 http_timeout。
-    单次 read() 动态计算剩余可用空间，避免读取超出 max_bytes 上限。
-    """
-    loop = asyncio.get_event_loop()
-    deadline = loop.time() + http_timeout
-    resp_bytes = b""
-    while len(resp_bytes) < max_bytes:
-        remaining = deadline - loop.time()
-        if remaining <= 0:
-            break
-        chunk = await asyncio.wait_for(
-            reader.read(min(1024, max_bytes - len(resp_bytes))),
-            timeout=remaining,
-        )
-        if not chunk:
-            break
-        resp_bytes += chunk
-        if b"\r\n\r\n" in resp_bytes or b"\n\n" in resp_bytes:
-            break
-    return resp_bytes
-
-
-def _split_header_body(resp_bytes: bytes) -> tuple[bytes, bytes]:
-    """按 \r\n\r\n 优先、\n\n 兜底切分 Header 与 Body 区域。"""
-    idx = resp_bytes.find(b"\r\n\r\n")
-    if idx != -1:
-        return resp_bytes[:idx], resp_bytes[idx + 4:]
-    idx = resp_bytes.find(b"\n\n")
-    if idx != -1:
-        return resp_bytes[:idx], resp_bytes[idx + 2:]
-    return resp_bytes, b""
 
 
 # ---------- 核心探测函数 ----------
@@ -163,8 +131,8 @@ async def probe_ip(
         writer.write(req)
         await asyncio.wait_for(writer.drain(), timeout=http_timeout)
 
-        resp_bytes = await _read_full_response(reader, http_timeout)
-        header_part, _ = _split_header_body(resp_bytes)
+        resp_bytes = await read_full_response(reader, http_timeout)
+        header_part, _ = split_header_body(resp_bytes)
 
         is_301 = bool(RE_HTTP_301.match(header_part))
         is_cf = bool(RE_SERVER_CF.search(header_part))
@@ -320,69 +288,7 @@ def save_scan_txt(rows_or_groups, path: str = SCAN_TXT):
     log.info("已按质检缓冲状态分层保存 %s: %d 条记录", path, len(rows))
 
 
-def save_scan_dir(asn_groups: dict, scan_dir: str = SCAN_DIR):
-    """
-    覆写 scan_ips/ 目录下的独立 ASN 纯文本文件（无注释 IP:端口）。
-    死节点被淘汰后，其对应的 ASN 文件会即时同步删除该 IP；
-    若某个 ASN 旗下所有 IP 全部死亡淘汰，该 ASN 文本文件也会被自动清除删除。
-    """
-    os.makedirs(scan_dir, exist_ok=True)
-
-    active_files = set()
-    for asn_name, group in asn_groups.items():
-        isp_name = ASN_TO_PROVIDER.get(asn_name, "")
-        if not isp_name:
-            isp_name = next((r.get("isp") for r in group if r.get("isp")), "")
-        clean_isp = re.sub(r"[^a-zA-Z0-9]", "", isp_name) if isp_name else ""
-        fname = f"{asn_name}_{clean_isp}.txt" if clean_isp else f"{asn_name}.txt"
-        fpath = os.path.join(scan_dir, fname)
-        with open(fpath, "w", encoding="utf-8") as f:
-            for r in sorted(group, key=lambda x: (x.get("ip", ""), int(x.get("port", 0)))):
-                f.write(f"{r['ip']}:{r['port']}\n")
-        active_files.add(fname)
-
-    # 移除已无活跃 IP 的旧分组文件（保留 .gitkeep 保持目录结构）
-    for old_f in os.listdir(scan_dir):
-        if old_f == ".gitkeep":
-            continue
-        if old_f.endswith(".txt") and old_f not in active_files:
-            try:
-                os.remove(os.path.join(scan_dir, old_f))
-            except OSError:
-                pass
-
-    log.info("已覆写更新 %s/ 目录: %d 个独立 ASN 纯文本文件", scan_dir, len(active_files))
-
-
 # ---------- Telegram 结果卡片推送 ----------
-def format_buffer_badge(
-    marked: int,
-    buf_new: int = 0,
-    buf_rec: int = 0,
-    f1: int = 0,
-    f2: int = 0,
-) -> str:
-    """格式化缓冲标签，带新增缓冲与取消缓冲动态"""
-    if marked <= 0:
-        if buf_rec > 0:
-            return f" · ⚠️ 0 缓冲 [{buf_rec} 取消]"
-        return ""
-    changes = []
-    if buf_new > 0:
-        changes.append(f"+{buf_new} 新增")
-    if buf_rec > 0:
-        changes.append(f"{buf_rec} 取消")
-    if changes:
-        return f" · ⚠️ {marked} 缓冲 [{(' · '.join(changes))}]"
-    if f1 > 0 or f2 > 0:
-        breakdown = []
-        if f1 > 0:
-            breakdown.append(f"1次: {f1}")
-        if f2 > 0:
-            breakdown.append(f"2次: {f2}")
-        if breakdown:
-            return f" · ⚠️ {marked} 缓冲 [{(' · '.join(breakdown))}]"
-    return f" · ⚠️ {marked} 缓冲"
 
 
 def send_verify_notification(
@@ -450,16 +356,6 @@ def send_verify_notification(
 
     total_eliminated = cf_eliminated + scan_eliminated + proxyip_eliminated + socks_eliminated
     total_survivors = cf_survivors + scan_survivors + proxyip_survivors + socks_survivors
-
-    def format_diff(new_c: int, upd_c: int) -> str:
-        parts = []
-        if new_c > 0:
-            parts.append(f"🟢 <b>+{new_c}</b> 新增")
-        if upd_c > 0:
-            parts.append(f"🔄 {upd_c} 刷新")
-        if not parts:
-            return "保持最新"
-        return " · ".join(parts)
 
     div = "━━━━━━━━━━━━━━━━━━━━"
 

@@ -12,6 +12,9 @@
   6. send_tg_message() / send_ci_failure_alert(): 统一 Telegram 消息推送与 Actions CI 失败秒级告警。
   7. canonical_key() / load_tombstone() / record_tombstone() / is_tombstoned():
      全生命周期淘汰死节点墓地记忆库与隔离冷却机制（默认 7 天自动修剪）。
+  8. read_full_response() / split_header_body(): 异步安全网络流分块读取与 HTTP 报文头体切分。
+  9. format_buffer_badge() / format_diff(): 质检缓冲标识徽章与增量差量数据统一格式化。
+  10. save_scan_ips_by_asn(): 按 ASN 分组导出独立纯文本扫描优选节点列表。
 """
 
 from __future__ import annotations
@@ -484,6 +487,104 @@ def send_ci_failure_alert(step_name: str = "") -> bool:
         f"🔗 <b>排查链接</b>: {link}"
     )
     return send_tg_message(msg, tag="CI-Failure-Alert")
+
+
+# ---------------------------------------------------------------------------
+# UI 标签格式化与差量格式化工具
+# ---------------------------------------------------------------------------
+
+def format_buffer_badge(
+    marked: int,
+    buf_new: int = 0,
+    buf_rec: int = 0,
+    f1: int = 0,
+    f2: int = 0,
+    bold: bool = False,
+) -> str:
+    """格式化缓冲标签，带新增缓冲与取消缓冲动态"""
+    m_str = f"<b>{marked}</b>" if bold else str(marked)
+    z_str = "<b>0</b>" if bold else "0"
+    if marked <= 0:
+        if buf_rec > 0:
+            return f" · ⚠️ {z_str} 缓冲 [{buf_rec} 取消]"
+        return ""
+    changes = []
+    if buf_new > 0:
+        changes.append(f"+{buf_new} 新增")
+    if buf_rec > 0:
+        changes.append(f"{buf_rec} 取消")
+    if changes:
+        return f" · ⚠️ {m_str} 缓冲 [{(' · '.join(changes))}]"
+    if f1 > 0 or f2 > 0:
+        breakdown = []
+        if f1 > 0:
+            breakdown.append(f"1次: {f1}")
+        if f2 > 0:
+            breakdown.append(f"2次: {f2}")
+        if breakdown:
+            return f" · ⚠️ {m_str} 缓冲 [{(' · '.join(breakdown))}]"
+    return f" · ⚠️ {m_str} 缓冲"
+
+
+def format_diff(new_c: int, upd_c: int) -> str:
+    """格式化增量新增与刷新变化标签"""
+    parts = []
+    if new_c > 0:
+        parts.append(f"🟢 <b>+{new_c}</b> 新增")
+    if upd_c > 0:
+        parts.append(f"🔄 {upd_c} 刷新")
+    if not parts:
+        return "保持最新"
+    return " · ".join(parts)
+
+
+# ---------------------------------------------------------------------------
+# 底层网络流异步安全读取与 HTTP 报文切分工具
+# ---------------------------------------------------------------------------
+
+RE_HTTP_301 = re.compile(rb"^HTTP/\d\.\d\s+301\b")
+RE_SERVER_CF = re.compile(rb"(?im)^server:\s*cloudflare\s*$")
+
+
+async def read_full_response(reader: asyncio.StreamReader, http_timeout: float, max_bytes: int = 4096) -> bytes:
+    """
+    循环读取直到拿到完整的 HTTP 响应头（遇到 \\r\\n\\r\\n 或 \\n\\n）或达到 max_bytes 硬上限。
+    用统一 deadline 控制总耗时，避免多次循环导致累计超时远超 http_timeout。
+    单次 read() 动态计算剩余可用空间，避免读取超出 max_bytes 上限。
+    """
+    loop = asyncio.get_event_loop()
+    deadline = loop.time() + http_timeout
+    resp_bytes = b""
+    while len(resp_bytes) < max_bytes:
+        remaining = deadline - loop.time()
+        if remaining <= 0:
+            break
+        chunk = await asyncio.wait_for(
+            reader.read(min(1024, max_bytes - len(resp_bytes))),
+            timeout=remaining,
+        )
+        if not chunk:
+            break
+        resp_bytes += chunk
+        if b"\r\n\r\n" in resp_bytes or b"\n\n" in resp_bytes:
+            break
+    return resp_bytes
+
+
+def split_header_body(resp_bytes: bytes) -> tuple[bytes, bytes]:
+    """按 \\r\\n\\r\\n 优先、\\n\\n 兜底切分 Header 与 Body 区域。"""
+    idx = resp_bytes.find(b"\r\n\r\n")
+    if idx != -1:
+        return resp_bytes[:idx], resp_bytes[idx + 4:]
+    idx = resp_bytes.find(b"\n\n")
+    if idx != -1:
+        return resp_bytes[:idx], resp_bytes[idx + 2:]
+    return resp_bytes, b""
+
+
+# 兼容私有下划线前缀命名
+_read_full_response = read_full_response
+_split_header_body = split_header_body
 
 
 def get_asn_conflicts() -> list:
@@ -1482,6 +1583,48 @@ def save_proxyip_by_country(rows: list, output_dir: str) -> int:
                 pass
 
     return len(active_files)
+
+
+def save_scan_ips_by_asn(asn_groups: dict, output_dir: str) -> int:
+    """
+    覆写 scan_ips/ 目录下的独立 ASN 纯文本文件（无注释 IP:端口）。
+    死节点被淘汰后，其对应的 ASN 文件会即时同步删除该 IP；
+    若某个 ASN 旗下所有 IP 全部死亡淘汰，该 ASN 文本文件也会被自动清除删除（保留 .gitkeep 保持目录结构）。
+    返回生成的独立文件数量。
+    """
+    if not asn_groups:
+        return 0
+
+    os.makedirs(output_dir, exist_ok=True)
+    active_files = set()
+    for asn_name, group in asn_groups.items():
+        isp_name = ASN_TO_PROVIDER.get(asn_name, "")
+        if not isp_name:
+            isp_name = next((r.get("isp") for r in group if r.get("isp")), "")
+        clean_isp = re.sub(r"[^a-zA-Z0-9]", "", isp_name) if isp_name else ""
+        fname = f"{asn_name}_{clean_isp}.txt" if clean_isp else f"{asn_name}.txt"
+        fpath = os.path.join(output_dir, fname)
+        with open(fpath, "w", encoding="utf-8") as f:
+            for r in sorted(group, key=lambda x: (x.get("ip", ""), int(x.get("port", 0)))):
+                f.write(f"{r['ip']}:{r['port']}\n")
+        active_files.add(fname)
+
+    # 移除已无活跃 IP 的旧分组文件（保留 .gitkeep 保持目录结构）
+    for old_f in os.listdir(output_dir):
+        if old_f == ".gitkeep":
+            continue
+        if old_f.endswith(".txt") and old_f not in active_files:
+            try:
+                os.remove(os.path.join(output_dir, old_f))
+            except OSError:
+                pass
+
+    log.info("已覆写更新 %s/ 目录: %d 个独立 ASN 纯文本文件", output_dir, len(active_files))
+    return len(active_files)
+
+
+# 兼容别名
+save_scan_dir = save_scan_ips_by_asn
 
 
 # =====================================================================

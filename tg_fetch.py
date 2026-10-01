@@ -55,6 +55,8 @@ from providers import (
     format_socks_txt,
     save_proxyip_by_country,
     save_proxies_by_protocol,
+    save_scan_ips_by_asn,
+    format_diff,
     classify_asn,
     is_asn_recorded,
     _extract_asn_code,
@@ -117,7 +119,6 @@ SUB_URLS = _parse_sub_urls()
 
 DATA_DIR = "data"
 OUTPUT_PROXY_FILE = os.path.join(DATA_DIR, "proxies.txt")
-COMPAT_PROXY_FILE = os.path.join(DATA_DIR, "socks5.txt")
 OUTPUT_PROXIES_DIR = os.path.join(DATA_DIR, "proxies")
 OUTPUT_CF_FILE = os.path.join(DATA_DIR, "cf_ips.csv")
 OUTPUT_CF_TXT = os.path.join(DATA_DIR, "cf_ips.txt")
@@ -186,16 +187,13 @@ def get_system_proxy() -> str:
 
 
 def load_existing_proxies(filepath: str = OUTPUT_PROXY_FILE) -> dict:
-    """读取本地已保存的代理列表，保留历史累积有效节点（兼容 proxies.txt 与旧 socks5.txt）"""
+    """读取本地已保存的代理列表，保留历史累积有效节点"""
     existing = {}
-    target = filepath
-    if not os.path.exists(target) and os.path.exists(COMPAT_PROXY_FILE):
-        target = COMPAT_PROXY_FILE
-    if not os.path.exists(target):
+    if not os.path.exists(filepath):
         return existing
     tombstone = load_tombstone()
     try:
-        with open(target, "r", encoding="utf-8") as f:
+        with open(filepath, "r", encoding="utf-8") as f:
             for line in f:
                 line_s = line.strip()
                 if not line_s or line_s.startswith("#"):
@@ -294,16 +292,6 @@ def send_tg_notification(
 
     bjt = datetime.now(TZ_BJT)
     date_str = bjt.strftime("%Y-%m-%d %H:%M:%S")
-
-    def format_diff(new_c: int, upd_c: int) -> str:
-        parts = []
-        if new_c > 0:
-            parts.append(f"🟢 <b>+{new_c}</b> 新增")
-        if upd_c > 0:
-            parts.append(f"🔄 {upd_c} 刷新")
-        if not parts:
-            return "保持最新"
-        return " · ".join(parts)
 
     total_new = new_proxies + new_cf + new_scan + new_proxyips
     total_updated = updated_proxies + updated_cf + updated_scan + updated_proxyips
@@ -577,28 +565,7 @@ def save_and_notify(
             f.write(format_scan_ips_txt(all_sorted_scan_rows))
         log.info("已按质检缓冲状态分层保存扫描优选IP汇总文本: %s (%d 行/条记录)", OUTPUT_SCAN_TXT, len(all_sorted_scan_rows))
 
-        active_files = set()
-        for asn_name, group in asn_groups.items():
-            isp_name = ASN_TO_PROVIDER.get(asn_name, "")
-            if not isp_name:
-                isp_name = next((r.get("isp") for r in group if r.get("isp")), "")
-            clean_isp = re.sub(r'[^a-zA-Z0-9]', '', isp_name) if isp_name else ""
-            fname = f"{asn_name}_{clean_isp}.txt" if clean_isp else f"{asn_name}.txt"
-            asn_file = os.path.join(OUTPUT_SCAN_DIR, fname)
-            with open(asn_file, "w", encoding="utf-8") as f:
-                for r in sorted(group, key=lambda x: (x.get("ip", ""), int(x.get("port", 0)))):
-                    f.write(f"{r['ip']}:{r['port']}\n")
-            active_files.add(fname)
-
-        # 清理已不存在或旧命名格式的分组文件
-        for old_f in os.listdir(OUTPUT_SCAN_DIR):
-            if old_f.endswith(".txt") and old_f not in active_files:
-                try:
-                    os.remove(os.path.join(OUTPUT_SCAN_DIR, old_f))
-                except OSError:
-                    pass
-        log.info("已在 %s/ 目录下生成 %d 个独立 ASN 纯文本列表", OUTPUT_SCAN_DIR, len(active_files))
-
+        save_scan_ips_by_asn(asn_groups, OUTPUT_SCAN_DIR)
         scan_ips_total = len(all_sorted_scan_rows)
 
     # 4. 保存反代 ProxyIP 独立池

@@ -49,6 +49,11 @@ from providers import (
     normalize_timestamp,
     record_tombstone,
     canonical_key,
+    RE_HTTP_301,
+    RE_SERVER_CF,
+    read_full_response,
+    split_header_body,
+    format_buffer_badge,
 )
 
 # 确保本地 .env 加载
@@ -107,45 +112,7 @@ SSL_CTX_CF.verify_mode = ssl.CERT_REQUIRED
 
 # 预编译正则，高并发下零重复编译开销
 RE_HTTP_200 = re.compile(rb"^HTTP/\d\.\d\s+200\b")
-RE_HTTP_301 = re.compile(rb"^HTTP/\d\.\d\s+301\b")
-RE_SERVER_CF = re.compile(rb"(?im)^server:\s*cloudflare\s*$")
 RE_COLO = re.compile(rb"colo=([A-Za-z0-9]+)", re.IGNORECASE)
-
-
-async def _read_full_response(reader, http_timeout: float, max_bytes: int = 4096) -> bytes:
-    """
-    循环读取直到拿到完整的 HTTP 响应头（遇到 \r\n\r\n 或 \n\n）或达到 max_bytes 硬上限。
-    用统一 deadline 控制总耗时，避免多次循环导致累计超时远超 http_timeout。
-    单次 read() 动态计算剩余可用空间，避免读取超出 max_bytes 上限。
-    """
-    loop = asyncio.get_event_loop()
-    deadline = loop.time() + http_timeout
-    resp_bytes = b""
-    while len(resp_bytes) < max_bytes:
-        remaining = deadline - loop.time()
-        if remaining <= 0:
-            break
-        chunk = await asyncio.wait_for(
-            reader.read(min(1024, max_bytes - len(resp_bytes))),
-            timeout=remaining,
-        )
-        if not chunk:
-            break
-        resp_bytes += chunk
-        if b"\r\n\r\n" in resp_bytes or b"\n\n" in resp_bytes:
-            break
-    return resp_bytes
-
-
-def _split_header_body(resp_bytes: bytes) -> tuple[bytes, bytes]:
-    """按 \r\n\r\n 优先、\n\n 兜底切分 Header 与 Body 区域。"""
-    idx = resp_bytes.find(b"\r\n\r\n")
-    if idx != -1:
-        return resp_bytes[:idx], resp_bytes[idx + 4:]
-    idx = resp_bytes.find(b"\n\n")
-    if idx != -1:
-        return resp_bytes[:idx], resp_bytes[idx + 2:]
-    return resp_bytes, b""
 
 
 # ---------- 核心探测函数 ----------
@@ -185,8 +152,8 @@ async def probe_proxyip(
         writer.write(req)
         await asyncio.wait_for(writer.drain(), timeout=http_timeout)
 
-        resp_bytes = await _read_full_response(reader, http_timeout)
-        header_part, body_part = _split_header_body(resp_bytes)
+        resp_bytes = await read_full_response(reader, http_timeout)
+        header_part, body_part = split_header_body(resp_bytes)
 
         is_200 = bool(RE_HTTP_200.match(header_part))
         is_cf = bool(RE_SERVER_CF.search(header_part))
@@ -236,8 +203,8 @@ async def probe_cf_clean(
         writer.write(req)
         await asyncio.wait_for(writer.drain(), timeout=http_timeout)
 
-        resp_bytes = await _read_full_response(reader, http_timeout)
-        header_part, _ = _split_header_body(resp_bytes)
+        resp_bytes = await read_full_response(reader, http_timeout)
+        header_part, _ = split_header_body(resp_bytes)
 
         is_301 = bool(RE_HTTP_301.match(header_part))
         is_cf = bool(RE_SERVER_CF.search(header_part))
@@ -417,28 +384,6 @@ async def verify_proxyips(
 
 
 # ---------- Telegram 质检通知 ----------
-def format_buffer_badge(marked: int, buf_new: int = 0, buf_rec: int = 0, f1: int = 0, f2: int = 0) -> str:
-    """格式化缓冲标签，带新增缓冲与取消缓冲动态"""
-    if marked <= 0:
-        if buf_rec > 0:
-            return f" · ⚠️ <b>0</b> 缓冲 [{buf_rec} 取消]"
-        return ""
-    changes = []
-    if buf_new > 0:
-        changes.append(f"+{buf_new} 新增")
-    if buf_rec > 0:
-        changes.append(f"{buf_rec} 取消")
-    if changes:
-        return f" · ⚠️ <b>{marked}</b> 缓冲 [{(' · '.join(changes))}]"
-    if f1 > 0 or f2 > 0:
-        breakdown = []
-        if f1 > 0:
-            breakdown.append(f"1次: {f1}")
-        if f2 > 0:
-            breakdown.append(f"2次: {f2}")
-        if breakdown:
-            return f" · ⚠️ <b>{marked}</b> 缓冲 [{(' · '.join(breakdown))}]"
-    return f" · ⚠️ <b>{marked}</b> 缓冲"
 
 
 def send_proxyip_notification(
@@ -481,7 +426,7 @@ def send_proxyip_notification(
         else f"🔀 <b>ProxyIP 穿透质检完成</b> (✅ 存活 <b>{pass_count}</b> 条)"
     )
 
-    buffer_badge = format_buffer_badge(fail_count, buf_new=buf_new, buf_rec=buf_rec, f1=fail_1, f2=fail_2)
+    buffer_badge = format_buffer_badge(fail_count, buf_new=buf_new, buf_rec=buf_rec, f1=fail_1, f2=fail_2, bold=True)
     status_line = f"✅ <b>{pass_count}</b> 存活{buffer_badge}"
 
     dual_line = (
