@@ -226,38 +226,66 @@ def resolve_asn_online(ip: str, isp_hint: str = "") -> tuple[str, str]:
     """
     当本地库完全无法识别 ASN 时，在线向权威 BGP 数据库实时反查并自动入库（实现『不知道就查，完善数据库』）：
     返回 (clean_asn, clean_isp)。
+    双通道 HTTPS 安全反查架构：
+      - 通道 1 (首选)：ipapi.co (全量 HTTPS，免 Key 每日 1,000 次，原生 asn 与 org 字段)
+      - 通道 2 (备选)：iplocate.io (全量 HTTPS，免 Key，原生结构化 ASN 对象)
     加固防护：若反查出的 ASN 已存在于本地权威字典 (ASN_TO_PROVIDER)，则坚决保留权威名称，
     严禁被第三方 API 临时/上游机房的脏名称覆盖污染。
     """
     if not ip or ip in ("AS_UNKNOWN", "unknown", "127.0.0.1"):
         return "", ""
+
+    clean_asn = ""
+    clean_isp = ""
+
+    # 通道 1 (首选): ipapi.co (HTTPS, 免 Key)
     try:
-        url = f"http://ip-api.com/json/{ip}?fields=query,as,asname,org,isp"
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        url = f"https://ipapi.co/{ip}/json/"
+        req = urllib.request.Request(url, headers={"User-Agent": "ipapi.co/#python-v1.0.3"})
         with urllib.request.urlopen(req, timeout=3.5) as res:
             data = json.loads(res.read())
-            as_str = data.get("as", "")
-            m = re.search(r"(AS\d+)", as_str, re.IGNORECASE)
+            raw_asn = data.get("asn") or ""
+            m = re.search(r"(AS\d+)", str(raw_asn), re.IGNORECASE)
             if m:
                 clean_asn = m.group(1).upper()
-                # 防御加固：如果已属于权威收录厂商（如 AS45102=Alibaba Cloud），直接使用权威标准名称，不被污染
-                if clean_asn in ASN_TO_PROVIDER:
-                    std_isp = ASN_TO_PROVIDER[clean_asn]
-                    log.debug("IP %s 命中权威已知 ASN %s: %s (忽略 API 原始标签: %s)", ip, clean_asn, std_isp, data.get("isp"))
-                    return clean_asn, std_isp
-
-                clean_isp = data.get("isp") or data.get("org") or data.get("asname") or isp_hint or ""
-                # 仅对真正未收录的新自治系统补充进内存字典并持久化
-                if clean_isp:
-                    ASN_DATABASE_ISP_TO_ASN[clean_isp] = clean_asn
-                    ASN_DATABASE_ISP_LOWER[clean_isp.lower()] = (clean_asn, clean_isp)
-                ASN_DATABASE_ASN_TO_ISP[clean_asn] = clean_isp or isp_hint
-                ASN_TO_PROVIDER[clean_asn] = clean_isp or isp_hint
-                save_asn_database(ASN_DATABASE_ISP_TO_ASN, ASN_DATABASE_ASN_TO_ISP)
-                log.info("【自动完善数据库】已在线反查新 IP %s 并补充入库: %s -> %s", ip, clean_asn, clean_isp)
-                return clean_asn, clean_isp
+                clean_isp = data.get("org") or isp_hint or ""
     except Exception as e:
-        log.debug("在线解析 IP %s 的 ASN 失败: %s", ip, e)
+        log.debug("ipapi.co 在线解析 IP %s 失败: %s", ip, e)
+
+    # 通道 2 (备选容灾): iplocate.io (HTTPS, 免 Key)
+    if not clean_asn:
+        try:
+            url = f"https://www.iplocate.io/api/lookup/{ip}"
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=3.5) as res:
+                data = json.loads(res.read())
+                asn_obj = data.get("asn") or {}
+                raw_asn = asn_obj.get("asn") or ""
+                m = re.search(r"(AS\d+)", str(raw_asn), re.IGNORECASE)
+                if m:
+                    clean_asn = m.group(1).upper()
+                    clean_isp = asn_obj.get("name") or isp_hint or ""
+        except Exception as e:
+            log.debug("iplocate.io 在线解析 IP %s 失败: %s", ip, e)
+
+    if clean_asn:
+        # 防御加固：如果已属于权威收录厂商（如 AS45102=Alibaba Cloud），直接使用权威标准名称，不被污染
+        if clean_asn in ASN_TO_PROVIDER:
+            std_isp = ASN_TO_PROVIDER[clean_asn]
+            log.debug("IP %s 命中权威已知 ASN %s: %s (忽略 API 原始标签: %s)", ip, clean_asn, std_isp, clean_isp)
+            return clean_asn, std_isp
+
+        # 仅对真正未收录的新自治系统补充进内存字典并持久化
+        clean_isp = clean_isp or isp_hint
+        if clean_isp:
+            ASN_DATABASE_ISP_TO_ASN[clean_isp] = clean_asn
+            ASN_DATABASE_ISP_LOWER[clean_isp.lower()] = (clean_asn, clean_isp)
+        ASN_DATABASE_ASN_TO_ISP[clean_asn] = clean_isp
+        ASN_TO_PROVIDER[clean_asn] = clean_isp
+        save_asn_database(ASN_DATABASE_ISP_TO_ASN, ASN_DATABASE_ASN_TO_ISP)
+        log.info("【自动完善数据库】已在线反查新 IP %s 并补充入库: %s -> %s", ip, clean_asn, clean_isp)
+        return clean_asn, clean_isp
+
     return "", ""
 
 
