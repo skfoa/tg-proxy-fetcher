@@ -229,6 +229,8 @@ def resolve_asn_online(ip: str, isp_hint: str = "") -> tuple[str, str]:
     """
     当本地库完全无法识别 ASN 时，在线向权威 BGP 数据库实时反查并自动入库（实现『不知道就查，完善数据库』）：
     返回 (clean_asn, clean_isp)。
+    加固防护：若反查出的 ASN 已存在于本地权威字典 (ASN_TO_PROVIDER)，则坚决保留权威名称，
+    严禁被第三方 API 临时/上游机房的脏名称覆盖污染。
     """
     if not ip or ip in ("AS_UNKNOWN", "unknown", "127.0.0.1"):
         return "", ""
@@ -241,14 +243,20 @@ def resolve_asn_online(ip: str, isp_hint: str = "") -> tuple[str, str]:
             m = re.search(r"(AS\d+)", as_str, re.IGNORECASE)
             if m:
                 clean_asn = m.group(1).upper()
+                # 防御加固：如果已属于权威收录厂商（如 AS45102=Alibaba Cloud），直接使用权威标准名称，不被污染
+                if clean_asn in ASN_TO_PROVIDER:
+                    std_isp = ASN_TO_PROVIDER[clean_asn]
+                    log.debug("IP %s 命中权威已知 ASN %s: %s (忽略 API 原始标签: %s)", ip, clean_asn, std_isp, data.get("isp"))
+                    return clean_asn, std_isp
+
                 clean_isp = data.get("isp") or data.get("org") or data.get("asname") or isp_hint or ""
-                # 动态补充进内存字典并持久化
+                # 仅对真正未收录的新自治系统补充进内存字典并持久化
                 if clean_isp:
                     ASN_DATABASE_ISP_TO_ASN[clean_isp] = clean_asn
                 ASN_DATABASE_ASN_TO_ISP[clean_asn] = clean_isp or isp_hint
                 ASN_TO_PROVIDER[clean_asn] = clean_isp or isp_hint
                 save_asn_database(ASN_DATABASE_ISP_TO_ASN, ASN_DATABASE_ASN_TO_ISP)
-                log.info("【自动完善数据库】已在线反查 IP %s 并补充入库: %s -> %s", ip, clean_asn, clean_isp)
+                log.info("【自动完善数据库】已在线反查新 IP %s 并补充入库: %s -> %s", ip, clean_asn, clean_isp)
                 return clean_asn, clean_isp
     except Exception as e:
         log.debug("在线解析 IP %s 的 ASN 失败: %s", ip, e)
@@ -264,7 +272,8 @@ def resolve_ip_asn(ip: str = "", isp_hint: str = "") -> tuple[str, str]:
     clean_isp = isp_hint.strip()
     if clean_isp and clean_isp in ASN_DATABASE_ISP_TO_ASN:
         clean_asn = ASN_DATABASE_ISP_TO_ASN[clean_isp]
-        return clean_asn, clean_isp
+        std_name = ASN_TO_PROVIDER.get(clean_asn, clean_isp)
+        return clean_asn, std_name
 
     if clean_isp:
         isp_lower = clean_isp.lower()
