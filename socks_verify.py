@@ -556,16 +556,20 @@ def save_socks_data(
 ):
     """
     保存质检幸存节点：
-    按 (fail_count 升序, delay_ms 升序) 排序。
-    覆写 socks5.txt 与 socks5.csv，并按协议独立拆分保存至 proxies/ 子目录。
+    按 (协议顺序, fail_count 升序, delay_ms 升序) 排序，确保在 CSV 与 TXT 中各协议严格分块独立，绝不交错混杂。
+    覆写 socks5.txt 与 socks5.csv，并按协议独立拆分保存至 proxies/ 子目录（包含 .txt 与 .csv 纯净单协议版）。
     """
+    PROTO_ORDER = ["socks5", "http", "https", "turn", "sstp"]
+
     def _sort_key(r):
+        proto = (r.get("proto") or "").strip().lower()
+        p_idx = PROTO_ORDER.index(proto) if proto in PROTO_ORDER else len(PROTO_ORDER)
         fc = safe_int(r.get("fail_count"), 0)
         dms = safe_int(r.get("delay_ms"), 0)
         # 0 delay 视作未测通或失败，排在后面
         if dms <= 0:
             dms = 99999
-        return (fc, dms)
+        return (p_idx, fc, dms)
 
     survivors.sort(key=_sort_key)
 
@@ -574,17 +578,17 @@ def save_socks_data(
         f.write(format_socks_txt(survivors))
     log.info("已按协议分段覆写保存 %s: %d 个高可用节点", txt_path, len(survivors))
 
-    # 按协议拆分独立文件至 data/proxies/ 子目录
+    # 按协议拆分独立文件至 data/proxies/ 子目录 (.txt 与 .csv)
     proto_counts = save_proxies_by_protocol(survivors, proxies_dir)
     log.info("已在 %s/ 目录下同步覆写 %d 个独立协议文件: %s", proxies_dir, len(proto_counts), proto_counts)
 
-    # 写入 socks5.csv (完整元数据表)
+    # 写入 socks5.csv (完整元数据表，按协议分块严格隔离，不混杂)
     with open(csv_path, "w", encoding="utf-8-sig", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
         writer.writeheader()
         for r in survivors:
             writer.writerow(r)
-    log.info("已覆写保存 %s: %d 条质检状态记录", csv_path, len(survivors))
+    log.info("已按协议分块覆写保存 %s: %d 条质检状态记录 (无交错混杂)", csv_path, len(survivors))
 
 
 # ---------- Telegram 通知 ----------

@@ -166,11 +166,13 @@ SORTED_CLOUD_PROVIDER_KEYS = tuple(sorted(KNOWN_CLOUD_PROVIDERS.keys(), key=len,
 # =====================================================================
 
 import asyncio
+import csv
 import json
 import logging
 import os
 import re
 import time
+import urllib.parse
 import urllib.request
 import zlib
 from datetime import datetime, timezone, timedelta
@@ -673,12 +675,12 @@ def format_socks_txt(rows: list) -> str:
 def save_proxies_by_protocol(rows: list, output_dir: str = "data/proxies") -> dict[str, int]:
     """
     将通用代理列表按协议类型拆分并独立保存至 output_dir 目录下：
-      - socks5.txt: 纯 SOCKS5 代理节点
-      - turn.txt: 纯 TURN 协议节点
-      - sstp.txt: 纯 SSTP 协议节点
-      - http.txt: 纯 HTTP 代理节点
-      - https.txt: 纯 HTTPS 代理节点
-    各协议文件内按 (fail_count 升序, delay_ms 升序) 排列，首行附带注释汇总头。
+      - socks5.txt / socks5.csv: 纯 SOCKS5 代理节点
+      - turn.txt / turn.csv: 纯 TURN 协议节点
+      - sstp.txt / sstp.csv: 纯 SSTP 协议节点
+      - http.txt / http.csv: 纯 HTTP 代理节点
+      - https.txt / https.csv: 纯 HTTPS 代理节点
+    各协议文件内按 (fail_count 升序, delay_ms 升序) 排列，首行附带注释汇总头，彻底杜绝不同协议交错混杂。
     返回各协议文件生成的节点数量字典。
     """
     os.makedirs(output_dir, exist_ok=True)
@@ -691,6 +693,18 @@ def save_proxies_by_protocol(rows: list, output_dir: str = "data/proxies") -> di
         "sstp": "SSTP 协议",
     }
 
+    CSV_FIELDS = [
+        "url",
+        "proto",
+        "host",
+        "port",
+        "delay_ms",
+        "fail_count",
+        "status",
+        "colo",
+        "tested_at",
+    ]
+
     groups: dict[str, list] = {}
     seen = set()
 
@@ -700,11 +714,13 @@ def save_proxies_by_protocol(rows: list, output_dir: str = "data/proxies") -> di
             proto = (item.get("proto") or "").strip().lower()
             fc = safe_int(item.get("fail_count"), 0)
             dms = safe_int(item.get("delay_ms"), 0)
+            row_dict = dict(item)
         else:
             url = str(item).strip()
             proto = ""
             fc = 0
             dms = 0
+            row_dict = {"url": url}
 
         if not url or url.startswith("#"):
             continue
@@ -718,32 +734,58 @@ def save_proxies_by_protocol(rows: list, output_dir: str = "data/proxies") -> di
         if dms <= 0:
             dms = 99999
 
-        groups.setdefault(proto, []).append((fc, dms, url))
+        row_dict["proto"] = proto
+        row_dict.setdefault("fail_count", fc)
+        row_dict.setdefault("delay_ms", item.get("delay_ms", 0) if isinstance(item, dict) else 0)
+        row_dict.setdefault("status", item.get("status", "pending") if isinstance(item, dict) else "pending")
+        row_dict.setdefault("colo", item.get("colo", "") if isinstance(item, dict) else "")
+        row_dict.setdefault("tested_at", item.get("tested_at", "") if isinstance(item, dict) else "")
+
+        if "host" not in row_dict or not row_dict["host"]:
+            try:
+                u = urllib.parse.urlparse(url)
+                row_dict["host"] = u.hostname or ""
+                row_dict["port"] = u.port or ""
+            except Exception:
+                row_dict["host"] = ""
+                row_dict["port"] = ""
+
+        groups.setdefault(proto, []).append((fc, dms, url, row_dict))
 
     active_files = set()
     result_counts = {}
 
-    for proto, nodes in groups.items():
-        nodes.sort(key=lambda x: (x[0], x[1]))
+    for proto, items in groups.items():
+        items.sort(key=lambda x: (x[0], x[1]))
         title = PROTO_NAMES.get(proto, f"{proto.upper()} 代理")
         safe_proto = re.sub(r'[\\/:*?"<>|]', "_", proto).strip().lower() or "other"
-        fname = f"{safe_proto}.txt"
-        filepath = os.path.join(output_dir, fname)
 
-        lines = [f"# {title} - {len(nodes)} 个\n"]
-        for _, _, url in nodes:
+        # 1. 保存纯文本单协议列表
+        txt_fname = f"{safe_proto}.txt"
+        txt_filepath = os.path.join(output_dir, txt_fname)
+        lines = [f"# {title} - {len(items)} 个\n"]
+        for _, _, url, _ in items:
             lines.append(f"{url}\n")
-
-        with open(filepath, "w", encoding="utf-8") as f:
+        with open(txt_filepath, "w", encoding="utf-8") as f:
             f.writelines(lines)
+        active_files.add(txt_fname)
 
-        active_files.add(fname)
-        result_counts[proto] = len(nodes)
+        # 2. 保存纯净单协议结构化 CSV
+        csv_fname = f"{safe_proto}.csv"
+        csv_filepath = os.path.join(output_dir, csv_fname)
+        with open(csv_filepath, "w", encoding="utf-8-sig", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
+            writer.writeheader()
+            for _, _, _, r_dict in items:
+                writer.writerow(r_dict)
+        active_files.add(csv_fname)
 
-    # 清理已不存在或旧命名格式的 .txt 文件
+        result_counts[proto] = len(items)
+
+    # 清理已不存在或旧命名格式的 .txt 与 .csv 文件
     for old_f in os.listdir(output_dir):
         fpath = os.path.join(output_dir, old_f)
-        if os.path.isfile(fpath) and old_f.endswith(".txt") and old_f not in active_files:
+        if os.path.isfile(fpath) and (old_f.endswith(".txt") or old_f.endswith(".csv")) and old_f not in active_files:
             try:
                 os.remove(fpath)
             except OSError:
