@@ -1042,7 +1042,10 @@
     "China Telecom CN2": "AS4809",
     "China Telecom": "AS4811",
     "China Unicom 9929": "AS9929",
-    "China Mobile CMIN2": "AS58807"
+    "China Mobile CMIN2": "AS58807",
+    "xTom GmbH": "AS3214",
+    "LIMEE NETWORK LTD": "AS215023",
+    "Akari Networks Limited": "AS38136"
   },
   "asn_to_isp": {
     "AS63023": "Ipxo LLC",
@@ -2013,6 +2016,9 @@
     "AS8143": "Neburst Networks",
     "AS8888": "xTom",
     "AS906": "DMIT",
-    "AS9929": "China Unicom 9929"
+    "AS9929": "China Unicom 9929",
+    "AS3214": "xTom GmbH",
+    "AS215023": "LIMEE NETWORK LTD",
+    "AS38136": "Akari Networks Limited"
   }
 }
