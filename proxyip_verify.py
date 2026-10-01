@@ -90,7 +90,7 @@ MAX_FAILS = 3        # 连续失败物理淘汰阈值（第 1~2 次缓冲容错�
 # 包含 cf_clean 双能标记的完整字段定义
 CSV_FIELDS = [
     "ip", "port", "tls", "delay_ms", "speed_kbs",
-    "colo", "cf_location", "isp", "asn",
+    "colo", "cf_location", "asn", "isp",
     "tested_at", "channel", "fail_count", "cf_clean", "net_type",
 ]
 

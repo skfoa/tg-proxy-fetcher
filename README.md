@@ -219,8 +219,8 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 | `speed_kbs` | 整数 | 下载速度（kB/s 纯数值，便于排序） | `89086` |
 | `colo` | 字符串 | Cloudflare 数据中心三字代码 | `HKG`、`NRT`、`LAX` |
 | `cf_location` | 字符串 | Cloudflare 落地地理位置 | `亚太 · 香港` |
+| `asn` | 字符串 | 规范化自治系统编号 | `AS400618` |
 | `isp` | 字符串 | 网络运营商 / 托管商名称 | `Prime Security Corp.` |
-| `asn` | 字符串 | ASN 编号与组织 | `AS400618 Prime Security Corp.` |
 | `tested_at` | 时间字符串 | 测速与发布时间 | `2026-09-13 18:00:33` |
 | `channel` | 字符串 | 来源频道 | `@danfeng_chat` / `@otcfxq` |
 | `fail_count` | 整数 | 连续探测失败次数（默认 0，连续失败 ≥ 3 次自动淘汰剔除） | `0` |
@@ -237,8 +237,8 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 | `speed_kbs` | 整数 | 下载速度（kB/s 纯数值，保留字段） | `0` |
 | `colo` | 字符串 | 穿透返回的 Cloudflare 实际处理机房三字码 | `HKG` |
 | `cf_location` | 字符串 | 落地地理位置 | `中国 · 香港特别行政区` |
+| `asn` | 字符串 | 规范化自治系统编号 | `AS9269` |
 | `isp` | 字符串 | 自治系统组织 / 运营商名称 | `HKBN Hong Kong Broadband` |
-| `asn` | 字符串 | 规范化 ASN 编号与组织 | `AS9269 Hong Kong Broadband` |
 | `tested_at` | 时间字符串 | 穿透质检测试时间 | `2026-09-19 18:00:00` |
 | `channel` | 字符串 | 来源频道或附件源 | `@danfeng_chat` |
 | `fail_count` | 整数 | 连续探测失败次数（连续失败 ≥ 3 次永久物理删除） | `0` |
@@ -253,7 +253,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 > - `banking`：银行金融与中央银行专网 ➔ 对应导出 `data/proxyip/【BANK_银行金融专网】.txt`
 > - `datacenter`：常规数据中心/托管机房 ➔ 归入各国家/地区常规列表
 
-#### ③ 通用代理质检数据表（`data/socks5.csv`）
+#### ③ 通用代理质检数据表（`data/proxies.csv`）
 *共 9 个字段，记录 SOCKS5/HTTP/HTTPS/TURN/SSTP 等通用代理应用层穿透结果：*
 
 | 字段 | 类型 | 说明 | 示例 |

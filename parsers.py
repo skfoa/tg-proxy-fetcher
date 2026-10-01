@@ -373,15 +373,26 @@ def parse_cf_csv_content(
                     loc_parts.append(val)
             cf_location = " · ".join(loc_parts)
 
-            raw_asn = row.get(field_map.get("asn", ""), "").strip()
+            raw_asn = row.get(field_map.get("asn", ""), "").replace("`", "").strip()
             if not raw_asn or raw_asn == "-":
                 raw_asn = fn_asn
-            m_asn = re.search(r"(AS\d+)", raw_asn, re.IGNORECASE)
-            asn_clean = m_asn.group(1).upper() if m_asn else (raw_asn if raw_asn and raw_asn != "-" else "")
 
-            raw_isp = row.get(field_map.get("isp", ""), "").strip()
+            raw_isp = row.get(field_map.get("isp", ""), "").replace("`", "").strip()
             if not raw_isp or raw_isp == "-":
                 raw_isp = fn_isp
+
+            m_asn = re.search(r"(AS\d+)", raw_asn, re.IGNORECASE)
+            if m_asn:
+                asn_clean = m_asn.group(1).upper()
+                if not raw_isp:
+                    rem_isp = raw_asn[m_asn.end():].strip().strip("-").strip()
+                    if rem_isp:
+                        raw_isp = rem_isp
+            else:
+                # 若 raw_asn 中完全没有 AS\\d+ 编号（如全是组织名称 "GTHost", "Amazon.com, Inc." 等），说明原数据将服务商写在了 ASN 列
+                if not raw_isp and raw_asn and raw_asn != "-":
+                    raw_isp = raw_asn
+                asn_clean = ""
 
             # 智能补全：若数据行缺少 ASN，但 ISP 匹配已知服务商，自动推断补全 ASN
             if (not asn_clean or asn_clean == "AS_UNKNOWN") and raw_isp:

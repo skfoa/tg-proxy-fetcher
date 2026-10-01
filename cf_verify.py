@@ -74,7 +74,7 @@ HTTP_TIMEOUT = 2.0
 MAX_FAILS = 3
 CSV_FIELDS = [
     "ip", "port", "tls", "delay_ms", "speed_kbs",
-    "colo", "cf_location", "isp", "asn",
+    "colo", "cf_location", "asn", "isp",
     "tested_at", "channel", "fail_count",
 ]
 
