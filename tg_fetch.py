@@ -54,6 +54,7 @@ from providers import (
     format_scan_ips_txt,
     format_socks_txt,
     save_proxyip_by_country,
+    save_proxies_by_protocol,
     classify_asn,
     is_asn_recorded,
     _extract_asn_code,
@@ -116,6 +117,7 @@ SUB_URLS = _parse_sub_urls()
 
 DATA_DIR = "data"
 OUTPUT_PROXY_FILE = os.path.join(DATA_DIR, "socks5.txt")
+OUTPUT_PROXIES_DIR = os.path.join(DATA_DIR, "proxies")
 OUTPUT_CF_FILE = os.path.join(DATA_DIR, "cf_ips.csv")
 OUTPUT_CF_TXT = os.path.join(DATA_DIR, "cf_ips.txt")
 
@@ -504,11 +506,14 @@ def save_and_notify(
     updated_proxyips_count: int = 0,
     unrecorded_asns: list = None,
 ):
-    # 1. 保存代理节点（按协议分段归类）
+    # 1. 保存代理节点（按协议分段归类及拆分子目录）
     os.makedirs(DATA_DIR, exist_ok=True)
     with open(OUTPUT_PROXY_FILE, "w", encoding="utf-8") as f:
         f.write(format_socks_txt(list(final_proxies.values())))
     log.info("已按协议分段保存代理文件: %s (%d 个全量累积节点)", OUTPUT_PROXY_FILE, len(final_proxies))
+
+    proto_counts = save_proxies_by_protocol(list(final_proxies.values()), OUTPUT_PROXIES_DIR)
+    log.info("已在 %s/ 目录下生成 %d 个独立协议纯文本文件: %s", OUTPUT_PROXIES_DIR, len(proto_counts), proto_counts)
 
     # 2. 保存单条优选 IP
     sorted_cf_ips = sorted(

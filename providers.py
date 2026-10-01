@@ -670,6 +670,88 @@ def format_socks_txt(rows: list) -> str:
     return "\n\n".join(sections).rstrip() + "\n" if sections else ""
 
 
+def save_proxies_by_protocol(rows: list, output_dir: str = "data/proxies") -> dict[str, int]:
+    """
+    将通用代理列表按协议类型拆分并独立保存至 output_dir 目录下：
+      - socks5.txt: 纯 SOCKS5 代理节点
+      - turn.txt: 纯 TURN 协议节点
+      - sstp.txt: 纯 SSTP 协议节点
+      - http.txt: 纯 HTTP 代理节点
+      - https.txt: 纯 HTTPS 代理节点
+    各协议文件内按 (fail_count 升序, delay_ms 升序) 排列，首行附带注释汇总头。
+    返回各协议文件生成的节点数量字典。
+    """
+    os.makedirs(output_dir, exist_ok=True)
+
+    PROTO_NAMES = {
+        "socks5": "SOCKS5 代理",
+        "http": "HTTP 代理",
+        "https": "HTTPS 代理",
+        "turn": "TURN 协议",
+        "sstp": "SSTP 协议",
+    }
+
+    groups: dict[str, list] = {}
+    seen = set()
+
+    for item in rows:
+        if isinstance(item, dict):
+            url = (item.get("url") or "").strip()
+            proto = (item.get("proto") or "").strip().lower()
+            fc = safe_int(item.get("fail_count"), 0)
+            dms = safe_int(item.get("delay_ms"), 0)
+        else:
+            url = str(item).strip()
+            proto = ""
+            fc = 0
+            dms = 0
+
+        if not url or url.startswith("#"):
+            continue
+        if url in seen:
+            continue
+        seen.add(url)
+
+        if not proto:
+            proto = url.split("://", 1)[0].lower() if "://" in url else "other"
+
+        if dms <= 0:
+            dms = 99999
+
+        groups.setdefault(proto, []).append((fc, dms, url))
+
+    active_files = set()
+    result_counts = {}
+
+    for proto, nodes in groups.items():
+        nodes.sort(key=lambda x: (x[0], x[1]))
+        title = PROTO_NAMES.get(proto, f"{proto.upper()} 代理")
+        safe_proto = re.sub(r'[\\/:*?"<>|]', "_", proto).strip().lower() or "other"
+        fname = f"{safe_proto}.txt"
+        filepath = os.path.join(output_dir, fname)
+
+        lines = [f"# {title} - {len(nodes)} 个\n"]
+        for _, _, url in nodes:
+            lines.append(f"{url}\n")
+
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.writelines(lines)
+
+        active_files.add(fname)
+        result_counts[proto] = len(nodes)
+
+    # 清理已不存在或旧命名格式的 .txt 文件
+    for old_f in os.listdir(output_dir):
+        fpath = os.path.join(output_dir, old_f)
+        if os.path.isfile(fpath) and old_f.endswith(".txt") and old_f not in active_files:
+            try:
+                os.remove(fpath)
+            except OSError:
+                pass
+
+    return result_counts
+
+
 def format_categorized_proxyip_txt(rows: list) -> str:
     """
     将 ProxyIP 列表按国家/地区聚合分组，并格式化为带 `# 地区 - 数量 个` 注释头的纯文本内容。

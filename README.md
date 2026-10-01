@@ -91,8 +91,8 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 所有数据产物集中收纳于 **`data/`** 目录，保持根目录代码纯净：
 
 | 文件名 | 内容说明 | 生成条件 | GitHub Raw 永久直链（点击即可导入） |
-| :--- | :--- | :---: | :--- |
-| **`data/socks5.txt`** | 质检存活的多协议通用代理清单（纯文本） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/socks5.txt` |
+| **`data/socks5.txt`** | 质检存活的多协议通用代理全量清单（按协议分段注释归类，纯文本） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/socks5.txt` |
+| **`data/proxies/*.txt`** | 按协议独立拆分的纯净单协议代理清单（如 `socks5.txt`、`turn.txt`、`sstp.txt`） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies/{协议}.txt` |
 | **`data/socks5.csv`** | 代理质检数据表（协议/延迟/fail_count/机房） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/socks5.csv` |
 | **`data/cf_ips.txt`** | 频道日常单条优选 IP（纯文本） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/cf_ips.txt` |
 | **`data/cf_ips.csv`** | 频道日常单条优选 IP（数据表） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/cf_ips.csv` |
@@ -138,12 +138,17 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 
 ## 输出产物与去重规则详细说明
 
-### 1. `data/socks5.txt` / `data/socks5.csv`（通用代理节点清单与质检表）
+### 1. `data/socks5.txt`、`data/proxies/` 与 `data/socks5.csv`（通用代理节点全量清单与独立协议拆分）
 * **智能增量合并**：每次抓取优先比对历史库，新发布的节点自动追加并去重，以 `host:port` 为唯一标识刷新认证与配置。
 * **主动质检淘汰（`socks_verify.py`）**：集成 RFC 1928（SOCKS5 协商/认证/CONNECT 隧道穿透）、RFC 5389（STUN/TURN Binding 鉴真）、HTTP CONNECT 穿透、MS-SSTP 标准双工隧道握手全套真实网络协议握手引擎。
 * **连续失败缓冲保护（`--max-fails 3`）**：探测失败标记缓冲（`fail_count=1~2` 为缓冲期），连续 3 次全网不可达方才彻底剔除，避免公网抖动误杀。
-* **双模持久化**：
-  - `data/socks5.txt`：纯文本每行一个可用节点 URL，按协议分段归类输出（`# SOCKS5 代理`、`# HTTP 代理`、`# TURN 协议`、`# SSTP 协议` 等），段内按实测延迟严选升序排列，开箱即用不混杂。
+* **双模持久化与协议专属拆分**：
+  - `data/socks5.txt`：全量代理汇总文件，按协议分段归类输出（`# SOCKS5 代理`、`# TURN 协议`、`# SSTP 协议` 等），段内按实测延迟严选升序排列，开箱即用不混杂。
+  - `data/proxies/`：专属单协议独立拆分子目录，方便各类专有客户端直接导入纯净单协议节点：
+    - `data/proxies/socks5.txt`：纯 SOCKS5 代理节点列表（开箱直连 Telegram / Proxifier 等）；
+    - `data/proxies/turn.txt`：纯 TURN 穿透协议节点列表；
+    - `data/proxies/sstp.txt`：纯 SSTP 安全隧道协议节点列表（VPNGate 等）；
+    - `data/proxies/http.txt` / `data/proxies/https.txt`：纯 HTTP/HTTPS 代理节点列表。
   - `data/socks5.csv`：结构化表格，包含协议类型、测速延迟（ms）、连续失败次数、Cloudflare Colo 数据中心与质检时间戳。
 
 ### 2. `data/cf_ips.txt` / `data/cf_ips.csv`（频道日常单条优选 IP）

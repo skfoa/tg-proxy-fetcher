@@ -44,6 +44,7 @@ from providers import (
     record_tombstone,
     canonical_key,
     format_socks_txt,
+    save_proxies_by_protocol,
 )
 
 # 确保本地 .env 加载
@@ -68,6 +69,7 @@ if sys.platform == "win32":
 DATA_DIR = "data"
 SOCKS_TXT = os.path.join(DATA_DIR, "socks5.txt")
 SOCKS_CSV = os.path.join(DATA_DIR, "socks5.csv")
+PROXIES_DIR = os.path.join(DATA_DIR, "proxies")
 
 PROBE_HOST = "speed.cloudflare.com"
 PROBE_PATH = "/cdn-cgi/trace"
@@ -550,11 +552,12 @@ def save_socks_data(
     survivors: list[dict],
     txt_path: str = SOCKS_TXT,
     csv_path: str = SOCKS_CSV,
+    proxies_dir: str = PROXIES_DIR,
 ):
     """
     保存质检幸存节点：
     按 (fail_count 升序, delay_ms 升序) 排序。
-    覆写 socks5.txt 与 socks5.csv。
+    覆写 socks5.txt 与 socks5.csv，并按协议独立拆分保存至 proxies/ 子目录。
     """
     def _sort_key(r):
         fc = safe_int(r.get("fail_count"), 0)
@@ -570,6 +573,10 @@ def save_socks_data(
     with open(txt_path, "w", encoding="utf-8") as f:
         f.write(format_socks_txt(survivors))
     log.info("已按协议分段覆写保存 %s: %d 个高可用节点", txt_path, len(survivors))
+
+    # 按协议拆分独立文件至 data/proxies/ 子目录
+    proto_counts = save_proxies_by_protocol(survivors, proxies_dir)
+    log.info("已在 %s/ 目录下同步覆写 %d 个独立协议文件: %s", proxies_dir, len(proto_counts), proto_counts)
 
     # 写入 socks5.csv (完整元数据表)
     with open(csv_path, "w", encoding="utf-8-sig", newline="") as f:
