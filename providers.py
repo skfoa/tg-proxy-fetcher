@@ -6,7 +6,7 @@
   2. clean_asn() / _extract_asn_code(): 统一 ASN 编号与服务商提取清洗。
   3. ASN_EXACT_NET_TYPE / classify_asn() / is_asn_recorded():
      方案 A+ 两级分层网络类型（ISP/BIZ/EDU/GOV/BANK/机房）识别引擎与收录判定。
-  4. format_buffer_nodes_txt() / format_proxyip_txt() / format_scan_ips_txt() / format_socks_txt() / format_categorized_proxyip_txt() / save_proxyip_by_country():
+  4. format_buffer_nodes_txt() / format_proxyip_txt() / format_scan_ips_txt() / format_proxies_txt() / format_socks_txt() / format_categorized_proxyip_txt() / save_proxyip_by_country():
      节点按质检可用性/缓冲状态分层输出（缓冲节点置顶、存活节点紧随）、通用代理按协议分段归类输出、按国家/地区聚合分组及稀缺高价值网络专线纯文本分类导出。
   5. load_dotenv() / safe_int(): 本地环境加载与安全类型转换。
   6. send_tg_message() / send_ci_failure_alert(): 统一 Telegram 消息推送与 Actions CI 失败秒级告警。
@@ -156,12 +156,9 @@ KNOWN_CLOUD_PROVIDERS = {
 
 # ASN 到标准服务商名称反查表
 ASN_TO_PROVIDER = {}
-for _k, (_asn, _isp) in KNOWN_CLOUD_PROVIDERS.items():
+for _asn, _isp in KNOWN_CLOUD_PROVIDERS.values():
     if _asn not in ASN_TO_PROVIDER:
         ASN_TO_PROVIDER[_asn] = _isp
-
-# 预先按名称长度倒序排好知名云厂商别名，避免在 clean_asn() 等高频调用循环中重复排序
-SORTED_CLOUD_PROVIDER_KEYS = tuple(sorted(KNOWN_CLOUD_PROVIDERS.keys(), key=len, reverse=True))
 
 
 # =====================================================================
@@ -185,13 +182,13 @@ log = logging.getLogger("providers")
 
 # ---------- 持久化 ASN 数据库加载与在线动态解析补库 ----------
 
+ASN_DATABASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "asn_database.json")
+ASN_DATABASE_REL_PATH = os.path.join("data", "asn_database.json")
+
+
 def load_asn_database() -> tuple[dict[str, str], dict[str, str]]:
     """从 data/asn_database.json 自动加载持久化 ASN/ISP 映射字典"""
-    candidates = [
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "asn_database.json"),
-        os.path.join("data", "asn_database.json"),
-    ]
-    for db_path in candidates:
+    for db_path in (ASN_DATABASE_PATH, ASN_DATABASE_REL_PATH):
         if os.path.isfile(db_path):
             try:
                 with open(db_path, "r", encoding="utf-8") as f:
@@ -204,11 +201,7 @@ def load_asn_database() -> tuple[dict[str, str], dict[str, str]]:
 
 def save_asn_database(isp_to_asn: dict[str, str], asn_to_isp: dict[str, str]):
     """持久化保存动态发现的 ASN/ISP 数据库"""
-    candidates = [
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "asn_database.json"),
-        os.path.join("data", "asn_database.json"),
-    ]
-    db_path = candidates[0]
+    db_path = ASN_DATABASE_PATH
     try:
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
         with open(db_path, "w", encoding="utf-8") as f:
@@ -289,7 +282,7 @@ def resolve_ip_asn(ip: str = "", isp_hint: str = "") -> tuple[str, str]:
     return "", clean_isp
 
 
-def load_dotenv(env_path: str = None) -> dict:
+def load_dotenv(env_path: str | None = None) -> dict:
     """
     自动加载本地 .env 文件至 os.environ（若存在）。
     仅当环境变量尚未在系统/CI 环境中定义时才写入，避免覆盖 GitHub Actions 等上游传入的 Secrets。
@@ -729,8 +722,6 @@ def extract_country(cf_location: str | None, colo: str | None) -> str:
             return loc
         if loc in CITY_TO_COUNTRY:
             return CITY_TO_COUNTRY[loc]
-        if loc in ("新加坡", "香港", "台湾", "澳门", "中国"):
-            return loc
 
     # 3. 单段式直接匹配国家或城市（如 '日本' 或 '东京'）
     if len(parts) == 1:
@@ -739,8 +730,6 @@ def extract_country(cf_location: str | None, colo: str | None) -> str:
             return loc
         if loc in CITY_TO_COUNTRY:
             return CITY_TO_COUNTRY[loc]
-        if loc in ("新加坡", "香港", "台湾", "澳门", "中国"):
-            return loc
 
     # 4. cf_location 文本中包含已知城市名
     if cf_location:
@@ -813,22 +802,37 @@ format_proxyip_txt = format_buffer_nodes_txt
 format_scan_ips_txt = format_buffer_nodes_txt
 
 
-def format_socks_txt(rows: list) -> str:
+# ============================================================
+# 通用代理协议展示规范与字段定义
+# ============================================================
+PROXY_PROTO_ORDER = ["socks5", "http", "https", "turn", "sstp"]
+PROXY_PROTO_NAMES = {
+    "socks5": "SOCKS5 代理",
+    "http": "HTTP 代理",
+    "https": "HTTPS 代理",
+    "turn": "TURN 协议",
+    "sstp": "SSTP 协议",
+}
+PROXY_CSV_FIELDS = [
+    "url",
+    "proto",
+    "host",
+    "port",
+    "delay_ms",
+    "fail_count",
+    "status",
+    "colo",
+    "tested_at",
+]
+
+
+def format_proxies_txt(rows: list) -> str:
     """
     将通用代理列表按协议类型分段归类输出：
-      - 优先按协议归类展示（SOCKS5 -> HTTP -> HTTPS -> TURN -> 其他）
+      - 优先按协议归类展示（SOCKS5 -> HTTP -> HTTPS -> TURN -> SSTP -> 其他）
       - 各协议段内按 (fail_count 升序, delay_ms 升序) 排序
       - 带有清晰的注释头部，避免各协议节点混杂穿插
     """
-    PROTO_ORDER = ["socks5", "http", "https", "turn", "sstp"]
-    PROTO_NAMES = {
-        "socks5": "SOCKS5 代理",
-        "http": "HTTP 代理",
-        "https": "HTTPS 代理",
-        "turn": "TURN 协议",
-        "sstp": "SSTP 协议",
-    }
-
     groups: dict[str, list] = {}
     seen = set()
 
@@ -859,9 +863,9 @@ def format_socks_txt(rows: list) -> str:
         groups.setdefault(proto, []).append((fc, dms, url))
 
     def _proto_sort_key(p: str) -> tuple[int, str]:
-        if p in PROTO_ORDER:
-            return (PROTO_ORDER.index(p), p)
-        return (len(PROTO_ORDER), p)
+        if p in PROXY_PROTO_ORDER:
+            return (PROXY_PROTO_ORDER.index(p), p)
+        return (len(PROXY_PROTO_ORDER), p)
 
     sorted_protos = sorted(groups.keys(), key=_proto_sort_key)
 
@@ -869,7 +873,7 @@ def format_socks_txt(rows: list) -> str:
     for proto in sorted_protos:
         nodes = groups[proto]
         nodes.sort(key=lambda x: (x[0], x[1]))
-        title = PROTO_NAMES.get(proto, f"{proto.upper()} 代理")
+        title = PROXY_PROTO_NAMES.get(proto, f"{proto.upper()} 代理")
         header = f"# {title} - {len(nodes)} 个"
         section_lines = [header]
         for _, _, url in nodes:
@@ -877,6 +881,10 @@ def format_socks_txt(rows: list) -> str:
         sections.append("\n".join(section_lines))
 
     return "\n\n".join(sections).rstrip() + "\n" if sections else ""
+
+
+# 向后兼容历史别名
+format_socks_txt = format_proxies_txt
 
 
 def save_proxies_by_protocol(rows: list, output_dir: str = "data/proxies") -> dict[str, int]:
@@ -891,26 +899,6 @@ def save_proxies_by_protocol(rows: list, output_dir: str = "data/proxies") -> di
     返回各协议文件生成的节点数量字典。
     """
     os.makedirs(output_dir, exist_ok=True)
-
-    PROTO_NAMES = {
-        "socks5": "SOCKS5 代理",
-        "http": "HTTP 代理",
-        "https": "HTTPS 代理",
-        "turn": "TURN 协议",
-        "sstp": "SSTP 协议",
-    }
-
-    CSV_FIELDS = [
-        "url",
-        "proto",
-        "host",
-        "port",
-        "delay_ms",
-        "fail_count",
-        "status",
-        "colo",
-        "tested_at",
-    ]
 
     groups: dict[str, list] = {}
     seen = set()
@@ -964,7 +952,7 @@ def save_proxies_by_protocol(rows: list, output_dir: str = "data/proxies") -> di
 
     for proto, items in groups.items():
         items.sort(key=lambda x: (x[0], x[1]))
-        title = PROTO_NAMES.get(proto, f"{proto.upper()} 代理")
+        title = PROXY_PROTO_NAMES.get(proto, f"{proto.upper()} 代理")
         safe_proto = re.sub(r'[\\/:*?"<>|]', "_", proto).strip().lower() or "other"
 
         # 1. 保存纯文本单协议列表
@@ -981,7 +969,7 @@ def save_proxies_by_protocol(rows: list, output_dir: str = "data/proxies") -> di
         csv_fname = f"{safe_proto}.csv"
         csv_filepath = os.path.join(output_dir, csv_fname)
         with open(csv_filepath, "w", encoding="utf-8-sig", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
+            writer = csv.DictWriter(f, fieldnames=PROXY_CSV_FIELDS, extrasaction="ignore")
             writer.writeheader()
             for _, _, _, r_dict in items:
                 writer.writerow(r_dict)
@@ -992,7 +980,7 @@ def save_proxies_by_protocol(rows: list, output_dir: str = "data/proxies") -> di
     # 清理已不存在或旧命名格式的 .txt 与 .csv 文件
     for old_f in os.listdir(output_dir):
         fpath = os.path.join(output_dir, old_f)
-        if os.path.isfile(fpath) and (old_f.endswith(".txt") or old_f.endswith(".csv")) and old_f not in active_files:
+        if os.path.isfile(fpath) and old_f.endswith((".txt", ".csv")) and old_f not in active_files:
             try:
                 os.remove(fpath)
             except OSError:
