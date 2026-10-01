@@ -27,13 +27,13 @@ log = logging.getLogger("parsers")
 
 # 通用代理匹配正则表达式
 ANNOUNCE_PROXY_RE = re.compile(
-    r"\[发现开放\s*(?P<proto>HTTP|SOCKS5|HTTPS|TURN)\s*(?:代理|服务)?\]\s*(?:(?:https?|socks5|turn)://)?(?P<ip>\d{1,3}(?:\.\d{1,3}){3}):(?P<port>\d{1,5})"
+    r"\[发现开放\s*(?P<proto>HTTP|SOCKS5|HTTPS|TURN|SSTP)\s*(?:代理|服务)?\]\s*(?:(?:https?|socks5|turn|sstp)://)?(?P<ip>\d{1,3}(?:\.\d{1,3}){3}):(?P<port>\d{1,5})"
 )
 TG_SOCKS_RE = re.compile(
     r"(?:tg://socks|https?://(?:t\.me|telegram\.me)/socks)\?(?P<query>[^\s#]+)"
 )
 PROXY_URL_RE = re.compile(
-    r"(?P<url>(?P<proto>socks5|http|https|turn)://(?:[^\s#@]+@)?(?P<host>(?:\d{1,3}\.){3}\d{1,3}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}):(?P<port>\d{1,5}))"
+    r"(?P<url>(?P<proto>socks5|http|https|turn|sstp)://(?:[^\s#@]+@)?(?P<host>(?:\d{1,3}\.){3}\d{1,3}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}):(?P<port>\d{1,5}))"
 )
 
 
@@ -503,7 +503,7 @@ def parse_proxy_attachment_content(text: str) -> list[tuple[str, str]]:
             continue
         # 1. 优先匹配行首标准代理格式（提取最真实的认证与节点信息，忽略后续 PTR 别名和中文评注）
         m = re.match(
-            r"^(?P<url>(?P<proto>socks5|http|https|turn)://(?:[^\s#@]+@[^@\s#]+@|[^\s#@]+@)?(?P<host>(?:\d{1,3}\.){3}\d{1,3}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}):(?P<port>\d{1,5}))",
+            r"^(?P<url>(?P<proto>socks5|http|https|turn|sstp)://(?:[^\s#@]+@[^@\s#]+@|[^\s#@]+@)?(?P<host>(?:\d{1,3}\.){3}\d{1,3}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}):(?P<port>\d{1,5}))",
             line,
             re.IGNORECASE,
         )
@@ -520,7 +520,7 @@ def parse_proxy_attachment_content(text: str) -> list[tuple[str, str]]:
 
         # 2. 回退普通提取（容错）
         m_any = re.search(
-            r"(?P<url>(?P<proto>socks5|http|https|turn)://(?:[^\s#@]+@)?(?P<host>(?:\d{1,3}\.){3}\d{1,3}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}):(?P<port>\d{1,5}))",
+            r"(?P<url>(?P<proto>socks5|http|https|turn|sstp)://(?:[^\s#@]+@)?(?P<host>(?:\d{1,3}\.){3}\d{1,3}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}):(?P<port>\d{1,5}))",
             line,
             re.IGNORECASE,
         )

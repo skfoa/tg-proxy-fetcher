@@ -611,12 +611,13 @@ def format_socks_txt(rows: list) -> str:
       - 各协议段内按 (fail_count 升序, delay_ms 升序) 排序
       - 带有清晰的注释头部，避免各协议节点混杂穿插
     """
-    PROTO_ORDER = ["socks5", "http", "https", "turn"]
+    PROTO_ORDER = ["socks5", "http", "https", "turn", "sstp"]
     PROTO_NAMES = {
         "socks5": "SOCKS5 代理",
         "http": "HTTP 代理",
         "https": "HTTPS 代理",
         "turn": "TURN 协议",
+        "sstp": "SSTP 协议",
     }
 
     groups: dict[str, list] = {}

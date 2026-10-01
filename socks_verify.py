@@ -2,10 +2,11 @@
 """
 SOCKS5 / 通用代理连通性质检与淘汰引擎 (socks_verify.py)
 
-针对 socks5.txt（涵盖 SOCKS5, HTTP, HTTPS, TURN 协议代理）进行应用层真实穿透校验：
+针对 socks5.txt（涵盖 SOCKS5, HTTP, HTTPS, TURN, SSTP 协议代理）进行应用层真实穿透校验：
   1. SOCKS5: RFC 1928 / RFC 1929 五步握手状态机 (无密码/有密码) -> CONNECT speed.cloudflare.com:80 -> GET /cdn-cgi/trace 校验 200 + Server: cloudflare + 正则解析 colo
   2. HTTP/HTTPS: HTTP CONNECT speed.cloudflare.com:80 (支持 Proxy-Authorization 认证) -> GET /cdn-cgi/trace 穿透校验 (回退至直接 Forward GET)
   3. TURN: STUN Binding Request over TCP (RFC 5389)，校验 20 字节头部 Magic Cookie (0x2112A442) 及 Transaction ID
+  4. SSTP: MS-SSTP 标准双工信道 (TLS 握手 + SSTP_DUPLEX_POST)，校验 200 OK 确认服务就绪
 
 淘汰与状态聚合机制：
   - 极致纯净模式 (--strict 或 --max-fails 1): 仅保留 100% 测试通过的存活节点，一次失败即彻底剔除
@@ -26,6 +27,7 @@ import logging
 import os
 import random
 import re
+import ssl
 import struct
 import sys
 import time
@@ -352,6 +354,64 @@ async def probe_turn(
             pass
 
 
+async def probe_sstp(
+    host: str,
+    port: int,
+    user: str | None = None,
+    pwd: str | None = None,
+    connect_timeout: float = TIMEOUT,
+    read_timeout: float = HTTP_TIMEOUT,
+) -> tuple[bool, int, str, str]:
+    """
+    SSTP (Secure Socket Tunneling Protocol) 鉴真：
+    1. TLS 握手建立加密信道 (对自签名证书与通配符证书保持兼容 ssl.CERT_NONE)
+    2. 发送标准 MS-SSTP 初始双工隧道请求:
+       SSTP_DUPLEX_POST /sra_{BA195980-CD49-458b-9E23-C84EE0ADCD75}/ HTTP/1.1
+    3. 校验服务端是否返回 HTTP/1.1 200 OK，确认 SSTP 隧道服务活跃就绪
+    返回 (is_alive, delay_ms, status, colo)
+    """
+    t0 = asyncio.get_event_loop().time()
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+
+    try:
+        reader, writer = await asyncio.wait_for(
+            asyncio.open_connection(host, port, ssl=ctx, server_hostname=host),
+            timeout=connect_timeout,
+        )
+    except Exception:
+        return False, 0, "conn_err", ""
+
+    try:
+        uri = "/sra_{BA195980-CD49-458b-9E23-C84EE0ADCD75}/"
+        req = (
+            f"SSTP_DUPLEX_POST {uri} HTTP/1.1\r\n"
+            f"Host: {host}\r\n"
+            f"Content-Length: 18446744073709551615\r\n"
+            f"\r\n"
+        ).encode("latin1")
+        writer.write(req)
+        await asyncio.wait_for(writer.drain(), timeout=connect_timeout)
+
+        resp = await asyncio.wait_for(reader.read(1024), timeout=read_timeout)
+        lat = max(1, int((asyncio.get_event_loop().time() - t0) * 1000))
+        resp_text = resp.decode("latin1", errors="ignore")
+        first_line = resp_text.splitlines()[0] if resp_text else ""
+
+        if "200" in first_line:
+            return True, lat, "alive", "-"
+        return False, lat, "sstp_fail", ""
+    except Exception:
+        return False, 0, "timeout_or_reset", ""
+    finally:
+        try:
+            writer.close()
+            await writer.wait_closed()
+        except Exception:
+            pass
+
+
 async def probe_single(
     row: dict,
     sem: asyncio.Semaphore,
@@ -377,6 +437,10 @@ async def probe_single(
         elif proto == "turn":
             is_alive, delay_ms, status, colo = await probe_turn(
                 host, port, timeout, http_timeout
+            )
+        elif proto == "sstp":
+            is_alive, delay_ms, status, colo = await probe_sstp(
+                host, port, user, pwd, timeout, http_timeout
             )
         else:
             is_alive, delay_ms, status, colo = False, 0, "unknown_proto", ""

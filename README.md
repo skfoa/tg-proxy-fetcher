@@ -115,20 +115,23 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
    - `socks5://...`、`http://...`、`https://...`（兼容免密与带账号密码认证）
 2. **TURN 穿透协议节点**：
    - `turn://114.34.87.173:3479#TW...`（自动识别 `turn://` 协议，智能剥离测速后缀与中文标签）
-3. **Telegram 官方 SOCKS5 一键直连链接**：
+3. **SSTP 安全隧道协议节点（含 VPNGate 外部订阅）**：
+   - `sstp://vpn:vpn@public-vpn-xxx.opengw.net:443`（自动识别与提取，支持通过 `SUB_URLS` 环境变量直接拉取外部订阅链接并自动去重合并）
+4. **Telegram 官方 SOCKS5 一键直连链接**：
    - `tg://socks?server=8.210.224.195&port=6666&user=6666&pass=6666`
    - `https://t.me/socks?server=8.210.224.195&port=6666&user=6666&pass=6666`
    - 自动无损转换为通用标准 `socks5://user:pass@ip:port` 格式，支持任意第三方客户端直接导入。
-4. **开放代理/服务通报消息（已做防污染隔离）**：
+5. **开放代理/服务通报消息（已做防污染隔离）**：
    - `[发现开放 HTTP 代理] 174.138.165.213:34887` ➔ 自动补全为 `http://174.138.165.213:34887`
    - `[发现开放 HTTPS 代理] https://121.42.225.20:443#CN` ➔ 自动提取为 `https://121.42.225.20:443`
    - `[发现开放 SOCKS5 代理] IP:Port` ➔ 自动补全为 `socks5://IP:Port`
    - `[发现开放 TURN 代理/服务] IP:Port 或 turn://IP:Port` ➔ 自动提取为 `turn://IP:Port`
+   - `[发现开放 SSTP 代理/服务] IP:Port 或 sstp://IP:Port` ➔ 自动提取为 `sstp://IP:Port`
    - 🛡️ **防污染机制**：通报消息后半段附带的第三方 SNI 测试目标域名（如 `域名:https://hf.molikuaiyin.com:443...`）会被自动精准过滤，确保代理库 100% 纯净。
-5. **代理附件文件自动解析（需官方 API 模式）**：
+6. **代理附件文件自动解析（需官方 API 模式）**：
    - 自动识别频道发布的代理附件文件（如 `http_proxies.txt`、`https_proxies.txt`、`turn_proxies.txt` 等）。
    - 自动提取行首有效节点与认证信息，过滤后续测速说明与反向 PTR 域名别名，统一去重合并至 `data/socks5.txt`。
-6. **Cloudflare 优选 IP 与反代池（需官方 API 模式）**：
+7. **Cloudflare 优选 IP 与反代池（需官方 API 模式）**：
    - 提取包含 IP、端口、TLS、网络延迟（纯数值 ms）、下载速度（纯数值 kB/s）、数据中心（Colo）、落地位置、ASN、运营商、测速时间等全量指标。
 
 ---
@@ -137,10 +140,10 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 
 ### 1. `data/socks5.txt` / `data/socks5.csv`（通用代理节点清单与质检表）
 * **智能增量合并**：每次抓取优先比对历史库，新发布的节点自动追加并去重，以 `host:port` 为唯一标识刷新认证与配置。
-* **主动质检淘汰（`socks_verify.py`）**：集成 RFC 1928（SOCKS5 协商/认证/CONNECT 隧道穿透）、RFC 5389（STUN/TURN Binding 鉴真）、HTTP CONNECT 穿透全套真实网络协议握手引擎。
+* **主动质检淘汰（`socks_verify.py`）**：集成 RFC 1928（SOCKS5 协商/认证/CONNECT 隧道穿透）、RFC 5389（STUN/TURN Binding 鉴真）、HTTP CONNECT 穿透、MS-SSTP 标准双工隧道握手全套真实网络协议握手引擎。
 * **连续失败缓冲保护（`--max-fails 3`）**：探测失败标记缓冲（`fail_count=1~2` 为缓冲期），连续 3 次全网不可达方才彻底剔除，避免公网抖动误杀。
 * **双模持久化**：
-  - `data/socks5.txt`：纯文本每行一个可用节点 URL，按协议分段归类输出（`# SOCKS5 代理`、`# HTTP 代理`、`# TURN 协议` 等），段内按实测延迟严选升序排列，开箱即用不混杂。
+  - `data/socks5.txt`：纯文本每行一个可用节点 URL，按协议分段归类输出（`# SOCKS5 代理`、`# HTTP 代理`、`# TURN 协议`、`# SSTP 协议` 等），段内按实测延迟严选升序排列，开箱即用不混杂。
   - `data/socks5.csv`：结构化表格，包含协议类型、测速延迟（ms）、连续失败次数、Cloudflare Colo 数据中心与质检时间戳。
 
 ### 2. `data/cf_ips.txt` / `data/cf_ips.csv`（频道日常单条优选 IP）
@@ -245,12 +248,12 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 > - `datacenter`：常规数据中心/托管机房 ➔ 归入各国家/地区常规列表
 
 #### ③ 通用代理质检数据表（`data/socks5.csv`）
-*共 9 个字段，记录 SOCKS5/HTTP/HTTPS/TURN 等通用代理应用层穿透结果：*
+*共 9 个字段，记录 SOCKS5/HTTP/HTTPS/TURN/SSTP 等通用代理应用层穿透结果：*
 
 | 字段 | 类型 | 说明 | 示例 |
 | :--- | :--- | :--- | :--- |
 | `url` | 字符串 | 包含协议、账号密码、主机的完整代理 URL | `socks5://user:pass@1.2.3.4:1080` |
-| `proto` | 字符串 | 协议类型（`socks5`、`http`、`https`、`turn`） | `socks5` |
+| `proto` | 字符串 | 协议类型（`socks5`、`http`、`https`、`turn`、`sstp`） | `socks5` |
 | `host` | 字符串 | 节点域名或 IP 地址 | `1.2.3.4` |
 | `port` | 整数 | 服务端口 | `1080` |
 | `delay_ms` | 整数 | RFC 1928 握手与穿透测速延迟（毫秒纯数值） | `320` |
@@ -269,6 +272,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
   * **SOCKS5**：RFC 1928 握手协商（无密 `0x00` / 账密 `0x02` RFC 1929）➔ 发送 CONNECT 指令 ➔ 穿透请求 `/cdn-cgi/trace` 检验 200 与机房。
   * **HTTP / HTTPS**：CONNECT 隧道穿透 + 正向代理回退双路径校验。
   * **TURN / STUN**：构造 RFC 5389 STUN Binding Request 二进制包，严格校验 Magic Cookie (`0x2112A442`) 与 Transaction ID。
+  * **SSTP**：MS-SSTP 标准双工隧道握手（TLS 握手 + `SSTP_DUPLEX_POST /sra_{BA195980-CD49-458b-9E23-C84EE0ADCD75}/` 校验 `HTTP/1.1 200 OK` 确认服务就绪）。
 * **淘汰机制**：连续失败达到阈值（默认 3 次）彻底从 `data/socks5.txt` 与 `data/socks5.csv` 永久删除。
 
 #### ② 反代 ProxyIP 穿透质检引擎（`proxyip_verify.py`）

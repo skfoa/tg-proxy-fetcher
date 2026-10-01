@@ -52,6 +52,7 @@ jobs:
           PROXY: ${{ vars.PROXY }}
           PROXY_CHANNELS: ${{ vars.PROXY_CHANNELS }}
           CF_IP_CHANNELS: ${{ vars.CF_IP_CHANNELS }}
+          SUB_URLS: ${{ vars.SUB_URLS }}
           DEFER_NOTIFY: "1"
         run: python tg_fetch.py
 
