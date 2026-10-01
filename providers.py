@@ -216,13 +216,10 @@ for _asn, _isp in ASN_DATABASE_ASN_TO_ISP.items():
     if _asn not in ASN_TO_PROVIDER and _isp:
         ASN_TO_PROVIDER[_asn] = _isp
 
-for _isp, _asn in ASN_DATABASE_ISP_TO_ASN.items():
-    clean_k = re.sub(r"[^a-z0-9]", "", _isp.lower())
-    if len(clean_k) >= 3 and clean_k not in KNOWN_CLOUD_PROVIDERS:
-        KNOWN_CLOUD_PROVIDERS[clean_k] = (_asn, _isp)
-
-# 动态扩展后重新生成排序别名元组
+# 生成排序别名元组（按关键词长度降序优先匹配更长更精确的名称，如 'huaweicloud' 优于 'huawei'）
+# 保持 KNOWN_CLOUD_PROVIDERS 作为权威云厂商/VPS/骨干网词库的独立纯净性，杜绝注入数据库泛 ISP 产生子串碰撞
 SORTED_CLOUD_PROVIDER_KEYS = tuple(sorted(KNOWN_CLOUD_PROVIDERS.keys(), key=len, reverse=True))
+ASN_DATABASE_ISP_LOWER = {k.lower(): (v, k) for k, v in ASN_DATABASE_ISP_TO_ASN.items()}
 
 
 def resolve_asn_online(ip: str, isp_hint: str = "") -> tuple[str, str]:
@@ -253,6 +250,7 @@ def resolve_asn_online(ip: str, isp_hint: str = "") -> tuple[str, str]:
                 # 仅对真正未收录的新自治系统补充进内存字典并持久化
                 if clean_isp:
                     ASN_DATABASE_ISP_TO_ASN[clean_isp] = clean_asn
+                    ASN_DATABASE_ISP_LOWER[clean_isp.lower()] = (clean_asn, clean_isp)
                 ASN_DATABASE_ASN_TO_ISP[clean_asn] = clean_isp or isp_hint
                 ASN_TO_PROVIDER[clean_asn] = clean_isp or isp_hint
                 save_asn_database(ASN_DATABASE_ISP_TO_ASN, ASN_DATABASE_ASN_TO_ISP)
@@ -266,23 +264,36 @@ def resolve_asn_online(ip: str, isp_hint: str = "") -> tuple[str, str]:
 def resolve_ip_asn(ip: str = "", isp_hint: str = "") -> tuple[str, str]:
     """
     智能解析/补全 ASN 与 ISP：
-    1. 优先查持久化数据库 (ASN_DATABASE_ISP_TO_ASN / KNOWN_CLOUD_PROVIDERS)
-    2. 若未知且存在有效 IP，在线向 BGP 路由库实时反查并写入数据库
+    1. 优先查持久化数据库 (ASN_DATABASE_ISP_TO_ASN，精确查表与大小写不敏感查表，杜绝子串碰撞误判)
+    2. 命中已知云厂商与知名骨干线路关键词 (KNOWN_CLOUD_PROVIDERS 词库，短词采用边界安全匹配)
+    3. 若未知且存在有效 IP，在线向 BGP 路由库实时反查并写入数据库
     """
     clean_isp = isp_hint.strip()
-    if clean_isp and clean_isp in ASN_DATABASE_ISP_TO_ASN:
-        clean_asn = ASN_DATABASE_ISP_TO_ASN[clean_isp]
-        std_name = ASN_TO_PROVIDER.get(clean_asn, clean_isp)
-        return clean_asn, std_name
-
     if clean_isp:
+        # 1. 持久化数据库精确查表
+        if clean_isp in ASN_DATABASE_ISP_TO_ASN:
+            clean_asn = ASN_DATABASE_ISP_TO_ASN[clean_isp]
+            std_name = ASN_TO_PROVIDER.get(clean_asn, clean_isp)
+            return clean_asn, std_name
+
+        norm_item = ASN_DATABASE_ISP_LOWER.get(clean_isp.lower())
+        if norm_item:
+            clean_asn, raw_isp = norm_item
+            std_name = ASN_TO_PROVIDER.get(clean_asn, raw_isp)
+            return clean_asn, std_name
+
+        # 2. 启发式子串匹配已知云厂商与骨干网关键词
         isp_lower = clean_isp.lower()
         for k in SORTED_CLOUD_PROVIDER_KEYS:
-            if k in isp_lower:
+            if len(k) <= 3:
+                if re.search(rf"(?:^|[^a-z0-9]){re.escape(k)}(?:[^a-z0-9]|$)", isp_lower):
+                    asn_code, std_name = KNOWN_CLOUD_PROVIDERS[k]
+                    return asn_code, std_name
+            elif k in isp_lower:
                 asn_code, std_name = KNOWN_CLOUD_PROVIDERS[k]
                 return asn_code, std_name
 
-    # 在线反查并入库
+    # 3. 在线反查并入库
     if ip and ip not in ("AS_UNKNOWN", "unknown"):
         found_asn, found_isp = resolve_asn_online(ip, isp_hint)
         if found_asn:
@@ -422,7 +433,10 @@ def clean_asn(raw_asn: str, isp: str = "") -> str:
         return m.group(1).upper()
     r_low = (raw_asn + " " + (isp or "")).lower()
     for k in SORTED_CLOUD_PROVIDER_KEYS:
-        if k in r_low:
+        if len(k) <= 3:
+            if re.search(rf"(?:^|[^a-z0-9]){re.escape(k)}(?:[^a-z0-9]|$)", r_low):
+                return KNOWN_CLOUD_PROVIDERS[k][0]
+        elif k in r_low:
             return KNOWN_CLOUD_PROVIDERS[k][0]
     m_d = re.search(r"\b(\d{3,7})\b", raw_asn)
     if m_d:
@@ -1443,7 +1457,7 @@ ASN_EXACT_NET_TYPE = {
 }
 
 # 自动将 KNOWN_CLOUD_PROVIDERS 中未单独显式指定类型的知名云厂商/机房补充进入 ASN_EXACT_NET_TYPE 默认为 datacenter
-for _asn in ASN_TO_PROVIDER:
+for _asn, _ in KNOWN_CLOUD_PROVIDERS.values():
     if _asn not in ASN_EXACT_NET_TYPE:
         ASN_EXACT_NET_TYPE[_asn] = "datacenter"
 
