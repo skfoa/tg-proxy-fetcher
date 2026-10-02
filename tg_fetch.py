@@ -152,7 +152,7 @@ CF_CSV_FIELDS = [
     "channel",
     "fail_count",
 ]
-PROXYIP_CSV_FIELDS = CF_CSV_FIELDS + ["cf_clean", "net_type"]
+PROXYIP_CSV_FIELDS = CF_CSV_FIELDS + ["net_type"]
 
 logging.basicConfig(
     level=logging.INFO,
@@ -582,7 +582,6 @@ def save_and_notify(
             writer.writeheader()
             for row in sorted_proxyips:
                 row.setdefault("fail_count", 0)
-                row.setdefault("cf_clean", "")
                 row["net_type"] = classify_asn(row.get("asn", ""), row.get("isp", ""))
                 writer.writerow(row)
         log.info("已保存反代 ProxyIP 表格: %s (%d 条全量累积记录)", OUTPUT_PROXYIP_FILE, len(sorted_proxyips))
@@ -703,10 +702,8 @@ def merge_and_save(
     final_proxyips = dict(existing_proxyips)
     for k, v in scraped_proxyips.items():
         if k in final_proxyips:
-            # 关键修复：保留已有 ProxyIP 失败计数与双料提纯标记
+            # 关键修复：保留已有 ProxyIP 失败计数与质检状态
             v["fail_count"] = final_proxyips[k].get("fail_count", 0)
-            if not v.get("cf_clean") and final_proxyips[k].get("cf_clean"):
-                v["cf_clean"] = final_proxyips[k]["cf_clean"]
             if not v.get("tested_at") and final_proxyips[k].get("tested_at"):
                 v["tested_at"] = final_proxyips[k]["tested_at"]
             final_proxyips[k].update(v)

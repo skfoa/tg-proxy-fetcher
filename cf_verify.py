@@ -477,11 +477,8 @@ def send_verify_notification(
             p_f1 = fetch_stats.get("proxyip_fail_1", 0)
             p_f2 = fetch_stats.get("proxyip_fail_2", 0)
             p_new = fetch_stats.get("proxyip_buf_new", 0)
-            p_rec = fetch_stats.get("proxyip_buf_rec", 0)
-            p_cf = fetch_stats.get("proxyip_cf_clean", 0)
             p_status = f"✅ {p_pass} 存活" + format_buffer_badge(p_marked, buf_new=p_new, buf_rec=p_rec, f1=p_f1, f2=p_f2)
-            cf_extra = f"\n   └ <i>🌟 兼具优选直连: <code>{p_cf}</code> 条 (已提纯 data/proxyip_cf.txt)</i>" if p_cf > 0 else ""
-            proxyip_line = f"🔀 <b>反代 ProxyIP</b>：<code>{p_surv}</code> 条 ({p_status}){cf_extra}\n"
+            proxyip_line = f"🔀 <b>反代 ProxyIP</b>：<code>{p_surv}</code> 条 ({p_status})\n"
         elif proxyips_count > 0:
             proxyip_line = f"🔀 <b>反代 ProxyIP</b>：<code>{proxyips_count}</code> 条 ({format_diff(new_proxyips, updated_proxyips)})\n"
 
@@ -491,7 +488,7 @@ def send_verify_notification(
         if socks_verified:
             verify_items.append("   • 代理检验：RFC 1928 全协议穿透鉴真")
         if proxyip_verified:
-            verify_items.append("   • 反代检验：/cdn-cgi/trace 穿透 + 优选双能")
+            verify_items.append("   • 反代检验：/cdn-cgi/trace 穿透鉴真")
 
         total_buf_new = (
             fetch_stats.get("socks_buf_new", 0)
