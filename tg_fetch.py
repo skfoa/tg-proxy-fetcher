@@ -493,8 +493,8 @@ def scrape_channel_web(channel: str, cutoff: datetime, proxy: str = "") -> tuple
 def save_and_notify(
     final_proxies: dict,
     final_cf_ips: dict,
-    final_scan_ips: dict = None,
-    final_proxyips: dict = None,
+    final_scan_ips: dict | None = None,
+    final_proxyips: dict | None = None,
     new_proxies_count: int = 0,
     updated_proxies_count: int = 0,
     new_cf_count: int = 0,
@@ -503,7 +503,7 @@ def save_and_notify(
     updated_scan_count: int = 0,
     new_proxyips_count: int = 0,
     updated_proxyips_count: int = 0,
-    unrecorded_asns: list = None,
+    unrecorded_asns: list | None = None,
 ):
     # 1. 保存通用代理总表（proxies.txt 及向后兼容 socks5.txt）并按协议独立拆分
     os.makedirs(DATA_DIR, exist_ok=True)
@@ -827,7 +827,7 @@ def run_web_scraper():
     log.info("已加载墓地黑名单: %d 个冷却中死节点（7天内淘汰）", len(tombstone))
 
     cutoff = datetime.now(timezone.utc) - timedelta(days=FETCH_DAYS)
-    all_channels = sorted(list(set(PROXY_CHANNELS + CF_IP_CHANNELS)))
+    all_channels = sorted(set(PROXY_CHANNELS + CF_IP_CHANNELS))
 
     scraped_proxies = {}
     scraped_cf_ips = {}
@@ -925,7 +925,7 @@ async def run_telethon():
         StringSession(TG_SESSION_STR), int(TG_API_ID), TG_API_HASH
     )
 
-    all_channels = sorted(list(set(PROXY_CHANNELS + CF_IP_CHANNELS)))
+    all_channels = sorted(set(PROXY_CHANNELS + CF_IP_CHANNELS))
     scraped_proxies = {}
     scraped_cf_ips = {}
     scraped_scan_ips = {}
@@ -1014,7 +1014,7 @@ async def run_telethon():
                         if msg.file and msg.file.name:
                             fname_lower = msg.file.name.lower()
                             # 1. 反代 ProxyIP 文件 (如 Global-proxyip-443.csv, Global-proxyip-8443.csv 等)
-                            if "proxyip" in fname_lower and (fname_lower.endswith(".csv") or fname_lower.endswith(".txt")):
+                            if "proxyip" in fname_lower and fname_lower.endswith((".csv", ".txt")):
                                 try:
                                     doc_bytes = await client.download_media(msg, file=bytes)
                                     if doc_bytes:

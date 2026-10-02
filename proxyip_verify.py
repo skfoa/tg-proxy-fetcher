@@ -49,6 +49,7 @@ from providers import (
     read_full_response,
     split_header_body,
     format_buffer_badge,
+    RE_SERVER_CF,
 )
 
 # 确保本地 .env 加载
@@ -264,11 +265,10 @@ async def verify_proxyips(
             fail_count_total += 1
             return
 
-        async with get_keyed_lock(ip):
-            async with sem:
-                alive, latency, colo = await probe_proxyip(
-                    ip, port, connect_timeout=timeout, http_timeout=http_timeout
-                )
+        async with get_keyed_lock(ip), sem:
+            alive, latency, colo = await probe_proxyip(
+                ip, port, connect_timeout=timeout, http_timeout=http_timeout
+            )
 
         completed += 1
         fc = _get_fc(row)

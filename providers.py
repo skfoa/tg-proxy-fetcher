@@ -6,7 +6,7 @@
   2. clean_asn() / format_asn_isp() / _extract_asn_code(): 统一 ASN 编号与『ASN + 服务商名称』一体化直观标签规范化提取。
   3. ASN_EXACT_NET_TYPE / classify_asn() / is_asn_recorded():
      方案 A+ 两级分层网络类型（ISP/BIZ/EDU/GOV/BANK/机房）识别引擎与收录判定。
-  4. format_buffer_nodes_txt() / format_proxyip_txt() / format_scan_ips_txt() / format_proxies_txt() / format_socks_txt() / format_categorized_proxyip_txt() / save_proxyip_by_country():
+  4. format_buffer_nodes_txt() / format_proxyip_txt() / format_scan_ips_txt() / format_proxies_txt() / format_socks_txt() / save_proxyip_by_country():
      节点按质检可用性/缓冲状态分层输出（缓冲节点置顶、存活节点紧随）、通用代理按协议分段归类输出、按国家/地区聚合分组及稀缺高价值网络专线纯文本分类导出。
   5. load_dotenv() / safe_int(): 本地环境加载与安全类型转换。
   6. send_tg_message() / send_ci_failure_alert(): 统一 Telegram 消息推送与 Actions CI 失败秒级告警。
@@ -405,7 +405,7 @@ def get_keyed_lock(key: str) -> asyncio.Lock:
     except RuntimeError:
         current_loop = None
 
-    if _LOCK_POOL is None or _LOCK_POOL_LOOP != current_loop:
+    if _LOCK_POOL is None or current_loop != _LOCK_POOL_LOOP:
         _LOCK_POOL = [asyncio.Lock() for _ in range(_LOCK_POOL_SIZE)]
         _LOCK_POOL_LOOP = current_loop
 
@@ -1082,39 +1082,6 @@ def save_proxies_by_protocol(rows: list, output_dir: str = "data/proxies") -> di
                 pass
 
     return result_counts
-
-
-def format_categorized_proxyip_txt(rows: list) -> str:
-    """
-    将 ProxyIP 列表按国家/地区聚合分组，并格式化为带 `# 地区 - 数量 个` 注释头的纯文本内容。
-    国家组按节点数量降序排列（“其他地区”排在最后）。
-    各组内部保持传入时的原始排序（通常已由调用方完成质量排序：fail_count 升序，delay_ms 升序）。
-    """
-    groups: dict[str, list] = {}
-    for r in rows:
-        country = extract_country(r.get("cf_location"), r.get("colo"))
-        groups.setdefault(country, []).append(r)
-
-    def _group_sort_key(item):
-        country, members = item
-        is_other = (country == "其他地区")
-        return (is_other, -len(members), country)
-
-    sorted_groups = sorted(groups.items(), key=_group_sort_key)
-
-    lines = []
-    for country, members in sorted_groups:
-        flag = COUNTRY_FLAGS.get(country, "")
-        header_name = f"{flag} {country}".strip() if flag else country
-        lines.append(f"# {header_name} - {len(members)} 个")
-        for r in members:
-            ip = (r.get("ip") or "").strip()
-            port = r.get("port", "")
-            if ip and port:
-                lines.append(f"{ip}:{port}")
-        lines.append("")
-
-    return "\n".join(lines).rstrip() + "\n" if lines else ""
 
 
 # ============================================================

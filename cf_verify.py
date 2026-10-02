@@ -24,7 +24,6 @@ import json
 import logging
 import os
 import random
-import re
 import ssl
 import sys
 import time
@@ -477,6 +476,7 @@ def send_verify_notification(
             p_f1 = fetch_stats.get("proxyip_fail_1", 0)
             p_f2 = fetch_stats.get("proxyip_fail_2", 0)
             p_new = fetch_stats.get("proxyip_buf_new", 0)
+            p_rec = fetch_stats.get("proxyip_buf_rec", 0)
             p_status = f"✅ {p_pass} 存活" + format_buffer_badge(p_marked, buf_new=p_new, buf_rec=p_rec, f1=p_f1, f2=p_f2)
             proxyip_line = f"🔀 <b>反代 ProxyIP</b>：<code>{p_surv}</code> 条 ({p_status})\n"
         elif proxyips_count > 0:
