@@ -175,7 +175,7 @@ import time
 import urllib.parse
 import urllib.request
 import zlib
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 
 log = logging.getLogger("providers")
 
@@ -252,6 +252,9 @@ def resolve_asn_online(ip: str, isp_hint: str = "") -> tuple[str, str]:
                     clean_asn = as_match.group(1).upper()
                     as_org = as_match.group(2).strip()
                     as_name = (data.get("asname") or "").strip()
+                    addr_keywords = ("building", "avenue", "road", "street", "floor", "suite", "room", "district", "highway", "jalan", "park", "bldg", "kejizhongyi")
+                    if any(k in as_org.lower() for k in addr_keywords):
+                        as_org = ""
                     clean_isp = as_org or as_name or data.get("org") or data.get("isp") or isp_hint or ""
     except Exception as e:
         log.debug("ip-api.com 在线解析 IP %s 失败: %s", ip, e)
@@ -296,11 +299,13 @@ def resolve_asn_online(ip: str, isp_hint: str = "") -> tuple[str, str]:
 
         # 仅对真正未收录的新自治系统补充进内存字典并持久化
         clean_isp = clean_isp or isp_hint
-        if clean_isp:
+        if clean_isp and clean_isp not in ASN_DATABASE_ISP_TO_ASN:
             ASN_DATABASE_ISP_TO_ASN[clean_isp] = clean_asn
             ASN_DATABASE_ISP_LOWER[clean_isp.lower()] = (clean_asn, clean_isp)
-        ASN_DATABASE_ASN_TO_ISP[clean_asn] = clean_isp
-        ASN_TO_PROVIDER[clean_asn] = clean_isp
+        if clean_asn not in ASN_DATABASE_ASN_TO_ISP:
+            ASN_DATABASE_ASN_TO_ISP[clean_asn] = clean_isp
+        if clean_asn not in ASN_TO_PROVIDER:
+            ASN_TO_PROVIDER[clean_asn] = clean_isp
         save_asn_database(ASN_DATABASE_ISP_TO_ASN, ASN_DATABASE_ASN_TO_ISP)
         log.info("【自动完善数据库】已在线反查新 IP %s 并补充入库: %s -> %s", ip, clean_asn, clean_isp)
         return clean_asn, clean_isp
@@ -493,29 +498,49 @@ def clean_asn(raw_asn: str, isp: str = "") -> str:
 
 def format_asn_isp(raw_asn: str, raw_isp: str = "") -> str:
     """
-    格式化生成『ASN + 服务商名称』一体化直观标签（如 AS906 DMIT Cloud Services）：
+    格式化生成『ASN + 服务商名称』一体化直观标签（如 AS906 DMIT, AS13335 Cloudflare）：
     1. 彻底清除 markdown 反引号 (`) 等多余标记
-    2. 若 raw_asn 已携带服务商后缀，规范保留
-    3. 若 raw_asn 仅为纯 AS 编号且 raw_isp 存在，自动拼接为 'ASxxx 服务商'
-    4. 若无法识别，回退至纯 ASN 或 raw_isp
+    2. 支持纯数字 ASN 补齐 AS 前缀（如 22773 -> AS22773）
+    3. 过滤街道、大厦等地址型脏后缀（如 Tencent Building, Kejizhongyi Avenue）
+    4. 权威优先：若 ASN 在权威字典 ASN_TO_PROVIDER 中收录，优先使用权威标准服务商名称
+    5. 若未收录于权威库，保留原有规范后缀或 ISP 名称拼接
+    6. 若无法识别，回退至纯 ASN 或 raw_isp
     """
     clean_a = (raw_asn or "").replace("`", "").strip()
     clean_i = (raw_isp or "").replace("`", "").strip()
-    m = re.search(r"(AS\d+)", clean_a, re.IGNORECASE)
-    if not m:
-        if clean_a and clean_a != "-":
-            return clean_a
-        return clean_i or "AS_UNKNOWN"
+    if clean_i in ("-", "None", "unknown"):
+        clean_i = ""
 
-    code = m.group(1).upper()
-    suffix = clean_a[m.end():].strip().strip("-").strip()
+    code = ""
+    suffix = ""
+    m = re.search(r"(AS\d+)", clean_a, re.IGNORECASE)
+    if m:
+        code = m.group(1).upper()
+        suffix = clean_a[m.end():].strip().strip("-").strip()
+    else:
+        m_num = re.match(r"^(\d{1,10})$", clean_a)
+        if m_num:
+            code = f"AS{m_num.group(1)}"
+        else:
+            if clean_a and clean_a != "-":
+                return clean_a
+            return clean_i or "AS_UNKNOWN"
+
+    addr_keywords = ("building", "avenue", "road", "street", "floor", "suite", "room", "district", "highway", "jalan", "park", "bldg", "kejizhongyi")
+    if suffix and any(k in suffix.lower() for k in addr_keywords):
+        suffix = ""
+    if clean_i and any(k in clean_i.lower() for k in addr_keywords):
+        clean_i = ""
+
+    # 权威单一真相源 (SSOT) 优先：若在已收录权威字典中，采用权威统一名称
+    auth_isp = ASN_TO_PROVIDER.get(code, "")
+    if auth_isp:
+        return f"{code} {auth_isp}"
+
     if suffix:
         return f"{code} {suffix}"
-    if clean_i and clean_i != "-":
+    if clean_i:
         return f"{code} {clean_i}"
-    lookup_isp = ASN_TO_PROVIDER.get(code, "")
-    if lookup_isp:
-        return f"{code} {lookup_isp}"
     return code
 
 
