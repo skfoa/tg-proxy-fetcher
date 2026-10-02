@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-SOCKS5 / 通用代理连通性质检与淘汰引擎 (socks_verify.py)
+多协议通用代理连通性质检与淘汰引擎 (proxies_verify.py)
 
-针对 socks5.txt（涵盖 SOCKS5, HTTP, HTTPS, TURN, SSTP 协议代理）进行应用层真实穿透校验：
+针对 proxies.txt（涵盖 SOCKS5, HTTP, HTTPS, TURN, SSTP 协议代理）进行应用层真实穿透校验：
   1. SOCKS5: RFC 1928 / RFC 1929 五步握手状态机 (无密码/有密码) -> CONNECT speed.cloudflare.com:80 -> GET /cdn-cgi/trace 校验 200 + Server: cloudflare + 正则解析 colo
   2. HTTP/HTTPS: HTTP CONNECT speed.cloudflare.com:80 (支持 Proxy-Authorization 认证) -> GET /cdn-cgi/trace 穿透校验 (回退至直接 Forward GET)
   3. TURN: STUN Binding Request over TCP (RFC 5389)，校验 20 字节头部 Magic Cookie (0x2112A442) 及 Transaction ID
@@ -56,7 +56,7 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
 )
-log = logging.getLogger("socks-verify")
+log = logging.getLogger("proxies-verify")
 
 # Windows 异步事件循环策略与 UTF-8 输出
 if sys.platform == "win32":
@@ -649,7 +649,7 @@ def send_socks_notification(
     )
 
     try:
-        send_tg_message(message, token=token, chat_id=chat_id, tag="socks-verify")
+        send_tg_message(message, token=token, chat_id=chat_id, tag="proxies-verify")
     except Exception as e:
         log.warning("发送 Telegram 消息时出现异常: %s", e)
 
@@ -808,7 +808,7 @@ async def async_main(args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="SOCKS5 / 通用代理连通性质检与淘汰引擎")
+    parser = argparse.ArgumentParser(description="多协议通用代理连通性质检与淘汰引擎")
     parser.add_argument("--concurrency", type=int, default=CONCURRENCY, help=f"并发探测协程数 (默认 {CONCURRENCY})")
     parser.add_argument("--max-fails", type=int, default=MAX_FAILS, help=f"连续失败淘汰阈值 (默认 {MAX_FAILS})")
     parser.add_argument("--strict", action="store_true", help="极致纯净模式 (只要失败 1 次立即剔除，等价于 --max-fails 1)")

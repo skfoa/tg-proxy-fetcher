@@ -66,7 +66,7 @@
                             四阶段流水线主动鉴真与淘汰引擎
   ┌───────────────────────┬─────────────────────────┬─────────────────────────┐
   ▼                       ▼                         ▼                         ▼
-Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step 4: cf_verify
+Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step 4: cf_verify
 多协议增量抓取          RFC 1928 全协议质检       /cdn-cgi/trace 穿透       全量优选 TLS+301 鉴真
 全局唯一去重合并        SOCKS5/HTTP/TURN 穿透     质检分层与纯净导出        + 全局四合一 TG 统一卡片
 
@@ -80,7 +80,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 | **`tg_fetch.py`** | **数据抓取与合并核心**：实现免登录 Web 爬虫与 Telethon API 双模抓取，跨文件全局唯一去重合并保存至 `data/`。 |
 | **`parsers.py`** | **文本与协议解析器模块**：提取通用代理正则、单条优选卡片、测速 CSV 附件、OTC 扫描清单等解析规则，全面解耦数据提取与业务流。 |
 | **`providers.py`** | **公共规范与网络分类中心**：全系统单一真相源（Single Source of Truth），维护云厂商与关键 ASN 映射表、两级分层网络分类引擎（Tier 1 权威对照 + Tier 2 词根规则）、未知 ASN 在线 BGP 反查补库与权威防污染加固引擎，联动驱动 `data/asn_database.json` 持久化知识库，并提供 ProxyIP 分国别与稀缺高价值网络专线纯文本分类导出。 |
-| **`socks_verify.py`** | **通用代理主动质检引擎**：基于 RFC 1928 (readexactly 精确字节读取)、RFC 5389 (STUN/TURN Binding) 与 HTTP CONNECT 穿透检验。 |
+| **`proxies_verify.py`** | **多协议通用代理质检引擎**：基于 RFC 1928 (readexactly 精确字节读取)、RFC 5389 (STUN/TURN Binding) 与 HTTP CONNECT 穿透检验。 |
 | **`proxyip_verify.py`** | **反代 ProxyIP 质检引擎**：抗分包/防截断（Header/Body 隔离），验证反代真实穿透能力，并按质检状态分层导出分国与网络属性纯净列表。 |
 | **`cf_verify.py`** | **全量优选 IP 鉴真与最终卡片推送**：执行 TLS 官方证书鉴真 + HTTP 301 重定向抗截断精准校验，汇总流水线所有阶段数据并推送统一 TG 统计卡片。 |
 | **`gen_session.py`** | **Telethon Session 辅助生成器**：本地运行快速交互登录 Telegram 并输出 Session 字符串，供 GitHub Actions 免交互调用。 |
@@ -141,7 +141,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 
 ### 1. `data/proxies.txt`、`data/proxies/` 与 `data/proxies.csv`（通用代理全量清单与独立协议拆分，杜绝混杂）
 * **智能增量合并**：每次抓取优先比对历史库，新发布的节点自动追加并去重，以 `host:port` 为唯一标识刷新认证与配置。
-* **主动质检淘汰（`socks_verify.py`）**：集成 RFC 1928（SOCKS5 协商/认证/CONNECT 隧道穿透）、RFC 5389（STUN/TURN Binding 鉴真）、HTTP CONNECT 穿透、MS-SSTP 标准双工隧道握手全套真实网络协议握手引擎。
+* **主动质检淘汰（`proxies_verify.py`）**：集成 RFC 1928（SOCKS5 协商/认证/CONNECT 隧道穿透）、RFC 5389（STUN/TURN Binding 鉴真）、HTTP CONNECT 穿透、MS-SSTP 标准双工隧道握手全套真实网络协议握手引擎。
 * **连续失败缓冲保护（`--max-fails 3`）**：探测失败标记缓冲（`fail_count=1~2` 为缓冲期），连续 3 次全网不可达方才彻底剔除，避免公网抖动误杀。
 * **双模持久化与协议专属拆分（绝对杜绝协议混杂交错）**：
   - `data/proxies.txt`：全量代理汇总纯文本，按协议分段归类输出（`# SOCKS5 代理`、`# TURN 协议`、`# SSTP 协议` 等），段内按实测延迟严选升序排列，开箱即用不混杂。
@@ -312,7 +312,7 @@ Step 1: tg_fetch        Step 2: socks_verify      Step 3: proxyip_verify    Step
 ### 7. 全线三大异步主动鉴真与缓冲淘汰体系
 为防止长期累积的节点失效或死灰复燃，系统配备了三套独立的高并发主动质检探测引擎：
 
-#### ① 代理连通性质检引擎（`socks_verify.py`）
+#### ① 多协议通用代理质检引擎（`proxies_verify.py`）
 * **全协议真实握手**：
   * **SOCKS5**：RFC 1928 握手协商（无密 `0x00` / 账密 `0x02` RFC 1929）➔ 发送 CONNECT 指令 ➔ 穿透请求 `/cdn-cgi/trace` 检验 200 与机房。
   * **HTTP / HTTPS**：CONNECT 隧道穿透 + 正向代理回退双路径校验。
@@ -508,7 +508,7 @@ pip install ruff
 ruff check . --select F82
 
 # ② 通用代理连通性质检
-python socks_verify.py --concurrency 100 --no-notify
+python proxies_verify.py --concurrency 100 --no-notify
 
 # ③ 反代 ProxyIP 应用层穿透质检
 python proxyip_verify.py --concurrency 150 --no-notify
