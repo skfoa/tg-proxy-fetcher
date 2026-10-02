@@ -711,9 +711,6 @@ def split_header_body(resp_bytes: bytes) -> tuple[bytes, bytes]:
     return resp_bytes, b""
 
 
-# 兼容私有下划线前缀命名
-_read_full_response = read_full_response
-_split_header_body = split_header_body
 
 
 def get_asn_conflicts() -> list:

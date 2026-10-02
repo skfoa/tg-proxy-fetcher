@@ -53,7 +53,7 @@ from providers import (
     TG_CHAT_ID,
     format_proxyip_txt,
     format_scan_ips_txt,
-    format_socks_txt,
+    format_proxies_txt,
     save_proxyip_by_country,
     save_proxies_by_protocol,
     save_scan_ips_by_asn,
@@ -103,17 +103,22 @@ def _parse_channels(env_name: str, default: list[str]) -> list[str]:
 PROXY_CHANNELS = _parse_channels("PROXY_CHANNELS", ["@otcfxq", "@danfeng_chat"])
 CF_IP_CHANNELS = _parse_channels("CF_IP_CHANNELS", ["@otcfxq", "@danfeng_chat"])
 
+DEFAULT_SUB_URLS = [
+    "https://sub.cmliussss.net/vpngate",
+    "https://sub.cmliussss.net/vpngate?token=cmliussss",
+]
+
+
 def _parse_sub_urls() -> list[str]:
-    default_sub = "https://sub.cmliussss.net/vpngate?token=20260924233538"
     raw_val = (os.getenv("SUB_URLS") or "").strip()
     if not raw_val:
-        return [default_sub]
+        return list(DEFAULT_SUB_URLS)
     urls = []
     for item in re.split(r"[,;\s]+", raw_val):
         item = item.strip()
         if item and item.startswith("http"):
             urls.append(item)
-    return urls if urls else [default_sub]
+    return urls if urls else list(DEFAULT_SUB_URLS)
 
 
 SUB_URLS = _parse_sub_urls()
@@ -252,9 +257,9 @@ def send_tg_notification(
     updated_scan: int = 0,
     new_proxyips: int = 0,
     updated_proxyips: int = 0,
-    top_providers: list = None,
+    top_providers: list | None = None,
     elapsed_seconds: float = 0.0,
-    unrecorded_asns: list = None,
+    unrecorded_asns: list | None = None,
 ):
     # 若设置了 DEFER_NOTIFY=1（如在 GitHub Actions 完整流水线中），则将抓取统计暂存至 .fetch_stats.json，由后续的 cf_verify 生成联合卡片
     if os.getenv("DEFER_NOTIFY") == "1":
@@ -389,7 +394,7 @@ def fetch_web_page(url: str, proxy: str = "") -> str:
             cmd.extend(["-x", proxy])
         cmd.extend([url, "--max-time", "15"])
         try:
-            res = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="ignore", timeout=20)
+            res = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="ignore", timeout=20, check=False)
             if res.returncode == 0 and res.stdout:
                 return res.stdout
         except Exception as e:
@@ -405,6 +410,43 @@ def fetch_web_page(url: str, proxy: str = "") -> str:
     )
     with opener.open(req, timeout=15) as resp:
         return resp.read().decode("utf-8", errors="ignore")
+
+
+def fetch_external_subscriptions(
+    sub_urls: list[str],
+    proxy: str,
+    tombstone: dict[str, int],
+    scraped_proxies: dict[str, str],
+) -> int:
+    """拉取外部通用订阅源（如 VPNGate SSTP 订阅），解析提取节点并自动去重与墓地过滤"""
+    if not sub_urls:
+        return 0
+
+    log.info("-" * 50)
+    log.info("开始拉取外部通用订阅源: %d 个链接", len(sub_urls))
+    total_added = 0
+
+    for sub_url in sub_urls:
+        try:
+            log.info("拉取外部订阅: %s", sub_url)
+            sub_content = fetch_web_page(sub_url, proxy=proxy)
+            if sub_content:
+                sub_proxies = extract_proxies(sub_content)
+                sub_added = 0
+                for url, key in sub_proxies:
+                    if is_tombstoned(key, tombstone):
+                        continue
+                    if key not in scraped_proxies:
+                        scraped_proxies[key] = url
+                        sub_added += 1
+                total_added += sub_added
+                log.info("从外部订阅 %s 成功提取节点: %d 个 (有效去重新增: %d 个)", sub_url, len(sub_proxies), sub_added)
+            else:
+                log.warning("外部订阅 %s 获取内容为空", sub_url)
+        except Exception as e:
+            log.warning("拉取外部订阅 %s 失败: %s", sub_url, e)
+
+    return total_added
 
 
 def scrape_channel_web(channel: str, cutoff: datetime, proxy: str = "") -> tuple[list[tuple[str, str]], list[dict]]:
@@ -444,7 +486,7 @@ def scrape_channel_web(channel: str, cutoff: datetime, proxy: str = "") -> tuple
                     m_id = int(p_m.group(1).split("/")[1])
                     if earliest_id is None or m_id < earliest_id:
                         earliest_id = m_id
-                except Exception:
+                except (ValueError, TypeError, IndexError):
                     pass
 
             t_m = re.search(r'<time[^>]*datetime="([^"]+)"', chunk)
@@ -459,7 +501,7 @@ def scrape_channel_web(channel: str, cutoff: datetime, proxy: str = "") -> tuple
                     if dt < cutoff:
                         reached_cutoff = True
                         break
-                except Exception:
+                except (ValueError, TypeError):
                     pass
 
             txt_m = re.search(r'<div class="tgme_widget_message_text[^"]*"[^>]*>(.*?)</div>', chunk, re.DOTALL)
@@ -507,7 +549,7 @@ def save_and_notify(
 ):
     # 1. 保存通用代理总表（proxies.txt 及向后兼容 socks5.txt）并按协议独立拆分
     os.makedirs(DATA_DIR, exist_ok=True)
-    formatted_proxies = format_socks_txt(list(final_proxies.values()))
+    formatted_proxies = format_proxies_txt(list(final_proxies.values()))
     with open(OUTPUT_PROXY_FILE, "w", encoding="utf-8") as f:
         f.write(formatted_proxies)
     log.info("已按协议分段保存通用代理总文件: %s (%d 个全量累积节点)", OUTPUT_PROXY_FILE, len(final_proxies))
@@ -864,27 +906,7 @@ def run_web_scraper():
             log.info("频道 %s 提取单条优选 IP: %d 条", channel, cf_cnt)
 
     # 1.5 外部通用订阅源抓取 (如 VPNGate SSTP 订阅等)
-    if SUB_URLS:
-        log.info("-" * 50)
-        log.info("开始拉取外部通用订阅源: %d 个链接", len(SUB_URLS))
-        for sub_url in SUB_URLS:
-            try:
-                log.info("拉取外部订阅: %s", sub_url)
-                sub_content = fetch_web_page(sub_url, proxy=proxy)
-                if sub_content:
-                    sub_proxies = extract_proxies(sub_content)
-                    sub_added = 0
-                    for url, key in sub_proxies:
-                        if is_tombstoned(key, tombstone):
-                            continue
-                        if key not in scraped_proxies:
-                            scraped_proxies[key] = url
-                            sub_added += 1
-                    log.info("从外部订阅 %s 成功提取节点: %d 个 (有效去重新增: %d 个)", sub_url, len(sub_proxies), sub_added)
-                else:
-                    log.warning("外部订阅 %s 获取内容为空", sub_url)
-            except Exception as e:
-                log.warning("拉取外部订阅 %s 失败: %s", sub_url, e)
+    fetch_external_subscriptions(SUB_URLS, proxy, tombstone, scraped_proxies)
 
     # Web 预览模式仅提取正文单条代理与优选 IP，扫描附件与反代大池需 API 模式自动获取
     scraped_scan_ips = {}
@@ -1081,28 +1103,8 @@ async def run_telethon():
                      channel_name, msg_count, proxy_count, cf_count, scan_count, proxyip_count)
 
         # 1.5 外部通用订阅源抓取 (如 VPNGate SSTP 订阅等)
-        if SUB_URLS:
-            log.info("-" * 50)
-            log.info("开始拉取外部通用订阅源: %d 个链接", len(SUB_URLS))
-            web_proxy = PROXY or get_system_proxy()
-            for sub_url in SUB_URLS:
-                try:
-                    log.info("拉取外部订阅: %s", sub_url)
-                    sub_content = fetch_web_page(sub_url, proxy=web_proxy)
-                    if sub_content:
-                        sub_proxies = extract_proxies(sub_content)
-                        sub_added = 0
-                        for url, key in sub_proxies:
-                            if is_tombstoned(key, tombstone):
-                                continue
-                            if key not in scraped_proxies:
-                                scraped_proxies[key] = url
-                                sub_added += 1
-                        log.info("从外部订阅 %s 成功提取节点: %d 个 (有效去重新增: %d 个)", sub_url, len(sub_proxies), sub_added)
-                    else:
-                        log.warning("外部订阅 %s 获取内容为空", sub_url)
-                except Exception as e:
-                    log.warning("拉取外部订阅 %s 失败: %s", sub_url, e)
+        web_proxy = PROXY or get_system_proxy()
+        fetch_external_subscriptions(SUB_URLS, web_proxy, tombstone, scraped_proxies)
 
         # 2. 智能增量合并并落盘保存
         merge_and_save(

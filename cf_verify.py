@@ -346,16 +346,16 @@ def send_verify_notification(
         proxyip_eliminated = fetch_stats.get("proxyip_eliminated", 0)
         proxyip_survivors = fetch_stats.get("proxyip_survivors", 0)
 
-    socks_verified = False
-    socks_eliminated = 0
-    socks_survivors = 0
-    if fetch_stats and fetch_stats.get("socks_verified"):
-        socks_verified = True
-        socks_eliminated = fetch_stats.get("socks_eliminated", 0)
-        socks_survivors = fetch_stats.get("socks_survivors", 0)
+    proxies_verified = False
+    proxies_eliminated = 0
+    proxies_survivors = 0
+    if fetch_stats and (fetch_stats.get("proxies_verified") or fetch_stats.get("socks_verified")):
+        proxies_verified = True
+        proxies_eliminated = fetch_stats.get("proxies_eliminated", fetch_stats.get("socks_eliminated", 0))
+        proxies_survivors = fetch_stats.get("proxies_survivors", fetch_stats.get("socks_survivors", 0))
 
-    total_eliminated = cf_eliminated + scan_eliminated + proxyip_eliminated + socks_eliminated
-    total_survivors = cf_survivors + scan_survivors + proxyip_survivors + socks_survivors
+    total_eliminated = cf_eliminated + scan_eliminated + proxyip_eliminated + proxies_eliminated
+    total_survivors = cf_survivors + scan_survivors + proxyip_survivors + proxies_survivors
 
     div = "━━━━━━━━━━━━━━━━━━━━"
 
@@ -369,7 +369,7 @@ def send_verify_notification(
     if fetch_stats:
         total_elapsed += fetch_stats.get("elapsed_seconds", 0.0)
         total_elapsed += fetch_stats.get("proxyip_elapsed", 0.0)
-        total_elapsed += fetch_stats.get("socks_elapsed", 0.0)
+        total_elapsed += fetch_stats.get("proxies_elapsed", fetch_stats.get("socks_elapsed", 0.0))
     footer_parts.append(f"⚡ <b>总耗时</b>: {total_elapsed:.1f}s")
     if github_repo:
         repo_url = f"{github_server}/{github_repo}"
@@ -385,8 +385,8 @@ def send_verify_notification(
     cf_status = f"✅ {cf_pass} 存活" + format_buffer_badge(cf_marked, buf_new=cf_buf_new, buf_rec=cf_buf_rec, f1=cf_f1, f2=cf_f2)
     scan_status = f"✅ {scan_pass} 存活" + format_buffer_badge(scan_marked, buf_new=scan_buf_new, buf_rec=scan_buf_rec, f1=scan_f1, f2=scan_f2)
     elim_details = []
-    if socks_eliminated > 0:
-        elim_details.append(f"代理 {socks_eliminated}")
+    if proxies_eliminated > 0:
+        elim_details.append(f"代理 {proxies_eliminated}")
     if proxyip_eliminated > 0:
         elim_details.append(f"反代 {proxyip_eliminated}")
     if cf_eliminated > 0:
@@ -394,13 +394,13 @@ def send_verify_notification(
     if scan_eliminated > 0:
         elim_details.append(f"扫描优选 {scan_eliminated}")
     detail_str = f" [{', '.join(elim_details)}]" if elim_details else ""
-    socks_max_fails = fetch_stats.get("socks_max_fails", 3) if fetch_stats else 3
+    proxies_max_fails = fetch_stats.get("proxies_max_fails", fetch_stats.get("socks_max_fails", 3)) if fetch_stats else 3
     if total_eliminated > 0:
-        if socks_eliminated > 0 and socks_max_fails != max_fails:
-            if socks_eliminated == total_eliminated:
-                threshold_desc = f"(连续失败 ≥ {socks_max_fails} 次)"
+        if proxies_eliminated > 0 and proxies_max_fails != max_fails:
+            if proxies_eliminated == total_eliminated:
+                threshold_desc = f"(连续失败 ≥ {proxies_max_fails} 次)"
             else:
-                threshold_desc = f"(代理 ≥ {socks_max_fails} 次 · 其余 ≥ {max_fails} 次)"
+                threshold_desc = f"(代理 ≥ {proxies_max_fails} 次 · 其余 ≥ {max_fails} 次)"
         else:
             threshold_desc = f"(连续失败 ≥ {max_fails} 次)"
         elim_str = f"<code>{total_eliminated}</code> 条{detail_str} {threshold_desc}"
@@ -443,15 +443,15 @@ def send_verify_notification(
             header = "⚡ <b>节点与优选 IP 同步完成</b> (数据已全部为最新)"
 
         proxy_line = ""
-        if socks_verified:
-            s_pass = fetch_stats.get("socks_pass", 0)
-            s_surv = fetch_stats.get("socks_survivors", 0)
+        if proxies_verified:
+            s_pass = fetch_stats.get("proxies_pass", fetch_stats.get("socks_pass", 0))
+            s_surv = fetch_stats.get("proxies_survivors", fetch_stats.get("socks_survivors", 0))
             s_marked = max(0, s_surv - s_pass)
-            s_f1 = fetch_stats.get("socks_fail_1", 0)
-            s_f2 = fetch_stats.get("socks_fail_2", 0)
-            s_new = fetch_stats.get("socks_buf_new", 0)
-            s_rec = fetch_stats.get("socks_buf_rec", 0)
-            s_avg = fetch_stats.get("socks_avg_delay_ms", 0)
+            s_f1 = fetch_stats.get("proxies_fail_1", fetch_stats.get("socks_fail_1", 0))
+            s_f2 = fetch_stats.get("proxies_fail_2", fetch_stats.get("socks_fail_2", 0))
+            s_new = fetch_stats.get("proxies_buf_new", fetch_stats.get("socks_buf_new", 0))
+            s_rec = fetch_stats.get("proxies_buf_rec", fetch_stats.get("socks_buf_rec", 0))
+            s_avg = fetch_stats.get("proxies_avg_delay_ms", fetch_stats.get("socks_avg_delay_ms", 0))
             s_status = f"✅ {s_pass} 存活" + format_buffer_badge(s_marked, buf_new=s_new, buf_rec=s_rec, f1=s_f1, f2=s_f2)
             avg_str = f" · ⚡ 均延 {s_avg}ms" if s_avg > 0 else ""
             proxy_line = f"📫 <b>可用代理</b>：<code>{s_surv}</code> 个 ({s_status}{avg_str})\n"
@@ -485,19 +485,19 @@ def send_verify_notification(
         verify_items = [
             f"   • 优选检验：TLS 握手 + HTTP 301 ({concurrency} 并发)",
         ]
-        if socks_verified:
+        if proxies_verified:
             verify_items.append("   • 代理检验：RFC 1928 全协议穿透鉴真")
         if proxyip_verified:
             verify_items.append("   • 反代检验：/cdn-cgi/trace 穿透鉴真")
 
         total_buf_new = (
-            fetch_stats.get("socks_buf_new", 0)
+            fetch_stats.get("proxies_buf_new", fetch_stats.get("socks_buf_new", 0))
             + fetch_stats.get("proxyip_buf_new", 0)
             + cf_buf_new
             + scan_buf_new
         )
         total_buf_rec = (
-            fetch_stats.get("socks_buf_rec", 0)
+            fetch_stats.get("proxies_buf_rec", fetch_stats.get("socks_buf_rec", 0))
             + fetch_stats.get("proxyip_buf_rec", 0)
             + cf_buf_rec
             + scan_buf_rec

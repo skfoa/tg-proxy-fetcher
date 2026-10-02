@@ -43,7 +43,7 @@ from providers import (
     TG_CHAT_ID,
     record_tombstone,
     canonical_key,
-    format_socks_txt,
+    format_proxies_txt,
     save_proxies_by_protocol,
     format_buffer_badge,
 )
@@ -495,7 +495,7 @@ def parse_proxy_url(url: str) -> dict | None:
         return None
 
 
-def load_socks_data(
+def load_proxies_data(
     txt_path: str = PROXIES_TXT,
     csv_path: str = PROXIES_CSV,
 ) -> list[dict]:
@@ -553,7 +553,7 @@ def load_socks_data(
     return list(url_map.values())
 
 
-def save_socks_data(
+def save_proxies_data(
     survivors: list[dict],
     txt_path: str = PROXIES_TXT,
     csv_path: str = PROXIES_CSV,
@@ -579,7 +579,7 @@ def save_socks_data(
     survivors.sort(key=_sort_key)
 
     # 写入 proxies.txt (纯文本 URL 清单，按协议分段归类)
-    formatted_txt = format_socks_txt(survivors)
+    formatted_txt = format_proxies_txt(survivors)
     with open(txt_path, "w", encoding="utf-8") as f:
         f.write(formatted_txt)
     log.info("已按协议分段覆写保存 %s: %d 个高可用节点", txt_path, len(survivors))
@@ -597,10 +597,15 @@ def save_socks_data(
     log.info("已按协议分块覆写保存 %s: %d 条质检状态记录 (无交错混杂)", csv_path, len(survivors))
 
 
+# 向后兼容历史别名
+load_socks_data = load_proxies_data
+save_socks_data = save_proxies_data
+
+
 # ---------- Telegram 通知 ----------
 
 
-def send_socks_notification(
+def send_proxies_notification(
     total: int,
     pass_count: int,
     fail_count: int,
@@ -658,7 +663,7 @@ def send_socks_notification(
 
 async def async_main(args):
     t_start = time.time()
-    rows = load_socks_data(PROXIES_TXT, PROXIES_CSV)
+    rows = load_proxies_data(PROXIES_TXT, PROXIES_CSV)
     total = len(rows)
     if total == 0:
         log.warning("未加载到任何待检代理节点，流程结束")
@@ -724,15 +729,15 @@ async def async_main(args):
     survivors = [r for r in results if safe_int(r.get("fail_count"), 0) < args.max_fails]
     eliminated = total - len(survivors)
     survivors_len = len(survivors)
-    socks_f1 = sum(1 for r in survivors if safe_int(r.get("fail_count"), 0) == 1)
-    socks_f2 = sum(1 for r in survivors if safe_int(r.get("fail_count"), 0) == 2)
-    socks_buf_new = sum(
+    proxies_f1 = sum(1 for r in survivors if safe_int(r.get("fail_count"), 0) == 1)
+    proxies_f2 = sum(1 for r in survivors if safe_int(r.get("fail_count"), 0) == 2)
+    proxies_buf_new = sum(
         1 for r in results
         if not r.get("is_alive")
         and safe_int(r.get("_old_fc"), 0) == 0
         and safe_int(r.get("fail_count"), 0) < args.max_fails
     )
-    socks_buf_rec = sum(
+    proxies_buf_rec = sum(
         1 for r in results
         if r.get("is_alive") and safe_int(r.get("_old_fc"), 0) > 0
     )
@@ -746,48 +751,61 @@ async def async_main(args):
     avg_delay = int(sum(alive_delays) / len(alive_delays)) if alive_delays else 0
 
     if eliminated > 0:
-        log.info("[SOCKS5 淘汰] 剔除 %d 条连续失败 >= %d 次的死节点", eliminated, args.max_fails)
+        log.info("[通用代理 淘汰] 剔除 %d 条连续失败 >= %d 次的死节点", eliminated, args.max_fails)
         dead_nodes = [r for r in results if safe_int(r.get("fail_count"), 0) >= args.max_fails]
         dead_keys = [canonical_key(r.get("host", ""), r.get("port", 0)) for r in dead_nodes]
         newly_tombstoned = record_tombstone(dead_keys)
-        log.info("[SOCKS5 墓地] 已登记 %d 个淘汰死节点至墓地冷却库 (新增: %d 个, 隔离期 7 天)", len(dead_keys), newly_tombstoned)
+        log.info("[通用代理 墓地] 已登记 %d 个淘汰死节点至墓地冷却库 (新增: %d 个, 隔离期 7 天)", len(dead_keys), newly_tombstoned)
     else:
-        log.info("[SOCKS5 淘汰] 本次无节点达到连续失败 %d 次的淘汰阈值", args.max_fails)
+        log.info("[通用代理 淘汰] 本次无节点达到连续失败 %d 次的淘汰阈值", args.max_fails)
 
-    save_socks_data(survivors, PROXIES_TXT, PROXIES_CSV)
+    save_proxies_data(survivors, PROXIES_TXT, PROXIES_CSV)
 
     elapsed = time.time() - t_start
-    log.info("代理连通性质检流程执行完毕，总耗时 %.2f 秒 (✅ 存活: %d | 均延: %dms | ⚠️ 缓冲: %d [新增: %d, 取消恢复: %d])", elapsed, pass_count, avg_delay, (survivors_len - pass_count), socks_buf_new, socks_buf_rec)
+    log.info("通用代理连通性质检执行完毕，总耗时 %.2f 秒 (✅ 存活: %d | 均延: %dms | ⚠️ 缓冲: %d [新增: %d, 取消恢复: %d])", elapsed, pass_count, avg_delay, (survivors_len - pass_count), proxies_buf_new, proxies_buf_rec)
 
-    # 若存在 tg_fetch 暂存的抓取统计，将 SOCKS5 质检结果并入其中，由后续统一卡片推送
+    # 若存在 tg_fetch 暂存的抓取统计，将通用代理质检结果并入其中，由后续统一卡片推送
     fetch_stats_file = os.path.join(DATA_DIR, ".fetch_stats.json")
     has_fetch_stats = os.path.isfile(fetch_stats_file)
     if has_fetch_stats:
         try:
             with open(fetch_stats_file, "r", encoding="utf-8") as f:
                 stats = json.load(f)
+            stats["proxies_verified"] = True
+            stats["proxies_total"] = total
+            stats["proxies_pass"] = pass_count
+            stats["proxies_fail"] = fail_count
+            stats["proxies_fail_1"] = proxies_f1
+            stats["proxies_fail_2"] = proxies_f2
+            stats["proxies_buf_new"] = proxies_buf_new
+            stats["proxies_buf_rec"] = proxies_buf_rec
+            stats["proxies_eliminated"] = eliminated
+            stats["proxies_survivors"] = survivors_len
+            stats["proxies_avg_delay_ms"] = avg_delay
+            stats["proxies_elapsed"] = elapsed
+            stats["proxies_proto_breakdown"] = proto_stats
+            stats["proxies_max_fails"] = args.max_fails
+            # 兼容历史 socks_* 字段
             stats["socks_verified"] = True
             stats["socks_total"] = total
             stats["socks_pass"] = pass_count
-            stats["socks_fail"] = fail_count
-            stats["socks_fail_1"] = socks_f1
-            stats["socks_fail_2"] = socks_f2
-            stats["socks_buf_new"] = socks_buf_new
-            stats["socks_buf_rec"] = socks_buf_rec
             stats["socks_eliminated"] = eliminated
             stats["socks_survivors"] = survivors_len
-            stats["socks_avg_delay_ms"] = avg_delay
             stats["socks_elapsed"] = elapsed
-            stats["socks_proto_breakdown"] = proto_stats
             stats["socks_max_fails"] = args.max_fails
+            stats["socks_fail_1"] = proxies_f1
+            stats["socks_fail_2"] = proxies_f2
+            stats["socks_buf_new"] = proxies_buf_new
+            stats["socks_buf_rec"] = proxies_buf_rec
+            stats["socks_avg_delay_ms"] = avg_delay
             with open(fetch_stats_file, "w", encoding="utf-8") as f:
                 json.dump(stats, f, ensure_ascii=False, indent=2)
-            log.info("已将 SOCKS5 质检统计写入 %s (并入统一卡片)", fetch_stats_file)
+            log.info("已将通用代理质检统计写入 %s (并入统一卡片)", fetch_stats_file)
         except Exception as e:
             log.warning("写入 %s 失败: %s", fetch_stats_file, e)
 
     if not args.no_notify and not has_fetch_stats:
-        send_socks_notification(
+        send_proxies_notification(
             total=total,
             pass_count=pass_count,
             fail_count=fail_count,
@@ -798,10 +816,10 @@ async def async_main(args):
             concurrency=args.concurrency,
             max_fails=args.max_fails,
             elapsed=elapsed,
-            fail_1=socks_f1,
-            fail_2=socks_f2,
-            buf_new=socks_buf_new,
-            buf_rec=socks_buf_rec,
+            fail_1=proxies_f1,
+            fail_2=proxies_f2,
+            buf_new=proxies_buf_new,
+            buf_rec=proxies_buf_rec,
         )
     else:
         log.info("已并入流水线或指定了 --no-notify，跳过独立卡片推送")
