@@ -66,6 +66,8 @@ KNOWN_CLOUD_PROVIDERS = {
     "kamatera_us": ("AS204548", "Kamatera"),
     "amazon_infra": ("AS14618", "Amazon AWS"),
     "google_infra": ("AS396982", "Google Cloud"),
+    "softlayer": ("AS36351", "SoftLayer Technologies Inc."),
+    "ibmcloud": ("AS36351", "SoftLayer Technologies Inc."),
 
     # 热门 VPS / 优选反代服务商 (圈内高频出现)
     "akile": ("AS61112", "AkileCloud"),
@@ -1236,7 +1238,7 @@ ASN_EXACT_NET_TYPE = {
         "AS3320": "isp", "AS5607": "isp", "AS3215": "isp", "AS2856": "isp", "AS6830": "isp", "AS3303": "isp",
         "AS12322": "isp", "AS1241": "isp", "AS30722": "isp", "AS6805": "isp", "AS3352": "isp", "AS5410": "isp",
         "AS5466": "isp", "AS8422": "isp", "AS3269": "isp", "AS43376": "isp", "AS3301": "isp", "AS3292": "isp",
-        "AS6713": "isp", "AS8551": "isp", "AS1273": "isp", "AS56478": "isp", "AS5089": "isp", "AS5378": "isp",
+        "AS6713": "isp", "AS8551": "isp", "AS1273": "isp", "AS56478": "isp", "AS5089": "isp", "AS5378": "isp", "AS13285": "isp",
         "AS3209": "isp", "AS35244": "isp", "AS8767": "isp", "AS33915": "isp", "AS12741": "isp", "AS35179": "isp",
         "AS8758": "isp", "AS15796": "isp", "AS51582": "isp", "AS12479": "isp", "AS25400": "isp", "AS6866": "isp",
         "AS35805": "isp", "AS34984": "isp", "AS58002": "isp", "AS15557": "isp", "AS24589": "isp", "AS15895": "isp",

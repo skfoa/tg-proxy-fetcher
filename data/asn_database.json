@@ -1075,7 +1075,8 @@
     "Wowrack.com": "AS23033",
     "Bharti Airtel Ltd., Telemedia Services": "AS9498",
     "OCULUS NETWORKS INC": "AS398781",
-    "FIRST SERVER LIMITED": "AS200740"
+    "FIRST SERVER LIMITED": "AS200740",
+    "TalkTalk Communications Limited": "AS13285"
   },
   "asn_to_isp": {
     "AS63023": "Ipxo LLC",
@@ -2077,6 +2078,11 @@
     "AS200740": "FIRST SERVER LIMITED",
     "AS212238": "Datacamp Limited",
     "AS6939": "Hurricane Electric LLC",
-    "AS23033": "Wowrack.com"
+    "AS23033": "Wowrack.com",
+    "AS16509": "Amazon AWS",
+    "AS35838": "Kamatera",
+    "AS15169": "Google Cloud",
+    "AS22773": "Cox Communications Inc.",
+    "AS13285": "TalkTalk Communications Limited"
   }
 }
