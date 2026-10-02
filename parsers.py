@@ -109,8 +109,8 @@ def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
         val = float(speed_m.group(1))
         unit = (speed_m.group(2) or "").lower().strip()
         if not unit:
-            # 缺乏单位时启发式判定：主流 CF 测速工具（如 CloudflareST）小数值 (< 500) 通常为 MB/s，大数值通常为 kB/s
-            unit = "mb/s" if val < 500 else "kb/s"
+            # 缺乏单位时启发式判定：主流 CF 测速工具（如 CloudflareST）小数值 (< 50) 通常为 MB/s，大数值通常为 kB/s
+            unit = "mb/s" if val < 50 else "kb/s"
 
         if "gb" in unit or unit == "g":
             val *= 1024 * 1024
@@ -331,7 +331,7 @@ def parse_cf_csv_content(
                 field_map["region"] = col
             elif any(k in c_clean for k in ("城市", "city")):
                 field_map["city"] = col
-            elif any(k in c_clean for k in ("asn", "as编号", "as号码")):
+            elif c_clean in ("asn", "as", "asnumber", "asnum") or any(k in c_clean for k in ("as编号", "as号码", "as_number")):
                 field_map["asn"] = col
             elif any(k in c_clean for k in ("运营商", "组织", "org", "isp", "company")):
                 field_map["isp"] = col

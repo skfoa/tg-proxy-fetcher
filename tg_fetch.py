@@ -83,6 +83,11 @@ FETCH_DAYS = int(os.getenv("FETCH_DAYS") or "3")
 PROXY = os.getenv("PROXY") or os.getenv("ALL_PROXY") or os.getenv("HTTPS_PROXY") or ""
 
 def _parse_channels(env_name: str, default: list[str]) -> list[str]:
+    """
+    解析环境变量中的频道列表。
+    向后兼容说明：若专属变量（如 PROXY_CHANNELS / CF_IP_CHANNELS）未配置，
+    将自动回退至全局 CHANNELS 环境变量；若仍未配置，则使用内置 default 列表。
+    """
     raw_val = (os.getenv(env_name) or "").strip()
     if not raw_val and env_name in ("PROXY_CHANNELS", "CF_IP_CHANNELS"):
         raw_val = (os.getenv("CHANNELS") or "").strip()

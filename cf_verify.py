@@ -93,6 +93,12 @@ CSV_FIELDS = [
 SSL_CTX = ssl.create_default_context()
 SSL_CTX.check_hostname = True
 SSL_CTX.verify_mode = ssl.CERT_REQUIRED
+try:
+    SSL_CTX.options |= getattr(ssl, "OP_NO_TICKET", 0)
+    if hasattr(SSL_CTX, "session_cache_mode"):
+        SSL_CTX.session_cache_mode = ssl.SSL_SESS_CACHE_OFF
+except Exception:
+    pass
 
 
 
@@ -174,6 +180,10 @@ async def verify_all(
     completed = 0
     total = len(rows)
 
+    # 全局显式初始化 _old_fc，确保异常提前返回或空跑时不遗留未定义状态
+    for r in rows:
+        r.setdefault("_old_fc", safe_int(r.get("fail_count"), 0))
+
     # 创建乱序执行队列，打散任务调度
     indices = list(range(total))
     random.shuffle(indices)
@@ -185,10 +195,12 @@ async def verify_all(
 
         ip = (row.get("ip") or "").strip()
         port = safe_int(row.get("port"), 0)
-        # 上游 load_csv 已执行过滤，此处为二次边界防御，避免外部直接传入脏数据
+        # 上游 load_csv 已执行过滤，此处为二次边界防御；非法行标记并累加失败计数以快速淘汰
         if not ip or port <= 0 or port > 65535:
             completed += 1
             row["_invalid"] = True
+            row["fail_count"] = fc + 1
+            fail_count_total += 1
             return
 
         async with get_keyed_lock(ip):
@@ -633,7 +645,10 @@ async def async_main(args):
 
         cf_pass = sum(1 for r in cf_rows if safe_int(r.get("fail_count"), 0) == 0)
         cf_fail = cf_total - cf_pass
-        cf_survivors = [r for r in cf_rows if safe_int(r.get("fail_count"), 0) < args.max_fails]
+        cf_survivors = [
+            r for r in cf_rows
+            if safe_int(r.get("fail_count"), 0) < args.max_fails and not r.get("_invalid")
+        ]
         cf_eliminated = cf_total - len(cf_survivors)
         cf_survivors_len = len(cf_survivors)
         cf_f1 = sum(1 for r in cf_survivors if safe_int(r.get("fail_count"), 0) == 1)
@@ -685,7 +700,10 @@ async def async_main(args):
 
         scan_pass = sum(1 for r in scan_rows if safe_int(r.get("fail_count"), 0) == 0)
         scan_fail = scan_total - scan_pass
-        scan_survivors = [r for r in scan_rows if safe_int(r.get("fail_count"), 0) < args.max_fails]
+        scan_survivors = [
+            r for r in scan_rows
+            if safe_int(r.get("fail_count"), 0) < args.max_fails and not r.get("_invalid")
+        ]
         scan_eliminated = scan_total - len(scan_survivors)
         scan_survivors_len = len(scan_survivors)
         scan_f1 = sum(1 for r in scan_survivors if safe_int(r.get("fail_count"), 0) == 1)

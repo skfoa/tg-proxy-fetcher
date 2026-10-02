@@ -165,15 +165,21 @@ async def probe_proxyip(
 
 # ---------- 数据加载与保存 ----------
 def load_proxyip_csv(path: str) -> list:
-    """读取 proxyip.csv，自动处理 utf-8-sig BOM 并自动补齐缺失的 fail_count 列"""
+    """读取 proxyip.csv，自动处理 utf-8-sig BOM 并自动补齐缺失的 fail_count 列与格式过滤"""
     if not os.path.exists(path):
         return []
     rows = []
     with open(path, "r", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         for r in reader:
+            ip = str(r.get("ip") or "").strip()
+            port = safe_int(r.get("port"), 0)
+            if not ip or port <= 0 or port > 65535:
+                continue
+            r["ip"] = ip
+            r["port"] = str(port)
             r["fail_count"] = safe_int(r.get("fail_count"), 0)
-            r["tested_at"] = normalize_timestamp(r.get("tested_at", ""))
+            r["tested_at"] = normalize_timestamp(str(r.get("tested_at") or ""))
             rows.append(r)
     return rows
 

@@ -274,6 +274,8 @@ def save_asn_database(isp_to_asn: dict[str, str], asn_to_isp: dict[str, str]):
 
         # 2. 权威 SSOT 锁定：内置权威已知云厂商始终锁定为 SSOT 权威名称，坚决禁止被覆盖
         for asn_code, auth_name in AUTHORITATIVE_CLOUD_ASNS.items():
+            if asn_code in clean_a2i and clean_a2i[asn_code] != auth_name:
+                log.debug("ASN %s 权威映射维持: %s (替换手工/历史配置: %s)", asn_code, auth_name, clean_a2i[asn_code])
             clean_a2i[asn_code] = auth_name
 
         # 3. 规范化正向映射，并实施防冲突检查
@@ -645,16 +647,26 @@ def format_asn_isp(raw_asn: str, raw_isp: str = "") -> str:
                 return clean_a
             return clean_i or "AS_UNKNOWN"
 
-    _addr_pattern = r"\b(?:building|avenue|road|street|floor|suite|room|district|highway|jalan|bldg|kejizhongyi)\b"
+    _addr_pattern = r"(?:\b(?:building|avenue|road|street|floor|suite|room|district|highway|jalan|bldg|kejizhongyi)\b|大厦|大楼|写字楼|园区|胡同|街道|号院)"
     if suffix and re.search(_addr_pattern, suffix, re.IGNORECASE):
         suffix = ""
     if clean_i and re.search(_addr_pattern, clean_i, re.IGNORECASE):
         clean_i = ""
 
+    # 提取 suffix 中已有的别名括号内容，避免多轮调用导致别名丢失或嵌套
+    existing_alias = ""
+    m_paren = re.search(r"\((.*?)\)", suffix)
+    if m_paren:
+        existing_alias = m_paren.group(1).strip()
+        suffix = re.sub(r"\s*\(.*?\)", "", suffix).strip()
+
     # 权威单一真相源 (SSOT) 优先：若在已收录权威字典中，采用权威统一名称
     auth_isp = ASN_TO_PROVIDER.get(code, "")
     if auth_isp:
-        alias = clean_i if (clean_i and clean_i.lower() != auth_isp.lower()) else suffix
+        candidate_alias = clean_i or existing_alias or suffix
+        m_cand = re.search(r"\((.*?)\)", candidate_alias)
+        alias = m_cand.group(1).strip() if m_cand else candidate_alias.strip()
+
         if alias and alias.upper() not in ("-", "NONE", "UNKNOWN", "AS_UNKNOWN", "NULL"):
             # 若输入别名与权威统一名称互不包含（即属于多品牌/租户/法定名与商业名不同），保留输入别名
             if alias.lower() not in auth_isp.lower() and auth_isp.lower() not in alias.lower():
@@ -814,6 +826,10 @@ async def read_full_response(
         has_headers = (b"\r\n\r\n" in resp_bytes or b"\n\n" in resp_bytes)
         if has_headers:
             if not need_body:
+                break
+            # 若响应头表明非 200 OK（如 403, 502 等），Body 绝不会含 colo，立即返回避免空耗超时
+            first_line = resp_bytes.splitlines()[0] if resp_bytes else b""
+            if not (b" 200 " in first_line or first_line.endswith(b" 200")):
                 break
             # 若需要 Body（例如 /cdn-cgi/trace 需获取 colo 字段），拿到关键特征后立即返回
             if b"colo=" in resp_bytes:

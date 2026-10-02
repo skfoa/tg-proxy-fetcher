@@ -282,11 +282,13 @@ async def probe_http(
             await writer.wait_closed()
         except Exception:
             pass
+        writer = None
 
-        reader, writer = await asyncio.wait_for(
+        fwd_reader, fwd_writer = await asyncio.wait_for(
             asyncio.open_connection(host, port),
             timeout=connect_timeout,
         )
+        reader, writer = fwd_reader, fwd_writer
 
         direct_req = (
             f"GET http://{PROBE_HOST}{PROBE_PATH} HTTP/1.1\r\n"
@@ -309,11 +311,12 @@ async def probe_http(
     except Exception:
         return False, 0, "timeout_or_reset", ""
     finally:
-        try:
-            writer.close()
-            await writer.wait_closed()
-        except Exception:
-            pass
+        if writer is not None:
+            try:
+                writer.close()
+                await writer.wait_closed()
+            except Exception:
+                pass
 
 
 async def probe_turn(

@@ -28,12 +28,12 @@ def detect_local_proxy():
     for env_var in ('ALL_PROXY', 'HTTPS_PROXY', 'HTTP_PROXY', 'all_proxy', 'https_proxy', 'http_proxy'):
         val = os.environ.get(env_var)
         if val:
-            val_clean = val.replace('http://', '').replace('https://', '').replace('socks5://', '').strip('/')
+            val_clean = val.replace('socks5h://', '').replace('socks5://', '').replace('http://', '').replace('https://', '').strip('/')
             if ':' in val_clean:
                 host, port = val_clean.split(':', 1)
                 try:
-                    p_type = 'socks5' if 'socks5' in val.lower() else 'http'
-                    return (p_type, host, int(port))
+                    p_type = 'socks5' if ('socks5' in val.lower() or 'socks5h' in val.lower()) else 'http'
+                    return (p_type, host, int(port), True) if p_type == 'socks5' else (p_type, host, int(port))
                 except ValueError:
                     pass
 
@@ -58,7 +58,7 @@ def detect_local_proxy():
                         s.sendall(b'\x05\x01\x00')
                         resp = s.recv(2)
                         if resp == b'\x05\x00':
-                            return ('socks5', '127.0.0.1', port)
+                            return ('socks5', '127.0.0.1', port, True)
                     else:
                         return (p_type, '127.0.0.1', port)
         except Exception:
@@ -77,26 +77,26 @@ async def main():
     proxy = None
 
     if detected:
-        p_type, p_host, p_port = detected
+        p_type, p_host, p_port = detected[0], detected[1], detected[2]
         print(f"\n🔍 检测到本地代理可用: {p_type}://{p_host}:{p_port}")
         choice = input("是否直接使用该代理？[Y/n/自定义输入其他端口]: ").strip()
         if choice.lower() in ('', 'y', 'yes'):
-            proxy = (p_type, p_host, p_port)
+            proxy = detected
         elif choice.lower() == 'n':
             proxy = None
         elif choice.isdigit():
-            proxy = ('socks5', '127.0.0.1', int(choice))
+            proxy = ('socks5', '127.0.0.1', int(choice), True)
         else:
             if ':' in choice:
                 parts = choice.split(':')
-                proxy = ('socks5', parts[0], int(parts[1]))
+                proxy = ('socks5', parts[0], int(parts[1]), True)
             else:
-                proxy = ('socks5', '127.0.0.1', 10808)
+                proxy = ('socks5', '127.0.0.1', 10808, True)
     else:
         print("\n⚠️ 未自动检测到本地运行的代理端口（如 10808, 7890）。")
         custom = input("请输入你的本地代理端口（如 10808 或 7890，不使用代理直接按回车）：").strip()
         if custom.isdigit():
-            proxy = ('socks5', '127.0.0.1', int(custom))
+            proxy = ('socks5', '127.0.0.1', int(custom), True)
 
     if proxy:
         print(f"✅ 将通过代理连接 Telegram: {proxy[0]}://{proxy[1]}:{proxy[2]}")
