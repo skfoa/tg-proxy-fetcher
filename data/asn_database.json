@@ -1076,7 +1076,8 @@
     "Bharti Airtel Ltd., Telemedia Services": "AS9498",
     "OCULUS NETWORKS INC": "AS398781",
     "FIRST SERVER LIMITED": "AS200740",
-    "TalkTalk Communications Limited": "AS13285"
+    "TalkTalk Communications Limited": "AS13285",
+    "Shenzhen Tencent Computer Systems Company Limited": "AS45090"
   },
   "asn_to_isp": {
     "AS63023": "Ipxo LLC",
@@ -2083,6 +2084,7 @@
     "AS35838": "Kamatera",
     "AS15169": "Google Cloud",
     "AS22773": "Cox Communications Inc.",
-    "AS13285": "TalkTalk Communications Limited"
+    "AS13285": "TalkTalk Communications Limited",
+    "AS45090": "Tencent Cloud"
   }
 }

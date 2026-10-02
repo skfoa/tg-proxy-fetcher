@@ -29,6 +29,7 @@ KNOWN_CLOUD_PROVIDERS = {
     "alicloud": ("AS45102", "Alibaba Cloud"),
     "tencent": ("AS132203", "Tencent Cloud"),
     "qcloud": ("AS132203", "Tencent Cloud"),
+    "tencent_cn": ("AS45090", "Tencent Cloud"),
     "hwcloud": ("AS136907", "Huawei Cloud"),
     "huawei": ("AS136907", "Huawei Cloud"),
     "huaweicloud": ("AS136907", "Huawei Cloud"),
@@ -224,16 +225,20 @@ SORTED_CLOUD_PROVIDER_KEYS = tuple(sorted(KNOWN_CLOUD_PROVIDERS.keys(), key=len,
 ASN_DATABASE_ISP_LOWER = {k.lower(): (v, k) for k, v in ASN_DATABASE_ISP_TO_ASN.items()}
 
 
-def resolve_asn_online(ip: str, isp_hint: str = "") -> tuple[str, str]:
+def resolve_asn_online(ip: str, isp_hint: str = "", persist: bool = False) -> tuple[str, str]:
     """
-    当本地库完全无法识别 ASN 时，在线向权威 BGP 数据库实时反查并自动入库（实现『不知道就查，完善数据库』）：
+    当本地权威库与持久化库无法识别 ASN 时，在线向权威 BGP 数据库实时反查：
     返回 (clean_asn, clean_isp)。
     多通道高可用安全反查架构：
-      - 通道 1 (首选)：ip-api.com (全字段结构化解析，优先提取 as 宣告机构与 asname，免 Key 极速响应)
+      - 通道 1 (首选)：ip-api.com (结构化解析: 优先取实际商业 ISP 运营商名称与 org，技术域别名 asname)
       - 通道 2 (备选)：iplocate.io (全量 HTTPS，免 Key，原生结构化 ASN 对象)
       - 通道 3 (备选)：ipapi.co (全量 HTTPS，免 Key 每日限额)
-    加固防护：若反查出的 ASN 已存在于本地权威字典 (ASN_TO_PROVIDER)，则坚决保留权威名称，
-    严禁被第三方 API 临时/上游机房的脏名称覆盖污染。
+    核心防御与防污染机制：
+      1. 纯数字/正则提取 AS\\d+，坚决抛弃 as 字段携带的物理注册大厦/街道门牌地址 (如 Tencent Building)
+      2. 提取到 ASN 后优先执行 SSOT 校验：若命中本地权威字典 (ASN_TO_PROVIDER)，坚决使用标准服务商名，
+         杜绝第三方 API 临时/工商长串/机房脏名称污染
+      3. persist 参数默认为 False：反查结果仅保留在当前进程内存字典高速缓存中，不隐式污染磁盘文件；
+         仅在离线专门维护阶段显式指定 persist=True 时才持久化写盘。
     """
     if not ip or ip in ("AS_UNKNOWN", "unknown", "127.0.0.1"):
         return "", ""
@@ -241,23 +246,22 @@ def resolve_asn_online(ip: str, isp_hint: str = "") -> tuple[str, str]:
     clean_asn = ""
     clean_isp = ""
 
-    # 通道 1 (首选): ip-api.com (结构化字段精准提取: as 机构名 > asname > org > isp)
+    # 通道 1 (首选): ip-api.com (语义优先: 实际商业 isp > 组织机构 org > 路由技术别名 asname)
     try:
         url = f"http://ip-api.com/json/{ip}?fields=status,message,as,asname,org,isp"
         req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
         with urllib.request.urlopen(req, timeout=3.5) as res:
             data = json.loads(res.read().decode("utf-8", errors="ignore"))
             if data.get("status") == "success":
-                raw_as = data.get("as") or ""
-                as_match = re.match(r"(AS\d+)\s*(.*)", str(raw_as), re.IGNORECASE)
+                raw_as = str(data.get("as") or "")
+                as_match = re.search(r"(AS\d+)", raw_as, re.IGNORECASE)
                 if as_match:
                     clean_asn = as_match.group(1).upper()
-                    as_org = as_match.group(2).strip()
-                    as_name = (data.get("asname") or "").strip()
-                    addr_keywords = ("building", "avenue", "road", "street", "floor", "suite", "room", "district", "highway", "jalan", "park", "bldg", "kejizhongyi")
-                    if any(k in as_org.lower() for k in addr_keywords):
-                        as_org = ""
-                    clean_isp = as_org or as_name or data.get("org") or data.get("isp") or isp_hint or ""
+                    # 正规语义提取：坚决不从 as 字段中截取大厦/街道地址，根治地址污染
+                    raw_isp_val = (data.get("isp") or "").strip()
+                    raw_org_val = (data.get("org") or "").strip()
+                    raw_asname_val = (data.get("asname") or "").strip()
+                    clean_isp = raw_isp_val or raw_org_val or raw_asname_val or isp_hint or ""
     except Exception as e:
         log.debug("ip-api.com 在线解析 IP %s 失败: %s", ip, e)
 
@@ -293,13 +297,14 @@ def resolve_asn_online(ip: str, isp_hint: str = "") -> tuple[str, str]:
             log.debug("ipapi.co 在线解析 IP %s 失败: %s", ip, e)
 
     if clean_asn:
-        # 防御加固：如果已属于权威收录厂商（如 AS45102=Alibaba Cloud），直接使用权威标准名称，不被污染
+        # SSOT 权威优先机制：若该 ASN 已属于权威收录厂商（如 AS132203=Tencent Cloud, AS45102=Alibaba Cloud），
+        # 坚决直接使用本地标准名，完全不受第三方 API 冗长工商全称或技术代号干扰
         if clean_asn in ASN_TO_PROVIDER:
             std_isp = ASN_TO_PROVIDER[clean_asn]
             log.debug("IP %s 命中权威已知 ASN %s: %s (忽略 API 原始标签: %s)", ip, clean_asn, std_isp, clean_isp)
             return clean_asn, std_isp
 
-        # 仅对真正未收录的新自治系统补充进内存字典并持久化
+        # 若为全新未收录自治系统，更新本进程运行时内存字典高速缓存
         clean_isp = clean_isp or isp_hint
         if clean_isp and clean_isp not in ASN_DATABASE_ISP_TO_ASN:
             ASN_DATABASE_ISP_TO_ASN[clean_isp] = clean_asn
@@ -308,19 +313,25 @@ def resolve_asn_online(ip: str, isp_hint: str = "") -> tuple[str, str]:
             ASN_DATABASE_ASN_TO_ISP[clean_asn] = clean_isp
         if clean_asn not in ASN_TO_PROVIDER:
             ASN_TO_PROVIDER[clean_asn] = clean_isp
-        save_asn_database(ASN_DATABASE_ISP_TO_ASN, ASN_DATABASE_ASN_TO_ISP)
-        log.info("【自动完善数据库】已在线反查新 IP %s 并补充入库: %s -> %s", ip, clean_asn, clean_isp)
+
+        if persist:
+            save_asn_database(ASN_DATABASE_ISP_TO_ASN, ASN_DATABASE_ASN_TO_ISP)
+            log.info("【自动完善数据库】已在线反查新 IP %s 并持久化入库: %s -> %s", ip, clean_asn, clean_isp)
+        else:
+            log.debug("【内存缓存更新】在线反查新 IP %s: %s -> %s", ip, clean_asn, clean_isp)
         return clean_asn, clean_isp
 
     return "", ""
 
 
-def resolve_ip_asn(ip: str = "", isp_hint: str = "") -> tuple[str, str]:
+def resolve_ip_asn(ip: str = "", isp_hint: str = "", allow_online: bool = False) -> tuple[str, str]:
     """
     智能解析/补全 ASN 与 ISP：
+    [纯本地极速查表 - 零网络阻塞，微秒级响应]
     1. 优先查持久化数据库 (ASN_DATABASE_ISP_TO_ASN，精确查表与大小写不敏感查表，杜绝子串碰撞误判)
     2. 命中已知云厂商与知名骨干线路关键词 (KNOWN_CLOUD_PROVIDERS 词库，短词采用边界安全匹配)
-    3. 若未知且存在有效 IP，在线向 BGP 路由库实时反查并写入数据库
+    [可选在线反查 - 默认关闭，解耦解析流程与网络请求]
+    3. 仅当显式指定 allow_online=True 且存在有效 IP 时，才向第三方 BGP 数据库实时反查
     """
     clean_isp = isp_hint.strip()
     if clean_isp:
@@ -347,8 +358,8 @@ def resolve_ip_asn(ip: str = "", isp_hint: str = "") -> tuple[str, str]:
                 asn_code, std_name = KNOWN_CLOUD_PROVIDERS[k]
                 return asn_code, std_name
 
-    # 3. 在线反查并入库
-    if ip and ip not in ("AS_UNKNOWN", "unknown"):
+    # 3. 仅在显式允许时在线反查（解耦数据解析与网络 I/O，杜绝 Parser 阻塞与限流故障）
+    if allow_online and ip and ip not in ("AS_UNKNOWN", "unknown"):
         found_asn, found_isp = resolve_asn_online(ip, isp_hint)
         if found_asn:
             return found_asn, found_isp or clean_isp
