@@ -977,6 +977,8 @@
     "Kamatera": "AS204548",
     "AkileCloud": "AS61112",
     "DMIT": "AS906",
+    "DMIT Cloud Services": "AS906",
+    "NetCrew": "AS906",
     "BandwagonHost": "AS25820",
     "VMISS": "AS147049",
     "Contabo": "AS51167",
@@ -2087,6 +2089,7 @@
     "AS22773": "Cox Communications Inc.",
     "AS13285": "TalkTalk Communications Limited",
     "AS45090": "Tencent Cloud",
-    "AS9304": "HGC Global Communications Limited"
+    "AS9304": "HGC Global Communications Limited",
+    "AS906": "DMIT"
   }
 }

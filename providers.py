@@ -74,6 +74,8 @@ KNOWN_CLOUD_PROVIDERS = {
     "akile": ("AS61112", "AkileCloud"),
     "akilecloud": ("AS61112", "AkileCloud"),
     "dmit": ("AS906", "DMIT"),
+    "dmitcloud": ("AS906", "DMIT"),
+    "netcrew": ("AS906", "DMIT"),
     "bandwagon": ("AS25820", "BandwagonHost"),
     "bwg": ("AS25820", "BandwagonHost"),
     "it7": ("AS25820", "BandwagonHost"),
