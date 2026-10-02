@@ -198,7 +198,8 @@ def save_proxyip(
 
     def _sort_key(r):
         fc = _get_fc(r)
-        delay = safe_int(r.get("delay_ms") or 99999, 99999)
+        d = safe_int(r.get("delay_ms"), 0)
+        delay = d if d > 0 else 99999
         return (fc, delay)
 
     rows.sort(key=_sort_key)
@@ -207,15 +208,19 @@ def save_proxyip(
         row["asn"] = format_asn_isp(row.get("asn", ""), row.get("isp", ""))
         row["net_type"] = classify_asn(row.get("asn", ""), row.get("isp", ""))
 
-    with open(csv_path, "w", encoding="utf-8-sig", newline="") as f:
+    tmp_csv = f"{csv_path}.tmp"
+    with open(tmp_csv, "w", encoding="utf-8-sig", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
         writer.writeheader()
         for row in rows:
             writer.writerow(row)
+    os.replace(tmp_csv, csv_path)
     log.info("已覆写保存 %s: %d 条记录 (含 fail_count, net_type 列)", csv_path, len(rows))
 
-    with open(txt_path, "w", encoding="utf-8") as f:
+    tmp_txt = f"{txt_path}.tmp"
+    with open(tmp_txt, "w", encoding="utf-8") as f:
         f.write(format_proxyip_txt(rows))
+    os.replace(tmp_txt, txt_path)
     log.info("已按质检状态分层保存 %s: %d 条记录", txt_path, len(rows))
 
     split_cnt = save_proxyip_by_country(rows, dir_path)

@@ -157,11 +157,13 @@ KNOWN_CLOUD_PROVIDERS = {
     "cmin2": ("AS58807", "China Mobile CMIN2"),
 }
 
-# ASN 到标准服务商名称反查表
-ASN_TO_PROVIDER = {}
+# ASN 到标准服务商名称反查表（内置权威已知云厂商/VPS/骨干网单一真相源 SSOT）
+# 必须使用 first-win 策略：头部顶层公有云名称优先，后续小品牌别名（如 claw/bagevm）不覆盖主品牌
+AUTHORITATIVE_CLOUD_ASNS: dict[str, str] = {}
 for _asn, _isp in KNOWN_CLOUD_PROVIDERS.values():
-    if _asn not in ASN_TO_PROVIDER:
-        ASN_TO_PROVIDER[_asn] = _isp
+    if _asn not in AUTHORITATIVE_CLOUD_ASNS:
+        AUTHORITATIVE_CLOUD_ASNS[_asn] = _isp
+ASN_TO_PROVIDER = dict(AUTHORITATIVE_CLOUD_ASNS)
 
 
 # =====================================================================
@@ -189,13 +191,67 @@ ASN_DATABASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "da
 ASN_DATABASE_REL_PATH = os.path.join("data", "asn_database.json")
 
 
+def validate_asn_database(db: dict | None = None) -> tuple[list[str], list[str]]:
+    """
+    对 ASN 数据库进行格式、完整性与防污染一致性校验。
+    返回 (errors, warnings):
+      - errors: 阻断性硬错误（非法格式、孤立无反向映射、空名称、SSOT 权威厂商名称篡改）
+      - warnings: 提示性告警（多业务线 1 对 N 自治域多重反查特征）
+    """
+    if db is None:
+        db_path = ASN_DATABASE_PATH if os.path.isfile(ASN_DATABASE_PATH) else ASN_DATABASE_REL_PATH
+        if not os.path.isfile(db_path):
+            return ["数据库文件不存在"], []
+        with open(db_path, "r", encoding="utf-8") as f:
+            db = json.load(f)
+
+    i2a = db.get("isp_to_asn", {})
+    a2i = db.get("asn_to_isp", {})
+    errors: list[str] = []
+    warnings: list[str] = []
+
+    # 1. 格式鉴真与孤立检测
+    for isp, asn in i2a.items():
+        if not isp or not str(isp).strip():
+            errors.append(f"[空名称] isp_to_asn 存在空服务商名称键指向 {asn}")
+        if not re.match(r"^AS\d+$", str(asn or "")):
+            errors.append(f"[非法ASN格式] isp_to_asn: '{isp}' -> '{asn}'")
+        elif asn not in a2i:
+            errors.append(f"[孤立映射] isp_to_asn 中 '{isp}' -> '{asn}'，但在 asn_to_isp 中无对应反查")
+
+    for asn, isp in a2i.items():
+        if not isp or not str(isp).strip():
+            errors.append(f"[空名称] asn_to_isp 中 {asn} 对应服务商名称为空")
+        if not re.match(r"^AS\d+$", str(asn or "")):
+            errors.append(f"[非法ASN格式] asn_to_isp: '{asn}' -> '{isp}'")
+        # 权威 SSOT 纯净性检测
+        if asn in AUTHORITATIVE_CLOUD_ASNS and AUTHORITATIVE_CLOUD_ASNS[asn].lower() != str(isp).strip().lower():
+            errors.append(f"[SSOT污染] asn_to_isp[{asn}] = '{isp}' 篡改了内置权威服务商 '{AUTHORITATIVE_CLOUD_ASNS[asn]}'")
+
+    # 2. 1 对 N 多业务线与别名映射提示（如 AWS / Google 跨多个不同业务 ASN）
+    for asn, std_name in a2i.items():
+        if std_name in i2a:
+            rev_asn = i2a[std_name]
+            if rev_asn != asn:
+                warnings.append(f"[1对N多业务线] {asn} 标准名 '{std_name}' 在正向索引中首选指向 {rev_asn}")
+
+    return errors, warnings
+
+
 def load_asn_database() -> tuple[dict[str, str], dict[str, str]]:
-    """从 data/asn_database.json 自动加载持久化 ASN/ISP 映射字典"""
+    """从 data/asn_database.json 自动加载持久化 ASN/ISP 映射字典，并启动自检预警"""
     for db_path in (ASN_DATABASE_PATH, ASN_DATABASE_REL_PATH):
         if os.path.isfile(db_path):
             try:
                 with open(db_path, "r", encoding="utf-8") as f:
                     data = json.load(f)
+                    errs, warns = validate_asn_database(data)
+                    if errs:
+                        for e in errs:
+                            log.error("【ASN数据库硬错误】%s", e)
+                    if warns:
+                        for w in warns:
+                            log.debug("【ASN数据库拓扑提示】%s", w)
                     return data.get("isp_to_asn", {}), data.get("asn_to_isp", {})
             except Exception as e:
                 log.debug("读取 %s 异常: %s", db_path, e)
@@ -203,21 +259,66 @@ def load_asn_database() -> tuple[dict[str, str], dict[str, str]]:
 
 
 def save_asn_database(isp_to_asn: dict[str, str], asn_to_isp: dict[str, str]):
-    """持久化保存动态发现的 ASN/ISP 数据库"""
+    """持久化保存动态发现的 ASN/ISP 数据库（带格式鉴真、防冲突覆盖与 SSOT 保护）"""
     db_path = ASN_DATABASE_PATH
     try:
+        clean_i2a: dict[str, str] = {}
+        clean_a2i: dict[str, str] = {}
+
+        # 1. 规范化加载传入的反向映射字典
+        for k, v in asn_to_isp.items():
+            asn_code = (k or "").strip().upper()
+            isp_name = (v or "").strip()
+            if re.match(r"^AS\d+$", asn_code) and isp_name:
+                clean_a2i[asn_code] = isp_name
+
+        # 2. 权威 SSOT 锁定：内置权威已知云厂商始终锁定为 SSOT 权威名称，坚决禁止被覆盖
+        for asn_code, auth_name in AUTHORITATIVE_CLOUD_ASNS.items():
+            clean_a2i[asn_code] = auth_name
+
+        # 3. 规范化正向映射，并实施防冲突检查
+        for k, v in isp_to_asn.items():
+            isp_name = (k or "").strip()
+            asn_code = (v or "").strip().upper()
+            if not re.match(r"^AS\d+$", asn_code) or not isp_name:
+                continue
+
+            clean_i2a[isp_name] = asn_code
+
+            # 若反向字典已有该 ASN，检查是否与当前正向名称一致；若不一致仅记录，严禁篡改反向字典
+            if asn_code in clean_a2i:
+                if clean_a2i[asn_code] != isp_name:
+                    log.debug("多对一服务商映射: %s 正向指向 %s，反向标准名称维持 %s", isp_name, asn_code, clean_a2i[asn_code])
+            else:
+                # 仅当反向完全缺失时进行安全补录，首个记录者锁定，后续多值不覆写
+                clean_a2i[asn_code] = isp_name
+                log.info("【自愈补齐反向索引】ASN %s 缺失反查名称，自动补录: %s", asn_code, isp_name)
+
+        # 4. 保存前进行硬错误阻断校验
+        val_errors, _ = validate_asn_database({"isp_to_asn": clean_i2a, "asn_to_isp": clean_a2i})
+        if val_errors:
+            log.error("拒绝持久化写入损坏的 ASN 数据库: %s", val_errors)
+            return
+
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
         with open(db_path, "w", encoding="utf-8") as f:
-            json.dump({"isp_to_asn": isp_to_asn, "asn_to_isp": asn_to_isp}, f, ensure_ascii=False, indent=2)
+            json.dump({"isp_to_asn": clean_i2a, "asn_to_isp": clean_a2i}, f, ensure_ascii=False, indent=2)
     except Exception as e:
         log.warning("保存 asn_database.json 异常: %s", e)
 
 
-# 加载持久化 ASN 数据库并融合进公共字典
+# 加载持久化 ASN 数据库并融合进公共字典（加入防污染校验与格式鉴真）
 ASN_DATABASE_ISP_TO_ASN, ASN_DATABASE_ASN_TO_ISP = load_asn_database()
 for _asn, _isp in ASN_DATABASE_ASN_TO_ISP.items():
-    if _asn not in ASN_TO_PROVIDER and _isp:
-        ASN_TO_PROVIDER[_asn] = _isp
+    _asn_clean = (_asn or "").strip().upper()
+    _isp_clean = (_isp or "").strip()
+    if not re.match(r"^AS\d+$", _asn_clean):
+        continue
+    # 权威防污染锁定：坚决禁止外部持久化数据覆盖内置权威已知云厂商
+    if _asn_clean in AUTHORITATIVE_CLOUD_ASNS:
+        continue
+    if _asn_clean not in ASN_TO_PROVIDER and _isp_clean:
+        ASN_TO_PROVIDER[_asn_clean] = _isp_clean
 
 # 生成排序别名元组（按关键词长度降序优先匹配更长更精确的名称，如 'huaweicloud' 优于 'huawei'）
 # 保持 KNOWN_CLOUD_PROVIDERS 作为权威云厂商/VPS/骨干网词库的独立纯净性，杜绝注入数据库泛 ISP 产生子串碰撞
@@ -535,19 +636,24 @@ def format_asn_isp(raw_asn: str, raw_isp: str = "") -> str:
         if m_num:
             code = f"AS{m_num.group(1)}"
         else:
-            if clean_a and clean_a != "-":
+            if clean_a and clean_a != "-" and clean_a.upper() != "AS_UNKNOWN":
                 return clean_a
             return clean_i or "AS_UNKNOWN"
 
-    addr_keywords = ("building", "avenue", "road", "street", "floor", "suite", "room", "district", "highway", "jalan", "park", "bldg", "kejizhongyi")
-    if suffix and any(k in suffix.lower() for k in addr_keywords):
+    _addr_pattern = r"\b(?:building|avenue|road|street|floor|suite|room|district|highway|jalan|bldg|kejizhongyi)\b"
+    if suffix and re.search(_addr_pattern, suffix, re.IGNORECASE):
         suffix = ""
-    if clean_i and any(k in clean_i.lower() for k in addr_keywords):
+    if clean_i and re.search(_addr_pattern, clean_i, re.IGNORECASE):
         clean_i = ""
 
     # 权威单一真相源 (SSOT) 优先：若在已收录权威字典中，采用权威统一名称
     auth_isp = ASN_TO_PROVIDER.get(code, "")
     if auth_isp:
+        alias = clean_i if (clean_i and clean_i.lower() != auth_isp.lower()) else suffix
+        if alias and alias.upper() not in ("-", "NONE", "UNKNOWN", "AS_UNKNOWN", "NULL"):
+            # 若输入别名与权威统一名称互不包含（即属于多品牌/租户/法定名与商业名不同），保留输入别名
+            if alias.lower() not in auth_isp.lower() and auth_isp.lower() not in alias.lower():
+                return f"{code} {auth_isp} ({alias})"
         return f"{code} {auth_isp}"
 
     if suffix:
@@ -891,7 +997,8 @@ def format_buffer_nodes_txt(rows: list) -> str:
             continue
         seen.add(endpoint)
         fc = safe_int(r.get("fail_count", 0), 0)
-        delay = safe_int(r.get("delay_ms") or 99999, 99999)
+        d = safe_int(r.get("delay_ms"), 0)
+        delay = d if d > 0 else 99999
         if fc == 0:
             alive_nodes.append((delay, endpoint))
         else:
@@ -1805,4 +1912,17 @@ def is_tombstoned(
     return (now - ts) < (max_age_days * 86400)
 
 
-
+if __name__ == "__main__":
+    import sys
+    if "--validate" in sys.argv or len(sys.argv) == 1:
+        errs, warns = validate_asn_database()
+        if warns:
+            print(f"[*] 检测到 {len(warns)} 条合法多业务线 (1对N) 自治域映射")
+        if errs:
+            print(f"[!] 发现 {len(errs)} 处 ASN 数据库阻断性硬错误:")
+            for e in errs:
+                print(f"  - {e}")
+            sys.exit(1)
+        else:
+            print("[+] ASN 数据库一致性校验通过，0 阻断性硬错误，结构纯净合法。")
+            sys.exit(0)

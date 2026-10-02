@@ -135,15 +135,19 @@ def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
     source_m = re.search(r"IP来源[:：]\s*([@\w]+)", text)
 
     raw_asn = asn_m.group(1).replace("`", "").strip() if asn_m else ""
-    m_asn = re.search(r"(AS\d+)", raw_asn, re.IGNORECASE)
-    asn_clean = m_asn.group(1).upper() if m_asn else (raw_asn if raw_asn and raw_asn != "-" else "")
-
     raw_isp = isp_m.group(1).replace("`", "").strip() if isp_m else ""
-    # 若运营商未显式声明，尝试从 ASN 原文提取（如 `AS906 DMIT Cloud Services`）
-    if not raw_isp and m_asn:
-        rem_isp = raw_asn[m_asn.end():].strip().strip("-").strip()
-        if rem_isp:
-            raw_isp = rem_isp
+
+    m_asn = re.search(r"(AS\d+)", raw_asn, re.IGNORECASE)
+    if m_asn:
+        asn_clean = m_asn.group(1).upper()
+        if not raw_isp:
+            rem_isp = raw_asn[m_asn.end():].strip().strip("-").strip()
+            if rem_isp:
+                raw_isp = rem_isp
+    else:
+        if not raw_isp and raw_asn and raw_asn != "-":
+            raw_isp = raw_asn
+        asn_clean = ""
 
     # 智能补全：若数据行缺少 ASN，查持久化库或在线反查并补充入库
     if not asn_clean or asn_clean == "AS_UNKNOWN":
@@ -153,11 +157,11 @@ def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
             if not raw_isp and found_isp:
                 raw_isp = found_isp
 
-    final_asn = format_asn_isp(raw_asn or asn_clean, raw_isp)
+    final_asn = format_asn_isp(asn_clean or raw_asn, raw_isp)
 
     return {
         "ip": ip,
-        "port": port,
+        "port": str(port),
         "tls": tls_m.group(1).lower() if tls_m else "unknown",
         "delay_ms": int(float(delay_m.group(1))) if delay_m else "",
         "speed_kbs": speed_kbs,
@@ -270,6 +274,15 @@ def parse_cf_csv_content(
                 if m_delay:
                     delay_ms = int(float(m_delay.group(1)))
 
+                row_asn = fn_asn
+                row_isp = fn_isp
+                if not row_asn or row_asn == "AS_UNKNOWN":
+                    found_asn, found_isp = resolve_ip_asn(raw_ip, row_isp)
+                    if found_asn:
+                        row_asn = found_asn
+                        if not row_isp and found_isp:
+                            row_isp = found_isp
+
                 results.append({
                     "ip": raw_ip,
                     "port": str(port),
@@ -278,10 +291,11 @@ def parse_cf_csv_content(
                     "speed_kbs": "",
                     "colo": "",
                     "cf_location": "",
-                    "isp": fn_isp,
-                    "asn": fn_asn or "AS_UNKNOWN",
+                    "isp": row_isp,
+                    "asn": format_asn_isp(row_asn, row_isp),
                     "tested_at": fn_time,
                     "channel": default_channel,
+                    "fail_count": 0,
                 })
             return results
 
@@ -413,7 +427,7 @@ def parse_cf_csv_content(
                 "colo": colo,
                 "cf_location": cf_location,
                 "isp": raw_isp,
-                "asn": format_asn_isp(raw_asn or asn_clean, raw_isp),
+                "asn": format_asn_isp(asn_clean or raw_asn, raw_isp),
                 "tested_at": tested_at,
                 "channel": default_channel,
                 "fail_count": 0,

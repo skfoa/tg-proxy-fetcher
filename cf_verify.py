@@ -250,34 +250,40 @@ def load_csv(path: str) -> list:
 
 # --- 单条优选 IP 保存逻辑 ---
 def save_cf_ips(rows: list, csv_path: str = CF_CSV, txt_path: str = CF_TXT):
-    """覆写 cf_ips.csv 与 cf_ips.txt（仅保留存活节点，剔除死节点）"""
-    with open(csv_path, "w", encoding="utf-8-sig", newline="") as f:
+    """覆写 cf_ips.csv 与 cf_ips.txt（仅保留存活节点，剔除死节点；原子写入防截断）"""
+    tmp_csv = f"{csv_path}.tmp"
+    with open(tmp_csv, "w", encoding="utf-8-sig", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
         writer.writeheader()
         for row in rows:
             writer.writerow(row)
+    os.replace(tmp_csv, csv_path)
     log.info("已覆写保存 %s: %d 条记录", csv_path, len(rows))
 
-    with open(txt_path, "w", encoding="utf-8") as f:
+    tmp_txt = f"{txt_path}.tmp"
+    with open(tmp_txt, "w", encoding="utf-8") as f:
         for r in rows:
             f.write(f"{r['ip']}:{r['port']}\n")
+    os.replace(tmp_txt, txt_path)
     log.info("已覆写保存 %s: %d 行 IP:Port", txt_path, len(rows))
 
 
 # --- 扫描测速优选 IP 保存逻辑 ---
 def save_scan_csv(rows: list, path: str = SCAN_CSV):
-    """覆写 scan_ips.csv（仅保留存活节点，剔除死节点）"""
-    with open(path, "w", encoding="utf-8-sig", newline="") as f:
+    """覆写 scan_ips.csv（仅保留存活节点，剔除死节点；原子写入防截断）"""
+    tmp_path = f"{path}.tmp"
+    with open(tmp_path, "w", encoding="utf-8-sig", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
         writer.writeheader()
         for row in rows:
             writer.writerow(row)
+    os.replace(tmp_path, path)
     log.info("已覆写保存 %s: %d 条记录", path, len(rows))
 
 
 def save_scan_txt(rows_or_groups, path: str = SCAN_TXT):
     """
-    覆写 scan_ips.txt（按质检可用性/缓冲状态分层输出：缓冲节点置顶，存活节点紧随）
+    覆写 scan_ips.txt（按质检可用性/缓冲状态分层输出：缓冲节点置顶，存活节点紧随；原子写入防截断）
     具体机房/ASN 独立清单已由 save_scan_dir() 独立保存至 scan_ips/ 目录。
     """
     if isinstance(rows_or_groups, dict):
@@ -288,8 +294,10 @@ def save_scan_txt(rows_or_groups, path: str = SCAN_TXT):
         rows = rows_or_groups
 
     content = format_scan_ips_txt(rows)
-    with open(path, "w", encoding="utf-8") as f:
+    tmp_path = f"{path}.tmp"
+    with open(tmp_path, "w", encoding="utf-8") as f:
         f.write(content)
+    os.replace(tmp_path, path)
     log.info("已按质检缓冲状态分层保存 %s: %d 条记录", path, len(rows))
 
 
@@ -482,8 +490,10 @@ def send_verify_notification(
             p_f2 = fetch_stats.get("proxyip_fail_2", 0)
             p_new = fetch_stats.get("proxyip_buf_new", 0)
             p_rec = fetch_stats.get("proxyip_buf_rec", 0)
+            p_avg = fetch_stats.get("proxyip_avg_delay_ms", 0)
             p_status = f"✅ {p_pass} 存活" + format_buffer_badge(p_marked, buf_new=p_new, buf_rec=p_rec, f1=p_f1, f2=p_f2)
-            proxyip_line = f"🔀 <b>反代 ProxyIP</b>：<code>{p_surv}</code> 条 ({p_status})\n"
+            p_avg_str = f" · ⚡ 均延 {p_avg}ms" if p_avg > 0 else ""
+            proxyip_line = f"🔀 <b>反代 ProxyIP</b>：<code>{p_surv}</code> 条 ({p_status}{p_avg_str})\n"
         elif proxyips_count > 0:
             proxyip_line = f"🔀 <b>反代 ProxyIP</b>：<code>{proxyips_count}</code> 条 ({format_diff(new_proxyips, updated_proxyips)})\n"
 
@@ -619,9 +629,9 @@ async def async_main(args):
             http_timeout=args.http_timeout,
         )
 
-        cf_pass = sum(1 for r in cf_rows if int(r.get("fail_count", 0)) == 0)
+        cf_pass = sum(1 for r in cf_rows if safe_int(r.get("fail_count"), 0) == 0)
         cf_fail = cf_total - cf_pass
-        cf_survivors = [r for r in cf_rows if int(r.get("fail_count", 0)) < args.max_fails]
+        cf_survivors = [r for r in cf_rows if safe_int(r.get("fail_count"), 0) < args.max_fails]
         cf_eliminated = cf_total - len(cf_survivors)
         cf_survivors_len = len(cf_survivors)
         cf_f1 = sum(1 for r in cf_survivors if safe_int(r.get("fail_count"), 0) == 1)
@@ -644,7 +654,7 @@ async def async_main(args):
 
         # 稳定双重排序：先按 tested_at 降序（最新获取优先），再按 (fail_count, delay_ms) 升序（质量优先）
         cf_survivors.sort(key=lambda x: x.get("tested_at", ""), reverse=True)
-        cf_survivors.sort(key=lambda x: (safe_int(x.get("fail_count"), 0), safe_int(x.get("delay_ms") or 99999, 99999)))
+        cf_survivors.sort(key=lambda x: (safe_int(x.get("fail_count"), 0), (safe_int(x.get("delay_ms"), 0) or 99999)))
         save_cf_ips(cf_survivors, CF_CSV, CF_TXT)
     else:
         log.info(">>> %s 文件不存在或无数据，跳过单条优选校验", CF_CSV)
@@ -671,9 +681,9 @@ async def async_main(args):
             http_timeout=args.http_timeout,
         )
 
-        scan_pass = sum(1 for r in scan_rows if int(r.get("fail_count", 0)) == 0)
+        scan_pass = sum(1 for r in scan_rows if safe_int(r.get("fail_count"), 0) == 0)
         scan_fail = scan_total - scan_pass
-        scan_survivors = [r for r in scan_rows if int(r.get("fail_count", 0)) < args.max_fails]
+        scan_survivors = [r for r in scan_rows if safe_int(r.get("fail_count"), 0) < args.max_fails]
         scan_eliminated = scan_total - len(scan_survivors)
         scan_survivors_len = len(scan_survivors)
         scan_f1 = sum(1 for r in scan_survivors if safe_int(r.get("fail_count"), 0) == 1)
@@ -703,7 +713,7 @@ async def async_main(args):
         all_sorted_scan = []
         for asn_name in sorted(asn_groups.keys()):
             group_rows = sorted(asn_groups[asn_name], key=lambda x: x.get("tested_at", ""), reverse=True)
-            group_rows = sorted(group_rows, key=lambda x: (safe_int(x.get("fail_count"), 0), safe_int(x.get("delay_ms") or 99999, 99999)))
+            group_rows = sorted(group_rows, key=lambda x: (safe_int(x.get("fail_count"), 0), (safe_int(x.get("delay_ms"), 0) or 99999)))
             all_sorted_scan.extend(group_rows)
 
         save_scan_csv(all_sorted_scan, SCAN_CSV)

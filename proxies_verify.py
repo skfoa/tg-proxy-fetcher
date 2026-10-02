@@ -46,6 +46,7 @@ from providers import (
     format_proxies_txt,
     save_proxies_by_protocol,
     format_buffer_badge,
+    read_full_response,
 )
 
 # 确保本地 .env 加载
@@ -188,7 +189,7 @@ async def probe_socks5(
         writer.write(http_req)
         await asyncio.wait_for(writer.drain(), timeout=http_timeout)
 
-        http_resp = await asyncio.wait_for(reader.read(2048), timeout=http_timeout)
+        http_resp = await read_full_response(reader, http_timeout)
         http_text = http_resp.decode("utf-8", errors="ignore")
 
         colo_match = re.search(r"\bcolo=([A-Za-z0-9]+)\b", http_text)
@@ -265,7 +266,7 @@ async def probe_http(
             ).encode("latin1")
             writer.write(probe)
             await asyncio.wait_for(writer.drain(), timeout=http_timeout)
-            http_resp = await asyncio.wait_for(reader.read(2048), timeout=http_timeout)
+            http_resp = await read_full_response(reader, http_timeout)
             http_text = http_resp.decode("utf-8", errors="ignore")
             colo_match = re.search(r"\bcolo=([A-Za-z0-9]+)\b", http_text)
             colo = colo_match.group(1).upper() if colo_match else ""
@@ -295,7 +296,7 @@ async def probe_http(
         ).encode("latin1")
         writer.write(direct_req)
         await asyncio.wait_for(writer.drain(), timeout=http_timeout)
-        direct_resp = await asyncio.wait_for(reader.read(2048), timeout=http_timeout)
+        direct_resp = await read_full_response(reader, http_timeout)
         direct_text = direct_resp.decode("utf-8", errors="ignore")
         colo_match = re.search(r"\bcolo=([A-Za-z0-9]+)\b", direct_text)
         colo = colo_match.group(1).upper() if colo_match else ""
@@ -578,22 +579,26 @@ def save_proxies_data(
 
     survivors.sort(key=_sort_key)
 
-    # 写入 proxies.txt (纯文本 URL 清单，按协议分段归类)
+    # 写入 proxies.txt (纯文本 URL 清单，按协议分段归类；原子写入防截断)
     formatted_txt = format_proxies_txt(survivors)
-    with open(txt_path, "w", encoding="utf-8") as f:
+    tmp_txt = f"{txt_path}.tmp"
+    with open(tmp_txt, "w", encoding="utf-8") as f:
         f.write(formatted_txt)
+    os.replace(tmp_txt, txt_path)
     log.info("已按协议分段覆写保存 %s: %d 个高可用节点", txt_path, len(survivors))
 
     # 按协议拆分独立文件至 data/proxies/ 子目录 (.txt 与 .csv)
     proto_counts = save_proxies_by_protocol(survivors, proxies_dir)
     log.info("已在 %s/ 目录下同步覆写 %d 个独立协议文件: %s", proxies_dir, len(proto_counts), proto_counts)
 
-    # 写入 proxies.csv (完整元数据表，按协议分块严格隔离，不混杂)
-    with open(csv_path, "w", encoding="utf-8-sig", newline="") as f:
+    # 写入 proxies.csv (完整元数据表，按协议分块严格隔离，不混杂；原子写入防截断)
+    tmp_csv = f"{csv_path}.tmp"
+    with open(tmp_csv, "w", encoding="utf-8-sig", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
         writer.writeheader()
         for r in survivors:
             writer.writerow(r)
+    os.replace(tmp_csv, csv_path)
     log.info("已按协议分块覆写保存 %s: %d 条质检状态记录 (无交错混杂)", csv_path, len(survivors))
 
 

@@ -37,7 +37,7 @@
   - **OTC 优选扫描**：单 ASN 文件以文件名目标 ASN 为准；混合扫描文件（如 `OTC_SCAN_YX_杂.txt`）自动逐行提取具体 ASN 与 ISP 拆分归类。
 - **⚡ 纯净 IP:端口 列表导出**：自动导出纯文本格式的 `IP:端口` 列表（`data/cf_ips.txt`、`data/scan_ips/*.txt`、`data/proxyip.txt`），方便直接复制或作为远程订阅导入。
 - **🧩 模块化解耦与确定性分段锁**：提取独立 `providers.py` 作为云厂商与 ASN 规范化字典的单一真相源（Single Source of Truth）；内置基于 `zlib.crc32` 的 2048 桶位确定性哈希分段锁池（`get_keyed_lock`），保证同 IP 严格互斥防风控、异 IP 高并发并行，且内存严格维持在常数级 $O(1)$（约 300KB），杜绝无界增长。
-- **🧠 自愈型持久化 ASN 知识库与 BGP 在线补库**：引入 `data/asn_database.json` 维持 1,000+ 条双向对称映射，实现「本地库未知时自动向权威 BGP 路由库实时反查并写入数据库」，彻底终结 `AS_UNKNOWN`；内置防污染保护（保留权威标准命名不被第三方脏标签篡改）与两级查表机制（精准查表 + 边界安全词根匹配），彻底杜绝短子串碰撞与网络类型投毒。
+- **🧠 自愈型持久化 ASN 知识库与 BGP 反查支持**：引入 `data/asn_database.json` 维持 1,000+ 条双向索引字典（`isp_to_asn` 与 `asn_to_isp`），并配备基于 BGP 路由库的离线自愈与在线反查扩展引擎；内置防污染保护（保留权威标准命名不被第三方脏标签篡改）与两级查表机制（精准查表 + 边界安全词根匹配），兼顾微秒级解析性能与自治系统高精度归属。
 - **💡 未收录 ASN 动态发现与自适应预警**：增量抓取遇外部新自治系统时，自动比对内置权威对照库；若发现未收录 ASN，将在 Telegram 卡片中动态高亮提示并展示待确认明细，方便一键入库；若无未知 ASN 则 0 噪音完全隐藏。
 - **📱 动态双状态 Telegram 运行卡片**：首行支持「🟢 发现新增 + 🗑️ 剔除死节点」双状态动态高亮呈现，底栏包含细分引擎淘汰明细 `[代理 X, 反代 Y, 扫描 Z]`，锁屏即知变动。
 - **🛡️ 工业级防截断与精准协议鉴真**：质检引擎采用统一 Deadline 超时控制与 4096 字节安全余量循环读取（`_read_full_response`），彻底消除 TCP 分包分片及长 Cookie/安全标头导致的报文截断假阴性误杀；严格切分 Header 与 Body 区域，结合字节级正则精准锚定状态行（`301`/`200`）与 `Server: cloudflare`，杜绝任何假阳性误判。
@@ -60,7 +60,7 @@
                                     ▲                                          
                                     │ 统一接入公共映射与持久化知识库
                               providers.py ◄──► data/asn_database.json
-                     (云厂商/ASN 单一真相源)   (在线 BGP 自愈反查补库)
+                     (云厂商/ASN 单一真相源)   (双向索引持久化知识库)
                                     │ 统一接入公共映射
                                     ▼
                             四阶段流水线主动鉴真与淘汰引擎
@@ -105,7 +105,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | **`data/proxyip/*.txt`** | 独立国家/地区纯净反代列表（如 `美国.txt`、`日本.txt`） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip/{地区}.txt` |
 | **`data/proxyip/【...】.txt`** | 稀缺网络属性独立反代列表（原生宽带/商业/教育/政务） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip/【ISP_运营商原生宽带】.txt` 等 |
 | **`data/proxyip.csv`** | 反代 ProxyIP 详细数据表（含 `net_type` 网络分类） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip.csv` |
-| **`data/asn_database.json`** | 持久化自愈型 ASN 数据库（1,000+ 条双向对称映射，在线 BGP 反查补库） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/asn_database.json` |
+| **`data/asn_database.json`** | 持久化自愈型 ASN 数据库（1,000+ 条双向索引映射，支持离线聚合与 BGP 反查） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/asn_database.json` |
 | **`data/tombstone.json`** | 死节点记忆库（7 天隔离冷却与生命周期闭环防回流） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/tombstone.json` |
 
 ---
@@ -202,7 +202,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 
 ### 5. 数据表通用字段说明
 * 采用 `UTF-8-SIG` 编码，Windows Excel 直接双击打开不乱码。
-* 数值字段（`delay_ms`, `speed_kbs`）均为纯数字，并在保存时按 **`tested_at`（测速/探测时间）倒序排序**。
+* 数值字段（`delay_ms`, `speed_kbs`）均为纯数字，并在保存时按**质检状态（`fail_count` 升序）、可用性与低延迟（`delay_ms` 升序）、测速探测时间（`tested_at` 降序）**执行多重稳定质量排序。
 * 全项目共有 4 个核心 CSV 数据表，按用途与结构分为以下 3 大规范体系：
 
 #### ① 优选 IP 测速数据表（`data/cf_ips.csv`、`data/scan_ips.csv`）
@@ -305,7 +305,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 
 #### ⑤ 本工程的一体化创新架构落地
 * **`format_asn_isp()` 一体化直观标签**：全线统一输出为 `AS{编号} {服务商}` 结构，使终端用户在查看 CSV 表格、订阅列表文件名（如 `data/scan_ips/AS906_DMIT.txt`）以及 Telegram 统计卡片时，**一眼既见自治网络编号、又晓商业提供商**。
-* **`asn_database.json` 双向对称自愈持久化知识库**：维持 1,000+ 条双向对称映射，遇到全新未知 IP 时自动向权威 BGP 路由库实时反查并写入持久化数据库，确保 `asn`（路由技术号）与 `isp`（实体组织名）永远保持严谨的规范与对应。
+* **`asn_database.json` 双向索引持久化知识库**：维持 1,000+ 条双向索引字典，配合权威 SSOT 字典对 `asn` 列实现技术编号与商业机构的一体化直观归类（如 `AS906 DMIT`），并真实保留源端测速上报的实际托管运营商（`isp`），兼顾网络层 BGP 路由技术属性与现实商业实体归属。
 
 ---
 
@@ -340,10 +340,10 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
   * **7 天隔离期与自动修剪（TTL Pruning）**：默认设置 7 天冷却隔离期，完全覆盖 3 天回溯抓取窗口。在每次读取与登记时自动清除超过 7 天的陈旧记录，确保墓地文件轻量高效。
   * **全链路源头拦截**：`tg_fetch.py` 在加载本地历史、抓取正文消息及解析附件时，全流程匹配墓地黑名单并 $O(1)$ 丢弃拦截，彻底杜绝死节点回流入库。
 
-#### ⑤ 增量自愈型 ASN 知识库与在线反查机制（`data/asn_database.json`）
+#### ⑤ 增量自愈型 ASN 知识库与规范化机制（`data/asn_database.json`）
 * **痛点根治**：
-  * **消除 `AS_UNKNOWN` 盲区**：面对新出现的节点或上游源缺少 ASN 元数据的 IP，传统离线库无法识别直接丢弃或归为未知。系统实现「未知即在线反查 BGP 路由库并自动入库持久化」，使知识库具备自我进化能力，节点入库即具备准确归属。
-  * **双向完全对称映射**：维护 1,000+ 条权威映射，严格保证 `isp_to_asn`（服务商查 ASN）与 `asn_to_isp`（ASN 查标准服务商）双向完全对称，彻底杜绝单向不对称或孤立数据。
+  * **智能 ASN 与 ISP 规范化归属**：面对新出现的节点或上游源缺少 ASN 元数据的 IP，解析引擎优先通过本地 1,000+ 离线数据库与云厂商特征词库秒级补齐，杜绝解析阶段的外网 I/O 阻塞；针对全新未知自治系统提供动态发现预警机制（模式 A），支持一键补录入库。
+  * **双向索引映射架构**：维护 1,000+ 条权威映射，构建 `isp_to_asn`（服务商查 ASN）与 `asn_to_isp`（ASN 查标准服务商）双向索引，在支持多业务线多 ASN（1 对 N）与共用上游自治系统（N 对 1）现实非对称特征的同时，实现毫秒级双向检索。
 * **权威防污染与安全隔离架构（Anti-Pollution & Safe Guard）**：
   * **权威名称防污染锁定**：反查出的 ASN 若已收录于本地权威已知厂商字典（如 `AS45102 = Alibaba Cloud`、`AS13335 = Cloudflare`），坚决保留规范化标准名称，拦截第三方 API 临时/上游机房的脏标签覆盖污染。
   * **双级精准查表与子串碰撞防御**：

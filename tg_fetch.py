@@ -616,7 +616,7 @@ def save_and_notify(
     if final_proxyips:
         sorted_proxyips = sorted(
             final_proxyips.values(),
-            key=lambda x: (x.get("tested_at", ""), -int(x.get("delay_ms") or 99999)),
+            key=lambda x: (x.get("tested_at", ""), -(safe_int(x.get("delay_ms"), 0) or 99999)),
             reverse=True,
         )
         with open(OUTPUT_PROXYIP_FILE, "w", encoding="utf-8-sig", newline="") as f:
@@ -1122,6 +1122,14 @@ async def run_telethon():
         await client.disconnect()
 
 def main():
+    # 每次运行前主动清理历史可能残留的中间统计文件，杜绝历史状态回流污染
+    if os.path.isfile(FETCH_STATS_FILE):
+        try:
+            os.remove(FETCH_STATS_FILE)
+            log.debug("已清理历史遗留统计缓存: %s", FETCH_STATS_FILE)
+        except OSError:
+            pass
+
     if TG_API_ID and TG_API_HASH and TG_SESSION_STR:
         import importlib.util
         if importlib.util.find_spec("telethon") is not None:
