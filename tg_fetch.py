@@ -582,6 +582,7 @@ def save_and_notify(
             writer.writeheader()
             for row in sorted_proxyips:
                 row.setdefault("fail_count", 0)
+                row["asn"] = format_asn_isp(row.get("asn", ""), row.get("isp", ""))
                 row["net_type"] = classify_asn(row.get("asn", ""), row.get("isp", ""))
                 writer.writerow(row)
         log.info("已保存反代 ProxyIP 表格: %s (%d 条全量累积记录)", OUTPUT_PROXYIP_FILE, len(sorted_proxyips))

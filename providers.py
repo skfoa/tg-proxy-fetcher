@@ -513,6 +513,9 @@ def format_asn_isp(raw_asn: str, raw_isp: str = "") -> str:
         return f"{code} {suffix}"
     if clean_i and clean_i != "-":
         return f"{code} {clean_i}"
+    lookup_isp = ASN_TO_PROVIDER.get(code, "")
+    if lookup_isp:
+        return f"{code} {lookup_isp}"
     return code
 
 

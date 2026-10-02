@@ -50,6 +50,7 @@ from providers import (
     split_header_body,
     format_buffer_badge,
     RE_SERVER_CF,
+    format_asn_isp,
 )
 
 # 确保本地 .env 加载
@@ -203,6 +204,7 @@ def save_proxyip(
     rows.sort(key=_sort_key)
 
     for row in rows:
+        row["asn"] = format_asn_isp(row.get("asn", ""), row.get("isp", ""))
         row["net_type"] = classify_asn(row.get("asn", ""), row.get("isp", ""))
 
     with open(csv_path, "w", encoding="utf-8-sig", newline="") as f:
