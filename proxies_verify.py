@@ -713,7 +713,7 @@ async def async_main(args):
             pct = (completed / total) * 100
             min_str = f"{min_delay}ms" if min_delay < 99999 else "-"
             log.info(
-                "[SOCKS5 质检进度] %d/%d (%.1f%%) - 存活: %d 个 (延迟最低: %s)",
+                "[通用代理 质检进度] %d/%d (%.1f%%) - 存活: %d 个 (延迟最低: %s)",
                 completed,
                 total,
                 pct,

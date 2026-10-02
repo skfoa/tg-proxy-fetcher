@@ -6,7 +6,7 @@
   2. clean_asn() / format_asn_isp() / _extract_asn_code(): 统一 ASN 编号与『ASN + 服务商名称』一体化直观标签规范化提取。
   3. ASN_EXACT_NET_TYPE / classify_asn() / is_asn_recorded():
      方案 A+ 两级分层网络类型（ISP/BIZ/EDU/GOV/BANK/机房）识别引擎与收录判定。
-  4. format_buffer_nodes_txt() / format_proxyip_txt() / format_scan_ips_txt() / format_proxies_txt() / format_socks_txt() / save_proxyip_by_country():
+  4. format_buffer_nodes_txt() / format_proxyip_txt() / format_scan_ips_txt() / format_proxies_txt() / save_proxyip_by_country():
      节点按质检可用性/缓冲状态分层输出（缓冲节点置顶、存活节点紧随）、通用代理按协议分段归类输出、按国家/地区聚合分组及稀缺高价值网络专线纯文本分类导出。
   5. load_dotenv() / safe_int(): 本地环境加载与安全类型转换。
   6. send_tg_message() / send_ci_failure_alert(): 统一 Telegram 消息推送与 Actions CI 失败秒级告警。
@@ -710,19 +710,6 @@ def split_header_body(resp_bytes: bytes) -> tuple[bytes, bytes]:
         return resp_bytes[:idx], resp_bytes[idx + 2:]
     return resp_bytes, b""
 
-
-
-
-def get_asn_conflicts() -> list:
-    """检测多厂商/多别名映射至同一 ASN 的情况，返回 (asn, primary_isp, alias_isp, alias_key) 列表"""
-    seen = {}
-    conflicts = []
-    for k, (asn, isp) in KNOWN_CLOUD_PROVIDERS.items():
-        if asn in seen and seen[asn] != isp:
-            conflicts.append((asn, seen[asn], isp, k))
-        elif asn not in seen:
-            seen[asn] = isp
-    return conflicts
 
 
 # ============================================================
@@ -1818,14 +1805,4 @@ def is_tombstoned(
     return (now - ts) < (max_age_days * 86400)
 
 
-if __name__ == "__main__":
-    print(f"Known cloud provider aliases: {len(KNOWN_CLOUD_PROVIDERS)}")
-    print(f"Unique mapped ASNs: {len(ASN_TO_PROVIDER)}")
-    c_list = get_asn_conflicts()
-    if c_list:
-        print(f"\n[Notice] {len(c_list)} multi-tenant / alias ASN mappings detected:")
-        for _asn, _primary, _alias_isp, _alias_k in c_list:
-            print(f"  - {_asn}: primary '{_primary}' | alias '{_alias_k}' -> '{_alias_isp}'")
-    else:
-        print("\n[OK] No ASN mapping conflicts detected.")
 

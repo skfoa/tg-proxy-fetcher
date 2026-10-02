@@ -413,6 +413,14 @@ async def async_main(args):
         if _get_fc(r) == 0 and safe_int(r.get("_old_fc"), 0) > 0
     )
 
+    # 仅统计本次实测存活节点的网络延迟（排除缓冲期节点的旧延迟）
+    alive_delays = [
+        int(r.get("delay_ms", 0))
+        for r in rows
+        if _get_fc(r) == 0 and safe_int(r.get("delay_ms"), 0) > 0
+    ]
+    avg_delay = int(sum(alive_delays) / len(alive_delays)) if alive_delays else 0
+
     if eliminated > 0:
         log.info("[ProxyIP 淘汰] 剔除 %d 条连续失败 >= %d 次的死节点", eliminated, args.max_fails)
         dead_nodes = [r for r in rows if _get_fc(r) >= args.max_fails]
@@ -430,7 +438,7 @@ async def async_main(args):
     )
 
     elapsed = time.time() - t_start
-    log.info("ProxyIP 穿透质检流程执行完毕，总耗时 %.2f 秒 (⚠️ 缓冲: %d [新增: %d, 取消恢复: %d])", elapsed, (survivors_len - pass_count), proxyip_buf_new, proxyip_buf_rec)
+    log.info("ProxyIP 穿透质检流程执行完毕，总耗时 %.2f 秒 (✅ 存活: %d | 均延: %dms | ⚠️ 缓冲: %d [新增: %d, 取消恢复: %d])", elapsed, pass_count, avg_delay, (survivors_len - pass_count), proxyip_buf_new, proxyip_buf_rec)
 
     # 若存在 tg_fetch 暂存的抓取统计，将 ProxyIP 质检结果并入其中，由后续统一卡片推送
     fetch_stats_file = os.path.join(DATA_DIR, ".fetch_stats.json")
@@ -440,6 +448,7 @@ async def async_main(args):
             with open(fetch_stats_file, "r", encoding="utf-8") as f:
                 stats = json.load(f)
             stats["proxyip_verified"] = True
+            stats["proxyip_total"] = total
             stats["proxyip_pass"] = pass_count
             stats["proxyip_fail"] = fail_count
             stats["proxyip_fail_1"] = proxyip_f1
@@ -450,6 +459,7 @@ async def async_main(args):
             stats["proxyip_survivors"] = survivors_len
             stats["proxyip_elapsed"] = elapsed
             stats["proxyip_max_fails"] = args.max_fails
+            stats["proxyip_avg_delay_ms"] = avg_delay
             with open(fetch_stats_file, "w", encoding="utf-8") as f:
                 json.dump(stats, f, ensure_ascii=False, indent=2)
             log.info("已将 ProxyIP 质检统计写入 %s (并入统一卡片)", fetch_stats_file)

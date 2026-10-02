@@ -547,7 +547,7 @@ def save_and_notify(
     updated_proxyips_count: int = 0,
     unrecorded_asns: list | None = None,
 ):
-    # 1. 保存通用代理总表（proxies.txt 及向后兼容 socks5.txt）并按协议独立拆分
+    # 1. 保存通用代理总表（proxies.txt）并按协议独立拆分
     os.makedirs(DATA_DIR, exist_ok=True)
     formatted_proxies = format_proxies_txt(list(final_proxies.values()))
     with open(OUTPUT_PROXY_FILE, "w", encoding="utf-8") as f:

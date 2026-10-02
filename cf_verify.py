@@ -62,9 +62,14 @@ logging.basicConfig(
 )
 log = logging.getLogger("cf-verify")
 
-# Windows 异步事件循环策略
+# Windows 异步事件循环策略与 UTF-8 输出
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+        sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
 
 DATA_DIR = "data"
 SCAN_CSV = os.path.join(DATA_DIR, "scan_ips.csv")
