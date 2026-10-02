@@ -251,8 +251,8 @@ def parse_cf_csv_content(
                         raw_delay = row[1].strip()
                     else:
                         val = row[1].strip()
-                        # 常见端口优先作为端口，否则作为延迟
-                        if val.isdigit() and int(val) in (80, 443, 8080, 8443, 2052, 2053, 2082, 2083, 2086, 2087, 2095, 2096, 1080):
+                        # 若为合法的端口数值范围 (1-65535)，优先作为端口；否则作为延迟
+                        if val.isdigit() and 1 <= int(val) <= 65535:
                             raw_port = val
                         else:
                             raw_port = raw_port or fn_port

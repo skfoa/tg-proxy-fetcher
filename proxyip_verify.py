@@ -141,7 +141,7 @@ async def probe_proxyip(
         writer.write(req)
         await asyncio.wait_for(writer.drain(), timeout=http_timeout)
 
-        resp_bytes = await read_full_response(reader, http_timeout)
+        resp_bytes = await read_full_response(reader, http_timeout, need_body=True)
         header_part, body_part = split_header_body(resp_bytes)
 
         is_200 = bool(RE_HTTP_200.match(header_part))

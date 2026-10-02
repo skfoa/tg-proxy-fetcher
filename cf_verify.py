@@ -183,17 +183,12 @@ async def verify_all(
         fc = int(row.get("fail_count") or 0)
         row["_old_fc"] = fc
 
-        port_raw = row.get("port", 0)
-        try:
-            port = int(port_raw)
-        except (ValueError, TypeError):
-            port = 0
-
         ip = (row.get("ip") or "").strip()
+        port = safe_int(row.get("port"), 0)
+        # 上游 load_csv 已执行过滤，此处为二次边界防御，避免外部直接传入脏数据
         if not ip or port <= 0 or port > 65535:
             completed += 1
-            row["fail_count"] = fc + 1
-            fail_count_total += 1
+            row["_invalid"] = True
             return
 
         async with get_keyed_lock(ip):
@@ -225,25 +220,29 @@ async def verify_all(
 
 # ---------- 数据读写与 ASN 智能聚合 ----------
 def load_csv(path: str) -> list:
-    """读取优选 IP CSV 文件，自动兼容 BOM 及旧版本缺少 fail_count 字段的情况"""
+    """读取优选 IP CSV 文件，自动兼容 BOM、缺少字段及异常端口/IP过滤"""
     if not os.path.exists(path):
         return []
     rows = []
     with open(path, "r", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         for r in reader:
+            ip = str(r.get("ip") or "").strip()
+            port_val = safe_int(r.get("port"), 0)
+            # 严格过滤无效 IP 与越界/非法的非数值端口，杜绝脏行进入质检池
+            if not ip or port_val <= 0 or port_val > 65535:
+                continue
+
+            r["ip"] = ip
+            r["port"] = str(port_val)
             r["fail_count"] = safe_int(r.get("fail_count"), 0)
-            r["tested_at"] = normalize_timestamp(r.get("tested_at", ""))
-            raw_asn = r.get("asn", "").replace("`", "").strip()
-            raw_isp = r.get("isp", "").replace("`", "").strip()
-            if "asn" in r:
-                r["asn"] = format_asn_isp(raw_asn, raw_isp)
-            if "isp" in r:
-                r["isp"] = raw_isp
-            if "colo" in r:
-                r["colo"] = r["colo"].replace("`", "").strip()
-            if "cf_location" in r:
-                r["cf_location"] = r["cf_location"].replace("`", "").strip()
+            r["tested_at"] = normalize_timestamp(str(r.get("tested_at") or ""))
+            raw_asn = str(r.get("asn") or "").replace("`", "").strip()
+            raw_isp = str(r.get("isp") or "").replace("`", "").strip()
+            r["asn"] = format_asn_isp(raw_asn, raw_isp)
+            r["isp"] = raw_isp
+            r["colo"] = str(r.get("colo") or "").replace("`", "").strip()
+            r["cf_location"] = str(r.get("cf_location") or "").replace("`", "").strip()
             rows.append(r)
     return rows
 
@@ -263,7 +262,10 @@ def save_cf_ips(rows: list, csv_path: str = CF_CSV, txt_path: str = CF_TXT):
     tmp_txt = f"{txt_path}.tmp"
     with open(tmp_txt, "w", encoding="utf-8") as f:
         for r in rows:
-            f.write(f"{r['ip']}:{r['port']}\n")
+            ip = str(r.get("ip") or "").strip()
+            port = safe_int(r.get("port"), 0)
+            if ip and 1 <= port <= 65535:
+                f.write(f"{ip}:{port}\n")
     os.replace(tmp_txt, txt_path)
     log.info("已覆写保存 %s: %d 行 IP:Port", txt_path, len(rows))
 

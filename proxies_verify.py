@@ -87,6 +87,8 @@ CSV_FIELDS = [
     "proto",
     "host",
     "port",
+    "user",
+    "pwd",
     "delay_ms",
     "fail_count",
     "status",
@@ -189,7 +191,7 @@ async def probe_socks5(
         writer.write(http_req)
         await asyncio.wait_for(writer.drain(), timeout=http_timeout)
 
-        http_resp = await read_full_response(reader, http_timeout)
+        http_resp = await read_full_response(reader, http_timeout, need_body=True)
         http_text = http_resp.decode("utf-8", errors="ignore")
 
         colo_match = re.search(r"\bcolo=([A-Za-z0-9]+)\b", http_text)
@@ -266,7 +268,7 @@ async def probe_http(
             ).encode("latin1")
             writer.write(probe)
             await asyncio.wait_for(writer.drain(), timeout=http_timeout)
-            http_resp = await read_full_response(reader, http_timeout)
+            http_resp = await read_full_response(reader, http_timeout, need_body=True)
             http_text = http_resp.decode("utf-8", errors="ignore")
             colo_match = re.search(r"\bcolo=([A-Za-z0-9]+)\b", http_text)
             colo = colo_match.group(1).upper() if colo_match else ""
@@ -296,7 +298,7 @@ async def probe_http(
         ).encode("latin1")
         writer.write(direct_req)
         await asyncio.wait_for(writer.drain(), timeout=http_timeout)
-        direct_resp = await read_full_response(reader, http_timeout)
+        direct_resp = await read_full_response(reader, http_timeout, need_body=True)
         direct_text = direct_resp.decode("utf-8", errors="ignore")
         colo_match = re.search(r"\bcolo=([A-Za-z0-9]+)\b", direct_text)
         colo = colo_match.group(1).upper() if colo_match else ""

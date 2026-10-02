@@ -425,6 +425,11 @@ def resolve_asn_online(ip: str, isp_hint: str = "", persist: bool = False) -> tu
     return "", ""
 
 
+async def resolve_asn_online_async(ip: str, isp_hint: str = "", persist: bool = False) -> tuple[str, str]:
+    """resolve_asn_online 的异步无阻塞封装，在独立工作线程中执行同步网络 I/O，杜绝阻塞事件循环"""
+    return await asyncio.to_thread(resolve_asn_online, ip, isp_hint, persist)
+
+
 def resolve_ip_asn(ip: str = "", isp_hint: str = "", allow_online: bool = False) -> tuple[str, str]:
     """
     智能解析/补全 ASN 与 ISP：
@@ -506,7 +511,7 @@ TG_CHAT_ID = os.getenv("TG_CHAT_ID") or ""
 # 确定性哈希分段锁池 (Striped Locks)
 # 解决同 IP/Host 互斥探测需求，且内存常数级 O(1)，无字典无界增长隐患
 # =====================================================================
-_LOCK_POOL_SIZE = 2048
+_LOCK_POOL_SIZE = 8192
 _LOCK_POOL_MASK = _LOCK_POOL_SIZE - 1
 _LOCK_POOL: list[asyncio.Lock] | None = None
 _LOCK_POOL_LOOP: asyncio.AbstractEventLoop | None = None
@@ -516,7 +521,7 @@ def get_keyed_lock(key: str) -> asyncio.Lock:
     """
     返回与 key (IP/Host) 绑定的确定性分段锁。
     采用 zlib.crc32 保证跨进程/跨运行哈希一致（避免 PYTHONHASHSEED 随机化干扰）。
-    同 key 必同锁，不同 key 在 2048 桶位下碰撞率极低，且内存严格常数级 O(1)，杜绝无界增长。
+    同 key 必同锁，不同 key 在 8192 桶位下碰撞率极低，且内存严格常数级 O(1)，杜绝无界增长。
     """
     global _LOCK_POOL, _LOCK_POOL_LOOP
     try:
@@ -781,9 +786,14 @@ RE_HTTP_301 = re.compile(rb"^HTTP/\d\.\d\s+301\b")
 RE_SERVER_CF = re.compile(rb"(?im)^server:\s*cloudflare\s*$")
 
 
-async def read_full_response(reader: asyncio.StreamReader, http_timeout: float, max_bytes: int = 4096) -> bytes:
+async def read_full_response(
+    reader: asyncio.StreamReader,
+    http_timeout: float,
+    max_bytes: int = 4096,
+    need_body: bool = False,
+) -> bytes:
     """
-    循环读取直到拿到完整的 HTTP 响应头（遇到 \\r\\n\\r\\n 或 \\n\\n）或达到 max_bytes 硬上限。
+    循环读取直到拿到完整的 HTTP 响应（若 need_body=False 遇到 \\r\\n\\r\\n 即可返回；若 need_body=True 读到匹配标志或 EOF）或达到 max_bytes 硬上限。
     用统一 deadline 控制总耗时，避免多次循环导致累计超时远超 http_timeout。
     单次 read() 动态计算剩余可用空间，避免读取超出 max_bytes 上限。
     """
@@ -801,8 +811,13 @@ async def read_full_response(reader: asyncio.StreamReader, http_timeout: float, 
         if not chunk:
             break
         resp_bytes += chunk
-        if b"\r\n\r\n" in resp_bytes or b"\n\n" in resp_bytes:
-            break
+        has_headers = (b"\r\n\r\n" in resp_bytes or b"\n\n" in resp_bytes)
+        if has_headers:
+            if not need_body:
+                break
+            # 若需要 Body（例如 /cdn-cgi/trace 需获取 colo 字段），拿到关键特征后立即返回
+            if b"colo=" in resp_bytes:
+                break
     return resp_bytes
 
 
@@ -1045,6 +1060,8 @@ PROXY_CSV_FIELDS = [
     "proto",
     "host",
     "port",
+    "user",
+    "pwd",
     "delay_ms",
     "fail_count",
     "status",
@@ -1168,9 +1185,22 @@ def save_proxies_by_protocol(rows: list, output_dir: str = "data/proxies") -> di
                 u = urllib.parse.urlparse(url)
                 row_dict["host"] = u.hostname or ""
                 row_dict["port"] = u.port or ""
+                row_dict["user"] = u.username or ""
+                row_dict["pwd"] = u.password or ""
             except Exception:
                 row_dict["host"] = ""
                 row_dict["port"] = ""
+                row_dict["user"] = ""
+                row_dict["pwd"] = ""
+        else:
+            if "user" not in row_dict or "pwd" not in row_dict:
+                try:
+                    u = urllib.parse.urlparse(url)
+                    row_dict.setdefault("user", u.username or "")
+                    row_dict.setdefault("pwd", u.password or "")
+                except Exception:
+                    row_dict.setdefault("user", "")
+                    row_dict.setdefault("pwd", "")
 
         groups.setdefault(proto, []).append((fc, dms, url, row_dict))
 
@@ -1182,24 +1212,28 @@ def save_proxies_by_protocol(rows: list, output_dir: str = "data/proxies") -> di
         title = PROXY_PROTO_NAMES.get(proto, f"{proto.upper()} 代理")
         safe_proto = re.sub(r'[\\/:*?"<>|]', "_", proto).strip().lower() or "other"
 
-        # 1. 保存纯文本单协议列表
+        # 1. 保存纯文本单协议列表（原子写入）
         txt_fname = f"{safe_proto}.txt"
         txt_filepath = os.path.join(output_dir, txt_fname)
+        tmp_txt = f"{txt_filepath}.tmp"
         lines = [f"# {title} - {len(items)} 个\n"]
         for _, _, url, _ in items:
             lines.append(f"{url}\n")
-        with open(txt_filepath, "w", encoding="utf-8") as f:
+        with open(tmp_txt, "w", encoding="utf-8") as f:
             f.writelines(lines)
+        os.replace(tmp_txt, txt_filepath)
         active_files.add(txt_fname)
 
-        # 2. 保存纯净单协议结构化 CSV
+        # 2. 保存纯净单协议结构化 CSV（原子写入）
         csv_fname = f"{safe_proto}.csv"
         csv_filepath = os.path.join(output_dir, csv_fname)
-        with open(csv_filepath, "w", encoding="utf-8-sig", newline="") as f:
+        tmp_csv = f"{csv_filepath}.tmp"
+        with open(tmp_csv, "w", encoding="utf-8-sig", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=PROXY_CSV_FIELDS, extrasaction="ignore")
             writer.writeheader()
             for _, _, _, r_dict in items:
                 writer.writerow(r_dict)
+        os.replace(tmp_csv, csv_filepath)
         active_files.add(csv_fname)
 
         result_counts[proto] = len(items)
@@ -1769,7 +1803,7 @@ def save_proxyip_by_country(rows: list, output_dir: str) -> int:
 
 def save_scan_ips_by_asn(asn_groups: dict, output_dir: str) -> int:
     """
-    覆写 scan_ips/ 目录下的独立 ASN 纯文本文件（无注释 IP:端口）。
+    覆写 scan_ips/ 目录下的独立 ASN 纯文本文件（无注释 IP:端口；原子写入防截断）。
     死节点被淘汰后，其对应的 ASN 文件会即时同步删除该 IP；
     若某个 ASN 旗下所有 IP 全部死亡淘汰，该 ASN 文本文件也会被自动清除删除（保留 .gitkeep 保持目录结构）。
     返回生成的独立文件数量。
@@ -1786,9 +1820,19 @@ def save_scan_ips_by_asn(asn_groups: dict, output_dir: str) -> int:
         clean_isp = re.sub(r"[^a-zA-Z0-9]", "", isp_name) if isp_name else ""
         fname = f"{asn_name}_{clean_isp}.txt" if clean_isp else f"{asn_name}.txt"
         fpath = os.path.join(output_dir, fname)
-        with open(fpath, "w", encoding="utf-8") as f:
-            for r in sorted(group, key=lambda x: (x.get("ip", ""), int(x.get("port", 0)))):
-                f.write(f"{r['ip']}:{r['port']}\n")
+        tmp_fpath = f"{fpath}.tmp"
+
+        valid_rows = [
+            r for r in group
+            if r.get("ip") and safe_int(r.get("port"), 0) > 0 and safe_int(r.get("port"), 0) <= 65535
+        ]
+        if not valid_rows:
+            continue
+
+        with open(tmp_fpath, "w", encoding="utf-8") as f:
+            for r in sorted(valid_rows, key=lambda x: (x.get("ip", ""), safe_int(x.get("port"), 0))):
+                f.write(f"{r['ip']}:{safe_int(r.get('port'), 0)}\n")
+        os.replace(tmp_fpath, fpath)
         active_files.add(fname)
 
     # 移除已无活跃 IP 的旧分组文件（保留 .gitkeep 保持目录结构）
