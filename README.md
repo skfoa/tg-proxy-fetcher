@@ -35,12 +35,11 @@
 - **📁 智能 ASN 分组与命名**：
   - **DanFeng 测速**：CSV 内部无 ASN 列时自动从文件名（如 `AS45102_CNNICALIBABACNNETAP_*.csv`）解析归类。
   - **OTC 优选扫描**：单 ASN 文件以文件名目标 ASN 为准；混合扫描文件（如 `OTC_SCAN_YX_杂.txt`）自动逐行提取具体 ASN 与 ISP 拆分归类。
-- **⚡ 纯净 IP:端口 列表导出**：自动导出纯文本格式的 `IP:端口` 列表（`data/cf_ips.txt`、`data/scan_ips/*.txt`、`data/proxyip.txt`），方便直接复制或作为远程订阅导入。
-- **🧩 模块化解耦与确定性分段锁**：提取独立 `providers.py` 作为云厂商与 ASN 规范化字典的单一真相源（Single Source of Truth）；内置基于 `zlib.crc32` 的 2048 桶位确定性哈希分段锁池（`get_keyed_lock`），保证同 IP 严格互斥防风控、异 IP 高并发并行，且内存严格维持在常数级 $O(1)$（约 300KB），杜绝无界增长。
-- **🧠 自愈型持久化 ASN 知识库与 BGP 反查支持**：引入 `data/asn_database.json` 维持 1,000+ 条双向索引字典（`isp_to_asn` 与 `asn_to_isp`），并配备基于 BGP 路由库的离线自愈与在线反查扩展引擎；内置防污染保护（保留权威标准命名不被第三方脏标签篡改）与两级查表机制（精准查表 + 边界安全词根匹配），兼顾微秒级解析性能与自治系统高精度归属。
+- **🧩 模块化解耦与确定性分段锁**：提取独立 `providers.py` 作为云厂商与 ASN 规范化字典的单一真相源（Single Source of Truth）；内置基于 `zlib.crc32` 的 8192 桶位确定性哈希分段锁池（`get_keyed_lock`），保证同 IP 严格互斥防风控、异 IP 高并发并行，碰撞率骤降 75%，且内存严格维持在常数级 $O(1)$（约 500KB），杜绝无界增长。
+- **🧠 自愈型持久化 ASN 知识库与 BGP 反查支持**：引入 `data/asn_database.json` 维持 1,000+ 条双向索引字典（`isp_to_asn` 与 `asn_to_isp`），并配备基于 BGP 路由库的离线自愈与在线反查扩展引擎；内置防污染保护（保留权威标准命名不被第三方脏标签篡改）与两级查表机制（精准查表 + 边界安全词根匹配），兼顾微秒级解析性能与自治系统高精度归属；支持多品牌别名保留（如 `AS63023 Ipxo LLC (GTHost)`）与完全幂等处理。
 - **💡 未收录 ASN 动态发现与自适应预警**：增量抓取遇外部新自治系统时，自动比对内置权威对照库；若发现未收录 ASN，将在 Telegram 卡片中动态高亮提示并展示待确认明细，方便一键入库；若无未知 ASN 则 0 噪音完全隐藏。
 - **📱 动态双状态 Telegram 运行卡片**：首行支持「🟢 发现新增 + 🗑️ 剔除死节点」双状态动态高亮呈现，底栏包含细分引擎淘汰明细 `[代理 X, 反代 Y, 扫描 Z]`，锁屏即知变动。
-- **🛡️ 工业级防截断与精准协议鉴真**：质检引擎采用统一 Deadline 超时控制与 4096 字节安全余量循环读取（`_read_full_response`），彻底消除 TCP 分包分片及长 Cookie/安全标头导致的报文截断假阴性误杀；严格切分 Header 与 Body 区域，结合字节级正则精准锚定状态行（`301`/`200`）与 `Server: cloudflare`，杜绝任何假阳性误判。
+- **🛡️ 工业级防截断、原子覆写与精准协议鉴真**：质检引擎采用统一 Deadline 超时控制与 4096 字节安全余量循环读取（`read_full_response`），支持 `need_body=True` 完整获取 `/cdn-cgi/trace` 响应体中的 `colo` 关键属性，非 200 响应毫秒级短路退出杜绝空耗超时；严格切分 Header 与 Body 区域，结合字节级正则精准锚定状态行（`301`/`200`）与 `Server: cloudflare`；全链路数据落盘统一采用 `.tmp` $\rightarrow$ `os.replace` 原子替换，彻底消除进程中断导致的半截坏文件。
 - **🛡️ 静态安全门禁与故障秒级告警**：工作流启动 1 秒内通过 `py_compile` 与 `ruff` 拦截未定义变量与语法错误；若流水线任何环节异常中断，自动秒级推送 Telegram 告警卡片并附带日志直链。
 - **🧹 自动维护与构建瘦身**：每次运行自动清理 GitHub Actions 历史记录，始终**仅保留最近 5 次运行记录**，告别冗余历史堆积！
 
@@ -251,7 +250,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 > - `datacenter`：常规数据中心/托管机房 ➔ 归入各国家/地区常规列表
 
 #### ③ 通用代理质检数据表（`data/proxies.csv`）
-*共 9 个字段，记录 SOCKS5/HTTP/HTTPS/TURN/SSTP 等通用代理应用层穿透结果：*
+*共 11 个字段，记录 SOCKS5/HTTP/HTTPS/TURN/SSTP 等通用代理应用层穿透结果与认证凭据：*
 
 | 字段 | 类型 | 说明 | 示例 |
 | :--- | :--- | :--- | :--- |
@@ -259,6 +258,8 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `proto` | 字符串 | 协议类型（`socks5`、`http`、`https`、`turn`、`sstp`） | `socks5` |
 | `host` | 字符串 | 节点域名或 IP 地址 | `1.2.3.4` |
 | `port` | 整数 | 服务端口 | `1080` |
+| `user` | 字符串 | 认证用户名（若无则为空） | `user` |
+| `pwd` | 字符串 | 认证密码（若无则为空） | `pass` |
 | `delay_ms` | 整数 | RFC 1928 握手与穿透测速延迟（毫秒纯数值） | `320` |
 | `fail_count` | 整数 | 连续探测失败次数（连续失败 ≥ 3 次自动淘汰剔除） | `0` |
 | `status` | 字符串 | 探测状态（`alive` 存活 或 `fail` 失败） | `alive` |
@@ -304,7 +305,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
    * *典型错误*：抓取时各行其是，同一机房的 IP 有时叫 `AS906`，有时叫 `DMIT`，数据严重分裂。
 
 #### ⑤ 本工程的一体化创新架构落地
-* **`format_asn_isp()` 一体化直观标签**：全线统一输出为 `AS{编号} {服务商}` 结构，使终端用户在查看 CSV 表格、订阅列表文件名（如 `data/scan_ips/AS906_DMIT.txt`）以及 Telegram 统计卡片时，**一眼既见自治网络编号、又晓商业提供商**。
+* **`format_asn_isp()` 一体化直观标签与别名保留**：全线统一输出为 `AS{编号} {服务商}` 结构，使终端用户在查看 CSV 表格、订阅列表文件名（如 `data/scan_ips/AS906_DMIT.txt`）以及 Telegram 统计卡片时，**一眼既见自治网络编号、又晓商业提供商**。对于多租户/商业品牌与技术网络持有者不同的场景（如 GTHost 租用 Ipxo LLC 广播），自动以 `AS63023 Ipxo LLC (GTHost)` 规范格式完整保留商业别名，且具备多轮调用幂等性，既不丢失别名，也绝不产生嵌套括号。
 * **`asn_database.json` 双向索引持久化知识库**：维持 1,000+ 条双向索引字典，配合权威 SSOT 字典对 `asn` 列实现技术编号与商业机构的一体化直观归类（如 `AS906 DMIT`），并真实保留源端测速上报的实际托管运营商（`isp`），兼顾网络层 BGP 路由技术属性与现实商业实体归属。
 
 ---
@@ -315,20 +316,21 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 #### ① 多协议通用代理质检引擎（`proxies_verify.py`）
 * **全协议真实握手**：
   * **SOCKS5**：RFC 1928 握手协商（无密 `0x00` / 账密 `0x02` RFC 1929）➔ 发送 CONNECT 指令 ➔ 穿透请求 `/cdn-cgi/trace` 检验 200 与机房。
-  * **HTTP / HTTPS**：CONNECT 隧道穿透 + 正向代理回退双路径校验。
+  * **HTTP / HTTPS**：CONNECT 隧道穿透 + 正向代理回退双路径校验，严密保障重连生命周期与异常关闭安全。
   * **TURN / STUN**：构造 RFC 5389 STUN Binding Request 二进制包，严格校验 Magic Cookie (`0x2112A442`) 与 Transaction ID。
   * **SSTP**：MS-SSTP 标准双工隧道握手（TLS 握手 + `SSTP_DUPLEX_POST /sra_{BA195980-CD49-458b-9E23-C84EE0ADCD75}/` 校验 `HTTP/1.1 200 OK` 确认服务就绪）。
 * **淘汰机制**：连续失败达到阈值（默认 3 次）彻底从 `data/proxies.txt` 与 `data/proxies.csv` 永久删除。
 
 #### ② 反代 ProxyIP 穿透质检引擎（`proxyip_verify.py`）
-* **穿透鉴真**：向反代节点发起 TLS ClientHello 握手（SNI: `speed.cloudflare.com`，跳过非官方证书校验），发送 HTTP/1.1 GET `/cdn-cgi/trace` 探针请求。采用统一 Deadline 超时控制与 4096B 上限循环读取，双兼容分隔符严格切分 Header 与 Body 区域：Header 字节级精确匹配 `HTTP 200` 与 `Server: cloudflare`，Body 独立正则提取有效 `colo` 机房代号，杜绝 Body 污染与 TCP 分片提前退出造成的误判。
+* **穿透鉴真**：向反代节点发起 TLS ClientHello 握手（SNI: `speed.cloudflare.com`，跳过非官方证书校验），发送 HTTP/1.1 GET `/cdn-cgi/trace` 探针请求。采用统一 Deadline 超时控制与 4096B 上限循环读取（`read_full_response`，支持 `need_body=True`），双兼容分隔符严格切分 Header 与 Body 区域：Header 字节级精确匹配 `HTTP 200` 与 `Server: cloudflare`（非 200 响应毫秒级短路退出杜绝空等），Body 独立正则提取有效 `colo` 机房代号，杜绝 Body 污染与 TCP 分片提前退出造成的误判。
 * **高可用调优参数**：握手与连接超时设为 `4.0s`（HTTP 读取 `3.5s`），充分兼容南美、中东、非洲等跨洲骨干网与家庭宽带的高 RTT 握手延时，消除短超时假死误杀；默认并发控制为 `250` 协程，配合 IP 哈希分段锁池平滑调度，避免突发流量触发对端限流。
 * **淘汰机制**：连续失败达到阈值（默认 3 次）彻底从 `data/proxyip.txt`、`data/proxyip.csv` 永久物理删除，并登入墓地（`data/tombstone.json`）7 天冷却防回流。
 
 #### ③ 优选 IP 两阶段主动鉴真引擎（`cf_verify.py`）
 * **全量优选 IP 覆盖**：无论来源，**只要是优选 IP（涵盖 `data/scan_ips` 扫描测速与 `data/cf_ips` 每日单条全线产物），一律全部执行阶段一与阶段二探测**：
-  * **阶段一（TLS 握手 + 证书鉴真）**：建立 TLS 握手并验证 `crypto.cloudflare.com` 官方证书有效性（底层强制校验 CA 根证书链与主机名 SAN 匹配）。
+  * **阶段一（TLS 握手 + 证书鉴真）**：建立 TLS 握手并验证 `crypto.cloudflare.com` 官方证书有效性（底层强制校验 CA 根证书链与主机名 SAN 匹配；配置 `OP_NO_TICKET` 并关闭 SSL 会话缓存，杜绝海量 IP 扫描时的内存堆积）。
   * **阶段二（同一连接 HTTP 301 重定向 + 服务头验证）**：在同一连接发送 GET 请求，通过统一 Deadline 超时控制与 4096B 动态余量循环读取，双兼容分隔符严格切分 Header 区域，零 Decode 字节匹配首行 `HTTP/X.X 301` 与单行 `Server: cloudflare`，彻底解决长 Cookie/安全头截断导致的假阴性误杀，并杜绝非 301 与伪装头假阳性。
+  * **全链路边界防御与闭环淘汰**：入库加载与测速前进行严格端口范围校验（`1 <= port <= 65535`），非法格式行自动累加失败计数并标记剔除，杜绝坏行作为“僵尸行”滞留。
 * **全产物联动删除剔除**：达到淘汰阈值（默认 3 次）的死节点，同步从 `data/scan_ips.csv`、`data/scan_ips.txt`、`data/scan_ips/*.txt`、`data/cf_ips.csv`、`data/cf_ips.txt` 中**彻底永久删除**。
 
 #### ④ 淘汰死节点墓地冷却机制与生命周期闭环（`data/tombstone.json`）
@@ -381,9 +383,10 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | 变量名 | 用途 | 默认值 | 必要性 | 说明 |
 | :--- | :--- | :---: | :---: | :--- |
 | `FETCH_DAYS` | 单次增量回溯天数（扫描时间窗口） | `3` | 可选 | 增量模式下只读取最近 N 天频道消息，加快运行速度 |
+| `FETCH_MAX_PAGES` | Web 免登录模式最大抓取页数 | `35` | 可选 | 控制无凭据网页爬虫向前抓取历史消息的最大分页数（每页约 20 条消息） |
 | `PROXY` | 抓取代理设置 | 留空 | 可选 | GitHub Actions 云端默认直连 Telegram 无需配置；自建私有 Runner 或特殊网络时可按需配置 |
-| `PROXY_CHANNELS` | 代理抓取目标频道/群组（逗号/空格分隔） | `@otcfxq, @danfeng_chat` | 可选 | 自定义抓取通用代理的 Telegram 公开频道/群组列表（留空自动使用代码默认值） |
-| `CF_IP_CHANNELS` | 优选 IP 抓取目标频道/群组（逗号/空格分隔） | `@otcfxq, @danfeng_chat` | 可选 | 自定义抓取 Cloudflare 优选 IP 与测速附件的大池频道/群组列表（留空自动使用代码默认值） |
+| `PROXY_CHANNELS` | 代理抓取目标频道/群组（逗号/空格分隔） | `@otcfxq, @danfeng_chat` | 可选 | 自定义抓取通用代理的频道/群组（若未配置自动回退至全局 `CHANNELS` 或默认值） |
+| `CF_IP_CHANNELS` | 优选 IP 抓取目标频道/群组（逗号/空格分隔） | `@otcfxq, @danfeng_chat` | 可选 | 自定义抓取 Cloudflare 优选 IP 与测速附件的频道/群组（若未配置自动回退至全局 `CHANNELS` 或默认值） |
 
 ### 3. 高级调优参数与本地调试对照（可选）
 
@@ -468,7 +471,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
    pip install telethon
    python gen_session.py
    ```
-   按终端提示输入手机号与验证码后，控制台将输出一串 Session 字符串。
+   按终端提示输入手机号与验证码后，控制台将输出一串 Session 字符串。（脚本内置自动识别本地代理与 `socks5h` 远程 DNS，国内开发环境免受 DNS 污染困扰，开箱平滑直连）。
 3. 在 GitHub Secrets 中填入对应 3 项：
    - `TG_API_ID`：你的 API ID（纯数字）
    - `TG_API_HASH`：你的 API Hash（32 位字符）
