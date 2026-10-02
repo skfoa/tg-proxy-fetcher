@@ -41,6 +41,8 @@ from providers import (
     TG_BOT_TOKEN,
     TG_CHAT_ID,
     record_tombstone,
+    load_tombstone,
+    is_tombstoned,
     canonical_key,
     format_scan_ips_txt,
     RE_HTTP_301,
@@ -232,9 +234,10 @@ async def verify_all(
 
 # ---------- 数据读写与 ASN 智能聚合 ----------
 def load_csv(path: str) -> list:
-    """读取优选 IP CSV 文件，自动兼容 BOM、缺少字段及异常端口/IP过滤"""
+    """读取优选 IP CSV 文件，自动兼容 BOM、过滤墓地黑名单及异常端口/IP"""
     if not os.path.exists(path):
         return []
+    tombstone = load_tombstone()
     rows = []
     with open(path, "r", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
@@ -243,6 +246,9 @@ def load_csv(path: str) -> list:
             port_val = safe_int(r.get("port"), 0)
             # 严格过滤无效 IP 与越界/非法的非数值端口，杜绝脏行进入质检池
             if not ip or port_val <= 0 or port_val > 65535:
+                continue
+            key = canonical_key(ip, port_val)
+            if is_tombstoned(key, tombstone):
                 continue
 
             r["ip"] = ip
@@ -666,6 +672,10 @@ async def async_main(args):
         )
         if cf_eliminated > 0:
             log.info("[单条优选] 淘汰剔除 %d 条连续失败 >= %d 次的死节点", cf_eliminated, args.max_fails)
+            dead_nodes = [r for r in cf_rows if safe_int(r.get("fail_count"), 0) >= args.max_fails or r.get("_invalid")]
+            dead_keys = [canonical_key(r.get("ip", ""), r.get("port", 0)) for r in dead_nodes]
+            newly_tombstoned = record_tombstone(dead_keys)
+            log.info("[单条优选 墓地] 已登记 %d 个淘汰死节点至墓地冷却库 (新增: %d 个, 隔离期 7 天)", len(dead_keys), newly_tombstoned)
         else:
             log.info("[单条优选] 本次无节点达到连续失败 %d 次的淘汰阈值", args.max_fails)
 
@@ -721,6 +731,10 @@ async def async_main(args):
         )
         if scan_eliminated > 0:
             log.info("[扫描优选] 淘汰剔除 %d 条连续失败 >= %d 次的死节点", scan_eliminated, args.max_fails)
+            dead_nodes = [r for r in scan_rows if safe_int(r.get("fail_count"), 0) >= args.max_fails or r.get("_invalid")]
+            dead_keys = [canonical_key(r.get("ip", ""), r.get("port", 0)) for r in dead_nodes]
+            newly_tombstoned = record_tombstone(dead_keys)
+            log.info("[扫描优选 墓地] 已登记 %d 个淘汰死节点至墓地冷却库 (新增: %d 个, 隔离期 7 天)", len(dead_keys), newly_tombstoned)
         else:
             log.info("[扫描优选] 本次无节点达到连续失败 %d 次的淘汰阈值", args.max_fails)
 

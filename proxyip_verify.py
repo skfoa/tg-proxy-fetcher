@@ -45,6 +45,8 @@ from providers import (
     classify_asn,
     normalize_timestamp,
     record_tombstone,
+    load_tombstone,
+    is_tombstoned,
     canonical_key,
     read_full_response,
     split_header_body,
@@ -165,9 +167,10 @@ async def probe_proxyip(
 
 # ---------- 数据加载与保存 ----------
 def load_proxyip_csv(path: str) -> list:
-    """读取 proxyip.csv，自动处理 utf-8-sig BOM 并自动补齐缺失的 fail_count 列与格式过滤"""
+    """读取 proxyip.csv，自动处理 utf-8-sig BOM、自动过滤墓地黑名单及非法端口"""
     if not os.path.exists(path):
         return []
+    tombstone = load_tombstone()
     rows = []
     with open(path, "r", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
@@ -175,6 +178,9 @@ def load_proxyip_csv(path: str) -> list:
             ip = str(r.get("ip") or "").strip()
             port = safe_int(r.get("port"), 0)
             if not ip or port <= 0 or port > 65535:
+                continue
+            key = canonical_key(ip, port)
+            if is_tombstoned(key, tombstone):
                 continue
             r["ip"] = ip
             r["port"] = str(port)
