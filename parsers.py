@@ -20,6 +20,7 @@ from providers import (
     KNOWN_CLOUD_PROVIDERS,
     ASN_TO_PROVIDER,
     SORTED_CLOUD_PROVIDER_KEYS,
+    format_asn_isp,
     normalize_timestamp,
     resolve_ip_asn,
 )
@@ -152,6 +153,8 @@ def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
             if not raw_isp and found_isp:
                 raw_isp = found_isp
 
+    final_asn = format_asn_isp(raw_asn or asn_clean, raw_isp)
+
     return {
         "ip": ip,
         "port": port,
@@ -161,7 +164,7 @@ def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
         "colo": colo_m.group(1).replace("`", "").strip() if colo_m else "",
         "cf_location": cf_loc_m.group(1).replace("`", "").strip() if cf_loc_m else "",
         "isp": raw_isp,
-        "asn": asn_clean or "AS_UNKNOWN",
+        "asn": final_asn,
         "tested_at": normalize_timestamp(time_m.group(1).strip() if time_m else ""),
         "channel": source_m.group(1).strip() if source_m else default_channel,
         "fail_count": 0,
@@ -410,7 +413,7 @@ def parse_cf_csv_content(
                 "colo": colo,
                 "cf_location": cf_location,
                 "isp": raw_isp,
-                "asn": asn_clean or "AS_UNKNOWN",
+                "asn": format_asn_isp(raw_asn or asn_clean, raw_isp),
                 "tested_at": tested_at,
                 "channel": default_channel,
                 "fail_count": 0,
@@ -518,7 +521,7 @@ def parse_otc_scan_content(
             "colo": colo,
             "cf_location": loc,
             "isp": isp,
-            "asn": asn,
+            "asn": format_asn_isp(asn, isp),
             "tested_at": dt_str,
             "channel": default_channel,
             "fail_count": 0,

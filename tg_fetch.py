@@ -46,6 +46,7 @@ from providers import (
     load_dotenv,
     safe_int,
     clean_asn,
+    format_asn_isp,
     send_tg_message,
     ASN_TO_PROVIDER,
     TG_BOT_TOKEN,
@@ -225,9 +226,9 @@ def load_existing_cf_ips(filepath: str = OUTPUT_CF_FILE) -> dict:
                         row["fail_count"] = safe_int(row.get("fail_count"), 0)
                         row["tested_at"] = normalize_timestamp(row.get("tested_at", ""))
                         raw_asn = row.get("asn", "").replace("`", "").strip()
-                        m_asn = re.search(r"(AS\d+)", raw_asn, re.IGNORECASE)
-                        row["asn"] = m_asn.group(1).upper() if m_asn else raw_asn
-                        row["isp"] = row.get("isp", "").replace("`", "").strip()
+                        raw_isp = row.get("isp", "").replace("`", "").strip()
+                        row["asn"] = format_asn_isp(raw_asn, raw_isp)
+                        row["isp"] = raw_isp
                         row["colo"] = row.get("colo", "").replace("`", "").strip()
                         row["cf_location"] = row.get("cf_location", "").replace("`", "").strip()
                         existing[key] = row
@@ -543,7 +544,7 @@ def save_and_notify(
         asn_groups = defaultdict(list)
         for row in final_scan_ips.values():
             asn_clean = clean_asn(row.get("asn"), row.get("isp"))
-            row["asn"] = asn_clean
+            row["asn"] = format_asn_isp(row.get("asn"), row.get("isp"))
             asn_groups[asn_clean].append(row)
 
         asn_groups_total = len(asn_groups)

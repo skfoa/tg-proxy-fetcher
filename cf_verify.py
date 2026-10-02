@@ -35,6 +35,7 @@ from providers import (
     load_dotenv,
     safe_int,
     clean_asn,
+    format_asn_isp,
     send_tg_message,
     normalize_timestamp,
     get_keyed_lock,
@@ -229,12 +230,12 @@ def load_csv(path: str) -> list:
         for r in reader:
             r["fail_count"] = safe_int(r.get("fail_count"), 0)
             r["tested_at"] = normalize_timestamp(r.get("tested_at", ""))
+            raw_asn = r.get("asn", "").replace("`", "").strip()
+            raw_isp = r.get("isp", "").replace("`", "").strip()
             if "asn" in r:
-                raw_asn = r["asn"].replace("`", "").strip()
-                m_asn = re.search(r"(AS\d+)", raw_asn, re.IGNORECASE)
-                r["asn"] = m_asn.group(1).upper() if m_asn else raw_asn
+                r["asn"] = format_asn_isp(raw_asn, raw_isp)
             if "isp" in r:
-                r["isp"] = r["isp"].replace("`", "").strip()
+                r["isp"] = raw_isp
             if "colo" in r:
                 r["colo"] = r["colo"].replace("`", "").strip()
             if "cf_location" in r:
@@ -694,7 +695,7 @@ async def async_main(args):
         asn_groups = defaultdict(list)
         for row in scan_survivors:
             asn_clean = clean_asn(row.get("asn", ""), row.get("isp", ""))
-            row["asn"] = asn_clean
+            row["asn"] = format_asn_isp(row.get("asn", ""), row.get("isp", ""))
             asn_groups[asn_clean].append(row)
 
         all_sorted_scan = []

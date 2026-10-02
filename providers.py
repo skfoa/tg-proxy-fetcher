@@ -3,7 +3,7 @@
 云厂商、CDN、ASN 规范化全局映射及公共工具模块 (providers.py)
 作为全系统单一真相源（Single Source of Truth），供全线抓取与质检脚本共享使用：
   1. KNOWN_CLOUD_PROVIDERS / ASN_TO_PROVIDER: 维护主流公有云、CDN、热门 VPS 与骨干网 ASN 标准名称。
-  2. clean_asn() / _extract_asn_code(): 统一 ASN 编号与服务商提取清洗。
+  2. clean_asn() / format_asn_isp() / _extract_asn_code(): 统一 ASN 编号与『ASN + 服务商名称』一体化直观标签规范化提取。
   3. ASN_EXACT_NET_TYPE / classify_asn() / is_asn_recorded():
      方案 A+ 两级分层网络类型（ISP/BIZ/EDU/GOV/BANK/机房）识别引擎与收录判定。
   4. format_buffer_nodes_txt() / format_proxyip_txt() / format_scan_ips_txt() / format_proxies_txt() / format_socks_txt() / format_categorized_proxyip_txt() / save_proxyip_by_country():
@@ -489,6 +489,31 @@ def clean_asn(raw_asn: str, isp: str = "") -> str:
     if m_d:
         return f"AS{m_d.group(1)}"
     return raw_asn if raw_asn else "AS_UNKNOWN"
+
+
+def format_asn_isp(raw_asn: str, raw_isp: str = "") -> str:
+    """
+    格式化生成『ASN + 服务商名称』一体化直观标签（如 AS906 DMIT Cloud Services）：
+    1. 彻底清除 markdown 反引号 (`) 等多余标记
+    2. 若 raw_asn 已携带服务商后缀，规范保留
+    3. 若 raw_asn 仅为纯 AS 编号且 raw_isp 存在，自动拼接为 'ASxxx 服务商'
+    4. 若无法识别，回退至纯 ASN 或 raw_isp
+    """
+    clean_a = (raw_asn or "").replace("`", "").strip()
+    clean_i = (raw_isp or "").replace("`", "").strip()
+    m = re.search(r"(AS\d+)", clean_a, re.IGNORECASE)
+    if not m:
+        if clean_a and clean_a != "-":
+            return clean_a
+        return clean_i or "AS_UNKNOWN"
+
+    code = m.group(1).upper()
+    suffix = clean_a[m.end():].strip().strip("-").strip()
+    if suffix:
+        return f"{code} {suffix}"
+    if clean_i and clean_i != "-":
+        return f"{code} {clean_i}"
+    return code
 
 
 def send_tg_message(text: str, token: str = "", chat_id: str = "", tag: str = "Telegram") -> bool:
