@@ -84,10 +84,13 @@ KNOWN_CLOUD_PROVIDERS = {
     "vmiss": ("AS147049", "VMISS"),
     "contabo": ("AS51167", "Contabo"),
     "netcup": ("AS197540", "Netcup"),
+    "hostpapa": ("AS36352", "HostPapa"),
+    "colocrossing": ("AS36352", "ColoCrossing"),
     "racknerd": ("AS36352", "RackNerd"),
     "buyvm": ("AS53667", "BuyVM FranTech"),
     "frantech": ("AS53667", "BuyVM FranTech"),
     "hostdare": ("AS397373", "HostDare"),
+    "pegtech": ("AS54600", "PEG TECH INC"),
     "misaka": ("AS54600", "Misaka"),
     "kurun": ("AS13768", "Kurun Cloud"),
     "spartan": ("AS201106", "SpartanHost"),
@@ -144,6 +147,9 @@ KNOWN_CLOUD_PROVIDERS = {
     "globalcommunication": ("AS152179", "Global Communication Network"),
     "hkglobal": ("AS152179", "Global Communication Network"),
     "halocloud": ("AS50385", "HaloCloud"),
+    "desivps": ("AS133619", "DESIVPS"),
+    "timeweb": ("AS210976", "Timeweb, LLP"),
+    "globaltelehost": ("AS62563", "GlobalTeleHost Corp."),
 
     # 运营商骨干与出海线路
     "hinet": ("AS3462", "Chunghwa Telecom HiNet"),
@@ -151,8 +157,9 @@ KNOWN_CLOUD_PROVIDERS = {
     "chinamobile": ("AS58453", "China Mobile CMI"),
     "cug": ("AS10099", "China Unicom CUG"),
     "chinaunicom": ("AS10099", "China Unicom CUG"),
-    "ctg": ("AS4134", "China Telecom CTG"),
-    "chinatelecom": ("AS4134", "China Telecom 163"),
+    "chinatelecom": ("AS4134", "China Telecom"),
+    "chinanet": ("AS4134", "China Telecom"),
+    "chinatelecom_163": ("AS4134", "China Telecom 163"),
     "cn2": ("AS4809", "China Telecom CN2"),
     "chinatelecom_group": ("AS4811", "China Telecom"),
     "9929": ("AS9929", "China Unicom 9929"),
@@ -280,14 +287,22 @@ def save_asn_database(isp_to_asn: dict[str, str], asn_to_isp: dict[str, str]):
                 log.debug("ASN %s 权威映射维持: %s (替换手工/历史配置: %s)", asn_code, auth_name, clean_a2i[asn_code])
             clean_a2i[asn_code] = auth_name
 
-        # 3. 规范化正向映射，并实施防冲突检查
+        # 3. 规范化正向映射，并实施大小写不敏感去重与防冲突检查
+        seen_lower_i2a: dict[str, str] = {}
         for k, v in isp_to_asn.items():
             isp_name = (k or "").strip()
             asn_code = (v or "").strip().upper()
             if not re.match(r"^AS\d+$", asn_code) or not isp_name:
                 continue
 
+            lower_name = isp_name.lower()
+            if lower_name in seen_lower_i2a:
+                existing_key = seen_lower_i2a[lower_name]
+                if clean_i2a.get(existing_key) == asn_code:
+                    continue
+
             clean_i2a[isp_name] = asn_code
+            seen_lower_i2a[lower_name] = isp_name
 
             # 若反向字典已有该 ASN，检查是否与当前正向名称一致；若不一致仅记录，严禁篡改反向字典
             if asn_code in clean_a2i:
