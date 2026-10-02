@@ -64,6 +64,7 @@ from providers import (
     normalize_timestamp,
     load_tombstone,
     is_tombstoned,
+    LEGACY_DEFAULT_FIRST_SEEN,
 )
 from parsers import (
     extract_proxies,
@@ -130,6 +131,7 @@ SUB_URLS = _parse_sub_urls()
 
 DATA_DIR = "data"
 OUTPUT_PROXY_FILE = os.path.join(DATA_DIR, "proxies.txt")
+OUTPUT_PROXIES_CSV = os.path.join(DATA_DIR, "proxies.csv")
 OUTPUT_PROXIES_DIR = os.path.join(DATA_DIR, "proxies")
 OUTPUT_CF_FILE = os.path.join(DATA_DIR, "cf_ips.csv")
 OUTPUT_CF_TXT = os.path.join(DATA_DIR, "cf_ips.txt")
@@ -197,9 +199,25 @@ def get_system_proxy() -> str:
 # parse_otc_scan_content, parse_proxy_attachment_content) 已提取至 parsers.py 维护
 
 
-def load_existing_proxies(filepath: str = OUTPUT_PROXY_FILE) -> dict:
-    """读取本地已保存的代理列表，保留历史累积有效节点"""
+def load_existing_proxies(
+    filepath: str = OUTPUT_PROXY_FILE,
+    csv_path: str = OUTPUT_PROXIES_CSV,
+) -> dict:
+    """读取本地已保存的代理列表，保留历史累积有效节点及其首次收录时间"""
     existing = {}
+    csv_first_seen = {}
+    if os.path.isfile(csv_path):
+        try:
+            with open(csv_path, "r", encoding="utf-8-sig") as f:
+                reader = csv.DictReader(f)
+                for r in reader:
+                    u = (r.get("url") or "").strip()
+                    fs = (r.get("first_seen") or "").strip()
+                    if u:
+                        csv_first_seen[u] = fs or LEGACY_DEFAULT_FIRST_SEEN
+        except Exception as e:
+            log.warning("读取已有代理 CSV 失败: %s", e)
+
     if not os.path.exists(filepath):
         return existing
     tombstone = load_tombstone()
@@ -211,7 +229,10 @@ def load_existing_proxies(filepath: str = OUTPUT_PROXY_FILE) -> dict:
                     continue
                 for url, key in extract_proxies(line_s):
                     if not is_tombstoned(key, tombstone):
-                        existing[key] = url
+                        existing[key] = {
+                            "url": url,
+                            "first_seen": csv_first_seen.get(url, LEGACY_DEFAULT_FIRST_SEEN),
+                        }
         log.info("已加载本地已存代理节点: %d 个（历史有效节点全部保留）", len(existing))
     except Exception as e:
         log.warning("读取已有代理文件失败: %s", e)
@@ -632,9 +653,14 @@ def save_and_notify(
     # 4. 保存反代 ProxyIP 独立池（原子写入）
     proxyip_total = 0
     if final_proxyips:
+        def _proxyip_sort_key(x):
+            d = safe_int(x.get("delay_ms"), 0)
+            delay = d if d > 0 else 99999
+            return (x.get("tested_at", ""), -delay)
+
         sorted_proxyips = sorted(
             final_proxyips.values(),
-            key=lambda x: (x.get("tested_at", ""), -(safe_int(x.get("delay_ms"), 0) or 99999)),
+            key=_proxyip_sort_key,
             reverse=True,
         )
         tmp_proxyip_file = f"{OUTPUT_PROXYIP_FILE}.tmp"
@@ -742,7 +768,24 @@ def merge_and_save(
     updated_proxyip_cnt = sum(1 for k in scraped_proxyips if k in existing_proxyips)
 
     # 2. 合并：严格保护历史 fail_count 与元数据，防止被新抓取结果抹除为 0
-    final_proxies = {**existing_proxies, **scraped_proxies}
+    final_proxies = {}
+    now_bjt = datetime.now(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S")
+    for k, v in existing_proxies.items():
+        if isinstance(v, dict):
+            final_proxies[k] = dict(v)
+        else:
+            final_proxies[k] = {"url": v, "first_seen": LEGACY_DEFAULT_FIRST_SEEN}
+    for k, v in scraped_proxies.items():
+        url = v.get("url") if isinstance(v, dict) else v
+        if k in final_proxies:
+            # 已经存在：严格保留原有 first_seen，不得被新抓取时间篡改
+            final_proxies[k]["url"] = url
+        else:
+            # 首次抓取收录：记录此时此刻为 first_seen
+            final_proxies[k] = {
+                "url": url,
+                "first_seen": now_bjt,
+            }
 
     final_cf_ips = dict(existing_cf_ips)
     for k, v in scraped_cf_ips.items():

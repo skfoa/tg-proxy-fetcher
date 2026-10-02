@@ -679,9 +679,14 @@ async def async_main(args):
         else:
             log.info("[单条优选] 本次无节点达到连续失败 %d 次的淘汰阈值", args.max_fails)
 
+        def _cf_sort_key(x):
+            fc = safe_int(x.get("fail_count"), 0)
+            d = safe_int(x.get("delay_ms"), 0)
+            return (fc, d if d > 0 else 99999)
+
         # 稳定双重排序：先按 tested_at 降序（最新获取优先），再按 (fail_count, delay_ms) 升序（质量优先）
         cf_survivors.sort(key=lambda x: x.get("tested_at", ""), reverse=True)
-        cf_survivors.sort(key=lambda x: (safe_int(x.get("fail_count"), 0), (safe_int(x.get("delay_ms"), 0) or 99999)))
+        cf_survivors.sort(key=_cf_sort_key)
         save_cf_ips(cf_survivors, CF_CSV, CF_TXT)
     else:
         log.info(">>> %s 文件不存在或无数据，跳过单条优选校验", CF_CSV)
@@ -747,7 +752,7 @@ async def async_main(args):
         all_sorted_scan = []
         for asn_name in sorted(asn_groups.keys()):
             group_rows = sorted(asn_groups[asn_name], key=lambda x: x.get("tested_at", ""), reverse=True)
-            group_rows = sorted(group_rows, key=lambda x: (safe_int(x.get("fail_count"), 0), (safe_int(x.get("delay_ms"), 0) or 99999)))
+            group_rows = sorted(group_rows, key=_cf_sort_key)
             all_sorted_scan.extend(group_rows)
 
         save_scan_csv(all_sorted_scan, SCAN_CSV)

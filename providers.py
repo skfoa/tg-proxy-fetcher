@@ -1073,18 +1073,22 @@ PROXY_PROTO_NAMES = {
     "turn": "TURN 协议",
     "sstp": "SSTP 协议",
 }
+# [Rule 9a Scoped Legacy Migration]
+# Expiry condition: Applies to historical proxy records gathered before 2026-10-02 without first_seen.
+# Once all legacy records are either backfilled or naturally phased out via tombstone, this fallback can be removed.
+LEGACY_DEFAULT_FIRST_SEEN = "2026-10-01 00:00:00"
+
 PROXY_CSV_FIELDS = [
     "url",
     "proto",
     "host",
     "port",
-    "user",
-    "pwd",
     "delay_ms",
     "fail_count",
     "status",
     "colo",
     "tested_at",
+    "first_seen",
 ]
 
 
@@ -1197,6 +1201,9 @@ def save_proxies_by_protocol(rows: list, output_dir: str = "data/proxies") -> di
         row_dict.setdefault("status", item.get("status", "pending") if isinstance(item, dict) else "pending")
         row_dict.setdefault("colo", item.get("colo", "") if isinstance(item, dict) else "")
         row_dict.setdefault("tested_at", item.get("tested_at", "") if isinstance(item, dict) else "")
+        row_dict.setdefault("first_seen", item.get("first_seen", "") if isinstance(item, dict) else "")
+        if not row_dict["first_seen"]:
+            row_dict["first_seen"] = LEGACY_DEFAULT_FIRST_SEEN
 
         if "host" not in row_dict or not row_dict["host"]:
             try:

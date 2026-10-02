@@ -47,6 +47,8 @@ from providers import (
     save_proxies_by_protocol,
     format_buffer_badge,
     read_full_response,
+    PROXY_CSV_FIELDS,
+    LEGACY_DEFAULT_FIRST_SEEN,
 )
 
 # 确保本地 .env 加载
@@ -82,19 +84,7 @@ HTTP_TIMEOUT = 2.5
 CONCURRENCY = 300
 MAX_FAILS = 3
 
-CSV_FIELDS = [
-    "url",
-    "proto",
-    "host",
-    "port",
-    "user",
-    "pwd",
-    "delay_ms",
-    "fail_count",
-    "status",
-    "colo",
-    "tested_at",
-]
+CSV_FIELDS = PROXY_CSV_FIELDS
 
 
 # ---------- 协议探测实现 ----------
@@ -531,6 +521,7 @@ def load_proxies_data(
                     parsed["status"] = r.get("status", "pending")
                     parsed["colo"] = r.get("colo", "")
                     parsed["tested_at"] = r.get("tested_at", "")
+                    parsed["first_seen"] = r.get("first_seen", "").strip() or LEGACY_DEFAULT_FIRST_SEEN
                     url_map[url] = parsed
             log.info("从 %s 加载已有记录 %d 条", target_csv, len(url_map))
         except Exception as e:
@@ -541,6 +532,7 @@ def load_proxies_data(
     # 合并 proxies.txt 中的新节点
     if os.path.isfile(target_txt):
         txt_count = 0
+        now_str = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
         try:
             with open(target_txt, "r", encoding="utf-8") as f:
                 for line in f:
@@ -551,6 +543,7 @@ def load_proxies_data(
                     if line not in url_map:
                         parsed = parse_proxy_url(line)
                         if parsed:
+                            parsed["first_seen"] = now_str
                             url_map[line] = parsed
             log.info("从 %s 读取 %d 行，合并后待检节点共: %d 条", target_txt, txt_count, len(url_map))
         except Exception as e:

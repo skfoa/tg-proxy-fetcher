@@ -252,7 +252,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 > - `datacenter`：常规数据中心/托管机房 ➔ 归入各国家/地区常规列表
 
 #### ③ 通用代理质检数据表（`data/proxies.csv`）
-*共 11 个字段，记录 SOCKS5/HTTP/HTTPS/TURN/SSTP 等通用代理应用层穿透结果与认证凭据：*
+*共 10 个字段，记录 SOCKS5/HTTP/HTTPS/TURN/SSTP 等通用代理应用层穿透结果、质检状态与首次收录生命周期：*
 
 | 字段 | 类型 | 说明 | 示例 |
 | :--- | :--- | :--- | :--- |
@@ -260,13 +260,12 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `proto` | 字符串 | 协议类型（`socks5`、`http`、`https`、`turn`、`sstp`） | `socks5` |
 | `host` | 字符串 | 节点域名或 IP 地址 | `1.2.3.4` |
 | `port` | 整数 | 服务端口 | `1080` |
-| `user` | 字符串 | 认证用户名（若无则为空） | `user` |
-| `pwd` | 字符串 | 认证密码（若无则为空） | `pass` |
 | `delay_ms` | 整数 | RFC 1928 握手与穿透测速延迟（毫秒纯数值） | `320` |
 | `fail_count` | 整数 | 连续探测失败次数（连续失败 ≥ 3 次自动淘汰剔除） | `0` |
 | `status` | 字符串 | 探测状态（`alive` 存活 或 `fail` 失败） | `alive` |
 | `colo` | 字符串 | 通过该代理中继访问返回的 Cloudflare 机房代号 | `NRT` |
 | `tested_at` | 时间字符串 | 质检探测完成时间 | `2026-09-19 18:35:00` |
+| `first_seen` | 时间字符串 | 首次收录时间（以第一次抓取入库为准，永久不变，用于统计节点存活时长与长期可用性） | `2026-10-01 00:00:00` |
 
 ---
 
