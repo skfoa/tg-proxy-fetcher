@@ -27,6 +27,7 @@ import logging
 import os
 import random
 import re
+import socket
 import ssl
 import struct
 import sys
@@ -50,6 +51,7 @@ from providers import (
     save_proxies_csv,
     format_buffer_badge,
     read_full_response,
+    safe_close_writer,
     PROXY_CSV_FIELDS,
     LEGACY_DEFAULT_FIRST_SEEN,
     resolve_asn_online_async,
@@ -204,14 +206,19 @@ async def probe_socks5(
         if re.search(r"\b200\b", first_line) and colo:
             return True, lat, "alive", colo, country, egress_ip
         return False, lat, "http_fail", "", "", ""
-    except Exception:
-        return False, 0, "timeout_or_reset", "", "", ""
+    except asyncio.TimeoutError:
+        return False, 0, "timeout", "", "", ""
+    except (ConnectionRefusedError, ConnectionResetError, BrokenPipeError) as e:
+        log.debug("SOCKS5 节点重置/断开 [%s:%s]: %s", host, port, e)
+        return False, 0, "conn_reset", "", "", ""
+    except (socket.gaierror, OSError) as e:
+        log.debug("SOCKS5 节点网络/DNS异常 [%s:%s]: %s", host, port, e)
+        return False, 0, "conn_err", "", "", ""
+    except Exception as e:
+        log.debug("SOCKS5 节点未知探测异常 [%s:%s]: %s", host, port, e)
+        return False, 0, "fail", "", "", ""
     finally:
-        try:
-            writer.close()
-            await writer.wait_closed()
-        except Exception:
-            pass
+        await safe_close_writer(writer)
 
 
 async def probe_http(
@@ -285,11 +292,7 @@ async def probe_http(
                 return True, lat, "alive", colo, country, egress_ip
 
         # 回退至直接正向代理 Forward GET（安全重连以避免原连接被代理端关闭/重置）
-        try:
-            writer.close()
-            await writer.wait_closed()
-        except Exception:
-            pass
+        await safe_close_writer(writer)
         writer = None
 
         fwd_reader, fwd_writer = await asyncio.wait_for(
@@ -321,15 +324,20 @@ async def probe_http(
         if re.search(r"\b200\b", direct_first_line) and colo:
             return True, lat, "alive", colo, country, egress_ip
         return False, lat, "http_fail", "", "", ""
-    except Exception:
-        return False, 0, "timeout_or_reset", "", "", ""
+    except asyncio.TimeoutError:
+        return False, 0, "timeout", "", "", ""
+    except (ConnectionRefusedError, ConnectionResetError, BrokenPipeError) as e:
+        log.debug("HTTP 节点重置/断开 [%s:%s]: %s", host, port, e)
+        return False, 0, "conn_reset", "", "", ""
+    except (socket.gaierror, OSError) as e:
+        log.debug("HTTP 节点网络/DNS异常 [%s:%s]: %s", host, port, e)
+        return False, 0, "conn_err", "", "", ""
+    except Exception as e:
+        log.debug("HTTP 节点未知探测异常 [%s:%s]: %s", host, port, e)
+        return False, 0, "fail", "", "", ""
     finally:
         if writer is not None:
-            try:
-                writer.close()
-                await writer.wait_closed()
-            except Exception:
-                pass
+            await safe_close_writer(writer)
 
 
 async def probe_turn(
@@ -366,14 +374,19 @@ async def probe_turn(
         if len(resp) >= 20 and resp[4:8] == b"\x21\x12\xa4\x42" and resp[8:20] == tx_id:
             return True, lat, "alive", "-", "", host
         return False, lat, "stun_fail", "", "", ""
-    except Exception:
-        return False, 0, "timeout_or_reset", "", "", ""
+    except asyncio.TimeoutError:
+        return False, 0, "timeout", "", "", ""
+    except (ConnectionRefusedError, ConnectionResetError, BrokenPipeError) as e:
+        log.debug("TURN 节点重置/断开 [%s:%s]: %s", host, port, e)
+        return False, 0, "conn_reset", "", "", ""
+    except (socket.gaierror, OSError) as e:
+        log.debug("TURN 节点网络/DNS异常 [%s:%s]: %s", host, port, e)
+        return False, 0, "conn_err", "", "", ""
+    except Exception as e:
+        log.debug("TURN 节点未知探测异常 [%s:%s]: %s", host, port, e)
+        return False, 0, "fail", "", "", ""
     finally:
-        try:
-            writer.close()
-            await writer.wait_closed()
-        except Exception:
-            pass
+        await safe_close_writer(writer)
 
 
 async def probe_sstp(
@@ -428,14 +441,19 @@ async def probe_sstp(
         if re.search(r"\b200\b", first_line):
             return True, lat, "alive", "-", "", host
         return False, lat, "sstp_fail", "", "", ""
-    except Exception:
-        return False, 0, "timeout_or_reset", "", "", ""
+    except asyncio.TimeoutError:
+        return False, 0, "timeout", "", "", ""
+    except (ConnectionRefusedError, ConnectionResetError, BrokenPipeError) as e:
+        log.debug("SSTP 节点重置/断开 [%s:%s]: %s", host, port, e)
+        return False, 0, "conn_reset", "", "", ""
+    except (socket.gaierror, OSError) as e:
+        log.debug("SSTP 节点网络/DNS异常 [%s:%s]: %s", host, port, e)
+        return False, 0, "conn_err", "", "", ""
+    except Exception as e:
+        log.debug("SSTP 节点未知探测异常 [%s:%s]: %s", host, port, e)
+        return False, 0, "fail", "", "", ""
     finally:
-        try:
-            writer.close()
-            await writer.wait_closed()
-        except Exception:
-            pass
+        await safe_close_writer(writer)
 
 
 async def probe_single(

@@ -63,6 +63,11 @@ class TestParsers(unittest.TestCase):
         self.assertFalse(is_valid_host("invalid_domain..com"))
         self.assertFalse(is_valid_host("-bad.com"))
 
+        # RFC 1035 / 1123 长度上限测试 (Q2)
+        self.assertFalse(is_valid_host("a" * 64 + ".com"))
+        self.assertFalse(is_valid_host("a." * 128 + "com"))
+        self.assertTrue(is_valid_host("a" * 63 + ".com"))
+
     def test_extract_proxies_case_insensitive(self):
         # 支持大小写 scheme
         text = "SOCKS5://user:pass@1.2.3.4:1080\nHTTP://5.6.7.8:8080"
@@ -73,6 +78,16 @@ class TestParsers(unittest.TestCase):
 
 
 class TestProviders(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        # 确保关键测试用的静态映射在内存中存在（防御外部 JSON 漂移与环境隔离, T1）
+        from providers import ASN_DATABASE_ASN_TO_ISP, ASN_DATABASE_ISP_TO_ASN, ASN_TO_PROVIDER
+        ASN_DATABASE_ASN_TO_ISP["AS63023"] = "Ipxo LLC"
+        ASN_TO_PROVIDER["AS63023"] = "Ipxo LLC"
+        ASN_DATABASE_ISP_TO_ASN["MobileOne Ltd. Mobile/Internet Service Provider Singapore"] = "AS4773"
+        ASN_DATABASE_ASN_TO_ISP["AS4773"] = "M1 LIMITED"
+        ASN_TO_PROVIDER["AS4773"] = "M1 LIMITED"
+
     def test_format_asn_isp_authoritative(self):
         # Cloudflare 权威已知库反查
         formatted = format_asn_isp("13335")
@@ -218,28 +233,32 @@ class TestTgFetchWorkflow(unittest.TestCase):
                     "first_seen": "2026-09-01",
                 })
 
-            # 1. 验证 TXT 缺失时的 CSV 兜底
-            loaded = load_existing_proxies(filepath=txt_path, csv_path=csv_path)
-            self.assertIn("2.2.2.2:1080", loaded)
-            # 优选 fail_count=0
-            self.assertEqual(loaded["2.2.2.2:1080"]["fail_count"], 0)
-            self.assertEqual(loaded["2.2.2.2:1080"]["colo"], "SJC")
-            self.assertEqual(loaded["2.2.2.2:1080"]["egress_ip"], "198.51.100.2")
-            # 墓碑死节点必须被拦截
-            self.assertNotIn("157.90.251.25:3478", loaded)
+            # 1. 验证 TXT 缺失时的 CSV 兜底（mock 墓碑包含测试死节点）
+            from unittest.mock import patch
+            import time
+            mock_ts = {"157.90.251.25:3478": int(time.time())}
+            with patch("tg_fetch.load_tombstone", return_value=mock_ts):
+                loaded = load_existing_proxies(filepath=txt_path, csv_path=csv_path)
+                self.assertIn("2.2.2.2:1080", loaded)
+                # 优选 fail_count=0
+                self.assertEqual(loaded["2.2.2.2:1080"]["fail_count"], 0)
+                self.assertEqual(loaded["2.2.2.2:1080"]["colo"], "SJC")
+                self.assertEqual(loaded["2.2.2.2:1080"]["egress_ip"], "198.51.100.2")
+                # 墓碑死节点必须被拦截
+                self.assertNotIn("157.90.251.25:3478", loaded)
 
-            # 2. 验证 TXT 存在时的 key 映射关联
-            with open(txt_path, "w", encoding="utf-8") as f:
-                f.write("SOCKS5://user_new:pass_new@2.2.2.2:1080\n")
-                f.write("http://4.4.4.4:8080\n")
+                # 2. 验证 TXT 存在时的 key 映射关联
+                with open(txt_path, "w", encoding="utf-8") as f:
+                    f.write("SOCKS5://user_new:pass_new@2.2.2.2:1080\n")
+                    f.write("http://4.4.4.4:8080\n")
 
-            loaded_txt = load_existing_proxies(filepath=txt_path, csv_path=csv_path)
-            self.assertIn("2.2.2.2:1080", loaded_txt)
-            self.assertEqual(loaded_txt["2.2.2.2:1080"]["fail_count"], 0)
-            self.assertEqual(loaded_txt["2.2.2.2:1080"]["egress_ip"], "198.51.100.2")
-            self.assertIn("4.4.4.4:8080", loaded_txt)
-            self.assertEqual(loaded_txt["4.4.4.4:8080"]["fail_count"], 0)
-            self.assertEqual(loaded_txt["4.4.4.4:8080"]["egress_ip"], "")
+                loaded_txt = load_existing_proxies(filepath=txt_path, csv_path=csv_path)
+                self.assertIn("2.2.2.2:1080", loaded_txt)
+                self.assertEqual(loaded_txt["2.2.2.2:1080"]["fail_count"], 0)
+                self.assertEqual(loaded_txt["2.2.2.2:1080"]["egress_ip"], "198.51.100.2")
+                self.assertIn("4.4.4.4:8080", loaded_txt)
+                self.assertEqual(loaded_txt["4.4.4.4:8080"]["fail_count"], 0)
+                self.assertEqual(loaded_txt["4.4.4.4:8080"]["egress_ip"], "")
 
     def test_save_scan_ips_by_asn_sanitizes_filenames(self):
         with tempfile.TemporaryDirectory() as td:
@@ -407,9 +426,9 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
                 self.assertEqual(res["egress_ip"], "203.0.113.19")
                 self.assertEqual(res["status"], "alive")
 
-            # 3. 验证探测失败时保留既有 country 与 egress_ip
+            # 3. 验证探测失败时保留既有 country 与 egress_ip (使用 copy 避免 dict mutate 副作用, T2)
             with patch("proxies_verify.probe_socks5", return_value=(False, 0, "conn_err", "", "", "")):
-                res_fail = await probe_single(res, sem)
+                res_fail = await probe_single(res.copy(), sem)
                 self.assertEqual(res_fail["country"], "JP")
                 self.assertEqual(res_fail["egress_ip"], "203.0.113.19")
                 self.assertEqual(res_fail["fail_count"], 1)

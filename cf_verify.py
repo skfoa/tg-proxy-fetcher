@@ -48,6 +48,7 @@ from providers import (
     RE_HTTP_301,
     RE_SERVER_CF,
     read_full_response,
+    safe_close_writer,
     split_header_body,
     format_buffer_badge,
     format_diff,
@@ -154,11 +155,7 @@ async def probe_ip(
     except Exception:
         return False, 0
     finally:
-        try:
-            writer.close()
-            await writer.wait_closed()
-        except Exception:
-            pass
+        await safe_close_writer(writer)
 
 
 async def verify_all(
@@ -631,6 +628,12 @@ def send_verify_notification(
     return sent
 
 
+def _cf_sort_key(x):
+    fc = safe_int(x.get("fail_count"), 0)
+    d = safe_int(x.get("delay_ms"), 0)
+    return (fc, d if d > 0 else 99999)
+
+
 # ---------- 主流程 ----------
 async def async_main(args):
     t_start = time.time()
@@ -686,11 +689,6 @@ async def async_main(args):
             log.info("[单条优选 墓地] 已登记 %d 个淘汰死节点至墓地冷却库 (新增: %d 个, 隔离期 7 天)", len(dead_keys), newly_tombstoned)
         else:
             log.info("[单条优选] 本次无节点达到连续失败 %d 次的淘汰阈值", args.max_fails)
-
-        def _cf_sort_key(x):
-            fc = safe_int(x.get("fail_count"), 0)
-            d = safe_int(x.get("delay_ms"), 0)
-            return (fc, d if d > 0 else 99999)
 
         # 稳定双重排序：先按 tested_at 降序（最新获取优先），再按 (fail_count, delay_ms) 升序（质量优先）
         cf_survivors.sort(key=lambda x: x.get("tested_at", ""), reverse=True)
@@ -768,17 +766,6 @@ async def async_main(args):
         save_scan_dir(asn_groups, SCAN_DIR)
     else:
         log.info(">>> %s 文件不存在或无数据，跳过扫描优选校验", SCAN_CSV)
-
-    # 统一登记淘汰死节点入墓地冷却库
-    all_dead = []
-    if cf_rows:
-        all_dead.extend([r for r in cf_rows if safe_int(r.get("fail_count"), 0) >= args.max_fails])
-    if scan_rows:
-        all_dead.extend([r for r in scan_rows if safe_int(r.get("fail_count"), 0) >= args.max_fails])
-    if all_dead:
-        all_dead_keys = [canonical_key(r.get("ip", ""), r.get("port", 0)) for r in all_dead]
-        newly_tombstoned = record_tombstone(all_dead_keys)
-        log.info("[优选 IP 墓地] 已登记 %d 个淘汰死节点至墓地冷却库 (新增: %d 个, 隔离期 7 天)", len(all_dead_keys), newly_tombstoned)
 
     elapsed = time.time() - t_start
     log.info("全部优选 IP 两阶段校验流程圆满完成，总耗时 %.2f 秒 (单条缓冲: %d [新增: %d, 取消: %d] | 扫描缓冲: %d [新增: %d, 取消: %d])", elapsed, (cf_survivors_len - cf_pass), cf_buf_new, cf_buf_rec, (scan_survivors_len - scan_pass), scan_buf_new, scan_buf_rec)

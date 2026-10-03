@@ -49,6 +49,7 @@ from providers import (
     is_tombstoned,
     canonical_key,
     read_full_response,
+    safe_close_writer,
     split_header_body,
     format_buffer_badge,
     RE_SERVER_CF,
@@ -95,7 +96,7 @@ CSV_FIELDS = [
     "tested_at", "channel", "fail_count", "net_type",
 ]
 
-# 反代穿透上下文：跳过证书链校验（用于反代服务器）
+# 反代穿透上下文：跳过非官方证书校验（安全审计说明：有意设计，反代节点由第三方部署且证书各异，需直接与节点建立 TLS 隧道嗅探 CDN /cdn-cgi/trace 边缘机房特征）
 SSL_CTX = ssl.create_default_context()
 SSL_CTX.check_hostname = False
 SSL_CTX.verify_mode = ssl.CERT_NONE
@@ -158,11 +159,7 @@ async def probe_proxyip(
     except Exception:
         return False, 0, ""
     finally:
-        try:
-            writer.close()
-            await writer.wait_closed()
-        except Exception:
-            pass
+        await safe_close_writer(writer)
 
 
 # ---------- 数据加载与保存 ----------

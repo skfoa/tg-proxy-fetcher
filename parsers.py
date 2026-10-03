@@ -41,12 +41,17 @@ PROXY_URL_RE = re.compile(
 
 
 def is_valid_host(host: str) -> bool:
-    """验证主机名是否为有效 IPv4 地址或域名"""
+    """验证主机名是否为有效 IPv4 地址或域名 (RFC 1035 / RFC 1123)"""
+    if not host or len(host) > 253:
+        return False
     parts = host.split(".")
     if len(parts) == 4 and all(p.isascii() and p.isdigit() for p in parts):
         return all(0 <= int(p) <= 255 for p in parts)
     if len(parts) >= 2 and parts[-1].isalpha() and len(parts[-1]) >= 2:
-        return all(bool(re.match(r"^[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$", part)) for part in parts)
+        return all(
+            0 < len(part) <= 63 and bool(re.match(r"^[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$", part))
+            for part in parts
+        )
     return False
 
 

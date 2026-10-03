@@ -100,7 +100,11 @@ def _parse_channels(env_name: str, default: list[str]) -> list[str]:
         item = item.strip()
         if not item:
             continue
-        if not item.startswith("@") and not item.startswith("https://") and not item.startswith("t.me/"):
+        # 兼容处理各种频道链接形态：https://t.me/s/xxx, https://t.me/xxx, t.me/xxx, @xxx, xxx (L3)
+        m = re.match(r"^(?:https?://)?(?:t\.me/)?(?:s/)?@?([A-Za-z0-9_]+)/?$", item)
+        if m:
+            item = f"@{m.group(1)}"
+        elif not item.startswith("@") and not item.startswith("https://"):
             item = f"@{item}"
         if item not in channels:
             channels.append(item)
@@ -561,8 +565,17 @@ def scrape_channel_web(channel: str, cutoff: datetime, proxy: str = "") -> tuple
             break
 
         if not html_content or "tgme_widget_message_wrap" not in html_content:
-            log.warning("频道 %s 未获取到公开消息卡片（可能不支持 Web 预览或为群组/私密频道）", channel)
-            break
+            if page_num == 1:
+                log.info("频道 %s 首次拉取未获取到公开消息卡片，等待 1.5 秒后重试 1 次...", channel)
+                time.sleep(1.5)
+                try:
+                    html_content = fetch_web_page(url, proxy=proxy)
+                except Exception as e:
+                    log.debug("频道 %s 重试异常: %s", channel, e)
+                    html_content = ""
+            if not html_content or "tgme_widget_message_wrap" not in html_content:
+                log.warning("频道 %s 未获取到公开消息卡片（可能不支持 Web 预览或为群组/私密频道）", channel)
+                break
 
         chunks = re.split(r'<div class="tgme_widget_message_wrap[^"]*"', html_content)[1:]
         if not chunks:

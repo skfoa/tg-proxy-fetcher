@@ -495,12 +495,18 @@ def resolve_ip_asn(ip: str = "", isp_hint: str = "", allow_online: bool = False)
     return "", clean_isp
 
 
+_DOTENV_LOADED = False
+
+
 def load_dotenv(env_path: str | None = None) -> dict:
     """
     自动加载本地 .env 文件至 os.environ（若存在）。
     仅当环境变量尚未在系统/CI 环境中定义时才写入，避免覆盖 GitHub Actions 等上游传入的 Secrets。
     返回本次实际加载的键值字典。
     """
+    global _DOTENV_LOADED
+    if not env_path and _DOTENV_LOADED:
+        return {}
     if not env_path:
         env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
     loaded = {}
@@ -519,6 +525,8 @@ def load_dotenv(env_path: str | None = None) -> dict:
                         loaded[k] = v
         except Exception as e:
             log.debug("读取 .env 文件异常: %s", e)
+    if not env_path or env_path.endswith(".env"):
+        _DOTENV_LOADED = True
     return loaded
 
 
@@ -694,18 +702,17 @@ def format_asn_isp(raw_asn: str, raw_isp: str = "") -> str:
         clean_i = ""
 
     # 提取 suffix 中已有的别名括号内容，避免多轮调用导致别名丢失或嵌套
-    existing_alias = ""
-    m_paren = re.search(r"\((.*?)\)", suffix)
-    if m_paren:
-        existing_alias = m_paren.group(1).strip()
+    existing_aliases = re.findall(r"\((.*?)\)", suffix)
+    existing_alias = " ".join(a.strip() for a in existing_aliases if a.strip())
+    if existing_aliases:
         suffix = re.sub(r"\s*\(.*?\)", "", suffix).strip()
 
     # 权威单一真相源 (SSOT) 优先：若在已收录权威字典中，采用权威统一名称
     auth_isp = ASN_TO_PROVIDER.get(code, "")
     if auth_isp:
         candidate_alias = clean_i or existing_alias or suffix
-        m_cand = re.search(r"\((.*?)\)", candidate_alias)
-        alias = m_cand.group(1).strip() if m_cand else candidate_alias.strip()
+        cand_aliases = re.findall(r"\((.*?)\)", candidate_alias)
+        alias = " ".join(a.strip() for a in cand_aliases if a.strip()) if cand_aliases else candidate_alias.strip()
 
         if alias and alias.upper() not in ("-", "NONE", "UNKNOWN", "AS_UNKNOWN", "NULL"):
             # 若输入别名与权威统一名称互不包含（即属于多品牌/租户/法定名与商业名不同），保留输入别名
@@ -843,6 +850,7 @@ async def read_full_response(
     http_timeout: float,
     max_bytes: int = 4096,
     need_body: bool = False,
+    early_exit_marker: bytes = b"",
 ) -> bytes:
     """
     循环读取直到拿到完整的 HTTP 响应（若 need_body=False 遇到 \\r\\n\\r\\n 即可返回；若 need_body=True 读到匹配标志或 EOF）或达到 max_bytes 硬上限。
@@ -866,14 +874,29 @@ async def read_full_response(
         if has_headers:
             if not need_body:
                 break
-            # 若响应头表明非 200 OK（如 403, 502 等），Body 绝不会含 colo，立即返回避免空耗超时
+            # 若响应头表明非 200 OK（如 403, 502 等），Body 绝不会含有效字段，立即返回避免空耗超时
             first_line = resp_bytes.splitlines()[0] if resp_bytes else b""
             if not (b" 200 " in first_line or first_line.endswith(b" 200")):
                 break
-            # 若需要 Body（例如 /cdn-cgi/trace 需获取 colo 字段），拿到关键特征后立即返回
-            if b"colo=" in resp_bytes:
+            # 若指定了提前退出标志，命中则立即返回
+            if early_exit_marker and early_exit_marker in resp_bytes:
+                break
+            # 默认 trace 判定：确保 /cdn-cgi/trace 尾部字段到达 (warp= 或 kex=)，避免因仅匹配 colo= 过早返回导致 loc= (国家) 截断丢失
+            if b"warp=" in resp_bytes or b"kex=" in resp_bytes:
                 break
     return resp_bytes
+
+
+async def safe_close_writer(writer: asyncio.StreamWriter, timeout: float = 0.5) -> None:
+    """安全关闭 StreamWriter 并等待连接释放，带超时控制防 hang 与静默忽略 RST 异常"""
+    try:
+        writer.close()
+    except Exception:
+        pass
+    try:
+        await asyncio.wait_for(writer.wait_closed(), timeout=timeout)
+    except Exception:
+        pass
 
 
 def split_header_body(resp_bytes: bytes) -> tuple[bytes, bytes]:
@@ -1218,86 +1241,6 @@ def format_proxies_txt(rows: list) -> str:
 format_socks_txt = format_proxies_txt
 
 
-def save_proxies_by_protocol(rows: list, output_dir: str = "data/proxies") -> dict[str, int]:
-    """
-    将通用代理列表按协议类型拆分并独立保存至 output_dir 目录下：
-      - socks5.txt / socks5.csv: 纯 SOCKS5 代理节点
-      - turn.txt / turn.csv: 纯 TURN 协议节点
-      - sstp.txt / sstp.csv: 纯 SSTP 协议节点
-      - http.txt / http.csv: 纯 HTTP 代理节点
-      - https.txt / https.csv: 纯 HTTPS 代理节点
-    各协议文件内按 (fail_count 升序, delay_ms 升序) 排列，首行附带注释汇总头，彻底杜绝不同协议交错混杂。
-    返回各协议文件生成的节点数量字典。
-    """
-    os.makedirs(output_dir, exist_ok=True)
-
-    groups: dict[str, list] = {}
-    seen = set()
-
-    for item in rows:
-        if isinstance(item, dict):
-            url = (item.get("url") or "").strip()
-            proto = (item.get("proto") or "").strip().lower()
-            fc = safe_int(item.get("fail_count"), 0)
-            dms = safe_int(item.get("delay_ms"), 0)
-            row_dict = dict(item)
-        else:
-            url = str(item).strip()
-            proto = ""
-            fc = 0
-            dms = 0
-            row_dict = {"url": url}
-
-        if not url or url.startswith("#"):
-            continue
-        if url in seen:
-            continue
-        seen.add(url)
-
-        if not proto:
-            proto = url.split("://", 1)[0].lower() if "://" in url else "other"
-
-        if dms <= 0:
-            dms = 99999
-
-        row_dict["proto"] = proto
-        row_dict.setdefault("fail_count", fc)
-        row_dict.setdefault("delay_ms", item.get("delay_ms", 0) if isinstance(item, dict) else 0)
-        row_dict.setdefault("status", item.get("status", "pending") if isinstance(item, dict) else "pending")
-        row_dict.setdefault("colo", item.get("colo", "") if isinstance(item, dict) else "")
-        row_dict.setdefault("country", item.get("country", "") if isinstance(item, dict) else "")
-        row_dict.setdefault("egress_ip", item.get("egress_ip", "") if isinstance(item, dict) else "")
-        row_dict.setdefault("asn", item.get("asn", "") if isinstance(item, dict) else "")
-        row_dict.setdefault("net_type", item.get("net_type", "") if isinstance(item, dict) else "")
-        row_dict.setdefault("tested_at", item.get("tested_at", "") if isinstance(item, dict) else "")
-        row_dict.setdefault("first_seen", item.get("first_seen", "") if isinstance(item, dict) else "")
-        if not row_dict["first_seen"]:
-            row_dict["first_seen"] = LEGACY_DEFAULT_FIRST_SEEN
-
-        if "host" not in row_dict or not row_dict["host"]:
-            try:
-                u = urllib.parse.urlparse(url)
-                row_dict["host"] = u.hostname or ""
-                row_dict["port"] = u.port or ""
-                row_dict["user"] = u.username or ""
-                row_dict["pwd"] = u.password or ""
-            except Exception:
-                row_dict["host"] = ""
-                row_dict["port"] = ""
-                row_dict["user"] = ""
-                row_dict["pwd"] = ""
-        else:
-            if "user" not in row_dict or "pwd" not in row_dict:
-                try:
-                    u = urllib.parse.urlparse(url)
-                    row_dict.setdefault("user", u.username or "")
-                    row_dict.setdefault("pwd", u.password or "")
-                except Exception:
-                    row_dict.setdefault("user", "")
-                    row_dict.setdefault("pwd", "")
-
-        groups.setdefault(proto, []).append((fc, dms, url, row_dict))
-
 def format_proxy_json_item(r_dict: dict) -> dict:
     """
     转换为适配 EDT-Toolkit / 油猴脚本与第三方前端的标准化 JSON 字典对象：
@@ -1463,10 +1406,14 @@ def save_proxies_by_protocol(rows: list, output_dir: str = "data/proxies") -> di
 
         result_counts[proto] = len(items)
 
-    # 清理已不存在或旧命名格式的 .txt、.csv 与 .json 文件
+    # 仅清理已知代理协议命名的陈旧 .txt、.csv 与 .json 文件，严禁误删用户自定义文件 (P2)
+    known_stems = set(PROXY_PROTO_ORDER) | {"other", "unknown", "socks"}
     for old_f in os.listdir(output_dir):
         fpath = os.path.join(output_dir, old_f)
-        if os.path.isfile(fpath) and old_f.endswith((".txt", ".csv", ".json")) and old_f not in active_files:
+        if not os.path.isfile(fpath):
+            continue
+        base_name, ext = os.path.splitext(old_f)
+        if ext in (".txt", ".csv", ".json") and base_name.lower() in known_stems and old_f not in active_files:
             try:
                 os.remove(fpath)
             except OSError:
@@ -2181,29 +2128,54 @@ def canonical_key(host_or_ip: str, port: int | str) -> str:
     return f"{h}:{p}"
 
 
-def load_tombstone(filepath: str | None = None, max_age_days: int = TOMBSTONE_MAX_AGE_DAYS) -> dict[str, int]:
+_TOMBSTONE_CACHE: dict[str, int] | None = None
+_TOMBSTONE_CACHE_FILE: str | None = None
+_TOMBSTONE_CACHE_MTIME: float = 0.0
+
+
+def load_tombstone(
+    filepath: str | None = None,
+    max_age_days: int = TOMBSTONE_MAX_AGE_DAYS,
+    force_reload: bool = False,
+) -> dict[str, int]:
     """
     读取墓地黑名单 (已被淘汰的死节点记忆库)。
     自动过滤/清理超过 max_age_days 天的过期记录，确保黑名单体积极简轻量。
+    带轻量进程内缓存与 mtime 变更检测，避免同一批次多模块重复反序列化。
     返回 {canonical_key: eliminated_timestamp}。
     """
-    if filepath is None:
-        filepath = TOMBSTONE_FILE
-    if not os.path.isfile(filepath):
+    global _TOMBSTONE_CACHE, _TOMBSTONE_CACHE_FILE, _TOMBSTONE_CACHE_MTIME
+    target_path = filepath if filepath is not None else TOMBSTONE_FILE
+    if not os.path.isfile(target_path):
+        _TOMBSTONE_CACHE = {}
+        _TOMBSTONE_CACHE_FILE = target_path
+        _TOMBSTONE_CACHE_MTIME = 0.0
         return {}
+
+    try:
+        mtime = os.path.getmtime(target_path)
+    except OSError:
+        mtime = 0.0
+
+    if not force_reload and _TOMBSTONE_CACHE is not None and _TOMBSTONE_CACHE_FILE == target_path and mtime == _TOMBSTONE_CACHE_MTIME:
+        return dict(_TOMBSTONE_CACHE)
+
     now = int(time.time())
     max_age_sec = max_age_days * 86400
     valid: dict[str, int] = {}
     try:
-        with open(filepath, "r", encoding="utf-8") as f:
+        with open(target_path, "r", encoding="utf-8") as f:
             data = json.load(f)
         if isinstance(data, dict):
             for k, ts in data.items():
                 if isinstance(ts, (int, float)) and (now - int(ts)) < max_age_sec:
                     valid[str(k).strip().lower()] = int(ts)
+        _TOMBSTONE_CACHE = valid
+        _TOMBSTONE_CACHE_FILE = target_path
+        _TOMBSTONE_CACHE_MTIME = mtime
     except Exception as e:
-        log.warning("读取墓地文件 %s 失败: %s", filepath, e)
-    return valid
+        log.warning("读取墓地文件 %s 失败: %s", target_path, e)
+    return dict(valid)
 
 
 def record_tombstone(
@@ -2217,6 +2189,7 @@ def record_tombstone(
     采用原子写入 (.tmp -> os.replace) 防止并发损坏。
     返回本次新增登记的节点数量。
     """
+    global _TOMBSTONE_CACHE, _TOMBSTONE_CACHE_FILE, _TOMBSTONE_CACHE_MTIME
     if not keys:
         return 0
     if filepath is None:
@@ -2240,6 +2213,12 @@ def record_tombstone(
         with open(tmp_path, "w", encoding="utf-8") as f:
             json.dump(tombstone, f, ensure_ascii=False, indent=2)
         os.replace(tmp_path, filepath)
+        try:
+            _TOMBSTONE_CACHE = tombstone
+            _TOMBSTONE_CACHE_FILE = filepath
+            _TOMBSTONE_CACHE_MTIME = os.path.getmtime(filepath)
+        except OSError:
+            _TOMBSTONE_CACHE = None
     except Exception as e:
         log.warning("写入墓地文件 %s 失败: %s", filepath, e)
         if os.path.exists(tmp_path):
