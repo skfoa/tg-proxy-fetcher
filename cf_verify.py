@@ -122,13 +122,13 @@ async def probe_ip(
         is_alive=True  -> 校验通过，latency_ms 为 TLS 握手与连接延迟 (RTT)
         is_alive=False -> 校验失败，latency_ms 为 0
     """
-    t0 = asyncio.get_event_loop().time()
+    t0 = time.monotonic()
     try:
         reader, writer = await asyncio.wait_for(
             asyncio.open_connection(ip, port, ssl=SSL_CTX, server_hostname=PROBE_HOST),
             timeout=connect_timeout,
         )
-        t1 = asyncio.get_event_loop().time()
+        t1 = time.monotonic()
         latency_ms = max(1, int((t1 - t0) * 1000))
     except Exception:
         return False, 0
@@ -366,8 +366,16 @@ def send_verify_notification(
     fetch_stats = None
     if os.path.isfile(fetch_stats_file):
         try:
-            with open(fetch_stats_file, "r", encoding="utf-8") as sf:
-                fetch_stats = json.load(sf)
+            mtime = os.path.getmtime(fetch_stats_file)
+            if time.time() - mtime > 6 * 3600:
+                log.warning("暂存抓取统计 %s 已过期 (超过 6 小时)，安全丢弃以防污染", fetch_stats_file)
+                try:
+                    os.remove(fetch_stats_file)
+                except OSError:
+                    pass
+            else:
+                with open(fetch_stats_file, "r", encoding="utf-8") as sf:
+                    fetch_stats = json.load(sf)
         except Exception as e:
             log.warning("读取暂存抓取统计 %s 失败: %s", fetch_stats_file, e)
 

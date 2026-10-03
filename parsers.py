@@ -35,17 +35,18 @@ TG_SOCKS_RE = re.compile(
     r"(?:tg://socks|https?://(?:t\.me|telegram\.me)/socks)\?(?P<query>[^\s#]+)"
 )
 PROXY_URL_RE = re.compile(
-    r"(?P<url>(?P<proto>socks5|http|https|turn|sstp)://(?:[^\s#@]+@)?(?P<host>(?:\d{1,3}\.){3}\d{1,3}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}):(?P<port>\d{1,5}))"
+    r"(?P<url>(?P<proto>socks5|http|https|turn|sstp)://(?:[^\s#@]+@)?(?P<host>(?:\d{1,3}\.){3}\d{1,3}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}):(?P<port>\d{1,5}))",
+    re.IGNORECASE,
 )
 
 
 def is_valid_host(host: str) -> bool:
     """验证主机名是否为有效 IPv4 地址或域名"""
     parts = host.split(".")
-    if len(parts) == 4 and all(p.isdigit() for p in parts):
+    if len(parts) == 4 and all(p.isascii() and p.isdigit() for p in parts):
         return all(0 <= int(p) <= 255 for p in parts)
     if len(parts) >= 2 and parts[-1].isalpha() and len(parts[-1]) >= 2:
-        return all(bool(re.match(r"^[a-zA-Z0-9-]+$", part)) for part in parts)
+        return all(bool(re.match(r"^[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$", part)) for part in parts)
     return False
 
 

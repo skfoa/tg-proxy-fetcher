@@ -109,7 +109,7 @@ async def probe_socks5(
     5. HTTP GET /cdn-cgi/trace 校验 200 与 colo
     返回 (is_alive, delay_ms, status, colo)
     """
-    t0 = asyncio.get_event_loop().time()
+    t0 = time.monotonic()
     try:
         reader, writer = await asyncio.wait_for(
             asyncio.open_connection(host, port),
@@ -189,9 +189,10 @@ async def probe_socks5(
 
         colo_match = re.search(r"\bcolo=([A-Za-z0-9]+)\b", http_text)
         colo = colo_match.group(1).upper() if colo_match else ""
-        lat = max(1, int((asyncio.get_event_loop().time() - t0) * 1000))
+        lat = max(1, int((time.monotonic() - t0) * 1000))
 
-        if "200" in (http_text.splitlines()[0] if http_text else "") and colo:
+        first_line = http_text.splitlines()[0] if http_text else ""
+        if re.search(r"\b200\b", first_line) and colo:
             return True, lat, "alive", colo
         return False, lat, "http_fail", ""
     except Exception:
@@ -219,7 +220,7 @@ async def probe_http(
     3. 若 CONNECT 不支持，回退至直接 Forward GET
     返回 (is_alive, delay_ms, status, colo)
     """
-    t0 = asyncio.get_event_loop().time()
+    t0 = time.monotonic()
     try:
         reader, writer = await asyncio.wait_for(
             asyncio.open_connection(host, port),
@@ -250,7 +251,7 @@ async def probe_http(
         resp_text = resp.decode("latin1", errors="ignore")
         first_line = resp_text.splitlines()[0] if resp_text else ""
 
-        if "200" in first_line:
+        if re.search(r"\b200\b", first_line):
             # 隧道建立成功，发送 HTTP 穿透
             probe = (
                 f"GET {PROBE_PATH} HTTP/1.1\r\n"
@@ -265,8 +266,9 @@ async def probe_http(
             http_text = http_resp.decode("utf-8", errors="ignore")
             colo_match = re.search(r"\bcolo=([A-Za-z0-9]+)\b", http_text)
             colo = colo_match.group(1).upper() if colo_match else ""
-            lat = max(1, int((asyncio.get_event_loop().time() - t0) * 1000))
-            if "200" in (http_text.splitlines()[0] if http_text else "") and colo:
+            lat = max(1, int((time.monotonic() - t0) * 1000))
+            first_line = http_text.splitlines()[0] if http_text else ""
+            if re.search(r"\b200\b", first_line) and colo:
                 return True, lat, "alive", colo
 
         # 回退至直接正向代理 Forward GET（安全重连以避免原连接被代理端关闭/重置）
@@ -297,8 +299,9 @@ async def probe_http(
         direct_text = direct_resp.decode("utf-8", errors="ignore")
         colo_match = re.search(r"\bcolo=([A-Za-z0-9]+)\b", direct_text)
         colo = colo_match.group(1).upper() if colo_match else ""
-        lat = max(1, int((asyncio.get_event_loop().time() - t0) * 1000))
-        if "200" in (direct_text.splitlines()[0] if direct_text else "") and colo:
+        lat = max(1, int((time.monotonic() - t0) * 1000))
+        direct_first_line = direct_text.splitlines()[0] if direct_text else ""
+        if re.search(r"\b200\b", direct_first_line) and colo:
             return True, lat, "alive", colo
         return False, lat, "http_fail", ""
     except Exception:
@@ -324,7 +327,7 @@ async def probe_turn(
     校验 20 字节响应头部 Magic Cookie (0x2112A442) 以及 Transaction ID 匹配。
     返回 (is_alive, delay_ms, status, colo)
     """
-    t0 = asyncio.get_event_loop().time()
+    t0 = time.monotonic()
     try:
         reader, writer = await asyncio.wait_for(
             asyncio.open_connection(host, port),
@@ -341,7 +344,7 @@ async def probe_turn(
         await asyncio.wait_for(writer.drain(), timeout=connect_timeout)
 
         resp = await asyncio.wait_for(reader.read(1024), timeout=read_timeout)
-        lat = max(1, int((asyncio.get_event_loop().time() - t0) * 1000))
+        lat = max(1, int((time.monotonic() - t0) * 1000))
 
         if len(resp) >= 20 and resp[4:8] == b"\x21\x12\xa4\x42" and resp[8:20] == tx_id:
             return True, lat, "alive", "-"
@@ -372,14 +375,18 @@ async def probe_sstp(
     3. 校验服务端是否返回 HTTP/1.1 200 OK，确认 SSTP 隧道服务活跃就绪
     返回 (is_alive, delay_ms, status, colo)
     """
-    t0 = asyncio.get_event_loop().time()
+    t0 = time.monotonic()
     ctx = ssl.create_default_context()
     ctx.check_hostname = False
     ctx.verify_mode = ssl.CERT_NONE
 
+    # RFC 6066: 纯 IPv4 地址不应作为 TLS SNI 发送
+    is_ip = bool(re.match(r"^\d{1,3}(?:\.\d{1,3}){3}$", host))
+    sni = None if is_ip else host
+
     try:
         reader, writer = await asyncio.wait_for(
-            asyncio.open_connection(host, port, ssl=ctx, server_hostname=host),
+            asyncio.open_connection(host, port, ssl=ctx, server_hostname=sni),
             timeout=connect_timeout,
         )
     except Exception:
@@ -397,11 +404,11 @@ async def probe_sstp(
         await asyncio.wait_for(writer.drain(), timeout=connect_timeout)
 
         resp = await asyncio.wait_for(reader.read(1024), timeout=read_timeout)
-        lat = max(1, int((asyncio.get_event_loop().time() - t0) * 1000))
+        lat = max(1, int((time.monotonic() - t0) * 1000))
         resp_text = resp.decode("latin1", errors="ignore")
         first_line = resp_text.splitlines()[0] if resp_text else ""
 
-        if "200" in first_line:
+        if re.search(r"\b200\b", first_line):
             return True, lat, "alive", "-"
         return False, lat, "sstp_fail", ""
     except Exception:

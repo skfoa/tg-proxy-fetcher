@@ -1,0 +1,181 @@
+"""
+核心纯函数与数据流单元测试集 (tests/test_core.py)
+覆盖:
+  1. is_valid_host: IPv4 (ASCII 校验、边界、Unicode 数字拦截) 与 域名格式校验
+  2. format_asn_isp: SSOT 权威查表、地址后缀清除、别名保留与幂等性
+  3. normalize_timestamp: 8 位纯数字日期保护、Unix 时间戳转换、ISO 字符串规整
+  4. classify_asn: 权威 exact_net_type、启发式分类与兜底逻辑
+  5. extract_proxies: 大小写协议通配、脏文本提取与 canonical_key 规范化
+  6. load_existing_proxies: TXT 缺失兜底、墓碑黑名单拦截、同 Key 冲突健康度择优
+"""
+
+import csv
+import json
+import os
+import sys
+import tempfile
+import unittest
+
+# 确保导入根目录模块
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
+
+from parsers import is_valid_host, extract_proxies
+from providers import (
+    format_asn_isp,
+    normalize_timestamp,
+    classify_asn,
+    ASN_TO_PROVIDER,
+    safe_int,
+)
+from tg_fetch import load_existing_proxies
+
+
+class TestParsers(unittest.TestCase):
+    def test_is_valid_host_ipv4(self):
+        self.assertTrue(is_valid_host("1.1.1.1"))
+        self.assertTrue(is_valid_host("192.168.1.1"))
+        self.assertTrue(is_valid_host("255.255.255.255"))
+        self.assertTrue(is_valid_host("0.0.0.0"))
+
+        # 越界与格式错误
+        self.assertFalse(is_valid_host("256.0.0.1"))
+        self.assertFalse(is_valid_host("1.2.3"))
+        self.assertFalse(is_valid_host("1.2.3.4.5"))
+        self.assertFalse(is_valid_host("1.2.3.-1"))
+        self.assertFalse(is_valid_host(""))
+
+        # 非 ASCII / Unicode 全角数字防御
+        self.assertFalse(is_valid_host("١.٢.٣.٤"))
+        self.assertFalse(is_valid_host("１.２.３.４"))
+
+    def test_is_valid_host_domain(self):
+        self.assertTrue(is_valid_host("cloudflare.com"))
+        self.assertTrue(is_valid_host("speed.cloudflare.com"))
+        self.assertTrue(is_valid_host("node-1.vps-provider.org"))
+        self.assertFalse(is_valid_host("invalid_domain..com"))
+        self.assertFalse(is_valid_host("-bad.com"))
+
+    def test_extract_proxies_case_insensitive(self):
+        # 支持大小写 scheme
+        text = "SOCKS5://user:pass@1.2.3.4:1080\nHTTP://5.6.7.8:8080"
+        proxies = extract_proxies(text)
+        self.assertEqual(len(proxies), 2)
+        self.assertEqual(proxies[0], ("SOCKS5://user:pass@1.2.3.4:1080", "1.2.3.4:1080"))
+        self.assertEqual(proxies[1], ("HTTP://5.6.7.8:8080", "5.6.7.8:8080"))
+
+
+class TestProviders(unittest.TestCase):
+    def test_format_asn_isp_authoritative(self):
+        # Cloudflare 权威已知库反查
+        formatted = format_asn_isp("13335")
+        self.assertIn("AS13335", formatted)
+        self.assertIn("Cloudflare", formatted)
+
+        # 腾讯云地址脏后缀清洗
+        dirty_tencent = "AS132203 Tencent Building, Kejizhongyi Avenue"
+        cleaned = format_asn_isp(dirty_tencent)
+        self.assertEqual(cleaned, "AS132203 Tencent Cloud")
+
+    def test_format_asn_isp_alias(self):
+        # 租户与宿主多品牌别名保留
+        res = format_asn_isp("AS63023", "GTHost")
+        self.assertEqual(res, "AS63023 Ipxo LLC (GTHost)")
+
+        # 二次调用幂等性校验
+        res2 = format_asn_isp(res, "")
+        self.assertEqual(res2, "AS63023 Ipxo LLC (GTHost)")
+
+    def test_normalize_timestamp(self):
+        # 8 位纯数字日期必须原样保留，严禁误转换为 1970 年时间戳
+        self.assertEqual(normalize_timestamp("20260906"), "20260906")
+        self.assertEqual(normalize_timestamp("20261001"), "20261001")
+
+        # 标准 ISO 字符串原样保留
+        iso_str = "2026-10-01 12:30:45"
+        self.assertEqual(normalize_timestamp(iso_str), iso_str)
+
+        # 毫秒时间戳转换
+        ms_ts = "1727784000000"
+        converted = normalize_timestamp(ms_ts)
+        self.assertTrue(converted.startswith("2024-") or converted.startswith("202"))
+
+    def test_classify_asn(self):
+        # 权威 exact_net_type
+        self.assertEqual(classify_asn("AS13335", "Cloudflare"), "datacenter")
+        # 运营商宽带
+        self.assertEqual(classify_asn("AS4134", "China Telecom"), "isp")
+        # 教育网
+        self.assertEqual(classify_asn("AS24168", "CERNET2"), "education")
+        # 银行金融专网
+        self.assertEqual(classify_asn("AS138139", "Reserve Bank of Australia"), "banking")
+
+
+class TestTgFetchWorkflow(unittest.TestCase):
+    def test_load_existing_proxies_fallback_and_tombstone(self):
+        with tempfile.TemporaryDirectory() as td:
+            txt_path = os.path.join(td, "proxies.txt")
+            csv_path = os.path.join(td, "proxies.csv")
+
+            # 写入 CSV 包含一条同 Key 重复（待择优）记录
+            with open(csv_path, "w", encoding="utf-8-sig", newline="") as f:
+                writer = csv.DictWriter(
+                    f,
+                    fieldnames=["url", "fail_count", "delay_ms", "status", "colo", "tested_at", "first_seen"],
+                )
+                writer.writeheader()
+                # 记录 1 (健康度低: fail_count=2)
+                writer.writerow({
+                    "url": "socks5://user1:pass1@2.2.2.2:1080",
+                    "fail_count": 2,
+                    "delay_ms": 150,
+                    "status": "fail",
+                    "colo": "",
+                    "tested_at": "2026-10-01 10:00:00",
+                    "first_seen": "2026-09-01",
+                })
+                # 记录 2 (同 Key 更优: fail_count=0)
+                writer.writerow({
+                    "url": "socks5://user2:pass2@2.2.2.2:1080",
+                    "fail_count": 0,
+                    "delay_ms": 80,
+                    "status": "alive",
+                    "colo": "SJC",
+                    "tested_at": "2026-10-02 10:00:00",
+                    "first_seen": "2026-09-01",
+                })
+                # 记录 3 (已在墓碑中的已知死节点: 157.90.251.25:3478)
+                writer.writerow({
+                    "url": "turn://157.90.251.25:3478",
+                    "fail_count": 0,
+                    "delay_ms": 50,
+                    "status": "alive",
+                    "colo": "",
+                    "tested_at": "2026-10-01 12:00:00",
+                    "first_seen": "2026-09-01",
+                })
+
+            # 1. 验证 TXT 缺失时的 CSV 兜底
+            loaded = load_existing_proxies(filepath=txt_path, csv_path=csv_path)
+            self.assertIn("2.2.2.2:1080", loaded)
+            # 优选 fail_count=0
+            self.assertEqual(loaded["2.2.2.2:1080"]["fail_count"], 0)
+            self.assertEqual(loaded["2.2.2.2:1080"]["colo"], "SJC")
+            # 墓碑死节点必须被拦截
+            self.assertNotIn("157.90.251.25:3478", loaded)
+
+            # 2. 验证 TXT 存在时的 key 映射关联
+            with open(txt_path, "w", encoding="utf-8") as f:
+                f.write("SOCKS5://user_new:pass_new@2.2.2.2:1080\n")
+                f.write("http://4.4.4.4:8080\n")
+
+            loaded_txt = load_existing_proxies(filepath=txt_path, csv_path=csv_path)
+            self.assertIn("2.2.2.2:1080", loaded_txt)
+            self.assertEqual(loaded_txt["2.2.2.2:1080"]["fail_count"], 0)
+            self.assertIn("4.4.4.4:8080", loaded_txt)
+            self.assertEqual(loaded_txt["4.4.4.4:8080"]["fail_count"], 0)
+
+
+if __name__ == "__main__":
+    unittest.main()

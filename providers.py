@@ -826,11 +826,10 @@ async def read_full_response(
     用统一 deadline 控制总耗时，避免多次循环导致累计超时远超 http_timeout。
     单次 read() 动态计算剩余可用空间，避免读取超出 max_bytes 上限。
     """
-    loop = asyncio.get_event_loop()
-    deadline = loop.time() + http_timeout
+    deadline = time.monotonic() + http_timeout
     resp_bytes = b""
     while len(resp_bytes) < max_bytes:
-        remaining = deadline - loop.time()
+        remaining = deadline - time.monotonic()
         if remaining <= 0:
             break
         chunk = await asyncio.wait_for(

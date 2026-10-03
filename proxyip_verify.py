@@ -120,13 +120,13 @@ async def probe_proxyip(
         is_alive=True  -> 探测成功，latency_ms 为握手延迟，colo 为解析到的机房代号
         is_alive=False -> 探测失败，latency_ms 为 0，colo 为空字符串
     """
-    t0 = asyncio.get_event_loop().time()
+    t0 = time.monotonic()
     try:
         reader, writer = await asyncio.wait_for(
             asyncio.open_connection(ip, port, ssl=SSL_CTX, server_hostname=PROBE_HOST),
             timeout=connect_timeout,
         )
-        t1 = asyncio.get_event_loop().time()
+        t1 = time.monotonic()
         latency_ms = max(1, int((t1 - t0) * 1000))
     except Exception:
         return False, 0, ""

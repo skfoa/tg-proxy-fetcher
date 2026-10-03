@@ -206,28 +206,66 @@ def load_existing_proxies(
 ) -> dict:
     """读取本地已保存的代理列表，保留历史累积有效节点及其首次收录时间与质检元数据"""
     existing = {}
-    csv_meta = {}
+    csv_meta_by_url = {}
+    csv_meta_by_key = {}
     if os.path.isfile(csv_path):
         try:
             with open(csv_path, "r", encoding="utf-8-sig") as f:
                 reader = csv.DictReader(f)
                 for r in reader:
                     u = (r.get("url") or "").strip()
-                    if u:
-                        csv_meta[u] = {
-                            "first_seen": (r.get("first_seen") or "").strip() or LEGACY_DEFAULT_FIRST_SEEN,
-                            "fail_count": safe_int(r.get("fail_count"), 0),
-                            "delay_ms": safe_int(r.get("delay_ms"), 0),
-                            "status": r.get("status", "pending"),
-                            "colo": r.get("colo", ""),
-                            "tested_at": r.get("tested_at", ""),
-                        }
+                    if not u:
+                        continue
+                    meta = {
+                        "url": u,
+                        "first_seen": (r.get("first_seen") or "").strip() or LEGACY_DEFAULT_FIRST_SEEN,
+                        "fail_count": safe_int(r.get("fail_count"), 0),
+                        "delay_ms": safe_int(r.get("delay_ms"), 0),
+                        "status": r.get("status", "pending"),
+                        "colo": r.get("colo", ""),
+                        "tested_at": r.get("tested_at", ""),
+                    }
+                    csv_meta_by_url[u] = meta
+                    for _, key in extract_proxies(u):
+                        # 若同 key 在 CSV 中存在多行历史记录，优选健康度更高 (fail_count 更低) 或更新 (tested_at 更近) 的记录
+                        if key not in csv_meta_by_key:
+                            csv_meta_by_key[key] = meta
+                        else:
+                            old = csv_meta_by_key[key]
+                            if meta["fail_count"] < old["fail_count"] or (
+                                meta["fail_count"] == old["fail_count"] and meta["tested_at"] > old["tested_at"]
+                            ):
+                                csv_meta_by_key[key] = meta
         except Exception as e:
             log.warning("读取已有代理 CSV 失败: %s", e)
 
-    if not os.path.exists(filepath):
-        return existing
+    # 1. 优先加载墓碑黑名单
     tombstone = load_tombstone()
+
+    # 2. 兜底回填：若 proxies.txt 缺失但 proxies.csv 存在，直接从 CSV 索引反解并严格过滤墓地
+    if not os.path.exists(filepath):
+        if csv_meta_by_key:
+            for key, meta in csv_meta_by_key.items():
+                if not is_tombstoned(key, tombstone):
+                    existing[key] = {
+                        "url": meta["url"],
+                        "first_seen": meta.get("first_seen", LEGACY_DEFAULT_FIRST_SEEN),
+                        "fail_count": meta.get("fail_count", 0),
+                        "delay_ms": meta.get("delay_ms", 0),
+                        "status": meta.get("status", "pending"),
+                        "colo": meta.get("colo", ""),
+                        "tested_at": meta.get("tested_at", ""),
+                    }
+            if not existing and csv_meta_by_url:
+                log.warning(
+                    "本地 %s 缺失，且 %s 中读取的 %d 条记录全部命中墓碑或未匹配到有效 host:port (可能含未识别格式/IPv6)",
+                    filepath, csv_path, len(csv_meta_by_url)
+                )
+            else:
+                log.info("本地 %s 缺失，已从 %s 兜底恢复有效代理节点: %d 个 (已执行墓碑过滤)", filepath, csv_path, len(existing))
+        return existing
+
+    # 3. 正常读取 proxies.txt，优先按 canonical key (host:port) 关联 CSV 质检元数据
     try:
         with open(filepath, "r", encoding="utf-8") as f:
             for line in f:
@@ -236,7 +274,7 @@ def load_existing_proxies(
                     continue
                 for url, key in extract_proxies(line_s):
                     if not is_tombstoned(key, tombstone):
-                        meta = csv_meta.get(url, {})
+                        meta = csv_meta_by_key.get(key) or csv_meta_by_url.get(url, {})
                         existing[key] = {
                             "url": url,
                             "first_seen": meta.get("first_seen", LEGACY_DEFAULT_FIRST_SEEN),
