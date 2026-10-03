@@ -40,7 +40,7 @@
 - **💡 未收录 ASN 动态发现与自适应预警**：增量抓取遇外部新自治系统时，自动比对内置权威对照库；若发现未收录 ASN，将在 Telegram 卡片中动态高亮提示并展示待确认明细，提示管理员按需确认并补充入库；若无未知 ASN 则 0 噪音完全隐藏。
 - **📱 动态双状态 Telegram 运行卡片**：首行支持「🟢 发现新增 + 🗑️ 剔除死节点」双状态动态高亮呈现，底栏包含细分引擎淘汰明细 `[代理 X, 反代 Y, 扫描 Z]`，锁屏即知变动。
 - **🛡️ 工业级防截断、原子覆写与精准协议鉴真**：质检引擎采用统一 Deadline 超时控制与 4096 字节安全余量循环读取（`read_full_response`），支持 `need_body=True` 完整获取 `/cdn-cgi/trace` 响应体中的 `colo` 关键属性，非 200 响应毫秒级短路退出杜绝空耗超时；严格切分 Header 与 Body 区域，结合字节级正则精准锚定状态行（`301`/`200`）与 `Server: cloudflare`；全链路数据落盘统一采用 `.tmp` $\rightarrow$ `os.replace` 原子替换，彻底消除进程中断导致的半截坏文件。
-- **🛡️ 静态安全门禁与故障秒级告警**：工作流启动 1 秒内通过 `py_compile` 拦截语法错误，`ruff --select F82` 拦截未定义变量，并由 `providers.py --validate` 执行数据库一致性校验；若流水线任何环节异常中断，自动秒级推送 Telegram 告警卡片并附带日志直链。
+- **🛡️ 静态安全门禁与全自动回归测试**：工作流启动 1 秒内通过 `py_compile` 拦截语法错误，`ruff --select F82` 拦截未定义变量，由 `providers.py --validate` 执行数据库一致性校验，并自动运行 `tests/test_core.py` 全量回归单元测试（覆盖协议解析、Host 安全防注入、SSOT 权威防污染与容灾自愈）；若流水线任何环节异常中断，自动秒级推送 Telegram 告警卡片并附带日志直链。
 - **🧹 自动维护与构建瘦身**：每次运行自动清理 GitHub Actions 历史记录，始终**仅保留最近 4 次运行记录**，告别冗余历史堆积！
 
 ---
@@ -83,6 +83,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | **`proxyip_verify.py`** | **反代 ProxyIP 质检引擎**：抗分包/防截断（Header/Body 隔离），验证反代真实穿透能力，并按质检状态分层导出分国与网络属性纯净列表。 |
 | **`cf_verify.py`** | **全量优选 IP 鉴真与最终卡片推送**：执行 TLS 官方证书鉴真 + HTTP 301 重定向抗截断精准校验，汇总流水线所有阶段数据并推送统一 TG 统计卡片。 |
 | **`gen_session.py`** | **Telethon Session 辅助生成器**：本地运行快速交互登录 Telegram 并输出 Session 字符串，供 GitHub Actions 免交互调用。 |
+| **`tests/test_core.py`** | **核心回归测试套件**：标准 `unittest` 自动化测试集，覆盖 Host 鉴真与防注入、路径穿越防御、多品牌别名幂等格式化、六大网络分类定性与数据容灾自愈，已深度接入 CI 门禁。 |
 
 ---
 
@@ -350,7 +351,9 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
   * **智能 ASN 与 ISP 规范化归属**：面对新出现的节点或上游源缺少 ASN 元数据的 IP，解析引擎优先通过本地 1,000+ 离线数据库与云厂商特征词库秒级补齐，杜绝解析阶段的外网 I/O 阻塞；针对全新未知自治系统提供动态发现预警机制（模式 A），在 TG 卡片中高亮提示，管理员可按需在本地离线补充维护。
   * **双向索引映射架构**：维护 1,000+ 条权威映射，构建 `isp_to_asn`（服务商查 ASN）与 `asn_to_isp`（ASN 查标准服务商）双向索引，在支持多业务线多 ASN（1 对 N）与共用上游自治系统（N 对 1）现实非对称特征的同时，实现毫秒级双向检索。
 * **权威防污染与安全隔离架构（Anti-Pollution & Safe Guard）**：
-  * **权威名称防污染锁定**：反查出的 ASN 若已收录于本地权威已知厂商字典（如 `AS45102 = Alibaba Cloud`、`AS13335 = Cloudflare`），坚决保留规范化标准名称，拦截第三方 API 临时/上游机房的脏标签覆盖污染。
+  * **权威名称防污染锁定与多租户别名保留（SSOT & Reseller Idempotency）**：
+    1. 反查出的 ASN 若已收录于本地权威已知厂商字典（如 `AS45102 = Alibaba Cloud`、`AS13335 = Cloudflare`），坚决保留规范化标准名称，拦截第三方 API 临时/上游机房的脏标签覆盖污染；
+    2. 针对无独立自治域的下游分销/租户品牌（如 Claw Cloud 复用阿里云 `AS45102`、BageVM 复用 DigitalOcean `AS14061`），采用 **first-win 主品牌优先**策略锁定权威名称，同时由 `format_asn_isp()` 规范格式化保留商业别名（如 `AS45102 Alibaba Cloud (Claw Cloud)`），且具备多轮调用幂等性，杜绝括号嵌套；
   * **双级精准查表与子串碰撞防御**：
     1. **第一级（精准匹配）**：持久化数据库严格执行全词精准哈希匹配（含大小写归一化 `ASN_DATABASE_ISP_LOWER`），绝不在泛 ISP 数据库上滥用模糊子串匹配，彻底根除如 `IDC` 泛化碰撞误伤（如将 `China Telecom IDC Center` 误判为 `AS36530 IDC`）；
     2. **第二级（词界安全词根）**：仅对精选的公有云/VPS 权威别名执行关键词匹配；针对 `len <= 3` 的超短别名（如 `ace`, `cf`, `aws`, `wap`）引入非字母数字边界防护（Regex 词界），杜绝内嵌单词误伤（如 `CyberSpace` 误匹配 `ace`）。
@@ -509,11 +512,12 @@ pip install -r requirements.txt
 
 ### 本地回归校验与测试命令
 ```bash
-# ① 语法与静态门禁预检（与 GitHub Actions 门禁一致，0.5秒拦截语法、未定义变量与ASN结构错误）
+# ① 语法、静态门禁与核心回归测试（与 GitHub Actions 门禁一致，毫秒级拦截语法、未定义变量、ASN结构与逻辑回归）
 python -m py_compile *.py
 pip install ruff
 ruff check . --select F82
 python providers.py --validate
+python -m unittest discover -s tests
 
 # ② 通用代理连通性质检
 python proxies_verify.py --concurrency 100 --no-notify
