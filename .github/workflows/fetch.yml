@@ -41,6 +41,7 @@ jobs:
           pip install ruff
           ruff check . --select F82
           python providers.py --validate
+          python -m unittest discover -s tests
 
       - name: 📡 抓取 TG 代理与优选 IP
         env:
