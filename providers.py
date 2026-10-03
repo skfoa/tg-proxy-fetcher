@@ -1307,13 +1307,23 @@ def format_proxy_json_item(r_dict: dict) -> dict:
     m_asn = re.search(r"AS(\d+)", raw_asn, re.IGNORECASE)
     clean_asn_num = m_asn.group(1) if m_asn else raw_asn
 
-    c_code = (r_dict.get("country") or "UN").strip().upper()
-    if len(c_code) != 2:
-        c_code = "UN"
-    c_name = COUNTRY_NAME_MAP.get(c_code, c_code)
-    c_emoji = country_code_to_emoji(c_code)
+    raw_country = str(r_dict.get("country") or "").strip().upper()
+    if len(raw_country) == 2 and raw_country != "UN":
+        c_code = raw_country
+        c_name = COUNTRY_NAME_MAP.get(c_code, c_code)
+        c_emoji = country_code_to_emoji(c_code)
+    else:
+        c_code = ""
+        c_name = ""
+        c_emoji = ""
+
     isp_name = str(r_dict.get("isp") or "").strip()
     proto = str(r_dict.get("proto") or "socks5").strip().lower()
+
+    # net_type：优先使用已确定的有效类型；若未显式标记但有 ASN/ISP 则执行分类；若完全未查询则留空，绝不虚假打标为 datacenter
+    net_type_val = str(r_dict.get("net_type") or "").strip()
+    if not net_type_val and (clean_asn_num or isp_name):
+        net_type_val = classify_asn(clean_asn_num, isp_name)
 
     return {
         "proxy": r_dict.get("url") or "",
@@ -1328,7 +1338,7 @@ def format_proxy_json_item(r_dict: dict) -> dict:
         "asn": clean_asn_num,
         "asOrganization": isp_name,
         "isp": isp_name,
-        "net_type": r_dict.get("net_type") or "datacenter",
+        "net_type": net_type_val,
         "delay_ms": safe_int(r_dict.get("delay_ms"), 0),
         "colo": r_dict.get("colo") or "",
         "egress_ip": r_dict.get("egress_ip") or "",
