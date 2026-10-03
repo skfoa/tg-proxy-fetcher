@@ -95,7 +95,6 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | :--- | :--- | :---: | :--- |
 | **`data/proxies.txt`** | 质检存活的多协议通用代理全量清单（按协议分段注释归类，纯文本） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies.txt` |
 | **`data/proxies.csv`** | 代理质检数据总表（15 字段完整元数据，含出口国家、出口 IP、ASN、ISP 与网络分类） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies.csv` |
-| **`data/proxies.json`** | 全量通用代理标准化 JSON 数据源（直接适配 EDT-Toolkit / 油猴脚本及第三方 API） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies.json` |
 | **`data/proxies/*.txt`** | 按协议独立拆分的纯净单协议代理清单（如 `socks5.txt`、`turn.txt`、`sstp.txt`） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies/{协议}.txt` |
 | **`data/proxies/*.csv`** | 按协议独立拆分的纯净单协议结构化数据表（如 `socks5.csv`、`turn.csv`、`sstp.csv`） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies/{协议}.csv` |
 | **`data/proxies/*.json`** | 按协议独立拆分的标准化 JSON 端点（如 `socks5.json`、`turn.json`、`sstp.json`，无缝无感对接 EDT-Toolkit 全协议拉取与国家/类型筛选） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies/{协议}.json` |
@@ -149,7 +148,6 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 * **多模持久化与协议专属拆分（绝对杜绝协议混杂交错，支持三模三端输出）**：
   - `data/proxies.txt`：全量代理汇总纯文本，按协议分段归类输出（`# SOCKS5 代理`、`# TURN 协议`、`# SSTP 协议` 等），段内按实测延迟严选升序排列，开箱即用不混杂。
   - `data/proxies.csv`：结构化质检总表（15 字段完整凭据），严格按协议大类分块聚集排序（SOCKS5 块 ➔ TURN 块 ➔ SSTP 块），行与行之间绝无交错混插。
-  - `data/proxies.json`：标准化全量 JSON 数据源，单节点包含 `proxy`, `protocol`, `ip`, `port`, `country`, `country_name`, `country_cn`, `country_emoji`, `asn`, `isp`, `asOrganization`, `net_type` 等全量凭据，直接适配 EDT-Toolkit 及外部系统拉取。
   - `data/proxies/`：专属单协议独立拆分子目录，提供纯净单协议 `.txt`、`.csv` 与 `.json` 文件：
     - `data/proxies/socks5.txt` / `socks5.csv` / `socks5.json`：纯 SOCKS5 代理节点列表、表格与 JSON 数据源（开箱直连 Telegram / Proxifier / EDT-Toolkit 等，100% 纯净无非 SOCKS5 记录）；
     - `data/proxies/turn.txt` / `turn.csv` / `turn.json`：纯 TURN 穿透协议节点列表、表格与 JSON；

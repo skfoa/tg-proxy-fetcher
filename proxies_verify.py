@@ -48,7 +48,6 @@ from providers import (
     format_proxies_txt,
     save_proxies_by_protocol,
     save_proxies_csv,
-    save_proxies_json,
     format_buffer_badge,
     read_full_response,
     PROXY_CSV_FIELDS,
@@ -82,7 +81,6 @@ if sys.platform == "win32":
 DATA_DIR = "data"
 PROXIES_TXT = os.path.join(DATA_DIR, "proxies.txt")
 PROXIES_CSV = os.path.join(DATA_DIR, "proxies.csv")
-PROXIES_JSON = os.path.join(DATA_DIR, "proxies.json")
 PROXIES_DIR = os.path.join(DATA_DIR, "proxies")
 
 PROBE_HOST = "speed.cloudflare.com"
@@ -697,13 +695,11 @@ def save_proxies_data(
     txt_path: str = PROXIES_TXT,
     csv_path: str = PROXIES_CSV,
     proxies_dir: str = PROXIES_DIR,
-    json_path: str = PROXIES_JSON,
 ):
     """
     保存质检幸存节点：
     按 (协议顺序, fail_count 升序, delay_ms 升序) 排序，确保在 CSV 与 TXT 中各协议严格分块独立，绝不交错混杂。
     覆写 proxies.txt 与 proxies.csv，并按协议独立拆分保存至 proxies/ 子目录（包含 .txt, .csv, .json 纯净单协议版）。
-    同时生成全量 proxies.json 文件，完美兼容 EDT-Toolkit / 油猴脚本与第三方前端。
     """
     PROTO_ORDER = ["socks5", "http", "https", "turn", "sstp"]
 
@@ -733,9 +729,6 @@ def save_proxies_data(
 
     # 写入 proxies.csv (完整元数据表，按协议分块严格隔离，不混杂；原子写入防截断)
     save_proxies_csv(survivors, csv_path=csv_path)
-
-    # 写入 proxies.json (全量标准化 JSON，适配前端/油猴脚本多地区与类型检索)
-    save_proxies_json(survivors, json_path=json_path)
 
 
 # 向后兼容历史别名
