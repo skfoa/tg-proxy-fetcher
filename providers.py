@@ -42,7 +42,8 @@ KNOWN_CLOUD_PROVIDERS = {
     "jcloud": ("AS44907", "JD Cloud"),
     "ksyun": ("AS45062", "Kingsoft Cloud"),
     "kingsoft": ("AS45062", "Kingsoft Cloud"),
-    "qiniu": ("AS136907", "Qiniu Cloud"),
+    "qiniu": ("AS152644", "Qiniu Cloud"),
+    "qiniucloud": ("AS152644", "Qiniu Cloud"),
 
     # 国际主流公有云
     "aws": ("AS16509", "Amazon AWS"),
@@ -79,6 +80,7 @@ KNOWN_CLOUD_PROVIDERS = {
     "bandwagon": ("AS25820", "BandwagonHost"),
     "bwg": ("AS25820", "BandwagonHost"),
     "it7": ("AS25820", "BandwagonHost"),
+    # 下游分销/租户品牌（无独立 ASN，现网复用阿里云 AS45102 基础设施；first-win 确保反查标准名锁定为 Alibaba Cloud）
     "claw": ("AS45102", "Claw Cloud"),
     "clawcloud": ("AS45102", "Claw Cloud"),
     "vmiss": ("AS147049", "VMISS"),
@@ -96,6 +98,7 @@ KNOWN_CLOUD_PROVIDERS = {
     "spartan": ("AS201106", "SpartanHost"),
     "spartanhost": ("AS201106", "SpartanHost"),
     "wap": ("AS149798", "WAP.ac"),
+    # 下游分销/租户品牌（无独立 ASN，现网美西等节点复用 DigitalOcean AS14061；first-win 确保反查标准名锁定为 DigitalOcean）
     "bagevm": ("AS14061", "BageVM"),
     "netlab": ("AS979", "NetLab"),
     "zenlayer": ("AS21859", "Zenlayer"),
@@ -1790,7 +1793,7 @@ ASN_EXACT_NET_TYPE = {
         "AS393398": "datacenter", "AS397503": "datacenter", "AS31130": "datacenter", "AS50812": "datacenter", "AS12306": "datacenter", "AS7385": "datacenter",
         "AS57495": "datacenter", "AS198614": "datacenter", "AS149573": "datacenter", "AS12655": "datacenter", "AS141968": "datacenter", "AS35758": "datacenter",
         "AS55470": "datacenter", "AS16371": "datacenter", "AS205275": "datacenter",
-        "AS26658": "datacenter", "AS34343": "datacenter"
+        "AS26658": "datacenter", "AS34343": "datacenter", "AS152644": "datacenter"
 }
 
 # 自动将 KNOWN_CLOUD_PROVIDERS 中未单独显式指定类型的知名云厂商/机房补充进入 ASN_EXACT_NET_TYPE 默认为 datacenter

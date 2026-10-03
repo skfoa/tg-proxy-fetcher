@@ -118,6 +118,18 @@ class TestProviders(unittest.TestCase):
         self.assertEqual(clean_asn("IDC Cube"), "AS36530")
         self.assertEqual(format_asn_isp("AS36530"), "AS36530 IDC Cube")
 
+        # 验证七牛云独立 ASN (AS152644) 与华为云 (AS136907) 解耦
+        self.assertEqual(clean_asn("Qiniu Cloud"), "AS152644")
+        self.assertEqual(clean_asn("Qiniu"), "AS152644")
+        self.assertEqual(format_asn_isp("AS152644"), "AS152644 Qiniu Cloud")
+        self.assertEqual(classify_asn("AS152644"), "datacenter")
+
+        # 验证下游租户/分销商别名保留 (Claw Cloud / BageVM)
+        self.assertEqual(clean_asn("Claw Cloud"), "AS45102")
+        self.assertEqual(format_asn_isp("AS45102", "Claw Cloud"), "AS45102 Alibaba Cloud (Claw Cloud)")
+        self.assertEqual(clean_asn("BageVM"), "AS14061")
+        self.assertEqual(format_asn_isp("AS14061", "BageVM"), "AS14061 DigitalOcean (BageVM)")
+
     def test_normalize_timestamp(self):
         # 8 位纯数字日期必须原样保留，严禁误转换为 1970 年时间戳
         self.assertEqual(normalize_timestamp("20260906"), "20260906")
