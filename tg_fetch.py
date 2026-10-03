@@ -57,6 +57,7 @@ from providers import (
     save_proxyip_by_country,
     save_proxies_by_protocol,
     save_proxies_csv,
+    save_proxies_json,
     save_scan_ips_by_asn,
     format_diff,
     classify_asn,
@@ -133,6 +134,7 @@ SUB_URLS = _parse_sub_urls()
 DATA_DIR = "data"
 OUTPUT_PROXY_FILE = os.path.join(DATA_DIR, "proxies.txt")
 OUTPUT_PROXIES_CSV = os.path.join(DATA_DIR, "proxies.csv")
+OUTPUT_PROXIES_JSON = os.path.join(DATA_DIR, "proxies.json")
 OUTPUT_PROXIES_DIR = os.path.join(DATA_DIR, "proxies")
 OUTPUT_CF_FILE = os.path.join(DATA_DIR, "cf_ips.csv")
 OUTPUT_CF_TXT = os.path.join(DATA_DIR, "cf_ips.txt")
@@ -226,6 +228,7 @@ def load_existing_proxies(
                         "country": r.get("country", ""),
                         "egress_ip": r.get("egress_ip", ""),
                         "asn": r.get("asn", ""),
+                        "isp": r.get("isp", ""),
                         "net_type": r.get("net_type", ""),
                         "tested_at": r.get("tested_at", ""),
                     }
@@ -261,6 +264,7 @@ def load_existing_proxies(
                         "country": meta.get("country", ""),
                         "egress_ip": meta.get("egress_ip", ""),
                         "asn": meta.get("asn", ""),
+                        "isp": meta.get("isp", ""),
                         "net_type": meta.get("net_type", ""),
                         "tested_at": meta.get("tested_at", ""),
                     }
@@ -293,6 +297,7 @@ def load_existing_proxies(
                             "country": meta.get("country", ""),
                             "egress_ip": meta.get("egress_ip", ""),
                             "asn": meta.get("asn", ""),
+                            "isp": meta.get("isp", ""),
                             "net_type": meta.get("net_type", ""),
                             "tested_at": meta.get("tested_at", ""),
                         }
@@ -649,6 +654,7 @@ def save_and_notify(
     log.info("已在 %s/ 目录下生成 %d 个独立协议文件: %s", OUTPUT_PROXIES_DIR, len(proto_counts), proto_counts)
 
     save_proxies_csv(list(final_proxies.values()), OUTPUT_PROXIES_CSV)
+    save_proxies_json(list(final_proxies.values()), OUTPUT_PROXIES_JSON)
 
     # 2. 保存单条优选 IP（原子写入）
     sorted_cf_ips = sorted(

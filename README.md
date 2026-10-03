@@ -94,9 +94,11 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | 文件名 | 内容说明 | 生成条件 | GitHub Raw 永久直链（点击即可导入） |
 | :--- | :--- | :---: | :--- |
 | **`data/proxies.txt`** | 质检存活的多协议通用代理全量清单（按协议分段注释归类，纯文本） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies.txt` |
-| **`data/proxies.csv`** | 代理质检数据总表（按协议严格分块排列，杜绝不同协议交错混杂） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies.csv` |
+| **`data/proxies.csv`** | 代理质检数据总表（15 字段完整元数据，含出口国家、出口 IP、ASN、ISP 与网络分类） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies.csv` |
+| **`data/proxies.json`** | 全量通用代理标准化 JSON 数据源（直接适配 EDT-Toolkit / 油猴脚本及第三方 API） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies.json` |
 | **`data/proxies/*.txt`** | 按协议独立拆分的纯净单协议代理清单（如 `socks5.txt`、`turn.txt`、`sstp.txt`） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies/{协议}.txt` |
 | **`data/proxies/*.csv`** | 按协议独立拆分的纯净单协议结构化数据表（如 `socks5.csv`、`turn.csv`、`sstp.csv`） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies/{协议}.csv` |
+| **`data/proxies/*.json`** | 按协议独立拆分的标准化 JSON 端点（如 `socks5.json`、`turn.json`、`sstp.json`，无缝无感对接 EDT-Toolkit 全协议拉取与国家/类型筛选） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies/{协议}.json` |
 | **`data/cf_ips.txt`** | 频道日常单条优选 IP（纯文本） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/cf_ips.txt` |
 | **`data/cf_ips.csv`** | 频道日常单条优选 IP（数据表） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/cf_ips.csv` |
 | **`data/scan_ips.txt`** | 扫描测速总清单（按存活/缓冲质检状态分层排序，纯文本） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/scan_ips.txt` |
@@ -144,15 +146,16 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 * **智能增量合并**：每次抓取优先比对历史库，新发布的节点自动追加并去重，以 `host:port` 为唯一标识刷新认证与配置。
 * **主动质检淘汰（`proxies_verify.py`）**：集成 RFC 1928（SOCKS5 协商/认证/CONNECT 隧道穿透）、RFC 5389（STUN/TURN Binding 鉴真）、HTTP CONNECT 穿透、MS-SSTP 标准双工隧道握手全套真实网络协议握手引擎。
 * **连续失败缓冲保护（`--max-fails 3`）**：探测失败标记缓冲（`fail_count=1~2` 为缓冲期），连续 3 次全网不可达方才彻底剔除，避免公网抖动误杀。
-* **双模持久化与协议专属拆分（绝对杜绝协议混杂交错）**：
+* **多模持久化与协议专属拆分（绝对杜绝协议混杂交错，支持三模三端输出）**：
   - `data/proxies.txt`：全量代理汇总纯文本，按协议分段归类输出（`# SOCKS5 代理`、`# TURN 协议`、`# SSTP 协议` 等），段内按实测延迟严选升序排列，开箱即用不混杂。
-  - `data/proxies.csv`：结构化质检总表，严格按协议大类分块聚集排序（SOCKS5 块 ➔ TURN 块 ➔ SSTP 块），行与行之间绝不再有交错混插现象。
-  - `data/proxies/`：专属单协议独立拆分子目录，提供纯净单协议 `.txt` 与 `.csv` 文件：
-    - `data/proxies/socks5.txt` / `socks5.csv`：纯 SOCKS5 代理节点列表与表格（开箱直连 Telegram / Proxifier 等，100% 纯净无非 SOCKS5 记录）；
-    - `data/proxies/turn.txt` / `turn.csv`：纯 TURN 穿透协议节点列表与表格；
-    - `data/proxies/sstp.txt` / `sstp.csv`：纯 SSTP 安全隧道协议节点列表与表格（VPNGate 等）；
-    - `data/proxies/http.txt` / `http.csv`：纯 HTTP 代理节点列表与表格；
-    - `data/proxies/https.txt` / `https.csv`：纯 HTTPS 代理节点列表与表格。
+  - `data/proxies.csv`：结构化质检总表（15 字段完整凭据），严格按协议大类分块聚集排序（SOCKS5 块 ➔ TURN 块 ➔ SSTP 块），行与行之间绝无交错混插。
+  - `data/proxies.json`：标准化全量 JSON 数据源，单节点包含 `proxy`, `protocol`, `ip`, `port`, `country`, `country_name`, `country_cn`, `country_emoji`, `asn`, `isp`, `asOrganization`, `net_type` 等全量凭据，直接适配 EDT-Toolkit 及外部系统拉取。
+  - `data/proxies/`：专属单协议独立拆分子目录，提供纯净单协议 `.txt`、`.csv` 与 `.json` 文件：
+    - `data/proxies/socks5.txt` / `socks5.csv` / `socks5.json`：纯 SOCKS5 代理节点列表、表格与 JSON 数据源（开箱直连 Telegram / Proxifier / EDT-Toolkit 等，100% 纯净无非 SOCKS5 记录）；
+    - `data/proxies/turn.txt` / `turn.csv` / `turn.json`：纯 TURN 穿透协议节点列表、表格与 JSON；
+    - `data/proxies/sstp.txt` / `sstp.csv` / `sstp.json`：纯 SSTP 安全隧道协议节点列表、表格与 JSON（VPNGate 等）；
+    - `data/proxies/http.txt` / `http.csv` / `http.json`：纯 HTTP 代理节点列表、表格与 JSON；
+    - `data/proxies/https.txt` / `https.csv` / `https.json`：纯 HTTPS 代理节点列表、表格与 JSON。
 
 ### 2. `data/cf_ips.txt` / `data/cf_ips.csv`（频道日常单条优选 IP）
 * 仅收录频道日常消息正文中发布的单条优选 IP（如 `@danfeng_chat`、`@otcfxq` 的实时测速通报）。
@@ -255,7 +258,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 > - `datacenter`：常规数据中心/托管机房 ➔ 归入各国家/地区常规列表
 
 #### ③ 通用代理质检数据表（`data/proxies.csv`）
-*共 14 个字段，记录 SOCKS5/HTTP/HTTPS/TURN/SSTP 等通用代理应用层穿透结果、出口机房国家、出口真实 IP、自治系统 ASN、原生家宽/数据中心属性、质检状态与首次收录生命周期：*
+*共 15 个字段，记录 SOCKS5/HTTP/HTTPS/TURN/SSTP 等通用代理应用层穿透结果、出口机房国家、出口真实 IP、自治系统 ASN、运营商 ISP 组织、原生家宽/数据中心属性、质检状态与首次收录生命周期：*
 
 | 字段 | 类型 | 说明 | 示例 |
 | :--- | :--- | :--- | :--- |
@@ -270,7 +273,8 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `country` | 字符串 | 出口落地国家或地区 ISO 二字代码（Cloudflare trace `loc`） | `JP`、`US` |
 | `egress_ip` | 字符串 | 代理节点向外访问时 Cloudflare 观测到的出口真实 IP（直连隧道为节点 host） | `198.51.100.2` |
 | `asn` | 字符串 | 自治系统编号与运营商标准归属（一体化直观标签） | `AS13335 Cloudflare`、`AS34343 Eweka` |
-| `net_type` | 字符串 | 网络类型属性分类（`isp` 原生家宽 / `datacenter` 机房 / `business` 商业专线等） | `isp`、`datacenter` |
+| `isp` | 字符串 | **【核心凭据】** 自治系统所属运营商 / 托管商组织名称（与 `proxyip.csv` 规范统一对齐） | `Cloudflare, Inc.`、`Eweka Internet Services B.V.` |
+| `net_type` | 字符串 | **【核心凭据】** 网络类型属性分类（`isp` 原生家宽 / `datacenter` 机房 / `business` 商业专线等） | `isp`、`datacenter` |
 | `tested_at` | 时间字符串 | 质检探测完成时间 | `2026-09-19 18:35:00` |
 | `first_seen` | 时间字符串 | 首次收录时间（以第一次抓取入库为准，永久不变，用于统计节点存活时长与长期可用性） | `2026-10-01 00:00:00` |
 

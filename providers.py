@@ -1115,6 +1115,29 @@ PROXY_PROTO_NAMES = {
 # Once all legacy records are either backfilled or naturally phased out via tombstone, this fallback can be removed.
 LEGACY_DEFAULT_FIRST_SEEN = "2026-10-01 00:00:00"
 
+# ISO 3166-1 alpha-2 常用国家/地区中文映射表
+COUNTRY_NAME_MAP: dict[str, str] = {
+    "US": "美国", "CN": "中国", "HK": "中国香港", "TW": "中国台湾", "JP": "日本",
+    "SG": "新加坡", "KR": "韩国", "GB": "英国", "DE": "德国", "FR": "法国",
+    "NL": "荷兰", "CA": "加拿大", "AU": "澳大利亚", "RU": "俄罗斯", "IN": "印度",
+    "MY": "马来西亚", "TH": "泰国", "VN": "越南", "ID": "印度尼西亚", "PH": "菲律宾",
+    "BR": "巴西", "MX": "墨西哥", "ZA": "南非", "IT": "意大利", "ES": "西班牙",
+    "SE": "瑞典", "NO": "挪威", "FI": "芬兰", "PL": "波兰", "CH": "瑞士",
+    "AT": "奥地利", "BE": "比利时", "IE": "爱尔兰", "NZ": "新西兰", "AE": "阿联酋",
+    "TR": "土耳其", "UA": "乌克兰", "CZ": "捷克", "RO": "罗马尼亚", "BG": "保加利亚",
+    "HU": "匈牙利", "GR": "希腊", "PT": "葡萄牙", "IL": "以色列", "AR": "阿根廷",
+    "CL": "智利", "CO": "哥伦比亚", "PE": "秘鲁", "EG": "埃及", "KZ": "哈萨克斯坦",
+}
+
+
+def country_code_to_emoji(country_code: str) -> str:
+    """将 ISO 3166-1 alpha-2 国家/地区代码转换为标准国旗 Emoji 表情（如 US -> 🇺🇸, JP -> 🇯🇵）"""
+    if not country_code or len(country_code) != 2 or not country_code.isalpha():
+        return "🌐"
+    code = country_code.upper()
+    return chr(0x1F1E6 + ord(code[0]) - ord('A')) + chr(0x1F1E6 + ord(code[1]) - ord('A'))
+
+
 PROXY_CSV_FIELDS = [
     "url",
     "proto",
@@ -1127,6 +1150,7 @@ PROXY_CSV_FIELDS = [
     "country",
     "egress_ip",
     "asn",
+    "isp",
     "net_type",
     "tested_at",
     "first_seen",
@@ -1274,6 +1298,122 @@ def save_proxies_by_protocol(rows: list, output_dir: str = "data/proxies") -> di
 
         groups.setdefault(proto, []).append((fc, dms, url, row_dict))
 
+def format_proxy_json_item(r_dict: dict) -> dict:
+    """
+    转换为适配 EDT-Toolkit / 油猴脚本与第三方前端的标准化 JSON 字典对象：
+    支持 proxy, protocol, ip, port, country, country_name, country_emoji, asn, isp, asOrganization, net_type 等全量凭据
+    """
+    raw_asn = str(r_dict.get("asn") or "").strip()
+    m_asn = re.search(r"AS(\d+)", raw_asn, re.IGNORECASE)
+    clean_asn_num = m_asn.group(1) if m_asn else raw_asn
+
+    c_code = (r_dict.get("country") or "UN").strip().upper()
+    if len(c_code) != 2:
+        c_code = "UN"
+    c_name = COUNTRY_NAME_MAP.get(c_code, c_code)
+    c_emoji = country_code_to_emoji(c_code)
+    isp_name = str(r_dict.get("isp") or "").strip()
+    proto = str(r_dict.get("proto") or "socks5").strip().lower()
+
+    return {
+        "proxy": r_dict.get("url") or "",
+        "protocol": proto,
+        "ip": r_dict.get("host") or "",
+        "port": safe_int(r_dict.get("port"), 0),
+        "country": c_code,
+        "country_name": c_name,
+        "country_cn": c_name,
+        "country_emoji": c_emoji,
+        "city": "",
+        "asn": clean_asn_num,
+        "asOrganization": isp_name,
+        "isp": isp_name,
+        "net_type": r_dict.get("net_type") or "datacenter",
+        "delay_ms": safe_int(r_dict.get("delay_ms"), 0),
+        "colo": r_dict.get("colo") or "",
+        "egress_ip": r_dict.get("egress_ip") or "",
+        "tested_at": r_dict.get("tested_at") or "",
+    }
+
+
+def save_proxies_json(rows: list, json_path: str = "data/proxies.json") -> int:
+    """
+    保存全量通用代理标准化 JSON 文件（原子写入），
+    按协议分组与延迟排序，直接适配 EDT-Toolkit / 油猴脚本及第三方 API 调用。
+    """
+    json_list = [format_proxy_json_item(r) for r in rows if isinstance(r, dict) and r.get("url")]
+    dir_name = os.path.dirname(os.path.abspath(json_path))
+    if dir_name:
+        os.makedirs(dir_name, exist_ok=True)
+    tmp_json = f"{json_path}.tmp"
+    with open(tmp_json, "w", encoding="utf-8") as f:
+        json.dump(json_list, f, ensure_ascii=False, indent=2)
+    os.replace(tmp_json, json_path)
+    log.info("已覆写保存 %s: %d 个全量代理节点 (标准 JSON 格式)", json_path, len(json_list))
+    return len(json_list)
+
+
+def save_proxies_by_protocol(rows: list, output_dir: str = "data/proxies") -> dict[str, int]:
+    """
+    按协议独立拆分保存至 output_dir 目录：
+    对 SOCKS5、HTTP、HTTPS、TURN、SSTP 等每种协议生成：
+      - {proto}.txt  (纯文本 URL 清单，带统计注释头)
+      - {proto}.csv  (单协议结构化 CSV，15 列完整元数据，包含 country, egress_ip, asn, isp, net_type)
+      - {proto}.json (单协议标准化 JSON，适配 EDT-Toolkit / 油猴脚本全协议抽取与类型筛选)
+    自动清理已过时或不存在的协议文件。
+    返回每个协议成功保存的节点数量字典。
+    """
+    os.makedirs(output_dir, exist_ok=True)
+    groups: dict[str, list] = {}
+    seen = set()
+
+    for item in rows:
+        if isinstance(item, dict):
+            url = (item.get("url") or "").strip()
+            row_dict = dict(item)
+        else:
+            url = str(item).strip()
+            row_dict = {"url": url}
+
+        if not url or url.startswith("#") or url in seen:
+            continue
+        seen.add(url)
+
+        proto = (row_dict.get("proto") or "").strip().lower()
+        if not proto:
+            proto = url.split("://", 1)[0].lower() if "://" in url else "other"
+        row_dict["proto"] = proto
+        row_dict.setdefault("fail_count", safe_int(row_dict.get("fail_count"), 0))
+        row_dict.setdefault("delay_ms", safe_int(row_dict.get("delay_ms"), 0))
+        row_dict.setdefault("status", row_dict.get("status", "pending"))
+        row_dict.setdefault("colo", row_dict.get("colo", ""))
+        row_dict.setdefault("country", row_dict.get("country", ""))
+        row_dict.setdefault("egress_ip", row_dict.get("egress_ip", ""))
+        row_dict.setdefault("asn", row_dict.get("asn", ""))
+        row_dict.setdefault("isp", row_dict.get("isp", ""))
+        row_dict.setdefault("net_type", row_dict.get("net_type", ""))
+        row_dict.setdefault("tested_at", row_dict.get("tested_at", ""))
+        row_dict.setdefault("first_seen", row_dict.get("first_seen", "") or LEGACY_DEFAULT_FIRST_SEEN)
+
+        if "host" not in row_dict or not row_dict["host"]:
+            try:
+                u = urllib.parse.urlparse(url)
+                row_dict["host"] = u.hostname or ""
+                row_dict["port"] = u.port or ""
+                row_dict.setdefault("user", u.username or "")
+                row_dict.setdefault("pwd", u.password or "")
+            except Exception:
+                row_dict["host"] = ""
+                row_dict["port"] = ""
+                row_dict.setdefault("user", "")
+                row_dict.setdefault("pwd", "")
+
+        fc = safe_int(row_dict.get("fail_count"), 0)
+        dms = safe_int(row_dict.get("delay_ms"), 0)
+        if dms <= 0:
+            dms = 99999
+        groups.setdefault(proto, []).append((fc, dms, url, row_dict))
+
     active_files = set()
     result_counts = {}
 
@@ -1306,12 +1446,22 @@ def save_proxies_by_protocol(rows: list, output_dir: str = "data/proxies") -> di
         os.replace(tmp_csv, csv_filepath)
         active_files.add(csv_fname)
 
+        # 3. 保存标准化单协议 JSON 接口数据（原子写入，完美兼容 EDT-Toolkit / 油猴脚本）
+        json_fname = f"{safe_proto}.json"
+        json_filepath = os.path.join(output_dir, json_fname)
+        tmp_json = f"{json_filepath}.tmp"
+        json_list = [format_proxy_json_item(r_dict) for _, _, _, r_dict in items]
+        with open(tmp_json, "w", encoding="utf-8") as f:
+            json.dump(json_list, f, ensure_ascii=False, indent=2)
+        os.replace(tmp_json, json_filepath)
+        active_files.add(json_fname)
+
         result_counts[proto] = len(items)
 
-    # 清理已不存在或旧命名格式的 .txt 与 .csv 文件
+    # 清理已不存在或旧命名格式的 .txt、.csv 与 .json 文件
     for old_f in os.listdir(output_dir):
         fpath = os.path.join(output_dir, old_f)
-        if os.path.isfile(fpath) and old_f.endswith((".txt", ".csv")) and old_f not in active_files:
+        if os.path.isfile(fpath) and old_f.endswith((".txt", ".csv", ".json")) and old_f not in active_files:
             try:
                 os.remove(fpath)
             except OSError:
@@ -1352,6 +1502,7 @@ def save_proxies_csv(rows: list, csv_path: str = "data/proxies.csv") -> int:
         row_dict.setdefault("country", row_dict.get("country", ""))
         row_dict.setdefault("egress_ip", row_dict.get("egress_ip", ""))
         row_dict.setdefault("asn", row_dict.get("asn", ""))
+        row_dict.setdefault("isp", row_dict.get("isp", ""))
         row_dict.setdefault("net_type", row_dict.get("net_type", ""))
         row_dict.setdefault("tested_at", row_dict.get("tested_at", ""))
         row_dict.setdefault("first_seen", row_dict.get("first_seen", "") or LEGACY_DEFAULT_FIRST_SEEN)

@@ -48,6 +48,7 @@ from providers import (
     format_proxies_txt,
     save_proxies_by_protocol,
     save_proxies_csv,
+    save_proxies_json,
     format_buffer_badge,
     read_full_response,
     PROXY_CSV_FIELDS,
@@ -55,6 +56,8 @@ from providers import (
     resolve_asn_online_async,
     classify_asn,
     format_asn_isp,
+    ASN_TO_PROVIDER,
+    ASN_DATABASE_ASN_TO_ISP,
 )
 
 # 确保本地 .env 加载
@@ -79,6 +82,7 @@ if sys.platform == "win32":
 DATA_DIR = "data"
 PROXIES_TXT = os.path.join(DATA_DIR, "proxies.txt")
 PROXIES_CSV = os.path.join(DATA_DIR, "proxies.csv")
+PROXIES_JSON = os.path.join(DATA_DIR, "proxies.json")
 PROXIES_DIR = os.path.join(DATA_DIR, "proxies")
 
 PROBE_HOST = "speed.cloudflare.com"
@@ -489,6 +493,7 @@ async def probe_single(
             row.setdefault("country", row.get("country", ""))
             row.setdefault("egress_ip", row.get("egress_ip", ""))
             row.setdefault("asn", row.get("asn", ""))
+            row.setdefault("isp", row.get("isp", ""))
             row.setdefault("net_type", row.get("net_type", ""))
 
         return row
@@ -519,6 +524,7 @@ def parse_proxy_url(url: str) -> dict | None:
             "country": "",
             "egress_ip": "",
             "asn": "",
+            "isp": "",
             "net_type": "",
             "tested_at": "",
         }
@@ -563,6 +569,7 @@ def load_proxies_data(
                     parsed["country"] = r.get("country", "")
                     parsed["egress_ip"] = r.get("egress_ip", "")
                     parsed["asn"] = r.get("asn", "")
+                    parsed["isp"] = r.get("isp", "")
                     parsed["net_type"] = r.get("net_type", "")
                     parsed["tested_at"] = r.get("tested_at", "")
                     parsed["first_seen"] = r.get("first_seen", "").strip() or LEGACY_DEFAULT_FIRST_SEEN
@@ -602,7 +609,7 @@ def load_proxies_data(
 async def enrich_proxies_metadata(survivors: list[dict], max_concurrency: int = 5) -> dict[str, int]:
     """
     为质检存活代理节点补全 ASN、ISP 及网络属性 (net_type：isp/datacenter/business 等)：
-    1. 优先使用已有的有效 asn / net_type（避免重复网络查询）
+    1. 优先使用已有的有效 asn / isp / net_type（避免重复网络查询）
     2. 基于 egress_ip（或 host IP）去重，通过并发信号量限制在线异步反查 ASN / ISP
     3. 调用 format_asn_isp 与 classify_asn 标准化打标
     4. 返回各网络属性的统计分布 dict，如 {"isp": 12, "datacenter": 35}
@@ -647,6 +654,7 @@ async def enrich_proxies_metadata(survivors: list[dict], max_concurrency: int = 
     net_stats: dict[str, int] = {}
     for r in survivors:
         curr_asn = r.get("asn", "").strip()
+        curr_isp = r.get("isp", "").strip()
         if not curr_asn:
             target_ip = r.get("egress_ip", "").strip()
             if not target_ip:
@@ -657,12 +665,23 @@ async def enrich_proxies_metadata(survivors: list[dict], max_concurrency: int = 
                 asn_code, isp_name = ip_cache[target_ip]
                 if asn_code:
                     r["asn"] = format_asn_isp(asn_code, isp_name)
+                    r["isp"] = isp_name
                     r["net_type"] = classify_asn(asn_code, isp_name)
 
         if r.get("asn"):
-            r["asn"] = format_asn_isp(r.get("asn", ""), r.get("isp", ""))
+            asn_val = r.get("asn", "")
+            isp_val = r.get("isp", "")
+            if not isp_val:
+                m_code = re.search(r"AS(\d+)", asn_val, re.IGNORECASE)
+                if m_code:
+                    code_key = f"AS{m_code.group(1)}"
+                    isp_val = ASN_TO_PROVIDER.get(code_key, "")
+                    if not isp_val and code_key in ASN_DATABASE_ASN_TO_ISP:
+                        isp_val = ASN_DATABASE_ASN_TO_ISP[code_key]
+                r["isp"] = isp_val
+            r["asn"] = format_asn_isp(asn_val, isp_val)
             if not r.get("net_type"):
-                r["net_type"] = classify_asn(r.get("asn", ""), r.get("isp", ""))
+                r["net_type"] = classify_asn(r.get("asn", ""), isp_val)
         else:
             if not r.get("net_type"):
                 r["net_type"] = classify_asn("", "")
@@ -678,11 +697,13 @@ def save_proxies_data(
     txt_path: str = PROXIES_TXT,
     csv_path: str = PROXIES_CSV,
     proxies_dir: str = PROXIES_DIR,
+    json_path: str = PROXIES_JSON,
 ):
     """
     保存质检幸存节点：
     按 (协议顺序, fail_count 升序, delay_ms 升序) 排序，确保在 CSV 与 TXT 中各协议严格分块独立，绝不交错混杂。
-    覆写 proxies.txt 与 proxies.csv（以及向后兼容 socks5.txt / socks5.csv），并按协议独立拆分保存至 proxies/ 子目录（包含 .txt 与 .csv 纯净单协议版）。
+    覆写 proxies.txt 与 proxies.csv，并按协议独立拆分保存至 proxies/ 子目录（包含 .txt, .csv, .json 纯净单协议版）。
+    同时生成全量 proxies.json 文件，完美兼容 EDT-Toolkit / 油猴脚本与第三方前端。
     """
     PROTO_ORDER = ["socks5", "http", "https", "turn", "sstp"]
 
@@ -706,12 +727,15 @@ def save_proxies_data(
     os.replace(tmp_txt, txt_path)
     log.info("已按协议分段覆写保存 %s: %d 个高可用节点", txt_path, len(survivors))
 
-    # 按协议拆分独立文件至 data/proxies/ 子目录 (.txt 与 .csv)
+    # 按协议拆分独立文件至 data/proxies/ 子目录 (.txt, .csv, .json)
     proto_counts = save_proxies_by_protocol(survivors, proxies_dir)
-    log.info("已在 %s/ 目录下同步覆写 %d 个独立协议文件: %s", proxies_dir, len(proto_counts), proto_counts)
+    log.info("已在 %s/ 目录下同步覆写 %d 个独立协议文件 (.txt/.csv/.json): %s", proxies_dir, len(proto_counts), proto_counts)
 
     # 写入 proxies.csv (完整元数据表，按协议分块严格隔离，不混杂；原子写入防截断)
     save_proxies_csv(survivors, csv_path=csv_path)
+
+    # 写入 proxies.json (全量标准化 JSON，适配前端/油猴脚本多地区与类型检索)
+    save_proxies_json(survivors, json_path=json_path)
 
 
 # 向后兼容历史别名
