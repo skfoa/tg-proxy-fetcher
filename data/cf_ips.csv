@@ -1,4 +1,6 @@
 ﻿ip,port,tls,delay_ms,speed_kbs,colo,cf_location,asn,isp,tested_at,channel,fail_count
+103.103.245.105,443,true,,,HKG,亚太 · 香港,AS40065 CNSERVERS LLC,Cnservers LLC,2026-10-03 12:00:32,@danfeng_chat,0
+69.63.210.244,32195,true,,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-10-03 06:00:29,@danfeng_chat,0
 207.57.141.44,443,true,,,LAX,北美洲 · 美国洛杉矶,AS1054 Zont LLC (NTT America),NTT America,2026-10-03 00:00:33,@danfeng_chat,0
 194.122.83.189,24443,true,,,BOM,亚太 · 印度孟买,AS152179 Global Communication Network,Global Communication Network Limited,2026-10-02 18:00:32,@danfeng_chat,0
 69.63.203.93,33333,true,,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-10-02 12:00:29,@danfeng_chat,0
