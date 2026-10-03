@@ -23,9 +23,11 @@ if ROOT_DIR not in sys.path:
 
 from parsers import is_valid_host, extract_proxies
 from providers import (
+    clean_asn,
     format_asn_isp,
     normalize_timestamp,
     classify_asn,
+    save_scan_ips_by_asn,
     ASN_TO_PROVIDER,
     safe_int,
 )
@@ -86,6 +88,18 @@ class TestProviders(unittest.TestCase):
         # 二次调用幂等性校验
         res2 = format_asn_isp(res, "")
         self.assertEqual(res2, "AS63023 Ipxo LLC (GTHost)")
+
+    def test_clean_asn_and_format_fallback(self):
+        # 针对无 AS 前缀、含斜杠/服务商描述的长文本进行别名反查
+        raw = "MobileOne Ltd. Mobile/Internet Service Provider Singapore"
+        self.assertEqual(clean_asn(raw), "AS4773")
+        formatted = format_asn_isp(raw)
+        self.assertIn("AS4773", formatted)
+        self.assertIn("M1 LIMITED", formatted)
+        self.assertIn("MobileOne Ltd.", formatted)
+
+        # 未知且无 AS 编号的文本兜底为 AS_UNKNOWN
+        self.assertEqual(clean_asn("Unknown Entity Without AS Number"), "AS_UNKNOWN")
 
     def test_normalize_timestamp(self):
         # 8 位纯数字日期必须原样保留，严禁误转换为 1970 年时间戳
@@ -175,6 +189,32 @@ class TestTgFetchWorkflow(unittest.TestCase):
             self.assertEqual(loaded_txt["2.2.2.2:1080"]["fail_count"], 0)
             self.assertIn("4.4.4.4:8080", loaded_txt)
             self.assertEqual(loaded_txt["4.4.4.4:8080"]["fail_count"], 0)
+
+    def test_save_scan_ips_by_asn_sanitizes_filenames(self):
+        with tempfile.TemporaryDirectory() as td:
+            # 构造包含路径分隔符、非法字符的 ASN 分组键
+            asn_groups = {
+                "MobileOne Ltd. Mobile/Internet Service Provider Singapore": [
+                    {"ip": "1.1.1.1", "port": 443}
+                ],
+                "AS99999:Test*Group?": [
+                    {"ip": "2.2.2.2", "port": 80}
+                ]
+            }
+            # 调用写入，确保不会抛出 FileNotFoundError 或路径解析异常
+            count = save_scan_ips_by_asn(asn_groups, td)
+            self.assertEqual(count, 2)
+
+            files = os.listdir(td)
+            self.assertEqual(len(files), 2)
+            # 确认所有生成的文件名均不含非法分隔符且均以 .txt 结尾
+            for fname in files:
+                self.assertTrue(fname.endswith(".txt"))
+                self.assertNotIn("/", fname)
+                self.assertNotIn("\\", fname)
+                self.assertNotIn(":", fname)
+                self.assertNotIn("*", fname)
+                self.assertNotIn("?", fname)
 
 
 if __name__ == "__main__":

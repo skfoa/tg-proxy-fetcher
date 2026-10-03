@@ -631,7 +631,14 @@ def clean_asn(raw_asn: str, isp: str = "") -> str:
     m_d = re.search(r"\b(\d{3,7})\b", raw_asn)
     if m_d:
         return f"AS{m_d.group(1)}"
-    return raw_asn if raw_asn else "AS_UNKNOWN"
+    cand = raw_asn or isp
+    if cand:
+        if cand in ASN_DATABASE_ISP_TO_ASN:
+            return ASN_DATABASE_ISP_TO_ASN[cand]
+        norm = ASN_DATABASE_ISP_LOWER.get(cand.lower())
+        if norm:
+            return norm[0]
+    return "AS_UNKNOWN"
 
 
 def format_asn_isp(raw_asn: str, raw_isp: str = "") -> str:
@@ -660,9 +667,22 @@ def format_asn_isp(raw_asn: str, raw_isp: str = "") -> str:
         if m_num:
             code = f"AS{m_num.group(1)}"
         else:
-            if clean_a and clean_a != "-" and clean_a.upper() != "AS_UNKNOWN":
-                return clean_a
-            return clean_i or "AS_UNKNOWN"
+            cand = clean_a or clean_i
+            found_asn = ""
+            if cand in ASN_DATABASE_ISP_TO_ASN:
+                found_asn = ASN_DATABASE_ISP_TO_ASN[cand]
+            else:
+                norm_item = ASN_DATABASE_ISP_LOWER.get(cand.lower())
+                if norm_item:
+                    found_asn = norm_item[0]
+            if found_asn:
+                code = found_asn
+                if not clean_i and clean_a != found_asn:
+                    clean_i = clean_a
+            else:
+                if clean_a and clean_a != "-" and clean_a.upper() != "AS_UNKNOWN":
+                    return clean_a
+                return clean_i or "AS_UNKNOWN"
 
     _addr_pattern = r"(?:\b(?:building|avenue|road|street|floor|suite|room|district|highway|jalan|bldg|kejizhongyi)\b|大厦|大楼|写字楼|园区|胡同|街道|号院)"
     if suffix and re.search(_addr_pattern, suffix, re.IGNORECASE):
@@ -1928,8 +1948,15 @@ def save_scan_ips_by_asn(asn_groups: dict, output_dir: str) -> int:
         isp_name = ASN_TO_PROVIDER.get(asn_name, "")
         if not isp_name:
             isp_name = next((r.get("isp") for r in group if r.get("isp")), "")
+
+        # 严谨过滤文件名非法字符（特别是 Windows / Linux 路径分隔符 / 与 \，以及冒号等）
+        safe_asn = re.sub(r'[\\/:*?"<>|\s]', "_", str(asn_name).strip()).strip(" ._") or "AS_UNKNOWN"
+        safe_asn = re.sub(r"_+", "_", safe_asn)
         clean_isp = re.sub(r"[^a-zA-Z0-9]", "", isp_name) if isp_name else ""
-        fname = f"{asn_name}_{clean_isp}.txt" if clean_isp else f"{asn_name}.txt"
+        if clean_isp and clean_isp.lower() != safe_asn.lower():
+            fname = f"{safe_asn}_{clean_isp}.txt"
+        else:
+            fname = f"{safe_asn}.txt"
         fpath = os.path.join(output_dir, fname)
         tmp_fpath = f"{fpath}.tmp"
 
