@@ -1290,6 +1290,78 @@ def save_proxies_by_protocol(rows: list, output_dir: str = "data/proxies") -> di
     return result_counts
 
 
+def save_proxies_csv(rows: list, csv_path: str = "data/proxies.csv") -> int:
+    """
+    保存 proxies.csv 结构化数据总表，按 (协议大类, fail_count 升序, delay_ms 升序) 分块排列（原子写入防截断）。
+    彻底杜绝不同协议交错混杂，并与 data/proxies/{proto}.csv 保持完全一致的元数据格式。
+    返回保存的有效节点总数。
+    """
+    formatted_rows = []
+    seen = set()
+
+    for item in rows:
+        if isinstance(item, dict):
+            url = (item.get("url") or "").strip()
+            row_dict = dict(item)
+        else:
+            url = str(item).strip()
+            row_dict = {"url": url}
+
+        if not url or url.startswith("#") or url in seen:
+            continue
+        seen.add(url)
+
+        proto = (row_dict.get("proto") or "").strip().lower()
+        if not proto:
+            proto = url.split("://", 1)[0].lower() if "://" in url else "other"
+        row_dict["proto"] = proto
+        row_dict.setdefault("fail_count", safe_int(row_dict.get("fail_count"), 0))
+        row_dict.setdefault("delay_ms", safe_int(row_dict.get("delay_ms"), 0))
+        row_dict.setdefault("status", row_dict.get("status", "pending"))
+        row_dict.setdefault("colo", row_dict.get("colo", ""))
+        row_dict.setdefault("tested_at", row_dict.get("tested_at", ""))
+        row_dict.setdefault("first_seen", row_dict.get("first_seen", "") or LEGACY_DEFAULT_FIRST_SEEN)
+
+        if "host" not in row_dict or not row_dict["host"]:
+            try:
+                u = urllib.parse.urlparse(url)
+                row_dict["host"] = u.hostname or ""
+                row_dict["port"] = u.port or ""
+                row_dict.setdefault("user", u.username or "")
+                row_dict.setdefault("pwd", u.password or "")
+            except Exception:
+                row_dict["host"] = ""
+                row_dict["port"] = ""
+                row_dict.setdefault("user", "")
+                row_dict.setdefault("pwd", "")
+
+        formatted_rows.append(row_dict)
+
+    def _sort_key(r):
+        proto = (r.get("proto") or "").strip().lower()
+        p_idx = PROXY_PROTO_ORDER.index(proto) if proto in PROXY_PROTO_ORDER else len(PROXY_PROTO_ORDER)
+        fc = safe_int(r.get("fail_count"), 0)
+        dms = safe_int(r.get("delay_ms"), 0)
+        if dms <= 0:
+            dms = 99999
+        return (p_idx, fc, dms)
+
+    formatted_rows.sort(key=_sort_key)
+
+    dir_name = os.path.dirname(os.path.abspath(csv_path))
+    if dir_name:
+        os.makedirs(dir_name, exist_ok=True)
+    tmp_csv = f"{csv_path}.tmp"
+    with open(tmp_csv, "w", encoding="utf-8-sig", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=PROXY_CSV_FIELDS, extrasaction="ignore")
+        writer.writeheader()
+        for r in formatted_rows:
+            writer.writerow(r)
+    os.replace(tmp_csv, csv_path)
+    log.info("已按协议分块覆写保存 %s: %d 条质检状态记录 (无交错混杂)", csv_path, len(formatted_rows))
+    return len(formatted_rows)
+
+
 # ============================================================
 # 网络属性（ISP宽带 / 商业专线 / 高校教育 / 政务公共）识别引擎 (方案 A)
 # ============================================================

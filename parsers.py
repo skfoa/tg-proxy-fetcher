@@ -245,12 +245,15 @@ def parse_cf_csv_content(
                 if len(row) == 1:
                     raw_port = raw_port or fn_port
                 elif len(row) == 2:
-                    # 只有两列 [IP, 第二列]: 若文件名已指定端口(如 ProxyIP-8443)，则第二列通常是延迟
+                    val = row[1].strip()
                     if fn_port:
-                        raw_port = raw_port or fn_port
-                        raw_delay = row[1].strip()
+                        # 若行内第二列也是合法端口且与文件名端口不同，优先信任行内数据；否则以文件名端口为准，第二列作为延迟
+                        if val.isdigit() and 1 <= int(val) <= 65535 and val != fn_port:
+                            raw_port = val
+                        else:
+                            raw_port = raw_port or fn_port
+                            raw_delay = val
                     else:
-                        val = row[1].strip()
                         # 若为合法的端口数值范围 (1-65535)，优先作为端口；否则作为延迟
                         if val.isdigit() and 1 <= int(val) <= 65535:
                             raw_port = val

@@ -457,7 +457,7 @@ def send_verify_notification(
         updated_scan = fetch_stats.get("updated_scan", 0)
         asn_count = fetch_stats.get("asn_count", 0)
         top_providers = fetch_stats.get("top_providers", [])
-        channels = fetch_stats.get("channels", ["@otcfxq", "@danfeng2"])
+        channels = fetch_stats.get("channels", ["@otcfxq", "@danfeng_chat"])
 
         total_new = new_proxies + new_cf + new_scan + new_proxyips
         total_updated = updated_proxies + updated_cf + updated_scan + updated_proxyips

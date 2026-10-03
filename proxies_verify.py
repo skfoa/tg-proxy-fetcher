@@ -42,9 +42,12 @@ from providers import (
     TG_BOT_TOKEN,
     TG_CHAT_ID,
     record_tombstone,
+    load_tombstone,
+    is_tombstoned,
     canonical_key,
     format_proxies_txt,
     save_proxies_by_protocol,
+    save_proxies_csv,
     format_buffer_badge,
     read_full_response,
     PROXY_CSV_FIELDS,
@@ -499,7 +502,9 @@ def load_proxies_data(
     加载待检代理节点：
     1. 优先读取 proxies.csv，保留既有 fail_count 与历史统计
     2. 合并 proxies.txt 中新增的节点
+    3. 自动过滤墓地黑名单中的冷却期死节点
     """
+    tombstone = load_tombstone()
     url_map: dict[str, dict] = {}
 
     target_csv = csv_path
@@ -515,6 +520,9 @@ def load_proxies_data(
                         continue
                     parsed = parse_proxy_url(url)
                     if not parsed:
+                        continue
+                    key = canonical_key(parsed["host"], parsed["port"])
+                    if is_tombstoned(key, tombstone):
                         continue
                     parsed["fail_count"] = safe_int(r.get("fail_count"), 0)
                     parsed["delay_ms"] = safe_int(r.get("delay_ms"), 0)
@@ -543,6 +551,9 @@ def load_proxies_data(
                     if line not in url_map:
                         parsed = parse_proxy_url(line)
                         if parsed:
+                            key = canonical_key(parsed["host"], parsed["port"])
+                            if is_tombstoned(key, tombstone):
+                                continue
                             parsed["first_seen"] = now_str
                             url_map[line] = parsed
             log.info("从 %s 读取 %d 行，合并后待检节点共: %d 条", target_txt, txt_count, len(url_map))
@@ -590,14 +601,7 @@ def save_proxies_data(
     log.info("已在 %s/ 目录下同步覆写 %d 个独立协议文件: %s", proxies_dir, len(proto_counts), proto_counts)
 
     # 写入 proxies.csv (完整元数据表，按协议分块严格隔离，不混杂；原子写入防截断)
-    tmp_csv = f"{csv_path}.tmp"
-    with open(tmp_csv, "w", encoding="utf-8-sig", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
-        writer.writeheader()
-        for r in survivors:
-            writer.writerow(r)
-    os.replace(tmp_csv, csv_path)
-    log.info("已按协议分块覆写保存 %s: %d 条质检状态记录 (无交错混杂)", csv_path, len(survivors))
+    save_proxies_csv(survivors, csv_path=csv_path)
 
 
 # 向后兼容历史别名

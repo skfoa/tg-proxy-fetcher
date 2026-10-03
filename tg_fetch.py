@@ -56,6 +56,7 @@ from providers import (
     format_proxies_txt,
     save_proxyip_by_country,
     save_proxies_by_protocol,
+    save_proxies_csv,
     save_scan_ips_by_asn,
     format_diff,
     classify_asn,
@@ -203,18 +204,24 @@ def load_existing_proxies(
     filepath: str = OUTPUT_PROXY_FILE,
     csv_path: str = OUTPUT_PROXIES_CSV,
 ) -> dict:
-    """读取本地已保存的代理列表，保留历史累积有效节点及其首次收录时间"""
+    """读取本地已保存的代理列表，保留历史累积有效节点及其首次收录时间与质检元数据"""
     existing = {}
-    csv_first_seen = {}
+    csv_meta = {}
     if os.path.isfile(csv_path):
         try:
             with open(csv_path, "r", encoding="utf-8-sig") as f:
                 reader = csv.DictReader(f)
                 for r in reader:
                     u = (r.get("url") or "").strip()
-                    fs = (r.get("first_seen") or "").strip()
                     if u:
-                        csv_first_seen[u] = fs or LEGACY_DEFAULT_FIRST_SEEN
+                        csv_meta[u] = {
+                            "first_seen": (r.get("first_seen") or "").strip() or LEGACY_DEFAULT_FIRST_SEEN,
+                            "fail_count": safe_int(r.get("fail_count"), 0),
+                            "delay_ms": safe_int(r.get("delay_ms"), 0),
+                            "status": r.get("status", "pending"),
+                            "colo": r.get("colo", ""),
+                            "tested_at": r.get("tested_at", ""),
+                        }
         except Exception as e:
             log.warning("读取已有代理 CSV 失败: %s", e)
 
@@ -229,9 +236,15 @@ def load_existing_proxies(
                     continue
                 for url, key in extract_proxies(line_s):
                     if not is_tombstoned(key, tombstone):
+                        meta = csv_meta.get(url, {})
                         existing[key] = {
                             "url": url,
-                            "first_seen": csv_first_seen.get(url, LEGACY_DEFAULT_FIRST_SEEN),
+                            "first_seen": meta.get("first_seen", LEGACY_DEFAULT_FIRST_SEEN),
+                            "fail_count": meta.get("fail_count", 0),
+                            "delay_ms": meta.get("delay_ms", 0),
+                            "status": meta.get("status", "pending"),
+                            "colo": meta.get("colo", ""),
+                            "tested_at": meta.get("tested_at", ""),
                         }
         log.info("已加载本地已存代理节点: %d 个（历史有效节点全部保留）", len(existing))
     except Exception as e:
@@ -585,6 +598,8 @@ def save_and_notify(
     proto_counts = save_proxies_by_protocol(list(final_proxies.values()), OUTPUT_PROXIES_DIR)
     log.info("已在 %s/ 目录下生成 %d 个独立协议文件: %s", OUTPUT_PROXIES_DIR, len(proto_counts), proto_counts)
 
+    save_proxies_csv(list(final_proxies.values()), OUTPUT_PROXIES_CSV)
+
     # 2. 保存单条优选 IP（原子写入）
     sorted_cf_ips = sorted(
         final_cf_ips.values(),
@@ -774,17 +789,22 @@ def merge_and_save(
         if isinstance(v, dict):
             final_proxies[k] = dict(v)
         else:
-            final_proxies[k] = {"url": v, "first_seen": LEGACY_DEFAULT_FIRST_SEEN}
+            final_proxies[k] = {"url": v, "first_seen": LEGACY_DEFAULT_FIRST_SEEN, "fail_count": 0}
     for k, v in scraped_proxies.items():
         url = v.get("url") if isinstance(v, dict) else v
         if k in final_proxies:
-            # 已经存在：严格保留原有 first_seen，不得被新抓取时间篡改
+            # 已经存在：严格保留原有 first_seen 及历史质检状态与失败计数，仅刷新 url
             final_proxies[k]["url"] = url
         else:
-            # 首次抓取收录：记录此时此刻为 first_seen
+            # 首次抓取收录：记录此时此刻为 first_seen，其余指标待质检
             final_proxies[k] = {
                 "url": url,
                 "first_seen": now_bjt,
+                "fail_count": 0,
+                "delay_ms": 0,
+                "status": "pending",
+                "colo": "",
+                "tested_at": "",
             }
 
     final_cf_ips = dict(existing_cf_ips)
