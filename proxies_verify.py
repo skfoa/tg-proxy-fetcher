@@ -52,6 +52,9 @@ from providers import (
     read_full_response,
     PROXY_CSV_FIELDS,
     LEGACY_DEFAULT_FIRST_SEEN,
+    resolve_asn_online_async,
+    classify_asn,
+    format_asn_isp,
 )
 
 # 确保本地 .env 加载
@@ -99,15 +102,15 @@ async def probe_socks5(
     pwd: str | None,
     connect_timeout: float = TIMEOUT,
     http_timeout: float = HTTP_TIMEOUT,
-) -> tuple[bool, int, str, str, str]:
+) -> tuple[bool, int, str, str, str, str]:
     """
     SOCKS5 RFC 1928 / RFC 1929 五步状态机鉴真：
     1. TCP 连接
     2. 方法协商 (0x00 无需认证, 0x02 账密认证)
     3. 子协商 (若服务端要求 0x02)
     4. CONNECT speed.cloudflare.com:80
-    5. HTTP GET /cdn-cgi/trace 校验 200 与 colo，并提取 egress_ip
-    返回 (is_alive, delay_ms, status, colo, egress_ip)
+    5. HTTP GET /cdn-cgi/trace 校验 200 与 colo，并提取 country 与 egress_ip
+    返回 (is_alive, delay_ms, status, colo, country, egress_ip)
     """
     t0 = time.monotonic()
     try:
@@ -116,7 +119,7 @@ async def probe_socks5(
             timeout=connect_timeout,
         )
     except Exception:
-        return False, 0, "conn_err", "", ""
+        return False, 0, "conn_err", "", "", ""
 
     try:
         # 步骤 2: 协商认证方式
@@ -128,14 +131,14 @@ async def probe_socks5(
 
         resp = await asyncio.wait_for(reader.readexactly(2), timeout=connect_timeout)
         if resp[0] != 0x05:
-            return False, 0, "bad_handshake", "", ""
+            return False, 0, "bad_handshake", "", "", ""
 
         method = resp[1]
         if method == 0xFF:
-            return False, 0, "no_acceptable_auth", "", ""
+            return False, 0, "no_acceptable_auth", "", "", ""
         elif method == 0x02:
             if not (user and pwd):
-                return False, 0, "auth_required_missing", "", ""
+                return False, 0, "auth_required_missing", "", "", ""
             # 步骤 3: 账密认证 RFC 1929
             u_b = user.encode("utf-8")
             p_b = pwd.encode("utf-8")
@@ -144,9 +147,9 @@ async def probe_socks5(
             await asyncio.wait_for(writer.drain(), timeout=connect_timeout)
             auth_resp = await asyncio.wait_for(reader.readexactly(2), timeout=connect_timeout)
             if auth_resp[1] != 0x00:
-                return False, 0, "auth_fail", "", ""
+                return False, 0, "auth_fail", "", "", ""
         elif method != 0x00:
-            return False, 0, "unsupported_method", "", ""
+            return False, 0, "unsupported_method", "", "", ""
 
         # 步骤 4: CONNECT speed.cloudflare.com:80
         target = PROBE_HOST.encode("ascii")
@@ -161,7 +164,7 @@ async def probe_socks5(
 
         conn_resp = await asyncio.wait_for(reader.readexactly(4), timeout=connect_timeout)
         if conn_resp[0] != 0x05 or conn_resp[1] != 0x00:
-            return False, 0, "connect_fail", "", ""
+            return False, 0, "connect_fail", "", "", ""
 
         # 排空 BND.ADDR / BND.PORT (RFC 1928 严谨读取)
         atyp = conn_resp[3]
@@ -189,16 +192,18 @@ async def probe_socks5(
 
         colo_match = re.search(r"\bcolo=([A-Za-z0-9]+)\b", http_text)
         colo = colo_match.group(1).upper() if colo_match else ""
+        loc_match = re.search(r"\bloc=([A-Za-z]{2})\b", http_text)
+        country = loc_match.group(1).upper() if loc_match else ""
         ip_match = re.search(r"\bip=([0-9a-fA-F.:]+)\b", http_text)
         egress_ip = ip_match.group(1).strip() if ip_match else ""
         lat = max(1, int((time.monotonic() - t0) * 1000))
 
         first_line = http_text.splitlines()[0] if http_text else ""
         if re.search(r"\b200\b", first_line) and colo:
-            return True, lat, "alive", colo, egress_ip
-        return False, lat, "http_fail", "", ""
+            return True, lat, "alive", colo, country, egress_ip
+        return False, lat, "http_fail", "", "", ""
     except Exception:
-        return False, 0, "timeout_or_reset", "", ""
+        return False, 0, "timeout_or_reset", "", "", ""
     finally:
         try:
             writer.close()
@@ -214,13 +219,13 @@ async def probe_http(
     pwd: str | None,
     connect_timeout: float = TIMEOUT,
     http_timeout: float = HTTP_TIMEOUT,
-) -> tuple[bool, int, str, str, str]:
+) -> tuple[bool, int, str, str, str, str]:
     """
     HTTP / HTTPS 代理鉴真：
     1. 发送 CONNECT speed.cloudflare.com:80 隧道请求 (若有账密带 Proxy-Authorization)
-    2. 穿透隧道发送 GET /cdn-cgi/trace 并提取 colo 与 egress_ip
+    2. 穿透隧道发送 GET /cdn-cgi/trace 并提取 colo, country 与 egress_ip
     3. 若 CONNECT 不支持，回退至直接 Forward GET
-    返回 (is_alive, delay_ms, status, colo, egress_ip)
+    返回 (is_alive, delay_ms, status, colo, country, egress_ip)
     """
     t0 = time.monotonic()
     try:
@@ -229,7 +234,7 @@ async def probe_http(
             timeout=connect_timeout,
         )
     except Exception:
-        return False, 0, "conn_err", "", ""
+        return False, 0, "conn_err", "", "", ""
 
     try:
         auth_header = ""
@@ -268,12 +273,14 @@ async def probe_http(
             http_text = http_resp.decode("utf-8", errors="ignore")
             colo_match = re.search(r"\bcolo=([A-Za-z0-9]+)\b", http_text)
             colo = colo_match.group(1).upper() if colo_match else ""
+            loc_match = re.search(r"\bloc=([A-Za-z]{2})\b", http_text)
+            country = loc_match.group(1).upper() if loc_match else ""
             ip_match = re.search(r"\bip=([0-9a-fA-F.:]+)\b", http_text)
             egress_ip = ip_match.group(1).strip() if ip_match else ""
             lat = max(1, int((time.monotonic() - t0) * 1000))
             first_line = http_text.splitlines()[0] if http_text else ""
             if re.search(r"\b200\b", first_line) and colo:
-                return True, lat, "alive", colo, egress_ip
+                return True, lat, "alive", colo, country, egress_ip
 
         # 回退至直接正向代理 Forward GET（安全重连以避免原连接被代理端关闭/重置）
         try:
@@ -303,15 +310,17 @@ async def probe_http(
         direct_text = direct_resp.decode("utf-8", errors="ignore")
         colo_match = re.search(r"\bcolo=([A-Za-z0-9]+)\b", direct_text)
         colo = colo_match.group(1).upper() if colo_match else ""
+        loc_match = re.search(r"\bloc=([A-Za-z]{2})\b", direct_text)
+        country = loc_match.group(1).upper() if loc_match else ""
         ip_match = re.search(r"\bip=([0-9a-fA-F.:]+)\b", direct_text)
         egress_ip = ip_match.group(1).strip() if ip_match else ""
         lat = max(1, int((time.monotonic() - t0) * 1000))
         direct_first_line = direct_text.splitlines()[0] if direct_text else ""
         if re.search(r"\b200\b", direct_first_line) and colo:
-            return True, lat, "alive", colo, egress_ip
-        return False, lat, "http_fail", "", ""
+            return True, lat, "alive", colo, country, egress_ip
+        return False, lat, "http_fail", "", "", ""
     except Exception:
-        return False, 0, "timeout_or_reset", "", ""
+        return False, 0, "timeout_or_reset", "", "", ""
     finally:
         if writer is not None:
             try:
@@ -326,12 +335,12 @@ async def probe_turn(
     port: int,
     connect_timeout: float = TIMEOUT,
     read_timeout: float = HTTP_TIMEOUT,
-) -> tuple[bool, int, str, str, str]:
+) -> tuple[bool, int, str, str, str, str]:
     """
     TURN 协议鉴真：
     通过 TCP 发送标准 STUN Binding Request (RFC 5389)，
     校验 20 字节响应头部 Magic Cookie (0x2112A442) 以及 Transaction ID 匹配。
-    返回 (is_alive, delay_ms, status, colo, egress_ip)
+    返回 (is_alive, delay_ms, status, colo, country, egress_ip)
     """
     t0 = time.monotonic()
     try:
@@ -340,7 +349,7 @@ async def probe_turn(
             timeout=connect_timeout,
         )
     except Exception:
-        return False, 0, "conn_err", "", ""
+        return False, 0, "conn_err", "", "", ""
 
     try:
         tx_id = os.urandom(12)
@@ -353,10 +362,10 @@ async def probe_turn(
         lat = max(1, int((time.monotonic() - t0) * 1000))
 
         if len(resp) >= 20 and resp[4:8] == b"\x21\x12\xa4\x42" and resp[8:20] == tx_id:
-            return True, lat, "alive", "-", host
-        return False, lat, "stun_fail", "", ""
+            return True, lat, "alive", "-", "", host
+        return False, lat, "stun_fail", "", "", ""
     except Exception:
-        return False, 0, "timeout_or_reset", "", ""
+        return False, 0, "timeout_or_reset", "", "", ""
     finally:
         try:
             writer.close()
@@ -372,14 +381,14 @@ async def probe_sstp(
     pwd: str | None = None,
     connect_timeout: float = TIMEOUT,
     read_timeout: float = HTTP_TIMEOUT,
-) -> tuple[bool, int, str, str, str]:
+) -> tuple[bool, int, str, str, str, str]:
     """
     SSTP (Secure Socket Tunneling Protocol) 鉴真：
     1. TLS 握手建立加密信道 (对自签名证书与通配符证书保持兼容 ssl.CERT_NONE)
     2. 发送标准 MS-SSTP 初始双工隧道请求:
        SSTP_DUPLEX_POST /sra_{BA195980-CD49-458b-9E23-C84EE0ADCD75}/ HTTP/1.1
     3. 校验服务端是否返回 HTTP/1.1 200 OK，确认 SSTP 隧道服务活跃就绪
-    返回 (is_alive, delay_ms, status, colo, egress_ip)
+    返回 (is_alive, delay_ms, status, colo, country, egress_ip)
     """
     t0 = time.monotonic()
     ctx = ssl.create_default_context()
@@ -396,7 +405,7 @@ async def probe_sstp(
             timeout=connect_timeout,
         )
     except Exception:
-        return False, 0, "conn_err", "", ""
+        return False, 0, "conn_err", "", "", ""
 
     try:
         uri = "/sra_{BA195980-CD49-458b-9E23-C84EE0ADCD75}/"
@@ -415,10 +424,10 @@ async def probe_sstp(
         first_line = resp_text.splitlines()[0] if resp_text else ""
 
         if re.search(r"\b200\b", first_line):
-            return True, lat, "alive", "-", host
-        return False, lat, "sstp_fail", "", ""
+            return True, lat, "alive", "-", "", host
+        return False, lat, "sstp_fail", "", "", ""
     except Exception:
-        return False, 0, "timeout_or_reset", "", ""
+        return False, 0, "timeout_or_reset", "", "", ""
     finally:
         try:
             writer.close()
@@ -442,23 +451,23 @@ async def probe_single(
         pwd = row.get("pwd") or None
 
         if proto == "socks5":
-            is_alive, delay_ms, status, colo, egress_ip = await probe_socks5(
+            is_alive, delay_ms, status, colo, country, egress_ip = await probe_socks5(
                 host, port, user, pwd, timeout, http_timeout
             )
         elif proto in ("http", "https"):
-            is_alive, delay_ms, status, colo, egress_ip = await probe_http(
+            is_alive, delay_ms, status, colo, country, egress_ip = await probe_http(
                 host, port, user, pwd, timeout, http_timeout
             )
         elif proto == "turn":
-            is_alive, delay_ms, status, colo, egress_ip = await probe_turn(
+            is_alive, delay_ms, status, colo, country, egress_ip = await probe_turn(
                 host, port, timeout, http_timeout
             )
         elif proto == "sstp":
-            is_alive, delay_ms, status, colo, egress_ip = await probe_sstp(
+            is_alive, delay_ms, status, colo, country, egress_ip = await probe_sstp(
                 host, port, user, pwd, timeout, http_timeout
             )
         else:
-            is_alive, delay_ms, status, colo, egress_ip = False, 0, "unknown_proto", "", ""
+            is_alive, delay_ms, status, colo, country, egress_ip = False, 0, "unknown_proto", "", "", ""
 
         row["is_alive"] = is_alive
         row["status"] = status
@@ -471,12 +480,16 @@ async def probe_single(
             row["fail_count"] = 0
             row["delay_ms"] = delay_ms
             row["colo"] = colo
+            row["country"] = country or row.get("country", "")
             row["egress_ip"] = egress_ip or row.get("egress_ip", "")
         else:
             row["fail_count"] = fc + 1
             if not row.get("delay_ms"):
                 row["delay_ms"] = 0
+            row.setdefault("country", row.get("country", ""))
             row.setdefault("egress_ip", row.get("egress_ip", ""))
+            row.setdefault("asn", row.get("asn", ""))
+            row.setdefault("net_type", row.get("net_type", ""))
 
         return row
 
@@ -503,7 +516,10 @@ def parse_proxy_url(url: str) -> dict | None:
             "fail_count": 0,
             "status": "pending",
             "colo": "",
+            "country": "",
             "egress_ip": "",
+            "asn": "",
+            "net_type": "",
             "tested_at": "",
         }
     except Exception:
@@ -544,7 +560,10 @@ def load_proxies_data(
                     parsed["delay_ms"] = safe_int(r.get("delay_ms"), 0)
                     parsed["status"] = r.get("status", "pending")
                     parsed["colo"] = r.get("colo", "")
+                    parsed["country"] = r.get("country", "")
                     parsed["egress_ip"] = r.get("egress_ip", "")
+                    parsed["asn"] = r.get("asn", "")
+                    parsed["net_type"] = r.get("net_type", "")
                     parsed["tested_at"] = r.get("tested_at", "")
                     parsed["first_seen"] = r.get("first_seen", "").strip() or LEGACY_DEFAULT_FIRST_SEEN
                     url_map[url] = parsed
@@ -578,6 +597,80 @@ def load_proxies_data(
             log.warning("读取 %s 失败: %s", target_txt, e)
 
     return list(url_map.values())
+
+
+async def enrich_proxies_metadata(survivors: list[dict], max_concurrency: int = 5) -> dict[str, int]:
+    """
+    为质检存活代理节点补全 ASN、ISP 及网络属性 (net_type：isp/datacenter/business 等)：
+    1. 优先使用已有的有效 asn / net_type（避免重复网络查询）
+    2. 基于 egress_ip（或 host IP）去重，通过并发信号量限制在线异步反查 ASN / ISP
+    3. 调用 format_asn_isp 与 classify_asn 标准化打标
+    4. 返回各网络属性的统计分布 dict，如 {"isp": 12, "datacenter": 35}
+    """
+    if not survivors:
+        return {}
+
+    ip_to_resolve = set()
+    for r in survivors:
+        asn = r.get("asn", "").strip()
+        if not asn:
+            ip = r.get("egress_ip", "").strip()
+            if not ip:
+                host = r.get("host", "").strip()
+                if re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", host) or ":" in host:
+                    ip = host
+            if ip and ip not in ("127.0.0.1", "localhost"):
+                ip_to_resolve.add(ip)
+
+    ip_cache: dict[str, tuple[str, str]] = {}
+    if ip_to_resolve:
+        sem = asyncio.Semaphore(max_concurrency)
+
+        async def _resolve(target_ip: str):
+            async with sem:
+                try:
+                    asn_code, isp_name = await asyncio.wait_for(
+                        resolve_asn_online_async(target_ip, persist=False),
+                        timeout=4.0,
+                    )
+                    return target_ip, asn_code, isp_name
+                except Exception as e:
+                    log.debug("在线反查 IP %s ASN 失败: %s", target_ip, e)
+                    return target_ip, "", ""
+
+        log.info("正在为 %d 个唯一出口 IP 在线解析 ASN 与网络类型...", len(ip_to_resolve))
+        tasks = [_resolve(ip) for ip in ip_to_resolve]
+        results = await asyncio.gather(*tasks)
+        for target_ip, asn_code, isp_name in results:
+            ip_cache[target_ip] = (asn_code, isp_name)
+
+    net_stats: dict[str, int] = {}
+    for r in survivors:
+        curr_asn = r.get("asn", "").strip()
+        if not curr_asn:
+            target_ip = r.get("egress_ip", "").strip()
+            if not target_ip:
+                host = r.get("host", "").strip()
+                if re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", host) or ":" in host:
+                    target_ip = host
+            if target_ip and target_ip in ip_cache:
+                asn_code, isp_name = ip_cache[target_ip]
+                if asn_code:
+                    r["asn"] = format_asn_isp(asn_code, isp_name)
+                    r["net_type"] = classify_asn(asn_code, isp_name)
+
+        if r.get("asn"):
+            r["asn"] = format_asn_isp(r.get("asn", ""), r.get("isp", ""))
+            if not r.get("net_type"):
+                r["net_type"] = classify_asn(r.get("asn", ""), r.get("isp", ""))
+        else:
+            if not r.get("net_type"):
+                r["net_type"] = classify_asn("", "")
+
+        nt = r.get("net_type", "datacenter")
+        net_stats[nt] = net_stats.get(nt, 0) + 1
+
+    return net_stats
 
 
 def save_proxies_data(
@@ -644,6 +737,7 @@ def send_proxies_notification(
     fail_2: int = 0,
     buf_new: int = 0,
     buf_rec: int = 0,
+    net_stats: dict | None = None,
 ):
     """发送独立的 SOCKS5 代理质检报告卡片"""
     token = TG_BOT_TOKEN
@@ -660,6 +754,21 @@ def send_proxies_notification(
         proto_lines.append(f"   • {proto.upper()}: {stat['alive']} 存活 / {stat['total']} 总量")
     proto_str = "\n".join(proto_lines)
 
+    net_lines = []
+    if net_stats:
+        type_labels = {
+            "isp": "🏠 原生家宽",
+            "datacenter": "🏢 数据中心",
+            "business": "💼 商业专线",
+            "education": "🎓 教育网",
+            "government": "🏛️ 政府机构",
+            "banking": "🏦 金融网络",
+        }
+        for k, count in sorted(net_stats.items(), key=lambda x: -x[1]):
+            lbl = type_labels.get(k, k.upper())
+            net_lines.append(f"{lbl} {count}")
+    net_str = f"\n🌐 <b>网络属性</b>：{' · '.join(net_lines)}" if net_lines else ""
+
     elim_str = f"<code>{eliminated}</code> 条 (连续失败 ≥ {max_fails} 次)" if eliminated > 0 else "无 (全部在存活阈值内)"
     buffer_badge = format_buffer_badge(fail_count, buf_new=buf_new, buf_rec=buf_rec, f1=fail_1, f2=fail_2)
     status_str = f"✅ {pass_count} 存活{buffer_badge}"
@@ -671,7 +780,8 @@ def send_proxies_notification(
         f"📫 <b>可用代理</b>：<code>{survivors}</code> 个 ({status_str})\n"
         f"⚡ <b>存活均延</b>：<code>{avg_delay}ms</code>\n"
         f"🗑️ <b>淘汰死节点</b>：{elim_str}\n"
-        f"📊 <b>协议分布</b>：\n{proto_str}\n"
+        f"📊 <b>协议分布</b>：\n{proto_str}"
+        f"{net_str}\n"
         f"{div}\n"
         f"⚙️ <b>检测规格</b>：RFC 1928 中继穿透 · {concurrency} 并发\n"
         f"⏱️ <b>质检耗时</b>：{elapsed:.1f}s\n"
@@ -783,6 +893,10 @@ async def async_main(args):
     else:
         log.info("[通用代理 淘汰] 本次无节点达到连续失败 %d 次的淘汰阈值", args.max_fails)
 
+    # 补全出口 IP 对应的 ASN 与网络属性打标
+    net_stats = await enrich_proxies_metadata(survivors)
+    log.info("[通用代理 网络属性] %s", net_stats)
+
     save_proxies_data(survivors, PROXIES_TXT, PROXIES_CSV)
 
     elapsed = time.time() - t_start
@@ -808,6 +922,7 @@ async def async_main(args):
             stats["proxies_avg_delay_ms"] = avg_delay
             stats["proxies_elapsed"] = elapsed
             stats["proxies_proto_breakdown"] = proto_stats
+            stats["proxies_net_stats"] = net_stats
             stats["proxies_max_fails"] = args.max_fails
             # 兼容历史 socks_* 字段
             stats["socks_verified"] = True
@@ -844,6 +959,7 @@ async def async_main(args):
             fail_2=proxies_f2,
             buf_new=proxies_buf_new,
             buf_rec=proxies_buf_rec,
+            net_stats=net_stats,
         )
     else:
         log.info("已并入流水线或指定了 --no-notify，跳过独立卡片推送")

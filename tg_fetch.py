@@ -223,7 +223,10 @@ def load_existing_proxies(
                         "delay_ms": safe_int(r.get("delay_ms"), 0),
                         "status": r.get("status", "pending"),
                         "colo": r.get("colo", ""),
+                        "country": r.get("country", ""),
                         "egress_ip": r.get("egress_ip", ""),
+                        "asn": r.get("asn", ""),
+                        "net_type": r.get("net_type", ""),
                         "tested_at": r.get("tested_at", ""),
                     }
                     csv_meta_by_url[u] = meta
@@ -255,7 +258,10 @@ def load_existing_proxies(
                         "delay_ms": meta.get("delay_ms", 0),
                         "status": meta.get("status", "pending"),
                         "colo": meta.get("colo", ""),
+                        "country": meta.get("country", ""),
                         "egress_ip": meta.get("egress_ip", ""),
+                        "asn": meta.get("asn", ""),
+                        "net_type": meta.get("net_type", ""),
                         "tested_at": meta.get("tested_at", ""),
                     }
             if not existing and csv_meta_by_url:
@@ -284,7 +290,10 @@ def load_existing_proxies(
                             "delay_ms": meta.get("delay_ms", 0),
                             "status": meta.get("status", "pending"),
                             "colo": meta.get("colo", ""),
+                            "country": meta.get("country", ""),
                             "egress_ip": meta.get("egress_ip", ""),
+                            "asn": meta.get("asn", ""),
+                            "net_type": meta.get("net_type", ""),
                             "tested_at": meta.get("tested_at", ""),
                         }
         log.info("已加载本地已存代理节点: %d 个（历史有效节点全部保留）", len(existing))

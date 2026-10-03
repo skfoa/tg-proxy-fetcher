@@ -255,7 +255,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 > - `datacenter`：常规数据中心/托管机房 ➔ 归入各国家/地区常规列表
 
 #### ③ 通用代理质检数据表（`data/proxies.csv`）
-*共 11 个字段，记录 SOCKS5/HTTP/HTTPS/TURN/SSTP 等通用代理应用层穿透结果、出口真实 IP、质检状态与首次收录生命周期：*
+*共 14 个字段，记录 SOCKS5/HTTP/HTTPS/TURN/SSTP 等通用代理应用层穿透结果、出口机房国家、出口真实 IP、自治系统 ASN、原生家宽/数据中心属性、质检状态与首次收录生命周期：*
 
 | 字段 | 类型 | 说明 | 示例 |
 | :--- | :--- | :--- | :--- |
@@ -267,7 +267,10 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `fail_count` | 整数 | 连续探测失败次数（连续失败 ≥ 3 次自动淘汰剔除） | `0` |
 | `status` | 字符串 | 探测状态（`alive` 存活 或 `fail` 失败） | `alive` |
 | `colo` | 字符串 | 通过该代理中继访问返回的 Cloudflare 机房代号 | `NRT` |
+| `country` | 字符串 | 出口落地国家或地区 ISO 二字代码（Cloudflare trace `loc`） | `JP`、`US` |
 | `egress_ip` | 字符串 | 代理节点向外访问时 Cloudflare 观测到的出口真实 IP（直连隧道为节点 host） | `198.51.100.2` |
+| `asn` | 字符串 | 自治系统编号与运营商标准归属（一体化直观标签） | `AS13335 Cloudflare`、`AS34343 Eweka` |
+| `net_type` | 字符串 | 网络类型属性分类（`isp` 原生家宽 / `datacenter` 机房 / `business` 商业专线等） | `isp`、`datacenter` |
 | `tested_at` | 时间字符串 | 质检探测完成时间 | `2026-09-19 18:35:00` |
 | `first_seen` | 时间字符串 | 首次收录时间（以第一次抓取入库为准，永久不变，用于统计节点存活时长与长期可用性） | `2026-10-01 00:00:00` |
 

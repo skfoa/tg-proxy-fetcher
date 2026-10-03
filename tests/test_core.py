@@ -268,14 +268,22 @@ class TestTgFetchWorkflow(unittest.TestCase):
 
 
 class TestProxiesVerifyAndExport(unittest.TestCase):
-    def test_proxy_csv_fields_contains_egress_ip(self):
+    def test_proxy_csv_fields_contains_country_egress_ip_asn_net_type(self):
+        self.assertIn("country", PROXY_CSV_FIELDS)
         self.assertIn("egress_ip", PROXY_CSV_FIELDS)
-        # 确保 egress_ip 紧随 colo 之后
+        self.assertIn("asn", PROXY_CSV_FIELDS)
+        self.assertIn("net_type", PROXY_CSV_FIELDS)
         colo_idx = PROXY_CSV_FIELDS.index("colo")
+        country_idx = PROXY_CSV_FIELDS.index("country")
         egress_idx = PROXY_CSV_FIELDS.index("egress_ip")
-        self.assertEqual(egress_idx, colo_idx + 1)
+        asn_idx = PROXY_CSV_FIELDS.index("asn")
+        net_type_idx = PROXY_CSV_FIELDS.index("net_type")
+        self.assertEqual(country_idx, colo_idx + 1)
+        self.assertEqual(egress_idx, country_idx + 1)
+        self.assertEqual(asn_idx, egress_idx + 1)
+        self.assertEqual(net_type_idx, asn_idx + 1)
 
-    def test_save_proxies_csv_and_by_protocol_persists_egress_ip(self):
+    def test_save_proxies_csv_and_by_protocol_persists_egress_ip_and_metadata(self):
         with tempfile.TemporaryDirectory() as td:
             csv_path = os.path.join(td, "proxies.csv")
             proxies_dir = os.path.join(td, "proxies")
@@ -289,7 +297,10 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
                     "fail_count": 0,
                     "status": "alive",
                     "colo": "HKG",
+                    "country": "HK",
                     "egress_ip": "1.1.1.100",
+                    "asn": "AS13335 Cloudflare",
+                    "net_type": "datacenter",
                     "tested_at": "2026-10-03 12:00:00",
                     "first_seen": "2026-10-01 00:00:00",
                 }
@@ -301,8 +312,11 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
                 reader = csv.DictReader(f)
                 rows = list(reader)
                 self.assertEqual(len(rows), 1)
-                self.assertEqual(rows[0]["egress_ip"], "1.1.1.100")
                 self.assertEqual(rows[0]["colo"], "HKG")
+                self.assertEqual(rows[0]["country"], "HK")
+                self.assertEqual(rows[0]["egress_ip"], "1.1.1.100")
+                self.assertEqual(rows[0]["asn"], "AS13335 Cloudflare")
+                self.assertEqual(rows[0]["net_type"], "datacenter")
 
             # 2. 验证 save_proxies_by_protocol
             proto_counts = save_proxies_by_protocol(sample_rows, output_dir=proxies_dir)
@@ -313,20 +327,29 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
                 reader = csv.DictReader(f)
                 rows = list(reader)
                 self.assertEqual(len(rows), 1)
+                self.assertEqual(rows[0]["country"], "HK")
                 self.assertEqual(rows[0]["egress_ip"], "1.1.1.100")
+                self.assertEqual(rows[0]["asn"], "AS13335 Cloudflare")
+                self.assertEqual(rows[0]["net_type"], "datacenter")
 
     def test_probe_single_and_parse_proxy_url_egress_ip(self):
         from proxies_verify import parse_proxy_url, probe_single
         import asyncio
         from unittest.mock import patch
 
-        # 1. 验证 parse_proxy_url 默认包含 egress_ip
+        # 1. 验证 parse_proxy_url 默认包含 country, egress_ip, asn, net_type
         parsed = parse_proxy_url("socks5://1.2.3.4:1080")
         self.assertIsNotNone(parsed)
+        self.assertIn("country", parsed)
         self.assertIn("egress_ip", parsed)
+        self.assertIn("asn", parsed)
+        self.assertIn("net_type", parsed)
+        self.assertEqual(parsed["country"], "")
         self.assertEqual(parsed["egress_ip"], "")
+        self.assertEqual(parsed["asn"], "")
+        self.assertEqual(parsed["net_type"], "")
 
-        # 2. 验证 probe_single 在 mock probe 下成功填充 egress_ip
+        # 2. 验证 probe_single 在 mock probe 下成功填充 country 与 egress_ip
         async def _test():
             sem = asyncio.Semaphore(10)
             mock_row = {
@@ -336,17 +359,60 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
                 "url": "socks5://1.2.3.4:1080",
                 "egress_ip": "",
             }
-            with patch("proxies_verify.probe_socks5", return_value=(True, 88, "alive", "NRT", "203.0.113.19")):
+            with patch("proxies_verify.probe_socks5", return_value=(True, 88, "alive", "NRT", "JP", "203.0.113.19")):
                 res = await probe_single(mock_row, sem)
-                self.assertEqual(res["egress_ip"], "203.0.113.19")
                 self.assertEqual(res["colo"], "NRT")
+                self.assertEqual(res["country"], "JP")
+                self.assertEqual(res["egress_ip"], "203.0.113.19")
                 self.assertEqual(res["status"], "alive")
 
-            # 3. 验证探测失败时保留既有 egress_ip
-            with patch("proxies_verify.probe_socks5", return_value=(False, 0, "conn_err", "", "")):
+            # 3. 验证探测失败时保留既有 country 与 egress_ip
+            with patch("proxies_verify.probe_socks5", return_value=(False, 0, "conn_err", "", "", "")):
                 res_fail = await probe_single(res, sem)
+                self.assertEqual(res_fail["country"], "JP")
                 self.assertEqual(res_fail["egress_ip"], "203.0.113.19")
                 self.assertEqual(res_fail["fail_count"], 1)
+
+        asyncio.run(_test())
+
+    def test_enrich_proxies_metadata(self):
+        from proxies_verify import enrich_proxies_metadata
+        import asyncio
+        from unittest.mock import patch
+
+        async def _test():
+            survivors = [
+                {
+                    "url": "socks5://1.1.1.1:1080",
+                    "proto": "socks5",
+                    "host": "1.1.1.1",
+                    "egress_ip": "194.109.6.1",
+                    "asn": "",
+                    "net_type": "",
+                },
+                {
+                    "url": "socks5://2.2.2.2:1080",
+                    "proto": "socks5",
+                    "host": "2.2.2.2",
+                    "egress_ip": "1.1.1.1",
+                    "asn": "AS13335 Cloudflare",
+                    "net_type": "",
+                },
+            ]
+
+            async def _mock_resolve(ip, isp_hint="", persist=False):
+                if ip == "194.109.6.1":
+                    return "AS34343", "Eweka Internet Services B.V."
+                return "", ""
+
+            with patch("proxies_verify.resolve_asn_online_async", side_effect=_mock_resolve):
+                stats = await enrich_proxies_metadata(survivors)
+                self.assertEqual(survivors[0]["asn"], "AS34343 Eweka Internet Services B.V.")
+                self.assertEqual(survivors[0]["net_type"], "isp")
+                self.assertEqual(survivors[1]["asn"], "AS13335 Cloudflare")
+                self.assertEqual(survivors[1]["net_type"], "datacenter")
+                self.assertEqual(stats.get("isp"), 1)
+                self.assertEqual(stats.get("datacenter"), 1)
 
         asyncio.run(_test())
 
