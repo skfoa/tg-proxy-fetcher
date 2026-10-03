@@ -103,7 +103,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | **`data/scan_ips.csv`** | 扫描测速优选 IP（数据表） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/scan_ips.csv` |
 | **`data/proxyip.txt`** | 反代 ProxyIP 总清单（按存活/缓冲质检状态分层排序，纯文本） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip.txt` |
 | **`data/proxyip/*.txt`** | 独立国家/地区纯净反代列表（如 `美国.txt`、`日本.txt`） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip/{地区}.txt` |
-| **`data/proxyip/【...】.txt`** | 稀缺网络属性独立反代列表（原生宽带/商业/教育/政务） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip/【ISP_运营商原生宽带】.txt` 等 |
+| **`data/proxyip/【...】.txt`** | 稀缺网络属性独立反代列表（原生宽带/商业/教育/政务，ASN 粗筛） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip/【ISP_运营商原生宽带】.txt` 等 |
 | **`data/proxyip.csv`** | 反代 ProxyIP 详细数据表（含 `net_type` 网络分类） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip.csv` |
 | **`data/asn_database.json`** | 内置离线 ASN 知识库（收录 1,000+ 条权威双向映射，解析阶段只读查表加速） | 静态内置资产（只读） | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/asn_database.json` |
 | **`data/tombstone.json`** | 死节点记忆库（7 天隔离冷却与生命周期闭环防回流） | 全模式支持（质检引擎运行触发） | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/tombstone.json` |
@@ -181,20 +181,22 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 * **质检分层排序与分国专属列表**：`data/proxyip.txt` 专注于全量反代池的可用性质量分层，以 `# 缓冲节点 (有失败) - X 个` 置顶优先排查、`# 存活节点 (无失败) - Y 个` 全量紧随清晰分段，段内按实测延迟严选升序排列；而各国家/地区专属分类则由 `data/proxyip/*.txt` 独立提供，各司其职无冗余。
 * **分国家/地区独立单文件（点击即复制）**：
   - `data/proxyip/*.txt`：在 `data/proxyip/` 目录下按国家/地区拆分为独立文件（如 `data/proxyip/美国.txt`、`data/proxyip/日本.txt`、`data/proxyip/香港.txt` 等 70+ 个国家与地区，按实际抓取数据动态生成），内容 100% 为纯净的 `IP:端口`，无任何注释行，直接全选（Ctrl+A ➔ Ctrl+C）即可复制或作为分地区远程订阅。
-* **高价值特殊网络类型提取（方案 A 离线精准分类）**：
-  在总计 30,000+ 的反代节点池中，99.3% 为常规 VPS/数据中心机房。系统通过 **方案 A（基于 BGP 自治系统组织与 ISP 权威名称离线规则清洗引擎）**，精准剥离出极其稀缺的非机房资产，在 `data/proxyip/` 目录下单独输出为高优先级文件（文件名前缀加 `【...】`，排序置顶）：
+* **高价值特殊网络类型提取（基于 ASN 静态属性的离线粗筛机制）**：
+  在总计 30,000+ 的海量混合节点池中，99.3% 为常规 VPS/数据中心机房。系统通过 **ASN 离线粗筛机制（基于 BGP 自治系统组织与 ISP 权威名称两级清洗引擎）**，精准从全量大池中粗选剥离出高信誉度、非机房的原生宽带与专线资产，在 `data/proxyip/` 目录下单独输出为高优先级文件（文件名前缀加 `【...】`，排序置顶）：
   - **`【ISP_运营商原生宽带】.txt`**：电信运营商原生宽带与精品线路网络（收录 中国电信 CN2、中国联通 9929/CUG、中国移动 CMIN2，以及 Comcast, Charter/Spectrum, Cox, HKT, HKBN, KT, SK Broadband, Vodafone, Orange, Singtel, Kazakhtelecom 等顶级电信商与骨干）。
   - **`【BIZ_商业企业专线】.txt`**：大型企业商业专线与商务宽带（收录 AT&T Enterprises, PCCW Business, Data Communication Business 等）。
   - **`【EDU_高校教育科研】.txt`**：高校与学术科研网（收录 University of Maine, CERNET, Academic Research 等）。
   - **`【GOV_政务公共网络】.txt`**：政务公用网与国家通信骨干（收录 Beltelecom 等）。
   所有特殊分类清单同样采用 **100% 纯净 `IP:端口`（按延迟升序排列，无多余注释）**，方便直接全选复制。
-* **技术实现与边界说明（方案 A+ 两级分层分类体系）**：
+* **技术实现与边界说明（方案 A+ 两级分层粗筛体系）**：
   - **两级架构执行逻辑**：
     1. **Tier 1（内置权威精准对照，Fast-path Lookup）**：智能正则提取 AS 编号（支持 `AS4760`、`AS 4760`、`as4760` 以及纯数字 `701`、`4760` 等各种格式），优先与内置核心 ASN 映射字典比对（涵盖电信 CN2 AS4809、联通 9929 AS9929、联通 CUG AS10099、移动 CMIN2 AS58807 以及 HKT、HKBN、Comcast、Charter、Cox、KT、SK Broadband、Verizon、AT&T、Orange、Vodafone、CERNET 等顶级自治系统，以及 Cloudflare、AWS、Azure、Alibaba 等机房强锁定），命中即确定网络类型，纳秒级高精度定性；
     2. **Tier 2（启发式词根规则智能匹配，Pattern Fallback）**：针对对照表中未收录的冷门/新出现 ASN，或上游仅提供文本名称的数据行，自动进入词根模式识别（优先识别教育与政务网，严密排除 `host`/`cloud`/`vps`/`datacenter`/`dedicated` 等数十种机房关键词，随后识别商业专线与运营商原生宽带）；
     3. **Tier 3（安全降级兜底，Default Fallback）**：两级均未命中的未知节点，稳妥归入 `datacenter` 机房，确保特殊资产清单的绝对高纯度，同时保证不丢失任何一个有效节点。
   - **网络分类对照基准**：
     代码内置收录 1,790+ 条独立自治系统的权威网络分类基准表（`ASN_EXACT_NET_TYPE`），覆盖主流电信运营商、企业专线与机房；遇到未收录的冷门自治系统时，分类引擎会自动进入启发式词根识别与机房兜底；且仅在 `tg_fetch.py` 增量抓取到未收录新自治系统时，于 Telegram 卡片中高亮提示以供管理员确认。
+  - **挑选定位与后续筛选（粗筛候选池）**：
+    本项目中的 ISP 及特殊网络归属主要作为**第一阶段的「ASN 粗筛」**。其核心作用是从海量混合扫描池中，通过自治系统属性快速甄别出潜在的民用宽带资产并剔除托管机房。这批导出的特殊列表本质上是**经过权威自治系统清洗后的优质粗筛候选池**，使用者后续可根据具体应用需求（如特定反代协议穿透、可用性指标或延迟要求），将粗筛出的节点拿出来**继续进行深入的连通性与穿透检测筛选**。
   - **客观界限（为什么不宣传为“100% 家中物理光猫”）**：
     由于 Tier 1 / Tier 2 顶级电信运营商（如 HKT, SK Broadband, Comcast, Charter 等）名下的自治系统（ASN）属于综合广播，同一个自治系统内部通常既广播给普通居民家庭光纤宽带，也广播给本地商户静态专线，甚至包含部分自建机房。因此，**在无需付费调用第三方商业 IP 数据库的前提下，方案 A+ 保证的是“运营商原生广播资产（非托管机房）”，无法保证 100% 来自居民家里的真实物理光猫**。
   - **风控优势**：
@@ -244,7 +246,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `net_type` | 字符串 | **【核心属性】** 网络类型归属（详见下方 6 类取值说明） | `isp` |
 
 > 📌 **`net_type` 网络分类取值与对应导出品**：
-> - `isp`：运营商原生民用宽带 ➔ 对应导出 `data/proxyip/【ISP_运营商原生宽带】.txt`
+> - `isp`：运营商原生民用宽带（ASN 粗筛候选） ➔ 对应导出 `data/proxyip/【ISP_运营商原生宽带】.txt`
 > - `business`：商业专线与企业宽带 ➔ 对应导出 `data/proxyip/【BIZ_商业企业专线】.txt`
 > - `education`：高校教育科研网 ➔ 对应导出 `data/proxyip/【EDU_高校教育科研】.txt`
 > - `government`：政务公用网与国家骨干 ➔ 对应导出 `data/proxyip/【GOV_政务公共网络】.txt`
