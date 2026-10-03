@@ -1124,6 +1124,7 @@ PROXY_CSV_FIELDS = [
     "fail_count",
     "status",
     "colo",
+    "egress_ip",
     "tested_at",
     "first_seen",
 ]
@@ -1237,6 +1238,7 @@ def save_proxies_by_protocol(rows: list, output_dir: str = "data/proxies") -> di
         row_dict.setdefault("delay_ms", item.get("delay_ms", 0) if isinstance(item, dict) else 0)
         row_dict.setdefault("status", item.get("status", "pending") if isinstance(item, dict) else "pending")
         row_dict.setdefault("colo", item.get("colo", "") if isinstance(item, dict) else "")
+        row_dict.setdefault("egress_ip", item.get("egress_ip", "") if isinstance(item, dict) else "")
         row_dict.setdefault("tested_at", item.get("tested_at", "") if isinstance(item, dict) else "")
         row_dict.setdefault("first_seen", item.get("first_seen", "") if isinstance(item, dict) else "")
         if not row_dict["first_seen"]:
@@ -1341,6 +1343,7 @@ def save_proxies_csv(rows: list, csv_path: str = "data/proxies.csv") -> int:
         row_dict.setdefault("delay_ms", safe_int(row_dict.get("delay_ms"), 0))
         row_dict.setdefault("status", row_dict.get("status", "pending"))
         row_dict.setdefault("colo", row_dict.get("colo", ""))
+        row_dict.setdefault("egress_ip", row_dict.get("egress_ip", ""))
         row_dict.setdefault("tested_at", row_dict.get("tested_at", ""))
         row_dict.setdefault("first_seen", row_dict.get("first_seen", "") or LEGACY_DEFAULT_FIRST_SEEN)
 

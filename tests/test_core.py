@@ -30,6 +30,9 @@ from providers import (
     save_scan_ips_by_asn,
     ASN_TO_PROVIDER,
     safe_int,
+    PROXY_CSV_FIELDS,
+    save_proxies_csv,
+    save_proxies_by_protocol,
 )
 from tg_fetch import load_existing_proxies
 
@@ -177,7 +180,7 @@ class TestTgFetchWorkflow(unittest.TestCase):
             with open(csv_path, "w", encoding="utf-8-sig", newline="") as f:
                 writer = csv.DictWriter(
                     f,
-                    fieldnames=["url", "fail_count", "delay_ms", "status", "colo", "tested_at", "first_seen"],
+                    fieldnames=["url", "fail_count", "delay_ms", "status", "colo", "egress_ip", "tested_at", "first_seen"],
                 )
                 writer.writeheader()
                 # 记录 1 (健康度低: fail_count=2)
@@ -187,6 +190,7 @@ class TestTgFetchWorkflow(unittest.TestCase):
                     "delay_ms": 150,
                     "status": "fail",
                     "colo": "",
+                    "egress_ip": "",
                     "tested_at": "2026-10-01 10:00:00",
                     "first_seen": "2026-09-01",
                 })
@@ -197,6 +201,7 @@ class TestTgFetchWorkflow(unittest.TestCase):
                     "delay_ms": 80,
                     "status": "alive",
                     "colo": "SJC",
+                    "egress_ip": "198.51.100.2",
                     "tested_at": "2026-10-02 10:00:00",
                     "first_seen": "2026-09-01",
                 })
@@ -207,6 +212,7 @@ class TestTgFetchWorkflow(unittest.TestCase):
                     "delay_ms": 50,
                     "status": "alive",
                     "colo": "",
+                    "egress_ip": "157.90.251.25",
                     "tested_at": "2026-10-01 12:00:00",
                     "first_seen": "2026-09-01",
                 })
@@ -217,6 +223,7 @@ class TestTgFetchWorkflow(unittest.TestCase):
             # 优选 fail_count=0
             self.assertEqual(loaded["2.2.2.2:1080"]["fail_count"], 0)
             self.assertEqual(loaded["2.2.2.2:1080"]["colo"], "SJC")
+            self.assertEqual(loaded["2.2.2.2:1080"]["egress_ip"], "198.51.100.2")
             # 墓碑死节点必须被拦截
             self.assertNotIn("157.90.251.25:3478", loaded)
 
@@ -228,8 +235,10 @@ class TestTgFetchWorkflow(unittest.TestCase):
             loaded_txt = load_existing_proxies(filepath=txt_path, csv_path=csv_path)
             self.assertIn("2.2.2.2:1080", loaded_txt)
             self.assertEqual(loaded_txt["2.2.2.2:1080"]["fail_count"], 0)
+            self.assertEqual(loaded_txt["2.2.2.2:1080"]["egress_ip"], "198.51.100.2")
             self.assertIn("4.4.4.4:8080", loaded_txt)
             self.assertEqual(loaded_txt["4.4.4.4:8080"]["fail_count"], 0)
+            self.assertEqual(loaded_txt["4.4.4.4:8080"]["egress_ip"], "")
 
     def test_save_scan_ips_by_asn_sanitizes_filenames(self):
         with tempfile.TemporaryDirectory() as td:
@@ -256,6 +265,90 @@ class TestTgFetchWorkflow(unittest.TestCase):
                 self.assertNotIn(":", fname)
                 self.assertNotIn("*", fname)
                 self.assertNotIn("?", fname)
+
+
+class TestProxiesVerifyAndExport(unittest.TestCase):
+    def test_proxy_csv_fields_contains_egress_ip(self):
+        self.assertIn("egress_ip", PROXY_CSV_FIELDS)
+        # 确保 egress_ip 紧随 colo 之后
+        colo_idx = PROXY_CSV_FIELDS.index("colo")
+        egress_idx = PROXY_CSV_FIELDS.index("egress_ip")
+        self.assertEqual(egress_idx, colo_idx + 1)
+
+    def test_save_proxies_csv_and_by_protocol_persists_egress_ip(self):
+        with tempfile.TemporaryDirectory() as td:
+            csv_path = os.path.join(td, "proxies.csv")
+            proxies_dir = os.path.join(td, "proxies")
+            sample_rows = [
+                {
+                    "url": "socks5://user:pass@1.1.1.1:1080",
+                    "proto": "socks5",
+                    "host": "1.1.1.1",
+                    "port": 1080,
+                    "delay_ms": 120,
+                    "fail_count": 0,
+                    "status": "alive",
+                    "colo": "HKG",
+                    "egress_ip": "1.1.1.100",
+                    "tested_at": "2026-10-03 12:00:00",
+                    "first_seen": "2026-10-01 00:00:00",
+                }
+            ]
+            # 1. 验证 save_proxies_csv
+            count = save_proxies_csv(sample_rows, csv_path=csv_path)
+            self.assertEqual(count, 1)
+            with open(csv_path, "r", encoding="utf-8-sig") as f:
+                reader = csv.DictReader(f)
+                rows = list(reader)
+                self.assertEqual(len(rows), 1)
+                self.assertEqual(rows[0]["egress_ip"], "1.1.1.100")
+                self.assertEqual(rows[0]["colo"], "HKG")
+
+            # 2. 验证 save_proxies_by_protocol
+            proto_counts = save_proxies_by_protocol(sample_rows, output_dir=proxies_dir)
+            self.assertIn("socks5", proto_counts)
+            socks5_csv = os.path.join(proxies_dir, "socks5.csv")
+            self.assertTrue(os.path.isfile(socks5_csv))
+            with open(socks5_csv, "r", encoding="utf-8-sig") as f:
+                reader = csv.DictReader(f)
+                rows = list(reader)
+                self.assertEqual(len(rows), 1)
+                self.assertEqual(rows[0]["egress_ip"], "1.1.1.100")
+
+    def test_probe_single_and_parse_proxy_url_egress_ip(self):
+        from proxies_verify import parse_proxy_url, probe_single
+        import asyncio
+        from unittest.mock import patch
+
+        # 1. 验证 parse_proxy_url 默认包含 egress_ip
+        parsed = parse_proxy_url("socks5://1.2.3.4:1080")
+        self.assertIsNotNone(parsed)
+        self.assertIn("egress_ip", parsed)
+        self.assertEqual(parsed["egress_ip"], "")
+
+        # 2. 验证 probe_single 在 mock probe 下成功填充 egress_ip
+        async def _test():
+            sem = asyncio.Semaphore(10)
+            mock_row = {
+                "proto": "socks5",
+                "host": "1.2.3.4",
+                "port": 1080,
+                "url": "socks5://1.2.3.4:1080",
+                "egress_ip": "",
+            }
+            with patch("proxies_verify.probe_socks5", return_value=(True, 88, "alive", "NRT", "203.0.113.19")):
+                res = await probe_single(mock_row, sem)
+                self.assertEqual(res["egress_ip"], "203.0.113.19")
+                self.assertEqual(res["colo"], "NRT")
+                self.assertEqual(res["status"], "alive")
+
+            # 3. 验证探测失败时保留既有 egress_ip
+            with patch("proxies_verify.probe_socks5", return_value=(False, 0, "conn_err", "", "")):
+                res_fail = await probe_single(res, sem)
+                self.assertEqual(res_fail["egress_ip"], "203.0.113.19")
+                self.assertEqual(res_fail["fail_count"], 1)
+
+        asyncio.run(_test())
 
 
 if __name__ == "__main__":

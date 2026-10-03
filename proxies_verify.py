@@ -99,15 +99,15 @@ async def probe_socks5(
     pwd: str | None,
     connect_timeout: float = TIMEOUT,
     http_timeout: float = HTTP_TIMEOUT,
-) -> tuple[bool, int, str, str]:
+) -> tuple[bool, int, str, str, str]:
     """
     SOCKS5 RFC 1928 / RFC 1929 五步状态机鉴真：
     1. TCP 连接
     2. 方法协商 (0x00 无需认证, 0x02 账密认证)
     3. 子协商 (若服务端要求 0x02)
     4. CONNECT speed.cloudflare.com:80
-    5. HTTP GET /cdn-cgi/trace 校验 200 与 colo
-    返回 (is_alive, delay_ms, status, colo)
+    5. HTTP GET /cdn-cgi/trace 校验 200 与 colo，并提取 egress_ip
+    返回 (is_alive, delay_ms, status, colo, egress_ip)
     """
     t0 = time.monotonic()
     try:
@@ -116,7 +116,7 @@ async def probe_socks5(
             timeout=connect_timeout,
         )
     except Exception:
-        return False, 0, "conn_err", ""
+        return False, 0, "conn_err", "", ""
 
     try:
         # 步骤 2: 协商认证方式
@@ -128,14 +128,14 @@ async def probe_socks5(
 
         resp = await asyncio.wait_for(reader.readexactly(2), timeout=connect_timeout)
         if resp[0] != 0x05:
-            return False, 0, "bad_handshake", ""
+            return False, 0, "bad_handshake", "", ""
 
         method = resp[1]
         if method == 0xFF:
-            return False, 0, "no_acceptable_auth", ""
+            return False, 0, "no_acceptable_auth", "", ""
         elif method == 0x02:
             if not (user and pwd):
-                return False, 0, "auth_required_missing", ""
+                return False, 0, "auth_required_missing", "", ""
             # 步骤 3: 账密认证 RFC 1929
             u_b = user.encode("utf-8")
             p_b = pwd.encode("utf-8")
@@ -144,9 +144,9 @@ async def probe_socks5(
             await asyncio.wait_for(writer.drain(), timeout=connect_timeout)
             auth_resp = await asyncio.wait_for(reader.readexactly(2), timeout=connect_timeout)
             if auth_resp[1] != 0x00:
-                return False, 0, "auth_fail", ""
+                return False, 0, "auth_fail", "", ""
         elif method != 0x00:
-            return False, 0, "unsupported_method", ""
+            return False, 0, "unsupported_method", "", ""
 
         # 步骤 4: CONNECT speed.cloudflare.com:80
         target = PROBE_HOST.encode("ascii")
@@ -161,7 +161,7 @@ async def probe_socks5(
 
         conn_resp = await asyncio.wait_for(reader.readexactly(4), timeout=connect_timeout)
         if conn_resp[0] != 0x05 or conn_resp[1] != 0x00:
-            return False, 0, "connect_fail", ""
+            return False, 0, "connect_fail", "", ""
 
         # 排空 BND.ADDR / BND.PORT (RFC 1928 严谨读取)
         atyp = conn_resp[3]
@@ -189,14 +189,16 @@ async def probe_socks5(
 
         colo_match = re.search(r"\bcolo=([A-Za-z0-9]+)\b", http_text)
         colo = colo_match.group(1).upper() if colo_match else ""
+        ip_match = re.search(r"\bip=([0-9a-fA-F.:]+)\b", http_text)
+        egress_ip = ip_match.group(1).strip() if ip_match else ""
         lat = max(1, int((time.monotonic() - t0) * 1000))
 
         first_line = http_text.splitlines()[0] if http_text else ""
         if re.search(r"\b200\b", first_line) and colo:
-            return True, lat, "alive", colo
-        return False, lat, "http_fail", ""
+            return True, lat, "alive", colo, egress_ip
+        return False, lat, "http_fail", "", ""
     except Exception:
-        return False, 0, "timeout_or_reset", ""
+        return False, 0, "timeout_or_reset", "", ""
     finally:
         try:
             writer.close()
@@ -212,13 +214,13 @@ async def probe_http(
     pwd: str | None,
     connect_timeout: float = TIMEOUT,
     http_timeout: float = HTTP_TIMEOUT,
-) -> tuple[bool, int, str, str]:
+) -> tuple[bool, int, str, str, str]:
     """
     HTTP / HTTPS 代理鉴真：
     1. 发送 CONNECT speed.cloudflare.com:80 隧道请求 (若有账密带 Proxy-Authorization)
-    2. 穿透隧道发送 GET /cdn-cgi/trace
+    2. 穿透隧道发送 GET /cdn-cgi/trace 并提取 colo 与 egress_ip
     3. 若 CONNECT 不支持，回退至直接 Forward GET
-    返回 (is_alive, delay_ms, status, colo)
+    返回 (is_alive, delay_ms, status, colo, egress_ip)
     """
     t0 = time.monotonic()
     try:
@@ -227,7 +229,7 @@ async def probe_http(
             timeout=connect_timeout,
         )
     except Exception:
-        return False, 0, "conn_err", ""
+        return False, 0, "conn_err", "", ""
 
     try:
         auth_header = ""
@@ -266,10 +268,12 @@ async def probe_http(
             http_text = http_resp.decode("utf-8", errors="ignore")
             colo_match = re.search(r"\bcolo=([A-Za-z0-9]+)\b", http_text)
             colo = colo_match.group(1).upper() if colo_match else ""
+            ip_match = re.search(r"\bip=([0-9a-fA-F.:]+)\b", http_text)
+            egress_ip = ip_match.group(1).strip() if ip_match else ""
             lat = max(1, int((time.monotonic() - t0) * 1000))
             first_line = http_text.splitlines()[0] if http_text else ""
             if re.search(r"\b200\b", first_line) and colo:
-                return True, lat, "alive", colo
+                return True, lat, "alive", colo, egress_ip
 
         # 回退至直接正向代理 Forward GET（安全重连以避免原连接被代理端关闭/重置）
         try:
@@ -299,13 +303,15 @@ async def probe_http(
         direct_text = direct_resp.decode("utf-8", errors="ignore")
         colo_match = re.search(r"\bcolo=([A-Za-z0-9]+)\b", direct_text)
         colo = colo_match.group(1).upper() if colo_match else ""
+        ip_match = re.search(r"\bip=([0-9a-fA-F.:]+)\b", direct_text)
+        egress_ip = ip_match.group(1).strip() if ip_match else ""
         lat = max(1, int((time.monotonic() - t0) * 1000))
         direct_first_line = direct_text.splitlines()[0] if direct_text else ""
         if re.search(r"\b200\b", direct_first_line) and colo:
-            return True, lat, "alive", colo
-        return False, lat, "http_fail", ""
+            return True, lat, "alive", colo, egress_ip
+        return False, lat, "http_fail", "", ""
     except Exception:
-        return False, 0, "timeout_or_reset", ""
+        return False, 0, "timeout_or_reset", "", ""
     finally:
         if writer is not None:
             try:
@@ -320,12 +326,12 @@ async def probe_turn(
     port: int,
     connect_timeout: float = TIMEOUT,
     read_timeout: float = HTTP_TIMEOUT,
-) -> tuple[bool, int, str, str]:
+) -> tuple[bool, int, str, str, str]:
     """
     TURN 协议鉴真：
     通过 TCP 发送标准 STUN Binding Request (RFC 5389)，
     校验 20 字节响应头部 Magic Cookie (0x2112A442) 以及 Transaction ID 匹配。
-    返回 (is_alive, delay_ms, status, colo)
+    返回 (is_alive, delay_ms, status, colo, egress_ip)
     """
     t0 = time.monotonic()
     try:
@@ -334,7 +340,7 @@ async def probe_turn(
             timeout=connect_timeout,
         )
     except Exception:
-        return False, 0, "conn_err", ""
+        return False, 0, "conn_err", "", ""
 
     try:
         tx_id = os.urandom(12)
@@ -347,10 +353,10 @@ async def probe_turn(
         lat = max(1, int((time.monotonic() - t0) * 1000))
 
         if len(resp) >= 20 and resp[4:8] == b"\x21\x12\xa4\x42" and resp[8:20] == tx_id:
-            return True, lat, "alive", "-"
-        return False, lat, "stun_fail", ""
+            return True, lat, "alive", "-", host
+        return False, lat, "stun_fail", "", ""
     except Exception:
-        return False, 0, "timeout_or_reset", ""
+        return False, 0, "timeout_or_reset", "", ""
     finally:
         try:
             writer.close()
@@ -366,14 +372,14 @@ async def probe_sstp(
     pwd: str | None = None,
     connect_timeout: float = TIMEOUT,
     read_timeout: float = HTTP_TIMEOUT,
-) -> tuple[bool, int, str, str]:
+) -> tuple[bool, int, str, str, str]:
     """
     SSTP (Secure Socket Tunneling Protocol) 鉴真：
     1. TLS 握手建立加密信道 (对自签名证书与通配符证书保持兼容 ssl.CERT_NONE)
     2. 发送标准 MS-SSTP 初始双工隧道请求:
        SSTP_DUPLEX_POST /sra_{BA195980-CD49-458b-9E23-C84EE0ADCD75}/ HTTP/1.1
     3. 校验服务端是否返回 HTTP/1.1 200 OK，确认 SSTP 隧道服务活跃就绪
-    返回 (is_alive, delay_ms, status, colo)
+    返回 (is_alive, delay_ms, status, colo, egress_ip)
     """
     t0 = time.monotonic()
     ctx = ssl.create_default_context()
@@ -390,7 +396,7 @@ async def probe_sstp(
             timeout=connect_timeout,
         )
     except Exception:
-        return False, 0, "conn_err", ""
+        return False, 0, "conn_err", "", ""
 
     try:
         uri = "/sra_{BA195980-CD49-458b-9E23-C84EE0ADCD75}/"
@@ -409,10 +415,10 @@ async def probe_sstp(
         first_line = resp_text.splitlines()[0] if resp_text else ""
 
         if re.search(r"\b200\b", first_line):
-            return True, lat, "alive", "-"
-        return False, lat, "sstp_fail", ""
+            return True, lat, "alive", "-", host
+        return False, lat, "sstp_fail", "", ""
     except Exception:
-        return False, 0, "timeout_or_reset", ""
+        return False, 0, "timeout_or_reset", "", ""
     finally:
         try:
             writer.close()
@@ -436,23 +442,23 @@ async def probe_single(
         pwd = row.get("pwd") or None
 
         if proto == "socks5":
-            is_alive, delay_ms, status, colo = await probe_socks5(
+            is_alive, delay_ms, status, colo, egress_ip = await probe_socks5(
                 host, port, user, pwd, timeout, http_timeout
             )
         elif proto in ("http", "https"):
-            is_alive, delay_ms, status, colo = await probe_http(
+            is_alive, delay_ms, status, colo, egress_ip = await probe_http(
                 host, port, user, pwd, timeout, http_timeout
             )
         elif proto == "turn":
-            is_alive, delay_ms, status, colo = await probe_turn(
+            is_alive, delay_ms, status, colo, egress_ip = await probe_turn(
                 host, port, timeout, http_timeout
             )
         elif proto == "sstp":
-            is_alive, delay_ms, status, colo = await probe_sstp(
+            is_alive, delay_ms, status, colo, egress_ip = await probe_sstp(
                 host, port, user, pwd, timeout, http_timeout
             )
         else:
-            is_alive, delay_ms, status, colo = False, 0, "unknown_proto", ""
+            is_alive, delay_ms, status, colo, egress_ip = False, 0, "unknown_proto", "", ""
 
         row["is_alive"] = is_alive
         row["status"] = status
@@ -465,10 +471,12 @@ async def probe_single(
             row["fail_count"] = 0
             row["delay_ms"] = delay_ms
             row["colo"] = colo
+            row["egress_ip"] = egress_ip or row.get("egress_ip", "")
         else:
             row["fail_count"] = fc + 1
             if not row.get("delay_ms"):
                 row["delay_ms"] = 0
+            row.setdefault("egress_ip", row.get("egress_ip", ""))
 
         return row
 
@@ -495,6 +503,7 @@ def parse_proxy_url(url: str) -> dict | None:
             "fail_count": 0,
             "status": "pending",
             "colo": "",
+            "egress_ip": "",
             "tested_at": "",
         }
     except Exception:
@@ -535,6 +544,7 @@ def load_proxies_data(
                     parsed["delay_ms"] = safe_int(r.get("delay_ms"), 0)
                     parsed["status"] = r.get("status", "pending")
                     parsed["colo"] = r.get("colo", "")
+                    parsed["egress_ip"] = r.get("egress_ip", "")
                     parsed["tested_at"] = r.get("tested_at", "")
                     parsed["first_seen"] = r.get("first_seen", "").strip() or LEGACY_DEFAULT_FIRST_SEEN
                     url_map[url] = parsed
