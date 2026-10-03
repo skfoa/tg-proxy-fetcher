@@ -1789,7 +1789,8 @@ ASN_EXACT_NET_TYPE = {
         "AS36114": "datacenter", "AS18229": "datacenter", "AS47381": "datacenter", "AS30175": "datacenter", "AS139220": "datacenter", "AS39351": "datacenter",
         "AS393398": "datacenter", "AS397503": "datacenter", "AS31130": "datacenter", "AS50812": "datacenter", "AS12306": "datacenter", "AS7385": "datacenter",
         "AS57495": "datacenter", "AS198614": "datacenter", "AS149573": "datacenter", "AS12655": "datacenter", "AS141968": "datacenter", "AS35758": "datacenter",
-        "AS55470": "datacenter", "AS16371": "datacenter", "AS205275": "datacenter"
+        "AS55470": "datacenter", "AS16371": "datacenter", "AS205275": "datacenter",
+        "AS26658": "datacenter", "AS34343": "datacenter"
 }
 
 # 自动将 KNOWN_CLOUD_PROVIDERS 中未单独显式指定类型的知名云厂商/机房补充进入 ASN_EXACT_NET_TYPE 默认为 datacenter

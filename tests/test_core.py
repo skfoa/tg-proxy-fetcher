@@ -101,6 +101,23 @@ class TestProviders(unittest.TestCase):
         # 未知且无 AS 编号的文本兜底为 AS_UNKNOWN
         self.assertEqual(clean_asn("Unknown Entity Without AS Number"), "AS_UNKNOWN")
 
+        # 验证 M-net (AS8767) 与 Level 3 (AS3356)
+        self.assertEqual(clean_asn("M-net Telekommunikations GmbH"), "AS8767")
+        self.assertEqual(classify_asn("AS8767"), "isp")
+        self.assertEqual(clean_asn("Level 3 Parent, LLC"), "AS3356")
+        self.assertEqual(classify_asn("AS3356"), "isp")
+
+        # 验证国内两大运营商权威归属 (AS4837 联通 / AS9808 移动)
+        self.assertEqual(clean_asn("China Unicom"), "AS4837")
+        self.assertEqual(clean_asn("CHINA UNICOM China169 Backbone"), "AS4837")
+        self.assertEqual(clean_asn("China Mobile"), "AS9808")
+        self.assertEqual(format_asn_isp("AS4837"), "AS4837 China Unicom")
+        self.assertEqual(format_asn_isp("AS9808"), "AS9808 China Mobile")
+
+        # 验证 IDC Cube (AS36530)
+        self.assertEqual(clean_asn("IDC Cube"), "AS36530")
+        self.assertEqual(format_asn_isp("AS36530"), "AS36530 IDC Cube")
+
     def test_normalize_timestamp(self):
         # 8 位纯数字日期必须原样保留，严禁误转换为 1970 年时间戳
         self.assertEqual(normalize_timestamp("20260906"), "20260906")
