@@ -357,6 +357,10 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
                 self.assertEqual(item["isp"], "Cloudflare, Inc.")
                 self.assertEqual(item["asOrganization"], "Cloudflare, Inc.")
                 self.assertEqual(item["net_type"], "datacenter")
+                self.assertNotIn("delay_ms", item)
+                self.assertNotIn("colo", item)
+                self.assertNotIn("egress_ip", item)
+                self.assertNotIn("tested_at", item)
 
             # 3. 验证 save_proxies_json 全量导出
             j_count = save_proxies_json(sample_rows, json_path=json_path)

@@ -1334,15 +1334,10 @@ def format_proxy_json_item(r_dict: dict) -> dict:
         "country_name": c_name,
         "country_cn": c_name,
         "country_emoji": c_emoji,
-        "city": "",
         "asn": clean_asn_num,
         "asOrganization": isp_name,
         "isp": isp_name,
         "net_type": net_type_val,
-        "delay_ms": safe_int(r_dict.get("delay_ms"), 0),
-        "colo": r_dict.get("colo") or "",
-        "egress_ip": r_dict.get("egress_ip") or "",
-        "tested_at": r_dict.get("tested_at") or "",
     }
 
 

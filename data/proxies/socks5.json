@@ -8,15 +8,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 749,
-    "colo": "ATL",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:40"
+    "net_type": ""
   },
   {
     "proxy": "socks5://OTC:OTC@184.178.172.17:4145",
@@ -27,15 +22,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 863,
-    "colo": "ATL",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:40"
+    "net_type": ""
   },
   {
     "proxy": "socks5://OTC:OTC@184.178.172.23:4145",
@@ -46,15 +36,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 926,
-    "colo": "ATL",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:40"
+    "net_type": ""
   },
   {
     "proxy": "socks5://OTC:OTC@184.181.217.201:4145",
@@ -65,15 +50,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 989,
-    "colo": "ATL",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:40"
+    "net_type": ""
   },
   {
     "proxy": "socks5://admin:admin@8.210.25.244:1080",
@@ -84,15 +64,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 1121,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:40"
+    "net_type": ""
   },
   {
     "proxy": "socks5://1:1@103.130.196.61:1080",
@@ -103,15 +78,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 1189,
-    "colo": "DAC",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:44"
+    "net_type": ""
   },
   {
     "proxy": "socks5://test123:test123@37.143.130.57:1080",
@@ -122,15 +92,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 1241,
-    "colo": "MAD",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:40"
+    "net_type": ""
   },
   {
     "proxy": "socks5://demo:demo@103.138.26.161:1080",
@@ -141,15 +106,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 1294,
-    "colo": "DAC",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:40"
+    "net_type": ""
   },
   {
     "proxy": "socks5://OTC:OTC@184.178.172.14:4145",
@@ -160,15 +120,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 1326,
-    "colo": "ATL",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:40"
+    "net_type": ""
   },
   {
     "proxy": "socks5://proxyuser:proxypass@23.177.185.234:1080",
@@ -179,15 +134,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 1328,
-    "colo": "SJC",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:39"
+    "net_type": ""
   },
   {
     "proxy": "socks5://demo:demo@103.138.26.73:1080",
@@ -198,15 +148,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 1340,
-    "colo": "DAC",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:40"
+    "net_type": ""
   },
   {
     "proxy": "socks5://123:123@152.32.215.130:1080",
@@ -217,15 +162,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 1386,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:40"
+    "net_type": ""
   },
   {
     "proxy": "socks5://test:test@103.79.183.34:1080",
@@ -236,15 +176,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 1453,
-    "colo": "DAC",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:41"
+    "net_type": ""
   },
   {
     "proxy": "socks5://123:123@165.154.23.224:1080",
@@ -255,15 +190,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 1492,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:40"
+    "net_type": ""
   },
   {
     "proxy": "socks5://6666:6666@8.210.177.181:6666",
@@ -274,15 +204,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 1512,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:40"
+    "net_type": ""
   },
   {
     "proxy": "socks5://test:test@103.135.252.30:1080",
@@ -293,15 +218,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 1602,
-    "colo": "CGP",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:41"
+    "net_type": ""
   },
   {
     "proxy": "socks5://root:123456@61.171.50.57:1080",
@@ -312,15 +232,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 1743,
-    "colo": "LAX",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:40"
+    "net_type": ""
   },
   {
     "proxy": "socks5://88888:88888@8.210.36.244:1080",
@@ -331,15 +246,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 1804,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:40"
+    "net_type": ""
   },
   {
     "proxy": "socks5://root:123456@101.89.159.229:1080",
@@ -350,15 +260,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 1842,
-    "colo": "FRA",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:40"
+    "net_type": ""
   },
   {
     "proxy": "socks5://123456:123456@8.209.226.46:1080",
@@ -369,15 +274,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 1917,
-    "colo": "NRT",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:40"
+    "net_type": ""
   },
   {
     "proxy": "socks5://test:test@103.179.238.33:1080",
@@ -388,15 +288,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 2072,
-    "colo": "DAC",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:40"
+    "net_type": ""
   },
   {
     "proxy": "socks5://OTC:OTC@184.181.217.213:4145",
@@ -407,15 +302,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 2089,
-    "colo": "ATL",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:39"
+    "net_type": ""
   },
   {
     "proxy": "socks5://123:123@165.154.23.8:1080",
@@ -426,15 +316,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 2136,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:40"
+    "net_type": ""
   },
   {
     "proxy": "socks5://test123:test123@103.75.119.242:1080",
@@ -445,15 +330,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 2137,
-    "colo": "SYD",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:40"
+    "net_type": ""
   },
   {
     "proxy": "socks5://OTC:OTC@184.178.172.3:4145",
@@ -464,15 +344,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 2329,
-    "colo": "ATL",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:34"
+    "net_type": ""
   },
   {
     "proxy": "socks5://OTC:OTC@184.181.217.194:4145",
@@ -483,15 +358,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 2548,
-    "colo": "ATL",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:34"
+    "net_type": ""
   },
   {
     "proxy": "socks5://8888:8888@8.210.212.0:6666",
@@ -502,15 +372,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 2578,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:40"
+    "net_type": ""
   },
   {
     "proxy": "socks5://123:123@101.36.109.158:1080",
@@ -521,15 +386,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 2711,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:39"
+    "net_type": ""
   },
   {
     "proxy": "socks5://OTC:OTC@184.178.172.26:4145",
@@ -540,15 +400,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 2781,
-    "colo": "ATL",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:36"
+    "net_type": ""
   },
   {
     "proxy": "socks5://test123:test123@23.238.34.20:1080",
@@ -559,15 +414,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 2816,
-    "colo": "DFW",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:34"
+    "net_type": ""
   },
   {
     "proxy": "socks5://123:123@123.58.219.172:1080",
@@ -578,15 +428,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 2827,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:39"
+    "net_type": ""
   },
   {
     "proxy": "socks5://OTC:OTC@184.181.217.210:4145",
@@ -597,15 +442,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 2882,
-    "colo": "ATL",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:39"
+    "net_type": ""
   },
   {
     "proxy": "socks5://184.178.172.28:15294",
@@ -616,15 +456,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 2902,
-    "colo": "ATL",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:37"
+    "net_type": ""
   },
   {
     "proxy": "socks5://test123:test123@31.40.212.146:1080",
@@ -635,15 +470,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 2983,
-    "colo": "EZE",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:33"
+    "net_type": ""
   },
   {
     "proxy": "socks5://1:1@103.133.69.139:1080",
@@ -654,15 +484,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3102,
-    "colo": "SIN",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:39"
+    "net_type": ""
   },
   {
     "proxy": "socks5://OTC:OTC@184.178.172.11:4145",
@@ -673,15 +498,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3121,
-    "colo": "ATL",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:39"
+    "net_type": ""
   },
   {
     "proxy": "socks5://root:123456@101.89.207.142:1080",
@@ -692,15 +512,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3168,
-    "colo": "FRA",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:35"
+    "net_type": ""
   },
   {
     "proxy": "socks5://test123:test123@23.158.200.158:1080",
@@ -711,15 +526,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3185,
-    "colo": "LAX",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:32"
+    "net_type": ""
   },
   {
     "proxy": "socks5://123:123@152.32.186.245:1080",
@@ -730,15 +540,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3224,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:33"
+    "net_type": ""
   },
   {
     "proxy": "socks5://6666:6666@8.210.157.145:6666",
@@ -749,15 +554,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3241,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:33"
+    "net_type": ""
   },
   {
     "proxy": "socks5://6666:6666@8.210.222.7:6666",
@@ -768,15 +568,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3241,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:33"
+    "net_type": ""
   },
   {
     "proxy": "socks5://123:123@101.36.109.122:1080",
@@ -787,15 +582,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3275,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:33"
+    "net_type": ""
   },
   {
     "proxy": "socks5://123456:123456@8.209.205.237:1080",
@@ -806,15 +596,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3282,
-    "colo": "NRT",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:35"
+    "net_type": ""
   },
   {
     "proxy": "socks5://1:1@103.130.196.110:1080",
@@ -825,15 +610,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3292,
-    "colo": "CGP",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:39"
+    "net_type": ""
   },
   {
     "proxy": "socks5://123:123@165.154.23.69:1080",
@@ -844,15 +624,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3293,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:36"
+    "net_type": ""
   },
   {
     "proxy": "socks5://root:123456@61.171.95.65:1080",
@@ -863,15 +638,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3340,
-    "colo": "LAX",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:40"
+    "net_type": ""
   },
   {
     "proxy": "socks5://test123:test123@109.104.155.18:1080",
@@ -882,15 +652,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3348,
-    "colo": "GRU",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:35"
+    "net_type": ""
   },
   {
     "proxy": "socks5://test123:test123@168.222.247.40:1080",
@@ -901,15 +666,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3350,
-    "colo": "FRA",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:36"
+    "net_type": ""
   },
   {
     "proxy": "socks5://test123:test123@104.219.233.124:1080",
@@ -920,15 +680,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3417,
-    "colo": "ORD",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:32"
+    "net_type": ""
   },
   {
     "proxy": "socks5://demo:demo@103.138.26.77:1080",
@@ -939,15 +694,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3473,
-    "colo": "DAC",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:35"
+    "net_type": ""
   },
   {
     "proxy": "socks5://123:123@165.154.1.222:1080",
@@ -958,15 +708,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3492,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:39"
+    "net_type": ""
   },
   {
     "proxy": "socks5://123456:123456@8.210.200.24:6666",
@@ -977,15 +722,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3496,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:37"
+    "net_type": ""
   },
   {
     "proxy": "socks5://888:888@47.243.25.202:1080",
@@ -996,15 +736,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3506,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:36"
+    "net_type": ""
   },
   {
     "proxy": "socks5://8888:8888@8.210.220.230:6666",
@@ -1015,15 +750,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3508,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:39"
+    "net_type": ""
   },
   {
     "proxy": "socks5://8888:8888@8.210.157.4:6666",
@@ -1034,15 +764,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3525,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:35"
+    "net_type": ""
   },
   {
     "proxy": "socks5://888888:888888@8.210.165.193:5555",
@@ -1053,15 +778,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3527,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:36"
+    "net_type": ""
   },
   {
     "proxy": "socks5://1:1@103.234.255.178:1080",
@@ -1072,15 +792,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3543,
-    "colo": "SIN",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:35"
+    "net_type": ""
   },
   {
     "proxy": "socks5://6666:6666@8.210.184.135:8888",
@@ -1091,15 +806,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3576,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:34"
+    "net_type": ""
   },
   {
     "proxy": "socks5://ss:ss@103.85.238.43:1080",
@@ -1110,15 +820,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3599,
-    "colo": "DAC",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:34"
+    "net_type": ""
   },
   {
     "proxy": "socks5://123:123@165.154.23.113:1080",
@@ -1129,15 +834,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3671,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:36"
+    "net_type": ""
   },
   {
     "proxy": "socks5://6666:6666@8.210.224.195:6666",
@@ -1148,15 +848,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3684,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:37"
+    "net_type": ""
   },
   {
     "proxy": "socks5://myuser:mypassword@8.210.135.205:1080",
@@ -1167,15 +862,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3687,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:37"
+    "net_type": ""
   },
   {
     "proxy": "socks5://abc123:abc123@103.238.72.56:1080",
@@ -1186,15 +876,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3729,
-    "colo": "HAN",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:34"
+    "net_type": ""
   },
   {
     "proxy": "socks5://root:123456@101.91.233.238:1080",
@@ -1205,15 +890,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3756,
-    "colo": "FRA",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:34"
+    "net_type": ""
   },
   {
     "proxy": "socks5://123:123@101.36.124.157:1080",
@@ -1224,15 +904,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3808,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:36"
+    "net_type": ""
   },
   {
     "proxy": "socks5://6666:6666@8.210.157.86:6666",
@@ -1243,15 +918,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3810,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:33"
+    "net_type": ""
   },
   {
     "proxy": "socks5://123:123@165.154.23.155:1080",
@@ -1262,15 +932,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3810,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:33"
+    "net_type": ""
   },
   {
     "proxy": "socks5://8888:8888@8.210.208.201:8888",
@@ -1281,15 +946,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3897,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:38"
+    "net_type": ""
   },
   {
     "proxy": "socks5://demo:demo@103.179.238.41:1080",
@@ -1300,15 +960,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3930,
-    "colo": "DAC",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:37"
+    "net_type": ""
   },
   {
     "proxy": "socks5://root:123456@101.89.160.59:1080",
@@ -1319,15 +974,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3946,
-    "colo": "LAX",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:40"
+    "net_type": ""
   },
   {
     "proxy": "socks5://123:123@101.36.125.98:1080",
@@ -1338,15 +988,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 3958,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:38"
+    "net_type": ""
   },
   {
     "proxy": "socks5://12345678:12345678@101.42.44.92:1080",
@@ -1357,15 +1002,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 4036,
-    "colo": "LAX",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:35"
+    "net_type": ""
   },
   {
     "proxy": "socks5://88888:88888@59.36.138.40:1080",
@@ -1376,15 +1016,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 4091,
-    "colo": "LAX",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:36"
+    "net_type": ""
   },
   {
     "proxy": "socks5://root:123456@61.171.51.87:1080",
@@ -1395,15 +1030,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 4103,
-    "colo": "FRA",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:40"
+    "net_type": ""
   },
   {
     "proxy": "socks5://OTC:OTC@184.185.2.12:4145",
@@ -1414,15 +1044,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 4119,
-    "colo": "ATL",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:39"
+    "net_type": ""
   },
   {
     "proxy": "socks5://11:11@103.156.238.48:1080",
@@ -1433,15 +1058,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 4246,
-    "colo": "DAC",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:38"
+    "net_type": ""
   },
   {
     "proxy": "socks5://123:123@152.32.215.230:1080",
@@ -1452,15 +1072,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 4316,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:33"
+    "net_type": ""
   },
   {
     "proxy": "socks5://root:123456@59.36.80.120:1080",
@@ -1471,15 +1086,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 4332,
-    "colo": "LAX",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:34"
+    "net_type": ""
   },
   {
     "proxy": "socks5://test:test@103.9.133.22:1080",
@@ -1490,15 +1100,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 4485,
-    "colo": "DAC",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:36"
+    "net_type": ""
   },
   {
     "proxy": "socks5://ss:ss@103.14.72.168:1080",
@@ -1509,15 +1114,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 4831,
-    "colo": "DAC",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:34"
+    "net_type": ""
   },
   {
     "proxy": "socks5://6666:6666@59.36.140.209:1080",
@@ -1528,15 +1128,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 4850,
-    "colo": "LAX",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:39"
+    "net_type": ""
   },
   {
     "proxy": "socks5://ss:ss@103.80.116.190:1080",
@@ -1547,15 +1142,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 4853,
-    "colo": "BOM",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:33"
+    "net_type": ""
   },
   {
     "proxy": "socks5://root:123456@59.36.137.51:1080",
@@ -1566,15 +1156,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 4889,
-    "colo": "FRA",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:39"
+    "net_type": ""
   },
   {
     "proxy": "socks5://vpn:vpn@101.126.33.223:1080",
@@ -1585,15 +1170,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 4994,
-    "colo": "FRA",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:39"
+    "net_type": ""
   },
   {
     "proxy": "socks5://666:666@58.209.83.25:1080",
@@ -1604,15 +1184,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 5029,
-    "colo": "LAX",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:34"
+    "net_type": ""
   },
   {
     "proxy": "socks5://1:1@103.243.244.133:1080",
@@ -1623,15 +1198,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 5271,
-    "colo": "DAC",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:34"
+    "net_type": ""
   },
   {
     "proxy": "socks5://test:test@47.104.206.9:1080",
@@ -1642,15 +1212,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 5933,
-    "colo": "LAX",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:34"
+    "net_type": ""
   },
   {
     "proxy": "socks5://root:123456@61.171.54.239:1080",
@@ -1661,15 +1226,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 7492,
-    "colo": "FRA",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:38"
+    "net_type": ""
   },
   {
     "proxy": "socks5://123:123@152.32.190.247:1080",
@@ -1680,15 +1240,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 913,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:39"
+    "net_type": ""
   },
   {
     "proxy": "socks5://111:111@106.55.143.100:1080",
@@ -1699,15 +1254,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 1383,
-    "colo": "LAX",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:42"
+    "net_type": ""
   },
   {
     "proxy": "socks5://666:666@106.227.75.21:1080",
@@ -1718,15 +1268,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 2412,
-    "colo": "FRA",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:31"
+    "net_type": ""
   },
   {
     "proxy": "socks5://1:1@103.94.1.50:1080",
@@ -1737,15 +1282,10 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 2796,
-    "colo": "SIN",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:31"
+    "net_type": ""
   },
   {
     "proxy": "socks5://admin:admin@47.239.116.165:1080",
@@ -1756,14 +1296,9 @@
     "country_name": "",
     "country_cn": "",
     "country_emoji": "",
-    "city": "",
     "asn": "",
     "asOrganization": "",
     "isp": "",
-    "net_type": "",
-    "delay_ms": 1059,
-    "colo": "HKG",
-    "egress_ip": "",
-    "tested_at": "2026-10-03 16:48:31"
+    "net_type": ""
   }
 ]
