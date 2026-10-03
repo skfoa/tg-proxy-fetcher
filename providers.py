@@ -1540,7 +1540,7 @@ ASN_EXACT_NET_TYPE = {
         "AS18712": "isp", "AS14988": "isp", "AS138652": "isp", "AS263135": "isp", "AS32133": "isp", "AS11776": "isp",
         "AS14615": "isp", "AS36996": "isp", "AS28006": "isp", "AS35900": "isp", "AS14642": "isp", "AS15146": "isp",
         "AS52233": "isp", "AS33363": "isp", "AS6057": "isp", "AS9644": "isp", "AS133269": "isp", "AS22646": "isp",
-        "AS214238": "isp", "AS63150": "isp", "AS204785": "isp", "AS214743": "isp", "AS13489": "isp", "AS3356": "isp",
+        "AS214238": "isp", "AS63150": "isp", "AS204785": "isp", "AS214743": "isp", "AS13489": "isp", "AS3356": "isp", "AS34343": "isp",
         "AS265688": "isp", "AS262186": "isp", "AS264689": "isp", "AS19429": "isp", "AS14080": "isp", "AS4007": "isp",
         "AS154372": "isp", "AS35540": "isp", "AS133120": "isp", "AS37123": "isp", "AS14453": "isp", "AS2914": "isp",
         "AS3257": "isp", "AS6939": "isp", "AS39326": "isp", "AS210464": "isp", "AS149020": "isp", "AS6871": "isp",
@@ -1793,7 +1793,7 @@ ASN_EXACT_NET_TYPE = {
         "AS393398": "datacenter", "AS397503": "datacenter", "AS31130": "datacenter", "AS50812": "datacenter", "AS12306": "datacenter", "AS7385": "datacenter",
         "AS57495": "datacenter", "AS198614": "datacenter", "AS149573": "datacenter", "AS12655": "datacenter", "AS141968": "datacenter", "AS35758": "datacenter",
         "AS55470": "datacenter", "AS16371": "datacenter", "AS205275": "datacenter",
-        "AS26658": "datacenter", "AS34343": "datacenter", "AS152644": "datacenter"
+        "AS26658": "datacenter", "AS152644": "datacenter"
 }
 
 # 自动将 KNOWN_CLOUD_PROVIDERS 中未单独显式指定类型的知名云厂商/机房补充进入 ASN_EXACT_NET_TYPE 默认为 datacenter

@@ -130,6 +130,18 @@ class TestProviders(unittest.TestCase):
         self.assertEqual(clean_asn("BageVM"), "AS14061")
         self.assertEqual(format_asn_isp("AS14061", "BageVM"), "AS14061 DigitalOcean (BageVM)")
 
+        # 验证 Eweka (AS34343) 归入 isp
+        self.assertEqual(clean_asn("Eweka Internet Services B.V."), "AS34343")
+        self.assertEqual(classify_asn("AS34343", "Eweka Internet Services B.V."), "isp")
+
+        # 验证石家庄电信 CHINANET 准确指向 AS4134
+        self.assertEqual(clean_asn("Shijiazhuang IDC network, CHINANET Hebei province"), "AS4134")
+        self.assertEqual(format_asn_isp("AS4134"), "AS4134 China Telecom")
+
+        # 验证 Ting Fiber Inc. 权威归属 AS32133 (ISP)
+        self.assertEqual(clean_asn("Ting Fiber Inc."), "AS32133")
+        self.assertEqual(classify_asn("AS32133"), "isp")
+
     def test_normalize_timestamp(self):
         # 8 位纯数字日期必须原样保留，严禁误转换为 1970 年时间戳
         self.assertEqual(normalize_timestamp("20260906"), "20260906")
