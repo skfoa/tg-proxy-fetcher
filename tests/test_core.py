@@ -500,6 +500,98 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
 
         asyncio.run(_test())
 
+    def test_normalize_endpoint_and_build_sstp_url(self):
+        from proxies_verify import normalize_endpoint, build_sstp_url
+
+        # normalize_endpoint
+        self.assertEqual(normalize_endpoint(None), "")
+        self.assertEqual(normalize_endpoint(""), "")
+        self.assertEqual(normalize_endpoint("off"), "")
+        self.assertEqual(normalize_endpoint("NONE"), "")
+        self.assertEqual(normalize_endpoint("0"), "")
+        self.assertEqual(normalize_endpoint("false"), "")
+        self.assertEqual(normalize_endpoint("disabled"), "")
+        self.assertEqual(
+            normalize_endpoint("check.socks5.cmliussss.net/"),
+            "https://check.socks5.cmliussss.net",
+        )
+        self.assertEqual(
+            normalize_endpoint("http://myworker.dev/"),
+            "http://myworker.dev",
+        )
+
+        # build_sstp_url
+        self.assertEqual(
+            build_sstp_url("vpn.example.com", 443),
+            "sstp://vpn:vpn@vpn.example.com:443",
+        )
+        self.assertEqual(
+            build_sstp_url("vpn.example.com", 443, "custom_u", "custom_p"),
+            "sstp://custom_u:custom_p@vpn.example.com:443",
+        )
+
+    def test_sstp_cf_worker_stage2_verification(self):
+        from proxies_verify import probe_single
+        import asyncio
+        from unittest.mock import patch, AsyncMock
+
+        async def _test():
+            sem = asyncio.Semaphore(10)
+            base_row = {
+                "url": "sstp://vpn:vpn@public-vpn-261.opengw.net:443",
+                "proto": "sstp",
+                "host": "public-vpn-261.opengw.net",
+                "port": 443,
+                "user": "vpn",
+                "pwd": "vpn",
+            }
+
+            # 1. 成功案例：CF Worker 返回 success=True，真实出口 IP、国家与 ASN 结构化丰富
+            mock_cf_success = {
+                "success": True,
+                "colo": "NRT",
+                "exit": {
+                    "ip": "219.100.37.244",
+                    "country_code": "JP",
+                    "asn": {
+                        "asn": "AS36599",
+                        "name": "SoftEther Telecommunication Research Institute, LLC",
+                        "type": "isp",
+                    },
+                },
+            }
+
+            with patch("proxies_verify.probe_sstp", return_value=(True, 150, "alive", "-", "", "1.2.3.4")), \
+                 patch("proxies_verify.check_sstp_exit_cf_worker", new_callable=AsyncMock, return_value=mock_cf_success):
+                res = await probe_single(base_row.copy(), sem, cf_check_endpoint="https://check.socks5.cmliussss.net")
+                self.assertTrue(res["is_alive"])
+                self.assertEqual(res["egress_ip"], "219.100.37.244")
+                self.assertEqual(res["country"], "JP")
+                self.assertEqual(res["colo"], "NRT")
+                self.assertIn("AS36599", res["asn"])
+
+            # 2. 淘汰假活案例：本地 HTTP 200 初筛通过，但 CF Worker 全隧道 PPP 握手失败
+            mock_cf_fail = {
+                "success": False,
+                "error": "SSTP server connection timed out",
+            }
+
+            with patch("proxies_verify.probe_sstp", return_value=(True, 150, "alive", "-", "", "1.2.3.4")), \
+                 patch("proxies_verify.check_sstp_exit_cf_worker", new_callable=AsyncMock, return_value=mock_cf_fail):
+                res = await probe_single(base_row.copy(), sem, cf_check_endpoint="https://check.socks5.cmliussss.net")
+                self.assertFalse(res["is_alive"])
+                self.assertEqual(res["status"], "sstp_vpn_fail")
+                self.assertEqual(res["fail_count"], 1)
+
+            # 3. 容灾回退案例：CF Worker 网络异常或超时 (返回 None)，平滑回退至本地探测结果
+            with patch("proxies_verify.probe_sstp", return_value=(True, 150, "alive", "-", "", "1.2.3.4")), \
+                 patch("proxies_verify.check_sstp_exit_cf_worker", new_callable=AsyncMock, return_value=None):
+                res = await probe_single(base_row.copy(), sem, cf_check_endpoint="https://check.socks5.cmliussss.net")
+                self.assertTrue(res["is_alive"])
+                self.assertEqual(res["egress_ip"], "1.2.3.4")
+
+        asyncio.run(_test())
+
     def test_enrich_proxies_metadata(self):
         from proxies_verify import enrich_proxies_metadata
         import asyncio

@@ -400,6 +400,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `PROXY_CHANNELS` | 代理抓取目标频道/群组（逗号/空格分隔） | `@otcfxq, @danfeng_chat` | 可选 | 自定义抓取通用代理的频道/群组（若未配置自动回退至全局 `CHANNELS` 或默认值） |
 | `CF_IP_CHANNELS` | 优选 IP 抓取目标频道/群组（逗号/空格分隔） | `@otcfxq, @danfeng_chat` | 可选 | 自定义抓取 Cloudflare 优选 IP 与测速附件的频道/群组（若未配置自动回退至全局 `CHANNELS` 或默认值） |
 | `SUB_URLS` | 外部通用订阅源 URL 列表（逗号/换行分隔） | 留空 | 可选 | 配置外部公开订阅链接（如 VPNGate SSTP 节点订阅），自动下载并去重合并 |
+| `CF_CHECK_ENDPOINT` | SSTP 代理出口检测端点 URL | `https://check.socks5.cmliussss.net` | 可选 | 用于存活 SSTP 节点的第二阶段真实出口 IP 与链路鉴真。<br>💡 **推荐自行部署**：公共端点每天共享 100,000 次请求额度，可能受其他人请求耗尽影响。推荐使用开源项目 [CF-Workers-CheckSocks5](https://github.com/cmlius/CF-Workers-CheckSocks5) 免费部署至个人 Cloudflare 账号，每天享有独立的 100,000 次免费请求额度。部署后将 Worker 域名填入此处即可。填入 `off` 可完全关闭外部检测回退为本地探测。 |
 
 ### 3. 高级调优参数与本地调试对照（可选）
 
@@ -411,6 +412,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `--max-fails` | 校验脚本 | `全部引擎统一为 3` | `全部引擎统一为 3` | 连续失败物理淘汰阈值（全线引擎统一默认 3 次，允许 1~2 次网络抖动缓冲；设为 `1` 即为严格无缓冲模式） |
 | `--timeout` | 校验脚本 | `反代 4.0 / 优选 3.0` | `3.0` ~ `5.0` | 单节点连接建立与 TLS 握手超时秒数（反代默认 4.0s 充分兼容跨洲 RTT） |
 | `--http-timeout` | `proxyip_verify.py` | `3.5` | `3.5` | 反代 HTTP /cdn-cgi/trace 响应读取统一 deadline 超时秒数 |
+| `--cf-check-endpoint` | `proxies_verify.py` | `默认公共端点或 vars` | `https://check.socks5.cmliussss.net` | SSTP 真实出口与 PPP 链路鉴真端点 URL (设为 `off` 或留空可关闭) |
 | `--no-notify` | 校验脚本 | 流水线静默 | 关闭 | 不单独推送各引擎卡片，由流水线终点聚合为四合一卡片 |
 | `DEFER_NOTIFY` | `tg_fetch.py` | `1` | `0` | 延迟 Telegram 推送标记，确保四合一卡片聚合完整 |
 
@@ -499,8 +501,8 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 
 ### 第三步：启用 Actions 定时任务
 1. 打开仓库的 **Actions** 标签页，点击绿色按钮开启工作流权限（*“I understand my workflows, go ahead and enable them”*）。
-2. **自动定时调度**：每天 **北京时间 18:05（UTC 10:05）** 自动执行完整的流水线（含语法预检、三级主动质检、数据去重提交与旧记录清理）。
-3. **手动随时触发**：在 Actions 页面左侧点击 **Fetch Proxies and CF IPs** ➔ **Run workflow**，即可按需随时触发一次同步。
+2. **自动定时调度**：每天 **北京时间 08:15（UTC 00:15）** 自动执行完整的流水线（位于 Cloudflare Workers 每日免费额度刷新后，并微调 15 分钟避开整点排队拥堵）。
+3. **手动随时触发**：在 Actions 页面左侧点击 **Fetch Proxies and CF IPs** ➔ **Run workflow**，支持自定义输入 `fetch_days` 与 `cf_check_endpoint`，按需随时触发同步。
 
 ---
 

@@ -2,14 +2,18 @@ name: Fetch Proxies and CF IPs
 
 on:
   schedule:
-    # 每天北京时间 18:05（UTC 10:05）执行，微调 5 分钟避开 GitHub Actions 整点排队拥堵
-    - cron: "5 10 * * *"
+    # 每天北京时间 08:15（UTC 00:15）执行，位于 Cloudflare Workers 每日免费额度重置（北京时间 08:00 / UTC 00:00）之后，并微调 15 分钟避开整点排队
+    - cron: "15 0 * * *"
   workflow_dispatch: # 支持在 GitHub 页面手动点击触发运行
     inputs:
       fetch_days:
         description: "回溯天数 (默认 3 天)"
         required: false
         default: "3"
+      cf_check_endpoint:
+        description: "SSTP 出口检测端点 URL (推荐自建 CF-Workers-CheckSocks5，留空使用 vars.CF_CHECK_ENDPOINT 或默认公共端点)"
+        required: false
+        default: ""
 
 concurrency:
   group: fetch-proxies
@@ -59,6 +63,8 @@ jobs:
         run: python tg_fetch.py
 
       - name: 🚀 通用代理多协议连通性质检
+        env:
+          CF_CHECK_ENDPOINT: ${{ inputs.cf_check_endpoint || vars.CF_CHECK_ENDPOINT || secrets.CF_CHECK_ENDPOINT || 'https://check.socks5.cmliussss.net' }}
         run: python proxies_verify.py --concurrency 300 --max-fails 3 --no-notify
 
       - name: 🔍 ProxyIP 穿透存活质检
