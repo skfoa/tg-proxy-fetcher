@@ -183,11 +183,14 @@ ASN_TO_PROVIDER = dict(AUTHORITATIVE_CLOUD_ASNS)
 # =====================================================================
 
 import asyncio
+import concurrent.futures
 import csv
+import ipaddress
 import json
 import logging
 import os
 import re
+import socket
 import time
 import urllib.parse
 import urllib.request
@@ -450,6 +453,338 @@ def resolve_asn_online(ip: str, isp_hint: str = "", persist: bool = False) -> tu
 async def resolve_asn_online_async(ip: str, isp_hint: str = "", persist: bool = False) -> tuple[str, str]:
     """resolve_asn_online 的异步无阻塞封装，在独立工作线程中执行同步网络 I/O，杜绝阻塞事件循环"""
     return await asyncio.to_thread(resolve_asn_online, ip, isp_hint, persist)
+
+
+# ---------- IP/域名 级别持久化元数据缓存 (data/ip_cache.json) ----------
+
+IP_CACHE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "ip_cache.json")
+IP_CACHE_REL_PATH = os.path.join("data", "ip_cache.json")
+
+
+def load_ip_cache() -> dict[str, dict]:
+    """从 data/ip_cache.json 加载已解析的 IP/域名 -> ASN/ISP/net_type 高速缓存"""
+    for p in (IP_CACHE_PATH, IP_CACHE_REL_PATH):
+        if os.path.isfile(p):
+            try:
+                with open(p, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    if isinstance(data, dict):
+                        return data
+            except Exception as e:
+                log.debug("读取 %s 异常: %s", p, e)
+    return {}
+
+
+def save_ip_cache(cache: dict[str, dict]):
+    """持久化保存 IP/域名 -> ASN/ISP/net_type 缓存字典至 data/ip_cache.json（原子写入）"""
+    target_path = IP_CACHE_PATH
+    os.makedirs(os.path.dirname(target_path), exist_ok=True)
+    tmp_path = f"{target_path}.tmp"
+    try:
+        with open(tmp_path, "w", encoding="utf-8") as f:
+            json.dump(cache, f, ensure_ascii=False, indent=2)
+        os.replace(tmp_path, target_path)
+    except Exception as e:
+        log.warning("保存 %s 异常: %s", target_path, e)
+        if os.path.exists(tmp_path):
+            try:
+                os.remove(tmp_path)
+            except OSError:
+                pass
+
+
+def is_valid_public_ip(ip_str: str) -> bool:
+    """严格校验是否为合规公网 IPv4/IPv6，剔除回环、内网私有段、链路本地与组播"""
+    if not ip_str or not isinstance(ip_str, str):
+        return False
+    clean_ip = ip_str.strip()
+    try:
+        ip_obj = ipaddress.ip_address(clean_ip)
+        return not (
+            ip_obj.is_private
+            or ip_obj.is_loopback
+            or ip_obj.is_link_local
+            or ip_obj.is_unspecified
+            or ip_obj.is_multicast
+            or ip_obj.is_reserved
+        )
+    except Exception:
+        return False
+
+
+def doh_resolve_public_ip(domain: str, timeout: float = 3.5) -> str:
+    """通过安全加密 DNS (DoH) 解析域名，绕过本地 DNS 污染/劫持返回真实公网 IP"""
+    if not domain or not isinstance(domain, str):
+        return ""
+    clean = domain.strip().lower()
+    doh_endpoints = [
+        f"https://1.1.1.1/dns-query?name={clean}&type=A",
+        f"https://cloudflare-dns.com/dns-query?name={clean}&type=A",
+        f"https://dns.google/resolve?name={clean}&type=A",
+    ]
+    for url in doh_endpoints:
+        try:
+            req = urllib.request.Request(
+                url,
+                headers={"Accept": "application/dns-json", "User-Agent": "Mozilla/5.0 (compatible; tg-proxy-fetcher/2.0)"},
+            )
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                data = json.loads(resp.read().decode("utf-8", errors="ignore"))
+                answers = data.get("Answer", [])
+                if isinstance(answers, list):
+                    for ans in answers:
+                        if isinstance(ans, dict) and ans.get("type") == 1:
+                            cand_ip = str(ans.get("data", "")).strip()
+                            if is_valid_public_ip(cand_ip):
+                                return cand_ip
+        except Exception:
+            continue
+    return ""
+
+
+def resolve_domain_to_ip(domain: str) -> str:
+    """尝试将域名解析为有效公网 IP，若失败或解析为保留/回环 IP 则依次尝试本地系统解析与 DoH 加密解析"""
+    if not domain or not isinstance(domain, str):
+        return ""
+    clean = domain.strip().lower()
+    if is_valid_public_ip(clean):
+        return clean
+    # 识别知名机房模式化反向 PTR 域名 (如 Hetzner: static.D.C.B.A.clients.your-server.de -> A.B.C.D)
+    m_hetzner = re.match(r"^static\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.clients\.your-server\.de$", clean)
+    if m_hetzner:
+        rev_ip = f"{m_hetzner.group(4)}.{m_hetzner.group(3)}.{m_hetzner.group(2)}.{m_hetzner.group(1)}"
+        if is_valid_public_ip(rev_ip):
+            return rev_ip
+    try:
+        addr = socket.gethostbyname(clean)
+        if is_valid_public_ip(addr):
+            return addr
+    except Exception:
+        pass
+
+    # 本地解析失败或被 DNS 污染拦截（如解析出 127.x.x.x 回环段），自动启用 DoH 权威查询兜底
+    return doh_resolve_public_ip(clean)
+
+
+def resolve_asn_batch_online(
+    targets: list[str],
+    max_chunk_size: int = 100,
+    persist: bool = True,
+) -> dict[str, tuple[str, str]]:
+    """
+    高吞吐批量在线解析目标（IP 或域名）的 ASN 与 ISP：
+    - 支持首次大规模全库同步与常态轻量增量解析
+    - 优先读取并命中本地持久化 IP 缓存 (data/ip_cache.json)
+    - 域名自动安全探测 DNS 解析为公网 IP (多线程并发 + DoH 防污染)
+    - 基于 http://ip-api.com/batch 批量通道（单请求上限 100 IP，限额 15 req/min）
+    - 动态解析响应头 X-Rl / X-Ttl 自适应限流退避，杜绝 429 封禁
+    - 严格遵循 SSOT 权威收录规范与格式防污染清洗
+    - 返回 target -> (clean_asn, clean_isp)
+    """
+    if not targets:
+        return {}
+
+    cache = load_ip_cache()
+    results: dict[str, tuple[str, str]] = {}
+    ip_to_targets: dict[str, list[str]] = {}
+    cache_modified = False
+
+    # 1. 第一轮快速初筛：区分已命中缓存、直接公网 IP、以及待解析域名
+    unresolved_domains = set()
+    cleaned_targets = []
+    for t in targets:
+        if not t or not isinstance(t, str):
+            continue
+        clean_t = t.strip()
+        if not clean_t or clean_t in ("127.0.0.1", "localhost", "AS_UNKNOWN", "unknown"):
+            continue
+        cleaned_targets.append(clean_t)
+
+        # 命中缓存 (需同时拥有有效 ASN 与国家代码，否则纳入增量补全)
+        if clean_t in cache:
+            item = cache[clean_t]
+            asn = item.get("asn", "")
+            isp = item.get("isp", "")
+            country = item.get("country", "")
+            if asn and country:
+                results[clean_t] = (asn, isp)
+                continue
+
+        if not is_valid_public_ip(clean_t):
+            # 若缓存已有合法 resolved_ip 则无需重新 DoH 解析
+            if not (clean_t in cache and is_valid_public_ip(cache[clean_t].get("resolved_ip", ""))):
+                unresolved_domains.add(clean_t)
+
+    # 2. 对所有待解析域名进行多线程并发 DNS / DoH 解析
+    domain_to_ip: dict[str, str] = {}
+    if unresolved_domains:
+        log.info("【域名 DNS 解析】正在并发解析 %d 个域名的真实公网 IP...", len(unresolved_domains))
+        workers = min(36, max(4, len(unresolved_domains)))
+        with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as pool:
+            future_to_dom = {pool.submit(resolve_domain_to_ip, dom): dom for dom in unresolved_domains}
+            for fut in concurrent.futures.as_completed(future_to_dom):
+                dom = future_to_dom[fut]
+                try:
+                    resolved = fut.result()
+                    if resolved and is_valid_public_ip(resolved):
+                        domain_to_ip[dom] = resolved
+                except Exception as e:
+                    log.debug("域名 %s 解析异常: %s", dom, e)
+
+    # 3. 将目标归类到对应的公网 IP
+    for clean_t in cleaned_targets:
+        if clean_t in results:
+            continue
+
+        if is_valid_public_ip(clean_t):
+            ip_to_targets.setdefault(clean_t, []).append(clean_t)
+        else:
+            resolved_ip = domain_to_ip.get(clean_t, "")
+            if not resolved_ip and clean_t in cache and is_valid_public_ip(cache[clean_t].get("resolved_ip", "")):
+                resolved_ip = cache[clean_t]["resolved_ip"]
+            if resolved_ip:
+                if resolved_ip in cache and cache[resolved_ip].get("asn") and cache[resolved_ip].get("country"):
+                    asn = cache[resolved_ip]["asn"]
+                    isp = cache[resolved_ip]["isp"]
+                    results[clean_t] = (asn, isp)
+                    cache[clean_t] = {
+                        "asn": asn,
+                        "isp": isp,
+                        "net_type": cache[resolved_ip].get("net_type") or classify_asn(asn, isp),
+                        "country": cache[resolved_ip].get("country", ""),
+                        "resolved_ip": resolved_ip,
+                    }
+                    cache_modified = True
+                else:
+                    ip_to_targets.setdefault(resolved_ip, []).append(clean_t)
+
+    # 待在线批量查询的去重 IP 列表
+    pending_ips = [ip for ip in ip_to_targets.keys() if ip not in results]
+    if not pending_ips:
+        if persist and cache_modified:
+            save_ip_cache(cache)
+        return results
+
+    log.info("【批量 ASN 解析】待解析出口 IP 数量: %d 个 (分批步长: %d)", len(pending_ips), max_chunk_size)
+
+    cache_modified = False
+
+    # 按 max_chunk_size 切块批量 POST
+    for i in range(0, len(pending_ips), max_chunk_size):
+        chunk = pending_ips[i : i + max_chunk_size]
+        payload = json.dumps([
+            {"query": ip, "fields": "status,message,query,countryCode,as,asname,org,isp"}
+            for ip in chunk
+        ]).encode("utf-8")
+
+        req = urllib.request.Request(
+            "http://ip-api.com/batch",
+            data=payload,
+            headers={"Content-Type": "application/json", "User-Agent": "Mozilla/5.0 (compatible; tg-proxy-fetcher/2.0)"},
+        )
+
+        chunk_success = False
+        x_rl = None
+        x_ttl = None
+
+        try:
+            with urllib.request.urlopen(req, timeout=10.0) as resp:
+                raw_data = resp.read().decode("utf-8", errors="ignore")
+                data_list = json.loads(raw_data)
+                headers = resp.headers
+                x_rl = safe_int(headers.get("X-Rl"), -1)
+                x_ttl = safe_int(headers.get("X-Ttl"), -1)
+
+                if isinstance(data_list, list):
+                    chunk_success = True
+                    for item in data_list:
+                        query_ip = (item.get("query") or "").strip()
+                        if not query_ip:
+                            continue
+                        if item.get("status") == "success":
+                            raw_as = str(item.get("as") or "")
+                            m_as = re.search(r"(AS\d+)", raw_as, re.IGNORECASE)
+                            if m_as:
+                                clean_asn = m_as.group(1).upper()
+                                raw_isp = (item.get("isp") or "").strip()
+                                raw_org = (item.get("org") or "").strip()
+                                raw_asname = (item.get("asname") or "").strip()
+                                clean_isp = raw_isp or raw_org or raw_asname or ""
+                                country_code = (item.get("countryCode") or "").strip().upper()
+
+                                # SSOT 权威校验
+                                if clean_asn in ASN_TO_PROVIDER:
+                                    clean_isp = ASN_TO_PROVIDER[clean_asn]
+
+                                # 内存运行时热更新
+                                if clean_isp and clean_isp not in ASN_DATABASE_ISP_TO_ASN:
+                                    ASN_DATABASE_ISP_TO_ASN[clean_isp] = clean_asn
+                                    ASN_DATABASE_ISP_LOWER[clean_isp.lower()] = (clean_asn, clean_isp)
+                                if clean_asn not in ASN_DATABASE_ASN_TO_ISP:
+                                    ASN_DATABASE_ASN_TO_ISP[clean_asn] = clean_isp
+                                if clean_asn not in ASN_TO_PROVIDER:
+                                    ASN_TO_PROVIDER[clean_asn] = clean_isp
+
+                                n_type = classify_asn(clean_asn, clean_isp)
+                                cache_entry = {
+                                    "asn": clean_asn,
+                                    "isp": clean_isp,
+                                    "net_type": n_type,
+                                    "country": country_code,
+                                }
+                                cache[query_ip] = cache_entry
+                                cache_modified = True
+                                results[query_ip] = (clean_asn, clean_isp)
+
+                                for tgt in ip_to_targets.get(query_ip, []):
+                                    results[tgt] = (clean_asn, clean_isp)
+                                    if tgt != query_ip:
+                                        tgt_entry = dict(cache_entry)
+                                        tgt_entry["resolved_ip"] = query_ip
+                                        cache[tgt] = tgt_entry
+        except Exception as e:
+            log.warning("【批量 ASN 解析】第 %d 批 (共 %d 个 IP) 请求失败: %s", (i // max_chunk_size) + 1, len(chunk), e)
+
+        # 若批量失败或个别 IP 漏失，针对缺失 IP 尝试单点通道兜底
+        for ip in chunk:
+            if ip not in results:
+                fallback_asn, fallback_isp = resolve_asn_online(ip, persist=False)
+                if fallback_asn:
+                    results[ip] = (fallback_asn, fallback_isp)
+                    n_type = classify_asn(fallback_asn, fallback_isp)
+                    cache_entry = {"asn": fallback_asn, "isp": fallback_isp, "net_type": n_type, "country": ""}
+                    cache[ip] = cache_entry
+                    cache_modified = True
+                    for tgt in ip_to_targets.get(ip, []):
+                        results[tgt] = (fallback_asn, fallback_isp)
+                        if tgt != ip:
+                            tgt_entry = dict(cache_entry)
+                            tgt_entry["resolved_ip"] = ip
+                            cache[tgt] = tgt_entry
+
+        # 自适应限流退避处理 (ip-api batch 限制 15 req/min)
+        has_more = (i + max_chunk_size) < len(pending_ips)
+        if has_more:
+            if x_rl is not None and x_rl <= 1 and x_ttl is not None and x_ttl > 0:
+                log.info("【批量 ASN 限流保护】接近配额上限 (剩余: %d)，安全等待 %d 秒...", x_rl, x_ttl + 1)
+                time.sleep(x_ttl + 1)
+            else:
+                time.sleep(0.5)
+
+    if persist and cache_modified:
+        save_ip_cache(cache)
+        log.info("【持久化 IP 缓存】已更新本地 data/ip_cache.json: 当前总计收录 %d 个 IP/域名网络画像", len(cache))
+
+    return results
+
+
+async def resolve_asn_batch_online_async(
+    targets: list[str],
+    max_chunk_size: int = 100,
+    persist: bool = True,
+) -> dict[str, tuple[str, str]]:
+    """resolve_asn_batch_online 的异步无阻塞封装，在独立线程执行批量 I/O，绝不阻塞主事件循环"""
+    return await asyncio.to_thread(resolve_asn_batch_online, targets, max_chunk_size, persist)
 
 
 def resolve_ip_asn(ip: str = "", isp_hint: str = "", allow_online: bool = False) -> tuple[str, str]:
@@ -1263,10 +1598,11 @@ def format_proxy_json_item(r_dict: dict) -> dict:
     isp_name = str(r_dict.get("isp") or "").strip()
     proto = str(r_dict.get("proto") or "socks5").strip().lower()
 
-    # net_type：优先使用已确定的有效类型；若未显式标记但有 ASN/ISP 则执行分类；若完全未查询则留空，绝不虚假打标为 datacenter
-    net_type_val = str(r_dict.get("net_type") or "").strip()
-    if not net_type_val and (clean_asn_num or isp_name):
+    # net_type：基于 ASN/ISP 进行权威分类；若完全未查询则留空，绝不虚假打标为 datacenter
+    if clean_asn_num or isp_name:
         net_type_val = classify_asn(clean_asn_num, isp_name)
+    else:
+        net_type_val = str(r_dict.get("net_type") or "").strip()
 
     return {
         "proxy": r_dict.get("url") or "",
@@ -1553,6 +1889,11 @@ ISP_RES_PATTERNS = (
     "singapore telecommunications", "shaw communications", "british telecommunications",
     "vietnam posts and telecommunications", "softbank corp", "rogers communications",
     "frontier communications", "lumen technologies", "telia sonera", "o2 czech",
+    # 扩展日韩与东南亚民用住宅宽带、有线电视 (CATV) 与志愿者网络
+    "softether", "jcom", "j:com", "asahi net", "tokai communications", "qtnet",
+    "its communications", "itscom", "freebit", "infoweb", "er-telecom", "dom.ru",
+    "hellovision", "triple t broadband", "cable tv", "cable television",
+    "cable network", "catv", "broadcasting", "fiber network",
 )
 
 BANKING_PATTERNS = (
@@ -1601,7 +1942,18 @@ def _extract_asn_code(asn_str: str | None, isp_str: str | None = "") -> str | No
 
 
 ASN_EXACT_NET_TYPE = {
-    # 1. 运营商原生民用家宽 (isp) - 共 903 个
+    # 1. 运营商原生民用家宽 (isp)
+        # 日本/韩国/东南亚/东欧民用住宅宽带与志愿网络 (VPNGate / CATV / Residential)
+        "AS36599": "isp", "AS9824": "isp", "AS4721": "isp", "AS9614": "isp", "AS4685": "isp",
+        "AS10010": "isp", "AS7679": "isp", "AS9365": "isp", "AS9354": "isp", "AS10013": "isp",
+        "AS7524": "isp", "AS18081": "isp", "AS18278": "isp", "AS9757": "isp", "AS10054": "isp",
+        "AS9694": "isp", "AS9781": "isp", "AS9617": "isp", "AS57378": "isp", "AS34533": "isp",
+        "AS12494": "isp", "AS138524": "isp", "AS10036": "isp", "AS9770": "isp", "AS38120": "isp",
+        "AS17839": "isp", "AS45361": "isp", "AS10019": "isp", "AS10002": "isp", "AS23783": "isp",
+        "AS9622": "isp", "AS7623": "isp", "AS7664": "isp", "AS17931": "isp", "AS17534": "isp",
+        "AS8369": "isp", "AS48438": "isp", "AS12714": "isp", "AS5483": "isp", "AS25406": "isp",
+        "AS1221": "isp", "AS46650": "isp", "AS30444": "isp", "AS21902": "isp", "AS12737": "isp",
+        "AS59533": "isp", "AS31364": "isp", "AS9316": "isp", "AS131933": "isp", "AS20055": "isp",
         "AS2527": "isp", "AS18126": "isp", "AS2497": "isp", "AS17511": "isp", "AS17676": "isp", "AS2516": "isp",
         "AS4713": "isp", "AS2518": "isp", "AS17506": "isp", "AS2519": "isp", "AS2514": "isp", "AS9605": "isp",
         "AS4725": "isp", "AS4760": "isp", "AS9269": "isp", "AS9304": "isp", "AS9231": "isp", "AS10103": "isp",
@@ -1780,8 +2132,8 @@ ASN_EXACT_NET_TYPE = {
         "AS9128": "banking", "AS7630": "banking", "AS5458": "banking", "AS8373": "banking", "AS7609": "banking", "AS9522": "banking",
         "AS9630": "banking", "AS9772": "banking", "AS7820": "banking", "AS6773": "banking", "AS9099": "banking", "AS9118": "banking",
         "AS6674": "banking", "AS9863": "banking", "AS1311": "banking", "AS5091": "banking", "AS25883": "banking", "AS207986": "banking",
-    # 6. 知名机房数据中心 (datacenter) - 共 756 个
-        "AS13335": "datacenter", "AS16509": "datacenter", "AS8075": "datacenter", "AS15169": "datacenter", "AS45102": "datacenter", "AS132203": "datacenter",
+    # 6. 知名机房数据中心 (datacenter)
+        "AS28716": "datacenter", "AS13335": "datacenter", "AS16509": "datacenter", "AS8075": "datacenter", "AS15169": "datacenter", "AS45102": "datacenter", "AS132203": "datacenter",
         "AS136907": "datacenter", "AS20473": "datacenter", "AS14061": "datacenter", "AS24940": "datacenter", "AS16276": "datacenter", "AS51167": "datacenter",
         "AS197540": "datacenter", "AS60068": "datacenter", "AS9009": "datacenter", "AS25820": "datacenter", "AS63949": "datacenter", "AS61112": "datacenter",
         "AS906": "datacenter", "AS210644": "datacenter", "AS212336": "datacenter", "AS36352": "datacenter", "AS53667": "datacenter", "AS47583": "datacenter",

@@ -480,6 +480,90 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
 
         asyncio.run(_test())
 
+    def test_resolve_asn_batch_online(self):
+        from providers import (
+            resolve_asn_batch_online,
+            is_valid_public_ip,
+            load_ip_cache,
+            save_ip_cache,
+        )
+        from unittest.mock import patch, MagicMock
+        import json
+
+        # 1. IP 鉴真工具测试
+        self.assertTrue(is_valid_public_ip("8.8.8.8"))
+        self.assertTrue(is_valid_public_ip("184.178.172.17"))
+        self.assertFalse(is_valid_public_ip("127.0.0.1"))
+        self.assertFalse(is_valid_public_ip("192.168.1.1"))
+        self.assertFalse(is_valid_public_ip("10.0.0.1"))
+        self.assertFalse(is_valid_public_ip(""))
+        self.assertFalse(is_valid_public_ip("not_an_ip"))
+
+        # 2. 批量在线解析器模拟响应测试
+        fake_api_response = [
+            {
+                "status": "success",
+                "query": "184.178.172.17",
+                "as": "AS22773 Cox Communications Inc.",
+                "isp": "Cox Communications Inc.",
+                "org": "Cox Communications Inc.",
+                "asname": "ASN-CXA",
+                "countryCode": "US",
+            },
+            {
+                "status": "success",
+                "query": "8.210.208.201",
+                "as": "AS45102 Alibaba (US) Technology Co., Ltd.",
+                "isp": "Alibaba (US) Technology Co., Ltd.",
+                "org": "Alibaba Cloud",
+                "asname": "ALIBABA-CN-NET",
+                "countryCode": "HK",
+            },
+        ]
+
+        mock_resp = MagicMock()
+        mock_resp.read.return_value = json.dumps(fake_api_response).encode("utf-8")
+        mock_resp.headers = {"X-Rl": "14", "X-Ttl": "50"}
+        mock_resp.__enter__.return_value = mock_resp
+
+        with patch("urllib.request.urlopen", return_value=mock_resp):
+            results = resolve_asn_batch_online(["184.178.172.17", "8.210.208.201"], persist=False)
+            self.assertIn("184.178.172.17", results)
+            self.assertEqual(results["184.178.172.17"][0], "AS22773")
+            self.assertEqual(results["184.178.172.17"][1], "Cox Communications Inc.")
+
+            # SSOT 权威收录覆盖验证 (AS45102 自动收录为 Alibaba Cloud)
+            self.assertIn("8.210.208.201", results)
+            self.assertEqual(results["8.210.208.201"][0], "AS45102")
+            self.assertEqual(results["8.210.208.201"][1], "Alibaba Cloud")
+
+    def test_doh_and_domain_resolution(self):
+        from providers import doh_resolve_public_ip, resolve_domain_to_ip
+        from unittest.mock import patch, MagicMock
+        import json
+
+        # 1. 模拟 DoH 成功解析 A 记录
+        fake_doh_resp = {
+            "Status": 0,
+            "Answer": [
+                {"name": "test.opengw.net", "type": 1, "TTL": 60, "data": "219.100.37.30"}
+            ]
+        }
+        mock_resp = MagicMock()
+        mock_resp.read.return_value = json.dumps(fake_doh_resp).encode("utf-8")
+        mock_resp.__enter__.return_value = mock_resp
+
+        with patch("urllib.request.urlopen", return_value=mock_resp):
+            ip = doh_resolve_public_ip("test.opengw.net")
+            self.assertEqual(ip, "219.100.37.30")
+
+        # 2. 模拟 socket.gethostbyname 返回受污染回环 IP 时，自动回退到 DoH
+        with patch("socket.gethostbyname", return_value="127.236.0.63"):
+            with patch("urllib.request.urlopen", return_value=mock_resp):
+                ip = resolve_domain_to_ip("test.opengw.net")
+                self.assertEqual(ip, "219.100.37.30")
+
 
 if __name__ == "__main__":
     unittest.main()
+
