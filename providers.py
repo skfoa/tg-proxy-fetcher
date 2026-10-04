@@ -2551,6 +2551,68 @@ def load_tombstone(
     return dict(valid)
 
 
+def prune_tombstone(
+    filepath: str | None = None,
+    max_age_days: int = TOMBSTONE_MAX_AGE_DAYS,
+) -> int:
+    """
+    主动修剪磁盘上超过 max_age_days 天的过期墓碑条目并原子持久化。
+    若磁盘文件无过期条目或文件不存在，不产生冗余写 I/O。
+    返回本次修剪删除的过期条目数量。
+    """
+    global _TOMBSTONE_CACHE, _TOMBSTONE_CACHE_FILE, _TOMBSTONE_CACHE_MTIME
+    target_path = filepath if filepath is not None else TOMBSTONE_FILE
+    if not os.path.isfile(target_path):
+        return 0
+
+    try:
+        with open(target_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception as e:
+        log.warning("读取墓地文件 %s 执行修剪失败: %s", target_path, e)
+        return 0
+
+    if not isinstance(data, dict) or not data:
+        return 0
+
+    now = int(time.time())
+    max_age_sec = max_age_days * 86400
+    valid: dict[str, int] = {}
+    pruned_count = 0
+
+    for k, ts in data.items():
+        if isinstance(ts, (int, float)) and (now - int(ts)) < max_age_sec:
+            valid[str(k).strip().lower()] = int(ts)
+        else:
+            pruned_count += 1
+
+    if pruned_count > 0:
+        dir_name = os.path.dirname(os.path.abspath(target_path))
+        if dir_name:
+            os.makedirs(dir_name, exist_ok=True)
+        tmp_path = f"{target_path}.tmp"
+        try:
+            with open(tmp_path, "w", encoding="utf-8") as f:
+                json.dump(valid, f, ensure_ascii=False, indent=2)
+            os.replace(tmp_path, target_path)
+            _TOMBSTONE_CACHE = valid
+            _TOMBSTONE_CACHE_FILE = target_path
+            try:
+                _TOMBSTONE_CACHE_MTIME = os.path.getmtime(target_path)
+            except OSError:
+                _TOMBSTONE_CACHE = None
+            log.info("已主动修剪墓地文件 %s: 剔除 %d 个超过 %d 天的过期条目 (剩余: %d 个)", target_path, pruned_count, max_age_days, len(valid))
+        except Exception as e:
+            log.warning("写回修剪后的墓地文件 %s 失败: %s", target_path, e)
+            if os.path.exists(tmp_path):
+                try:
+                    os.remove(tmp_path)
+                except OSError:
+                    pass
+
+    return pruned_count
+
+
 def record_tombstone(
     keys: list[str] | set[str],
     filepath: str | None = None,
@@ -2564,6 +2626,7 @@ def record_tombstone(
     """
     global _TOMBSTONE_CACHE, _TOMBSTONE_CACHE_FILE, _TOMBSTONE_CACHE_MTIME
     if not keys:
+        prune_tombstone(filepath=filepath, max_age_days=max_age_days)
         return 0
     if filepath is None:
         filepath = TOMBSTONE_FILE

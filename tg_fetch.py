@@ -64,6 +64,7 @@ from providers import (
     _extract_asn_code,
     normalize_timestamp,
     load_tombstone,
+    prune_tombstone,
     is_tombstoned,
     LEGACY_DEFAULT_FIRST_SEEN,
 )
@@ -1284,6 +1285,11 @@ def main():
             log.debug("已清理历史遗留统计缓存: %s", FETCH_STATS_FILE)
         except OSError:
             pass
+
+    # 主动修剪磁盘上超过 7 天的过期墓碑条目并原子持久化
+    pruned = prune_tombstone()
+    if pruned > 0:
+        log.info("已前置修剪墓地过期死节点: %d 个", pruned)
 
     if TG_API_ID and TG_API_HASH and TG_SESSION_STR:
         import importlib.util

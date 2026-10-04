@@ -656,8 +656,50 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
             # 未在 active_files 且无保护前缀的旧文件被清理
             self.assertFalse(os.path.exists(stale_file))
 
+    def test_prune_tombstone(self):
+        from providers import prune_tombstone, record_tombstone, load_tombstone
+        import time
+
+        with tempfile.TemporaryDirectory() as td:
+            tombstone_file = os.path.join(td, "tombstone.json")
+            now = int(time.time())
+
+            # 写入 1 条新鲜记录 (1天前) + 2 条过期记录 (8天前, 10天前)
+            data = {
+                "1.1.1.1:80": now - 86400,
+                "2.2.2.2:80": now - 8 * 86400,
+                "3.3.3.3:80": now - 10 * 86400,
+            }
+            with open(tombstone_file, "w", encoding="utf-8") as f:
+                json.dump(data, f)
+
+            # 1. 验证 prune_tombstone 正确剔除 2 条过期条目
+            pruned = prune_tombstone(filepath=tombstone_file, max_age_days=7)
+            self.assertEqual(pruned, 2)
+
+            # 2. 检查磁盘物理文件内容
+            with open(tombstone_file, "r", encoding="utf-8") as f:
+                remaining = json.load(f)
+            self.assertEqual(len(remaining), 1)
+            self.assertIn("1.1.1.1:80", remaining)
+            self.assertNotIn("2.2.2.2:80", remaining)
+
+            # 3. 再次运行无过期条目时返回 0 且无冗余写
+            pruned_again = prune_tombstone(filepath=tombstone_file, max_age_days=7)
+            self.assertEqual(pruned_again, 0)
+
+            # 4. 验证 record_tombstone 传入空列表时也会自动触发修剪
+            remaining["4.4.4.4:80"] = now - 9 * 86400
+            with open(tombstone_file, "w", encoding="utf-8") as f:
+                json.dump(remaining, f)
+            added = record_tombstone([], filepath=tombstone_file, max_age_days=7)
+            self.assertEqual(added, 0)
+            loaded = load_tombstone(filepath=tombstone_file, max_age_days=7, force_reload=True)
+            self.assertNotIn("4.4.4.4:80", loaded)
+
 
 if __name__ == "__main__":
     unittest.main()
+
 
 
