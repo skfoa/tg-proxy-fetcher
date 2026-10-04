@@ -512,8 +512,8 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
         self.assertEqual(normalize_endpoint("false"), "")
         self.assertEqual(normalize_endpoint("disabled"), "")
         self.assertEqual(
-            normalize_endpoint("check.socks5.cmliussss.net/"),
-            "https://check.socks5.cmliussss.net",
+            normalize_endpoint("worker.example.com/"),
+            "https://worker.example.com",
         )
         self.assertEqual(
             normalize_endpoint("http://myworker.dev/"),
@@ -563,7 +563,7 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
 
             with patch("proxies_verify.probe_sstp", return_value=(True, 150, "alive", "-", "", "1.2.3.4")), \
                  patch("proxies_verify.check_sstp_exit_cf_worker", new_callable=AsyncMock, return_value=mock_cf_success):
-                res = await probe_single(base_row.copy(), sem, cf_check_endpoint="https://check.socks5.cmliussss.net")
+                res = await probe_single(base_row.copy(), sem, cf_check_endpoint="https://my-worker.workers.dev")
                 self.assertTrue(res["is_alive"])
                 self.assertEqual(res["egress_ip"], "219.100.37.244")
                 self.assertEqual(res["country"], "JP")
@@ -578,7 +578,7 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
 
             with patch("proxies_verify.probe_sstp", return_value=(True, 150, "alive", "-", "", "1.2.3.4")), \
                  patch("proxies_verify.check_sstp_exit_cf_worker", new_callable=AsyncMock, return_value=mock_cf_fail):
-                res = await probe_single(base_row.copy(), sem, cf_check_endpoint="https://check.socks5.cmliussss.net")
+                res = await probe_single(base_row.copy(), sem, cf_check_endpoint="https://my-worker.workers.dev")
                 self.assertFalse(res["is_alive"])
                 self.assertEqual(res["status"], "sstp_vpn_fail")
                 self.assertEqual(res["fail_count"], 1)
@@ -586,9 +586,17 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
             # 3. 容灾回退案例：CF Worker 网络异常或超时 (返回 None)，平滑回退至本地探测结果
             with patch("proxies_verify.probe_sstp", return_value=(True, 150, "alive", "-", "", "1.2.3.4")), \
                  patch("proxies_verify.check_sstp_exit_cf_worker", new_callable=AsyncMock, return_value=None):
-                res = await probe_single(base_row.copy(), sem, cf_check_endpoint="https://check.socks5.cmliussss.net")
+                res = await probe_single(base_row.copy(), sem, cf_check_endpoint="https://my-worker.workers.dev")
                 self.assertTrue(res["is_alive"])
                 self.assertEqual(res["egress_ip"], "1.2.3.4")
+
+            # 4. 默认未配置端点 (留空)：完全不调用外部 Worker，零网络请求
+            with patch("proxies_verify.probe_sstp", return_value=(True, 150, "alive", "-", "", "1.2.3.4")), \
+                 patch("proxies_verify.check_sstp_exit_cf_worker", new_callable=AsyncMock) as mock_worker:
+                res = await probe_single(base_row.copy(), sem, cf_check_endpoint="")
+                self.assertTrue(res["is_alive"])
+                self.assertEqual(res["egress_ip"], "1.2.3.4")
+                mock_worker.assert_not_called()
 
         asyncio.run(_test())
 

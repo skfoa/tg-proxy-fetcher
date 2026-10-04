@@ -11,7 +11,7 @@ on:
         required: false
         default: "3"
       cf_check_endpoint:
-        description: "SSTP 出口检测端点 URL (推荐自建 CF-Workers-CheckSocks5，留空使用 vars.CF_CHECK_ENDPOINT 或默认公共端点)"
+        description: "SSTP 出口检测端点 URL (需自行部署 CF-Workers-CheckSocks5，留空则不执行外部检测)"
         required: false
         default: ""
 
@@ -64,7 +64,7 @@ jobs:
 
       - name: 🚀 通用代理多协议连通性质检
         env:
-          CF_CHECK_ENDPOINT: ${{ inputs.cf_check_endpoint || vars.CF_CHECK_ENDPOINT || secrets.CF_CHECK_ENDPOINT || 'https://check.socks5.cmliussss.net' }}
+          CF_CHECK_ENDPOINT: ${{ inputs.cf_check_endpoint || vars.CF_CHECK_ENDPOINT || secrets.CF_CHECK_ENDPOINT || '' }}
         run: python proxies_verify.py --concurrency 300 --max-fails 3 --no-notify
 
       - name: 🔍 ProxyIP 穿透存活质检

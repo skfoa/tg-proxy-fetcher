@@ -103,8 +103,7 @@ MAX_FAILS = 3
 
 CSV_FIELDS = PROXY_CSV_FIELDS
 
-DEFAULT_CF_CHECK_ENDPOINT = "https://check.socks5.cmliussss.net"
-CF_CHECK_ENDPOINT = os.getenv("CF_CHECK_ENDPOINT", DEFAULT_CF_CHECK_ENDPOINT).strip()
+CF_CHECK_ENDPOINT = os.getenv("CF_CHECK_ENDPOINT", "").strip()
 
 
 def normalize_endpoint(endpoint: str | None) -> str:
@@ -1028,7 +1027,7 @@ async def async_main(args):
     if cf_endpoint:
         log.info("SSTP 启用第二阶段 Cloudflare Worker 深度穿透鉴真与出口探测端点: %s", cf_endpoint)
     else:
-        log.info("SSTP 第二阶段 Cloudflare Worker 深度穿透探测已禁用或未配置，将采用本地解析直连出口")
+        log.info("SSTP 未配置外部检测端点，跳过第二阶段外部检测，采用本地解析直连出口（无外部依赖）")
 
     async def _worker(r):
         nonlocal completed, pass_count, fail_count, min_delay
@@ -1223,7 +1222,7 @@ def main():
         "--cf-check-endpoint",
         type=str,
         default=CF_CHECK_ENDPOINT,
-        help=f"Cloudflare Workers 代理检测端点 (用于 SSTP 真实出口与链路鉴真，默认 {DEFAULT_CF_CHECK_ENDPOINT}，留空或设为 off 禁用)",
+        help="Cloudflare Workers 代理检测端点 (用于 SSTP 真实出口与链路鉴真，默认留空不执行外部检测，需自行部署 CF-Workers-CheckSocks5)",
     )
     parser.add_argument("--no-notify", action="store_true", help="静默模式，不单独发送 Telegram 质检通知")
     parser.add_argument("--enrich-only", action="store_true", help="仅对现有 proxies.csv 补全 ASN 与网络属性打标，跳过网络连通性探测")
