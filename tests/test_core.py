@@ -180,6 +180,23 @@ class TestProviders(unittest.TestCase):
         self.assertEqual(classify_asn("AS13335", "Cloudflare"), "datacenter")
         # 运营商宽带
         self.assertEqual(classify_asn("AS4134", "China Telecom"), "isp")
+        # 海外/东欧/东南亚/中东/拉美/大洋洲头部电信运营商 (Yettel / One NZ / Algar / du / SPT / CS LOXINFO / MTS / MegaFon / Rostelecom)
+        for asn, isp in [
+            ("AS31042", "Yettel d.o.o."),
+            ("AS9500", "One New Zealand"),
+            ("AS16735", "ALGAR TELECOM"),
+            ("AS57187", "du (EITC)"),
+            ("AS7602", "Sai gon Postel"),
+            ("AS9891", "CS LOXINFO"),
+            ("AS13055", "MTS PJSC"),
+            ("AS25159", "PJSC MegaFon"),
+            ("AS42610", "Rostelecom"),
+            ("AS25106", "MTS JLLC"),
+        ]:
+            self.assertEqual(classify_asn(asn, isp), "isp")
+        # 启发式关键词兜底匹配
+        self.assertEqual(classify_asn("", "Rostelecom Regional Network"), "isp")
+        self.assertEqual(classify_asn("", "PJSC MegaFon Broadband"), "isp")
         # 教育网
         self.assertEqual(classify_asn("AS24168", "CERNET2"), "education")
         # 银行金融专网

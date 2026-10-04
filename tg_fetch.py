@@ -116,7 +116,6 @@ CF_IP_CHANNELS = _parse_channels("CF_IP_CHANNELS", ["@otcfxq", "@danfeng_chat"])
 
 DEFAULT_SUB_URLS = [
     "https://sub.cmliussss.net/vpngate",
-    "https://sub.cmliussss.net/vpngate?token=cmliussss",
 ]
 
 

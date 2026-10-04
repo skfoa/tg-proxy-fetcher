@@ -1896,6 +1896,10 @@ ISP_RES_PATTERNS = (
     "its communications", "itscom", "freebit", "infoweb", "er-telecom", "dom.ru",
     "hellovision", "triple t broadband", "cable tv", "cable television",
     "cable network", "catv", "broadcasting", "fiber network",
+    # 补充东欧/俄罗斯/东南亚/中东/拉美/大洋洲头部主流电信运营商关键词
+    "rostelecom", "megafon", "mobile telesystems", "mts pjsc", "mts jllc",
+    "yettel", "algar telecom", "cs loxinfo", "sai gon postel", "one new zealand",
+    "emirates integrated telecommunications",
 )
 
 BANKING_PATTERNS = (
@@ -2110,6 +2114,10 @@ ASN_EXACT_NET_TYPE = {
         "AS38794": "isp", "AS51077": "isp",
         "AS6730": "isp", "AS12338": "isp", "AS15694": "isp", "AS20042": "isp", "AS12530": "isp",
         "AS10091": "isp", "AS10898": "isp", "AS11311": "isp", "AS45464": "isp", "AS45465": "isp",
+        # 海外/东欧/东南亚/中东/拉美/大洋洲头部主流电信运营商 (Yettel / One NZ / Algar / du / SPT / CS LOXINFO / MTS / MegaFon / Rostelecom)
+        "AS31042": "isp", "AS9500": "isp", "AS16735": "isp", "AS57187": "isp",
+        "AS7602": "isp",  "AS9891": "isp", "AS13055": "isp", "AS25159": "isp",
+        "AS42610": "isp", "AS25106": "isp",
     # 2. 商业企业专线 (business) - 共 21 个
         "AS174": "business", "AS27015": "business", "AS4451": "business", "AS132822": "business", "AS254": "business",
         "AS396290": "business", "AS142554": "business", "AS979": "business", "AS153061": "business", "AS198357": "business", "AS55344": "business",
