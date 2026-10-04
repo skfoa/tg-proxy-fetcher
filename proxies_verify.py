@@ -122,12 +122,12 @@ async def probe_socks5(
     5. HTTP GET /cdn-cgi/trace 校验 200 与 colo，并提取 country 与 egress_ip
     返回 (is_alive, delay_ms, status, colo, country, egress_ip)
     """
-    t0 = time.monotonic()
     connect_host = host
     if not is_valid_public_ip(host):
         resolved = await asyncio.to_thread(resolve_domain_to_ip, host)
         if resolved and is_valid_public_ip(resolved):
             connect_host = resolved
+    t0 = time.monotonic()
     try:
         reader, writer = await asyncio.wait_for(
             asyncio.open_connection(connect_host, port),
@@ -247,12 +247,12 @@ async def probe_http(
     3. 若 CONNECT 不支持，回退至直接 Forward GET
     返回 (is_alive, delay_ms, status, colo, country, egress_ip)
     """
-    t0 = time.monotonic()
     connect_host = host
     if not is_valid_public_ip(host):
         resolved = await asyncio.to_thread(resolve_domain_to_ip, host)
         if resolved and is_valid_public_ip(resolved):
             connect_host = resolved
+    t0 = time.monotonic()
     try:
         reader, writer = await asyncio.wait_for(
             asyncio.open_connection(connect_host, port),
@@ -368,12 +368,12 @@ async def probe_turn(
     校验 20 字节响应头部 Magic Cookie (0x2112A442) 以及 Transaction ID 匹配。
     返回 (is_alive, delay_ms, status, colo, country, egress_ip)
     """
-    t0 = time.monotonic()
     connect_host = host
     if not is_valid_public_ip(host):
         resolved = await asyncio.to_thread(resolve_domain_to_ip, host)
         if resolved and is_valid_public_ip(resolved):
             connect_host = resolved
+    t0 = time.monotonic()
     try:
         reader, writer = await asyncio.wait_for(
             asyncio.open_connection(connect_host, port),
@@ -426,7 +426,6 @@ async def probe_sstp(
     3. 校验服务端是否返回 HTTP/1.1 200 OK，确认 SSTP 隧道服务活跃就绪
     返回 (is_alive, delay_ms, status, colo, country, egress_ip)
     """
-    t0 = time.monotonic()
     ctx = ssl.create_default_context()
     ctx.check_hostname = False
     ctx.verify_mode = ssl.CERT_NONE
@@ -450,6 +449,7 @@ async def probe_sstp(
         if resolved and is_valid_public_ip(resolved):
             connect_host = resolved
 
+    t0 = time.monotonic()
     try:
         reader, writer = await asyncio.wait_for(
             asyncio.open_connection(connect_host, port, ssl=ctx, server_hostname=sni),
