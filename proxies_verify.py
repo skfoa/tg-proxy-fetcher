@@ -393,7 +393,7 @@ async def probe_turn(
         lat = max(1, int((time.monotonic() - t0) * 1000))
 
         if len(resp) >= 20 and resp[4:8] == b"\x21\x12\xa4\x42" and resp[8:20] == tx_id:
-            return True, lat, "alive", "-", "", host
+            return True, lat, "alive", "-", "", connect_host
         return False, lat, "stun_fail", "", "", ""
     except asyncio.TimeoutError:
         return False, 0, "timeout", "", "", ""
@@ -478,7 +478,7 @@ async def probe_sstp(
         first_line = resp_text.splitlines()[0] if resp_text else ""
 
         if re.search(r"\b200\b", first_line):
-            return True, lat, "alive", "-", "", host
+            return True, lat, "alive", "-", "", connect_host
         return False, lat, "sstp_fail", "", "", ""
     except asyncio.TimeoutError:
         return False, 0, "timeout", "", "", ""
@@ -752,7 +752,7 @@ async def enrich_proxies_metadata(survivors: list[dict], max_concurrency: int = 
                 if c_code:
                     r["country"] = c_code
 
-            if not curr_egress:
+            if not curr_egress or not is_valid_public_ip(curr_egress):
                 if target_ip in persistent_cache and persistent_cache[target_ip].get("resolved_ip"):
                     r["egress_ip"] = persistent_cache[target_ip]["resolved_ip"]
                 elif is_valid_public_ip(target_ip):

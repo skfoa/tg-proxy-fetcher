@@ -452,6 +452,54 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
 
         asyncio.run(_test())
 
+    def test_probe_turn_and_sstp_return_resolved_egress_ip(self):
+        from proxies_verify import probe_turn, probe_sstp
+        import asyncio
+        from unittest.mock import patch, AsyncMock, MagicMock
+
+        async def _test():
+            # 1. Mock TURN connection
+            mock_reader = AsyncMock()
+            mock_writer = MagicMock()
+            mock_writer.drain = AsyncMock()
+            mock_writer.wait_closed = AsyncMock()
+            written = []
+            mock_writer.write = lambda data: written.append(data)
+
+            async def _dynamic_read(n):
+                req = written[0]
+                tx_id = req[8:20]
+                return b"\x01\x01\x00\x00\x21\x12\xa4\x42" + tx_id
+
+            mock_reader.read = _dynamic_read
+
+            async def _fake_turn_conn(*args, **kwargs):
+                return mock_reader, mock_writer
+
+            with patch("proxies_verify.resolve_domain_to_ip", return_value="93.184.216.34"), \
+                 patch("asyncio.open_connection", side_effect=_fake_turn_conn):
+                alive, lat, status, colo, country, egress_ip = await probe_turn("stun.example.com", 3478)
+                self.assertTrue(alive)
+                self.assertEqual(egress_ip, "93.184.216.34")
+
+            # 2. Mock SSTP connection
+            mock_sstp_reader = AsyncMock()
+            mock_sstp_writer = MagicMock()
+            mock_sstp_writer.drain = AsyncMock()
+            mock_sstp_writer.wait_closed = AsyncMock()
+            mock_sstp_reader.read = AsyncMock(return_value=b"HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n")
+
+            async def _fake_sstp_conn(*args, **kwargs):
+                return mock_sstp_reader, mock_sstp_writer
+
+            with patch("proxies_verify.resolve_domain_to_ip", return_value="93.184.216.35"), \
+                 patch("asyncio.open_connection", side_effect=_fake_sstp_conn):
+                alive, lat, status, colo, country, egress_ip = await probe_sstp("vpn.example.com", 443)
+                self.assertTrue(alive)
+                self.assertEqual(egress_ip, "93.184.216.35")
+
+        asyncio.run(_test())
+
     def test_enrich_proxies_metadata(self):
         from proxies_verify import enrich_proxies_metadata
         import asyncio
