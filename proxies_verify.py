@@ -95,6 +95,8 @@ PROBE_PORT = 80
 
 TIMEOUT = 3.0
 HTTP_TIMEOUT = 2.5
+SSTP_TIMEOUT = 8.0
+SSTP_READ_TIMEOUT = 4.0
 CONCURRENCY = 300
 MAX_FAILS = 3
 
@@ -121,7 +123,11 @@ async def probe_socks5(
     返回 (is_alive, delay_ms, status, colo, country, egress_ip)
     """
     t0 = time.monotonic()
-    connect_host = resolve_domain_to_ip(host) or host if not is_valid_public_ip(host) else host
+    connect_host = host
+    if not is_valid_public_ip(host):
+        resolved = await asyncio.to_thread(resolve_domain_to_ip, host)
+        if resolved and is_valid_public_ip(resolved):
+            connect_host = resolved
     try:
         reader, writer = await asyncio.wait_for(
             asyncio.open_connection(connect_host, port),
@@ -242,7 +248,11 @@ async def probe_http(
     返回 (is_alive, delay_ms, status, colo, country, egress_ip)
     """
     t0 = time.monotonic()
-    connect_host = resolve_domain_to_ip(host) or host if not is_valid_public_ip(host) else host
+    connect_host = host
+    if not is_valid_public_ip(host):
+        resolved = await asyncio.to_thread(resolve_domain_to_ip, host)
+        if resolved and is_valid_public_ip(resolved):
+            connect_host = resolved
     try:
         reader, writer = await asyncio.wait_for(
             asyncio.open_connection(connect_host, port),
@@ -359,7 +369,11 @@ async def probe_turn(
     返回 (is_alive, delay_ms, status, colo, country, egress_ip)
     """
     t0 = time.monotonic()
-    connect_host = resolve_domain_to_ip(host) or host if not is_valid_public_ip(host) else host
+    connect_host = host
+    if not is_valid_public_ip(host):
+        resolved = await asyncio.to_thread(resolve_domain_to_ip, host)
+        if resolved and is_valid_public_ip(resolved):
+            connect_host = resolved
     try:
         reader, writer = await asyncio.wait_for(
             asyncio.open_connection(connect_host, port),
@@ -401,13 +415,13 @@ async def probe_sstp(
     port: int,
     user: str | None = None,
     pwd: str | None = None,
-    connect_timeout: float = TIMEOUT,
-    read_timeout: float = HTTP_TIMEOUT,
+    connect_timeout: float = SSTP_TIMEOUT,
+    read_timeout: float = SSTP_READ_TIMEOUT,
 ) -> tuple[bool, int, str, str, str, str]:
     """
     SSTP (Secure Socket Tunneling Protocol) 鉴真：
-    1. TLS 握手建立加密信道 (对自签名证书与通配符证书保持兼容 ssl.CERT_NONE)
-    2. 发送标准 MS-SSTP 初始双工隧道请求:
+    1. TLS 握手建立加密信道 (兼容自签名证书与通配符证书 ssl.CERT_NONE，支持老旧节点 TLS 1.0/1.1 与 SECLEVEL=0 密码套件)
+    2. 发送标准 MS-SSTP 初始双工隧道请求 (携带 SSTPCORRELATIONID 与标准客户端标头):
        SSTP_DUPLEX_POST /sra_{BA195980-CD49-458b-9E23-C84EE0ADCD75}/ HTTP/1.1
     3. 校验服务端是否返回 HTTP/1.1 200 OK，确认 SSTP 隧道服务活跃就绪
     返回 (is_alive, delay_ms, status, colo, country, egress_ip)
@@ -416,15 +430,23 @@ async def probe_sstp(
     ctx = ssl.create_default_context()
     ctx.check_hostname = False
     ctx.verify_mode = ssl.CERT_NONE
+    try:
+        ctx.minimum_version = ssl.TLSVersion.MINIMUM_SUPPORTED
+    except Exception:
+        pass
+    try:
+        ctx.set_ciphers("DEFAULT:@SECLEVEL=0")
+    except Exception:
+        pass
 
     # RFC 6066: 纯 IPv4 地址不应作为 TLS SNI 发送
     is_ip = bool(re.match(r"^\d{1,3}(?:\.\d{1,3}){3}$", host))
     sni = None if is_ip else host
 
-    # 对域名进行安全解析 (DoH 权威防 DNS 污染)，若能解析出公网 IP 则优先直连真实 IP，并将原域名作为 TLS SNI 发送
+    # 对域名进行异步安全解析 (DoH 权威防 DNS 污染)，若能解析出公网 IP 则优先直连真实 IP，并将原域名作为 TLS SNI 发送
     connect_host = host
     if not is_ip:
-        resolved = resolve_domain_to_ip(host)
+        resolved = await asyncio.to_thread(resolve_domain_to_ip, host)
         if resolved and is_valid_public_ip(resolved):
             connect_host = resolved
 
@@ -440,7 +462,10 @@ async def probe_sstp(
         uri = "/sra_{BA195980-CD49-458b-9E23-C84EE0ADCD75}/"
         req = (
             f"SSTP_DUPLEX_POST {uri} HTTP/1.1\r\n"
+            f"SSTPCORRELATIONID: {{BA195980-CD49-458b-9E23-C84EE0ADCD75}}\r\n"
             f"Host: {host}\r\n"
+            f"User-Agent: SSTP Client\r\n"
+            f"Connection: Keep-Alive\r\n"
             f"Content-Length: 18446744073709551615\r\n"
             f"\r\n"
         ).encode("latin1")
@@ -475,6 +500,7 @@ async def probe_single(
     sem: asyncio.Semaphore,
     timeout: float = TIMEOUT,
     http_timeout: float = HTTP_TIMEOUT,
+    sstp_timeout: float = SSTP_TIMEOUT,
 ) -> dict:
     """协议分流路由与执行"""
     async with sem:
@@ -498,7 +524,7 @@ async def probe_single(
             )
         elif proto == "sstp":
             is_alive, delay_ms, status, colo, country, egress_ip = await probe_sstp(
-                host, port, user, pwd, timeout, http_timeout
+                host, port, user, pwd, sstp_timeout, max(http_timeout, SSTP_READ_TIMEOUT)
             )
         else:
             is_alive, delay_ms, status, colo, country, egress_ip = False, 0, "unknown_proto", "", "", ""
@@ -907,7 +933,7 @@ async def async_main(args):
         nonlocal completed, pass_count, fail_count, min_delay
         host = r.get("host", "")
         async with get_keyed_lock(host):
-            res = await probe_single(r, sem, args.timeout, args.http_timeout)
+            res = await probe_single(r, sem, args.timeout, args.http_timeout, args.sstp_timeout)
         completed += 1
 
         proto = res.get("proto", "unknown")
@@ -1084,6 +1110,7 @@ def main():
     parser.add_argument("--strict", action="store_true", help="极致纯净模式 (只要失败 1 次立即剔除，等价于 --max-fails 1)")
     parser.add_argument("--timeout", type=float, default=TIMEOUT, help=f"单节点握手超时秒数 (默认 {TIMEOUT})")
     parser.add_argument("--http-timeout", type=float, default=HTTP_TIMEOUT, help=f"单节点 HTTP 穿透校验超时秒数 (默认 {HTTP_TIMEOUT})")
+    parser.add_argument("--sstp-timeout", type=float, default=SSTP_TIMEOUT, help=f"SSTP 协议专属握手超时秒数 (默认 {SSTP_TIMEOUT})")
     parser.add_argument("--no-notify", action="store_true", help="静默模式，不单独发送 Telegram 质检通知")
     parser.add_argument("--enrich-only", action="store_true", help="仅对现有 proxies.csv 补全 ASN 与网络属性打标，跳过网络连通性探测")
     args = parser.parse_args()

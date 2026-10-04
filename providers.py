@@ -185,6 +185,7 @@ ASN_TO_PROVIDER = dict(AUTHORITATIVE_CLOUD_ASNS)
 import asyncio
 import concurrent.futures
 import csv
+import functools
 import ipaddress
 import json
 import logging
@@ -542,6 +543,7 @@ def doh_resolve_public_ip(domain: str, timeout: float = 3.5) -> str:
     return ""
 
 
+@functools.lru_cache(maxsize=4096)
 def resolve_domain_to_ip(domain: str) -> str:
     """尝试将域名解析为有效公网 IP，若失败或解析为保留/回环 IP 则依次尝试本地系统解析与 DoH 加密解析"""
     if not domain or not isinstance(domain, str):
