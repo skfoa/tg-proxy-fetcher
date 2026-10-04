@@ -312,7 +312,7 @@ async def probe_http(
         writer = None
 
         fwd_reader, fwd_writer = await asyncio.wait_for(
-            asyncio.open_connection(host, port),
+            asyncio.open_connection(connect_host, port),
             timeout=connect_timeout,
         )
         reader, writer = fwd_reader, fwd_writer
@@ -928,6 +928,10 @@ async def async_main(args):
         args.timeout,
         args.max_fails,
     )
+
+    # 全局显式初始化 _old_fc，确保异常提前返回或空跑时不遗留未定义状态
+    for r in rows:
+        r.setdefault("_old_fc", safe_int(r.get("fail_count"), 0))
 
     async def _worker(r):
         nonlocal completed, pass_count, fail_count, min_delay

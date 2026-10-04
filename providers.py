@@ -2393,10 +2393,16 @@ def save_proxyip_by_country(rows: list, output_dir: str) -> int:
             f.writelines(lines)
         active_files.add(fname)
 
-    # 清理已不存在或旧命名格式的 .txt 文件（保留 .gitkeep 等非 txt 标记文件）
+    # 清理已不存在或旧命名格式的 .txt 文件（保留 .gitkeep 等非 txt 标记文件，以及 custom_ / manual_ 用户自定义文件）
     for old_f in os.listdir(output_dir):
         fpath = os.path.join(output_dir, old_f)
-        if os.path.isfile(fpath) and old_f.endswith(".txt") and old_f not in active_files:
+        if (
+            os.path.isfile(fpath)
+            and old_f.endswith(".txt")
+            and old_f not in active_files
+            and not old_f.startswith("custom_")
+            and not old_f.startswith("manual_")
+        ):
             try:
                 os.remove(fpath)
             except OSError:
@@ -2450,7 +2456,12 @@ def save_scan_ips_by_asn(asn_groups: dict, output_dir: str) -> int:
     for old_f in os.listdir(output_dir):
         if old_f == ".gitkeep":
             continue
-        if old_f.endswith(".txt") and old_f not in active_files:
+        if (
+            old_f.endswith(".txt")
+            and old_f not in active_files
+            and not old_f.startswith("custom_")
+            and not old_f.startswith("manual_")
+        ):
             try:
                 os.remove(os.path.join(output_dir, old_f))
             except OSError:

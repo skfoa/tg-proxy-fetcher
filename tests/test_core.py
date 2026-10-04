@@ -563,7 +563,84 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
                 ip = resolve_domain_to_ip("test.opengw.net")
                 self.assertEqual(ip, "219.100.37.30")
 
+    def test_parse_cf_ip_speed_units(self):
+        from parsers import parse_cf_ip
+
+        # 1. 括号内标注 MB/s
+        text_mb = "节点测试\nIP地址: 1.1.1.1\n端口: 443\n速度(MB/s): 45"
+        res_mb = parse_cf_ip(text_mb)
+        self.assertIsNotNone(res_mb)
+        self.assertEqual(res_mb["speed_kbs"], 45 * 1024)
+
+        # 2. 括号内标注 kB/s（数值 < 50 时严禁误判为 MB/s）
+        text_kb = "节点测试\nIP地址: 1.1.1.1\n端口: 443\n速度(kB/s): 45"
+        res_kb = parse_cf_ip(text_kb)
+        self.assertIsNotNone(res_kb)
+        self.assertEqual(res_kb["speed_kbs"], 45)
+
+        # 3. 冒号后标注 MB/s
+        text_post = "节点测试\nIP地址: 1.1.1.1\n端口: 443\n下载速度: 12.5 MB/s"
+        res_post = parse_cf_ip(text_post)
+        self.assertIsNotNone(res_post)
+        self.assertEqual(res_post["speed_kbs"], int(12.5 * 1024))
+
+    def test_scrape_channel_web_order_and_cutoff(self):
+        from unittest.mock import patch
+        from datetime import datetime, timezone
+        from tg_fetch import scrape_channel_web
+
+        # 模拟 Telegram 网页 Preview HTML：
+        # 页面顶部是最旧消息 (ID 100, 2026-09-25)，底部是最新消息 (ID 102, 2026-10-04)
+        mock_html = (
+            '<html><body>'
+            '<div class="tgme_widget_message_wrap" data-post="testchan/100">'
+            '  <time datetime="2026-09-25T10:00:00+00:00"></time>'
+            '  <div class="tgme_widget_message_text">http://1.1.1.1:80</div>'
+            '</div>'
+            '<div class="tgme_widget_message_wrap" data-post="testchan/101">'
+            '  <time datetime="2026-10-02T10:00:00+00:00"></time>'
+            '  <div class="tgme_widget_message_text">http://2.2.2.2:80</div>'
+            '</div>'
+            '<div class="tgme_widget_message_wrap" data-post="testchan/102">'
+            '  <time datetime="2026-10-04T12:00:00+00:00"></time>'
+            '  <div class="tgme_widget_message_text">http://3.3.3.3:80</div>'
+            '</div>'
+            '</body></html>'
+        )
+
+        cutoff = datetime(2026, 10, 1, tzinfo=timezone.utc)
+        with patch("tg_fetch.fetch_web_page", return_value=mock_html):
+            proxies, cf_ips = scrape_channel_web("@testchan", cutoff=cutoff)
+            # 必须成功解析出最新两条 (102 与 101)，而早于 cutoff 的第 100 条被过滤跳过
+            urls = [p[0] for p in proxies]
+            self.assertIn("http://3.3.3.3:80", urls)
+            self.assertIn("http://2.2.2.2:80", urls)
+            self.assertNotIn("http://1.1.1.1:80", urls)
+
+    def test_providers_preserves_custom_txt_files(self):
+        from providers import save_proxyip_by_country
+        with tempfile.TemporaryDirectory() as td:
+            custom_file = os.path.join(td, "custom_list.txt")
+            manual_file = os.path.join(td, "manual_backup.txt")
+            stale_file = os.path.join(td, "stale_country.txt")
+            with open(custom_file, "w") as f:
+                f.write("1.2.3.4:8080\n")
+            with open(manual_file, "w") as f:
+                f.write("5.6.7.8:8080\n")
+            with open(stale_file, "w") as f:
+                f.write("9.9.9.9:8080\n")
+
+            rows = [{"ip": "8.8.8.8", "port": 443, "cf_location": "US", "colo": "SJC", "net_type": "datacenter"}]
+            save_proxyip_by_country(rows, td)
+
+            # custom_ 和 manual_ 文件必须保留
+            self.assertTrue(os.path.exists(custom_file))
+            self.assertTrue(os.path.exists(manual_file))
+            # 未在 active_files 且无保护前缀的旧文件被清理
+            self.assertFalse(os.path.exists(stale_file))
+
 
 if __name__ == "__main__":
     unittest.main()
+
 

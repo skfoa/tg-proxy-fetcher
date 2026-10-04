@@ -604,8 +604,11 @@ def scrape_channel_web(channel: str, cutoff: datetime, proxy: str = "") -> tuple
                     else:
                         dt = dt.astimezone(timezone.utc)
                     if dt < cutoff:
+                        # Telegram Web 页面 HTML 中 chunks[0] 为最旧消息，chunks[-1] 为最新消息。
+                        # reversed(chunks) 从最新遍历到最旧。遇到早于 cutoff 的消息时标记 reached_cutoff，
+                        # 使用 continue 跳过当前旧消息，确保整页消息（及 earliest_id）遍历完整，并在外层停止翻页。
                         reached_cutoff = True
-                        break
+                        continue
                 except (ValueError, TypeError):
                     pass
 

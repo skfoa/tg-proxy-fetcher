@@ -258,6 +258,10 @@ async def verify_proxyips(
     fail_count_total = 0
     completed = 0
 
+    # 全局显式初始化 _old_fc，确保异常提前返回或空跑时不遗留未定义状态
+    for r in rows:
+        r.setdefault("_old_fc", _get_fc(r))
+
     # 创建乱序执行队列，保护同 IP 多端口节点
     indices = list(range(total))
     random.shuffle(indices)

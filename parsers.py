@@ -109,11 +109,11 @@ def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
     colo_m = re.search(r"数据中心[:：]\s*([A-Za-z0-9]+)", text)
     cf_loc_m = re.search(r"CF落地位置[:：].*?🌐\s*([^\r\n]+)", text, re.DOTALL)
     delay_m = re.search(r"网络延迟[:：]\s*(\d+(?:\.\d+)?)\s*ms", text)
-    speed_m = re.search(r"(?:下载)?速度[:：]\s*(\d+(?:\.\d+)?)\s*([a-zA-Z/]+)?", text)
+    speed_m = re.search(r"(?:下载)?速度(?:\s*[\(\[（]\s*([a-zA-Z/]+)\s*[\)\]）])?[:：]\s*(\d+(?:\.\d+)?)\s*([a-zA-Z/]+)?", text)
     speed_kbs = ""
     if speed_m:
-        val = float(speed_m.group(1))
-        unit = (speed_m.group(2) or "").lower().strip()
+        val = float(speed_m.group(2))
+        unit = (speed_m.group(1) or speed_m.group(3) or "").lower().strip()
         if not unit:
             # 缺乏单位时启发式判定：主流 CF 测速工具（如 CloudflareST）小数值 (< 50) 通常为 MB/s，大数值通常为 kB/s
             unit = "mb/s" if val < 50 else "kb/s"
