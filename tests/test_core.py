@@ -567,7 +567,7 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
                 self.assertTrue(res["is_alive"])
                 self.assertEqual(res["egress_ip"], "219.100.37.244")
                 self.assertEqual(res["country"], "JP")
-                self.assertEqual(res["colo"], "NRT")
+                self.assertEqual(res["colo"], "-")
                 self.assertIn("AS36599", res["asn"])
 
             # 2. 淘汰假活案例：本地 HTTP 200 初筛通过，但 CF Worker 全隧道 PPP 握手失败

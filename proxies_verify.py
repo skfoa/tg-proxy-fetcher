@@ -600,8 +600,10 @@ async def probe_single(
                         c_code = (exit_info.get("country_code") or "").strip().upper()
                         if c_code:
                             country = c_code
-                        if cf_res.get("colo"):
-                            colo = cf_res["colo"].strip().upper()
+                        # 注意：Cloudflare Worker (CF-Workers-CheckSocks5) 响应根字段中的 colo
+                        # 实际上是调用方 (GitHub Actions runner) 连接 Worker 时的入站 CDN 机房 (如 IAD)，
+                        # 且 SSTP 隧道内仅访问了 iplocate.io 查询 IP，并未穿透 Cloudflare /cdn-cgi/trace。
+                        # 因此 SSTP 的 colo 统一保持 "-"，不采纳 cf_res["colo"]。
                         # 若 Worker 已附带 ASN/ISP 归属，直接结构化丰富
                         asn_obj = exit_info.get("asn") or {}
                         cf_asn = (asn_obj.get("asn") or "").strip()
