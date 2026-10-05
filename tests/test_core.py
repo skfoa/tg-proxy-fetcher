@@ -845,9 +845,120 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
             loaded = load_tombstone(filepath=tombstone_file, max_age_days=7, force_reload=True)
             self.assertNotIn("4.4.4.4:80", loaded)
 
+    def test_asn_database_auto_maintenance_and_normalization(self):
+        from providers import (
+            normalize_external_asn_info,
+            validate_asn_database,
+            save_asn_database,
+            load_asn_database,
+            resolve_asn_batch_online,
+            ASN_EXACT_NET_TYPE,
+            ASN_DATABASE_ASN_TO_NET_TYPE,
+        )
+        from unittest.mock import patch, MagicMock
+
+        # 1. 异构字段归一化测试 (不同第三方查询源字段映射与清洗)
+        asn1, isp1, type1 = normalize_external_asn_info("AS13335 Cloudflare, Inc.", "Cloudflare, Inc.")
+        self.assertEqual(asn1, "AS13335")
+        self.assertEqual(isp1, "Cloudflare, Inc.")
+        self.assertEqual(type1, "datacenter")
+
+        # 纯数字格式与 hosting 类型映射
+        asn2, isp2, type2 = normalize_external_asn_info(13335, "Cloudflare", external_type="hosting")
+        self.assertEqual(asn2, "AS13335")
+        self.assertEqual(type2, "datacenter")
+
+        # residential 类型映射到 isp
+        asn3, isp3, type3 = normalize_external_asn_info("AS99999", "Local Fiber Corp", external_type="residential")
+        self.assertEqual(asn3, "AS99999")
+        self.assertEqual(type3, "isp")
+
+        # 物理大厦/街道门牌地址防污染清洗
+        asn4, isp4, type4 = normalize_external_asn_info("AS132203 Tencent Building, Keji 39th Road", "")
+        self.assertEqual(asn4, "AS132203")
+        self.assertNotIn("Tencent Building", isp4)
+
+        # 移动蜂窝网络类型映射至 isp
+        asn5, isp5, type5 = normalize_external_asn_info("AS58453", "China Mobile CMI", raw_type="mobile")
+        self.assertEqual(asn5, "AS58453")
+        self.assertEqual(type5, "isp")
+
+        # format_proxy_json_item 保留已有合规 net_type 不被 classify_asn 覆盖
+        from providers import format_proxy_json_item
+        custom_item = {
+            "url": "socks5://1.2.3.4:1080",
+            "host": "1.2.3.4",
+            "port": 1080,
+            "asn": "AS99999",
+            "isp": "Custom ISP",
+            "net_type": "business",
+        }
+        res_json = format_proxy_json_item(custom_item)
+        self.assertEqual(res_json["net_type"], "business")
+
+        # 2. 数据库读写完整性测试 (含仅具备 net_type 而无反向厂商名的合法 ASN)
+        with tempfile.TemporaryDirectory() as td:
+            db_path = os.path.join(td, "test_asn_db.json")
+            cache_path = os.path.join(td, "test_ip_cache.json")
+            test_i2a = {"Test Telecom": "AS987654"}
+            test_a2i = {"AS987654": "Test Telecom"}
+            # AS987655 仅有 net_type，无厂商归属，完全合法
+            test_a2nt = {"AS987654": "isp", "AS987655": "datacenter"}
+
+            # 校验无错误
+            errs, _ = validate_asn_database({
+                "isp_to_asn": test_i2a,
+                "asn_to_isp": test_a2i,
+                "asn_to_net_type": test_a2nt,
+            })
+            self.assertEqual(len(errs), 0)
+
+            # 保存并加载
+            save_asn_database(test_i2a, test_a2i, test_a2nt, db_path=db_path)
+            loaded_i2a, loaded_a2i, loaded_a2nt = load_asn_database(db_path=db_path)
+            self.assertEqual(loaded_i2a.get("Test Telecom"), "AS987654")
+            self.assertEqual(loaded_a2i.get("AS987654"), "Test Telecom")
+            self.assertEqual(loaded_a2nt.get("AS987654"), "isp")
+            self.assertEqual(loaded_a2nt.get("AS987655"), "datacenter")
+
+            # 3. 批量解析自动维护持久化测试
+            fake_api_response = [
+                {
+                    "status": "success",
+                    "query": "184.178.172.18",
+                    "as": "AS77777 New Dynamic ISP",
+                    "isp": "New Dynamic Residential Broadband",
+                    "org": "New Dynamic Corp",
+                    "asname": "NEWDYNAMIC-AS",
+                    "countryCode": "JP",
+                }
+            ]
+            mock_resp = MagicMock()
+            mock_resp.read.return_value = json.dumps(fake_api_response).encode("utf-8")
+            mock_resp.headers = {"X-Rl": "10", "X-Ttl": "60"}
+            mock_resp.__enter__.return_value = mock_resp
+
+            with patch("urllib.request.urlopen", return_value=mock_resp):
+                results = resolve_asn_batch_online(
+                    ["184.178.172.18"],
+                    persist=True,
+                    db_path=db_path,
+                    cache_path=cache_path,
+                )
+                self.assertIn("184.178.172.18", results)
+                res_asn, res_isp = results["184.178.172.18"]
+                self.assertEqual(res_asn, "AS77777")
+
+                # 验证磁盘文件已自动持久化收录新 ASN 及其网络类型
+                with open(db_path, "r", encoding="utf-8") as f:
+                    disk_db = json.load(f)
+                self.assertIn("AS77777", disk_db.get("asn_to_net_type", {}))
+                self.assertEqual(disk_db["asn_to_net_type"]["AS77777"], "isp")
+
 
 if __name__ == "__main__":
     unittest.main()
+
 
 
 

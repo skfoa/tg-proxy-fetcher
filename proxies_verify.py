@@ -827,7 +827,8 @@ async def enrich_proxies_metadata(survivors: list[dict], max_concurrency: int = 
                     if asn_code:
                         r["asn"] = format_asn_isp(asn_code, isp_name)
                         r["isp"] = isp_name
-                        r["net_type"] = classify_asn(asn_code, isp_name)
+                        cached_nt = (persistent_cache.get(target_ip) or {}).get("net_type")
+                        r["net_type"] = cached_nt or classify_asn(asn_code, isp_name)
                 elif target_ip in persistent_cache:
                     c_item = persistent_cache[target_ip]
                     asn_code = c_item.get("asn", "")
