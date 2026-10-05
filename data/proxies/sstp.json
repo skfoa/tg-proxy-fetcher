@@ -445,7 +445,7 @@
     "asn": "46375",
     "asOrganization": "Sonic Telecom LLC",
     "isp": "Sonic Telecom LLC",
-    "net_type": "datacenter"
+    "net_type": "isp"
   },
   {
     "proxy": "sstp://vpn:vpn@vpn974535826.opengw.net:1570",
@@ -529,7 +529,7 @@
     "asn": "11203",
     "asOrganization": "Matrix Broadband",
     "isp": "Matrix Broadband",
-    "net_type": "datacenter"
+    "net_type": "isp"
   },
   {
     "proxy": "sstp://vpn:vpn@vpn539804093.opengw.net:1974",
@@ -809,7 +809,7 @@
     "asn": "9351",
     "asOrganization": "ZTV CO.,LTD",
     "isp": "ZTV CO.,LTD",
-    "net_type": "datacenter"
+    "net_type": "isp"
   },
   {
     "proxy": "sstp://vpn:vpn@vpn550892612.opengw.net:1837",
@@ -4043,7 +4043,7 @@
     "asn": "51004",
     "asOrganization": "Sakhalin Cable Telesystems Ltd",
     "isp": "Sakhalin Cable Telesystems Ltd",
-    "net_type": "datacenter"
+    "net_type": "isp"
   },
   {
     "proxy": "sstp://vpn:vpn@vpn918083457.opengw.net:1826",
@@ -5051,7 +5051,7 @@
     "asn": "8749",
     "asOrganization": "JSC \"Redcom-lnternet\"",
     "isp": "JSC \"Redcom-lnternet\"",
-    "net_type": "datacenter"
+    "net_type": "isp"
   },
   {
     "proxy": "sstp://vpn:vpn@vpn177976718.opengw.net:1280",
@@ -6563,7 +6563,7 @@
     "asn": "17698",
     "asOrganization": "Community Network Center Incorporated.",
     "isp": "Community Network Center Incorporated.",
-    "net_type": "business"
+    "net_type": "isp"
   },
   {
     "proxy": "sstp://vpn:vpn@public-vpn-210.opengw.net:443",
@@ -7683,7 +7683,7 @@
     "asn": "9319",
     "asOrganization": "HYUNDAI HCN Chungbuk Systems Co.Ltd",
     "isp": "HYUNDAI HCN Chungbuk Systems Co.Ltd",
-    "net_type": "datacenter"
+    "net_type": "isp"
   },
   {
     "proxy": "sstp://vpn:vpn@public-vpn-54.opengw.net:443",
@@ -8481,7 +8481,7 @@
     "asn": "10001",
     "asOrganization": "Mics Network Corporation",
     "isp": "Mics Network Corporation",
-    "net_type": "datacenter"
+    "net_type": "isp"
   },
   {
     "proxy": "sstp://vpn:vpn@public-vpn-240.opengw.net:443",
@@ -9727,7 +9727,7 @@
     "asn": "17698",
     "asOrganization": "Community Network Center Incorporated.",
     "isp": "Community Network Center Incorporated.",
-    "net_type": "business"
+    "net_type": "isp"
   },
   {
     "proxy": "sstp://vpn:vpn@vpn486662942.opengw.net:1730",
@@ -9755,7 +9755,7 @@
     "asn": "7522",
     "asOrganization": "STNet, Incorporated",
     "isp": "STNet, Incorporated",
-    "net_type": "business"
+    "net_type": "isp"
   },
   {
     "proxy": "sstp://vpn:vpn@vpn363762271.opengw.net:1954",
@@ -9979,7 +9979,7 @@
     "asn": "42772",
     "asOrganization": "Unitary enterprise A1",
     "isp": "Unitary enterprise A1",
-    "net_type": "business"
+    "net_type": "isp"
   },
   {
     "proxy": "sstp://vpn:vpn@vpn560905336.opengw.net:995",
@@ -10007,7 +10007,7 @@
     "asn": "7522",
     "asOrganization": "STNet, Incorporated",
     "isp": "STNet, Incorporated",
-    "net_type": "business"
+    "net_type": "isp"
   },
   {
     "proxy": "sstp://vpn:vpn@vpn176559303.opengw.net:1327",
@@ -10427,7 +10427,7 @@
     "asn": "7522",
     "asOrganization": "STNet, Incorporated",
     "isp": "STNet, Incorporated",
-    "net_type": "business"
+    "net_type": "isp"
   },
   {
     "proxy": "sstp://vpn:vpn@vpn664101522.opengw.net:995",
@@ -10609,7 +10609,7 @@
     "asn": "7522",
     "asOrganization": "STNet, Incorporated",
     "isp": "STNet, Incorporated",
-    "net_type": "business"
+    "net_type": "isp"
   },
   {
     "proxy": "sstp://vpn:vpn@vpn288202104.opengw.net:1475",

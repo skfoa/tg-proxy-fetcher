@@ -1072,7 +1072,17 @@
     "Zont LLC": "AS1054",
     "Zorn Technologies": "AS17644",
     "Zouter": "AS205548",
-    "Ztv Corp LLC": "AS43581"
+    "Ztv Corp LLC": "AS43581",
+    "ZTV CO.,LTD": "AS9351",
+    "Mics Network Corporation": "AS10001",
+    "HYUNDAI HCN Chungbuk Systems Co.Ltd": "AS9319",
+    "Sonic Telecom LLC": "AS46375",
+    "Matrix Broadband": "AS11203",
+    "Sakhalin Cable Telesystems Ltd": "AS51004",
+    "JSC Redcom-Internet": "AS8749",
+    "Community Network Center Incorporated.": "AS17698",
+    "STNet, Incorporated": "AS7522",
+    "Unitary enterprise A1": "AS42772"
   },
   "asn_to_isp": {
     "AS174": "Cogent Communications, LLC",
@@ -2084,6 +2094,16 @@
     "AS402429": "Raff",
     "AS402506": "Zenixcloud",
     "AS402681": "Vircs LLC",
-    "AS402799": "Input Output Flood LLC"
+    "AS402799": "Input Output Flood LLC",
+    "AS9351": "ZTV CO.,LTD",
+    "AS10001": "Mics Network Corporation",
+    "AS9319": "HYUNDAI HCN Chungbuk Systems Co.Ltd",
+    "AS46375": "Sonic Telecom LLC",
+    "AS11203": "Matrix Broadband",
+    "AS51004": "Sakhalin Cable Telesystems Ltd",
+    "AS8749": "JSC Redcom-Internet",
+    "AS17698": "Community Network Center Incorporated.",
+    "AS7522": "STNet, Incorporated",
+    "AS42772": "Unitary enterprise A1"
   }
 }

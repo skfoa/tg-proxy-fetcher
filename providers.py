@@ -1950,6 +1950,8 @@ def _extract_asn_code(asn_str: str | None, isp_str: str | None = "") -> str | No
 ASN_EXACT_NET_TYPE = {
     # 1. 运营商原生民用家宽 (isp)
         # 日本/韩国/东南亚/东欧民用住宅宽带与志愿网络 (VPNGate / CATV / Residential)
+        "AS9351": "isp", "AS10001": "isp", "AS9319": "isp", "AS46375": "isp", "AS11203": "isp",
+        "AS51004": "isp", "AS8749": "isp", "AS17698": "isp", "AS7522": "isp", "AS42772": "isp",
         "AS36599": "isp", "AS9824": "isp", "AS4721": "isp", "AS9614": "isp", "AS4685": "isp",
         "AS10010": "isp", "AS7679": "isp", "AS9365": "isp", "AS9354": "isp", "AS10013": "isp",
         "AS7524": "isp", "AS18081": "isp", "AS18278": "isp", "AS9757": "isp", "AS10054": "isp",
