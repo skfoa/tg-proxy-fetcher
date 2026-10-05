@@ -13111,5 +13111,187 @@
     "net_type": "isp",
     "country": "KR",
     "resolved_ip": "14.54.18.48"
+  },
+  "77.82.200.65": {
+    "asn": "AS12389",
+    "isp": "OJSC Rostelecom",
+    "net_type": "isp",
+    "country": "RU"
+  },
+  "vpn261084075.opengw.net": {
+    "asn": "AS12389",
+    "isp": "OJSC Rostelecom",
+    "net_type": "isp",
+    "country": "RU",
+    "resolved_ip": "77.82.200.65"
+  },
+  "121.130.225.99": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn593605282.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "121.130.225.99"
+  },
+  "136.36.44.247": {
+    "asn": "AS16591",
+    "isp": "Google Fiber Inc.",
+    "net_type": "isp",
+    "country": "US"
+  },
+  "vpn332561882.opengw.net": {
+    "asn": "AS16591",
+    "isp": "Google Fiber Inc.",
+    "net_type": "isp",
+    "country": "US",
+    "resolved_ip": "136.36.44.247"
+  },
+  "187.14.63.241": {
+    "asn": "AS147049",
+    "isp": "VMISS",
+    "net_type": "datacenter",
+    "country": "JP"
+  },
+  "vpn981697033.opengw.net": {
+    "asn": "AS147049",
+    "isp": "VMISS",
+    "net_type": "datacenter",
+    "country": "JP",
+    "resolved_ip": "187.14.63.241"
+  },
+  "211.199.236.132": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn552924701.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "211.199.236.132"
+  },
+  "182.172.196.51": {
+    "asn": "AS10036",
+    "isp": "DLIVE",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn686835063.opengw.net": {
+    "asn": "AS10036",
+    "isp": "DLIVE",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "182.172.196.51"
+  },
+  "219.100.37.27": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "public-vpn-79.opengw.net": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "219.100.37.27"
+  },
+  "219.100.37.223": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "public-vpn-251.opengw.net": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "219.100.37.223"
+  },
+  "122.36.8.16": {
+    "asn": "AS17858",
+    "isp": "LG POWERCOMM",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn855551265.opengw.net": {
+    "asn": "AS17858",
+    "isp": "LG POWERCOMM",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "122.36.8.16"
+  },
+  "50.110.94.199": {
+    "asn": "AS5650",
+    "isp": "Frontier Communications of America, Inc.",
+    "net_type": "isp",
+    "country": "US"
+  },
+  "vpn395062778.opengw.net": {
+    "asn": "AS5650",
+    "isp": "Frontier Communications of America, Inc.",
+    "net_type": "isp",
+    "country": "US",
+    "resolved_ip": "50.110.94.199"
+  },
+  "211.194.198.236": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn801409039.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "211.194.198.236"
+  },
+  "122.42.200.46": {
+    "asn": "AS17858",
+    "isp": "LG POWERCOMM",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn243465846.opengw.net": {
+    "asn": "AS17858",
+    "isp": "LG POWERCOMM",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "122.42.200.46"
+  },
+  "59.11.40.19": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn623845864.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "59.11.40.19"
+  },
+  "119.231.169.183": {
+    "asn": "AS17511",
+    "isp": "OPTAGE Inc.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn689958394.opengw.net": {
+    "asn": "AS17511",
+    "isp": "OPTAGE Inc.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "119.231.169.183"
   }
 }
