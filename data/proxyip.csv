@@ -1,5 +1,4 @@
 ﻿ip,port,tls,delay_ms,speed_kbs,colo,cf_location,asn,isp,tested_at,channel,fail_count,net_type
-151.243.18.120,443,true,3,,IAD,北美洲 · 杜勒斯 · 美国,AS207043 Dedik Services Limited,Dedik Services Limited,2026-10-06 17:07:50,@danfeng2,0,datacenter
 38.60.206.32,443,true,3,,IAD,北美洲 · 杜勒斯 · 美国,AS154177 LIGHT NODE LIMITED (Kaopu Cloud HK Limited),Kaopu Cloud HK Limited,2026-10-06 17:07:50,@danfeng2,0,datacenter
 192.80.63.51,443,true,15,,PHX,北美洲 · 菲尼克斯 · 美国,AS11782 Perfecto Mobile Inc,Perfecto Mobile Inc,2026-09-16 08:24:48,@danfeng2,0,datacenter
 104.207.153.159,443,true,21,,LAX,北美洲 · 圣何塞 · 美国,"AS20473 Vultr (The Constant Company, LLC)","The Constant Company, LLC",2026-09-16 08:17:00,@danfeng2,0,datacenter
@@ -22033,3 +22032,4 @@
 62.60.245.255,443,true,710,,FRA,欧洲 · 法兰克福 · 德国,AS203273 NetCrafters OU,NetCrafters OU,2026-07-24 22:30:47,@danfeng2,2,datacenter
 5.144.180.112,443,true,775,,FRU,亚洲 · 比什凯克 · 吉尔吉斯斯坦,AS50053 Anton Levin,Anton Levin,2026-09-16 08:32:12,@danfeng2,2,datacenter
 87.120.186.155,443,true,1173,,FRA,欧洲 · 法兰克福 · 德国,AS215439 Play2go International Limited,Play2go International Limited,2026-09-16 08:35:19,@danfeng2,2,datacenter
+151.243.18.120,443,true,9999,,IAD,北美洲 · 杜勒斯 · 美国,AS207043 Dedik Services Limited,Dedik Services Limited,2026-10-06 17:07:50,@danfeng2,2,datacenter
