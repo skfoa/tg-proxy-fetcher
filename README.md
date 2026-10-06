@@ -393,7 +393,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `PROXY_CHANNELS` | 代理抓取目标频道/群组（逗号/空格分隔） | `@otcfxq, @danfeng_chat` | 可选 | 自定义抓取通用代理的频道/群组（若未配置自动回退至全局 `CHANNELS` 或默认值） |
 | `CF_IP_CHANNELS` | 优选 IP 抓取目标频道/群组（逗号/空格分隔） | `@otcfxq, @danfeng_chat` | 可选 | 自定义抓取 Cloudflare 优选 IP 与测速附件的频道/群组（若未配置自动回退至全局 `CHANNELS` 或默认值） |
 | `SUB_URLS` | 外部通用订阅源 URL 列表（逗号/换行分隔） | `sub.cmliussss.net/vpngate` (留空默认) | 可选 | 配置外部公开订阅链接（默认加载开源公共镜像 `https://sub.cmliussss.net/vpngate` 获取 VPNGate SSTP 节点）；如需**彻底禁用外部订阅**，设置为 `off`、`none` 或 `false` 即可；也可填入自有公开订阅链接 |
-| `CF_CHECK_ENDPOINT` | SSTP 代理出口检测端点 URL | 留空（不执行） | 可选 | 用于存活 SSTP 节点的第二阶段真实出口 IP 与链路鉴真。<br>💡 **需自行部署**：本项目**默认不预设第三方公共端点**（避免占用他人私人项目额度）。推荐使用开源项目 [CF-Workers-CheckSocks5](https://github.com/cmlius/CF-Workers-CheckSocks5) 部署到个人 Cloudflare Workers 免费账号（每日 100,000 次免费请求额度），部署后将个人 Worker 域名填入此处。若留空则仅使用本地探测，完全不调用外部服务。 |
+| `CF_CHECK_ENDPOINT` | SSTP 代理出口检测端点 URL | 留空（不执行） | 可选 | 用于存活 SSTP 节点的第二阶段真实出口 IP 与链路鉴真。<br>💡 **需自行部署**：本项目**默认不预设第三方公共端点**（避免占用他人私人项目额度）。推荐使用开源项目 [CF-Workers-CheckSocks5](https://github.com/cmliu/CF-Workers-CheckSocks5) 部署到个人 Cloudflare Workers 免费账号（每日 100,000 次免费请求额度），部署后将个人 Worker 域名填入此处。若留空则仅使用本地探测，完全不调用外部服务。 |
 
 ### 3. 高级调优参数与本地调试对照（可选）
 
@@ -540,7 +540,7 @@ python cf_verify.py --concurrency 150 --timeout 3.0
   - [@otcfxq](https://t.me/otcfxq)
   - [DanFeng 交流群 (@danfeng_chat)](https://t.me/danfeng_chat)
 - **开源订阅镜像与工具**：
-  - [@cmliu](https://github.com/cmliu)（提供开源公共订阅镜像服务及 [CF-Workers-CheckSocks5](https://github.com/cmlius/CF-Workers-CheckSocks5) 鉴真端点项目）
+  - [@cmliu](https://github.com/cmliu)（提供开源公共订阅镜像服务及 [CF-Workers-CheckSocks5](https://github.com/cmliu/CF-Workers-CheckSocks5) 鉴真端点项目）
 - **公共中继实验项目**：
   - [VPN Gate 学术实验项目](https://www.vpngate.net/)（日本国立筑波大学研究生院全球分布式学术中继网络）
 
