@@ -534,10 +534,15 @@ python cf_verify.py --concurrency 150 --timeout 3.0
 
 ## 🙏 致谢
 
-本项目节点与优选 IP 数据源来自以下 Telegram 公开频道，在此表示感谢：
+本项目节点与优选 IP 数据源及配套工具来自以下公开频道与开源项目，在此表示诚挚感谢：
 
-- [@otcfxq](https://t.me/otcfxq)
-- [DanFeng 交流群 (@danfeng_chat)](https://t.me/danfeng_chat)
+- **Telegram 公开频道**：
+  - [@otcfxq](https://t.me/otcfxq)
+  - [DanFeng 交流群 (@danfeng_chat)](https://t.me/danfeng_chat)
+- **开源订阅镜像与工具**：
+  - [@cmliu](https://github.com/cmliu)（提供开源公共订阅镜像服务及 [CF-Workers-CheckSocks5](https://github.com/cmlius/CF-Workers-CheckSocks5) 鉴真端点项目）
+- **公共中继实验项目**：
+  - [VPN Gate 学术实验项目](https://www.vpngate.net/)（日本国立筑波大学研究生院全球分布式学术中继网络）
 
 ---
 
