@@ -488,14 +488,26 @@ ASN_DATABASE_ISP_LOWER = {k.lower(): (v, k) for k, v in ASN_DATABASE_ISP_TO_ASN.
 
 # 核心基准骨干自治系统兜底定义（在外部 JSON 缺失或损坏时的基础防御）
 _CORE_BASELINE_NET_TYPES: dict[str, str] = {
-    "AS4134": "isp",     # 中国电信
-    "AS4837": "isp",     # 中国联通
-    "AS9808": "isp",     # 中国移动
-    "AS13335": "datacenter", # Cloudflare
-    "AS15169": "datacenter", # Google
-    "AS16509": "datacenter", # Amazon AWS
-    "AS8075": "datacenter",  # Microsoft Azure
-    "AS45102": "datacenter", # Alibaba Cloud
+    # 核心运营商骨干与主流 ISP (权威锁定为 isp)
+    "AS4134": "isp",          # 中国电信 163
+    "AS4811": "isp",          # 中国电信集团
+    "AS4809": "isp",          # 中国电信 CN2
+    "AS4837": "isp",          # 中国联通 169
+    "AS9929": "isp",          # 中国联通 9929
+    "AS10099": "isp",         # 中国联通 CUG
+    "AS9808": "isp",          # 中国移动
+    "AS58453": "isp",         # 中国移动 CMI
+    "AS58807": "isp",         # 中国移动 CMIN2
+    "AS3462": "isp",          # 中华电信 HiNet
+    "AS4760": "isp",          # 香港电讯 HKT
+    "AS4766": "isp",          # 韩国电信 KT
+    "AS9318": "isp",          # 韩国 SK Broadband
+    # 核心云厂商机房 (权威锁定为 datacenter)
+    "AS13335": "datacenter",  # Cloudflare
+    "AS15169": "datacenter",  # Google
+    "AS16509": "datacenter",  # Amazon AWS
+    "AS8075": "datacenter",   # Microsoft Azure
+    "AS45102": "datacenter",  # Alibaba Cloud
     "AS132203": "datacenter", # Tencent Cloud
 }
 
@@ -503,10 +515,14 @@ _CORE_BASELINE_NET_TYPES: dict[str, str] = {
 ASN_EXACT_NET_TYPE: dict[str, str] = dict(_CORE_BASELINE_NET_TYPES)
 ASN_EXACT_NET_TYPE.update(ASN_DATABASE_ASN_TO_NET_TYPE)
 
-# 自动将 KNOWN_CLOUD_PROVIDERS 中未单独显式指定类型的知名云厂商/机房补充进入 ASN_EXACT_NET_TYPE 默认为 datacenter
-for _asn, _ in KNOWN_CLOUD_PROVIDERS.values():
+# 自动将 KNOWN_CLOUD_PROVIDERS 中未单独显式指定类型的服务商补充进入 ASN_EXACT_NET_TYPE
+for _asn, _isp in KNOWN_CLOUD_PROVIDERS.values():
     if _asn not in ASN_EXACT_NET_TYPE:
-        ASN_EXACT_NET_TYPE[_asn] = "datacenter"
+        text = f"{_asn} {_isp}".lower()
+        if any(p in text for p in ("telecom", "unicom", "mobile", "broadband", "hinet")):
+            ASN_EXACT_NET_TYPE[_asn] = "isp"
+        else:
+            ASN_EXACT_NET_TYPE[_asn] = "datacenter"
 
 
 def resolve_asn_online(ip: str, isp_hint: str = "", persist: bool = False, db_path: str = "") -> tuple[str, str]:
