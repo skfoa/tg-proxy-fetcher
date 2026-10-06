@@ -1341,18 +1341,18 @@ def format_buffer_badge(
     f2: int = 0,
     bold: bool = False,
 ) -> str:
-    """格式化缓冲标签，带新增缓冲与取消缓冲动态"""
+    """格式化缓冲标签，带新进缓冲与恢复健康动态"""
     m_str = f"<b>{marked}</b>" if bold else str(marked)
     z_str = "<b>0</b>" if bold else "0"
     if marked <= 0:
         if buf_rec > 0:
-            return f" · ⚠️ {z_str} 缓冲 [{buf_rec} 取消]"
+            return f" · ⚠️ {z_str} 缓冲 [{buf_rec} 恢复]"
         return ""
     changes = []
     if buf_new > 0:
-        changes.append(f"+{buf_new} 新增")
+        changes.append(f"+{buf_new} 新进")
     if buf_rec > 0:
-        changes.append(f"{buf_rec} 取消")
+        changes.append(f"{buf_rec} 恢复")
     if changes:
         return f" · ⚠️ {m_str} 缓冲 [{(' · '.join(changes))}]"
     if f1 > 0 or f2 > 0:

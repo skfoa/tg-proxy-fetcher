@@ -1004,6 +1004,28 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
                 ASN_DATABASE_ASN_TO_NET_TYPE.clear()
                 ASN_DATABASE_ASN_TO_NET_TYPE.update(orig_a2nt)
 
+    def test_format_buffer_badge(self):
+        from providers import format_buffer_badge
+
+        # 1. 无缓冲且无恢复
+        self.assertEqual(format_buffer_badge(0), "")
+
+        # 2. 缓冲归零但有恢复
+        self.assertEqual(format_buffer_badge(0, buf_rec=5), " · ⚠️ 0 缓冲 [5 恢复]")
+
+        # 3. 既有新进缓冲又有恢复健康 (无歧义描述)
+        badge = format_buffer_badge(10, buf_new=3, buf_rec=7)
+        self.assertEqual(badge, " · ⚠️ 10 缓冲 [+3 新进 · 7 恢复]")
+
+        # 4. 仅新进缓冲
+        self.assertEqual(format_buffer_badge(5, buf_new=5), " · ⚠️ 5 缓冲 [+5 新进]")
+
+        # 5. 仅恢复
+        self.assertEqual(format_buffer_badge(5, buf_rec=2), " · ⚠️ 5 缓冲 [2 恢复]")
+
+        # 6. 次数细分 (无新进/恢复动态时)
+        self.assertEqual(format_buffer_badge(3, f1=2, f2=1), " · ⚠️ 3 缓冲 [1次: 2 · 2次: 1]")
+
 
 if __name__ == "__main__":
     unittest.main()
