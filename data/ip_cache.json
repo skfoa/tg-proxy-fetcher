@@ -13293,5 +13293,407 @@
     "net_type": "isp",
     "country": "JP",
     "resolved_ip": "119.231.169.183"
+  },
+  "121.84.19.218": {
+    "asn": "AS17511",
+    "isp": "OPTAGE Inc.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "219.100.37.193": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "61.26.9.169": {
+    "asn": "AS9824",
+    "isp": "JCOM Co., Ltd.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "121.153.29.243": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "212.91.194.38": {
+    "asn": "AS12389",
+    "isp": "Primorye NET",
+    "net_type": "isp",
+    "country": "RU"
+  },
+  "219.100.37.166": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "124.219.214.107": {
+    "asn": "AS2527",
+    "isp": "Sony Network Communications Inc.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "60.73.52.173": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "221.145.49.55": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "124.18.54.178": {
+    "asn": "AS18126",
+    "isp": "Chubu Telecommunications Company, Inc.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "126.216.4.150": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "60.143.120.123": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "219.100.37.7": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "153.199.168.210": {
+    "asn": "AS4713",
+    "isp": "NTT Communications Corporation",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "61.72.60.12": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn698074106.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "61.72.60.12"
+  },
+  "223.219.47.25": {
+    "asn": "AS4713",
+    "isp": "NTT Communications Corporation",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "153.174.22.211": {
+    "asn": "AS4713",
+    "isp": "NTT Communications Corporation",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "61.11.207.28": {
+    "asn": "AS23783",
+    "isp": "Cable Networks Akita Co., ltd.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "118.193.45.130": {
+    "asn": "AS135377",
+    "isp": "UCLOUD INFORMATION TECHNOLOGY (HK) LIMITED",
+    "net_type": "datacenter",
+    "country": "HK"
+  },
+  "23.93.5.4": {
+    "asn": "AS46375",
+    "isp": "Sonic Telecom LLC",
+    "net_type": "isp",
+    "country": "US"
+  },
+  "27.89.16.210": {
+    "asn": "AS2516",
+    "isp": "KDDI CORPORATION",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "79.105.38.73": {
+    "asn": "AS12389",
+    "isp": "Primorye NET",
+    "net_type": "isp",
+    "country": "RU"
+  },
+  "222.117.16.150": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "60.41.98.149": {
+    "asn": "AS4713",
+    "isp": "NTT Communications Corporation",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "119.70.219.13": {
+    "asn": "AS17858",
+    "isp": "LG POWERCOMM",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "1.176.241.219": {
+    "asn": "AS10066",
+    "isp": "LG HelloVision Corp.",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "42.119.21.89": {
+    "asn": "AS18403",
+    "isp": "FPT Telecom Company",
+    "net_type": "isp",
+    "country": "VN"
+  },
+  "32.219.224.248": {
+    "asn": "AS46690",
+    "isp": "Frontier Communications Solutions",
+    "net_type": "isp",
+    "country": "US"
+  },
+  "vpn868248289.opengw.net": {
+    "asn": "AS46690",
+    "isp": "Frontier Communications Solutions",
+    "net_type": "isp",
+    "country": "US",
+    "resolved_ip": "32.219.224.248"
+  },
+  "211.250.203.225": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "220.146.109.124": {
+    "asn": "AS4685",
+    "isp": "ASAHI Net, Inc.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "42.146.135.174": {
+    "asn": "AS9824",
+    "isp": "JCOM Co., Ltd.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "221.164.187.162": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "183.106.84.223": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "175.195.154.183": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "59.135.150.87": {
+    "asn": "AS2516",
+    "isp": "KDDI CORPORATION",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn506288440.opengw.net": {
+    "asn": "AS2516",
+    "isp": "KDDI CORPORATION",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "59.135.150.87"
+  },
+  "50.35.89.231": {
+    "asn": "AS20055",
+    "isp": "Wholesail networks LLC",
+    "net_type": "isp",
+    "country": "US"
+  },
+  "59.10.57.184": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn999209650.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "59.10.57.184"
+  },
+  "39.125.225.66": {
+    "asn": "AS9318",
+    "isp": "SK Broadband",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "121.163.152.115": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn486068759.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "121.163.152.115"
+  },
+  "165.154.22.183": {
+    "asn": "AS135377",
+    "isp": "UCLOUD INFORMATION TECHNOLOGY (HK) LIMITED",
+    "net_type": "datacenter",
+    "country": "HK"
+  },
+  "39.110.97.87": {
+    "asn": "AS2527",
+    "isp": "Sony Network Communications Inc.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "121.128.3.51": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "77.34.77.93": {
+    "asn": "AS12389",
+    "isp": "Primorye NET",
+    "net_type": "isp",
+    "country": "RU"
+  },
+  "152.32.192.43": {
+    "asn": "AS135377",
+    "isp": "UCLOUD INFORMATION TECHNOLOGY (HK) LIMITED",
+    "net_type": "datacenter",
+    "country": "HK"
+  },
+  "221.154.168.208": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "175.201.99.23": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn400016974.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "175.201.99.23"
+  },
+  "1.247.249.37": {
+    "asn": "AS9318",
+    "isp": "SK Broadband",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "220.148.188.98": {
+    "asn": "AS10010",
+    "isp": "TOKAI Communications Corporation",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "59.8.32.44": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "42.118.158.22": {
+    "asn": "AS18403",
+    "isp": "FPT Telecom Company",
+    "net_type": "isp",
+    "country": "VN"
+  },
+  "219.100.37.95": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "165.154.22.211": {
+    "asn": "AS135377",
+    "isp": "UCLOUD INFORMATION TECHNOLOGY (HK) LIMITED",
+    "net_type": "datacenter",
+    "country": "HK"
+  },
+  "152.32.212.221": {
+    "asn": "AS135377",
+    "isp": "UCLOUD INFORMATION TECHNOLOGY (HK) LIMITED",
+    "net_type": "datacenter",
+    "country": "HK"
+  },
+  "121.164.146.116": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "126.79.124.253": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "211.217.149.195": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "49.165.136.156": {
+    "asn": "AS17858",
+    "isp": "LG POWERCOMM",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "61.79.77.34": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "60.127.235.152": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "116.82.233.100": {
+    "asn": "AS2527",
+    "isp": "Sony Network Communications Inc.",
+    "net_type": "isp",
+    "country": "JP"
   }
 }

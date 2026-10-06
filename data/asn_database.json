@@ -1082,7 +1082,20 @@
     "JSC Redcom-Internet": "AS8749",
     "Community Network Center Incorporated.": "AS17698",
     "STNet, Incorporated": "AS7522",
-    "Unitary enterprise A1": "AS42772"
+    "Unitary enterprise A1": "AS42772",
+    "SoftEther": "AS36599",
+    "JCOM Co., Ltd.": "AS9824",
+    "Primorye NET": "AS12389",
+    "NTT Communications Corporation": "AS4713",
+    "Cable Networks Akita Co., ltd.": "AS23783",
+    "UCLOUD INFORMATION TECHNOLOGY (HK) LIMITED": "AS135377",
+    "LG POWERCOMM": "AS17858",
+    "LG HelloVision Corp.": "AS10066",
+    "FPT Telecom Company": "AS18403",
+    "Frontier Communications Solutions": "AS46690",
+    "ASAHI Net, Inc.": "AS4685",
+    "Wholesail networks LLC": "AS20055",
+    "TOKAI Communications Corporation": "AS10010"
   },
   "asn_to_isp": {
     "AS174": "Cogent Communications, LLC",
@@ -2104,7 +2117,20 @@
     "AS8749": "JSC Redcom-Internet",
     "AS17698": "Community Network Center Incorporated.",
     "AS7522": "STNet, Incorporated",
-    "AS42772": "Unitary enterprise A1"
+    "AS42772": "Unitary enterprise A1",
+    "AS36599": "SoftEther",
+    "AS9824": "JCOM Co., Ltd.",
+    "AS12389": "Primorye NET",
+    "AS4713": "NTT Communications Corporation",
+    "AS23783": "Cable Networks Akita Co., ltd.",
+    "AS135377": "UCLOUD INFORMATION TECHNOLOGY (HK) LIMITED",
+    "AS17858": "LG POWERCOMM",
+    "AS10066": "LG HelloVision Corp.",
+    "AS18403": "FPT Telecom Company",
+    "AS46690": "Frontier Communications Solutions",
+    "AS4685": "ASAHI Net, Inc.",
+    "AS20055": "Wholesail networks LLC",
+    "AS10010": "TOKAI Communications Corporation"
   },
   "asn_to_net_type": {
     "AS1311": "banking",
@@ -4326,6 +4352,8 @@
     "AS401479": "datacenter",
     "AS402279": "datacenter",
     "AS402429": "datacenter",
-    "AS402681": "datacenter"
+    "AS402681": "datacenter",
+    "AS10066": "isp",
+    "AS46690": "isp"
   }
 }
