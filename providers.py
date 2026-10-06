@@ -426,6 +426,11 @@ def save_asn_database(
             if re.match(r"^AS\d+$", asn_code) and net_type in VALID_NET_TYPES:
                 clean_a2nt[asn_code] = net_type
 
+        # 自愈补齐：若 clean_a2i 中的 ASN 尚未被 clean_a2nt 分类，自动利用 classify_asn 补齐网络类型，确保 100% 覆盖
+        for asn_code, isp_name in clean_a2i.items():
+            if asn_code not in clean_a2nt:
+                clean_a2nt[asn_code] = classify_asn(asn_code, isp_name)
+
         # 5. 保存前进行硬错误阻断校验
         val_errors, _ = validate_asn_database({
             "isp_to_asn": clean_i2a,
@@ -843,7 +848,6 @@ def resolve_asn_batch_online(
             headers={"Content-Type": "application/json", "User-Agent": "Mozilla/5.0 (compatible; tg-proxy-fetcher/2.0)"},
         )
 
-        chunk_success = False
         x_rl = None
         x_ttl = None
 
@@ -856,7 +860,6 @@ def resolve_asn_batch_online(
                 x_ttl = safe_int(headers.get("X-Ttl"), -1)
 
                 if isinstance(data_list, list):
-                    chunk_success = True
                     for item in data_list:
                         query_ip = (item.get("query") or "").strip()
                         if not query_ip:

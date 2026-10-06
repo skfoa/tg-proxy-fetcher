@@ -11,7 +11,7 @@ on:
         required: false
         default: "3"
       cf_check_endpoint:
-        description: "SSTP 出口检测端点 URL (需自行部署 CF-Workers-CheckSocks5，留空则不执行外部检测)"
+        description: "SSTP 出口检测端点 URL (需自行部署 CF-Workers-CheckSocks5，仅对 proxies_verify 生效，留空则不执行外部检测)"
         required: false
         default: ""
 
@@ -43,7 +43,7 @@ jobs:
         run: |
           python -m py_compile *.py
           pip install ruff
-          ruff check . --select F82
+          ruff check . --select F,E9 --ignore E501
           python providers.py --validate
           python -m unittest discover -s tests
 

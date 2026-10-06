@@ -28,8 +28,6 @@ from providers import (
     normalize_timestamp,
     classify_asn,
     save_scan_ips_by_asn,
-    ASN_TO_PROVIDER,
-    safe_int,
     PROXY_CSV_FIELDS,
     save_proxies_csv,
     save_proxies_json,
@@ -652,8 +650,6 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
         from providers import (
             resolve_asn_batch_online,
             is_valid_public_ip,
-            load_ip_cache,
-            save_ip_cache,
         )
         from unittest.mock import patch, MagicMock
         import json
@@ -878,8 +874,6 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
             save_asn_database,
             load_asn_database,
             resolve_asn_batch_online,
-            ASN_EXACT_NET_TYPE,
-            ASN_DATABASE_ASN_TO_NET_TYPE,
         )
         from unittest.mock import patch, MagicMock
 
