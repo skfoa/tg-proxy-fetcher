@@ -15,6 +15,7 @@ import os
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch, MagicMock, AsyncMock
 
 # 确保导入根目录模块
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -80,11 +81,25 @@ class TestProviders(unittest.TestCase):
     def setUpClass(cls):
         # 确保关键测试用的静态映射在内存中存在（防御外部 JSON 漂移与环境隔离, T1）
         from providers import ASN_DATABASE_ASN_TO_ISP, ASN_DATABASE_ISP_TO_ASN, ASN_TO_PROVIDER
+        cls._orig_a2i = dict(ASN_DATABASE_ASN_TO_ISP)
+        cls._orig_i2a = dict(ASN_DATABASE_ISP_TO_ASN)
+        cls._orig_a2p = dict(ASN_TO_PROVIDER)
         ASN_DATABASE_ASN_TO_ISP["AS63023"] = "Ipxo LLC"
         ASN_TO_PROVIDER["AS63023"] = "Ipxo LLC"
         ASN_DATABASE_ISP_TO_ASN["MobileOne Ltd. Mobile/Internet Service Provider Singapore"] = "AS4773"
         ASN_DATABASE_ASN_TO_ISP["AS4773"] = "M1 LIMITED"
         ASN_TO_PROVIDER["AS4773"] = "M1 LIMITED"
+
+    @classmethod
+    def tearDownClass(cls):
+        # 严格恢复全局字典，确保跨测试类不发生状态泄漏与污染
+        from providers import ASN_DATABASE_ASN_TO_ISP, ASN_DATABASE_ISP_TO_ASN, ASN_TO_PROVIDER
+        ASN_DATABASE_ASN_TO_ISP.clear()
+        ASN_DATABASE_ASN_TO_ISP.update(cls._orig_a2i)
+        ASN_DATABASE_ISP_TO_ASN.clear()
+        ASN_DATABASE_ISP_TO_ASN.update(cls._orig_i2a)
+        ASN_TO_PROVIDER.clear()
+        ASN_TO_PROVIDER.update(cls._orig_a2p)
 
     def test_format_asn_isp_authoritative(self):
         # Cloudflare 权威已知库反查
@@ -168,10 +183,10 @@ class TestProviders(unittest.TestCase):
         iso_str = "2026-10-01 12:30:45"
         self.assertEqual(normalize_timestamp(iso_str), iso_str)
 
-        # 毫秒时间戳转换
+        # 毫秒时间戳转换（精确定位转换后时间字符串）
         ms_ts = "1727784000000"
         converted = normalize_timestamp(ms_ts)
-        self.assertTrue(converted.startswith("2024-") or converted.startswith("202"))
+        self.assertEqual(converted, "2024-10-01 20:00:00")
 
     def test_classify_asn(self):
         # 权威 exact_net_type
@@ -411,7 +426,6 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
     def test_probe_single_and_parse_proxy_url_egress_ip(self):
         from proxies_verify import parse_proxy_url, probe_single
         import asyncio
-        from unittest.mock import patch
 
         # 1. 验证 parse_proxy_url 默认包含 country, egress_ip, asn, isp, net_type
         parsed = parse_proxy_url("socks5://1.2.3.4:1080")
@@ -456,7 +470,7 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
     def test_probe_turn_and_sstp_return_resolved_egress_ip(self):
         from proxies_verify import probe_turn, probe_sstp
         import asyncio
-        from unittest.mock import patch, AsyncMock, MagicMock
+        from unittest.mock import AsyncMock
 
         async def _test():
             # 1. Mock TURN connection
@@ -478,7 +492,7 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
                 return mock_reader, mock_writer
 
             with patch("proxies_verify.resolve_domain_to_ip", return_value="93.184.216.34"), \
-                 patch("asyncio.open_connection", side_effect=_fake_turn_conn):
+                 patch("proxies_verify.asyncio.open_connection", side_effect=_fake_turn_conn):
                 alive, lat, status, colo, country, egress_ip = await probe_turn("stun.example.com", 3478)
                 self.assertTrue(alive)
                 self.assertEqual(egress_ip, "93.184.216.34")
@@ -494,7 +508,7 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
                 return mock_sstp_reader, mock_sstp_writer
 
             with patch("proxies_verify.resolve_domain_to_ip", return_value="93.184.216.35"), \
-                 patch("asyncio.open_connection", side_effect=_fake_sstp_conn):
+                 patch("proxies_verify.asyncio.open_connection", side_effect=_fake_sstp_conn):
                 alive, lat, status, colo, country, egress_ip = await probe_sstp("vpn.example.com", 443)
                 self.assertTrue(alive)
                 self.assertEqual(egress_ip, "93.184.216.35")
@@ -534,7 +548,7 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
     def test_sstp_cf_worker_stage2_verification(self):
         from proxies_verify import probe_single
         import asyncio
-        from unittest.mock import patch, AsyncMock
+        from unittest.mock import AsyncMock
 
         async def _test():
             sem = asyncio.Semaphore(10)
@@ -604,7 +618,6 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
     def test_enrich_proxies_metadata(self):
         from proxies_verify import enrich_proxies_metadata
         import asyncio
-        from unittest.mock import patch
 
         async def _test():
             survivors = [
@@ -633,7 +646,7 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
                     return "AS34343", "Eweka Internet Services B.V."
                 return "", ""
 
-            with patch("proxies_verify.resolve_asn_online_async", side_effect=_mock_resolve):
+            with patch("proxies_verify.resolve_asn_online_async", new_callable=AsyncMock, side_effect=_mock_resolve):
                 stats = await enrich_proxies_metadata(survivors)
                 self.assertEqual(survivors[0]["asn"], "AS34343 Eweka Internet Services B.V.")
                 self.assertEqual(survivors[0]["isp"], "Eweka Internet Services B.V.")
@@ -651,7 +664,6 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
             resolve_asn_batch_online,
             is_valid_public_ip,
         )
-        from unittest.mock import patch, MagicMock
         import json
 
         # 1. IP 鉴真工具测试
@@ -703,7 +715,6 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
 
     def test_doh_and_domain_resolution(self):
         from providers import doh_resolve_public_ip, resolve_domain_to_ip
-        from unittest.mock import patch, MagicMock
         import json
 
         # 1. 模拟 DoH 成功解析 A 记录
@@ -717,15 +728,19 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
         mock_resp.read.return_value = json.dumps(fake_doh_resp).encode("utf-8")
         mock_resp.__enter__.return_value = mock_resp
 
-        with patch("urllib.request.urlopen", return_value=mock_resp):
-            ip = doh_resolve_public_ip("test.opengw.net")
-            self.assertEqual(ip, "219.100.37.30")
-
-        # 2. 模拟 socket.gethostbyname 返回受污染回环 IP 时，自动回退到 DoH
-        with patch("socket.gethostbyname", return_value="127.236.0.63"):
+        resolve_domain_to_ip.cache_clear()
+        try:
             with patch("urllib.request.urlopen", return_value=mock_resp):
-                ip = resolve_domain_to_ip("test.opengw.net")
+                ip = doh_resolve_public_ip("test.opengw.net")
                 self.assertEqual(ip, "219.100.37.30")
+
+            # 2. 模拟 socket.gethostbyname 返回受污染回环 IP 时，自动回退到 DoH
+            with patch("socket.gethostbyname", return_value="127.236.0.63"):
+                with patch("urllib.request.urlopen", return_value=mock_resp):
+                    ip = resolve_domain_to_ip("test.opengw.net")
+                    self.assertEqual(ip, "219.100.37.30")
+        finally:
+            resolve_domain_to_ip.cache_clear()
 
     def test_parse_cf_ip_speed_units(self):
         from parsers import parse_cf_ip
@@ -772,7 +787,6 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
         self.assertEqual(items[1]["delay_ms"], 120)
 
     def test_scrape_channel_web_order_and_cutoff(self):
-        from unittest.mock import patch
         from datetime import datetime, timezone
         from tg_fetch import scrape_channel_web
 
@@ -875,7 +889,6 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
             load_asn_database,
             resolve_asn_batch_online,
         )
-        from unittest.mock import patch, MagicMock
 
         # 1. 异构字段归一化测试 (不同第三方查询源字段映射与清洗)
         asn1, isp1, type1 = normalize_external_asn_info("AS13335 Cloudflare, Inc.", "Cloudflare, Inc.")
@@ -958,22 +971,38 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
             mock_resp.headers = {"X-Rl": "10", "X-Ttl": "60"}
             mock_resp.__enter__.return_value = mock_resp
 
-            with patch("urllib.request.urlopen", return_value=mock_resp):
-                results = resolve_asn_batch_online(
-                    ["184.178.172.18"],
-                    persist=True,
-                    db_path=db_path,
-                    cache_path=cache_path,
-                )
-                self.assertIn("184.178.172.18", results)
-                res_asn, res_isp = results["184.178.172.18"]
-                self.assertEqual(res_asn, "AS77777")
+            from providers import (
+                ASN_DATABASE_ISP_TO_ASN,
+                ASN_DATABASE_ASN_TO_ISP,
+                ASN_DATABASE_ASN_TO_NET_TYPE,
+            )
+            orig_i2a = dict(ASN_DATABASE_ISP_TO_ASN)
+            orig_a2i = dict(ASN_DATABASE_ASN_TO_ISP)
+            orig_a2nt = dict(ASN_DATABASE_ASN_TO_NET_TYPE)
+            try:
+                with patch("urllib.request.urlopen", return_value=mock_resp):
+                    results = resolve_asn_batch_online(
+                        ["184.178.172.18"],
+                        persist=True,
+                        db_path=db_path,
+                        cache_path=cache_path,
+                    )
+                    self.assertIn("184.178.172.18", results)
+                    res_asn, res_isp = results["184.178.172.18"]
+                    self.assertEqual(res_asn, "AS77777")
 
-                # 验证磁盘文件已自动持久化收录新 ASN 及其网络类型
-                with open(db_path, "r", encoding="utf-8") as f:
-                    disk_db = json.load(f)
-                self.assertIn("AS77777", disk_db.get("asn_to_net_type", {}))
-                self.assertEqual(disk_db["asn_to_net_type"]["AS77777"], "isp")
+                    # 验证磁盘文件已自动持久化收录新 ASN 及其网络类型
+                    with open(db_path, "r", encoding="utf-8") as f:
+                        disk_db = json.load(f)
+                    self.assertIn("AS77777", disk_db.get("asn_to_net_type", {}))
+                    self.assertEqual(disk_db["asn_to_net_type"]["AS77777"], "isp")
+            finally:
+                ASN_DATABASE_ISP_TO_ASN.clear()
+                ASN_DATABASE_ISP_TO_ASN.update(orig_i2a)
+                ASN_DATABASE_ASN_TO_ISP.clear()
+                ASN_DATABASE_ASN_TO_ISP.update(orig_a2i)
+                ASN_DATABASE_ASN_TO_NET_TYPE.clear()
+                ASN_DATABASE_ASN_TO_NET_TYPE.update(orig_a2nt)
 
 
 if __name__ == "__main__":
