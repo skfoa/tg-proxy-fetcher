@@ -118,16 +118,16 @@ def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
             # 缺乏单位时启发式判定：主流 CF 测速工具（如 CloudflareST）小数值 (< 50) 通常为 MB/s，大数值通常为 kB/s
             unit = "mb/s" if val < 50 else "kb/s"
 
-        if "gb" in unit or unit == "g":
-            val *= 1024 * 1024
-        elif "gbps" in unit or "gb/s" in unit:
+        if "gbps" in unit or "gb/s" in unit:
             val *= (1024 * 1024) / 8 if "bps" in unit else (1024 * 1024)
-        elif "mbps" in unit:
-            val *= 1024 / 8
+        elif "gb" in unit or unit == "g":
+            val *= 1024 * 1024
+        elif "mbps" in unit or "mb/s" in unit:
+            val *= (1024 / 8) if "bps" in unit else 1024
         elif "mb" in unit or unit == "m":
             val *= 1024
-        elif "kbps" in unit:
-            val /= 8
+        elif "kbps" in unit or "kb/s" in unit:
+            val = (val / 8) if "bps" in unit else val
         elif "kb" in unit or unit == "k":
             pass
         elif "bps" in unit:
@@ -253,14 +253,11 @@ def parse_cf_csv_content(
                 elif len(row) == 2:
                     val = row[1].strip()
                     if fn_port:
-                        # 若行内第二列也是合法端口且与文件名端口不同，优先信任行内数据；否则以文件名端口为准，第二列作为延迟
-                        if val.isdigit() and 1 <= int(val) <= 65535 and val != fn_port:
-                            raw_port = val
-                        else:
-                            raw_port = raw_port or fn_port
-                            raw_delay = val
+                        # 文件名已显式指定端口（如 proxyip-443.csv），第二列为延迟数值，端口继承自文件名端口
+                        raw_port = raw_port or fn_port
+                        raw_delay = val
                     else:
-                        # 若为合法的端口数值范围 (1-65535)，优先作为端口；否则作为延迟
+                        # 文件名未指定端口时，若第二列为合法的端口数值范围 (1-65535)，优先作为端口；否则作为延迟
                         if val.isdigit() and 1 <= int(val) <= 65535:
                             raw_port = val
                         else:

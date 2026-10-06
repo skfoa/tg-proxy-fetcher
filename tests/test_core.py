@@ -201,6 +201,9 @@ class TestProviders(unittest.TestCase):
         self.assertEqual(classify_asn("AS24168", "CERNET2"), "education")
         # 银行金融专网
         self.assertEqual(classify_asn("AS138139", "Reserve Bank of Australia"), "banking")
+        # 短词包含测试（防止 colorado 误中 colo、ghost 误中 host 机房排除）
+        self.assertEqual(classify_asn("", "Colorado Consumer Broadband"), "isp")
+        self.assertEqual(classify_asn("", "Ghost Networks Consumer Broadband"), "isp")
 
 
 class TestTgFetchWorkflow(unittest.TestCase):
@@ -748,6 +751,29 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
         res_post = parse_cf_ip(text_post)
         self.assertIsNotNone(res_post)
         self.assertEqual(res_post["speed_kbs"], int(12.5 * 1024))
+
+        # 4. Gbps 与 Mbps 单位按位除 8 换算（防止包含 gb 子串被高估 8 倍）
+        text_gbps = "节点测试\nIP地址: 1.1.1.1\n端口: 443\n下载速度: 12 Gbps"
+        res_gbps = parse_cf_ip(text_gbps)
+        self.assertIsNotNone(res_gbps)
+        self.assertEqual(res_gbps["speed_kbs"], int(12 * 1024 * 1024 / 8))
+
+        text_mbps = "节点测试\nIP地址: 1.1.1.1\n端口: 443\n下载速度: 100 Mbps"
+        res_mbps = parse_cf_ip(text_mbps)
+        self.assertIsNotNone(res_mbps)
+        self.assertEqual(res_mbps["speed_kbs"], int(100 * 1024 / 8))
+
+    def test_parse_cf_csv_content_2col_disambiguation(self):
+        from parsers import parse_cf_csv_content
+
+        # 当文件名已指定端口时，2 列无表头 CSV 的第二列数值应判定为延迟，严禁误判为端口
+        csv_2col = "1.1.1.1,50\n2.2.2.2,120\n"
+        items = parse_cf_csv_content(csv_2col, filename="proxyip-443.csv")
+        self.assertEqual(len(items), 2)
+        self.assertEqual(items[0]["port"], "443")
+        self.assertEqual(items[0]["delay_ms"], 50)
+        self.assertEqual(items[1]["port"], "443")
+        self.assertEqual(items[1]["delay_ms"], 120)
 
     def test_scrape_channel_web_order_and_cutoff(self):
         from unittest.mock import patch

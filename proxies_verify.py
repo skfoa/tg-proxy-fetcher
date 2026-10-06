@@ -1201,10 +1201,15 @@ async def enrich_existing_proxies_file(
             parsed = parse_proxy_url(url)
             if not parsed:
                 continue
-            parsed.update(r)
-            parsed["fail_count"] = safe_int(r.get("fail_count"), 0)
-            parsed["delay_ms"] = safe_int(r.get("delay_ms"), 0)
-            rows.append(parsed)
+            item = dict(r)
+            item.setdefault("user", parsed.get("user", ""))
+            item.setdefault("pwd", parsed.get("pwd", ""))
+            item["host"] = parsed["host"]
+            item["port"] = parsed["port"]
+            item["proto"] = parsed["proto"]
+            item["fail_count"] = safe_int(r.get("fail_count"), 0)
+            item["delay_ms"] = safe_int(r.get("delay_ms"), 0)
+            rows.append(item)
 
     log.info("【全量 ASN 补全模式】从 %s 读取到 %d 个现有节点", csv_path, len(rows))
     net_stats = await enrich_proxies_metadata(rows)

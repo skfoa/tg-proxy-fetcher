@@ -1274,10 +1274,16 @@ def send_tg_message(text: str, token: str = "", chat_id: str = "", tag: str = "T
                 logging.getLogger(tag).info("✅ %s 统计卡片已成功发送！", tag)
                 return True
             else:
-                logging.getLogger(tag).warning("%s 消息发送失败: %s", tag, data.get("description") or data)
+                desc = str(data.get("description") or data)
+                if t and t in desc:
+                    desc = desc.replace(t, "bot***")
+                logging.getLogger(tag).warning("%s 消息发送失败: %s", tag, desc)
                 return False
     except Exception as e:
-        logging.getLogger(tag).warning("发送 %s 消息时出现异常: %s", tag, e)
+        err_msg = str(e)
+        if t and t in err_msg:
+            err_msg = err_msg.replace(t, "bot***")
+        logging.getLogger(tag).warning("发送 %s 消息时出现异常: %s", tag, err_msg)
         return False
 
 
@@ -2182,8 +2188,16 @@ def classify_asn(asn_str: str | None, isp_str: str | None = "") -> str:
     if any(p in text for p in BANKING_PATTERNS):
         return "banking"
 
-    # 4. 排除机房/主机商
-    is_hosting = any(h in text for h in HOSTING_EXCLUSIONS)
+    # 4. 排除机房/主机商（对短词如 host/vps/colo 使用独立单词边界匹配，杜绝 ghost/colorado 等合法运营商词根误杀）
+    is_hosting = False
+    for h in HOSTING_EXCLUSIONS:
+        if len(h) <= 4:
+            if re.search(rf"\b{re.escape(h)}\b", text, re.IGNORECASE):
+                is_hosting = True
+                break
+        elif h in text:
+            is_hosting = True
+            break
 
     # 5. 识别商业专线
     if any(p in text for p in BIZ_PATTERNS) and not is_hosting:

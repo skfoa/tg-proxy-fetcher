@@ -33,7 +33,7 @@ def detect_local_proxy():
                 host, port = val_clean.split(':', 1)
                 try:
                     p_type = 'socks5' if ('socks5' in val.lower() or 'socks5h' in val.lower()) else 'http'
-                    return (p_type, host, int(port), True) if p_type == 'socks5' else (p_type, host, int(port))
+                    return (p_type, host, int(port), True if p_type == 'socks5' else False)
                 except ValueError:
                     pass
 
@@ -60,7 +60,7 @@ def detect_local_proxy():
                         if resp == b'\x05\x00':
                             return ('socks5', '127.0.0.1', port, True)
                     else:
-                        return (p_type, '127.0.0.1', port)
+                        return (p_type, '127.0.0.1', port, False)
         except Exception:
             pass
 
