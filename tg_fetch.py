@@ -122,6 +122,8 @@ DEFAULT_SUB_URLS = [
 
 def _parse_sub_urls() -> list[str]:
     raw_val = (os.getenv("SUB_URLS") or "").strip()
+    if raw_val.lower() in ("none", "off", "disable", "false", "0"):
+        return []
     if not raw_val:
         return list(DEFAULT_SUB_URLS)
     urls = []
