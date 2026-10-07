@@ -13695,5 +13695,135 @@
     "isp": "Sony Network Communications Inc.",
     "net_type": "isp",
     "country": "JP"
+  },
+  "203.112.55.113": {
+    "asn": "AS7522",
+    "isp": "STNet, Incorporated",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn104312461.opengw.net": {
+    "asn": "AS7522",
+    "isp": "STNet, Incorporated",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "203.112.55.113"
+  },
+  "218.159.15.106": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn690489070.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "218.159.15.106"
+  },
+  "27.83.64.102": {
+    "asn": "AS2516",
+    "isp": "KDDI CORPORATION",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn957276198.opengw.net": {
+    "asn": "AS2516",
+    "isp": "KDDI CORPORATION",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "27.83.64.102"
+  },
+  "126.79.105.117": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn432121661.opengw.net": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "126.79.105.117"
+  },
+  "47.143.57.132": {
+    "asn": "AS5650",
+    "isp": "Frontier Communications of America, Inc.",
+    "net_type": "isp",
+    "country": "US"
+  },
+  "vpn932993769.opengw.net": {
+    "asn": "AS5650",
+    "isp": "Frontier Communications of America, Inc.",
+    "net_type": "isp",
+    "country": "US",
+    "resolved_ip": "47.143.57.132"
+  },
+  "126.109.82.237": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn392743991.opengw.net": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "126.109.82.237"
+  },
+  "5.143.55.214": {
+    "asn": "AS12389",
+    "isp": "Primorye NET",
+    "net_type": "isp",
+    "country": "RU"
+  },
+  "vpn902826727.opengw.net": {
+    "asn": "AS12389",
+    "isp": "Primorye NET",
+    "net_type": "isp",
+    "country": "RU",
+    "resolved_ip": "5.143.55.214"
+  },
+  "119.170.233.13": {
+    "asn": "AS9824",
+    "isp": "JCOM Co., Ltd.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn402080134.opengw.net": {
+    "asn": "AS9824",
+    "isp": "JCOM Co., Ltd.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "119.170.233.13"
+  },
+  "112.70.66.3": {
+    "asn": "AS17511",
+    "isp": "OPTAGE Inc.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn908225336.opengw.net": {
+    "asn": "AS17511",
+    "isp": "OPTAGE Inc.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "112.70.66.3"
+  },
+  "117.18.129.79": {
+    "asn": "AS9351",
+    "isp": "ZTV CO.,LTD",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn173902462.opengw.net": {
+    "asn": "AS9351",
+    "isp": "ZTV CO.,LTD",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "117.18.129.79"
   }
 }
