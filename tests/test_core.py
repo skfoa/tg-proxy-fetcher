@@ -615,6 +615,59 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
 
         asyncio.run(_test())
 
+    def test_cf_executor_lifecycle_and_cli_concurrency(self):
+        import proxies_verify
+        from unittest.mock import patch
+
+        # 1. 测试执行器生命周期与惰性初始化
+        proxies_verify.shutdown_cf_check_executor(wait=True)
+        self.assertIsNone(proxies_verify._CF_CHECK_EXECUTOR)
+
+        executor = proxies_verify.get_cf_check_executor(max_workers=24)
+        self.assertIsNotNone(executor)
+        self.assertEqual(executor._max_workers, 24)
+
+        # 2. 测试幂等关闭与防御 None 保护
+        proxies_verify.shutdown_cf_check_executor(wait=True)
+        self.assertIsNone(proxies_verify._CF_CHECK_EXECUTOR)
+        # 再次调用绝不抛出异常
+        proxies_verify.shutdown_cf_check_executor(wait=False)
+        self.assertIsNone(proxies_verify._CF_CHECK_EXECUTOR)
+
+        # 3. 测试 CLI 参数 --cf-concurrency 流向与同步 (enrich-only 模式)
+        with patch.object(sys, "argv", ["proxies_verify.py", "--cf-concurrency", "48", "--enrich-only"]):
+            with patch("proxies_verify.enrich_existing_proxies_file") as mock_enrich:
+                mock_enrich.return_value = None
+                proxies_verify.main()
+                self.assertEqual(proxies_verify.CF_CONCURRENCY, 48)
+
+        # 4. 测试完整调度路径：CLI -> main -> async_main -> get_cf_check_executor(max_workers=50) -> finally 关闭
+        # 拦截 shutdown，捕获 async_main 实际初始化的线程池 max_workers
+        from unittest.mock import AsyncMock
+        real_shutdown = proxies_verify.shutdown_cf_check_executor
+        captured_workers = None
+
+        def fake_shutdown(wait=False, cancel_futures=True):
+            nonlocal captured_workers
+            if proxies_verify._CF_CHECK_EXECUTOR is not None:
+                captured_workers = proxies_verify._CF_CHECK_EXECUTOR._max_workers
+            real_shutdown(wait=wait, cancel_futures=cancel_futures)
+
+        with patch.object(sys, "argv", ["proxies_verify.py", "--cf-concurrency", "50", "--cf-check-endpoint", "https://check.example.com", "--no-notify"]), \
+             patch("proxies_verify.load_proxies_data", return_value=[{"proto": "socks5", "host": "1.1.1.1", "port": 1080}]), \
+             patch("proxies_verify.probe_single", new_callable=AsyncMock, return_value={"proto": "socks5", "is_alive": True, "delay_ms": 10}), \
+             patch("proxies_verify.enrich_proxies_metadata", new_callable=AsyncMock, return_value={}), \
+             patch("proxies_verify.save_proxies_data"), \
+             patch("proxies_verify.shutdown_cf_check_executor", side_effect=fake_shutdown):
+            proxies_verify.main()
+
+        self.assertEqual(captured_workers, 50)
+        self.assertEqual(proxies_verify.CF_CONCURRENCY, 50)
+        self.assertIsNone(proxies_verify._CF_CHECK_EXECUTOR)
+
+        # 清理恢复默认
+        proxies_verify.shutdown_cf_check_executor(wait=True)
+
     def test_enrich_proxies_metadata(self):
         from proxies_verify import enrich_proxies_metadata
         import asyncio

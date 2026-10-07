@@ -20,7 +20,9 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import atexit
 import base64
+import concurrent.futures
 import csv
 import json
 import logging
@@ -104,6 +106,44 @@ MAX_FAILS = 3
 CSV_FIELDS = PROXY_CSV_FIELDS
 
 CF_CHECK_ENDPOINT = os.getenv("CF_CHECK_ENDPOINT", "").strip()
+CF_CONCURRENCY = safe_int(os.getenv("CF_CONCURRENCY"), 32)
+_CF_CHECK_EXECUTOR: concurrent.futures.ThreadPoolExecutor | None = None
+
+
+def get_cf_check_executor(max_workers: int | None = None) -> concurrent.futures.ThreadPoolExecutor:
+    """获取或惰性初始化 Cloudflare Worker SSTP 质检专用高并发线程池"""
+    global _CF_CHECK_EXECUTOR
+    if _CF_CHECK_EXECUTOR is None:
+        workers = max_workers if max_workers is not None else CF_CONCURRENCY
+        _CF_CHECK_EXECUTOR = concurrent.futures.ThreadPoolExecutor(
+            max_workers=max(1, workers),
+            thread_name_prefix="cf_worker",
+        )
+    return _CF_CHECK_EXECUTOR
+
+
+def shutdown_cf_check_executor(wait: bool = False, cancel_futures: bool = True) -> None:
+    """
+    关闭 Cloudflare Worker 质检线程池，释放线程资源。
+
+    【幂等设计与先后互斥说明】：
+    1. 正常执行退出时，main() 的 finally 块率先触发，传入 wait=True 优雅等待未决任务收尾，
+       并将全局 _CF_CHECK_EXECUTOR 置为 None；
+    2. 进程最终终止时触发 atexit 回调，后触发者检测到已为 None 则直接跳过，保证绝不重复关闭；
+    3. 若遇异常崩溃或 SIGINT 中断，finally 未能执行，则由 atexit 传入 wait=False 兜底强制丢弃未决任务，
+       确保 CI 环境不会因卡在远程 HTTP 超时而导致进程退出挂起。
+    """
+    global _CF_CHECK_EXECUTOR
+    if _CF_CHECK_EXECUTOR is not None:
+        try:
+            _CF_CHECK_EXECUTOR.shutdown(wait=wait, cancel_futures=cancel_futures)
+        except TypeError:
+            _CF_CHECK_EXECUTOR.shutdown(wait=wait)
+        _CF_CHECK_EXECUTOR = None
+
+
+# 注册退出回调，异常或中断时非阻塞强行释放（后触发者检测到 None 则跳过）
+atexit.register(shutdown_cf_check_executor, wait=False, cancel_futures=True)
 
 
 def normalize_endpoint(endpoint: str | None) -> str:
@@ -150,16 +190,20 @@ async def check_sstp_exit_cf_worker(
     user: str | None = None,
     pwd: str | None = None,
     timeout: float = 12.0,
+    executor: concurrent.futures.ThreadPoolExecutor | None = None,
 ) -> dict | None:
     """
     异步调用 Cloudflare Worker 端点针对存活的 SSTP 节点执行深层 PPP 隧道鉴真与出口 IP 探测。
+    使用独立的高并发 ThreadPoolExecutor 分派同步 HTTP 探测，打破默认 6 线程瓶颈。
     返回 Worker 返回的 dict 数据结构；若端点不可用、网络异常或超时，则返回 None（平滑回退，不阻断流程）。
     """
     clean_ep = normalize_endpoint(endpoint)
     if not clean_ep:
         return None
     proxy_url = build_sstp_url(host, port, user, pwd)
-    return await asyncio.to_thread(_sync_cf_check, clean_ep, proxy_url, timeout)
+    exec_pool = executor or get_cf_check_executor()
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(exec_pool, _sync_cf_check, clean_ep, proxy_url, timeout)
 
 
 # ---------- 协议探测实现 ----------
@@ -561,6 +605,7 @@ async def probe_single(
     http_timeout: float = HTTP_TIMEOUT,
     sstp_timeout: float = SSTP_TIMEOUT,
     cf_check_endpoint: str | None = None,
+    cf_executor: concurrent.futures.ThreadPoolExecutor | None = None,
 ) -> dict:
     """协议分流路由与执行"""
     async with sem:
@@ -589,7 +634,7 @@ async def probe_single(
             # 第二阶段：对本地初筛存活的 SSTP 节点调用 Cloudflare Worker 进行真实出口 IP 解析与全隧道 PPP 握手鉴真
             if is_alive and cf_check_endpoint:
                 cf_res = await check_sstp_exit_cf_worker(
-                    cf_check_endpoint, host, port, user, pwd
+                    cf_check_endpoint, host, port, user, pwd, executor=cf_executor
                 )
                 if cf_res is not None:
                     if cf_res.get("success"):
@@ -1027,8 +1072,15 @@ async def async_main(args):
         r.setdefault("_old_fc", safe_int(r.get("fail_count"), 0))
 
     cf_endpoint = normalize_endpoint(getattr(args, "cf_check_endpoint", CF_CHECK_ENDPOINT))
+    cf_concurrency = getattr(args, "cf_concurrency", CF_CONCURRENCY)
+    cf_executor = None
     if cf_endpoint:
-        log.info("SSTP 启用第二阶段 Cloudflare Worker 深度穿透鉴真与出口探测端点: %s", cf_endpoint)
+        cf_executor = get_cf_check_executor(max_workers=cf_concurrency)
+        log.info(
+            "SSTP 启用第二阶段 Cloudflare Worker 深度穿透鉴真与出口探测端点: %s (专用并发: %d)",
+            cf_endpoint,
+            cf_concurrency,
+        )
     else:
         log.info("SSTP 未配置外部检测端点，跳过第二阶段外部检测，采用本地解析直连出口（无外部依赖）")
 
@@ -1043,6 +1095,7 @@ async def async_main(args):
                 args.http_timeout,
                 args.sstp_timeout,
                 cf_check_endpoint=cf_endpoint,
+                cf_executor=cf_executor,
             )
         completed += 1
 
@@ -1219,8 +1272,15 @@ async def enrich_existing_proxies_file(
 
 
 def main():
+    global CF_CONCURRENCY
     parser = argparse.ArgumentParser(description="多协议通用代理连通性质检与淘汰引擎")
     parser.add_argument("--concurrency", type=int, default=CONCURRENCY, help=f"并发探测协程数 (默认 {CONCURRENCY})")
+    parser.add_argument(
+        "--cf-concurrency",
+        type=int,
+        default=CF_CONCURRENCY,
+        help=f"Cloudflare Worker 质检专用并发线程数 (默认 {CF_CONCURRENCY})",
+    )
     parser.add_argument("--max-fails", type=int, default=MAX_FAILS, help=f"连续失败淘汰阈值 (默认 {MAX_FAILS})")
     parser.add_argument("--strict", action="store_true", help="极致纯净模式 (只要失败 1 次立即剔除，等价于 --max-fails 1)")
     parser.add_argument("--timeout", type=float, default=TIMEOUT, help=f"单节点握手超时秒数 (默认 {TIMEOUT})")
@@ -1236,6 +1296,9 @@ def main():
     parser.add_argument("--enrich-only", action="store_true", help="仅对现有 proxies.csv 补全 ASN 与网络属性打标，跳过网络连通性探测")
     args = parser.parse_args()
 
+    # 显式将解析出的 CLI 参数同步回模块全局变量，确保各层级与直接引用处保持一致
+    CF_CONCURRENCY = args.cf_concurrency
+
     if args.enrich_only:
         log.info("🚀 启动 --enrich-only 模式：仅补全数据画像，跳过连通性测试")
         asyncio.run(enrich_existing_proxies_file())
@@ -1245,7 +1308,10 @@ def main():
         args.max_fails = 1
         log.info("🔥 启用了 --strict 【极致纯净模式】，淘汰阈值强制设为 1")
 
-    asyncio.run(async_main(args))
+    try:
+        asyncio.run(async_main(args))
+    finally:
+        shutdown_cf_check_executor(wait=True)
 
 
 if __name__ == "__main__":
