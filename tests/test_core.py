@@ -694,12 +694,16 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
                 },
             ]
 
-            async def _mock_resolve(ip, isp_hint="", persist=False):
-                if ip == "194.109.6.1":
-                    return "AS34343", "Eweka Internet Services B.V."
-                return "", ""
+            async def _mock_batch_resolve(ips, max_chunk_size=100, persist=True):
+                res = {}
+                for ip in ips:
+                    if ip == "194.109.6.1":
+                        res[ip] = ("AS34343", "Eweka Internet Services B.V.")
+                    else:
+                        res[ip] = ("", "")
+                return res
 
-            with patch("proxies_verify.resolve_asn_online_async", new_callable=AsyncMock, side_effect=_mock_resolve):
+            with patch("proxies_verify.resolve_asn_batch_online_async", new_callable=AsyncMock, side_effect=_mock_batch_resolve):
                 stats = await enrich_proxies_metadata(survivors)
                 self.assertEqual(survivors[0]["asn"], "AS34343 Eweka Internet Services B.V.")
                 self.assertEqual(survivors[0]["isp"], "Eweka Internet Services B.V.")

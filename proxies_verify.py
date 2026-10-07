@@ -57,7 +57,6 @@ from providers import (
     safe_close_writer,
     PROXY_CSV_FIELDS,
     LEGACY_DEFAULT_FIRST_SEEN,
-    resolve_asn_online_async,
     resolve_asn_batch_online_async,
     load_ip_cache,
     classify_asn,
@@ -828,34 +827,8 @@ async def enrich_proxies_metadata(survivors: list[dict], max_concurrency: int = 
 
     ip_cache: dict[str, tuple[str, str]] = {}
     if ip_to_resolve:
-        # 兼容单元测试 Mock: 若 resolve_asn_online_async 被打桩 Mock，则保持单点并发测试路径
-        is_mocked = (
-            hasattr(resolve_asn_online_async, "assert_called")
-            or getattr(resolve_asn_online_async, "_mock_self", None) is not None
-        )
-        if is_mocked:
-            sem = asyncio.Semaphore(max_concurrency)
-
-            async def _resolve(target_ip: str):
-                async with sem:
-                    try:
-                        asn_code, isp_name = await asyncio.wait_for(
-                            resolve_asn_online_async(target_ip, persist=False),
-                            timeout=4.0,
-                        )
-                        return target_ip, asn_code, isp_name
-                    except Exception as e:
-                        log.debug("在线反查 IP %s ASN 失败: %s", target_ip, e)
-                        return target_ip, "", ""
-
-            log.info("正在为 %d 个唯一出口 IP 在线解析 ASN 与网络类型 (Mock 兼容模式)...", len(ip_to_resolve))
-            tasks = [_resolve(ip) for ip in ip_to_resolve]
-            results = await asyncio.gather(*tasks)
-            for target_ip, asn_code, isp_name in results:
-                ip_cache[target_ip] = (asn_code, isp_name)
-        else:
-            log.info("正在为 %d 个唯一出口 IP/域名批量解析 ASN 与国家属性...", len(ip_to_resolve))
-            ip_cache = await resolve_asn_batch_online_async(list(ip_to_resolve))
+        log.info("正在为 %d 个唯一出口 IP/域名批量解析 ASN 与国家属性...", len(ip_to_resolve))
+        ip_cache = await resolve_asn_batch_online_async(list(ip_to_resolve))
 
     persistent_cache = load_ip_cache()
     net_stats: dict[str, int] = {}

@@ -322,14 +322,10 @@ def save_scan_txt(rows_or_groups, path: str = SCAN_TXT):
 
 
 def send_verify_notification(
-    cf_total: int,
     cf_pass: int,
-    cf_fail: int,
     cf_eliminated: int,
     cf_survivors: int,
-    scan_total: int,
     scan_pass: int,
-    scan_fail: int,
     scan_eliminated: int,
     scan_survivors: int,
     concurrency: int,
@@ -642,7 +638,6 @@ async def async_main(args):
     cf_rows = load_csv(CF_CSV)
     cf_total = len(cf_rows)
     cf_pass = 0
-    cf_fail = 0
     cf_eliminated = 0
     cf_survivors_len = 0
 
@@ -661,7 +656,6 @@ async def async_main(args):
         )
 
         cf_pass = sum(1 for r in cf_rows if safe_int(r.get("fail_count"), 0) == 0)
-        cf_fail = cf_total - cf_pass
         cf_survivors = [
             r for r in cf_rows
             if safe_int(r.get("fail_count"), 0) < args.max_fails and not r.get("_invalid")
@@ -701,7 +695,6 @@ async def async_main(args):
     scan_rows = load_csv(SCAN_CSV)
     scan_total = len(scan_rows)
     scan_pass = 0
-    scan_fail = 0
     scan_eliminated = 0
     scan_survivors_len = 0
     scan_f1 = 0
@@ -720,7 +713,6 @@ async def async_main(args):
         )
 
         scan_pass = sum(1 for r in scan_rows if safe_int(r.get("fail_count"), 0) == 0)
-        scan_fail = scan_total - scan_pass
         scan_survivors = [
             r for r in scan_rows
             if safe_int(r.get("fail_count"), 0) < args.max_fails and not r.get("_invalid")
@@ -771,14 +763,10 @@ async def async_main(args):
     log.info("全部优选 IP 两阶段校验流程圆满完成，总耗时 %.2f 秒 (单条缓冲: %d [新增: %d, 取消: %d] | 扫描缓冲: %d [新增: %d, 取消: %d])", elapsed, (cf_survivors_len - cf_pass), cf_buf_new, cf_buf_rec, (scan_survivors_len - scan_pass), scan_buf_new, scan_buf_rec)
 
     send_verify_notification(
-        cf_total=cf_total,
         cf_pass=cf_pass,
-        cf_fail=cf_fail,
         cf_eliminated=cf_eliminated,
         cf_survivors=cf_survivors_len,
-        scan_total=scan_total,
         scan_pass=scan_pass,
-        scan_fail=scan_fail,
         scan_eliminated=scan_eliminated,
         scan_survivors=scan_survivors_len,
         concurrency=args.concurrency,
