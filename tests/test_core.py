@@ -229,7 +229,7 @@ class TestTgFetchWorkflow(unittest.TestCase):
             with open(csv_path, "w", encoding="utf-8-sig", newline="") as f:
                 writer = csv.DictWriter(
                     f,
-                    fieldnames=["url", "fail_count", "delay_ms", "status", "colo", "egress_ip", "tested_at", "first_seen"],
+                    fieldnames=["url", "fail_count", "delay_ms", "status", "colo", "egress_ip", "first_seen"],
                 )
                 writer.writeheader()
                 # 记录 1 (健康度低: fail_count=2)
@@ -240,7 +240,6 @@ class TestTgFetchWorkflow(unittest.TestCase):
                     "status": "fail",
                     "colo": "",
                     "egress_ip": "",
-                    "tested_at": "2026-10-01 10:00:00",
                     "first_seen": "2026-09-01",
                 })
                 # 记录 2 (同 Key 更优: fail_count=0)
@@ -251,8 +250,7 @@ class TestTgFetchWorkflow(unittest.TestCase):
                     "status": "alive",
                     "colo": "SJC",
                     "egress_ip": "198.51.100.2",
-                    "tested_at": "2026-10-02 10:00:00",
-                    "first_seen": "2026-09-01",
+                    "first_seen": "2026-09-02",
                 })
                 # 记录 3 (已在墓碑中的已知死节点: 157.90.251.25:3478)
                 writer.writerow({
@@ -262,7 +260,6 @@ class TestTgFetchWorkflow(unittest.TestCase):
                     "status": "alive",
                     "colo": "",
                     "egress_ip": "157.90.251.25",
-                    "tested_at": "2026-10-01 12:00:00",
                     "first_seen": "2026-09-01",
                 })
 
@@ -359,7 +356,6 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
                     "asn": "AS13335 Cloudflare",
                     "isp": "Cloudflare, Inc.",
                     "net_type": "datacenter",
-                    "tested_at": "2026-10-03 12:00:00",
                     "first_seen": "2026-10-01 00:00:00",
                 }
             ]
@@ -386,6 +382,8 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
             self.assertTrue(os.path.isfile(socks5_json))
             with open(socks5_csv, "r", encoding="utf-8-sig") as f:
                 reader = csv.DictReader(f)
+                self.assertNotIn("tested_at", reader.fieldnames)
+                self.assertIn("first_seen", reader.fieldnames)
                 rows = list(reader)
                 self.assertEqual(len(rows), 1)
                 self.assertEqual(rows[0]["country"], "HK")

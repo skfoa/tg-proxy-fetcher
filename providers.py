@@ -1716,7 +1716,6 @@ PROXY_CSV_FIELDS = [
     "asn",
     "isp",
     "net_type",
-    "tested_at",
     "first_seen",
 ]
 
@@ -1885,7 +1884,6 @@ def save_proxies_by_protocol(rows: list, output_dir: str = "data/proxies") -> di
         row_dict.setdefault("asn", row_dict.get("asn", ""))
         row_dict.setdefault("isp", row_dict.get("isp", ""))
         row_dict.setdefault("net_type", row_dict.get("net_type", ""))
-        row_dict.setdefault("tested_at", row_dict.get("tested_at", ""))
         row_dict.setdefault("first_seen", row_dict.get("first_seen", "") or LEGACY_DEFAULT_FIRST_SEEN)
 
         if "host" not in row_dict or not row_dict["host"]:
@@ -2001,7 +1999,6 @@ def save_proxies_csv(rows: list, csv_path: str = "data/proxies.csv") -> int:
         row_dict.setdefault("asn", row_dict.get("asn", ""))
         row_dict.setdefault("isp", row_dict.get("isp", ""))
         row_dict.setdefault("net_type", row_dict.get("net_type", ""))
-        row_dict.setdefault("tested_at", row_dict.get("tested_at", ""))
         row_dict.setdefault("first_seen", row_dict.get("first_seen", "") or LEGACY_DEFAULT_FIRST_SEEN)
 
         if "host" not in row_dict or not row_dict["host"]:

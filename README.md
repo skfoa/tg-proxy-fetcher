@@ -256,7 +256,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 > - `datacenter`：常规数据中心/托管机房 ➔ 归入各国家/地区常规列表
 
 #### ③ 通用代理质检数据表（`data/proxies.csv`）
-*共 15 个字段，记录 SOCKS5/HTTP/HTTPS/TURN/SSTP 等通用代理应用层穿透结果、出口机房国家、出口真实 IP、自治系统 ASN、运营商 ISP 组织、原生家宽/数据中心属性、质检状态与首次收录生命周期：*
+*共 14 个字段，记录 SOCKS5/HTTP/HTTPS/TURN/SSTP 等通用代理应用层穿透结果、出口机房国家、出口真实 IP、自治系统 ASN、运营商 ISP 组织、原生家宽/数据中心属性、质检状态与首次收录生命周期：*
 
 | 字段 | 类型 | 说明 | 示例 |
 | :--- | :--- | :--- | :--- |
@@ -273,7 +273,6 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `asn` | 字符串 | 自治系统编号与运营商标准归属（一体化直观标签） | `AS13335 Cloudflare`、`AS34343 Eweka` |
 | `isp` | 字符串 | **【核心凭据】** 自治系统所属运营商 / 托管商组织名称（与 `proxyip.csv` 规范统一对齐） | `Cloudflare, Inc.`、`Eweka Internet Services B.V.` |
 | `net_type` | 字符串 | **【核心凭据】** 网络类型属性分类（`isp` 原生家宽 / `datacenter` 机房 / `business` 商业专线等） | `isp`、`datacenter` |
-| `tested_at` | 时间字符串 | 质检探测完成时间 | `2026-09-19 18:35:00` |
 | `first_seen` | 时间字符串 | 首次收录时间（以第一次抓取入库为准，永久不变，用于统计节点存活时长与长期可用性；注：针对 2026-10-01 前无此字段的历史旧节点，统一兼容赋予 2026-10-01 00:00:00 作为基准初值） | `2026-10-01 00:00:00` |
 
 ---

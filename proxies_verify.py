@@ -667,8 +667,6 @@ async def probe_single(
 
         row["is_alive"] = is_alive
         row["status"] = status
-        now_str = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
-        row["tested_at"] = now_str
 
         fc = safe_int(row.get("fail_count"), 0)
         row["_old_fc"] = fc
@@ -718,7 +716,6 @@ def parse_proxy_url(url: str) -> dict | None:
             "asn": "",
             "isp": "",
             "net_type": "",
-            "tested_at": "",
         }
     except Exception:
         return None
@@ -763,7 +760,6 @@ def load_proxies_data(
                     parsed["asn"] = r.get("asn", "")
                     parsed["isp"] = r.get("isp", "")
                     parsed["net_type"] = r.get("net_type", "")
-                    parsed["tested_at"] = r.get("tested_at", "")
                     parsed["first_seen"] = r.get("first_seen", "").strip() or LEGACY_DEFAULT_FIRST_SEEN
                     url_map[url] = parsed
             log.info("从 %s 加载已有记录 %d 条", target_csv, len(url_map))

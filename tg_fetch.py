@@ -234,17 +234,16 @@ def load_existing_proxies(
                         "asn": r.get("asn", ""),
                         "isp": r.get("isp", ""),
                         "net_type": r.get("net_type", ""),
-                        "tested_at": r.get("tested_at", ""),
                     }
                     csv_meta_by_url[u] = meta
                     for _, key in extract_proxies(u):
-                        # 若同 key 在 CSV 中存在多行历史记录，优选健康度更高 (fail_count 更低) 或更新 (tested_at 更近) 的记录
+                        # 若同 key 在 CSV 中存在多行历史记录，优选健康度更高 (fail_count 更低) 或更新 (first_seen 更近) 的记录
                         if key not in csv_meta_by_key:
                             csv_meta_by_key[key] = meta
                         else:
                             old = csv_meta_by_key[key]
                             if meta["fail_count"] < old["fail_count"] or (
-                                meta["fail_count"] == old["fail_count"] and meta["tested_at"] > old["tested_at"]
+                                meta["fail_count"] == old["fail_count"] and meta["first_seen"] > old["first_seen"]
                             ):
                                 csv_meta_by_key[key] = meta
         except Exception as e:
@@ -270,7 +269,6 @@ def load_existing_proxies(
                         "asn": meta.get("asn", ""),
                         "isp": meta.get("isp", ""),
                         "net_type": meta.get("net_type", ""),
-                        "tested_at": meta.get("tested_at", ""),
                     }
             if not existing and csv_meta_by_url:
                 log.warning(
@@ -303,7 +301,6 @@ def load_existing_proxies(
                             "asn": meta.get("asn", ""),
                             "isp": meta.get("isp", ""),
                             "net_type": meta.get("net_type", ""),
-                            "tested_at": meta.get("tested_at", ""),
                         }
         log.info("已加载本地已存代理节点: %d 个（历史有效节点全部保留）", len(existing))
     except Exception as e:
@@ -875,7 +872,6 @@ def merge_and_save(
                 "delay_ms": 0,
                 "status": "pending",
                 "colo": "",
-                "tested_at": "",
             }
 
     final_cf_ips = dict(existing_cf_ips)
