@@ -13825,5 +13825,300 @@
     "net_type": "isp",
     "country": "JP",
     "resolved_ip": "117.18.129.79"
+  },
+  "210.106.55.92": {
+    "asn": "AS17839",
+    "isp": "CJ-HELLOVISION",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn936948753.opengw.net": {
+    "asn": "AS17839",
+    "isp": "CJ-HELLOVISION",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "210.106.55.92"
+  },
+  "150.241.116.60": {
+    "asn": "AS215590",
+    "isp": "DpkgSoft International Limited",
+    "net_type": "datacenter",
+    "country": "DE"
+  },
+  "219.100.37.28": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "public-vpn-81.opengw.net": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "219.100.37.28"
+  },
+  "140.86.211.130": {
+    "asn": "AS31898",
+    "isp": "Oracle Cloud",
+    "net_type": "datacenter",
+    "country": "CH"
+  },
+  "60.36.27.254": {
+    "asn": "AS4713",
+    "isp": "NTT Communications Corporation",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn627911050.opengw.net": {
+    "asn": "AS4713",
+    "isp": "NTT Communications Corporation",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "60.36.27.254"
+  },
+  "vpn873142806.opengw.net": {
+    "asn": "AS4713",
+    "isp": "NTT Communications Corporation",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "60.36.27.254"
+  },
+  "119.228.182.208": {
+    "asn": "AS17511",
+    "isp": "OPTAGE Inc.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn814689310.opengw.net": {
+    "asn": "AS17511",
+    "isp": "OPTAGE Inc.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "119.228.182.208"
+  },
+  "125.140.216.198": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn494670279.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "125.140.216.198"
+  },
+  "42.118.99.28": {
+    "asn": "AS18403",
+    "isp": "FPT Telecom Company",
+    "net_type": "isp",
+    "country": "VN"
+  },
+  "vpn923730258.opengw.net": {
+    "asn": "AS18403",
+    "isp": "FPT Telecom Company",
+    "net_type": "isp",
+    "country": "VN",
+    "resolved_ip": "42.118.99.28"
+  },
+  "219.100.37.202": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "public-vpn-230.opengw.net": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "219.100.37.202"
+  },
+  "219.100.37.52": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "public-vpn-66.opengw.net": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "219.100.37.52"
+  },
+  "103.198.148.130": {
+    "asn": "AS134736",
+    "isp": "NTT MYANMAR CO., LTD.",
+    "net_type": "datacenter",
+    "country": "MM"
+  },
+  "vpn192397778.opengw.net": {
+    "asn": "AS134736",
+    "isp": "NTT MYANMAR CO., LTD.",
+    "net_type": "datacenter",
+    "country": "MM",
+    "resolved_ip": "103.198.148.130"
+  },
+  "31.77.202.216": {
+    "asn": "AS215590",
+    "isp": "DpkgSoft International Limited",
+    "net_type": "datacenter",
+    "country": "FI"
+  },
+  "60.93.146.33": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn969156711.opengw.net": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "60.93.146.33"
+  },
+  "120.142.213.196": {
+    "asn": "AS10036",
+    "isp": "DLIVE",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "94.141.161.213": {
+    "asn": "AS215590",
+    "isp": "DpkgSoft International Limited",
+    "net_type": "datacenter",
+    "country": "DE"
+  },
+  "219.100.37.18": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "public-vpn-0.opengw.net": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "219.100.37.18"
+  },
+  "58.140.198.138": {
+    "asn": "AS10036",
+    "isp": "DLIVE",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn456334502.opengw.net": {
+    "asn": "AS10036",
+    "isp": "DLIVE",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "58.140.198.138"
+  },
+  "219.100.37.220": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "public-vpn-228.opengw.net": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "219.100.37.220"
+  },
+  "219.100.37.61": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "public-vpn-117.opengw.net": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "219.100.37.61"
+  },
+  "219.100.37.1": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "public-vpn-37.opengw.net": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "219.100.37.1"
+  },
+  "126.122.106.171": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn223473667.opengw.net": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "126.122.106.171"
+  },
+  "144.24.247.19": {
+    "asn": "AS31898",
+    "isp": "Oracle Cloud",
+    "net_type": "datacenter",
+    "country": "CH"
+  },
+  "140.245.205.142": {
+    "asn": "AS31898",
+    "isp": "Oracle Cloud",
+    "net_type": "datacenter",
+    "country": "IN"
+  },
+  "79.76.41.110": {
+    "asn": "AS31898",
+    "isp": "Oracle Cloud",
+    "net_type": "datacenter",
+    "country": "SE"
+  },
+  "219.100.37.128": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "public-vpn-164.opengw.net": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "219.100.37.128"
+  },
+  "144.24.249.21": {
+    "asn": "AS31898",
+    "isp": "Oracle Cloud",
+    "net_type": "datacenter",
+    "country": "CH"
+  },
+  "60.56.40.4": {
+    "asn": "AS17511",
+    "isp": "OPTAGE Inc.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn858760053.opengw.net": {
+    "asn": "AS17511",
+    "isp": "OPTAGE Inc.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "60.56.40.4"
   }
 }
