@@ -1,4 +1,4 @@
-﻿ip,port,tls,delay_ms,speed_kbs,colo,cf_location,asn,isp,tested_at,channel,fail_count
+﻿ip,port,tls,delay_ms,speed_kbs,colo,cf_location,asn,isp,first_seen,channel,fail_count
 64.118.155.168,443,true,47,,SJC,北美洲 · 美国圣何塞,AS138997 Eons Data,Eons Data Communications Limited,2026-09-22 06:00:33,@danfeng_chat,0
 185.218.7.129,443,true,95,,SJC,北美洲 · 美国圣何塞,AS51089 SnapStack Limited,SnapStack Limited,2026-10-06 06:00:23,@danfeng_chat,0
 154.17.27.150,51888,true,96,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-09-17 06:00:33,@danfeng_chat,0

@@ -207,7 +207,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 
 ### 5. 数据表通用字段说明
 * 采用 `UTF-8-SIG` 编码，Windows Excel 直接双击打开不乱码。
-* 数值字段（`delay_ms`, `speed_kbs`）均为纯数字，并在保存时按**质检状态（`fail_count` 升序）、可用性与低延迟（`delay_ms` 升序）、测速探测时间（`tested_at` 降序）**执行多重稳定质量排序。
+* 数值字段（`delay_ms`, `speed_kbs`）均为纯数字，并在保存时按**质检状态（`fail_count` 升序）、可用性与低延迟（`delay_ms` 升序）、首次收录时间（`first_seen` 降序）**执行多重稳定质量排序。
 * 全项目共有 4 个核心 CSV 数据表，按用途与结构分为以下 3 大规范体系：
 
 #### ① 优选 IP 测速数据表（`data/cf_ips.csv`、`data/scan_ips.csv`）
@@ -224,7 +224,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `cf_location` | 字符串 | Cloudflare 落地地理位置 | `亚太 · 香港` |
 | `asn` | 字符串 | **【核心规范】** 『ASN 编号 + 服务商名称』一体化直观标签 | `AS400618 Prime Security Corp.` |
 | `isp` | 字符串 | 自治系统所属运营商 / 托管商组织名称 | `Prime Security Corp.` |
-| `tested_at` | 时间字符串 | 测速与发布时间 | `2026-09-13 18:00:33` |
+| `first_seen` | 时间字符串 | 首次收录时间（以第一次抓取入库为准，永久不变） | `2026-09-13 18:00:33` |
 | `channel` | 字符串 | 来源频道 | `@danfeng_chat` / `@otcfxq` |
 | `fail_count` | 整数 | 连续探测失败次数（默认 0，连续失败 ≥ 3 次自动淘汰剔除） | `0` |
 
@@ -242,7 +242,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `cf_location` | 字符串 | 落地地理位置 | `中国 · 香港特别行政区` |
 | `asn` | 字符串 | **【核心规范】** 『ASN 编号 + 服务商名称』一体化直观标签 | `AS9269 HKBN Hong Kong Broadband` |
 | `isp` | 字符串 | 自治系统组织 / 运营商组织全称 | `HKBN Hong Kong Broadband` |
-| `tested_at` | 时间字符串 | 穿透质检测试时间 | `2026-09-19 18:00:00` |
+| `first_seen` | 时间字符串 | 首次收录时间（以第一次抓取入库为准，永久不变） | `2026-09-19 18:00:00` |
 | `channel` | 字符串 | 来源频道或附件源 | `@danfeng_chat` |
 | `fail_count` | 整数 | 连续探测失败次数（连续失败 ≥ 3 次永久物理删除） | `0` |
 | `net_type` | 字符串 | **【核心属性】** 网络类型归属（详见下方 6 类取值说明） | `isp` |

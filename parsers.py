@@ -175,7 +175,7 @@ def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
         "cf_location": cf_loc_m.group(1).replace("`", "").strip() if cf_loc_m else "",
         "isp": raw_isp,
         "asn": final_asn,
-        "tested_at": normalize_timestamp(time_m.group(1).strip() if time_m else ""),
+        "first_seen": normalize_timestamp(time_m.group(1).strip() if time_m else ""),
         "channel": source_m.group(1).strip() if source_m else default_channel,
         "fail_count": 0,
     }
@@ -299,7 +299,7 @@ def parse_cf_csv_content(
                     "cf_location": "",
                     "isp": row_isp,
                     "asn": format_asn_isp(row_asn, row_isp),
-                    "tested_at": fn_time,
+                    "first_seen": fn_time,
                     "channel": default_channel,
                     "fail_count": 0,
                 })
@@ -422,7 +422,7 @@ def parse_cf_csv_content(
                         raw_isp = found_isp
 
             raw_time = row.get(field_map.get("time", ""), "").strip()
-            tested_at = normalize_timestamp(raw_time, fn_time)
+            first_seen = normalize_timestamp(raw_time, fn_time)
 
             results.append({
                 "ip": raw_ip,
@@ -434,7 +434,7 @@ def parse_cf_csv_content(
                 "cf_location": cf_location,
                 "isp": raw_isp,
                 "asn": format_asn_isp(asn_clean or raw_asn, raw_isp),
-                "tested_at": tested_at,
+                "first_seen": first_seen,
                 "channel": default_channel,
                 "fail_count": 0,
             })
@@ -542,7 +542,7 @@ def parse_otc_scan_content(
             "cf_location": loc,
             "isp": isp,
             "asn": format_asn_isp(asn, isp),
-            "tested_at": dt_str,
+            "first_seen": dt_str,
             "channel": default_channel,
             "fail_count": 0,
         })

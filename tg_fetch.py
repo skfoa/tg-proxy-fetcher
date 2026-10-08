@@ -167,7 +167,7 @@ CF_CSV_FIELDS = [
     "cf_location",
     "asn",
     "isp",
-    "tested_at",
+    "first_seen",
     "channel",
     "fail_count",
 ]
@@ -327,7 +327,7 @@ def load_existing_cf_ips(filepath: str = OUTPUT_CF_FILE) -> dict:
                     key = f"{ip}:{port}"
                     if not is_tombstoned(key, tombstone):
                         row["fail_count"] = safe_int(row.get("fail_count"), 0)
-                        row["tested_at"] = normalize_timestamp(row.get("tested_at", ""))
+                        row["first_seen"] = normalize_timestamp(str(row.get("first_seen") or row.get("tested_at") or ""))
                         raw_asn = row.get("asn", "").replace("`", "").strip()
                         raw_isp = row.get("isp", "").replace("`", "").strip()
                         row["asn"] = format_asn_isp(raw_asn, raw_isp)
@@ -628,8 +628,8 @@ def scrape_channel_web(channel: str, cutoff: datetime, proxy: str = "") -> tuple
 
             cf_data = parse_cf_ip(cleaned_text, default_channel=channel)
             if cf_data:
-                if not cf_data["tested_at"] and dt:
-                    cf_data["tested_at"] = dt.astimezone(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S")
+                if not cf_data.get("first_seen") and dt:
+                    cf_data["first_seen"] = dt.astimezone(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S")
                 cf_ips_found.append(cf_data)
 
         if reached_cutoff or not earliest_id:
@@ -674,7 +674,7 @@ def save_and_notify(
     # 2. 保存单条优选 IP（原子写入）
     sorted_cf_ips = sorted(
         final_cf_ips.values(),
-        key=lambda item: item.get("tested_at", ""),
+        key=lambda item: item.get("first_seen", ""),
         reverse=True,
     )
     tmp_cf_file = f"{OUTPUT_CF_FILE}.tmp"
@@ -714,7 +714,7 @@ def save_and_notify(
 
         all_sorted_scan_rows = []
         for asn_name in sorted(asn_groups.keys()):
-            group_rows = sorted(asn_groups[asn_name], key=lambda x: x.get("tested_at", ""), reverse=True)
+            group_rows = sorted(asn_groups[asn_name], key=lambda x: x.get("first_seen", ""), reverse=True)
             all_sorted_scan_rows.extend(group_rows)
 
         tmp_scan_file = f"{OUTPUT_SCAN_FILE}.tmp"
@@ -742,7 +742,7 @@ def save_and_notify(
         def _proxyip_sort_key(x):
             d = safe_int(x.get("delay_ms"), 0)
             delay = d if d > 0 else 99999
-            return (x.get("tested_at", ""), -delay)
+            return (x.get("first_seen", ""), -delay)
 
         sorted_proxyips = sorted(
             final_proxyips.values(),
@@ -883,8 +883,8 @@ def merge_and_save(
         if k in final_cf_ips:
             # 关键修复：保留已有质检 fail_count，不被抓取默认的 0 抹除
             v["fail_count"] = final_cf_ips[k].get("fail_count", 0)
-            if not v.get("tested_at") and final_cf_ips[k].get("tested_at"):
-                v["tested_at"] = final_cf_ips[k]["tested_at"]
+            if not v.get("first_seen"):
+                v["first_seen"] = final_cf_ips[k].get("first_seen") or final_cf_ips[k].get("tested_at", "")
             final_cf_ips[k].update(v)
         else:
             final_cf_ips[k] = v
@@ -894,8 +894,8 @@ def merge_and_save(
         if k in final_scan_ips:
             # 关键修复：保留已有扫描 IP 失败计数
             v["fail_count"] = final_scan_ips[k].get("fail_count", 0)
-            if not v.get("tested_at") and final_scan_ips[k].get("tested_at"):
-                v["tested_at"] = final_scan_ips[k]["tested_at"]
+            if not v.get("first_seen"):
+                v["first_seen"] = final_scan_ips[k].get("first_seen") or final_scan_ips[k].get("tested_at", "")
             final_scan_ips[k].update(v)
         else:
             final_scan_ips[k] = v
@@ -905,8 +905,8 @@ def merge_and_save(
         if k in final_proxyips:
             # 关键修复：保留已有 ProxyIP 失败计数与质检状态
             v["fail_count"] = final_proxyips[k].get("fail_count", 0)
-            if not v.get("tested_at") and final_proxyips[k].get("tested_at"):
-                v["tested_at"] = final_proxyips[k]["tested_at"]
+            if not v.get("first_seen"):
+                v["first_seen"] = final_proxyips[k].get("first_seen") or final_proxyips[k].get("tested_at", "")
             final_proxyips[k].update(v)
         else:
             final_proxyips[k] = v
@@ -1186,8 +1186,8 @@ async def run_telethon():
                                 cf_key = f"{cf_data['ip']}:{cf_data['port']}"
                                 if not is_tombstoned(cf_key, tombstone):
                                     if cf_key not in scraped_cf_ips:
-                                        if not cf_data["tested_at"] and msg.date:
-                                            cf_data["tested_at"] = msg.date.astimezone(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S")
+                                        if not cf_data.get("first_seen") and msg.date:
+                                            cf_data["first_seen"] = msg.date.astimezone(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S")
                                         scraped_cf_ips[cf_key] = cf_data
                                         cf_count += 1
 

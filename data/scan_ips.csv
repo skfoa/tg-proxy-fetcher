@@ -1,4 +1,4 @@
-﻿ip,port,tls,delay_ms,speed_kbs,colo,cf_location,asn,isp,tested_at,channel,fail_count
+﻿ip,port,tls,delay_ms,speed_kbs,colo,cf_location,asn,isp,first_seen,channel,fail_count
 38.95.79.169,443,true,24,,LAX,北美洲 · 洛杉矶 · 美国,AS1054 Zont LLC,Zont LLC,2026-10-02 00:20:25,@danfeng_chat,0
 207.57.141.98,443,true,24,,LAX,北美洲 · 洛杉矶 · 美国,AS1054 Zont LLC,Zont LLC,2026-10-02 00:19:04,@danfeng_chat,0
 207.57.145.53,443,true,26,,LAX,北美洲 · 洛杉矶 · 美国,AS1054 Zont LLC,Zont LLC,2026-10-02 00:19:05,@danfeng_chat,0

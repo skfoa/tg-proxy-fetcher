@@ -93,7 +93,7 @@ MAX_FAILS = 3        # 连续失败物理淘汰阈值（第 1~2 次缓冲容错�
 CSV_FIELDS = [
     "ip", "port", "tls", "delay_ms", "speed_kbs",
     "colo", "cf_location", "asn", "isp",
-    "tested_at", "channel", "fail_count", "net_type",
+    "first_seen", "channel", "fail_count", "net_type",
 ]
 
 # 反代穿透上下文：跳过非官方证书校验（安全审计说明：有意设计，反代节点由第三方部署且证书各异，需直接与节点建立 TLS 隧道嗅探 CDN /cdn-cgi/trace 边缘机房特征）
@@ -182,7 +182,7 @@ def load_proxyip_csv(path: str) -> list:
             r["ip"] = ip
             r["port"] = str(port)
             r["fail_count"] = safe_int(r.get("fail_count"), 0)
-            r["tested_at"] = normalize_timestamp(str(r.get("tested_at") or ""))
+            r["first_seen"] = normalize_timestamp(str(r.get("first_seen") or r.get("tested_at") or ""))
             rows.append(r)
     return rows
 
@@ -202,8 +202,8 @@ def save_proxyip(
     同时将全量反代按国家/地区拆分至 data/proxyip/ 独立目录。
     自动按质量排序：存活节点优先（fail_count 升序），低延迟优先（delay_ms 升序）。
     """
-    # 稳定双重排序：先按 tested_at 降序（最新优先），再按 (fail_count, delay_ms) 升序
-    rows.sort(key=lambda r: r.get("tested_at", ""), reverse=True)
+    # 稳定双重排序：先按 first_seen 降序（最新优先），再按 (fail_count, delay_ms) 升序
+    rows.sort(key=lambda r: r.get("first_seen", ""), reverse=True)
 
     def _sort_key(r):
         fc = _get_fc(r)

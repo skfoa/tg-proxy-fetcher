@@ -89,7 +89,7 @@ MAX_FAILS = 3
 CSV_FIELDS = [
     "ip", "port", "tls", "delay_ms", "speed_kbs",
     "colo", "cf_location", "asn", "isp",
-    "tested_at", "channel", "fail_count",
+    "first_seen", "channel", "fail_count",
 ]
 
 # 复用全局 SSL 证书上下文，避免重复加载系统 CA 证书
@@ -251,7 +251,7 @@ def load_csv(path: str) -> list:
             r["ip"] = ip
             r["port"] = str(port_val)
             r["fail_count"] = safe_int(r.get("fail_count"), 0)
-            r["tested_at"] = normalize_timestamp(str(r.get("tested_at") or ""))
+            r["first_seen"] = normalize_timestamp(str(r.get("first_seen") or r.get("tested_at") or ""))
             raw_asn = str(r.get("asn") or "").replace("`", "").strip()
             raw_isp = str(r.get("isp") or "").replace("`", "").strip()
             r["asn"] = format_asn_isp(raw_asn, raw_isp)
@@ -684,8 +684,8 @@ async def async_main(args):
         else:
             log.info("[单条优选] 本次无节点达到连续失败 %d 次的淘汰阈值", args.max_fails)
 
-        # 稳定双重排序：先按 tested_at 降序（最新获取优先），再按 (fail_count, delay_ms) 升序（质量优先）
-        cf_survivors.sort(key=lambda x: x.get("tested_at", ""), reverse=True)
+        # 稳定双重排序：先按 first_seen 降序（最新获取优先），再按 (fail_count, delay_ms) 升序（质量优先）
+        cf_survivors.sort(key=lambda x: x.get("first_seen", ""), reverse=True)
         cf_survivors.sort(key=_cf_sort_key)
         save_cf_ips(cf_survivors, CF_CSV, CF_TXT)
     else:
@@ -749,7 +749,7 @@ async def async_main(args):
 
         all_sorted_scan = []
         for asn_name in sorted(asn_groups.keys()):
-            group_rows = sorted(asn_groups[asn_name], key=lambda x: x.get("tested_at", ""), reverse=True)
+            group_rows = sorted(asn_groups[asn_name], key=lambda x: x.get("first_seen", ""), reverse=True)
             group_rows = sorted(group_rows, key=_cf_sort_key)
             all_sorted_scan.extend(group_rows)
 
