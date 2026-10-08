@@ -55,6 +55,7 @@ KNOWN_CLOUD_PROVIDERS = {
     "google": ("AS15169", "Google Cloud"),
     "oracle": ("AS31898", "Oracle Cloud"),
     "oci": ("AS31898", "Oracle Cloud"),
+    "oracle_corp": ("AS54253", "Oracle Corporation"),
     "digitalocean": ("AS14061", "DigitalOcean"),
     "vultr": ("AS20473", "Vultr"),
     "choopa": ("AS20473", "Vultr"),
@@ -509,6 +510,8 @@ _CORE_BASELINE_NET_TYPES: dict[str, str] = {
     "AS8075": "datacenter",   # Microsoft Azure
     "AS45102": "datacenter",  # Alibaba Cloud
     "AS132203": "datacenter", # Tencent Cloud
+    "AS31898": "datacenter",  # Oracle Cloud
+    "AS54253": "datacenter",  # Oracle Corporation
 }
 
 # 运行时 ASN 精准网络类型对照表（从 data/asn_database.json 动态加载，兼具核心兜底）
