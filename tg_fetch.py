@@ -136,29 +136,62 @@ def _parse_sub_urls() -> list[str]:
 
 SUB_URLS = _parse_sub_urls()
 
-DEFAULT_EDT_HTTPS_URLS = [
-    "https://github.cmliussss.net/raw.githubusercontent.com/EDT-Pages/Proxy-List/main/data/https.json",
-    "https://github.090227.xyz/raw.githubusercontent.com/EDT-Pages/Proxy-List/main/data/https.json",
-    "https://github.cmliussss.com/raw.githubusercontent.com/EDT-Pages/Proxy-List/main/data/https.json",
-    "https://raw.githubusercontent.com/EDT-Pages/Proxy-List/main/data/https.json",
-]
+DEFAULT_EDT_PROXY_URLS = {
+    "https": [
+        "https://github.090227.xyz/raw.githubusercontent.com/EDT-Pages/Proxy-List/main/data/https.json",
+        "https://github.cmliussss.net/raw.githubusercontent.com/EDT-Pages/Proxy-List/main/data/https.json",
+        "https://github.cmliussss.com/raw.githubusercontent.com/EDT-Pages/Proxy-List/main/data/https.json",
+        "https://raw.githubusercontent.com/EDT-Pages/Proxy-List/main/data/https.json",
+    ],
+    "http": [
+        "https://github.090227.xyz/raw.githubusercontent.com/EDT-Pages/Proxy-List/main/data/http.json",
+        "https://github.cmliussss.net/raw.githubusercontent.com/EDT-Pages/Proxy-List/main/data/http.json",
+        "https://github.cmliussss.com/raw.githubusercontent.com/EDT-Pages/Proxy-List/main/data/http.json",
+        "https://raw.githubusercontent.com/EDT-Pages/Proxy-List/main/data/http.json",
+    ],
+    "socks5": [
+        "https://github.090227.xyz/raw.githubusercontent.com/EDT-Pages/Proxy-List/main/data/socks5.json",
+        "https://github.cmliussss.net/raw.githubusercontent.com/EDT-Pages/Proxy-List/main/data/socks5.json",
+        "https://github.cmliussss.com/raw.githubusercontent.com/EDT-Pages/Proxy-List/main/data/socks5.json",
+        "https://raw.githubusercontent.com/EDT-Pages/Proxy-List/main/data/socks5.json",
+    ],
+}
+
+DEFAULT_EDT_HTTPS_URLS = DEFAULT_EDT_PROXY_URLS["https"]
+DEFAULT_EDT_HTTP_URLS = DEFAULT_EDT_PROXY_URLS["http"]
+DEFAULT_EDT_SOCKS5_URLS = DEFAULT_EDT_PROXY_URLS["socks5"]
 
 
-def _parse_edt_https_urls() -> list[str]:
-    raw_val = (os.getenv("EDT_HTTPS_URLS") or "").strip()
+def _parse_edt_urls_for_proto(proto: str) -> list[str]:
+    env_key = f"EDT_{proto.upper()}_URLS"
+    raw_val = (os.getenv(env_key) or "").strip()
     if raw_val.lower() in ("none", "off", "disable", "false", "0"):
         return []
     if not raw_val:
-        return list(DEFAULT_EDT_HTTPS_URLS)
+        return list(DEFAULT_EDT_PROXY_URLS.get(proto, []))
     urls = []
     for item in re.split(r"[,;\s]+", raw_val):
         item = item.strip()
         if item and item.startswith("http"):
             urls.append(item)
-    return urls if urls else list(DEFAULT_EDT_HTTPS_URLS)
+    return urls if urls else list(DEFAULT_EDT_PROXY_URLS.get(proto, []))
+
+
+def _parse_edt_https_urls() -> list[str]:
+    return _parse_edt_urls_for_proto("https")
+
+
+def _parse_edt_http_urls() -> list[str]:
+    return _parse_edt_urls_for_proto("http")
+
+
+def _parse_edt_socks5_urls() -> list[str]:
+    return _parse_edt_urls_for_proto("socks5")
 
 
 EDT_HTTPS_URLS = _parse_edt_https_urls()
+EDT_HTTP_URLS = _parse_edt_http_urls()
+EDT_SOCKS5_URLS = _parse_edt_socks5_urls()
 
 DATA_DIR = "data"
 OUTPUT_PROXY_FILE = os.path.join(DATA_DIR, "proxies.txt")
@@ -568,14 +601,15 @@ def fetch_external_subscriptions(
     return total_added
 
 
-def fetch_edt_https_proxies(
+def fetch_edt_proxies(
+    proto: str,
     edt_urls: list[str],
     proxy: str,
     tombstone: dict[str, int],
     scraped_proxies: dict[str, dict | str],
 ) -> tuple[int, list[dict]]:
     """
-    拉取外部 EDT-Pages/Proxy-List 的 https.json 镜像源，
+    拉取外部 EDT-Pages/Proxy-List 的 {proto}.json 镜像源，
     直接过滤剔除机房 (datacenter) 节点，仅抓取保留高价值非机房节点（ISP 宽带、高校教育网、政务网、商业专线），
     提取 clientIp 为实际 egress_ip，并自动去重与过滤墓地黑名单。
     同时动态统计未收录在权威库中的自治系统 (ASN)。
@@ -584,13 +618,16 @@ def fetch_edt_https_proxies(
     if not edt_urls:
         return 0, []
 
+    proto_lower = proto.strip().lower()
+    proto_upper = proto_lower.upper()
+
     log.info("-" * 50)
-    log.info("开始拉取 EDT-Pages 外部 HTTPS 代理镜像源: %d 个候选镜像", len(edt_urls))
+    log.info("开始拉取 EDT-Pages 外部 %s 代理镜像源: %d 个候选镜像", proto_upper, len(edt_urls))
     raw_json_str = ""
     success_url = ""
     for url in edt_urls:
         try:
-            log.info("尝试拉取 EDT HTTPS 镜像: %s", url)
+            log.info("尝试拉取 EDT %s 镜像: %s", proto_upper, url)
             content = fetch_web_page(url, proxy=proxy)
             if content and content.strip().startswith("["):
                 raw_json_str = content
@@ -602,20 +639,20 @@ def fetch_edt_https_proxies(
             log.warning("拉取镜像 %s 异常: %s", url, e)
 
     if not raw_json_str:
-        log.warning("所有 EDT HTTPS 代理镜像源均无法拉取，跳过本次拉取")
+        log.warning("所有 EDT %s 代理镜像源均无法拉取，跳过本次拉取", proto_upper)
         return 0, []
 
     try:
         data = json.loads(raw_json_str)
     except Exception as e:
-        log.error("解析 EDT HTTPS JSON 失败: %s", e)
+        log.error("解析 EDT %s JSON 失败: %s", proto_upper, e)
         return 0, []
 
     if not isinstance(data, list):
-        log.warning("EDT HTTPS 数据格式非列表，跳过")
+        log.warning("EDT %s 数据格式非列表，跳过", proto_upper)
         return 0, []
 
-    log.info("成功从 %s 获取 EDT HTTPS 代理源数据: %d 条原始记录", success_url, len(data))
+    log.info("成功从 %s 获取 EDT %s 代理源数据: %d 条原始记录", success_url, proto_upper, len(data))
 
     total_added = 0
     dc_filtered = 0
@@ -657,11 +694,11 @@ def fetch_edt_https_proxies(
         egress_ip = client_ip if client_ip else ip
         country = str(item.get("country") or "").strip().upper()
         formatted_asn = format_asn_isp(asn_code, org)
-        proxy_url = f"https://{ip}:{port}"
+        proxy_url = f"{proto_lower}://{ip}:{port}"
 
         meta_dict = {
             "url": proxy_url,
-            "proto": "https",
+            "proto": proto_lower,
             "host": ip,
             "port": port,
             "country": country,
@@ -682,12 +719,23 @@ def fetch_edt_https_proxies(
                     scraped_proxies[key][m_k] = meta_dict[m_k]
 
     log.info(
-        "EDT HTTPS 过滤与提取完成: 剔除机房节点 %d 个, 提取非机房节点 (有效新增: %d 个), 发现未收录 ASN: %d 个",
+        "EDT %s 过滤与提取完成: 剔除机房节点 %d 个, 提取非机房节点 (有效新增: %d 个), 发现未收录 ASN: %d 个",
+        proto_upper,
         dc_filtered,
         total_added,
         len(unrecorded_asns_map),
     )
     return total_added, list(unrecorded_asns_map.values())
+
+
+def fetch_edt_https_proxies(
+    edt_urls: list[str],
+    proxy: str,
+    tombstone: dict[str, int],
+    scraped_proxies: dict[str, dict | str],
+) -> tuple[int, list[dict]]:
+    """向后兼容历史调用，默认拉取 HTTPS"""
+    return fetch_edt_proxies("https", edt_urls, proxy, tombstone, scraped_proxies)
 
 
 def scrape_channel_web(channel: str, cutoff: datetime, proxy: str = "") -> tuple[list[tuple[str, str]], list[dict]]:
@@ -1227,8 +1275,10 @@ def run_web_scraper():
     # 1.5 外部通用订阅源抓取 (如 VPNGate SSTP 订阅等)
     fetch_external_subscriptions(SUB_URLS, proxy, tombstone, scraped_proxies)
 
-    # 1.6 外部 EDT-Pages HTTPS 代理源抓取 (多镜像容灾、非机房过滤、元数据丰富)
-    fetch_edt_https_proxies(EDT_HTTPS_URLS, proxy, tombstone, scraped_proxies)
+    # 1.6 外部 EDT-Pages 多协议代理源抓取 (HTTPS / HTTP / SOCKS5 多镜像容灾、非机房高价值过滤、元数据丰富)
+    fetch_edt_proxies("https", EDT_HTTPS_URLS, proxy, tombstone, scraped_proxies)
+    fetch_edt_proxies("http", EDT_HTTP_URLS, proxy, tombstone, scraped_proxies)
+    fetch_edt_proxies("socks5", EDT_SOCKS5_URLS, proxy, tombstone, scraped_proxies)
 
     # Web 预览模式仅提取正文单条代理与优选 IP，扫描附件与反代大池需 API 模式自动获取
     scraped_scan_ips = {}
@@ -1428,8 +1478,10 @@ async def run_telethon():
         web_proxy = PROXY or get_system_proxy()
         fetch_external_subscriptions(SUB_URLS, web_proxy, tombstone, scraped_proxies)
 
-        # 1.6 外部 EDT-Pages HTTPS 代理源抓取 (多镜像容灾、非机房过滤、元数据丰富)
-        fetch_edt_https_proxies(EDT_HTTPS_URLS, web_proxy, tombstone, scraped_proxies)
+        # 1.6 外部 EDT-Pages 多协议代理源抓取 (HTTPS / HTTP / SOCKS5 多镜像容灾、非机房高价值过滤、元数据丰富)
+        fetch_edt_proxies("https", EDT_HTTPS_URLS, web_proxy, tombstone, scraped_proxies)
+        fetch_edt_proxies("http", EDT_HTTP_URLS, web_proxy, tombstone, scraped_proxies)
+        fetch_edt_proxies("socks5", EDT_SOCKS5_URLS, web_proxy, tombstone, scraped_proxies)
 
         # 2. 智能增量合并并落盘保存
         merge_and_save(

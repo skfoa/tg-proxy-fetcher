@@ -1198,6 +1198,23 @@ class TestEdtHttpsFetcher(unittest.TestCase):
         self.assertEqual(added, 1)
         self.assertIn("84.17.47.124:9002", scraped)
 
+    def test_fetch_edt_proxies_multi_protocol(self):
+        from tg_fetch import fetch_edt_proxies
+        mock_http = [
+            {"ip": "1.1.1.1", "port": 8080, "asn": 7018, "asOrganization": "AT&T Services", "country": "US"}
+        ]
+        mock_socks = [
+            {"ip": "2.2.2.2", "port": 1080, "asn": 7018, "asOrganization": "AT&T Services", "country": "US"}
+        ]
+        scraped = {}
+        with patch("tg_fetch.fetch_web_page", side_effect=[json.dumps(mock_http), json.dumps(mock_socks)]):
+            cnt1, _ = fetch_edt_proxies("http", ["http://m.test/http.json"], "", {}, scraped)
+            cnt2, _ = fetch_edt_proxies("socks5", ["http://m.test/socks5.json"], "", {}, scraped)
+        self.assertEqual(cnt1, 1)
+        self.assertEqual(cnt2, 1)
+        self.assertEqual(scraped["1.1.1.1:8080"]["proto"], "http")
+        self.assertEqual(scraped["2.2.2.2:1080"]["proto"], "socks5")
+
 
 class TestHttpsProbe(unittest.IsolatedAsyncioTestCase):
     async def test_probe_http_ssl_tunnel_success(self):

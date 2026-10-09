@@ -380,6 +380,11 @@ async def probe_http(
             asyncio.open_connection(connect_host, port, ssl=ssl_ctx, server_hostname=sni),
             timeout=connect_timeout,
         )
+    except asyncio.TimeoutError:
+        return False, 0, "timeout", "", "", ""
+    except ssl.SSLError as e:
+        log.debug("HTTP(S) 节点 TLS 握手异常 [%s:%s]: %s", host, port, e)
+        return False, 0, "tls_err", "", "", ""
     except Exception:
         return False, 0, "conn_err", "", "", ""
 
@@ -647,7 +652,7 @@ async def probe_single(
             )
         elif proto == "https":
             is_alive, delay_ms, status, colo, country, egress_ip = await probe_http(
-                host, port, user, pwd, max(timeout, 5.0), http_timeout, is_ssl=True
+                host, port, user, pwd, max(timeout, 7.0), http_timeout, is_ssl=True
             )
         elif proto == "turn":
             is_alive, delay_ms, status, colo, country, egress_ip = await probe_turn(
@@ -751,6 +756,7 @@ def parse_proxy_url(url: str) -> dict | None:
 def load_proxies_data(
     txt_path: str = PROXIES_TXT,
     csv_path: str = PROXIES_CSV,
+    proxies_dir: str = PROXIES_DIR,
 ) -> list[dict]:
     """
     加载待检代理节点：
@@ -817,6 +823,60 @@ def load_proxies_data(
             log.info("从 %s 读取 %d 行，合并后待检节点共: %d 条", target_txt, txt_count, len(url_map))
         except Exception as e:
             log.warning("读取 %s 失败: %s", target_txt, e)
+
+    # 合并 data/proxies/ 子目录各独立协议文件中的新节点（如 https.csv, https.txt，防止遗漏单协议新增节点）
+    if proxies_dir and os.path.isdir(proxies_dir):
+        now_str = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
+        sub_added = 0
+        for fname in sorted(os.listdir(proxies_dir)):
+            sub_path = os.path.join(proxies_dir, fname)
+            if fname.endswith(".csv"):
+                try:
+                    with open(sub_path, "r", encoding="utf-8-sig") as f:
+                        for r in csv.DictReader(f):
+                            url = r.get("url", "").strip()
+                            if not url or url in url_map:
+                                continue
+                            parsed = parse_proxy_url(url)
+                            if not parsed:
+                                continue
+                            key = canonical_key(parsed["host"], parsed["port"])
+                            if is_tombstoned(key, tombstone):
+                                continue
+                            parsed["fail_count"] = safe_int(r.get("fail_count"), 0)
+                            parsed["delay_ms"] = safe_int(r.get("delay_ms"), 0)
+                            parsed["status"] = r.get("status", "pending")
+                            parsed["colo"] = r.get("colo", "")
+                            parsed["country"] = r.get("country", "")
+                            parsed["egress_ip"] = r.get("egress_ip", "")
+                            parsed["asn"] = r.get("asn", "")
+                            parsed["isp"] = r.get("isp", "")
+                            parsed["net_type"] = r.get("net_type", "")
+                            parsed["first_seen"] = r.get("first_seen", "").strip() or now_str
+                            url_map[url] = parsed
+                            sub_added += 1
+                except Exception as e:
+                    log.warning("读取子协议文件 %s 失败: %s", sub_path, e)
+            elif fname.endswith(".txt"):
+                try:
+                    with open(sub_path, "r", encoding="utf-8") as f:
+                        for line in f:
+                            line = line.strip()
+                            if not line or line.startswith("#") or line in url_map:
+                                continue
+                            parsed = parse_proxy_url(line)
+                            if not parsed:
+                                continue
+                            key = canonical_key(parsed["host"], parsed["port"])
+                            if is_tombstoned(key, tombstone):
+                                continue
+                            parsed["first_seen"] = now_str
+                            url_map[line] = parsed
+                            sub_added += 1
+                except Exception as e:
+                    log.warning("读取子协议文件 %s 失败: %s", sub_path, e)
+        if sub_added > 0:
+            log.info("从 %s 子目录合并新增节点 %d 条，合并后待检节点共: %d 条", proxies_dir, sub_added, len(url_map))
 
     return list(url_map.values())
 
