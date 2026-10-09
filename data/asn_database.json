@@ -1100,7 +1100,10 @@
     "NTT MYANMAR CO., LTD.": "AS134736",
     "DLIVE": "AS10036",
     "Oracle Corporation": "AS54253",
-    "Cogento Backbone Limited": "AS214743"
+    "Cogento Backbone Limited": "AS214743",
+    "SUTV": "AS9617",
+    "SNU": "AS9488",
+    "VLADLINK": "AS42038"
   },
   "asn_to_isp": {
     "AS174": "Cogent Communications, LLC",
@@ -2140,7 +2143,10 @@
     "AS134736": "NTT MYANMAR CO., LTD.",
     "AS10036": "DLIVE",
     "AS54253": "Oracle Corporation",
-    "AS214743": "Cogento Backbone Limited"
+    "AS214743": "Cogento Backbone Limited",
+    "AS9617": "SUTV",
+    "AS9488": "SNU",
+    "AS42038": "VLADLINK"
   },
   "asn_to_net_type": {
     "AS1311": "banking",
@@ -4365,6 +4371,8 @@
     "AS402681": "datacenter",
     "AS10066": "isp",
     "AS46690": "isp",
-    "AS134736": "datacenter"
+    "AS134736": "datacenter",
+    "AS9488": "datacenter",
+    "AS42038": "datacenter"
   }
 }

@@ -14120,5 +14120,177 @@
     "net_type": "isp",
     "country": "JP",
     "resolved_ip": "60.56.40.4"
+  },
+  "175.215.52.146": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn808365139.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "175.215.52.146"
+  },
+  "60.93.7.71": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn748539980.opengw.net": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "60.93.7.71"
+  },
+  "121.188.123.241": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn283553964.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "121.188.123.241"
+  },
+  "101.36.118.102": {
+    "asn": "AS135377",
+    "isp": "UCLOUD INFORMATION TECHNOLOGY (HK) LIMITED",
+    "net_type": "datacenter",
+    "country": "HK"
+  },
+  "92.37.173.221": {
+    "asn": "AS12389",
+    "isp": "Primorye NET",
+    "net_type": "isp",
+    "country": "RU"
+  },
+  "vpn151248857.opengw.net": {
+    "asn": "AS12389",
+    "isp": "Primorye NET",
+    "net_type": "isp",
+    "country": "RU",
+    "resolved_ip": "92.37.173.221"
+  },
+  "92.37.153.73": {
+    "asn": "AS12389",
+    "isp": "Primorye NET",
+    "net_type": "isp",
+    "country": "RU"
+  },
+  "219.109.117.43": {
+    "asn": "AS7522",
+    "isp": "STNet, Incorporated",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn547356845.opengw.net": {
+    "asn": "AS7522",
+    "isp": "STNet, Incorporated",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "219.109.117.43"
+  },
+  "165.154.20.162": {
+    "asn": "AS135377",
+    "isp": "UCLOUD INFORMATION TECHNOLOGY (HK) LIMITED",
+    "net_type": "datacenter",
+    "country": "HK"
+  },
+  "122.197.64.42": {
+    "asn": "AS9617",
+    "isp": "SUTV",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "60.96.167.60": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn196647472.opengw.net": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "60.96.167.60"
+  },
+  "147.47.146.209": {
+    "asn": "AS9488",
+    "isp": "SNU",
+    "net_type": "datacenter",
+    "country": "KR"
+  },
+  "vpn460668134.opengw.net": {
+    "asn": "AS9488",
+    "isp": "SNU",
+    "net_type": "datacenter",
+    "country": "KR",
+    "resolved_ip": "147.47.146.209"
+  },
+  "46.37.157.224": {
+    "asn": "AS42038",
+    "isp": "VLADLINK",
+    "net_type": "datacenter",
+    "country": "RU"
+  },
+  "vpn189291441.opengw.net": {
+    "asn": "AS42038",
+    "isp": "VLADLINK",
+    "net_type": "datacenter",
+    "country": "RU",
+    "resolved_ip": "46.37.157.224"
+  },
+  "101.36.121.221": {
+    "asn": "AS135377",
+    "isp": "UCLOUD INFORMATION TECHNOLOGY (HK) LIMITED",
+    "net_type": "datacenter",
+    "country": "HK"
+  },
+  "101.36.126.84": {
+    "asn": "AS135377",
+    "isp": "UCLOUD INFORMATION TECHNOLOGY (HK) LIMITED",
+    "net_type": "datacenter",
+    "country": "HK"
+  },
+  "101.36.121.2": {
+    "asn": "AS135377",
+    "isp": "UCLOUD INFORMATION TECHNOLOGY (HK) LIMITED",
+    "net_type": "datacenter",
+    "country": "HK"
+  },
+  "125.176.199.132": {
+    "asn": "AS17858",
+    "isp": "LG POWERCOMM",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn582814215.opengw.net": {
+    "asn": "AS17858",
+    "isp": "LG POWERCOMM",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "125.176.199.132"
+  },
+  "112.144.58.207": {
+    "asn": "AS17858",
+    "isp": "LG POWERCOMM",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn340919201.opengw.net": {
+    "asn": "AS17858",
+    "isp": "LG POWERCOMM",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "112.144.58.207"
   }
 }
