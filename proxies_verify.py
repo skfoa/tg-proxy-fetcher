@@ -341,12 +341,14 @@ async def probe_http(
     pwd: str | None,
     connect_timeout: float = TIMEOUT,
     http_timeout: float = HTTP_TIMEOUT,
+    is_ssl: bool = False,
 ) -> tuple[bool, int, str, str, str, str]:
     """
     HTTP / HTTPS 代理鉴真：
-    1. 发送 CONNECT speed.cloudflare.com:80 隧道请求 (若有账密带 Proxy-Authorization)
-    2. 穿透隧道发送 GET /cdn-cgi/trace 并提取 colo, country 与 egress_ip
-    3. 若 CONNECT 不支持，回退至直接 Forward GET
+    1. 若 is_ssl=True (HTTPS 代理)，首先与代理服务器完成 TLS 加密握手 (支持老旧版本与 SECLEVEL=0)
+    2. 发送 CONNECT speed.cloudflare.com:80 隧道请求 (若有账密带 Proxy-Authorization)
+    3. 穿透隧道发送 GET /cdn-cgi/trace 并提取 colo, country 与 egress_ip
+    4. 若 CONNECT 不支持，回退至直接 Forward GET
     返回 (is_alive, delay_ms, status, colo, country, egress_ip)
     """
     connect_host = host
@@ -354,10 +356,28 @@ async def probe_http(
         resolved = await asyncio.to_thread(resolve_domain_to_ip, host)
         if resolved and is_valid_public_ip(resolved):
             connect_host = resolved
+
+    ssl_ctx = None
+    sni = None
+    if is_ssl:
+        ssl_ctx = ssl.create_default_context()
+        ssl_ctx.check_hostname = False
+        ssl_ctx.verify_mode = ssl.CERT_NONE
+        try:
+            ssl_ctx.minimum_version = ssl.TLSVersion.MINIMUM_SUPPORTED
+        except Exception:
+            pass
+        try:
+            ssl_ctx.set_ciphers("DEFAULT:@SECLEVEL=0")
+        except Exception:
+            pass
+        is_ip = bool(re.match(r"^\d{1,3}(?:\.\d{1,3}){3}$", host))
+        sni = None if is_ip else host
+
     t0 = time.monotonic()
     try:
         reader, writer = await asyncio.wait_for(
-            asyncio.open_connection(connect_host, port),
+            asyncio.open_connection(connect_host, port, ssl=ssl_ctx, server_hostname=sni),
             timeout=connect_timeout,
         )
     except Exception:
@@ -414,7 +434,7 @@ async def probe_http(
         writer = None
 
         fwd_reader, fwd_writer = await asyncio.wait_for(
-            asyncio.open_connection(connect_host, port),
+            asyncio.open_connection(connect_host, port, ssl=ssl_ctx, server_hostname=sni),
             timeout=connect_timeout,
         )
         reader, writer = fwd_reader, fwd_writer
@@ -444,6 +464,9 @@ async def probe_http(
         return False, lat, "http_fail", "", "", ""
     except asyncio.TimeoutError:
         return False, 0, "timeout", "", "", ""
+    except ssl.SSLError as e:
+        log.debug("HTTP(S) 节点 TLS 握手异常 [%s:%s]: %s", host, port, e)
+        return False, 0, "tls_err", "", "", ""
     except (ConnectionRefusedError, ConnectionResetError, BrokenPipeError) as e:
         log.debug("HTTP 节点重置/断开 [%s:%s]: %s", host, port, e)
         return False, 0, "conn_reset", "", "", ""
@@ -618,9 +641,13 @@ async def probe_single(
             is_alive, delay_ms, status, colo, country, egress_ip = await probe_socks5(
                 host, port, user, pwd, timeout, http_timeout
             )
-        elif proto in ("http", "https"):
+        elif proto == "http":
             is_alive, delay_ms, status, colo, country, egress_ip = await probe_http(
-                host, port, user, pwd, timeout, http_timeout
+                host, port, user, pwd, timeout, http_timeout, is_ssl=False
+            )
+        elif proto == "https":
+            is_alive, delay_ms, status, colo, country, egress_ip = await probe_http(
+                host, port, user, pwd, max(timeout, 5.0), http_timeout, is_ssl=True
             )
         elif proto == "turn":
             is_alive, delay_ms, status, colo, country, egress_ip = await probe_turn(

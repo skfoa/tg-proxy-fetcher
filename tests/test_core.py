@@ -9,6 +9,7 @@
   6. load_existing_proxies: TXT 缺失兜底、墓碑黑名单拦截、同 Key 冲突健康度择优
 """
 
+import asyncio
 import csv
 import json
 import os
@@ -1080,6 +1081,174 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
 
         # 6. 次数细分 (无新进/恢复动态时)
         self.assertEqual(format_buffer_badge(3, f1=2, f2=1), " · ⚠️ 3 缓冲 [1次: 2 · 2次: 1]")
+
+
+class TestEdtHttpsFetcher(unittest.TestCase):
+    def test_parse_edt_https_urls(self):
+        from tg_fetch import _parse_edt_https_urls, DEFAULT_EDT_HTTPS_URLS
+
+        with patch.dict(os.environ, {}, clear=True):
+            urls = _parse_edt_https_urls()
+            self.assertEqual(urls, DEFAULT_EDT_HTTPS_URLS)
+
+        with patch.dict(os.environ, {"EDT_HTTPS_URLS": "none"}):
+            self.assertEqual(_parse_edt_https_urls(), [])
+
+        with patch.dict(os.environ, {"EDT_HTTPS_URLS": "https://m1.test/https.json, https://m2.test/https.json"}):
+            urls = _parse_edt_https_urls()
+            self.assertEqual(urls, ["https://m1.test/https.json", "https://m2.test/https.json"])
+
+    def test_fetch_edt_https_proxies_filtering_and_metadata(self):
+        import time
+        from tg_fetch import fetch_edt_https_proxies
+
+        mock_data = [
+            # 1. 机房节点：应当被严格过滤剔除
+            {
+                "ip": "104.16.1.1",
+                "port": 443,
+                "protocol": "https",
+                "asn": 13335,
+                "asOrganization": "Cloudflare, Inc.",
+                "country": "US",
+                "clientIp": "104.16.1.1",
+            },
+            # 2. 非机房节点 (ISP 宽带)：应当被保留，提取 clientIp 为实际出口
+            {
+                "ip": "12.34.56.78",
+                "port": 8443,
+                "protocol": "https",
+                "asn": 7018,
+                "asOrganization": "AT&T Services, Inc.",
+                "country": "US",
+                "clientIp": "12.34.56.99",
+            },
+            # 3. 墓地黑名单节点：应当被过滤
+            {
+                "ip": "1.2.3.4",
+                "port": 8443,
+                "protocol": "https",
+                "asn": 7018,
+                "asOrganization": "AT&T Services, Inc.",
+                "country": "US",
+            },
+            # 4. 非法端口与脏数据：跳过
+            {
+                "ip": "bad.ip.host",
+                "port": 999999,
+                "protocol": "https",
+            },
+        ]
+
+        tombstone = {"1.2.3.4:8443": int(time.time())}
+        scraped_proxies = {}
+
+        with patch("tg_fetch.fetch_web_page", return_value=json.dumps(mock_data)):
+            added, unrec = fetch_edt_https_proxies(
+                ["https://mirror1.test/https.json"],
+                proxy="",
+                tombstone=tombstone,
+                scraped_proxies=scraped_proxies,
+            )
+
+        self.assertEqual(added, 1)
+        self.assertIn("12.34.56.78:8443", scraped_proxies)
+        item = scraped_proxies["12.34.56.78:8443"]
+        self.assertEqual(item["proto"], "https")
+        self.assertEqual(item["url"], "https://12.34.56.78:8443")
+        self.assertEqual(item["egress_ip"], "12.34.56.99")
+        self.assertEqual(item["country"], "US")
+        self.assertIn(item["net_type"], ("isp", "education", "government", "business"))
+
+        # 验证机房与墓地均未进入 scraped_proxies
+        self.assertNotIn("104.16.1.1:443", scraped_proxies)
+        self.assertNotIn("1.2.3.4:8443", scraped_proxies)
+
+    def test_fetch_edt_https_proxies_mirror_failover(self):
+        from tg_fetch import fetch_edt_https_proxies
+
+        call_records = []
+
+        def mock_fetch(url, proxy=""):
+            call_records.append(url)
+            if "fail" in url:
+                return ""
+            return json.dumps([
+                {
+                    "ip": "84.17.47.124",
+                    "port": 9002,
+                    "protocol": "https",
+                    "asn": 12389,
+                    "asOrganization": "Rostelecom",
+                    "country": "RU",
+                    "clientIp": "84.17.47.124",
+                }
+            ])
+
+        scraped = {}
+        with patch("tg_fetch.fetch_web_page", side_effect=mock_fetch):
+            added, _ = fetch_edt_https_proxies(
+                ["https://fail1.test/https.json", "https://success2.test/https.json"],
+                proxy="",
+                tombstone={},
+                scraped_proxies=scraped,
+            )
+
+        self.assertEqual(len(call_records), 2)
+        self.assertEqual(added, 1)
+        self.assertIn("84.17.47.124:9002", scraped)
+
+
+class TestHttpsProbe(unittest.IsolatedAsyncioTestCase):
+    async def test_probe_http_ssl_tunnel_success(self):
+        from proxies_verify import probe_http
+
+        # 模拟 reader / writer
+        mock_reader = AsyncMock()
+        mock_writer = MagicMock()
+        mock_writer.drain = AsyncMock()
+        mock_writer.close = MagicMock()
+        mock_writer.wait_closed = AsyncMock()
+
+        # 第一次 read: CONNECT 响应 200
+        # 第二次 read: GET /cdn-cgi/trace 响应 200 + colo + loc + ip + warp
+        mock_reader.read = AsyncMock(side_effect=[
+            b"HTTP/1.1 200 Connection Established\r\n\r\n",
+            b"HTTP/1.1 200 OK\r\nServer: cloudflare\r\n\r\ncolo=FRA\r\nloc=DE\r\nip=84.115.12.34\r\nwarp=off\r\n",
+            b"",
+        ])
+
+        with patch("asyncio.open_connection", return_value=(mock_reader, mock_writer)) as mock_open:
+            is_alive, delay, status, colo, country, egress_ip = await probe_http(
+                "45.150.164.23", 8443, None, None, connect_timeout=5.0, is_ssl=True
+            )
+
+            # 验证 open_connection 使用了 ssl 参数
+            _, kwargs = mock_open.call_args
+            self.assertIsNotNone(kwargs.get("ssl"))
+            self.assertTrue(is_alive)
+            self.assertEqual(status, "alive")
+            self.assertEqual(colo, "FRA")
+            self.assertEqual(country, "DE")
+            self.assertEqual(egress_ip, "84.115.12.34")
+
+    async def test_probe_single_routes_https(self):
+        from proxies_verify import probe_single
+
+        row = {
+            "proto": "https",
+            "host": "45.150.164.23",
+            "port": 8443,
+            "url": "https://45.150.164.23:8443",
+        }
+        sem = asyncio.Semaphore(10)
+
+        with patch("proxies_verify.probe_http", return_value=(True, 45, "alive", "FRA", "DE", "84.115.12.34")) as mock_probe:
+            res = await probe_single(row, sem)
+            self.assertTrue(res["is_alive"])
+            self.assertEqual(res["colo"], "FRA")
+            # 确认调用 probe_http 时传入了 is_ssl=True
+            self.assertTrue(mock_probe.call_args[1].get("is_ssl"))
 
 
 if __name__ == "__main__":

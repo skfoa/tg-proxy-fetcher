@@ -136,6 +136,30 @@ def _parse_sub_urls() -> list[str]:
 
 SUB_URLS = _parse_sub_urls()
 
+DEFAULT_EDT_HTTPS_URLS = [
+    "https://github.cmliussss.net/raw.githubusercontent.com/EDT-Pages/Proxy-List/main/data/https.json",
+    "https://github.090227.xyz/raw.githubusercontent.com/EDT-Pages/Proxy-List/main/data/https.json",
+    "https://github.cmliussss.com/raw.githubusercontent.com/EDT-Pages/Proxy-List/main/data/https.json",
+    "https://raw.githubusercontent.com/EDT-Pages/Proxy-List/main/data/https.json",
+]
+
+
+def _parse_edt_https_urls() -> list[str]:
+    raw_val = (os.getenv("EDT_HTTPS_URLS") or "").strip()
+    if raw_val.lower() in ("none", "off", "disable", "false", "0"):
+        return []
+    if not raw_val:
+        return list(DEFAULT_EDT_HTTPS_URLS)
+    urls = []
+    for item in re.split(r"[,;\s]+", raw_val):
+        item = item.strip()
+        if item and item.startswith("http"):
+            urls.append(item)
+    return urls if urls else list(DEFAULT_EDT_HTTPS_URLS)
+
+
+EDT_HTTPS_URLS = _parse_edt_https_urls()
+
 DATA_DIR = "data"
 OUTPUT_PROXY_FILE = os.path.join(DATA_DIR, "proxies.txt")
 OUTPUT_PROXIES_CSV = os.path.join(DATA_DIR, "proxies.csv")
@@ -544,6 +568,128 @@ def fetch_external_subscriptions(
     return total_added
 
 
+def fetch_edt_https_proxies(
+    edt_urls: list[str],
+    proxy: str,
+    tombstone: dict[str, int],
+    scraped_proxies: dict[str, dict | str],
+) -> tuple[int, list[dict]]:
+    """
+    拉取外部 EDT-Pages/Proxy-List 的 https.json 镜像源，
+    直接过滤剔除机房 (datacenter) 节点，仅抓取保留高价值非机房节点（ISP 宽带、高校教育网、政务网、商业专线），
+    提取 clientIp 为实际 egress_ip，并自动去重与过滤墓地黑名单。
+    同时动态统计未收录在权威库中的自治系统 (ASN)。
+    返回: (有效新增节点数, 未收录 ASN 列表)
+    """
+    if not edt_urls:
+        return 0, []
+
+    log.info("-" * 50)
+    log.info("开始拉取 EDT-Pages 外部 HTTPS 代理镜像源: %d 个候选镜像", len(edt_urls))
+    raw_json_str = ""
+    success_url = ""
+    for url in edt_urls:
+        try:
+            log.info("尝试拉取 EDT HTTPS 镜像: %s", url)
+            content = fetch_web_page(url, proxy=proxy)
+            if content and content.strip().startswith("["):
+                raw_json_str = content
+                success_url = url
+                break
+            else:
+                log.warning("镜像 %s 返回内容为空或非有效 JSON", url)
+        except Exception as e:
+            log.warning("拉取镜像 %s 异常: %s", url, e)
+
+    if not raw_json_str:
+        log.warning("所有 EDT HTTPS 代理镜像源均无法拉取，跳过本次拉取")
+        return 0, []
+
+    try:
+        data = json.loads(raw_json_str)
+    except Exception as e:
+        log.error("解析 EDT HTTPS JSON 失败: %s", e)
+        return 0, []
+
+    if not isinstance(data, list):
+        log.warning("EDT HTTPS 数据格式非列表，跳过")
+        return 0, []
+
+    log.info("成功从 %s 获取 EDT HTTPS 代理源数据: %d 条原始记录", success_url, len(data))
+
+    total_added = 0
+    dc_filtered = 0
+    unrecorded_asns_map: dict[str, dict] = {}
+
+    for item in data:
+        if not isinstance(item, dict):
+            continue
+        ip = str(item.get("ip") or "").strip()
+        port = safe_int(item.get("port"), 0)
+        if not ip or not (1 <= port <= 65535):
+            continue
+
+        asn_raw = str(item.get("asn") or "").strip()
+        asn_code = f"AS{asn_raw}" if asn_raw and not asn_raw.upper().startswith("AS") else asn_raw.upper()
+        org = str(item.get("asOrganization") or "").strip()
+
+        # 检查是否为未收录的 ASN
+        if asn_code and not is_asn_recorded(asn_code):
+            if asn_code not in unrecorded_asns_map:
+                unrecorded_asns_map[asn_code] = {
+                    "asn": asn_code,
+                    "isp": org,
+                    "ip": ip,
+                    "net_type": classify_asn(asn_code, org),
+                }
+
+        # 核心策略：严格过滤机房节点，仅保留非机房高价值代理
+        net_type = classify_asn(asn_code, org)
+        if net_type == "datacenter":
+            dc_filtered += 1
+            continue
+
+        key = f"{ip}:{port}"
+        if is_tombstoned(key, tombstone):
+            continue
+
+        client_ip = str(item.get("clientIp") or "").strip()
+        egress_ip = client_ip if client_ip else ip
+        country = str(item.get("country") or "").strip().upper()
+        formatted_asn = format_asn_isp(asn_code, org)
+        proxy_url = f"https://{ip}:{port}"
+
+        meta_dict = {
+            "url": proxy_url,
+            "proto": "https",
+            "host": ip,
+            "port": port,
+            "country": country,
+            "egress_ip": egress_ip,
+            "asn": formatted_asn,
+            "isp": org,
+            "net_type": net_type,
+            "status": "pending",
+        }
+
+        if key not in scraped_proxies:
+            scraped_proxies[key] = meta_dict
+            total_added += 1
+        elif isinstance(scraped_proxies[key], dict):
+            # 若已存在但缺乏关键元数据，择优补全
+            for m_k in ("country", "egress_ip", "asn", "isp", "net_type"):
+                if meta_dict.get(m_k) and not scraped_proxies[key].get(m_k):
+                    scraped_proxies[key][m_k] = meta_dict[m_k]
+
+    log.info(
+        "EDT HTTPS 过滤与提取完成: 剔除机房节点 %d 个, 提取非机房节点 (有效新增: %d 个), 发现未收录 ASN: %d 个",
+        dc_filtered,
+        total_added,
+        len(unrecorded_asns_map),
+    )
+    return total_added, list(unrecorded_asns_map.values())
+
+
 def scrape_channel_web(channel: str, cutoff: datetime, proxy: str = "") -> tuple[list[tuple[str, str]], list[dict]]:
     clean_channel = channel.lstrip("@")
     base_url = f"https://t.me/s/{clean_channel}"
@@ -863,9 +1009,13 @@ def merge_and_save(
         if k in final_proxies:
             # 已经存在：严格保留原有 first_seen 及历史质检状态与失败计数，仅刷新 url
             final_proxies[k]["url"] = url
+            if isinstance(v, dict):
+                for meta_key in ("country", "egress_ip", "asn", "isp", "net_type", "colo"):
+                    if v.get(meta_key) and not final_proxies[k].get(meta_key):
+                        final_proxies[k][meta_key] = v[meta_key]
         else:
             # 首次抓取收录：记录此时此刻为 first_seen，其余指标待质检
-            final_proxies[k] = {
+            item = {
                 "url": url,
                 "first_seen": now_bjt,
                 "fail_count": 0,
@@ -873,6 +1023,11 @@ def merge_and_save(
                 "status": "pending",
                 "colo": "",
             }
+            if isinstance(v, dict):
+                for meta_key in ("country", "egress_ip", "asn", "isp", "net_type", "colo"):
+                    if v.get(meta_key):
+                        item[meta_key] = v[meta_key]
+            final_proxies[k] = item
 
     final_cf_ips = dict(existing_cf_ips)
     for k, v in scraped_cf_ips.items():
@@ -974,6 +1129,16 @@ def merge_and_save(
                     org = re.sub(r"^AS\d+\s*", "", org, flags=re.IGNORECASE).strip()
                     unrecorded_orgs[c] = org
 
+    for k, v in scraped_proxies.items():
+        if k not in existing_proxies and isinstance(v, dict):
+            c = _extract_asn_code(v.get("asn"), v.get("isp"))
+            if c and not is_asn_recorded(c):
+                unrecorded_counts[c] += 1
+                if c not in unrecorded_orgs:
+                    org = v.get("isp") or v.get("asn") or ""
+                    org = re.sub(r"^AS\d+\s*", "", org, flags=re.IGNORECASE).strip()
+                    unrecorded_orgs[c] = org
+
     unrecorded_asns = []
     for c, cnt in unrecorded_counts.most_common():
         unrecorded_asns.append({
@@ -1061,6 +1226,9 @@ def run_web_scraper():
 
     # 1.5 外部通用订阅源抓取 (如 VPNGate SSTP 订阅等)
     fetch_external_subscriptions(SUB_URLS, proxy, tombstone, scraped_proxies)
+
+    # 1.6 外部 EDT-Pages HTTPS 代理源抓取 (多镜像容灾、非机房过滤、元数据丰富)
+    fetch_edt_https_proxies(EDT_HTTPS_URLS, proxy, tombstone, scraped_proxies)
 
     # Web 预览模式仅提取正文单条代理与优选 IP，扫描附件与反代大池需 API 模式自动获取
     scraped_scan_ips = {}
@@ -1259,6 +1427,9 @@ async def run_telethon():
         # 1.5 外部通用订阅源抓取 (如 VPNGate SSTP 订阅等)
         web_proxy = PROXY or get_system_proxy()
         fetch_external_subscriptions(SUB_URLS, web_proxy, tombstone, scraped_proxies)
+
+        # 1.6 外部 EDT-Pages HTTPS 代理源抓取 (多镜像容灾、非机房过滤、元数据丰富)
+        fetch_edt_https_proxies(EDT_HTTPS_URLS, web_proxy, tombstone, scraped_proxies)
 
         # 2. 智能增量合并并落盘保存
         merge_and_save(
