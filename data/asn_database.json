@@ -1136,7 +1136,9 @@
     "RADIOGRAFICA COSTARRICENSE": "AS3790",
     "National Wimax/IMS environment": "AS38264",
     "Milkywan Association": "AS2027",
-    "Aruba S.p.A. Broadband Pool BNG": "AS202613"
+    "Aruba S.p.A. Broadband Pool BNG": "AS202613",
+    "Enecom, Inc.": "AS18144",
+    "Limited Liability Company": "AS41349"
   },
   "asn_to_isp": {
     "AS174": "Cogent Communications, LLC",
@@ -2214,7 +2216,9 @@
     "AS3790": "RADIOGRAFICA COSTARRICENSE",
     "AS38264": "National Wimax/IMS environment",
     "AS2027": "Milkywan Association",
-    "AS202613": "Aruba S.p.A. Broadband Pool BNG"
+    "AS202613": "Aruba S.p.A. Broadband Pool BNG",
+    "AS18144": "Enecom, Inc.",
+    "AS41349": "Limited Liability Company"
   },
   "asn_to_net_type": {
     "AS1311": "banking",
@@ -4476,6 +4480,8 @@
     "AS3790": "datacenter",
     "AS38264": "datacenter",
     "AS2027": "datacenter",
-    "AS202613": "datacenter"
+    "AS202613": "datacenter",
+    "AS18144": "datacenter",
+    "AS41349": "datacenter"
   }
 }

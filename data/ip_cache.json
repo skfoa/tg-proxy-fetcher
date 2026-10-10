@@ -14292,5 +14292,294 @@
     "net_type": "isp",
     "country": "KR",
     "resolved_ip": "112.144.58.207"
+  },
+  "126.91.70.186": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn983406443.opengw.net": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "126.91.70.186"
+  },
+  "60.107.188.86": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn176833325.opengw.net": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "60.107.188.86"
+  },
+  "154.21.91.106": {
+    "asn": "AS906",
+    "isp": "DMIT",
+    "net_type": "datacenter",
+    "country": "US"
+  },
+  "154.17.10.5": {
+    "asn": "AS906",
+    "isp": "DMIT",
+    "net_type": "datacenter",
+    "country": "US"
+  },
+  "219.100.37.201": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "public-vpn-226.opengw.net": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "219.100.37.201"
+  },
+  "154.17.15.8": {
+    "asn": "AS906",
+    "isp": "DMIT",
+    "net_type": "datacenter",
+    "country": "US"
+  },
+  "59.12.131.120": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn575908802.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "59.12.131.120"
+  },
+  "58.183.231.240": {
+    "asn": "AS18144",
+    "isp": "Enecom, Inc.",
+    "net_type": "datacenter",
+    "country": "JP"
+  },
+  "vpn451672079.opengw.net": {
+    "asn": "AS18144",
+    "isp": "Enecom, Inc.",
+    "net_type": "datacenter",
+    "country": "JP",
+    "resolved_ip": "58.183.231.240"
+  },
+  "203.165.155.236": {
+    "asn": "AS9824",
+    "isp": "JCOM Co., Ltd.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn400835378.opengw.net": {
+    "asn": "AS9824",
+    "isp": "JCOM Co., Ltd.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "203.165.155.236"
+  },
+  "136.175.177.78": {
+    "asn": "AS906",
+    "isp": "DMIT",
+    "net_type": "datacenter",
+    "country": "US"
+  },
+  "92.126.79.194": {
+    "asn": "AS12389",
+    "isp": "Primorye NET",
+    "net_type": "isp",
+    "country": "RU"
+  },
+  "vpn272308604.opengw.net": {
+    "asn": "AS12389",
+    "isp": "Primorye NET",
+    "net_type": "isp",
+    "country": "RU",
+    "resolved_ip": "92.126.79.194"
+  },
+  "123.48.55.82": {
+    "asn": "AS18126",
+    "isp": "Chubu Telecommunications Company, Inc.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn251445827.opengw.net": {
+    "asn": "AS18126",
+    "isp": "Chubu Telecommunications Company, Inc.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "123.48.55.82"
+  },
+  "42.113.31.121": {
+    "asn": "AS18403",
+    "isp": "FPT Telecom Company",
+    "net_type": "isp",
+    "country": "VN"
+  },
+  "vpn209052080.opengw.net": {
+    "asn": "AS18403",
+    "isp": "FPT Telecom Company",
+    "net_type": "isp",
+    "country": "VN",
+    "resolved_ip": "42.113.31.121"
+  },
+  "2605:52c0:1:bb:be24:11ff:fe67:1008": {
+    "asn": "AS906",
+    "isp": "DMIT",
+    "net_type": "datacenter",
+    "country": "US"
+  },
+  "219.100.37.173": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "public-vpn-233.opengw.net": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "219.100.37.173"
+  },
+  "180.146.218.48": {
+    "asn": "AS17511",
+    "isp": "OPTAGE Inc.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn358573545.opengw.net": {
+    "asn": "AS17511",
+    "isp": "OPTAGE Inc.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "180.146.218.48"
+  },
+  "154.17.29.151": {
+    "asn": "AS906",
+    "isp": "DMIT",
+    "net_type": "datacenter",
+    "country": "US"
+  },
+  "219.100.37.120": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "public-vpn-151.opengw.net": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "219.100.37.120"
+  },
+  "121.84.62.81": {
+    "asn": "AS17511",
+    "isp": "OPTAGE Inc.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn152731748.opengw.net": {
+    "asn": "AS17511",
+    "isp": "OPTAGE Inc.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "121.84.62.81"
+  },
+  "14.63.89.103": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn543687977.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "14.63.89.103"
+  },
+  "126.15.240.234": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn293400493.opengw.net": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "126.15.240.234"
+  },
+  "126.140.88.184": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn836437229.opengw.net": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "126.140.88.184"
+  },
+  "211.224.74.65": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn231526020.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "211.224.74.65"
+  },
+  "59.11.19.147": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn399081295.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "59.11.19.147"
+  },
+  "136.175.178.107": {
+    "asn": "AS906",
+    "isp": "DMIT",
+    "net_type": "datacenter",
+    "country": "US"
+  },
+  "89.250.7.33": {
+    "asn": "AS41349",
+    "isp": "Limited Liability Company",
+    "net_type": "datacenter",
+    "country": "RU"
+  },
+  "vpn201135917.opengw.net": {
+    "asn": "AS41349",
+    "isp": "Limited Liability Company",
+    "net_type": "datacenter",
+    "country": "RU",
+    "resolved_ip": "89.250.7.33"
   }
 }
