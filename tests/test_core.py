@@ -1225,6 +1225,53 @@ class TestEdtHttpsFetcher(unittest.TestCase):
         self.assertEqual(scraped["1.1.1.1:8080"]["proto"], "http")
         self.assertEqual(scraped["2.2.2.2:1080"]["proto"], "socks5")
 
+    def test_parse_edt_urls_environment_variables(self):
+        from tg_fetch import _parse_edt_urls_for_proto
+
+        # 1. 验证用户配置 EDT_MIRRORS 前缀列表
+        with patch.dict(os.environ, {"EDT_MIRRORS": "https://m1.xyz, https://m2.net"}, clear=True):
+            urls = _parse_edt_urls_for_proto("https")
+            self.assertIn("https://m1.xyz/raw.githubusercontent.com/EDT-Pages/Proxy-List/main/data/https.json", urls)
+            self.assertIn("https://m2.net/raw.githubusercontent.com/EDT-Pages/Proxy-List/main/data/https.json", urls)
+            self.assertIn("https://raw.githubusercontent.com/EDT-Pages/Proxy-List/main/data/https.json", urls)
+
+        # 2. 验证用户配置 EDT_BASE_URL 自建基址
+        with patch.dict(os.environ, {"EDT_BASE_URL": "https://cdn.example.com/proxy_data"}, clear=True):
+            urls = _parse_edt_urls_for_proto("socks5")
+            self.assertEqual(urls, ["https://cdn.example.com/proxy_data/socks5.json"])
+
+        # 3. 验证专属 EDT_HTTPS_URLS 最高优先级
+        with patch.dict(os.environ, {"EDT_HTTPS_URLS": "https://special.org/h.json", "EDT_MIRRORS": "https://m1.xyz"}, clear=True):
+            urls = _parse_edt_urls_for_proto("https")
+            self.assertEqual(urls, ["https://special.org/h.json"])
+
+    def test_fetch_edt_proxies_concurrent_racing(self):
+        from tg_fetch import fetch_edt_proxies
+        import time
+
+        slow_url = "https://slow.mirror.test/https.json"
+        fast_url = "https://fast.mirror.test/https.json"
+
+        def mock_racing_fetch(url, proxy="", timeout=12):
+            if "slow" in url:
+                time.sleep(0.15)
+                return json.dumps([{"ip": "9.9.9.9", "port": 443, "asn": 7018, "asOrganization": "AT&T", "country": "US"}])
+            else:
+                time.sleep(0.01)
+                return json.dumps([{"ip": "8.8.8.8", "port": 443, "asn": 7018, "asOrganization": "AT&T", "country": "US"}])
+
+        scraped = {}
+        t0 = time.time()
+        with patch("tg_fetch.fetch_web_page", side_effect=mock_racing_fetch):
+            added, _ = fetch_edt_proxies("https", [slow_url, fast_url], "", {}, scraped)
+        elapsed = time.time() - t0
+
+        self.assertEqual(added, 1)
+        # 快源胜出
+        self.assertIn("8.8.8.8:443", scraped)
+        # 总耗时应远小于慢源的 0.15s
+        self.assertLess(elapsed, 0.12)
+
 
 class TestHttpsProbe(unittest.IsolatedAsyncioTestCase):
     async def test_probe_http_ssl_tunnel_success(self):

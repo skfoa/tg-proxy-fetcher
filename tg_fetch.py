@@ -27,6 +27,7 @@ import asyncio
 import subprocess
 import urllib.request
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta, timezone
 
 # Windows 事件循环策略
@@ -162,19 +163,79 @@ DEFAULT_EDT_HTTP_URLS = DEFAULT_EDT_PROXY_URLS["http"]
 DEFAULT_EDT_SOCKS5_URLS = DEFAULT_EDT_PROXY_URLS["socks5"]
 
 
+def _parse_edt_mirrors() -> list[str]:
+    """从环境变量解析用户配置的镜像加速前缀列表（支持 EDT_MIRRORS / GITHUB_MIRRORS）"""
+    raw_val = (os.getenv("EDT_MIRRORS") or os.getenv("GITHUB_MIRRORS") or "").strip()
+    if not raw_val or raw_val.lower() in ("none", "off", "disable", "false", "0"):
+        return []
+    mirrors = []
+    for item in re.split(r"[,;\s]+", raw_val):
+        item = item.strip().rstrip("/")
+        if item and (item.startswith("http://") or item.startswith("https://")):
+            mirrors.append(item)
+    return mirrors
+
+
 def _parse_edt_urls_for_proto(proto: str) -> list[str]:
-    env_key = f"EDT_{proto.upper()}_URLS"
+    """
+    按协议解析镜像 URL 候选列表，优先采用环境变量输入：
+    1. 协议专属完整 URL: EDT_HTTPS_URLS / EDT_HTTP_URLS / EDT_SOCKS5_URLS
+    2. 全局通用 URL 列表: EDT_URLS / EDT_PROXY_URLS
+    3. 用户自建基址环境变量: EDT_BASE_URLS / EDT_BASE_URL (如 Worker / CDN)
+    4. 用户输入的镜像前缀: EDT_MIRRORS / GITHUB_MIRRORS (动态生成多源候选)
+    5. 默认开箱即用候选镜像源 (DEFAULT_EDT_PROXY_URLS)
+    """
+    proto_lower = proto.strip().lower()
+    proto_file = f"{proto_lower}.json"
+    env_key = f"EDT_{proto_lower.upper()}_URLS"
     raw_val = (os.getenv(env_key) or "").strip()
     if raw_val.lower() in ("none", "off", "disable", "false", "0"):
         return []
-    if not raw_val:
-        return list(DEFAULT_EDT_PROXY_URLS.get(proto, []))
-    urls = []
-    for item in re.split(r"[,;\s]+", raw_val):
-        item = item.strip()
-        if item and item.startswith("http"):
-            urls.append(item)
-    return urls if urls else list(DEFAULT_EDT_PROXY_URLS.get(proto, []))
+
+    # 1. 协议专属环境变量完整 URL
+    if raw_val:
+        urls = [item.strip() for item in re.split(r"[,;\s]+", raw_val) if item.strip().startswith("http")]
+        if urls:
+            return urls
+
+    # 2. 全局通用 URL 列表 (EDT_URLS / EDT_PROXY_URLS)
+    global_urls_val = (os.getenv("EDT_URLS") or os.getenv("EDT_PROXY_URLS") or "").strip()
+    if global_urls_val and global_urls_val.lower() not in ("none", "off", "disable", "false", "0"):
+        matched_urls = []
+        for item in re.split(r"[,;\s]+", global_urls_val):
+            item = item.strip()
+            if item.startswith("http") and proto_file in item.lower():
+                matched_urls.append(item)
+        if matched_urls:
+            return matched_urls
+
+    # 3. 用户自建基址环境变量 (EDT_BASE_URLS / EDT_BASE_URL)
+    base_val = (os.getenv("EDT_BASE_URLS") or os.getenv("EDT_BASE_URL") or "").strip()
+    if base_val and base_val.lower() not in ("none", "off", "disable", "false", "0"):
+        base_urls = []
+        for item in re.split(r"[,;\s]+", base_val):
+            item = item.strip().rstrip("/")
+            if item.startswith("http"):
+                base_urls.append(f"{item}/{proto_file}")
+        if base_urls:
+            return base_urls
+
+    # 4. 用户配置的镜像加速前缀环境变量 (EDT_MIRRORS / GITHUB_MIRRORS)
+    user_mirrors = _parse_edt_mirrors()
+    if user_mirrors:
+        built_urls = []
+        for m in user_mirrors:
+            if "raw.githubusercontent.com" in m:
+                built_urls.append(f"{m}/EDT-Pages/Proxy-List/main/data/{proto_file}")
+            else:
+                built_urls.append(f"{m}/raw.githubusercontent.com/EDT-Pages/Proxy-List/main/data/{proto_file}")
+        official_url = f"https://raw.githubusercontent.com/EDT-Pages/Proxy-List/main/data/{proto_file}"
+        if official_url not in built_urls:
+            built_urls.append(official_url)
+        return built_urls
+
+    # 5. 默认开箱即用候选源
+    return list(DEFAULT_EDT_PROXY_URLS.get(proto_lower, []))
 
 
 def _parse_edt_https_urls() -> list[str]:
@@ -538,7 +599,7 @@ def send_tg_notification(
         log.warning("发送 TG 机器人通知网络异常: %s", e)
 
 
-def fetch_web_page(url: str, proxy: str = "") -> str:
+def fetch_web_page(url: str, proxy: str = "", timeout: int = 15) -> str:
     """获取网页 HTML 内容，支持 curl 与 urllib.request 优雅降级"""
     if shutil.which("curl"):
         cmd = [
@@ -547,9 +608,9 @@ def fetch_web_page(url: str, proxy: str = "") -> str:
         ]
         if proxy:
             cmd.extend(["-x", proxy])
-        cmd.extend([url, "--max-time", "15"])
+        cmd.extend([url, "--max-time", str(timeout)])
         try:
-            res = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="ignore", timeout=20, check=False)
+            res = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="ignore", timeout=timeout + 5, check=False)
             if res.returncode == 0 and res.stdout:
                 return res.stdout
         except Exception as e:
@@ -563,7 +624,7 @@ def fetch_web_page(url: str, proxy: str = "") -> str:
         url,
         headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
     )
-    with opener.open(req, timeout=15) as resp:
+    with opener.open(req, timeout=timeout) as resp:
         return resp.read().decode("utf-8", errors="ignore")
 
 
@@ -611,9 +672,11 @@ def fetch_edt_proxies(
     proxy: str,
     tombstone: dict[str, int],
     scraped_proxies: dict[str, dict | str],
+    timeout: float = 12.0,
 ) -> tuple[int, list[dict]]:
     """
     拉取外部 EDT-Pages/Proxy-List 的 {proto}.json 镜像源，
+    采用【多镜像并发竞速机制】(Concurrent Racing)：同时向所有候选镜像发起请求，以最先返回有效合法数据的镜像为胜出者并立即采用，彻底避免慢镜像串行阻塞。
     直接过滤剔除机房 (datacenter) 节点，仅抓取保留高价值非机房节点（ISP 宽带、高校教育网、政务网、商业专线），
     提取 clientIp 为实际 egress_ip，并自动去重与过滤墓地黑名单。
     同时动态统计未收录在权威库中的自治系统 (ASN)。
@@ -626,37 +689,60 @@ def fetch_edt_proxies(
     proto_upper = proto_lower.upper()
 
     log.info("-" * 50)
-    log.info("开始拉取 EDT-Pages 外部 %s 代理镜像源: %d 个候选镜像", proto_upper, len(edt_urls))
+    log.info("开始拉取 EDT-Pages 外部 %s 代理镜像源: %d 个候选镜像 (并发竞速模式)", proto_upper, len(edt_urls))
+
     raw_json_str = ""
     success_url = ""
-    for url in edt_urls:
+    data = []
+
+    def _fetch_single_mirror(u: str) -> tuple[str, str, list]:
+        txt = fetch_web_page(u, proxy=proxy)
+        if not txt or not txt.strip().startswith("["):
+            raise ValueError("内容为空或非有效 JSON 列表")
+        parsed = json.loads(txt)
+        if not isinstance(parsed, list) or len(parsed) == 0:
+            raise ValueError("返回 JSON 非列表或无有效节点")
+        return u, txt, parsed
+
+    if len(edt_urls) == 1:
+        u = edt_urls[0]
         try:
-            log.info("尝试拉取 EDT %s 镜像: %s", proto_upper, url)
-            content = fetch_web_page(url, proxy=proxy)
-            if content and content.strip().startswith("["):
-                raw_json_str = content
-                success_url = url
-                break
-            else:
-                log.warning("镜像 %s 返回内容为空或非有效 JSON", url)
+            t0 = time.time()
+            success_url, raw_json_str, data = _fetch_single_mirror(u)
+            log.info("单源拉取 EDT %s 成功: %s (耗时 %.2fs, 记录数 %d)", proto_upper, u, time.time() - t0, len(data))
         except Exception as e:
-            log.warning("拉取镜像 %s 异常: %s", url, e)
+            log.warning("单源拉取 EDT %s 失败: %s (%s)", proto_upper, u, e)
+    else:
+        t_start = time.time()
+        executor = ThreadPoolExecutor(max_workers=min(len(edt_urls), 8), thread_name_prefix=f"edt-race-{proto_lower}")
+        try:
+            future_to_url = {executor.submit(_fetch_single_mirror, u): u for u in edt_urls}
+            for future in as_completed(future_to_url):
+                cand_url = future_to_url[future]
+                try:
+                    cand_url, cand_raw, cand_data = future.result()
+                    success_url = cand_url
+                    raw_json_str = cand_raw
+                    data = cand_data
+                    cost = time.time() - t_start
+                    log.info(
+                        "🏆 EDT %s 镜像并发竞速胜出: %s (耗时 %.2fs, 原始记录 %d 条), 领先并率先采用！",
+                        proto_upper,
+                        success_url,
+                        cost,
+                        len(data),
+                    )
+                    break
+                except Exception as e:
+                    log.debug("候选镜像 %s 竞速未达标或较慢: %s", cand_url, e)
+        finally:
+            executor.shutdown(wait=False, cancel_futures=True)
 
-    if not raw_json_str:
-        log.warning("所有 EDT %s 代理镜像源均无法拉取，跳过本次拉取", proto_upper)
+    if not data:
+        log.warning("所有 EDT %s 代理镜像源竞速拉取均未成功返回有效数据，跳过本次拉取", proto_upper)
         return 0, []
 
-    try:
-        data = json.loads(raw_json_str)
-    except Exception as e:
-        log.error("解析 EDT %s JSON 失败: %s", proto_upper, e)
-        return 0, []
-
-    if not isinstance(data, list):
-        log.warning("EDT %s 数据格式非列表，跳过", proto_upper)
-        return 0, []
-
-    log.info("成功从 %s 获取 EDT %s 代理源数据: %d 条原始记录", success_url, proto_upper, len(data))
+    log.info("成功采用 %s 的 EDT %s 代理源数据: %d 条原始记录", success_url, proto_upper, len(data))
 
     total_added = 0
     dc_filtered = 0
