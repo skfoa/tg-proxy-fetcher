@@ -291,6 +291,7 @@ def load_existing_proxies(
                         "asn": r.get("asn", ""),
                         "isp": r.get("isp", ""),
                         "net_type": r.get("net_type", ""),
+                        "source": (r.get("source") or "").strip(),
                     }
                     csv_meta_by_url[u] = meta
                     for _, key in extract_proxies(u):
@@ -326,6 +327,7 @@ def load_existing_proxies(
                         "asn": meta.get("asn", ""),
                         "isp": meta.get("isp", ""),
                         "net_type": meta.get("net_type", ""),
+                        "source": meta.get("source", ""),
                     }
             if not existing and csv_meta_by_url:
                 log.warning(
@@ -358,6 +360,7 @@ def load_existing_proxies(
                             "asn": meta.get("asn", ""),
                             "isp": meta.get("isp", ""),
                             "net_type": meta.get("net_type", ""),
+                            "source": meta.get("source", ""),
                         }
         log.info("已加载本地已存代理节点: %d 个（历史有效节点全部保留）", len(existing))
     except Exception as e:
@@ -589,7 +592,8 @@ def fetch_external_subscriptions(
                     if is_tombstoned(key, tombstone):
                         continue
                     if key not in scraped_proxies:
-                        scraped_proxies[key] = url
+                        src_label = "vpngate" if ("vpngate" in sub_url.lower() or "opengw" in sub_url.lower()) else "subscription"
+                        scraped_proxies[key] = {"url": url, "source": src_label}
                         sub_added += 1
                 total_added += sub_added
                 log.info("从外部订阅 %s 成功提取节点: %d 个 (有效去重新增: %d 个)", sub_url, len(sub_proxies), sub_added)
@@ -706,6 +710,7 @@ def fetch_edt_proxies(
             "asn": formatted_asn,
             "isp": org,
             "net_type": net_type,
+            "source": "EDT-Pages",
             "status": "pending",
         }
 
@@ -714,7 +719,7 @@ def fetch_edt_proxies(
             total_added += 1
         elif isinstance(scraped_proxies[key], dict):
             # 若已存在但缺乏关键元数据，择优补全
-            for m_k in ("country", "egress_ip", "asn", "isp", "net_type"):
+            for m_k in ("country", "egress_ip", "asn", "isp", "net_type", "source"):
                 if meta_dict.get(m_k) and not scraped_proxies[key].get(m_k):
                     scraped_proxies[key][m_k] = meta_dict[m_k]
 
@@ -1051,14 +1056,15 @@ def merge_and_save(
         if isinstance(v, dict):
             final_proxies[k] = dict(v)
         else:
-            final_proxies[k] = {"url": v, "first_seen": LEGACY_DEFAULT_FIRST_SEEN, "fail_count": 0}
+            final_proxies[k] = {"url": v, "first_seen": LEGACY_DEFAULT_FIRST_SEEN, "fail_count": 0, "source": ""}
     for k, v in scraped_proxies.items():
         url = v.get("url") if isinstance(v, dict) else v
+        src = v.get("source") if isinstance(v, dict) else ""
         if k in final_proxies:
             # 已经存在：严格保留原有 first_seen 及历史质检状态与失败计数，仅刷新 url
             final_proxies[k]["url"] = url
             if isinstance(v, dict):
-                for meta_key in ("country", "egress_ip", "asn", "isp", "net_type", "colo"):
+                for meta_key in ("country", "egress_ip", "asn", "isp", "net_type", "colo", "source"):
                     if v.get(meta_key) and not final_proxies[k].get(meta_key):
                         final_proxies[k][meta_key] = v[meta_key]
         else:
@@ -1070,9 +1076,10 @@ def merge_and_save(
                 "delay_ms": 0,
                 "status": "pending",
                 "colo": "",
+                "source": src,
             }
             if isinstance(v, dict):
-                for meta_key in ("country", "egress_ip", "asn", "isp", "net_type", "colo"):
+                for meta_key in ("country", "egress_ip", "asn", "isp", "net_type", "colo", "source"):
                     if v.get(meta_key):
                         item[meta_key] = v[meta_key]
             final_proxies[k] = item
@@ -1257,7 +1264,7 @@ def run_web_scraper():
                 if is_tombstoned(key, tombstone):
                     continue
                 if key not in scraped_proxies:
-                    scraped_proxies[key] = url
+                    scraped_proxies[key] = {"url": url, "source": channel}
                     p_cnt += 1
             log.info("频道 %s 提取去重代理节点: %d 个", channel, p_cnt)
 
@@ -1369,7 +1376,7 @@ async def run_telethon():
                                 if is_tombstoned(key, tombstone):
                                     continue
                                 if key not in scraped_proxies:
-                                    scraped_proxies[key] = url
+                                    scraped_proxies[key] = {"url": url, "source": channel_name}
                                     proxy_count += 1
 
                         # 支持自动下载并解析代理文件附件 (如 http_proxies.txt, https_proxies.txt, turn_proxies.txt 等)
@@ -1386,7 +1393,7 @@ async def run_telethon():
                                             if is_tombstoned(key, tombstone):
                                                 continue
                                             if key not in scraped_proxies:
-                                                scraped_proxies[key] = url
+                                                scraped_proxies[key] = {"url": url, "source": channel_name}
                                                 proxy_count += 1
                                                 doc_added += 1
                                         log.info("从频道 %s 附件 %s 中提取 %d 个代理节点", channel_name, msg.file.name, doc_added)

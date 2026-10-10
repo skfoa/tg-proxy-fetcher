@@ -1720,6 +1720,7 @@ PROXY_CSV_FIELDS = [
     "isp",
     "net_type",
     "first_seen",
+    "source",
 ]
 
 
@@ -1828,6 +1829,7 @@ def format_proxy_json_item(r_dict: dict) -> dict:
         "asOrganization": isp_name,
         "isp": isp_name,
         "net_type": net_type_val,
+        "source": str(r_dict.get("source") or "").strip(),
     }
 
 
@@ -1888,6 +1890,7 @@ def save_proxies_by_protocol(rows: list, output_dir: str = "data/proxies") -> di
         row_dict.setdefault("isp", row_dict.get("isp", ""))
         row_dict.setdefault("net_type", row_dict.get("net_type", ""))
         row_dict.setdefault("first_seen", row_dict.get("first_seen", "") or LEGACY_DEFAULT_FIRST_SEEN)
+        row_dict.setdefault("source", str(row_dict.get("source") or "").strip())
 
         if "host" not in row_dict or not row_dict["host"]:
             try:
@@ -2003,6 +2006,7 @@ def save_proxies_csv(rows: list, csv_path: str = "data/proxies.csv") -> int:
         row_dict.setdefault("isp", row_dict.get("isp", ""))
         row_dict.setdefault("net_type", row_dict.get("net_type", ""))
         row_dict.setdefault("first_seen", row_dict.get("first_seen", "") or LEGACY_DEFAULT_FIRST_SEEN)
+        row_dict.setdefault("source", str(row_dict.get("source") or "").strip())
 
         if "host" not in row_dict or not row_dict["host"]:
             try:

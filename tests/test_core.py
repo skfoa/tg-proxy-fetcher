@@ -325,17 +325,21 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
         self.assertIn("asn", PROXY_CSV_FIELDS)
         self.assertIn("isp", PROXY_CSV_FIELDS)
         self.assertIn("net_type", PROXY_CSV_FIELDS)
+        self.assertIn("source", PROXY_CSV_FIELDS)
         colo_idx = PROXY_CSV_FIELDS.index("colo")
         country_idx = PROXY_CSV_FIELDS.index("country")
         egress_idx = PROXY_CSV_FIELDS.index("egress_ip")
         asn_idx = PROXY_CSV_FIELDS.index("asn")
         isp_idx = PROXY_CSV_FIELDS.index("isp")
         net_type_idx = PROXY_CSV_FIELDS.index("net_type")
+        first_seen_idx = PROXY_CSV_FIELDS.index("first_seen")
+        source_idx = PROXY_CSV_FIELDS.index("source")
         self.assertEqual(country_idx, colo_idx + 1)
         self.assertEqual(egress_idx, country_idx + 1)
         self.assertEqual(asn_idx, egress_idx + 1)
         self.assertEqual(isp_idx, asn_idx + 1)
         self.assertEqual(net_type_idx, isp_idx + 1)
+        self.assertEqual(source_idx, first_seen_idx + 1)
 
     def test_save_proxies_csv_and_by_protocol_persists_egress_ip_and_metadata(self):
         with tempfile.TemporaryDirectory() as td:
@@ -358,6 +362,7 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
                     "isp": "Cloudflare, Inc.",
                     "net_type": "datacenter",
                     "first_seen": "2026-10-01 00:00:00",
+                    "source": "EDT-Pages",
                 }
             ]
             # 1. 验证 save_proxies_csv
@@ -373,6 +378,7 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
                 self.assertEqual(rows[0]["asn"], "AS13335 Cloudflare")
                 self.assertEqual(rows[0]["isp"], "Cloudflare, Inc.")
                 self.assertEqual(rows[0]["net_type"], "datacenter")
+                self.assertEqual(rows[0]["source"], "EDT-Pages")
 
             # 2. 验证 save_proxies_by_protocol 生成 CSV 与 JSON
             proto_counts = save_proxies_by_protocol(sample_rows, output_dir=proxies_dir)
@@ -385,6 +391,7 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
                 reader = csv.DictReader(f)
                 self.assertNotIn("tested_at", reader.fieldnames)
                 self.assertIn("first_seen", reader.fieldnames)
+                self.assertIn("source", reader.fieldnames)
                 rows = list(reader)
                 self.assertEqual(len(rows), 1)
                 self.assertEqual(rows[0]["country"], "HK")
@@ -392,6 +399,7 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
                 self.assertEqual(rows[0]["asn"], "AS13335 Cloudflare")
                 self.assertEqual(rows[0]["isp"], "Cloudflare, Inc.")
                 self.assertEqual(rows[0]["net_type"], "datacenter")
+                self.assertEqual(rows[0]["source"], "EDT-Pages")
 
             with open(socks5_json, "r", encoding="utf-8") as f:
                 json_items = json.load(f)
@@ -408,6 +416,7 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
                 self.assertEqual(item["isp"], "Cloudflare, Inc.")
                 self.assertEqual(item["asOrganization"], "Cloudflare, Inc.")
                 self.assertEqual(item["net_type"], "datacenter")
+                self.assertEqual(item["source"], "EDT-Pages")
                 self.assertNotIn("delay_ms", item)
                 self.assertNotIn("colo", item)
                 self.assertNotIn("egress_ip", item)
@@ -434,6 +443,7 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
         self.assertIn("asn", parsed)
         self.assertIn("isp", parsed)
         self.assertIn("net_type", parsed)
+        self.assertIn("source", parsed)
         self.assertEqual(parsed["country"], "")
         self.assertEqual(parsed["egress_ip"], "")
         self.assertEqual(parsed["asn"], "")

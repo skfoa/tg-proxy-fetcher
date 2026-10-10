@@ -717,6 +717,7 @@ async def probe_single(
             row.setdefault("asn", row.get("asn", ""))
             row.setdefault("isp", row.get("isp", ""))
             row.setdefault("net_type", row.get("net_type", ""))
+            row.setdefault("source", row.get("source", ""))
 
         return row
 
@@ -748,6 +749,7 @@ def parse_proxy_url(url: str) -> dict | None:
             "asn": "",
             "isp": "",
             "net_type": "",
+            "source": "",
         }
     except Exception:
         return None
@@ -794,6 +796,7 @@ def load_proxies_data(
                     parsed["isp"] = r.get("isp", "")
                     parsed["net_type"] = r.get("net_type", "")
                     parsed["first_seen"] = r.get("first_seen", "").strip() or LEGACY_DEFAULT_FIRST_SEEN
+                    parsed["source"] = r.get("source", "").strip()
                     url_map[url] = parsed
             log.info("从 %s 加载已有记录 %d 条", target_csv, len(url_map))
         except Exception as e:
@@ -853,6 +856,7 @@ def load_proxies_data(
                             parsed["isp"] = r.get("isp", "")
                             parsed["net_type"] = r.get("net_type", "")
                             parsed["first_seen"] = r.get("first_seen", "").strip() or now_str
+                            parsed["source"] = r.get("source", "").strip()
                             url_map[url] = parsed
                             sub_added += 1
                 except Exception as e:
