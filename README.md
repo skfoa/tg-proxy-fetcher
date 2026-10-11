@@ -94,10 +94,10 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | 文件名 | 内容说明 | 生成条件 | GitHub Raw 永久直链（点击即可导入） |
 | :--- | :--- | :---: | :--- |
 | **`data/proxies.txt`** | 质检存活的多协议通用代理全量清单（按协议分段注释归类，纯文本；每段以 `# {协议} 代理 - N 个` 开头，客户端订阅时请过滤 `#` 注释行，或直接使用下方单协议纯文本） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies.txt` |
-| **`data/proxies.csv`** | 代理质检数据总表（15 字段完整元数据，含出口国家、出口 IP、ASN、ISP 与网络分类） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies.csv` |
-| **`data/proxies/*.txt`** | 按协议独立拆分的纯净单协议代理清单（如 `socks5.txt`、`turn.txt`、`sstp.txt`，无注释行） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies/{协议}.txt` |
-| **`data/proxies/*.csv`** | 按协议独立拆分的纯净单协议结构化数据表（如 `socks5.csv`、`turn.csv`、`sstp.csv`） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies/{协议}.csv` |
-| **`data/proxies/*.json`** | 按协议独立拆分的标准化 JSON 端点（如 `socks5.json`、`turn.json`、`sstp.json`，结构化输出协议、国家、出口真实 IP、ASN 与网络属性，兼容各类通用客户端与工具链拉取） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies/{协议}.json` |
+| **`data/proxies.csv`** | 代理质检数据总表（15 字段完整元数据，含出口国家、出口真实 IP、ASN、ISP、网络分类与来源渠道 `source`） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies.csv` |
+| **`data/proxies/*.txt`** | 按协议独立拆分的纯净单协议代理清单（涵盖 `socks5.txt`、`http.txt`、`https.txt`、`turn.txt`、`sstp.txt`，纯文本无注释行） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies/{协议}.txt` |
+| **`data/proxies/*.csv`** | 按协议独立拆分的纯净单协议结构化数据表（涵盖 `socks5.csv`、`http.csv`、`https.csv`、`turn.csv`、`sstp.csv`，15 字段含 `source`） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies/{协议}.csv` |
+| **`data/proxies/*.json`** | 按协议独立拆分的标准化 JSON 端点（涵盖 `socks5.json`、`http.json`、`https.json`、`turn.json`、`sstp.json`，结构化输出协议、国家、出口真实 IP、ASN、网络属性与来源 `source`，兼容 EDT-Toolkit / 油猴脚本及各类客户端导入） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies/{协议}.json` |
 | **`data/cf_ips.txt`** | 频道日常单条优选 IP（纯文本） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/cf_ips.txt` |
 | **`data/cf_ips.csv`** | 频道日常单条优选 IP（数据表） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/cf_ips.csv` |
 | **`data/scan_ips.txt`** | 扫描测速总清单（按存活/缓冲质检状态分层排序，纯文本） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/scan_ips.txt` |
@@ -136,6 +136,12 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
    - 自动提取行首有效节点与认证信息，过滤后续测速说明与反向 PTR 域名别名，统一去重合并至 `data/proxies.txt`。
 7. **Cloudflare 优选 IP 与反代池（需官方 API 模式）**：
    - 提取包含 IP、端口、TLS、网络延迟（纯数值 ms）、下载速度（纯数值 kB/s）、数据中心（Colo）、落地位置、ASN、运营商、测速时间等全量指标。
+8. **外部高价值代理镜像源（EDT-Pages 多镜像并发竞速与非机房严苛提取）**：
+   - 支持 HTTPS、HTTP、SOCKS5 外部开源镜像拉取。
+   - 🛡️ **严格过滤机房 (`datacenter`) 节点**：仅收录提取非机房资产（运营商原生宽带 ISP、企业商业专线、教育高校、政务公用网）。
+   - 🎯 **出口真实 IP 鉴真**：提取 `clientIp` 为实际落地出口 IP（`egress_ip`）。
+   - ⚡ **多镜像并发竞速（Concurrent Racing）**：多源同时发起网络请求，最快返回有效合法数据的镜像胜出率先采用，彻底消除慢镜像排队阻塞；自动拦截墓地冷却期黑名单。
+   - 🏷️ **全链路来源追踪**：显式打标来源字段为 `source="EDT-Pages"`。
 
 ---
 
@@ -256,7 +262,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 > - `datacenter`：常规数据中心/托管机房 ➔ 归入各国家/地区常规列表
 
 #### ③ 通用代理质检数据表（`data/proxies.csv`）
-*共 14 个字段，记录 SOCKS5/HTTP/HTTPS/TURN/SSTP 等通用代理应用层穿透结果、出口机房国家、出口真实 IP、自治系统 ASN、运营商 ISP 组织、原生家宽/数据中心属性、质检状态与首次收录生命周期：*
+*共 15 个字段，记录 SOCKS5/HTTP/HTTPS/TURN/SSTP 等通用代理应用层穿透结果、出口机房国家、出口真实 IP、自治系统 ASN、运营商 ISP 组织、原生家宽/数据中心属性、质检状态、首次收录生命周期与代理来源渠道：*
 
 | 字段 | 类型 | 说明 | 示例 |
 | :--- | :--- | :--- | :--- |
@@ -274,6 +280,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `isp` | 字符串 | **【核心凭据】** 自治系统所属运营商 / 托管商组织名称（与 `proxyip.csv` 规范统一对齐） | `Cloudflare, Inc.`、`Eweka Internet Services B.V.` |
 | `net_type` | 字符串 | **【核心凭据】** 网络类型属性分类（`isp` 原生家宽 / `datacenter` 机房 / `business` 商业专线等） | `isp`、`datacenter` |
 | `first_seen` | 时间字符串 | 首次收录时间（以第一次抓取入库为准，永久不变，用于统计节点存活时长与长期可用性；注：针对 2026-10-01 前无此字段的历史旧节点，统一兼容赋予 2026-10-01 00:00:00 作为基准初值） | `2026-10-01 00:00:00` |
+| `source` | 字符串 | **【来源渠道】** 代理节点抓取/获取渠道（如 `EDT-Pages`、`@danfeng_chat`、`@otcfxq`、`vpngate` 等，精准标识来源） | `EDT-Pages`、`@danfeng_chat` |
 
 ---
 
@@ -393,9 +400,11 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `CF_IP_CHANNELS` | 优选 IP 抓取目标频道/群组（逗号/空格分隔） | `@otcfxq, @danfeng_chat` | 可选 | 自定义抓取 Cloudflare 优选 IP 与测速附件的频道/群组（若未配置自动回退至全局 `CHANNELS` 或默认值） |
 | `SUB_URLS` | 外部通用订阅源 URL 列表（逗号/换行分隔） | `sub.cmliussss.net/vpngate` (留空默认) | 可选 | 配置外部公开订阅链接（默认加载开源公共镜像 `https://sub.cmliussss.net/vpngate` 获取 VPNGate SSTP 节点）；如需**彻底禁用外部订阅**，设置为 `off`、`none` 或 `false` 即可；也可填入自有公开订阅链接 |
 | `EDT_MIRRORS` | EDT-Pages 外部代理镜像加速前缀列表（逗号/空格分隔） | 留空（自动竞速多组内置镜像源） | 可选 | 配置自定义 GitHub 加速镜像域名或前缀（如 `https://github.090227.xyz, https://github.cmliussss.net, https://ghfast.top`）。**系统采用多源并发竞速机制（Concurrent Racing）**：所有候选源同时起跑，最快有效返回者瞬间胜出采用，其余自动舍弃，彻底告别单源超时卡死；若需彻底禁用外部镜像拉取，设为 `off` 即可 |
-| `EDT_HTTPS_URLS` | 专属 HTTPS 代理完整 JSON 候选列表（逗号分隔） | 留空（由镜像自动推导） | 可选 | 高级自定义：直接指定抓取非机房 HTTPS 代理的完整 JSON 地址列表（支持多源并发竞速，最高优先级） |
-| `EDT_HTTP_URLS` | 专属 HTTP 代理完整 JSON 候选列表（逗号分隔） | 留空（由镜像自动推导） | 可选 | 高级自定义：直接指定抓取非机房 HTTP 代理的完整 JSON 地址列表（支持多源并发竞速，最高优先级） |
-| `EDT_SOCKS5_URLS` | 专属 SOCKS5 代理完整 JSON 候选列表（逗号分隔） | 留空（由镜像自动推导） | 可选 | 高级自定义：直接指定抓取非机房 SOCKS5 代理的完整 JSON 地址列表（支持多源并发竞速，最高优先级） |
+| `EDT_URLS` | 自定义代理完整 JSON URL 列表（逗号/空格分隔） | 留空（由镜像自动推导） | 可选 | 直接传入多个完整的 proxy json 链接（支持同时混合 https/http/socks5，系统自动按文件名路由），进入并发竞速池 |
+| `EDT_BASE_URL` | 自建 Worker/CDN 代理基址（支持单个或多个，逗号分隔） | 留空（由镜像自动推导） | 可选 | 用于自建反代加速服务（如 `https://my-proxy.workers.dev/data`），系统自动拼接 `{base}/{proto}.json` 并参与竞速 |
+| `EDT_HTTPS_URLS` | 专属 HTTPS 代理完整 JSON 候选列表（逗号分隔） | 留空（由镜像自动推导） | 可选 | 高级自定义：直接指定抓取非机房 HTTPS 代理的完整 JSON 地址列表（支持多源并发竞速，协议级最高优先级） |
+| `EDT_HTTP_URLS` | 专属 HTTP 代理完整 JSON 候选列表（逗号分隔） | 留空（由镜像自动推导） | 可选 | 高级自定义：直接指定抓取非机房 HTTP 代理的完整 JSON 地址列表（支持多源并发竞速，协议级最高优先级） |
+| `EDT_SOCKS5_URLS` | 专属 SOCKS5 代理完整 JSON 候选列表（逗号分隔） | 留空（由镜像自动推导） | 可选 | 高级自定义：直接指定抓取非机房 SOCKS5 代理的完整 JSON 地址列表（支持多源并发竞速，协议级最高优先级） |
 | `CF_CHECK_ENDPOINT` | SSTP 代理出口检测端点 URL | 留空（不执行） | 可选 | 用于存活 SSTP 节点的第二阶段真实出口 IP 与链路鉴真。<br>💡 **需自行部署**：本项目**默认不预设第三方公共端点**（避免占用他人私人项目额度）。推荐使用开源项目 [CF-Workers-CheckSocks5](https://github.com/cmliu/CF-Workers-CheckSocks5) 部署到个人 Cloudflare Workers 免费账号（每日 100,000 次免费请求额度），部署后将个人 Worker 域名填入此处。若留空则仅使用本地探测，完全不调用外部服务。 |
 
 ### 3. 高级调优参数与本地调试对照（可选）
@@ -498,7 +507,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 ### 第三步：启用 Actions 定时任务
 1. 打开仓库的 **Actions** 标签页，点击绿色按钮开启工作流权限（*“I understand my workflows, go ahead and enable them”*）。（注：流水线 YAML 已显式声明 `permissions: contents: write` 与 `actions: write`，开箱即支持自动提交数据产物与清理历史运行；若为 Fork 仓库，可在 Settings -> Actions -> General 中确认 "Workflow permissions" 允许读写）。
 2. **自动定时调度**：每天 **北京时间 08:15（UTC 00:15）** 自动执行完整的流水线（位于 Cloudflare Workers 每日免费额度刷新后，并微调 15 分钟避开整点排队拥堵）。
-3. **手动随时触发**：在 Actions 页面左侧点击 **Fetch Proxies and CF IPs** ➔ **Run workflow**，支持自定义输入 `fetch_days` 与 `cf_check_endpoint`，按需随时触发同步。
+3. **手动随时触发**：在 Actions 页面左侧点击 **Fetch Proxies and CF IPs** ➔ **Run workflow**，支持自定义输入回溯天数 `fetch_days`、检测端点 `cf_check_endpoint`、镜像加速源 `edt_mirrors` 与自定义地址 `edt_urls`，按需随时触发同步。
 
 ---
 
@@ -542,9 +551,9 @@ python cf_verify.py --concurrency 150 --timeout 3.0
 - **Telegram 公开频道**：
   - [@otcfxq](https://t.me/otcfxq)
   - [DanFeng 交流群 (@danfeng_chat)](https://t.me/danfeng_chat)
-- **开源订阅镜像与工具**：
+- **开源代理镜像与实验项目**：
+  - [EDT-Pages/Proxy-List](https://github.com/EDT-Pages/Proxy-List)（提供高质量公开多协议非机房代理镜像）
   - [@cmliu](https://github.com/cmliu)（提供开源公共订阅镜像服务及 [CF-Workers-CheckSocks5](https://github.com/cmliu/CF-Workers-CheckSocks5) 鉴真端点项目）
-- **公共中继实验项目**：
   - [VPN Gate 学术实验项目](https://www.vpngate.net/)（日本国立筑波大学研究生院全球分布式学术中继网络）
 
 ---
