@@ -1138,7 +1138,8 @@
     "Milkywan Association": "AS2027",
     "Aruba S.p.A. Broadband Pool BNG": "AS202613",
     "Enecom, Inc.": "AS18144",
-    "Limited Liability Company": "AS41349"
+    "Limited Liability Company": "AS41349",
+    "TOT Public Company Limited": "AS23969"
   },
   "asn_to_isp": {
     "AS174": "Cogent Communications, LLC",
@@ -2218,7 +2219,8 @@
     "AS2027": "Milkywan Association",
     "AS202613": "Aruba S.p.A. Broadband Pool BNG",
     "AS18144": "Enecom, Inc.",
-    "AS41349": "Limited Liability Company"
+    "AS41349": "Limited Liability Company",
+    "AS23969": "TOT Public Company Limited"
   },
   "asn_to_net_type": {
     "AS1311": "banking",
