@@ -104,6 +104,22 @@ SSTP_READ_TIMEOUT = 4.0
 CONCURRENCY = 300
 MAX_FAILS = 3
 
+# 致命硬故障状态集：对端端口关闭 (Connection Refused)、主机不可达、协议错配或鉴权永久失败
+# 遇此错误直接判死淘汰（fail_count 达到淘汰阈值并登记至墓地冷却库），不进入缓冲期
+FATAL_FAIL_STATUSES = {
+    "conn_err",               # 端口关闭 (Connection Refused) / 主机不可达 / DNS 解析失败
+    "bad_handshake",          # 协议头不匹配 (非目标代理协议)
+    "no_acceptable_auth",     # 认证方式协商失败 (0xFF)
+    "auth_required_missing",  # 代理需要账密认证但未提供
+    "auth_fail",              # 代理账密认证错误
+    "unsupported_method",     # 不支持的认证方式
+    "connect_fail",           # 代理端明确拒绝中继 (CONNECT 响应 REP != 0)
+    "tls_err",                # TLS 握手异常 (非 SSL/TLS 服务)
+    "stun_fail",              # STUN/TURN Magic Cookie 校验失败 (非 STUN 服务)
+    "sstp_fail",              # SSTP 隧道请求返回非 200 (非 SSTP 服务)
+    "unknown_proto",          # 未知协议
+}
+
 CSV_FIELDS = PROXY_CSV_FIELDS
 
 CF_CHECK_ENDPOINT = os.getenv("CF_CHECK_ENDPOINT", "").strip()
@@ -665,6 +681,7 @@ async def probe_single(
     cf_executor: concurrent.futures.ThreadPoolExecutor | None = None,
     http_probe_timeout: float = HTTP_PROBE_TIMEOUT,
     http_max_latency_ms: int = HTTP_MAX_LATENCY_MS,
+    max_fails: int = MAX_FAILS,
 ) -> dict:
     """协议分流路由与执行"""
     async with sem:
@@ -764,7 +781,10 @@ async def probe_single(
             row["country"] = country or row.get("country", "")
             row["egress_ip"] = egress_ip or row.get("egress_ip", "")
         else:
-            row["fail_count"] = fc + 1
+            if status in FATAL_FAIL_STATUSES:
+                row["fail_count"] = max_fails
+            else:
+                row["fail_count"] = fc + 1
             if not row.get("delay_ms"):
                 row["delay_ms"] = 0
             row.setdefault("country", row.get("country", ""))
@@ -1218,6 +1238,7 @@ async def async_main(args):
                 cf_executor=cf_executor,
                 http_probe_timeout=h_to,
                 http_max_latency_ms=h_lat,
+                max_fails=args.max_fails,
             )
         completed += 1
 

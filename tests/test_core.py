@@ -468,8 +468,8 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
                 self.assertEqual(res["egress_ip"], "203.0.113.19")
                 self.assertEqual(res["status"], "alive")
 
-            # 3. 验证探测失败时保留既有 country 与 egress_ip (使用 copy 避免 dict mutate 副作用, T2)
-            with patch("proxies_verify.probe_socks5", return_value=(False, 0, "conn_err", "", "", "")):
+            # 3. 验证探测失败 (软故障 timeout) 时保留既有 country 与 egress_ip (使用 copy 避免 dict mutate 副作用, T2)
+            with patch("proxies_verify.probe_socks5", return_value=(False, 0, "timeout", "", "", "")):
                 res_fail = await probe_single(res.copy(), sem)
                 self.assertEqual(res_fail["country"], "JP")
                 self.assertEqual(res_fail["egress_ip"], "203.0.113.19")
@@ -1547,6 +1547,48 @@ class TestHttpsProbe(unittest.IsolatedAsyncioTestCase):
             args, kwargs = mock_probe.call_args
             self.assertEqual(kwargs.get("max_latency_ms"), 2500)
             self.assertEqual(kwargs.get("is_ssl"), False)
+
+    async def test_probe_single_fatal_failure_sets_max_fails_immediately(self):
+        """测试遇到 conn_err / bad_handshake 等致命硬故障时，fail_count 直接拉满到 max_fails 立即淘汰"""
+        from proxies_verify import probe_single
+
+        row = {
+            "proto": "socks5",
+            "host": "1.2.3.4",
+            "port": 1080,
+            "url": "socks5://1.2.3.4:1080",
+            "fail_count": 0,
+        }
+        sem = asyncio.Semaphore(10)
+
+        # 模拟返回 conn_err 致命错误
+        with patch("proxies_verify.probe_socks5", return_value=(False, 0, "conn_err", "", "", "")):
+            res = await probe_single(row, sem, max_fails=3)
+            self.assertFalse(res["is_alive"])
+            self.assertEqual(res["status"], "conn_err")
+            # 关键断言：fail_count 直接变为 max_fails (3)，不给缓冲期
+            self.assertEqual(res["fail_count"], 3)
+
+    async def test_probe_single_slow_timeout_is_soft_failure_increments_by_one(self):
+        """测试 slow_timeout 属于软故障，fail_count 仅递增 1，保留重试缓冲期"""
+        from proxies_verify import probe_single
+
+        row = {
+            "proto": "http",
+            "host": "1.2.3.4",
+            "port": 8080,
+            "url": "http://1.2.3.4:8080",
+            "fail_count": 0,
+        }
+        sem = asyncio.Semaphore(10)
+
+        # 模拟返回 slow_timeout 延迟超标软故障
+        with patch("proxies_verify.probe_http", return_value=(False, 2800, "slow_timeout", "", "", "")):
+            res = await probe_single(row, sem, max_fails=3)
+            self.assertFalse(res["is_alive"])
+            self.assertEqual(res["status"], "slow_timeout")
+            # 关键断言：fail_count 仅递增为 1，享有缓冲期，不直接判死为 3
+            self.assertEqual(res["fail_count"], 1)
 
 
 if __name__ == "__main__":
