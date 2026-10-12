@@ -3495,21 +3495,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "http://5.160.103.45:80",
-    "protocol": "http",
-    "ip": "5.160.103.45",
-    "port": 80,
-    "country": "IR",
-    "country_name": "IR",
-    "country_cn": "IR",
-    "country_emoji": "🇮🇷",
-    "asn": "42337",
-    "asOrganization": "respina",
-    "isp": "respina",
-    "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "http://80.72.176.101:8080",
     "protocol": "http",
     "ip": "80.72.176.101",
@@ -4076,21 +4061,6 @@
     "asn": "200912",
     "asOrganization": "vpslayer.net",
     "isp": "vpslayer.net",
-    "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "http://190.153.22.2:999",
-    "protocol": "http",
-    "ip": "190.153.22.2",
-    "port": 999,
-    "country": "VE",
-    "country_name": "VE",
-    "country_cn": "VE",
-    "country_emoji": "🇻🇪",
-    "asn": "11562",
-    "asOrganization": "Net Uno, C.A.",
-    "isp": "Net Uno, C.A.",
     "net_type": "isp",
     "source": "EDT-Pages"
   },
@@ -6510,21 +6480,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "http://46.23.166.161:1080",
-    "protocol": "http",
-    "ip": "46.23.166.161",
-    "port": 1080,
-    "country": "FI",
-    "country_name": "芬兰",
-    "country_cn": "芬兰",
-    "country_emoji": "🇫🇮",
-    "asn": "719",
-    "asOrganization": "Elisa Oyj",
-    "isp": "Elisa Oyj",
-    "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "http://45.168.239.58:999",
     "protocol": "http",
     "ip": "45.168.239.58",
@@ -6626,21 +6581,6 @@
     "asn": "269771",
     "asOrganization": "Cogent Communications",
     "isp": "Cogent Communications",
-    "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "http://60.49.236.13:8080",
-    "protocol": "http",
-    "ip": "60.49.236.13",
-    "port": 8080,
-    "country": "MY",
-    "country_name": "马来西亚",
-    "country_cn": "马来西亚",
-    "country_emoji": "🇲🇾",
-    "asn": "4788",
-    "asOrganization": "TM TECHNOLOGY SERVICES SDN. BHD.",
-    "isp": "TM TECHNOLOGY SERVICES SDN. BHD.",
     "net_type": "isp",
     "source": "EDT-Pages"
   },
@@ -7316,21 +7256,6 @@
     "asn": "216472",
     "asOrganization": "High Speed",
     "isp": "High Speed",
-    "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "http://95.3.69.222:8080",
-    "protocol": "http",
-    "ip": "95.3.69.222",
-    "port": 8080,
-    "country": "TR",
-    "country_name": "土耳其",
-    "country_cn": "土耳其",
-    "country_emoji": "🇹🇷",
-    "asn": "9121",
-    "asOrganization": "Turk Telekomunikasyon Anonim Sirketi",
-    "isp": "Turk Telekomunikasyon Anonim Sirketi",
     "net_type": "isp",
     "source": "EDT-Pages"
   },
@@ -8805,21 +8730,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "http://95.215.161.153:8080",
-    "protocol": "http",
-    "ip": "95.215.161.153",
-    "port": 8080,
-    "country": "AZ",
-    "country_name": "AZ",
-    "country_cn": "AZ",
-    "country_emoji": "🇦🇿",
-    "asn": "29049",
-    "asOrganization": "Leased IPv4 Blocks",
-    "isp": "Leased IPv4 Blocks",
-    "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "http://102.0.20.200:8080",
     "protocol": "http",
     "ip": "102.0.20.200",
@@ -9840,21 +9750,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "http://157.66.36.75:8080",
-    "protocol": "http",
-    "ip": "157.66.36.75",
-    "port": 8080,
-    "country": "ID",
-    "country_name": "印度尼西亚",
-    "country_cn": "印度尼西亚",
-    "country_emoji": "🇮🇩",
-    "asn": "140016",
-    "asOrganization": "PT Trik Media Data",
-    "isp": "PT Trik Media Data",
-    "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "http://103.101.219.118:8080",
     "protocol": "http",
     "ip": "103.101.219.118",
@@ -9926,21 +9821,6 @@
     "asn": "136290",
     "asOrganization": "Country Online Services PVT LTD",
     "isp": "Country Online Services PVT LTD",
-    "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "http://112.216.54.226:12121",
-    "protocol": "http",
-    "ip": "112.216.54.226",
-    "port": 12121,
-    "country": "KR",
-    "country_name": "韩国",
-    "country_cn": "韩国",
-    "country_emoji": "🇰🇷",
-    "asn": "3786",
-    "asOrganization": "LG Uplus",
-    "isp": "LG Uplus",
     "net_type": "isp",
     "source": "EDT-Pages"
   },
@@ -11070,21 +10950,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "http://103.188.168.173:8080",
-    "protocol": "http",
-    "ip": "103.188.168.173",
-    "port": 8080,
-    "country": "ID",
-    "country_name": "印度尼西亚",
-    "country_cn": "印度尼西亚",
-    "country_emoji": "🇮🇩",
-    "asn": "58821",
-    "asOrganization": "PT Trinity Telekomunikasi Indonesia",
-    "isp": "PT Trinity Telekomunikasi Indonesia",
-    "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "http://203.76.220.126:16464",
     "protocol": "http",
     "ip": "203.76.220.126",
@@ -11370,21 +11235,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "http://61.130.176.21:4317",
-    "protocol": "http",
-    "ip": "61.130.176.21",
-    "port": 4317,
-    "country": "CN",
-    "country_name": "中国",
-    "country_cn": "中国",
-    "country_emoji": "🇨🇳",
-    "asn": "4134",
-    "asOrganization": "CHINANET-ZJ Lishui node network",
-    "isp": "CHINANET-ZJ Lishui node network",
-    "net_type": "datacenter",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "http://181.78.95.58:999",
     "protocol": "http",
     "ip": "181.78.95.58",
@@ -11426,21 +11276,6 @@
     "asn": "64126",
     "asOrganization": "Cloud Innovation Ltd",
     "isp": "Cloud Innovation Ltd",
-    "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "http://112.210.199.136:8080",
-    "protocol": "http",
-    "ip": "112.210.199.136",
-    "port": 8080,
-    "country": "PH",
-    "country_name": "菲律宾",
-    "country_cn": "菲律宾",
-    "country_emoji": "🇵🇭",
-    "asn": "9299",
-    "asOrganization": "PLDT SPCHME60i01 DHCP",
-    "isp": "PLDT SPCHME60i01 DHCP",
     "net_type": "isp",
     "source": "EDT-Pages"
   },
@@ -12026,21 +11861,6 @@
     "asn": "27951",
     "asOrganization": "CABLE & TV YOPAL S.A.S INTERNET INALÁMBRICO",
     "isp": "CABLE & TV YOPAL S.A.S INTERNET INALÁMBRICO",
-    "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "http://5.202.120.123:3128",
-    "protocol": "http",
-    "ip": "5.202.120.123",
-    "port": 3128,
-    "country": "IR",
-    "country_name": "IR",
-    "country_cn": "IR",
-    "country_emoji": "🇮🇷",
-    "asn": "49100",
-    "asOrganization": "Pishgaman Toseeh Ertebatat Company (Private Joint Stock)",
-    "isp": "Pishgaman Toseeh Ertebatat Company (Private Joint Stock)",
     "net_type": "isp",
     "source": "EDT-Pages"
   },
@@ -13635,21 +13455,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "http://118.179.206.42:8080",
-    "protocol": "http",
-    "ip": "118.179.206.42",
-    "port": 8080,
-    "country": "BD",
-    "country_name": "BD",
-    "country_cn": "BD",
-    "country_emoji": "🇧🇩",
-    "asn": "23956",
-    "asOrganization": "Amber IT Limited",
-    "isp": "Amber IT Limited",
-    "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "http://81.0.49.104:20500",
     "protocol": "http",
     "ip": "81.0.49.104",
@@ -14591,21 +14396,6 @@
     "asn": "24323",
     "asOrganization": "Aamra Networks Limited",
     "isp": "Aamra Networks Limited",
-    "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "http://190.43.92.94:999",
-    "protocol": "http",
-    "ip": "190.43.92.94",
-    "port": 999,
-    "country": "PE",
-    "country_name": "秘鲁",
-    "country_cn": "秘鲁",
-    "country_emoji": "🇵🇪",
-    "asn": "6147",
-    "asOrganization": "PE-TDPERX11-LACNIC",
-    "isp": "PE-TDPERX11-LACNIC",
     "net_type": "isp",
     "source": "EDT-Pages"
   },

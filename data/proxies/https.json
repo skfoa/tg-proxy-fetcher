@@ -3810,21 +3810,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "https://45.220.232.12:443",
-    "protocol": "https",
-    "ip": "45.220.232.12",
-    "port": 443,
-    "country": "ZA",
-    "country_name": "南非",
-    "country_cn": "南非",
-    "country_emoji": "🇿🇦",
-    "asn": "32653",
-    "asOrganization": "eNetworks cc",
-    "isp": "eNetworks cc",
-    "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "https://201.54.216.54:443",
     "protocol": "https",
     "ip": "201.54.216.54",

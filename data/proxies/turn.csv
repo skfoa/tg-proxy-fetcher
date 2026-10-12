@@ -607,14 +607,3 @@ turn://159.75.236.44:3478,turn,159.75.236.44,3478,1981,0,alive,-,CN,159.75.236.4
 turn://47.76.28.111:3479,turn,47.76.28.111,3479,2001,0,alive,-,HK,47.76.28.111,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://52.66.209.215:3479,turn,52.66.209.215,3479,2107,0,alive,-,IN,52.66.209.215,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://110.184.206.131:3478,turn,110.184.206.131,3478,2187,0,alive,-,CN,110.184.206.131,AS4134 China Telecom,China Telecom,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://190.94.243.45:3478,turn,190.94.243.45,3478,159,1,conn_err,-,VE,190.94.243.45,AS8053 IFX Networks Venezuela C.A.,IFX Networks Venezuela C.A.,isp,2026-10-01 00:00:00,@danfeng_chat
-turn://150.241.116.60:3479,turn,150.241.116.60,3479,310,1,conn_err,-,DE,150.241.116.60,AS215590 DpkgSoft International Limited,DpkgSoft International Limited,datacenter,2026-10-08 14:09:40,@danfeng_chat
-turn://iipult.ru:3479,turn,iipult.ru,3479,316,1,conn_err,-,DE,150.241.116.60,AS215590 DpkgSoft International Limited,DpkgSoft International Limited,datacenter,2026-10-08 14:09:40,@danfeng_chat
-turn://135.181.114.98:3478,turn,135.181.114.98,3478,318,1,conn_err,-,FI,135.181.114.98,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://test:test123@125.46.82.229:3478,turn,125.46.82.229,3478,419,1,conn_err,-,CN,125.46.82.229,AS4837 China Unicom,China Unicom,isp,2026-10-01 00:00:00,@danfeng_chat
-turn://1.71.22.102:3478,turn,1.71.22.102,3478,424,1,conn_err,-,CN,1.71.22.102,AS132147,"No.3, Shu-Ma Road",datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://iipult.ru:3478,turn,iipult.ru,3478,484,1,conn_err,-,DE,150.241.116.60,AS215590 DpkgSoft International Limited,DpkgSoft International Limited,datacenter,2026-10-08 14:09:40,@danfeng_chat
-turn://190.94.243.45:3479,turn,190.94.243.45,3479,929,1,conn_err,-,VE,190.94.243.45,AS8053 IFX Networks Venezuela C.A.,IFX Networks Venezuela C.A.,isp,2026-10-01 00:00:00,@danfeng_chat
-turn://95.217.183.3:3478,turn,95.217.183.3,3478,1491,1,conn_err,-,FI,95.217.183.3,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://150.241.116.60:3478,turn,150.241.116.60,3478,1880,1,conn_err,-,DE,150.241.116.60,AS215590 DpkgSoft International Limited,DpkgSoft International Limited,datacenter,2026-10-08 14:09:40,@danfeng_chat
-turn://91.99.14.79:3478,turn,91.99.14.79,3478,2499,1,conn_err,-,DE,91.99.14.79,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
