@@ -1681,6 +1681,72 @@ class TestHttpsProbe(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(res["fail_count"], 1)
 
 
+class TestLayeredAsnClassification(unittest.TestCase):
+    def test_l0_conflict_overrides(self):
+        """测试 L0 冲突裁决表：优先级最高，强制压制机房冒充 ISP，纠偏正牌宽带，SSOT 保护金融"""
+        from providers import classify_asn
+
+        # IDC/VPS 冒充 Cable/DSL/ISP 强行压制为 datacenter
+        self.assertEqual(classify_asn("AS39618", "HostCram LLC"), "datacenter")
+        self.assertEqual(classify_asn("AS45090", "West263 Network"), "datacenter")
+        self.assertEqual(classify_asn("AS3214", "xTom GmbH"), "datacenter")
+        self.assertEqual(classify_asn("AS7720", "Skywolf Cloud"), "datacenter")
+
+        # 知名宽带 ISP 纠偏为 isp (覆盖 NSP/Content)
+        self.assertEqual(classify_asn("AS18106", "ViewQwest Singapore"), "isp")
+        self.assertEqual(classify_asn("AS1257", "Tele2 Sverige AB"), "isp")
+
+        # 核心金融机构专网 SSOT 保护
+        self.assertEqual(classify_asn("AS1311"), "banking")
+        self.assertEqual(classify_asn("AS5091", "STRIPE"), "banking")
+        self.assertEqual(classify_asn("AS4787"), "banking")
+
+    def test_l1_peeringdb_snapshot_mapping(self):
+        """测试 L1 PeeringDB 事实快照：权威枚举直接映射"""
+        from providers import classify_asn
+
+        # Cable/DSL/ISP -> isp
+        self.assertEqual(classify_asn("AS40786", "Digicel"), "isp")
+        self.assertEqual(classify_asn("AS4134", "China Telecom"), "isp")
+        # Content -> datacenter
+        self.assertEqual(classify_asn("AS13335", "Cloudflare"), "datacenter")
+        # Educational/Research -> education
+        self.assertEqual(classify_asn("AS26", "Cornell University"), "education")
+
+    def test_l2_strict_pattern_fallback(self):
+        """测试 L2 高置信度收窄词根保守回退：非 PeeringDB 节点或 NSP 节点精确降级"""
+        from providers import classify_asn
+
+        # 强语义银行词根回退
+        self.assertEqual(classify_asn("AS999991", "Central Bank of Someland"), "banking")
+        self.assertEqual(classify_asn("AS999992", "Banco de Bogota"), "banking")
+        self.assertEqual(classify_asn("AS999993", "Federal Credit Union"), "banking")
+
+        # 强语义高校词根回退
+        self.assertEqual(classify_asn("AS999994", "Oxford Academic University"), "education")
+
+        # 强语义住宅宽带词根回退
+        self.assertEqual(classify_asn("AS999995", "Local Residential FTTH Broadband"), "isp")
+
+        # 剔除宽泛词根：单纯泛词 (如 CATV / cable tv) 不再直接认定为 isp
+        self.assertEqual(classify_asn("AS999996", "Random CATV Network Ltd"), "datacenter")
+
+    def test_l3_default_fallback_and_is_recorded(self):
+        """测试 L3 安全降级兜底及 is_asn_recorded 防刷屏机制"""
+        from providers import classify_asn, is_asn_recorded
+
+        # 未知节点无规则命中安全降级为 datacenter
+        self.assertEqual(classify_asn("AS999999", "Unknown Strange Network"), "datacenter")
+
+        # 快照/裁决表已收录节点均返回 True，免于未收录报警
+        self.assertTrue(is_asn_recorded("AS39618"))
+        self.assertTrue(is_asn_recorded("AS18106"))
+        self.assertTrue(is_asn_recorded("AS4134"))
+        self.assertTrue(is_asn_recorded("AS13335"))
+        # 真正的新 ASN 返回 False
+        self.assertFalse(is_asn_recorded("AS999999"))
+
+
 if __name__ == "__main__":
     unittest.main()
 
