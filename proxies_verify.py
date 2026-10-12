@@ -348,7 +348,7 @@ async def probe_http(
     1. 若 is_ssl=True (HTTPS 代理)，首先与代理服务器完成 TLS 加密握手 (支持老旧版本与 SECLEVEL=0)
     2. 发送 CONNECT speed.cloudflare.com:80 隧道请求 (若有账密带 Proxy-Authorization)
     3. 穿透隧道发送 GET /cdn-cgi/trace 并提取 colo, country 与 egress_ip
-    4. 若 CONNECT 不支持，回退至直接 Forward GET
+    4. 若 CONNECT 阶段无响应或超时直接判死；仅当收到明确的非 200 HTTP 响应（如 403/405）时才回退至 Forward GET
     返回 (is_alive, delay_ms, status, colo, country, egress_ip)
     """
     connect_host = host
@@ -406,7 +406,20 @@ async def probe_http(
         writer.write(connect_req)
         await asyncio.wait_for(writer.drain(), timeout=connect_timeout)
 
-        resp = await asyncio.wait_for(reader.read(1024), timeout=connect_timeout)
+        try:
+            resp = await asyncio.wait_for(reader.read(1024), timeout=connect_timeout)
+        except asyncio.TimeoutError:
+            lat = max(1, int((time.monotonic() - t0) * 1000))
+            await safe_close_writer(writer)
+            writer = None
+            return False, lat, "http_connect_timeout", "", "", ""
+
+        if not resp:
+            lat = max(1, int((time.monotonic() - t0) * 1000))
+            await safe_close_writer(writer)
+            writer = None
+            return False, lat, "conn_reset", "", "", ""
+
         resp_text = resp.decode("latin1", errors="ignore")
         first_line = resp_text.splitlines()[0] if resp_text else ""
 
@@ -430,9 +443,18 @@ async def probe_http(
             ip_match = re.search(r"\bip=([0-9a-fA-F.:]+)\b", http_text)
             egress_ip = ip_match.group(1).strip() if ip_match else ""
             lat = max(1, int((time.monotonic() - t0) * 1000))
-            first_line = http_text.splitlines()[0] if http_text else ""
-            if re.search(r"\b200\b", first_line) and colo:
+            probe_first_line = http_text.splitlines()[0] if http_text else ""
+            if re.search(r"\b200\b", probe_first_line) and colo:
                 return True, lat, "alive", colo, country, egress_ip
+            # 隧道已成功建立但目标穿透失败，直接判死，不进入 Forward GET
+            return False, lat, "http_fail", "", "", ""
+
+        # 仅当收到明确的 HTTP 协议非 200 响应（如 400/403/405/501）时，才回退尝试 Forward GET
+        if not (first_line.upper().startswith("HTTP/") or re.match(r"^HTTP/\d", first_line, re.IGNORECASE)):
+            lat = max(1, int((time.monotonic() - t0) * 1000))
+            await safe_close_writer(writer)
+            writer = None
+            return False, lat, "http_fail", "", "", ""
 
         # 回退至直接正向代理 Forward GET（安全重连以避免原连接被代理端关闭/重置）
         await safe_close_writer(writer)

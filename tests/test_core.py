@@ -1409,6 +1409,90 @@ class TestHttpsProbe(unittest.IsolatedAsyncioTestCase):
             # 确认调用 probe_http 时传入了 is_ssl=True
             self.assertTrue(mock_probe.call_args[1].get("is_ssl"))
 
+    async def test_probe_http_connect_timeout_dies_immediately_no_fallback(self):
+        """测试 CONNECT 阶段无响应读取超时，直接判死，严禁触发 Forward GET 重连"""
+        from proxies_verify import probe_http
+
+        mock_reader = AsyncMock()
+        mock_writer = MagicMock()
+        mock_writer.drain = AsyncMock()
+        mock_writer.close = MagicMock()
+        mock_writer.wait_closed = AsyncMock()
+
+        # reader.read 抛出 TimeoutError
+        mock_reader.read = AsyncMock(side_effect=asyncio.TimeoutError())
+
+        with patch("asyncio.open_connection", return_value=(mock_reader, mock_writer)) as mock_open:
+            is_alive, delay, status, colo, country, egress_ip = await probe_http(
+                "1.2.3.4", 8080, None, None, connect_timeout=1.0, is_ssl=False
+            )
+            # 必须直接判死
+            self.assertFalse(is_alive)
+            self.assertEqual(status, "http_connect_timeout")
+            # 关键验证：open_connection 仅被调用 1 次，绝无二次重连 Forward GET
+            self.assertEqual(mock_open.call_count, 1)
+
+    async def test_probe_http_connect_eof_dies_immediately_no_fallback(self):
+        """测试 CONNECT 阶段收到空字节 EOF (对端直接断开)，直接判死，严禁触发 Forward GET 重连"""
+        from proxies_verify import probe_http
+
+        mock_reader = AsyncMock()
+        mock_writer = MagicMock()
+        mock_writer.drain = AsyncMock()
+        mock_writer.close = MagicMock()
+        mock_writer.wait_closed = AsyncMock()
+
+        # reader.read 返回 b""
+        mock_reader.read = AsyncMock(return_value=b"")
+
+        with patch("asyncio.open_connection", return_value=(mock_reader, mock_writer)) as mock_open:
+            is_alive, delay, status, colo, country, egress_ip = await probe_http(
+                "1.2.3.4", 8080, None, None, connect_timeout=1.0, is_ssl=False
+            )
+            self.assertFalse(is_alive)
+            self.assertEqual(status, "conn_reset")
+            # 关键验证：open_connection 仅被调用 1 次
+            self.assertEqual(mock_open.call_count, 1)
+
+    async def test_probe_http_connect_explicit_non200_falls_back_to_forward_get(self):
+        """测试 CONNECT 收到明确的非 200 HTTP 响应 (如 405 Method Not Allowed)，才正常回退至 Forward GET"""
+        from proxies_verify import probe_http
+
+        # 第一次连接返回 405
+        mock_reader_conn = AsyncMock()
+        mock_writer_conn = MagicMock()
+        mock_writer_conn.drain = AsyncMock()
+        mock_writer_conn.close = MagicMock()
+        mock_writer_conn.wait_closed = AsyncMock()
+        mock_reader_conn.read = AsyncMock(return_value=b"HTTP/1.1 405 Method Not Allowed\r\n\r\n")
+
+        # 第二次连接 (Forward GET) 返回 200 OK + trace 响应
+        mock_reader_fwd = AsyncMock()
+        mock_writer_fwd = MagicMock()
+        mock_writer_fwd.drain = AsyncMock()
+        mock_writer_fwd.close = MagicMock()
+        mock_writer_fwd.wait_closed = AsyncMock()
+        mock_reader_fwd.read = AsyncMock(side_effect=[
+            b"HTTP/1.1 200 OK\r\nServer: cloudflare\r\n\r\ncolo=HKG\r\nloc=HK\r\nip=1.2.3.4\r\nwarp=off\r\n",
+            b"",
+        ])
+
+        with patch("asyncio.open_connection", side_effect=[
+            (mock_reader_conn, mock_writer_conn),
+            (mock_reader_fwd, mock_writer_fwd),
+        ]) as mock_open:
+            is_alive, delay, status, colo, country, egress_ip = await probe_http(
+                "1.2.3.4", 8080, None, None, connect_timeout=1.0, is_ssl=False
+            )
+            # 应当回退并成功测活
+            self.assertTrue(is_alive)
+            self.assertEqual(status, "alive")
+            self.assertEqual(colo, "HKG")
+            self.assertEqual(country, "HK")
+            self.assertEqual(egress_ip, "1.2.3.4")
+            # open_connection 被调用了 2 次 (初次 CONNECT + 回退 Forward GET)
+            self.assertEqual(mock_open.call_count, 2)
+
 
 if __name__ == "__main__":
     unittest.main()
