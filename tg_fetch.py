@@ -43,6 +43,7 @@ START_TIME = time.time()
 TZ_BJT = timezone(timedelta(hours=8))
 
 # ================= 配置区域 =================
+import providers
 from providers import (
     load_dotenv,
     safe_int,
@@ -68,6 +69,10 @@ from providers import (
     prune_tombstone,
     is_tombstoned,
     LEGACY_DEFAULT_FIRST_SEEN,
+    AUTHORITATIVE_CLOUD_ASNS,
+    load_asn_database,
+    save_asn_database,
+    resolve_asn_online,
 )
 from parsers import (
     extract_proxies,
@@ -551,9 +556,10 @@ def send_tg_notification(
             o = item.get("org", "").strip()
             cnt = item.get("count", 0)
             name_str = f" {o}" if o else ""
-            items.append(f"   • <code>{c}</code>{name_str} ({cnt} 条)")
-        suffix = f"\n   └ <i>共 {len(unrecorded_asns)} 个待确认归属</i>" if len(unrecorded_asns) > 4 else ""
-        unmatched_block = "💡 <b>发现未收录 ASN (可补充入库)</b>：\n" + "\n".join(items) + suffix + "\n"
+            cnt_str = f" ({cnt} 条)" if cnt else ""
+            items.append(f"   • <code>{c}</code>{name_str}{cnt_str}")
+        suffix = f"\n   └ <i>共 {len(unrecorded_asns)} 个已自动收录入库</i>" if len(unrecorded_asns) > 4 else ""
+        unmatched_block = f"💡 <b>新收录 ASN (已自动归类入库 +{len(unrecorded_asns)})</b>：\n" + "\n".join(items) + suffix + "\n"
 
     all_channels = []
     for ch in PROXY_CHANNELS + CF_IP_CHANNELS:
@@ -666,6 +672,101 @@ def fetch_external_subscriptions(
     return total_added
 
 
+def auto_enrich_and_save_asns(unrecorded_items: list[dict], proxy: str = "") -> int:
+    """
+    针对自带 ASN / 组织机构属性的数据源（如 EDT-Pages、测速扫描附件等）：
+    在抓取阶段直接自动完成网络类型属性分类并持久化入库到 data/asn_database.json。
+    对于裸 IP（如 Telegram 频道提取的裸节点），保持在抓取阶段不作处理，交由质检阶段在线反查入库。
+
+    工程保障：
+    1. 【严格幂等性】：内存字典去重 + is_asn_recorded 检查 + JSON 对象键覆盖，多次调用与多轮定时任务绝不产生重复条目或频繁写盘。
+    2. 【全链路异常隔离】：单条记录解析异常、正则不匹配、在线反查超时、写盘异常均被完全隔离捕获，记录日志后安全跳过，绝不中断抓取主流程。
+    3. 【云厂商 SSOT 保护】：若传入的 ASN 属于内置权威已知云厂商（如 AWS、Cloudflare、阿里云、腾讯云等），强制维持权威标准名称与 datacenter 属性，绝对禁止外部数据篡改。
+    """
+    if not unrecorded_items:
+        return 0
+
+    try:
+        to_save_map: dict[str, dict] = {}
+        for item in unrecorded_items:
+            try:
+                if not isinstance(item, dict):
+                    continue
+                raw_asn = str(item.get("asn") or "").strip()
+                raw_isp = str(item.get("isp") or item.get("org") or "").strip()
+                code = _extract_asn_code(raw_asn, raw_isp)
+                if not code or not re.match(r"^AS\d+$", code):
+                    continue
+
+                # 云厂商 SSOT 保护：若命中内置权威已知云厂商，坚决维持权威定义，直接跳过并拒绝外部污染
+                if code in AUTHORITATIVE_CLOUD_ASNS:
+                    log.debug("ASN %s 命中权威已知云厂商 SSOT 锁定列表，维持权威名称 %s，忽略外部标签: %s", code, AUTHORITATIVE_CLOUD_ASNS[code], raw_isp)
+                    continue
+
+                # 幂等性快速短路：若本地权威库已收录，直接跳过
+                if is_asn_recorded(code):
+                    continue
+
+                org = re.sub(r"^AS\d+\s*", "", raw_isp, flags=re.IGNORECASE).strip()
+                sample_ip = str(item.get("ip") or "").strip()
+
+                # 若组织名缺失且存在有效公网 IP，尝试轻量在线反查一次获取标准组织名 (隔离超时与异常)
+                if not org and sample_ip and not is_tombstoned(f"{sample_ip}:0", {}):
+                    try:
+                        resolved_code, resolved_isp = resolve_asn_online(sample_ip)
+                        if resolved_code == code and resolved_isp:
+                            org = resolved_isp
+                    except Exception as resolve_err:
+                        log.debug("尝试在线反查缺失组织名的 ASN %s 失败 (已安全跳过反查): %s", code, resolve_err)
+
+                net_type = item.get("net_type") or classify_asn(code, org)
+                if code not in to_save_map:
+                    to_save_map[code] = {
+                        "asn": code,
+                        "isp": org,
+                        "net_type": net_type,
+                    }
+            except Exception as item_err:
+                log.debug("解析单条未收录 ASN 条目发生异常 (已隔离跳过): %s (%s)", item, item_err)
+                continue
+
+        if not to_save_map:
+            return 0
+
+        i2a, a2i, a2nt = load_asn_database()
+        added_count = 0
+        for code, info in to_save_map.items():
+            # 再次确认 SSOT 保护
+            if code in AUTHORITATIVE_CLOUD_ASNS:
+                continue
+            org = info["isp"]
+            n_type = info["net_type"]
+            if code not in a2nt:
+                a2nt[code] = n_type
+                added_count += 1
+            if org:
+                if code not in a2i:
+                    a2i[code] = org
+                if org not in i2a:
+                    i2a[org] = code
+
+        if added_count > 0:
+            save_asn_database(i2a, a2i, a2nt)
+            # 同步更新内存运行时 SSOT 字典与 Fast-path
+            ASN_TO_PROVIDER.update(a2i)
+            if hasattr(providers, "ASN_DATABASE_ASN_TO_NET_TYPE"):
+                providers.ASN_DATABASE_ASN_TO_NET_TYPE.update(a2nt)
+            if hasattr(providers, "ASN_EXACT_NET_TYPE"):
+                providers.ASN_EXACT_NET_TYPE.update(a2nt)
+
+            sample_str = ", ".join(f"{c}[{info['net_type']}]" for c, info in list(to_save_map.items())[:6])
+            log.info("【批量自动持久化新 ASN】从自带源提取 %d 个全新自治系统并原子写入数据库: %s", added_count, sample_str)
+        return added_count
+    except Exception:
+        log.exception("【自动收录新 ASN】执行异常（已安全隔离，抓取主流程继续正常执行）")
+        return 0
+
+
 def fetch_edt_proxies(
     proto: str,
     edt_urls: list[str],
@@ -691,24 +792,23 @@ def fetch_edt_proxies(
     log.info("-" * 50)
     log.info("开始拉取 EDT-Pages 外部 %s 代理镜像源: %d 个候选镜像 (并发竞速模式)", proto_upper, len(edt_urls))
 
-    raw_json_str = ""
     success_url = ""
     data = []
 
-    def _fetch_single_mirror(u: str) -> tuple[str, str, list]:
+    def _fetch_single_mirror(u: str) -> tuple[str, list]:
         txt = fetch_web_page(u, proxy=proxy)
         if not txt or not txt.strip().startswith("["):
             raise ValueError("内容为空或非有效 JSON 列表")
         parsed = json.loads(txt)
         if not isinstance(parsed, list) or len(parsed) == 0:
             raise ValueError("返回 JSON 非列表或无有效节点")
-        return u, txt, parsed
+        return u, parsed
 
     if len(edt_urls) == 1:
         u = edt_urls[0]
         try:
             t0 = time.time()
-            success_url, raw_json_str, data = _fetch_single_mirror(u)
+            success_url, data = _fetch_single_mirror(u)
             log.info("单源拉取 EDT %s 成功: %s (耗时 %.2fs, 记录数 %d)", proto_upper, u, time.time() - t0, len(data))
         except Exception as e:
             log.warning("单源拉取 EDT %s 失败: %s (%s)", proto_upper, u, e)
@@ -720,9 +820,8 @@ def fetch_edt_proxies(
             for future in as_completed(future_to_url):
                 cand_url = future_to_url[future]
                 try:
-                    cand_url, cand_raw, cand_data = future.result()
+                    cand_url, cand_data = future.result()
                     success_url = cand_url
-                    raw_json_str = cand_raw
                     data = cand_data
                     cost = time.time() - t_start
                     log.info(
@@ -816,6 +915,7 @@ def fetch_edt_proxies(
         total_added,
         len(unrecorded_asns_map),
     )
+
     return total_added, list(unrecorded_asns_map.values())
 
 
@@ -1105,6 +1205,8 @@ def merge_and_save(
     scraped_scan_ips: dict | None = None,
     existing_proxyips: dict | None = None,
     scraped_proxyips: dict | None = None,
+    edt_unrecorded_asns: list[dict] | None = None,
+    proxy: str = "",
 ):
     """
     智能增量合并：历史保留，重复更新，新增追加，并持久化落盘与发送通知。
@@ -1287,8 +1389,28 @@ def merge_and_save(
             "org": unrecorded_orgs.get(c, ""),
             "count": cnt,
         })
-    if unrecorded_asns:
-        log.info("本次新增节点中检测到 %d 个未收录 ASN: %s", len(unrecorded_asns), ", ".join(f"{x['asn']}({x['count']})" for x in unrecorded_asns[:5]))
+
+    # 统一汇流所有自带 ASN 来源（扫描附件、反代池附件、EDT 外部多镜像源等）检测到的新未收录条目
+    new_asn_records = list(unrecorded_asns)
+    if edt_unrecorded_asns:
+        seen_codes = {x.get("asn") for x in new_asn_records if x.get("asn")}
+        for item in edt_unrecorded_asns:
+            c = _extract_asn_code(item.get("asn"), item.get("isp") or item.get("org"))
+            if c and c not in seen_codes:
+                new_asn_records.append(item)
+                seen_codes.add(c)
+
+    enriched_count = 0
+    if new_asn_records:
+        log.info("本次抓取全源汇总检测到 %d 个自带未收录 ASN，执行统一单次批量原子持久化入库...", len(new_asn_records))
+        enriched_count = auto_enrich_and_save_asns(new_asn_records, proxy=proxy)
+        if enriched_count > 0:
+            log.info("【批量自动持久化新 ASN】全流程批量入库完成: 本次共新收录 %d 个全新自治系统到权威库！", enriched_count)
+        else:
+            log.debug("【批量自动持久化新 ASN】本次全源无新 ASN 需入库（全部已在库或已去重跳过）")
+
+    # 仅当本次实际入库了新 ASN，才在通知卡片中展示新收录清单；无新增则 0 视觉噪音
+    card_unrecorded = new_asn_records if enriched_count > 0 else []
 
     save_and_notify(
         final_proxies,
@@ -1303,7 +1425,7 @@ def merge_and_save(
         updated_scan_count=updated_scan_cnt,
         new_proxyips_count=new_proxyip_cnt,
         updated_proxyips_count=updated_proxyip_cnt,
-        unrecorded_asns=unrecorded_asns,
+        unrecorded_asns=card_unrecorded,
     )
 
 
@@ -1369,15 +1491,16 @@ def run_web_scraper():
     fetch_external_subscriptions(SUB_URLS, proxy, tombstone, scraped_proxies)
 
     # 1.6 外部 EDT-Pages 多协议代理源抓取 (HTTPS / HTTP / SOCKS5 多镜像容灾、非机房高价值过滤、元数据丰富)
-    fetch_edt_proxies("https", EDT_HTTPS_URLS, proxy, tombstone, scraped_proxies)
-    fetch_edt_proxies("http", EDT_HTTP_URLS, proxy, tombstone, scraped_proxies)
-    fetch_edt_proxies("socks5", EDT_SOCKS5_URLS, proxy, tombstone, scraped_proxies)
+    edt_unrec_all = []
+    for proto_name, urls in [("https", EDT_HTTPS_URLS), ("http", EDT_HTTP_URLS), ("socks5", EDT_SOCKS5_URLS)]:
+        _, unrec = fetch_edt_proxies(proto_name, urls, proxy, tombstone, scraped_proxies)
+        edt_unrec_all.extend(unrec)
 
     # Web 预览模式仅提取正文单条代理与优选 IP，扫描附件与反代大池需 API 模式自动获取
     scraped_scan_ips = {}
     scraped_proxyips = {}
 
-    # 2. 智能增量合并并落盘保存
+    # 2. 智能增量合并并落盘保存 (统一单次原子持久化写盘)
     merge_and_save(
         existing_proxies=existing_proxies,
         scraped_proxies=scraped_proxies,
@@ -1387,6 +1510,8 @@ def run_web_scraper():
         scraped_scan_ips=scraped_scan_ips,
         existing_proxyips=existing_proxyips,
         scraped_proxyips=scraped_proxyips,
+        edt_unrecorded_asns=edt_unrec_all,
+        proxy=proxy,
     )
 
 async def run_telethon():
@@ -1572,11 +1697,12 @@ async def run_telethon():
         fetch_external_subscriptions(SUB_URLS, web_proxy, tombstone, scraped_proxies)
 
         # 1.6 外部 EDT-Pages 多协议代理源抓取 (HTTPS / HTTP / SOCKS5 多镜像容灾、非机房高价值过滤、元数据丰富)
-        fetch_edt_proxies("https", EDT_HTTPS_URLS, web_proxy, tombstone, scraped_proxies)
-        fetch_edt_proxies("http", EDT_HTTP_URLS, web_proxy, tombstone, scraped_proxies)
-        fetch_edt_proxies("socks5", EDT_SOCKS5_URLS, web_proxy, tombstone, scraped_proxies)
+        edt_unrec_all = []
+        for proto_name, urls in [("https", EDT_HTTPS_URLS), ("http", EDT_HTTP_URLS), ("socks5", EDT_SOCKS5_URLS)]:
+            _, unrec = fetch_edt_proxies(proto_name, urls, web_proxy, tombstone, scraped_proxies)
+            edt_unrec_all.extend(unrec)
 
-        # 2. 智能增量合并并落盘保存
+        # 2. 智能增量合并并落盘保存 (统一单次原子持久化写盘)
         merge_and_save(
             existing_proxies=existing_proxies,
             scraped_proxies=scraped_proxies,
@@ -1586,6 +1712,8 @@ async def run_telethon():
             scraped_scan_ips=scraped_scan_ips,
             existing_proxyips=existing_proxyips,
             scraped_proxyips=scraped_proxyips,
+            edt_unrecorded_asns=edt_unrec_all,
+            proxy=web_proxy,
         )
 
     finally:

@@ -427,6 +427,11 @@ def save_asn_database(
             if re.match(r"^AS\d+$", asn_code) and net_type in VALID_NET_TYPES:
                 clean_a2nt[asn_code] = net_type
 
+        # 权威云厂商 SSOT 属性保护：所有已知权威云厂商必须永久锁定为 datacenter，杜绝被篡改为 isp 等
+        for auth_asn in AUTHORITATIVE_CLOUD_ASNS:
+            if clean_a2nt.get(auth_asn) != "datacenter":
+                clean_a2nt[auth_asn] = "datacenter"
+
         # 自愈补齐：若 clean_a2i 中的 ASN 尚未被 clean_a2nt 分类，自动利用 classify_asn 补齐网络类型，确保 100% 覆盖
         for asn_code, isp_name in clean_a2i.items():
             if asn_code not in clean_a2nt:
@@ -440,7 +445,26 @@ def save_asn_database(
         })
         if val_errors:
             log.error("拒绝持久化写入损坏的 ASN 数据库: %s", val_errors)
-            return
+            return False
+
+        # 6. 脏写检测 (Dirty Check / 零 I/O 优化)：若磁盘文件内容完全一致，坚决跳过写盘
+        if os.path.exists(target_path):
+            try:
+                with open(target_path, "r", encoding="utf-8") as cur_f:
+                    cur_data = json.load(cur_f)
+                if (
+                    cur_data.get("isp_to_asn") == clean_i2a
+                    and cur_data.get("asn_to_isp") == clean_a2i
+                    and cur_data.get("asn_to_net_type") == clean_a2nt
+                ):
+                    log.debug("【零 I/O 优化】ASN 数据库内容完全一致无新增变更，跳过磁盘写入: %s", target_path)
+                    if not db_path or os.path.abspath(target_path) == os.path.abspath(ASN_DATABASE_PATH):
+                        ASN_DATABASE_ASN_TO_NET_TYPE.update(clean_a2nt)
+                        if "ASN_EXACT_NET_TYPE" in globals():
+                            ASN_EXACT_NET_TYPE.update(clean_a2nt)
+                    return False
+            except Exception:
+                pass
 
         os.makedirs(os.path.dirname(target_path), exist_ok=True)
         tmp_target = f"{target_path}.tmp"
@@ -456,10 +480,12 @@ def save_asn_database(
                 indent=2,
             )
         os.replace(tmp_target, target_path)
-        # 同步更新内存运行时字典
-        ASN_DATABASE_ASN_TO_NET_TYPE.update(clean_a2nt)
-        if "ASN_EXACT_NET_TYPE" in globals():
-            ASN_EXACT_NET_TYPE.update(clean_a2nt)
+        # 仅当写入默认系统数据库时才同步更新进程全局单例运行时字典
+        if not db_path or os.path.abspath(target_path) == os.path.abspath(ASN_DATABASE_PATH):
+            ASN_DATABASE_ASN_TO_NET_TYPE.update(clean_a2nt)
+            if "ASN_EXACT_NET_TYPE" in globals():
+                ASN_EXACT_NET_TYPE.update(clean_a2nt)
+        return True
     except Exception as e:
         log.warning("保存 asn_database.json 异常: %s", e)
         if "tmp_target" in locals() and os.path.exists(tmp_target):
@@ -467,6 +493,7 @@ def save_asn_database(
                 os.remove(tmp_target)
             except OSError:
                 pass
+        return False
 
 
 # 加载持久化 ASN 数据库并融合进公共字典（加入防污染校验与格式鉴真）

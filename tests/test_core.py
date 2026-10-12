@@ -1272,6 +1272,87 @@ class TestEdtHttpsFetcher(unittest.TestCase):
         # 总耗时应远小于慢源的 0.15s
         self.assertLess(elapsed, 0.12)
 
+    def test_auto_enrich_and_save_asns(self):
+        from tg_fetch import auto_enrich_and_save_asns
+        import providers
+
+        # 1. 正常入库与同批重复 ASN 幂等合并
+        test_items = [
+            {"asn": "AS999901", "isp": "Test Dynamic Fiber Broadband", "net_type": "isp"},
+            {"asn": "AS999901", "isp": "Test Duplicate Item", "net_type": "isp"},  # 重复条目应自动去重
+            {"asn": "AS999902", "isp": "Test Cloud DC Hosting", "net_type": "datacenter"},
+        ]
+
+        saved_db = {}
+        save_calls = 0
+        def mock_save(i2a, a2i, a2nt, db_path=""):
+            nonlocal save_calls
+            save_calls += 1
+            saved_db["i2a"] = i2a
+            saved_db["a2i"] = a2i
+            saved_db["a2nt"] = a2nt
+
+        with patch("tg_fetch.is_asn_recorded", side_effect=lambda c, isp="": False), \
+             patch("tg_fetch.load_asn_database", return_value=({}, {}, {})), \
+             patch("tg_fetch.save_asn_database", side_effect=mock_save), \
+             patch("providers.save_asn_database", side_effect=mock_save):
+            added = auto_enrich_and_save_asns(test_items)
+            self.assertEqual(added, 2)
+            self.assertEqual(save_calls, 1)  # 全批次仅调用一次原子写盘
+            self.assertEqual(saved_db["a2nt"].get("AS999901"), "isp")
+            self.assertEqual(saved_db["a2nt"].get("AS999902"), "datacenter")
+            self.assertEqual(saved_db["a2i"].get("AS999901"), "Test Dynamic Fiber Broadband")
+
+        # 清理内存中的测试键
+        providers.ASN_TO_PROVIDER.pop("AS999901", None)
+        providers.ASN_TO_PROVIDER.pop("AS999902", None)
+        providers.ASN_DATABASE_ASN_TO_NET_TYPE.pop("AS999901", None)
+        providers.ASN_DATABASE_ASN_TO_NET_TYPE.pop("AS999902", None)
+
+        # 2. 云厂商 SSOT 保护：外部源若试图篡改已知权威云厂商（如 AS13335 Cloudflare），坚决维持 SSOT 权威名称并跳过
+        cf_tamper_items = [{"asn": "AS13335", "isp": "Fake Hacker Broadband", "net_type": "isp"}]
+        with patch("tg_fetch.save_asn_database") as mock_save_ssot:
+            added_ssot = auto_enrich_and_save_asns(cf_tamper_items)
+            self.assertEqual(added_ssot, 0)
+            mock_save_ssot.assert_not_called()
+
+        # 3. 裸 IP（无 ASN）应跳过
+        bare_ip_items = [{"ip": "1.2.3.4", "port": 8080}]
+        with patch("tg_fetch.save_asn_database") as mock_save2:
+            added_bare = auto_enrich_and_save_asns(bare_ip_items)
+            self.assertEqual(added_bare, 0)
+            mock_save2.assert_not_called()
+
+        # 4. 异常隔离：底层写盘或分类发生致命异常时，安全捕获并返回 0，绝不中断主流程
+        with patch("tg_fetch.is_asn_recorded", side_effect=lambda c, isp="": False), \
+             patch("tg_fetch.load_asn_database", side_effect=OSError("Disk hardware error")):
+            res = auto_enrich_and_save_asns([{"asn": "AS999903", "isp": "Crash Test"}])
+            self.assertEqual(res, 0)  # 安全返回 0，主抓取流程不受任何阻碍
+
+    def test_save_asn_database_dirty_check_and_ssot_lock(self):
+        import tempfile
+        from providers import save_asn_database, load_asn_database
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp_db = os.path.join(tmpdir, "asn_database.json")
+
+            # 1. 首次写入全新数据：实际写盘，返回 True
+            i2a = {"Test ISP": "AS999901"}
+            a2i = {"AS999901": "Test ISP", "AS13335": "Fake CF Name"}  # 试图篡改 AS13335
+            a2nt = {"AS999901": "isp", "AS13335": "isp"}  # 试图将 AS13335 篡改为 isp
+            written1 = save_asn_database(i2a, a2i, a2nt, db_path=tmp_db)
+            self.assertTrue(written1)
+
+            # 验证底层 SSOT 强制重写：AS13335 必须锁定为官方标准名称 Cloudflare 与 datacenter
+            loaded_i2a, loaded_a2i, loaded_a2nt = load_asn_database(tmp_db)
+            from providers import AUTHORITATIVE_CLOUD_ASNS
+            self.assertEqual(loaded_a2i.get("AS13335"), AUTHORITATIVE_CLOUD_ASNS["AS13335"])
+            self.assertEqual(loaded_a2nt.get("AS13335"), "datacenter")
+
+            # 2. 二次调用传入完全一致的数据：触发脏写检测，零 I/O 跳过，返回 False
+            written2 = save_asn_database(loaded_i2a, loaded_a2i, loaded_a2nt, db_path=tmp_db)
+            self.assertFalse(written2)
+
 
 class TestHttpsProbe(unittest.IsolatedAsyncioTestCase):
     async def test_probe_http_ssl_tunnel_success(self):
