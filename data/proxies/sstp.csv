@@ -326,6 +326,57 @@ sstp://vpn:vpn@vpn312291996.opengw.net:995,sstp,vpn312291996.opengw.net,995,2226
 sstp://vpn:vpn@vpn641759273.opengw.net:1754,sstp,vpn641759273.opengw.net,1754,2363,0,alive,-,JP,113.154.3.100,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-01 00:00:00,vpngate
 sstp://vpn:vpn@vpn895117905.opengw.net:1557,sstp,vpn895117905.opengw.net,1557,2983,0,alive,-,KR,182.31.150.90,AS9694 Seokyung Cable Television Co.. Ltd.,Seokyung Cable Television Co.. Ltd.,isp,2026-10-12 15:18:13,vpngate
 sstp://vpn:vpn@vpn713508768.opengw.net:1390,sstp,vpn713508768.opengw.net,1390,3262,0,alive,-,JP,221.103.33.126,AS17676 SoftBank Corp. (SoftBank Mobile Corp.),SoftBank Mobile Corp.,isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@public-vpn-195.opengw.net:443,sstp,public-vpn-195.opengw.net,443,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@public-vpn-118.opengw.net:443,sstp,public-vpn-118.opengw.net,443,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@public-vpn-108.opengw.net:443,sstp,public-vpn-108.opengw.net,443,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@public-vpn-207.opengw.net:443,sstp,public-vpn-207.opengw.net,443,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn931771153.opengw.net:1237,sstp,vpn931771153.opengw.net,1237,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@public-vpn-235.opengw.net:443,sstp,public-vpn-235.opengw.net,443,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn459624604.opengw.net:995,sstp,vpn459624604.opengw.net,995,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn814090086.opengw.net:1402,sstp,vpn814090086.opengw.net,1402,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn873672178.opengw.net:1629,sstp,vpn873672178.opengw.net,1629,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn891658192.opengw.net:1745,sstp,vpn891658192.opengw.net,1745,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn331018207.opengw.net:1352,sstp,vpn331018207.opengw.net,1352,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn411848129.opengw.net:1430,sstp,vpn411848129.opengw.net,1430,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn900568862.opengw.net:995,sstp,vpn900568862.opengw.net,995,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn941432398.opengw.net:1652,sstp,vpn941432398.opengw.net,1652,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn928426686.opengw.net:1743,sstp,vpn928426686.opengw.net,1743,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn588256277.opengw.net:1320,sstp,vpn588256277.opengw.net,1320,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn167421173.opengw.net:1771,sstp,vpn167421173.opengw.net,1771,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn230024862.opengw.net:995,sstp,vpn230024862.opengw.net,995,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn146183221.opengw.net:1968,sstp,vpn146183221.opengw.net,1968,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn556509387.opengw.net:1412,sstp,vpn556509387.opengw.net,1412,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn458903199.opengw.net:1202,sstp,vpn458903199.opengw.net,1202,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn926161461.opengw.net:1875,sstp,vpn926161461.opengw.net,1875,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn978804775.opengw.net:1725,sstp,vpn978804775.opengw.net,1725,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn258922262.opengw.net:1921,sstp,vpn258922262.opengw.net,1921,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn102577348.opengw.net:995,sstp,vpn102577348.opengw.net,995,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn851717986.opengw.net:1684,sstp,vpn851717986.opengw.net,1684,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn685235275.opengw.net:1585,sstp,vpn685235275.opengw.net,1585,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn618720077.opengw.net:1841,sstp,vpn618720077.opengw.net,1841,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn940314135.opengw.net:995,sstp,vpn940314135.opengw.net,995,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn546794625.opengw.net:1812,sstp,vpn546794625.opengw.net,1812,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn226893992.opengw.net:1207,sstp,vpn226893992.opengw.net,1207,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn647794933.opengw.net:1328,sstp,vpn647794933.opengw.net,1328,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn182270293.opengw.net:995,sstp,vpn182270293.opengw.net,995,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn967521612.opengw.net:1399,sstp,vpn967521612.opengw.net,1399,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn794854159.opengw.net:1585,sstp,vpn794854159.opengw.net,1585,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn732656322.opengw.net:1266,sstp,vpn732656322.opengw.net,1266,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn616353630.opengw.net:1733,sstp,vpn616353630.opengw.net,1733,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn644041734.opengw.net:1954,sstp,vpn644041734.opengw.net,1954,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn696208175.opengw.net:1976,sstp,vpn696208175.opengw.net,1976,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn421506563.opengw.net:1679,sstp,vpn421506563.opengw.net,1679,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn966189837.opengw.net:1346,sstp,vpn966189837.opengw.net,1346,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn109005299.opengw.net:1829,sstp,vpn109005299.opengw.net,1829,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn611376333.opengw.net:1279,sstp,vpn611376333.opengw.net,1279,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn760976437.opengw.net:1533,sstp,vpn760976437.opengw.net,1533,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn761798642.opengw.net:1272,sstp,vpn761798642.opengw.net,1272,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn446279611.opengw.net:1779,sstp,vpn446279611.opengw.net,1779,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn215888696.opengw.net:1342,sstp,vpn215888696.opengw.net,1342,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn628591400.opengw.net:1763,sstp,vpn628591400.opengw.net,1763,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn487120861.opengw.net:995,sstp,vpn487120861.opengw.net,995,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn991567854.opengw.net:995,sstp,vpn991567854.opengw.net,995,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn878303378.opengw.net:995,sstp,vpn878303378.opengw.net,995,0,0,pending,,,,,,,2026-10-12 21:49:55,vpngate
 sstp://vpn:vpn@public-vpn-66.opengw.net:443,sstp,public-vpn-66.opengw.net,443,551,1,sstp_vpn_fail,-,JP,219.100.37.52,AS36599 SoftEther,SoftEther,isp,2026-10-08 14:09:40,vpngate
 sstp://vpn:vpn@public-vpn-148.opengw.net:443,sstp,public-vpn-148.opengw.net,443,563,1,sstp_vpn_fail,-,JP,219.100.37.107,AS36599 SoftEther,SoftEther,isp,2026-10-01 00:00:00,vpngate
 sstp://vpn:vpn@public-vpn-132.opengw.net:443,sstp,public-vpn-132.opengw.net,443,605,1,sstp_vpn_fail,-,JP,219.100.37.115,AS36599 SoftEther,SoftEther,isp,2026-10-03 22:57:17,vpngate

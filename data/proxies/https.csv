@@ -251,6 +251,9 @@ https://118.184.157.67:4443,https,118.184.157.67,4443,5532,0,alive,LAX,CN,118.18
 https://79.188.239.41:8443,https,79.188.239.41,8443,6241,0,alive,WAW,PL,79.188.239.41,AS5617 static IP,static IP,isp,2026-10-09 00:00:00,EDT-Pages
 https://79.188.239.42:8443,https,79.188.239.42,8443,6846,0,alive,WAW,PL,79.188.239.41,AS5617 Orange Polska Spolka Akcyjna,Orange Polska Spolka Akcyjna,isp,2026-10-09 00:00:00,EDT-Pages
 https://79.188.239.47:8443,https,79.188.239.47,8443,8074,0,alive,WAW,PL,79.188.239.41,AS5617 static IP,static IP,isp,2026-10-09 00:00:00,EDT-Pages
+https://84.237.50.69:443,https,84.237.50.69,443,0,0,pending,,RU,84.237.50.69,AS3335 NSU,NSU,education,2026-10-12 21:49:55,EDT-Pages
+https://87.251.79.232:443,https,87.251.79.232,443,0,0,pending,,US,35.0.127.52,AS36375 University of Michigan,University of Michigan,education,2026-10-12 21:49:55,EDT-Pages
+https://103.127.242.229:7000,https,103.127.242.229,7000,0,0,pending,,JP,103.127.242.229,"AS137535 JT Telecom (Hong Kong Communications International Co., limited)","Hong Kong Communications International Co., limited",isp,2026-10-12 21:49:55,EDT-Pages
 https://79.188.239.43:8443,https,79.188.239.43,8443,0,1,timeout,Pruszkow,PL,79.188.239.41,AS5617 Orange Polska Spolka Akcyjna,Orange Polska Spolka Akcyjna,isp,2026-10-09 00:00:00,EDT-Pages
 https://202.162.232.76:443,https,202.162.232.76,443,0,1,timeout,Mumbai,IN,202.162.232.48,AS4755 Netcore Solutions Pvt Ltd,Netcore Solutions Pvt Ltd,isp,2026-10-09 00:00:00,EDT-Pages
 https://201.54.216.54:443,https,201.54.216.54,443,0,1,timeout,Belo Horizonte,BR,201.54.216.54,AS28616 Emp. de Informatica e Informaçao do Mun. BH/SA,Emp. de Informatica e Informaçao do Mun. BH/SA,government,2026-10-09 00:00:00,EDT-Pages
