@@ -1338,16 +1338,18 @@ class TestEdtHttpsFetcher(unittest.TestCase):
 
             # 1. 首次写入全新数据：实际写盘，返回 True
             i2a = {"Test ISP": "AS999901"}
-            a2i = {"AS999901": "Test ISP", "AS13335": "Fake CF Name"}  # 试图篡改 AS13335
-            a2nt = {"AS999901": "isp", "AS13335": "isp"}  # 试图将 AS13335 篡改为 isp
+            a2i = {"AS999901": "Test ISP", "AS13335": "Fake CF Name", "AS4134": "Fake CT Name"}  # 试图篡改 AS13335 与 AS4134
+            a2nt = {"AS999901": "isp", "AS13335": "isp", "AS4134": "datacenter"}  # 试图将 AS13335 篡改为 isp，AS4134 篡改为 datacenter
             written1 = save_asn_database(i2a, a2i, a2nt, db_path=tmp_db)
             self.assertTrue(written1)
 
-            # 验证底层 SSOT 强制重写：AS13335 必须锁定为官方标准名称 Cloudflare 与 datacenter
+            # 验证底层 SSOT 强制重写：AS13335 必须锁定为官方标准名称 Cloudflare 与 datacenter，AS4134 必须锁定为 China Telecom 与 isp
             loaded_i2a, loaded_a2i, loaded_a2nt = load_asn_database(tmp_db)
             from providers import AUTHORITATIVE_CLOUD_ASNS
             self.assertEqual(loaded_a2i.get("AS13335"), AUTHORITATIVE_CLOUD_ASNS["AS13335"])
             self.assertEqual(loaded_a2nt.get("AS13335"), "datacenter")
+            self.assertEqual(loaded_a2i.get("AS4134"), AUTHORITATIVE_CLOUD_ASNS["AS4134"])
+            self.assertEqual(loaded_a2nt.get("AS4134"), "isp")
 
             # 2. 二次调用传入完全一致的数据：触发脏写检测，零 I/O 跳过，返回 False
             written2 = save_asn_database(loaded_i2a, loaded_a2i, loaded_a2nt, db_path=tmp_db)

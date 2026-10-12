@@ -178,6 +178,46 @@ for _asn, _isp in KNOWN_CLOUD_PROVIDERS.values():
         AUTHORITATIVE_CLOUD_ASNS[_asn] = _isp
 ASN_TO_PROVIDER = dict(AUTHORITATIVE_CLOUD_ASNS)
 
+# 核心基准骨干自治系统网络类型定义（权威锁定）
+_CORE_BASELINE_NET_TYPES: dict[str, str] = {
+    # 核心运营商骨干与主流 ISP (权威锁定为 isp)
+    "AS4134": "isp",          # 中国电信 163
+    "AS4811": "isp",          # 中国电信集团
+    "AS4809": "isp",          # 中国电信 CN2
+    "AS4837": "isp",          # 中国联通 169
+    "AS9929": "isp",          # 中国联通 9929
+    "AS10099": "isp",         # 中国联通 CUG
+    "AS9808": "isp",          # 中国移动
+    "AS58453": "isp",         # 中国移动 CMI
+    "AS58807": "isp",         # 中国移动 CMIN2
+    "AS3462": "isp",          # 中华电信 HiNet
+    "AS4760": "isp",          # 香港电讯 HKT
+    "AS4766": "isp",          # 韩国电信 KT
+    "AS9318": "isp",          # 韩国 SK Broadband
+    # 核心云厂商机房 (权威锁定为 datacenter)
+    "AS13335": "datacenter",  # Cloudflare
+    "AS15169": "datacenter",  # Google
+    "AS16509": "datacenter",  # Amazon AWS
+    "AS8075": "datacenter",   # Microsoft Azure
+    "AS45102": "datacenter",  # Alibaba Cloud
+    "AS132203": "datacenter", # Tencent Cloud
+    "AS31898": "datacenter",  # Oracle Cloud
+    "AS54253": "datacenter",  # Oracle Corporation
+}
+
+# 权威已知云厂商与核心骨干网 SSOT 网络类型基准表
+AUTHORITATIVE_CLOUD_NET_TYPES: dict[str, str] = {}
+for _asn, _isp in AUTHORITATIVE_CLOUD_ASNS.items():
+    if _asn in _CORE_BASELINE_NET_TYPES:
+        AUTHORITATIVE_CLOUD_NET_TYPES[_asn] = _CORE_BASELINE_NET_TYPES[_asn]
+    else:
+        text = f"{_asn} {_isp}".lower()
+        if any(p in text for p in ("telecom", "unicom", "mobile", "broadband", "hinet")):
+            AUTHORITATIVE_CLOUD_NET_TYPES[_asn] = "isp"
+        else:
+            AUTHORITATIVE_CLOUD_NET_TYPES[_asn] = "datacenter"
+
+
 
 # =====================================================================
 # 公共实用工具：环境加载、类型转换、ASN 清洗、Telegram 推送与自检
@@ -427,10 +467,10 @@ def save_asn_database(
             if re.match(r"^AS\d+$", asn_code) and net_type in VALID_NET_TYPES:
                 clean_a2nt[asn_code] = net_type
 
-        # 权威云厂商 SSOT 属性保护：所有已知权威云厂商必须永久锁定为 datacenter，杜绝被篡改为 isp 等
-        for auth_asn in AUTHORITATIVE_CLOUD_ASNS:
-            if clean_a2nt.get(auth_asn) != "datacenter":
-                clean_a2nt[auth_asn] = "datacenter"
+        # 权威云厂商与核心骨干网 SSOT 属性保护：锁定官方权威网络类型（云厂商/VPS 锁定 datacenter，运营商/宽带锁定 isp），杜绝被外部源篡改
+        for auth_asn, auth_type in AUTHORITATIVE_CLOUD_NET_TYPES.items():
+            if clean_a2nt.get(auth_asn) != auth_type:
+                clean_a2nt[auth_asn] = auth_type
 
         # 自愈补齐：若 clean_a2i 中的 ASN 尚未被 clean_a2nt 分类，自动利用 classify_asn 补齐网络类型，确保 100% 覆盖
         for asn_code, isp_name in clean_a2i.items():
@@ -514,45 +554,10 @@ for _asn, _isp in ASN_DATABASE_ASN_TO_ISP.items():
 SORTED_CLOUD_PROVIDER_KEYS = tuple(sorted(KNOWN_CLOUD_PROVIDERS.keys(), key=len, reverse=True))
 ASN_DATABASE_ISP_LOWER = {k.lower(): (v, k) for k, v in ASN_DATABASE_ISP_TO_ASN.items()}
 
-# 核心基准骨干自治系统兜底定义（在外部 JSON 缺失或损坏时的基础防御）
-_CORE_BASELINE_NET_TYPES: dict[str, str] = {
-    # 核心运营商骨干与主流 ISP (权威锁定为 isp)
-    "AS4134": "isp",          # 中国电信 163
-    "AS4811": "isp",          # 中国电信集团
-    "AS4809": "isp",          # 中国电信 CN2
-    "AS4837": "isp",          # 中国联通 169
-    "AS9929": "isp",          # 中国联通 9929
-    "AS10099": "isp",         # 中国联通 CUG
-    "AS9808": "isp",          # 中国移动
-    "AS58453": "isp",         # 中国移动 CMI
-    "AS58807": "isp",         # 中国移动 CMIN2
-    "AS3462": "isp",          # 中华电信 HiNet
-    "AS4760": "isp",          # 香港电讯 HKT
-    "AS4766": "isp",          # 韩国电信 KT
-    "AS9318": "isp",          # 韩国 SK Broadband
-    # 核心云厂商机房 (权威锁定为 datacenter)
-    "AS13335": "datacenter",  # Cloudflare
-    "AS15169": "datacenter",  # Google
-    "AS16509": "datacenter",  # Amazon AWS
-    "AS8075": "datacenter",   # Microsoft Azure
-    "AS45102": "datacenter",  # Alibaba Cloud
-    "AS132203": "datacenter", # Tencent Cloud
-    "AS31898": "datacenter",  # Oracle Cloud
-    "AS54253": "datacenter",  # Oracle Corporation
-}
+# 运行时 ASN 精准网络类型对照表（从 data/asn_database.json 动态加载，且权威 SSOT 拥有最高优先级锁定防御）
+ASN_EXACT_NET_TYPE: dict[str, str] = dict(ASN_DATABASE_ASN_TO_NET_TYPE)
+ASN_EXACT_NET_TYPE.update(AUTHORITATIVE_CLOUD_NET_TYPES)
 
-# 运行时 ASN 精准网络类型对照表（从 data/asn_database.json 动态加载，兼具核心兜底）
-ASN_EXACT_NET_TYPE: dict[str, str] = dict(_CORE_BASELINE_NET_TYPES)
-ASN_EXACT_NET_TYPE.update(ASN_DATABASE_ASN_TO_NET_TYPE)
-
-# 自动将 KNOWN_CLOUD_PROVIDERS 中未单独显式指定类型的服务商补充进入 ASN_EXACT_NET_TYPE
-for _asn, _isp in KNOWN_CLOUD_PROVIDERS.values():
-    if _asn not in ASN_EXACT_NET_TYPE:
-        text = f"{_asn} {_isp}".lower()
-        if any(p in text for p in ("telecom", "unicom", "mobile", "broadband", "hinet")):
-            ASN_EXACT_NET_TYPE[_asn] = "isp"
-        else:
-            ASN_EXACT_NET_TYPE[_asn] = "datacenter"
 
 
 def resolve_asn_online(ip: str, isp_hint: str = "", persist: bool = False, db_path: str = "") -> tuple[str, str]:
