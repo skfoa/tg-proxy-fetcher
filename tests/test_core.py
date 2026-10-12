@@ -1275,6 +1275,96 @@ class TestEdtHttpsFetcher(unittest.TestCase):
         # 总耗时应远小于慢源的 0.15s
         self.assertLess(elapsed, 0.12)
 
+    def test_fetch_zip_proxyips_filtering_and_metadata(self):
+        from tg_fetch import fetch_zip_proxyips
+        import time
+
+        mock_zip_data = {
+            "data": [
+                # 1. 机房节点：应当被严格过滤剔除
+                {
+                    "ip": "104.16.1.1",
+                    "port": [443],
+                    "meta": {
+                        "asn": 13335,
+                        "asOrganization": "Cloudflare, Inc.",
+                        "country": "US",
+                        "colo": {"iata": "SJC"},
+                    },
+                },
+                # 2. 非机房节点 (ISP 宽带，双端口)：应当被完整保留，生成 2 条记录
+                {
+                    "ip": "70.229.10.106",
+                    "port": [443, 8443],
+                    "meta": {
+                        "asn": 7018,
+                        "asOrganization": "AT&T Enterprises, LLC",
+                        "country": "US",
+                        "city": "San Jose",
+                        "region": "California",
+                        "continent_cn": "北美洲",
+                        "country_cn": "美国",
+                        "colo": {"iata": "SJC"},
+                    },
+                },
+                # 3. 非机房节点 (教育网)：应当被保留且 net_type 为 education
+                {
+                    "ip": "140.115.53.51",
+                    "port": [443],
+                    "meta": {
+                        "asn": 207705,
+                        "asOrganization": "TW NCU",
+                        "country": "TW",
+                        "colo": {"iata": "TPE"},
+                    },
+                },
+                # 4. 墓地黑名单节点：应当被过滤
+                {
+                    "ip": "1.2.3.4",
+                    "port": [8443],
+                    "meta": {
+                        "asn": 7018,
+                        "asOrganization": "AT&T Enterprises, LLC",
+                    },
+                },
+                # 5. 非法端口与脏数据：跳过
+                {
+                    "ip": "invalid.host",
+                    "port": [999999],
+                },
+            ]
+        }
+
+        tombstone = {"1.2.3.4:8443": int(time.time())}
+        scraped_proxyips = {}
+
+        with patch("tg_fetch.fetch_web_page", return_value=json.dumps(mock_zip_data)):
+            added, unrec = fetch_zip_proxyips(
+                ["https://zip.test/all.json"],
+                proxy="",
+                tombstone=tombstone,
+                scraped_proxyips=scraped_proxyips,
+            )
+
+        # 70.229.10.106 (2个端口) + 140.115.53.51 (1个端口) = 3 条
+        self.assertEqual(added, 3)
+        self.assertNotIn("104.16.1.1:443", scraped_proxyips, "机房节点必须被剔除")
+        self.assertNotIn("1.2.3.4:8443", scraped_proxyips, "墓地死节点必须被剔除")
+
+        # 验证双端口展开
+        self.assertIn("70.229.10.106:443", scraped_proxyips)
+        self.assertIn("70.229.10.106:8443", scraped_proxyips)
+        item1 = scraped_proxyips["70.229.10.106:8443"]
+        self.assertEqual(item1["net_type"], "isp")
+        self.assertEqual(item1["colo"], "SJC")
+        self.assertEqual(item1["tls"], "true")
+        self.assertIn("北美洲", item1["cf_location"])
+
+        # 验证教育网节点
+        self.assertIn("140.115.53.51:443", scraped_proxyips)
+        item2 = scraped_proxyips["140.115.53.51:443"]
+        self.assertEqual(item2["net_type"], "education")
+
     def test_auto_enrich_and_save_asns(self):
         from tg_fetch import auto_enrich_and_save_asns
         import providers

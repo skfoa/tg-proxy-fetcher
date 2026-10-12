@@ -80,6 +80,7 @@ from parsers import (
     parse_cf_csv_content,
     parse_otc_scan_content,
     parse_proxy_attachment_content,
+    is_valid_host,
 )
 
 # 确保本地 .env 加载
@@ -258,6 +259,22 @@ def _parse_edt_socks5_urls() -> list[str]:
 EDT_HTTPS_URLS = _parse_edt_https_urls()
 EDT_HTTP_URLS = _parse_edt_http_urls()
 EDT_SOCKS5_URLS = _parse_edt_socks5_urls()
+
+DEFAULT_PROXYIP_ZIP_URLS = [
+    "https://zip.cm.edu.kg.cmliussss.net/all.json",
+]
+
+
+def _parse_proxyip_zip_urls() -> list[str]:
+    raw_val = (os.getenv("PROXYIP_ZIP_URLS") or os.getenv("PROXYIP_ZIP_URL") or "").strip()
+    if raw_val:
+        if raw_val.lower() in ("none", "off", "disable", "false", "0"):
+            return []
+        return [u.strip() for u in re.split(r"[,;\s]+", raw_val) if u.strip().startswith("http")]
+    return list(DEFAULT_PROXYIP_ZIP_URLS)
+
+
+PROXYIP_ZIP_URLS = _parse_proxyip_zip_urls()
 
 DATA_DIR = "data"
 OUTPUT_PROXY_FILE = os.path.join(DATA_DIR, "proxies.txt")
@@ -929,6 +946,177 @@ def fetch_edt_https_proxies(
     return fetch_edt_proxies("https", edt_urls, proxy, tombstone, scraped_proxies)
 
 
+def fetch_zip_proxyips(
+    zip_urls: list[str],
+    proxy: str,
+    tombstone: dict[str, int],
+    scraped_proxyips: dict[str, dict],
+    timeout: float = 30.0,
+) -> tuple[int, list[dict]]:
+    """
+    拉取外部 ProxyIP 聚合源 (如 cmliussss zip all.json)，
+    采用【多镜像并发竞速机制】(Concurrent Racing)：同时向所有候选镜像发起请求，最快返回合法数据的镜像胜出。
+    【核心收录策略】：
+      - 严格只收录非机房节点（ISP 宽带、高校教育网、政务网、商业企业专线、银行金融），
+        net_type == 'datacenter' 的常规机房节点直接过滤剔除。
+      - 自动过滤墓地黑名单、自动提取国家/城市/colo 等详细位置信息。
+      - 动态发现并汇流未收录在权威库中的自治系统 (ASN)。
+    返回: (有效新增 ProxyIP 条数, 未收录 ASN 列表)
+    """
+    if not zip_urls:
+        return 0, []
+
+    log.info("-" * 50)
+    log.info("开始拉取外部 ProxyIP 聚合源: %d 个候选镜像 (并发竞速模式, 严控只收录非机房)", len(zip_urls))
+
+    success_url = ""
+    data = []
+
+    def _fetch_single_zip_mirror(u: str) -> tuple[str, list]:
+        txt = fetch_web_page(u, proxy=proxy, timeout=int(timeout))
+        if not txt:
+            raise ValueError("内容为空")
+        parsed = json.loads(txt)
+        if isinstance(parsed, dict):
+            parsed = parsed.get("data", [])
+        if not isinstance(parsed, list) or len(parsed) == 0:
+            raise ValueError("返回 JSON 无有效节点数据列表")
+        return u, parsed
+
+    if len(zip_urls) == 1:
+        u = zip_urls[0]
+        try:
+            t0 = time.time()
+            success_url, data = _fetch_single_zip_mirror(u)
+            log.info("单源拉取 ProxyIP 成功: %s (耗时 %.2fs, 原始记录数 %d)", u, time.time() - t0, len(data))
+        except Exception as e:
+            log.warning("单源拉取 ProxyIP 失败: %s (%s)", u, e)
+    else:
+        t_start = time.time()
+        executor = ThreadPoolExecutor(max_workers=min(len(zip_urls), 8), thread_name_prefix="proxyip-zip-race")
+        try:
+            future_to_url = {executor.submit(_fetch_single_zip_mirror, u): u for u in zip_urls}
+            for future in as_completed(future_to_url):
+                cand_url = future_to_url[future]
+                try:
+                    cand_url, cand_data = future.result()
+                    success_url = cand_url
+                    data = cand_data
+                    cost = time.time() - t_start
+                    log.info(
+                        "🏆 ProxyIP 聚合源镜像并发竞速胜出: %s (耗时 %.2fs, 原始记录 %d 条), 领先并率先采用！",
+                        success_url,
+                        cost,
+                        len(data),
+                    )
+                    break
+                except Exception as e:
+                    log.debug("候选镜像 %s 竞速未达标或较慢: %s", cand_url, e)
+        finally:
+            executor.shutdown(wait=False, cancel_futures=True)
+
+    if not data:
+        log.warning("所有 ProxyIP 聚合源镜像竞速拉取均未成功返回有效数据，跳过本次拉取")
+        return 0, []
+
+    log.info("成功采用 %s 的 ProxyIP 聚合源数据: %d 条原始记录", success_url, len(data))
+
+    now_bjt = datetime.now(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S")
+    total_added = 0
+    dc_filtered = 0
+    unrecorded_asns_map: dict[str, dict] = {}
+
+    for item in data:
+        if not isinstance(item, dict):
+            continue
+        ip = str(item.get("ip") or "").strip()
+        raw_port = item.get("port")
+        if isinstance(raw_port, list):
+            ports = [safe_int(p, 0) for p in raw_port]
+        elif isinstance(raw_port, (int, str)):
+            ports = [safe_int(raw_port, 0)]
+        else:
+            ports = [443]
+        ports = [p for p in ports if 1 <= p <= 65535]
+        if not ip or not ports or not is_valid_host(ip):
+            continue
+
+        meta = item.get("meta") if isinstance(item.get("meta"), dict) else {}
+        raw_asn = str(meta.get("asn") or item.get("asn") or "").strip()
+        raw_isp = str(meta.get("asOrganization") or meta.get("isp") or item.get("asOrganization") or item.get("isp") or "").strip()
+        asn_code = _extract_asn_code(raw_asn, raw_isp)
+
+        # 检查是否为未收录的 ASN
+        if asn_code and not is_asn_recorded(asn_code, raw_isp):
+            if asn_code not in unrecorded_asns_map:
+                unrecorded_asns_map[asn_code] = {
+                    "asn": asn_code,
+                    "isp": raw_isp,
+                    "ip": ip,
+                    "net_type": classify_asn(asn_code, raw_isp),
+                }
+
+        # 核心策略：严格只收录非机房，常规 datacenter 机房节点直接过滤剔除
+        net_type = classify_asn(asn_code, raw_isp)
+        if net_type == "datacenter":
+            dc_filtered += 1
+            continue
+
+        colo_obj = meta.get("colo")
+        if isinstance(colo_obj, dict):
+            colo = str(colo_obj.get("iata") or "").strip().upper()
+        else:
+            colo = str(colo_obj or "").strip().upper()
+
+        loc_parts = []
+        for part in (meta.get("continent_cn"), meta.get("city") or meta.get("region"), meta.get("country_cn") or meta.get("country")):
+            p_str = str(part or "").strip()
+            if p_str and p_str != "-" and p_str not in loc_parts:
+                loc_parts.append(p_str)
+        cf_location = " · ".join(loc_parts)
+
+        formatted_asn = format_asn_isp(asn_code or raw_asn, raw_isp)
+
+        for port in ports:
+            key = f"{ip}:{port}"
+            if is_tombstoned(key, tombstone):
+                continue
+
+            tls = "true" if port in (443, 8443, 2053, 2083, 2087, 2096) else "false"
+            proxyip_item = {
+                "ip": ip,
+                "port": str(port),
+                "tls": tls,
+                "delay_ms": 0,
+                "speed_kbs": 0,
+                "colo": colo,
+                "cf_location": cf_location,
+                "isp": raw_isp,
+                "asn": formatted_asn,
+                "first_seen": now_bjt,
+                "channel": "@cmliussss_all",
+                "fail_count": 0,
+                "net_type": net_type,
+            }
+
+            if key not in scraped_proxyips:
+                scraped_proxyips[key] = proxyip_item
+                total_added += 1
+            elif isinstance(scraped_proxyips[key], dict):
+                for mk in ("colo", "cf_location", "isp", "asn", "net_type"):
+                    if proxyip_item.get(mk) and not scraped_proxyips[key].get(mk):
+                        scraped_proxyips[key][mk] = proxyip_item[mk]
+
+    log.info(
+        "外部 ProxyIP 源过滤与提取完成: 剔除机房节点 %d 个, 提取非机房 ProxyIP (有效新增: %d 个), 发现未收录 ASN: %d 个",
+        dc_filtered,
+        total_added,
+        len(unrecorded_asns_map),
+    )
+
+    return total_added, list(unrecorded_asns_map.values())
+
+
 def scrape_channel_web(channel: str, cutoff: datetime, proxy: str = "") -> tuple[list[tuple[str, str]], list[dict]]:
     clean_channel = channel.lstrip("@")
     base_url = f"https://t.me/s/{clean_channel}"
@@ -1496,9 +1684,13 @@ def run_web_scraper():
         _, unrec = fetch_edt_proxies(proto_name, urls, proxy, tombstone, scraped_proxies)
         edt_unrec_all.extend(unrec)
 
-    # Web 预览模式仅提取正文单条代理与优选 IP，扫描附件与反代大池需 API 模式自动获取
-    scraped_scan_ips = {}
+    # 1.7 外部 ProxyIP 聚合源抓取 (仅收录非机房原生宽带、教育、专线等高价值反代节点)
     scraped_proxyips = {}
+    _, zip_unrec = fetch_zip_proxyips(PROXYIP_ZIP_URLS, proxy, tombstone, scraped_proxyips)
+    edt_unrec_all.extend(zip_unrec)
+
+    # Web 预览模式仅提取正文单条代理与优选 IP，扫描附件需 API 模式自动获取
+    scraped_scan_ips = {}
 
     # 2. 智能增量合并并落盘保存 (统一单次原子持久化写盘)
     merge_and_save(
@@ -1701,6 +1893,10 @@ async def run_telethon():
         for proto_name, urls in [("https", EDT_HTTPS_URLS), ("http", EDT_HTTP_URLS), ("socks5", EDT_SOCKS5_URLS)]:
             _, unrec = fetch_edt_proxies(proto_name, urls, web_proxy, tombstone, scraped_proxies)
             edt_unrec_all.extend(unrec)
+
+        # 1.7 外部 ProxyIP 聚合源抓取 (与频道附件中提取到的 ProxyIP 增量合并，仅收录非机房)
+        _, zip_unrec = fetch_zip_proxyips(PROXYIP_ZIP_URLS, web_proxy, tombstone, scraped_proxyips)
+        edt_unrec_all.extend(zip_unrec)
 
         # 2. 智能增量合并并落盘保存 (统一单次原子持久化写盘)
         merge_and_save(
