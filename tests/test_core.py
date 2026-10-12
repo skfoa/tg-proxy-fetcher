@@ -585,7 +585,7 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
                 },
             }
 
-            with patch("proxies_verify.probe_sstp", return_value=(True, 150, "alive", "-", "", "1.2.3.4")), \
+            with patch("proxies_verify.probe_sstp", return_value=(True, 150, "alive", "-", "", "1.2.3.4")) as mock_probe, \
                  patch("proxies_verify.check_sstp_exit_cf_worker", new_callable=AsyncMock, return_value=mock_cf_success):
                 res = await probe_single(base_row.copy(), sem, cf_check_endpoint="https://my-worker.workers.dev")
                 self.assertTrue(res["is_alive"])
@@ -593,19 +593,21 @@ class TestProxiesVerifyAndExport(unittest.TestCase):
                 self.assertEqual(res["country"], "JP")
                 self.assertEqual(res["colo"], "-")
                 self.assertIn("AS36599", res["asn"])
+                mock_probe.assert_not_called()  # 独占直连 Worker：本地 probe_sstp 完全跳过
 
-            # 2. 淘汰假活案例：本地 HTTP 200 初筛通过，但 CF Worker 全隧道 PPP 握手失败
+            # 2. 淘汰假活案例：CF Worker 全隧道 PPP 握手失败，直接判定失败且完全跳过本地探测
             mock_cf_fail = {
                 "success": False,
                 "error": "SSTP server connection timed out",
             }
 
-            with patch("proxies_verify.probe_sstp", return_value=(True, 150, "alive", "-", "", "1.2.3.4")), \
+            with patch("proxies_verify.probe_sstp", return_value=(True, 150, "alive", "-", "", "1.2.3.4")) as mock_probe, \
                  patch("proxies_verify.check_sstp_exit_cf_worker", new_callable=AsyncMock, return_value=mock_cf_fail):
                 res = await probe_single(base_row.copy(), sem, cf_check_endpoint="https://my-worker.workers.dev")
                 self.assertFalse(res["is_alive"])
                 self.assertEqual(res["status"], "sstp_vpn_fail")
                 self.assertEqual(res["fail_count"], 1)
+                mock_probe.assert_not_called()  # 独占直连 Worker：本地 probe_sstp 完全跳过
 
             # 3. 容灾回退案例：CF Worker 网络异常或超时 (返回 None)，平滑回退至本地探测结果
             with patch("proxies_verify.probe_sstp", return_value=(True, 150, "alive", "-", "", "1.2.3.4")), \

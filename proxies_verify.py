@@ -659,16 +659,21 @@ async def probe_single(
                 host, port, timeout, http_timeout
             )
         elif proto == "sstp":
-            is_alive, delay_ms, status, colo, country, egress_ip = await probe_sstp(
-                host, port, user, pwd, sstp_timeout, max(http_timeout, SSTP_READ_TIMEOUT)
-            )
-            # 第二阶段：对本地初筛存活的 SSTP 节点调用 Cloudflare Worker 进行真实出口 IP 解析与全隧道 PPP 握手鉴真
-            if is_alive and cf_check_endpoint:
+            if cf_check_endpoint:
+                # SSTP 优先直通 Cloudflare Worker 进行端到端全隧道 PPP 拨号与出口探测，单步到位，免除本地重复握手与超时叠加
+                t_cf0 = time.monotonic()
                 cf_res = await check_sstp_exit_cf_worker(
                     cf_check_endpoint, host, port, user, pwd, executor=cf_executor
                 )
                 if cf_res is not None:
                     if cf_res.get("success"):
+                        is_alive = True
+                        calc_delay = max(1, int((time.monotonic() - t_cf0) * 1000))
+                        delay_ms = safe_int(cf_res.get("latency_ms") or cf_res.get("time") or calc_delay, calc_delay)
+                        status = "alive"
+                        colo = "-"
+                        country = ""
+                        egress_ip = ""
                         exit_info = cf_res.get("exit") or {}
                         exit_ip = (exit_info.get("ip") or "").strip()
                         if is_valid_public_ip(exit_ip):
@@ -676,10 +681,6 @@ async def probe_single(
                         c_code = (exit_info.get("country_code") or "").strip().upper()
                         if c_code:
                             country = c_code
-                        # 注意：Cloudflare Worker (CF-Workers-CheckSocks5) 响应根字段中的 colo
-                        # 实际上是调用方 (GitHub Actions runner) 连接 Worker 时的入站 CDN 机房 (如 IAD)，
-                        # 且 SSTP 隧道内仅访问了 iplocate.io 查询 IP，并未穿透 Cloudflare /cdn-cgi/trace。
-                        # 因此 SSTP 的 colo 统一保持 "-"，不采纳 cf_res["colo"]。
                         # 若 Worker 已附带 ASN/ISP 归属，直接结构化丰富
                         asn_obj = exit_info.get("asn") or {}
                         cf_asn = (asn_obj.get("asn") or "").strip()
@@ -689,11 +690,24 @@ async def probe_single(
                             row["isp"] = cf_isp
                             row["net_type"] = classify_asn(cf_asn, cf_isp)
                     else:
-                        # Cloudflare Worker 全隧道 PPP 握手失败，剔除假活节点
+                        # Cloudflare Worker 全隧道 PPP 握手失败（含连接超时、服务端拨号故障等）
                         is_alive = False
+                        delay_ms = 0
                         status = "sstp_vpn_fail"
+                        colo = ""
+                        country = ""
+                        egress_ip = ""
                 else:
-                    log.debug("SSTP 节点 [%s:%s] CF Worker 检测不可达，保留本地探测结果", host, port)
+                    # 容灾备选：Worker 端点调用异常/网络不可达时，平滑降级执行本地轻量握手探测
+                    log.debug("SSTP 节点 [%s:%s] CF Worker 检测不可达，平滑降级至本地轻量握手", host, port)
+                    is_alive, delay_ms, status, colo, country, egress_ip = await probe_sstp(
+                        host, port, user, pwd, sstp_timeout, max(http_timeout, SSTP_READ_TIMEOUT)
+                    )
+            else:
+                # 未配置外部检测端点，执行本地轻量握手探测（无外部依赖）
+                is_alive, delay_ms, status, colo, country, egress_ip = await probe_sstp(
+                    host, port, user, pwd, sstp_timeout, max(http_timeout, SSTP_READ_TIMEOUT)
+                )
         else:
             is_alive, delay_ms, status, colo, country, egress_ip = False, 0, "unknown_proto", "", "", ""
 
@@ -1137,12 +1151,12 @@ async def async_main(args):
     if cf_endpoint:
         cf_executor = get_cf_check_executor(max_workers=cf_concurrency)
         log.info(
-            "SSTP 启用第二阶段 Cloudflare Worker 深度穿透鉴真与出口探测端点: %s (专用并发: %d)",
+            "SSTP 启用 Cloudflare Worker 独占直连穿透鉴真与出口探测端点: %s (专用并发: %d)",
             cf_endpoint,
             cf_concurrency,
         )
     else:
-        log.info("SSTP 未配置外部检测端点，跳过第二阶段外部检测，采用本地解析直连出口（无外部依赖）")
+        log.info("SSTP 未配置外部检测端点，采用本地解析轻量直连出口（无外部依赖）")
 
     async def _worker(r):
         nonlocal completed, pass_count, fail_count, min_delay
