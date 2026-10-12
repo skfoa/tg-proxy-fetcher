@@ -2098,13 +2098,14 @@ HOSTING_EXCLUSIONS = (
     "sakura internet", "conoha", "kamatera", "racknerd", "buyvm",
     "frantech", "vmiss", "dmit", "akile", "bytevirt", "bandwagon",
     "xtom", "synlinq", "tzulo", "drosys", "dromatics", "nktele",
-    "moedove", "fiberxpress", "skyquantum", "gsl networks", "idc cube",
+    "moedove", "fiberxpress", "skyquantum", "gsl networks", "idc cube", "idc",
 )
 
 EDU_PATTERNS = (
     "university", "college", "school", "education", "cernet",
     "academician research", "academic", "institute of technology",
     "polytechnic", "edunet", "research network", "research", "renater", "dfn", "surfnet",
+    "tw ncu", "national central university", "universidad", "universidade", "universite",
 )
 
 GOV_PATTERNS = (
@@ -2143,6 +2144,17 @@ ISP_RES_PATTERNS = (
     "rostelecom", "megafon", "mobile telesystems", "mts pjsc", "mts jllc",
     "yettel", "algar telecom", "cs loxinfo", "sai gon postel", "one new zealand",
     "emirates integrated telecommunications",
+    # 扩展拉美、西葡语区高精度民用宽带词根与国家级/大区主力电信运营商
+    "telecomunicações", "telecomunicacoes", "telecomunicaciones", "comunicacoes",
+    "multicable", "telecable", "tv cable",
+    "broadband services", "broadband network", "broadband internet",
+    "subscribers", "cable isp", "gpon", "adsl_", "fiberlink", "fibernet",
+    "etecsa", "empresa de telecomunicaciones de cuba",
+    "maroc telecom", "pakistan telecomm",
+    "comunicaciones celulares", "tigo",
+    "megacable", "mega cable", "asianet", "cat telecom",
+    "dalsvyaz", "severen-telecom", "vntt", "vietnam technology and telecommunication",
+    "digi spain", "ebox telecom", "ebox",
 )
 
 BANKING_PATTERNS = (
