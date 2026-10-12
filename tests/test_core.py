@@ -15,6 +15,7 @@ import json
 import os
 import sys
 import tempfile
+import time
 import unittest
 from unittest.mock import patch, MagicMock, AsyncMock
 
@@ -1492,6 +1493,60 @@ class TestHttpsProbe(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(egress_ip, "1.2.3.4")
             # open_connection 被调用了 2 次 (初次 CONNECT + 回退 Forward GET)
             self.assertEqual(mock_open.call_count, 2)
+
+    async def test_probe_http_exceeds_max_latency_dies_as_slow_timeout(self):
+        """测试即使 HTTP 节点返回 200，若延迟超过 max_latency_ms (2500ms)，直接判定为 slow_timeout 淘汰"""
+        from proxies_verify import probe_http
+
+        mock_reader = AsyncMock()
+        mock_writer = MagicMock()
+        mock_writer.drain = AsyncMock()
+        mock_writer.close = MagicMock()
+        mock_writer.wait_closed = AsyncMock()
+
+        mock_reader.read = AsyncMock(side_effect=[
+            b"HTTP/1.1 200 Connection Established\r\n\r\n",
+            b"HTTP/1.1 200 OK\r\nServer: cloudflare\r\n\r\ncolo=HKG\r\nloc=HK\r\nip=1.2.3.4\r\nwarp=off\r\n",
+            b"",
+        ])
+
+        real_t = time.monotonic()
+        t_vals = [real_t, real_t + 3.0]
+        def fake_monotonic():
+            if t_vals:
+                return t_vals.pop(0)
+            return real_t + 3.0
+
+        # 模拟耗时超过 2500ms (3000ms)
+        with patch("asyncio.open_connection", return_value=(mock_reader, mock_writer)), \
+             patch("proxies_verify.time.monotonic", side_effect=fake_monotonic):
+            is_alive, delay, status, colo, country, egress_ip = await probe_http(
+                "1.2.3.4", 8080, None, None, connect_timeout=5.0, http_timeout=5.0, is_ssl=False, max_latency_ms=2500
+            )
+            # 必须判定为淘汰
+            self.assertFalse(is_alive)
+            self.assertEqual(status, "slow_timeout")
+            self.assertGreater(delay, 2500)
+
+    async def test_probe_single_routes_http_with_strict_latency_and_timeout(self):
+        """测试 probe_single 针对明文 http 节点传入了严格 2.0s 超时与 2500ms 延迟上限"""
+        from proxies_verify import probe_single
+
+        row = {
+            "proto": "http",
+            "host": "1.2.3.4",
+            "port": 8080,
+            "url": "http://1.2.3.4:8080",
+        }
+        sem = asyncio.Semaphore(10)
+
+        with patch("proxies_verify.probe_http", return_value=(True, 300, "alive", "HKG", "HK", "1.2.3.4")) as mock_probe:
+            res = await probe_single(row, sem)
+            self.assertTrue(res["is_alive"])
+            # 确认调用参数：connect_timeout 缩紧为 2.0s，max_latency_ms=2500
+            args, kwargs = mock_probe.call_args
+            self.assertEqual(kwargs.get("max_latency_ms"), 2500)
+            self.assertEqual(kwargs.get("is_ssl"), False)
 
 
 if __name__ == "__main__":

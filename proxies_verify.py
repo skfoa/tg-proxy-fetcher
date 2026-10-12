@@ -97,6 +97,8 @@ PROBE_PORT = 80
 
 TIMEOUT = 3.0
 HTTP_TIMEOUT = 2.5
+HTTP_PROBE_TIMEOUT = 2.0
+HTTP_MAX_LATENCY_MS = 2500
 SSTP_TIMEOUT = 8.0
 SSTP_READ_TIMEOUT = 4.0
 CONCURRENCY = 300
@@ -342,6 +344,7 @@ async def probe_http(
     connect_timeout: float = TIMEOUT,
     http_timeout: float = HTTP_TIMEOUT,
     is_ssl: bool = False,
+    max_latency_ms: int = 0,
 ) -> tuple[bool, int, str, str, str, str]:
     """
     HTTP / HTTPS 代理鉴真：
@@ -349,6 +352,7 @@ async def probe_http(
     2. 发送 CONNECT speed.cloudflare.com:80 隧道请求 (若有账密带 Proxy-Authorization)
     3. 穿透隧道发送 GET /cdn-cgi/trace 并提取 colo, country 与 egress_ip
     4. 若 CONNECT 阶段无响应或超时直接判死；仅当收到明确的非 200 HTTP 响应（如 403/405）时才回退至 Forward GET
+    5. 若配置了 max_latency_ms (>0) 且总探测延迟超过该上限，直接判定为 slow_timeout 淘汰
     返回 (is_alive, delay_ms, status, colo, country, egress_ip)
     """
     connect_host = host
@@ -445,6 +449,8 @@ async def probe_http(
             lat = max(1, int((time.monotonic() - t0) * 1000))
             probe_first_line = http_text.splitlines()[0] if http_text else ""
             if re.search(r"\b200\b", probe_first_line) and colo:
+                if max_latency_ms > 0 and lat > max_latency_ms:
+                    return False, lat, "slow_timeout", "", "", ""
                 return True, lat, "alive", colo, country, egress_ip
             # 隧道已成功建立但目标穿透失败，直接判死，不进入 Forward GET
             return False, lat, "http_fail", "", "", ""
@@ -487,6 +493,8 @@ async def probe_http(
         lat = max(1, int((time.monotonic() - t0) * 1000))
         direct_first_line = direct_text.splitlines()[0] if direct_text else ""
         if re.search(r"\b200\b", direct_first_line) and colo:
+            if max_latency_ms > 0 and lat > max_latency_ms:
+                return False, lat, "slow_timeout", "", "", ""
             return True, lat, "alive", colo, country, egress_ip
         return False, lat, "http_fail", "", "", ""
     except asyncio.TimeoutError:
@@ -655,6 +663,8 @@ async def probe_single(
     sstp_timeout: float = SSTP_TIMEOUT,
     cf_check_endpoint: str | None = None,
     cf_executor: concurrent.futures.ThreadPoolExecutor | None = None,
+    http_probe_timeout: float = HTTP_PROBE_TIMEOUT,
+    http_max_latency_ms: int = HTTP_MAX_LATENCY_MS,
 ) -> dict:
     """协议分流路由与执行"""
     async with sem:
@@ -669,8 +679,17 @@ async def probe_single(
                 host, port, user, pwd, timeout, http_timeout
             )
         elif proto == "http":
+            h_conn_to = min(timeout, http_probe_timeout)
+            h_read_to = min(http_timeout, http_probe_timeout)
             is_alive, delay_ms, status, colo, country, egress_ip = await probe_http(
-                host, port, user, pwd, timeout, http_timeout, is_ssl=False
+                host,
+                port,
+                user,
+                pwd,
+                h_conn_to,
+                h_read_to,
+                is_ssl=False,
+                max_latency_ms=http_max_latency_ms,
             )
         elif proto == "https":
             is_alive, delay_ms, status, colo, country, egress_ip = await probe_http(
@@ -1155,11 +1174,16 @@ async def async_main(args):
 
     proto_stats = {}
 
+    h_to = getattr(args, "http_probe_timeout", HTTP_PROBE_TIMEOUT)
+    h_lat = getattr(args, "http_max_latency", HTTP_MAX_LATENCY_MS)
+
     log.info(
-        "开始并发质检代理连通性: 共 %d 条 | 并发: %d | 超时: %.1fs | 淘汰阈值: 连续失败 >= %d 次",
+        "开始并发质检代理连通性: 共 %d 条 | 并发: %d | 超时: %.1fs (HTTP专属: %.1fs, 延迟上限: %dms) | 淘汰阈值: 连续失败 >= %d 次",
         total,
         args.concurrency,
         args.timeout,
+        h_to,
+        h_lat,
         args.max_fails,
     )
 
@@ -1192,6 +1216,8 @@ async def async_main(args):
                 args.sstp_timeout,
                 cf_check_endpoint=cf_endpoint,
                 cf_executor=cf_executor,
+                http_probe_timeout=h_to,
+                http_max_latency_ms=h_lat,
             )
         completed += 1
 
@@ -1381,6 +1407,18 @@ def main():
     parser.add_argument("--strict", action="store_true", help="极致纯净模式 (只要失败 1 次立即剔除，等价于 --max-fails 1)")
     parser.add_argument("--timeout", type=float, default=TIMEOUT, help=f"单节点握手超时秒数 (默认 {TIMEOUT})")
     parser.add_argument("--http-timeout", type=float, default=HTTP_TIMEOUT, help=f"单节点 HTTP 穿透校验超时秒数 (默认 {HTTP_TIMEOUT})")
+    parser.add_argument(
+        "--http-probe-timeout",
+        type=float,
+        default=HTTP_PROBE_TIMEOUT,
+        help=f"明文 HTTP 协议握手与穿透专属严格超时秒数 (默认 {HTTP_PROBE_TIMEOUT})",
+    )
+    parser.add_argument(
+        "--http-max-latency",
+        type=int,
+        default=HTTP_MAX_LATENCY_MS,
+        help=f"明文 HTTP 协议最大允许延迟毫秒数，超出直接淘汰 (默认 {HTTP_MAX_LATENCY_MS})",
+    )
     parser.add_argument("--sstp-timeout", type=float, default=SSTP_TIMEOUT, help=f"SSTP 协议专属握手超时秒数 (默认 {SSTP_TIMEOUT})")
     parser.add_argument(
         "--cf-check-endpoint",
