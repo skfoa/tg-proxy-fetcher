@@ -40,7 +40,7 @@
 - **💡 未收录 ASN 动态发现与自适应预警**：增量抓取遇外部新自治系统时，自动比对内置权威对照库；若发现未收录 ASN，将在 Telegram 卡片中提示并展示待确认明细，提示管理员按需确认并补充入库；若无未知 ASN 则自动隐藏。
 - **📱 动态双状态 Telegram 运行卡片**：首行支持「🟢 发现新增 + 🗑️ 剔除死节点」双状态动态呈现，底栏包含细分引擎淘汰明细 `[代理 X, 反代 Y, 扫描 Z]`，锁屏即知变动。
 - **🛡️ 响应防截断、原子覆写与协议校验**：质检引擎采用统一 Deadline 超时控制与循环读取（`read_full_response`），完整获取 `/cdn-cgi/trace` 响应中的 `colo` 属性，非 200 响应快速退出；严格切分 Header 与 Body 区域，校验状态码（`301`/`200`）与 `Server: cloudflare`；全链路数据落盘统一采用 `.tmp` $\rightarrow$ `os.replace` 原子替换，避免进程意外中断产生损坏文件。
-- **🛡️ 静态安全门禁与自动化回归测试**：在数据抓取前首先通过 `py_compile` 拦截语法错误、`ruff` 拦截未定义变量，由 `providers.py --validate` 校验数据库一致性，并运行 `tests/test_core.py` 自动化回归测试（覆盖协议解析、Host 格式校验、防污染与容灾自愈）；若流水线任何环节异常中断，自动推送 Telegram 告警卡片并附带日志直链。
+- **🛡️ 静态安全门禁**：在数据抓取前首先通过 `py_compile` 拦截语法错误、`ruff` 拦截未定义变量，由 `providers.py --validate` 校验数据库一致性；若流水线任何环节异常中断，自动推送 Telegram 告警卡片并附带日志直链。
 - **🧹 自动维护与构建瘦身**：每次运行自动清理 GitHub Actions 历史记录（工作流已显式预置 `actions: write` 权限），始终**仅保留最近 4 次运行记录**，告别冗余历史堆积！
 
 ---
@@ -83,7 +83,6 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | **`proxyip_verify.py`** | **反代 ProxyIP 质检引擎**：抗分包/防截断（Header/Body 隔离），验证反代真实穿透能力，并按质检状态分层导出分国与网络属性纯净列表。 |
 | **`cf_verify.py`** | **全量优选 IP 鉴真与最终卡片推送**：执行 TLS 官方证书鉴真 + HTTP 301 重定向抗截断精准校验，汇总流水线所有阶段数据并推送统一 TG 统计卡片。 |
 | **`gen_session.py`** | **Telethon Session 辅助生成器**：本地运行快速交互登录 Telegram 并输出 Session 字符串，供 GitHub Actions 免交互调用。 |
-| **`tests/test_core.py`** | **核心回归测试套件**：标准 `unittest` 自动化测试集，覆盖 Host 鉴真与防注入、路径穿越防御、多品牌别名幂等格式化、六大网络分类定性与数据容灾自愈，已深度接入 CI 门禁。 |
 
 ---
 
@@ -525,12 +524,11 @@ pip install -r requirements.txt
 
 ### 本地回归校验与测试命令
 ```bash
-# ① 语法、静态门禁与核心回归测试（与 GitHub Actions 门禁一致，执行语法、未定义变量、ASN 结构与逻辑回归测试）
+# ① 语法与静态门禁预检（与 GitHub Actions 门禁一致，执行语法、未定义变量与 ASN 数据库一致性校验）
 python -m py_compile *.py
 pip install ruff
-ruff check . --select F82
+ruff check . --select F,E9 --ignore E501
 python providers.py --validate
-python -m unittest discover -s tests
 
 # ② 通用代理连通性质检
 python proxies_verify.py --concurrency 100 --no-notify
