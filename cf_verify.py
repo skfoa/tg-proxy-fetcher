@@ -554,15 +554,19 @@ def send_verify_notification(
         unrecorded_asns = fetch_stats.get("unrecorded_asns", [])
         unmatched_block = ""
         if unrecorded_asns:
-            items = []
-            for item in unrecorded_asns[:4]:
-                c = item.get("asn", "")
-                o = item.get("org", "").strip()
-                cnt = item.get("count", 0)
-                name_str = f" {o}" if o else ""
-                items.append(f"   • <code>{c}</code>{name_str} ({cnt} 条)")
-            suffix = f"\n   └ <i>共 {len(unrecorded_asns)} 个待确认归属</i>" if len(unrecorded_asns) > 4 else ""
-            unmatched_block = "💡 <b>发现未收录 ASN (可补充入库)</b>：\n" + "\n".join(items) + suffix + "\n"
+            # 严格过滤 count <= 0 的幽灵条目，仅展示实际包含可用存活节点的入库自治系统
+            valid_unrecorded = [item for item in unrecorded_asns if item.get("count", 0) > 0]
+            if valid_unrecorded:
+                items = []
+                for item in valid_unrecorded[:4]:
+                    c = item.get("asn", "")
+                    o = str(item.get("org") or item.get("isp") or "").strip()
+                    cnt = item.get("count", 0)
+                    name_str = f" {o}" if o else ""
+                    cnt_str = f" ({cnt} 条)" if cnt else ""
+                    items.append(f"   • <code>{c}</code>{name_str}{cnt_str}")
+                suffix = f"\n   └ <i>共 {len(valid_unrecorded)} 个已自动收录入库</i>" if len(valid_unrecorded) > 4 else ""
+                unmatched_block = f"💡 <b>新收录 ASN (已自动归类入库 +{len(valid_unrecorded)})</b>：\n" + "\n".join(items) + suffix + "\n"
 
         message = (
             f"{header}\n"

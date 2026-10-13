@@ -567,16 +567,18 @@ def send_tg_notification(
 
     unmatched_block = ""
     if unrecorded_asns:
-        items = []
-        for item in unrecorded_asns[:4]:
-            c = item.get("asn", "")
-            o = item.get("org", "").strip()
-            cnt = item.get("count", 0)
-            name_str = f" {o}" if o else ""
-            cnt_str = f" ({cnt} 条)" if cnt else ""
-            items.append(f"   • <code>{c}</code>{name_str}{cnt_str}")
-        suffix = f"\n   └ <i>共 {len(unrecorded_asns)} 个已自动收录入库</i>" if len(unrecorded_asns) > 4 else ""
-        unmatched_block = f"💡 <b>新收录 ASN (已自动归类入库 +{len(unrecorded_asns)})</b>：\n" + "\n".join(items) + suffix + "\n"
+        valid_unrecorded = [item for item in unrecorded_asns if item.get("count", 0) > 0]
+        if valid_unrecorded:
+            items = []
+            for item in valid_unrecorded[:4]:
+                c = item.get("asn", "")
+                o = str(item.get("org") or item.get("isp") or "").strip()
+                cnt = item.get("count", 0)
+                name_str = f" {o}" if o else ""
+                cnt_str = f" ({cnt} 条)" if cnt else ""
+                items.append(f"   • <code>{c}</code>{name_str}{cnt_str}")
+            suffix = f"\n   └ <i>共 {len(valid_unrecorded)} 个已自动收录入库</i>" if len(valid_unrecorded) > 4 else ""
+            unmatched_block = f"💡 <b>新收录 ASN (已自动归类入库 +{len(valid_unrecorded)})</b>：\n" + "\n".join(items) + suffix + "\n"
 
     all_channels = []
     for ch in PROXY_CHANNELS + CF_IP_CHANNELS:
@@ -743,6 +745,9 @@ def auto_enrich_and_save_asns(unrecorded_items: list[dict], proxy: str = "") -> 
                         "isp": org,
                         "net_type": net_type,
                     }
+                if org:
+                    item["org"] = org
+                    item["isp"] = org
             except Exception as item_err:
                 log.debug("解析单条未收录 ASN 条目发生异常 (已隔离跳过): %s (%s)", item, item_err)
                 continue
@@ -876,16 +881,6 @@ def fetch_edt_proxies(
         asn_code = f"AS{asn_raw}" if asn_raw and not asn_raw.upper().startswith("AS") else asn_raw.upper()
         org = str(item.get("asOrganization") or "").strip()
 
-        # 检查是否为未收录的 ASN
-        if asn_code and not is_asn_recorded(asn_code):
-            if asn_code not in unrecorded_asns_map:
-                unrecorded_asns_map[asn_code] = {
-                    "asn": asn_code,
-                    "isp": org,
-                    "ip": ip,
-                    "net_type": classify_asn(asn_code, org),
-                }
-
         # 核心策略：严格过滤机房节点，仅保留非机房高价值代理
         net_type = classify_asn(asn_code, org)
         if net_type == "datacenter":
@@ -895,6 +890,19 @@ def fetch_edt_proxies(
         key = f"{ip}:{port}"
         if is_tombstoned(key, tombstone):
             continue
+
+        # 检查是否为未收录的有效非机房 ASN (仅针对通过过滤且存活的高价值候选节点进行收录统计)
+        if asn_code and not is_asn_recorded(asn_code, org):
+            if asn_code not in unrecorded_asns_map:
+                unrecorded_asns_map[asn_code] = {
+                    "asn": asn_code,
+                    "org": org,
+                    "isp": org,
+                    "ip": ip,
+                    "net_type": net_type,
+                    "count": 0,
+                }
+            unrecorded_asns_map[asn_code]["count"] += 1
 
         client_ip = str(item.get("clientIp") or "").strip()
         egress_ip = client_ip if client_ip else ip
@@ -1046,16 +1054,6 @@ def fetch_zip_proxyips(
         raw_isp = str(meta.get("asOrganization") or meta.get("isp") or item.get("asOrganization") or item.get("isp") or "").strip()
         asn_code = _extract_asn_code(raw_asn, raw_isp)
 
-        # 检查是否为未收录的 ASN
-        if asn_code and not is_asn_recorded(asn_code, raw_isp):
-            if asn_code not in unrecorded_asns_map:
-                unrecorded_asns_map[asn_code] = {
-                    "asn": asn_code,
-                    "isp": raw_isp,
-                    "ip": ip,
-                    "net_type": classify_asn(asn_code, raw_isp),
-                }
-
         # 核心策略：严格只收录非机房，常规 datacenter 机房节点直接过滤剔除
         net_type = classify_asn(asn_code, raw_isp)
         if net_type == "datacenter":
@@ -1102,6 +1100,18 @@ def fetch_zip_proxyips(
             if key not in scraped_proxyips:
                 scraped_proxyips[key] = proxyip_item
                 total_added += 1
+                # 检查是否为未收录的有效非机房 ASN (仅针对通过过滤且存活的高价值候选节点进行收录统计)
+                if asn_code and not is_asn_recorded(asn_code, raw_isp):
+                    if asn_code not in unrecorded_asns_map:
+                        unrecorded_asns_map[asn_code] = {
+                            "asn": asn_code,
+                            "org": raw_isp,
+                            "isp": raw_isp,
+                            "ip": ip,
+                            "net_type": net_type,
+                            "count": 0,
+                        }
+                    unrecorded_asns_map[asn_code]["count"] += 1
             elif isinstance(scraped_proxyips[key], dict):
                 for mk in ("colo", "cf_location", "isp", "asn", "net_type"):
                     if proxyip_item.get(mk) and not scraped_proxyips[key].get(mk):
@@ -1529,6 +1539,8 @@ def merge_and_save(
     from collections import Counter
     unrecorded_counts = Counter()
     unrecorded_orgs = {}
+    unrecorded_ips = {}
+    unrecorded_net_types = {}
 
     for k, v in scraped_scan_ips.items():
         if k not in existing_scan_ips:
@@ -1539,6 +1551,10 @@ def merge_and_save(
                     org = v.get("isp") or v.get("asn") or ""
                     org = re.sub(r"^AS\d+\s*", "", org, flags=re.IGNORECASE).strip()
                     unrecorded_orgs[c] = org
+                if c not in unrecorded_ips:
+                    unrecorded_ips[c] = v.get("ip") or (k.split(":")[0] if ":" in k else "")
+                if c not in unrecorded_net_types:
+                    unrecorded_net_types[c] = v.get("net_type") or ""
 
     for k, v in scraped_cf_ips.items():
         if k not in existing_cf_ips:
@@ -1549,6 +1565,10 @@ def merge_and_save(
                     org = v.get("isp") or v.get("asn") or ""
                     org = re.sub(r"^AS\d+\s*", "", org, flags=re.IGNORECASE).strip()
                     unrecorded_orgs[c] = org
+                if c not in unrecorded_ips:
+                    unrecorded_ips[c] = v.get("ip") or (k.split(":")[0] if ":" in k else "")
+                if c not in unrecorded_net_types:
+                    unrecorded_net_types[c] = v.get("net_type") or ""
 
     for k, v in scraped_proxyips.items():
         if k not in existing_proxyips:
@@ -1559,6 +1579,10 @@ def merge_and_save(
                     org = v.get("isp") or v.get("asn") or ""
                     org = re.sub(r"^AS\d+\s*", "", org, flags=re.IGNORECASE).strip()
                     unrecorded_orgs[c] = org
+                if c not in unrecorded_ips:
+                    unrecorded_ips[c] = v.get("ip") or (k.split(":")[0] if ":" in k else "")
+                if c not in unrecorded_net_types:
+                    unrecorded_net_types[c] = v.get("net_type") or ""
 
     for k, v in scraped_proxies.items():
         if k not in existing_proxies and isinstance(v, dict):
@@ -1569,6 +1593,10 @@ def merge_and_save(
                     org = v.get("isp") or v.get("asn") or ""
                     org = re.sub(r"^AS\d+\s*", "", org, flags=re.IGNORECASE).strip()
                     unrecorded_orgs[c] = org
+                if c not in unrecorded_ips:
+                    unrecorded_ips[c] = v.get("host") or v.get("egress_ip") or (k.split(":")[0] if ":" in k else "")
+                if c not in unrecorded_net_types:
+                    unrecorded_net_types[c] = v.get("net_type") or ""
 
     unrecorded_asns = []
     for c, cnt in unrecorded_counts.most_common():
@@ -1576,6 +1604,8 @@ def merge_and_save(
             "asn": c,
             "org": unrecorded_orgs.get(c, ""),
             "count": cnt,
+            "ip": unrecorded_ips.get(c, ""),
+            "net_type": unrecorded_net_types.get(c, ""),
         })
 
     # 统一汇流所有自带 ASN 来源（扫描附件、反代池附件、EDT 外部多镜像源等）检测到的新未收录条目
@@ -1583,6 +1613,9 @@ def merge_and_save(
     if edt_unrecorded_asns:
         seen_codes = {x.get("asn") for x in new_asn_records if x.get("asn")}
         for item in edt_unrecorded_asns:
+            # 严格防穿透：绝不接纳 count <= 0 的幽灵条目，仅收录具有真实存活候选节点的有效 ASN
+            if item.get("count", 0) <= 0:
+                continue
             c = _extract_asn_code(item.get("asn"), item.get("isp") or item.get("org"))
             if c and c not in seen_codes:
                 new_asn_records.append(item)
@@ -1597,8 +1630,11 @@ def merge_and_save(
         else:
             log.debug("【批量自动持久化新 ASN】本次全源无新 ASN 需入库（全部已在库或已去重跳过）")
 
-    # 仅当本次实际入库了新 ASN，才在通知卡片中展示新收录清单；无新增则 0 视觉噪音
-    card_unrecorded = new_asn_records if enriched_count > 0 else []
+    # 仅当本次实际入库了新 ASN，且节点计数 > 0，才在通知卡片中展示新收录清单；无新增或 0 条则 0 视觉噪音
+    card_unrecorded = [
+        item for item in new_asn_records
+        if item.get("count", 0) > 0
+    ] if enriched_count > 0 else []
 
     save_and_notify(
         final_proxies,
