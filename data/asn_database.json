@@ -2033,7 +2033,16 @@
     "Directive LLC": "AS41957",
     "Annet Ltd.": "AS50060",
     "Merlin-Telekom LLC": "AS208139",
-    "Dhaka Electric Supply Company Limited (DESCO)": "AS59361"
+    "Dhaka Electric Supply Company Limited (DESCO)": "AS59361",
+    "China Mobile Communications Corporation - shanghai company": "AS24400",
+    "Alaxona Internet Inc.": "AS39900",
+    "NTT-ME Corporation": "AS9595",
+    "Telephone&Telegraph Station": "AS34205",
+    "CJ Hello Co.": "AS38121",
+    "AIS-Fibre": "AS133481",
+    "STARCAT Co ., LTD.": "AS17529",
+    "LG DACOM Corporation": "AS3786",
+    "QTnet, Inc.": "AS7679"
   },
   "asn_to_isp": {
     "AS174": "Cogent Communications, LLC",
@@ -4053,7 +4062,16 @@
     "AS50060": "Annet Ltd.",
     "AS219401": "VH Global Limited",
     "AS208139": "Merlin-Telekom LLC",
-    "AS59361": "Dhaka Electric Supply Company Limited (DESCO)"
+    "AS59361": "Dhaka Electric Supply Company Limited (DESCO)",
+    "AS24400": "China Mobile Communications Corporation - shanghai company",
+    "AS39900": "Alaxona Internet Inc.",
+    "AS9595": "NTT-ME Corporation",
+    "AS34205": "Telephone&Telegraph Station",
+    "AS38121": "CJ Hello Co.",
+    "AS133481": "AIS-Fibre",
+    "AS17529": "STARCAT Co ., LTD.",
+    "AS3786": "LG DACOM Corporation",
+    "AS7679": "QTnet, Inc."
   },
   "asn_to_net_type": {
     "AS1311": "banking",
@@ -7255,6 +7273,12 @@
     "AS50060": "datacenter",
     "AS219401": "datacenter",
     "AS208139": "datacenter",
-    "AS59361": "datacenter"
+    "AS59361": "datacenter",
+    "AS24400": "isp",
+    "AS39900": "datacenter",
+    "AS9595": "datacenter",
+    "AS34205": "datacenter",
+    "AS38121": "datacenter",
+    "AS17529": "datacenter"
   }
 }
