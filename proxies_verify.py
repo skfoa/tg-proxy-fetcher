@@ -97,12 +97,13 @@ PROBE_PORT = 80
 
 TIMEOUT = 3.0
 HTTP_TIMEOUT = 2.5
-HTTP_PROBE_TIMEOUT = 2.0
+HTTP_PROBE_TIMEOUT = 1.5
 HTTP_MAX_LATENCY_MS = 2500
 SSTP_TIMEOUT = 8.0
 SSTP_READ_TIMEOUT = 4.0
 CONCURRENCY = 300
 MAX_FAILS = 3
+HTTP_MAX_FAILS = 1
 
 # 致命硬故障状态集：对端端口关闭 (Connection Refused)、主机不可达、协议错配或鉴权永久失败
 # 遇此错误直接判死淘汰（fail_count 达到淘汰阈值并登记至墓地冷却库），不进入缓冲期
@@ -114,6 +115,7 @@ FATAL_FAIL_STATUSES = {
     "auth_fail",              # 代理账密认证错误
     "unsupported_method",     # 不支持的认证方式
     "connect_fail",           # 代理端明确拒绝中继 (CONNECT 响应 REP != 0)
+    "http_connect_fail",      # HTTP 代理端明确拒绝 CONNECT 隧道 (400/403/405/502 等)
     "tls_err",                # TLS 握手异常 (非 SSL/TLS 服务)
     "stun_fail",              # STUN/TURN Magic Cookie 校验失败 (非 STUN 服务)
     "sstp_fail",              # SSTP 隧道请求返回非 200 (非 SSTP 服务)
@@ -468,51 +470,14 @@ async def probe_http(
                 if max_latency_ms > 0 and lat > max_latency_ms:
                     return False, lat, "slow_timeout", "", "", ""
                 return True, lat, "alive", colo, country, egress_ip
-            # 隧道已成功建立但目标穿透失败，直接判死，不进入 Forward GET
+            # 隧道已成功建立但目标穿透失败，直接判死
             return False, lat, "http_fail", "", "", ""
 
-        # 仅当收到明确的 HTTP 协议非 200 响应（如 400/403/405/501）时，才回退尝试 Forward GET
-        if not (first_line.upper().startswith("HTTP/") or re.match(r"^HTTP/\d", first_line, re.IGNORECASE)):
-            lat = max(1, int((time.monotonic() - t0) * 1000))
-            await safe_close_writer(writer)
-            writer = None
-            return False, lat, "http_fail", "", "", ""
-
-        # 回退至直接正向代理 Forward GET（安全重连以避免原连接被代理端关闭/重置）
+        # CONNECT 返回非 200 响应（如 400/403/405/502 等拒绝对外建联），直接判定失败淘汰，彻底杜绝二次重连耗时
+        lat = max(1, int((time.monotonic() - t0) * 1000))
         await safe_close_writer(writer)
         writer = None
-
-        fwd_reader, fwd_writer = await asyncio.wait_for(
-            asyncio.open_connection(connect_host, port, ssl=ssl_ctx, server_hostname=sni),
-            timeout=connect_timeout,
-        )
-        reader, writer = fwd_reader, fwd_writer
-
-        direct_req = (
-            f"GET http://{PROBE_HOST}{PROBE_PATH} HTTP/1.1\r\n"
-            f"Host: {PROBE_HOST}\r\n"
-            f"{auth_header}"
-            f"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36\r\n"
-            f"Connection: close\r\n"
-            f"\r\n"
-        ).encode("latin1")
-        writer.write(direct_req)
-        await asyncio.wait_for(writer.drain(), timeout=http_timeout)
-        direct_resp = await read_full_response(reader, http_timeout, need_body=True)
-        direct_text = direct_resp.decode("utf-8", errors="ignore")
-        colo_match = re.search(r"\bcolo=([A-Za-z0-9]+)\b", direct_text)
-        colo = colo_match.group(1).upper() if colo_match else ""
-        loc_match = re.search(r"\bloc=([A-Za-z]{2})\b", direct_text)
-        country = loc_match.group(1).upper() if loc_match else ""
-        ip_match = re.search(r"\bip=([0-9a-fA-F.:]+)\b", direct_text)
-        egress_ip = ip_match.group(1).strip() if ip_match else ""
-        lat = max(1, int((time.monotonic() - t0) * 1000))
-        direct_first_line = direct_text.splitlines()[0] if direct_text else ""
-        if re.search(r"\b200\b", direct_first_line) and colo:
-            if max_latency_ms > 0 and lat > max_latency_ms:
-                return False, lat, "slow_timeout", "", "", ""
-            return True, lat, "alive", colo, country, egress_ip
-        return False, lat, "http_fail", "", "", ""
+        return False, lat, "http_connect_fail", "", "", ""
     except asyncio.TimeoutError:
         return False, 0, "timeout", "", "", ""
     except ssl.SSLError as e:
@@ -682,6 +647,7 @@ async def probe_single(
     http_probe_timeout: float = HTTP_PROBE_TIMEOUT,
     http_max_latency_ms: int = HTTP_MAX_LATENCY_MS,
     max_fails: int = MAX_FAILS,
+    http_max_fails: int = HTTP_MAX_FAILS,
 ) -> dict:
     """协议分流路由与执行"""
     async with sem:
@@ -781,8 +747,9 @@ async def probe_single(
             row["country"] = country or row.get("country", "")
             row["egress_ip"] = egress_ip or row.get("egress_ip", "")
         else:
+            eff_max_fails = http_max_fails if proto == "http" else max_fails
             if status in FATAL_FAIL_STATUSES:
-                row["fail_count"] = max_fails
+                row["fail_count"] = eff_max_fails
             else:
                 row["fail_count"] = fc + 1
             if not row.get("delay_ms"):
@@ -1196,15 +1163,17 @@ async def async_main(args):
 
     h_to = getattr(args, "http_probe_timeout", HTTP_PROBE_TIMEOUT)
     h_lat = getattr(args, "http_max_latency", HTTP_MAX_LATENCY_MS)
+    h_mf = getattr(args, "http_max_fails", HTTP_MAX_FAILS)
 
     log.info(
-        "开始并发质检代理连通性: 共 %d 条 | 并发: %d | 超时: %.1fs (HTTP专属: %.1fs, 延迟上限: %dms) | 淘汰阈值: 连续失败 >= %d 次",
+        "开始并发质检代理连通性: 共 %d 条 | 并发: %d | 超时: %.1fs (HTTP专属: %.1fs, 延迟上限: %dms) | 淘汰阈值: 连续失败 >= %d 次 (HTTP专属: >= %d 次)",
         total,
         args.concurrency,
         args.timeout,
         h_to,
         h_lat,
         args.max_fails,
+        h_mf,
     )
 
     # 全局显式初始化 _old_fc，确保异常提前返回或空跑时不遗留未定义状态
@@ -1227,7 +1196,9 @@ async def async_main(args):
     async def _worker(r):
         nonlocal completed, pass_count, fail_count, min_delay
         host = r.get("host", "")
-        async with get_keyed_lock(host):
+        port = r.get("port", 0)
+        lock_key = f"{host}:{port}"
+        async with get_keyed_lock(lock_key):
             res = await probe_single(
                 r,
                 sem,
@@ -1239,6 +1210,7 @@ async def async_main(args):
                 http_probe_timeout=h_to,
                 http_max_latency_ms=h_lat,
                 max_fails=args.max_fails,
+                http_max_fails=h_mf,
             )
         completed += 1
 
@@ -1272,8 +1244,14 @@ async def async_main(args):
     tasks = [_worker(r) for r in rows]
     results = await asyncio.gather(*tasks)
 
-    # 幸存者筛选（包含本次探测存活节点 + 处于连续失败容忍缓冲期内的节点：fail_count < args.max_fails，默认连续失败 < 3 次保留，允许 1~2 次失败缓冲）
-    survivors = [r for r in results if safe_int(r.get("fail_count"), 0) < args.max_fails]
+    # 幸存者筛选（支持按协议分流淘汰阈值：HTTP 专属严格阈值，其余协议维持 max_fails 缓冲容错）
+    def _is_survivor(r):
+        proto = (r.get("proto") or "").lower()
+        fc = safe_int(r.get("fail_count"), 0)
+        eff_mf = h_mf if proto == "http" else args.max_fails
+        return fc < eff_mf
+
+    survivors = [r for r in results if _is_survivor(r)]
     eliminated = total - len(survivors)
     survivors_len = len(survivors)
     proxies_f1 = sum(1 for r in survivors if safe_int(r.get("fail_count"), 0) == 1)
@@ -1282,7 +1260,7 @@ async def async_main(args):
         1 for r in results
         if not r.get("is_alive")
         and safe_int(r.get("_old_fc"), 0) == 0
-        and safe_int(r.get("fail_count"), 0) < args.max_fails
+        and _is_survivor(r)
     )
     proxies_buf_rec = sum(
         1 for r in results
@@ -1298,13 +1276,13 @@ async def async_main(args):
     avg_delay = int(sum(alive_delays) / len(alive_delays)) if alive_delays else 0
 
     if eliminated > 0:
-        log.info("[通用代理 淘汰] 剔除 %d 条连续失败 >= %d 次的死节点", eliminated, args.max_fails)
-        dead_nodes = [r for r in results if safe_int(r.get("fail_count"), 0) >= args.max_fails]
+        log.info("[通用代理 淘汰] 剔除 %d 条达到淘汰阈值的死节点 (HTTP专属: >= %d 次, 其余协议: >= %d 次)", eliminated, h_mf, args.max_fails)
+        dead_nodes = [r for r in results if not _is_survivor(r)]
         dead_keys = [canonical_key(r.get("host", ""), r.get("port", 0)) for r in dead_nodes]
         newly_tombstoned = record_tombstone(dead_keys)
         log.info("[通用代理 墓地] 已登记 %d 个淘汰死节点至墓地冷却库 (新增: %d 个, 隔离期 7 天)", len(dead_keys), newly_tombstoned)
     else:
-        log.info("[通用代理 淘汰] 本次无节点达到连续失败 %d 次的淘汰阈值", args.max_fails)
+        log.info("[通用代理 淘汰] 本次无节点达到淘汰阈值")
 
     # 补全出口 IP 对应的 ASN 与网络属性打标
     net_stats = await enrich_proxies_metadata(survivors)
@@ -1337,6 +1315,7 @@ async def async_main(args):
             stats["proxies_proto_breakdown"] = proto_stats
             stats["proxies_net_stats"] = net_stats
             stats["proxies_max_fails"] = args.max_fails
+            stats["proxies_http_max_fails"] = h_mf
             # 兼容历史 socks_* 字段
             stats["socks_verified"] = True
             stats["socks_total"] = total
@@ -1425,7 +1404,13 @@ def main():
         help=f"Cloudflare Worker 质检专用并发线程数 (默认 {CF_CONCURRENCY})",
     )
     parser.add_argument("--max-fails", type=int, default=MAX_FAILS, help=f"连续失败淘汰阈值 (默认 {MAX_FAILS})")
-    parser.add_argument("--strict", action="store_true", help="极致纯净模式 (只要失败 1 次立即剔除，等价于 --max-fails 1)")
+    parser.add_argument(
+        "--http-max-fails",
+        type=int,
+        default=HTTP_MAX_FAILS,
+        help=f"明文 HTTP 协议专属淘汰阈值 (默认 {HTTP_MAX_FAILS}，失败立即淘汰，杜绝低质僵尸节点积压占用资源)",
+    )
+    parser.add_argument("--strict", action="store_true", help="极致纯净模式 (只要失败 1 次立即剔除，等价于 --max-fails 1 --http-max-fails 1)")
     parser.add_argument("--timeout", type=float, default=TIMEOUT, help=f"单节点握手超时秒数 (默认 {TIMEOUT})")
     parser.add_argument("--http-timeout", type=float, default=HTTP_TIMEOUT, help=f"单节点 HTTP 穿透校验超时秒数 (默认 {HTTP_TIMEOUT})")
     parser.add_argument(
@@ -1461,7 +1446,8 @@ def main():
 
     if args.strict:
         args.max_fails = 1
-        log.info("🔥 启用了 --strict 【极致纯净模式】，淘汰阈值强制设为 1")
+        args.http_max_fails = 1
+        log.info("🔥 启用了 --strict 【极致纯净模式】，全协议淘汰阈值强制设为 1")
 
     try:
         asyncio.run(async_main(args))
