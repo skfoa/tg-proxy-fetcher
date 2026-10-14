@@ -229,45 +229,25 @@ def parse_cf_csv_content(
         if not first_line:
             return results
 
-        # 检测首行分隔符（支持逗号、制表符、中文逗号）
-        delim = ","
-        if "\t" in first_line and "," not in first_line:
-            delim = "\t"
-        elif "，" in first_line and "," not in first_line:
-            delim = "，"
-
-        # 检测首行是否为无标题数据行 (例如首列直接是 IP 地址或 IP:Port)
-        first_parts = [p.strip().strip('"') for p in first_line.split(delim)]
+        # 智能探测分隔符与首行是否为无标题数据行 (例如首列直接是 IP 地址)
+        delimiter = "\t" if ("\t" in first_line and "," not in first_line) else ","
+        first_parts = [p.strip().strip('"') for p in first_line.split(delimiter)]
         is_headerless = False
-        if first_parts:
-            cand0 = first_parts[0].split("#")[0].strip()
-            if ":" in cand0:
-                cand0 = cand0.split(":", 1)[0].strip()
-            if is_valid_host(cand0):
-                is_headerless = True
+        if first_parts and (is_valid_host(first_parts[0]) or ":" in first_parts[0]):
+            is_headerless = True
 
         if is_headerless:
-            reader_rows = csv.reader(lines, delimiter=delim)
+            reader_rows = csv.reader(lines, delimiter=delimiter)
             for row in reader_rows:
                 if not row or not row[0].strip():
                     continue
                 raw_ip = row[0].strip()
-                # 若当前行未被全局分隔符切分（例如混入制表符或空格），尝试二次切分解包
-                if "\t" in raw_ip and len(row) == 1:
-                    row = [p.strip() for p in raw_ip.split("\t") if p.strip()]
-                    raw_ip = row[0]
-                elif " " in raw_ip and len(row) == 1 and not raw_ip.startswith("http"):
-                    row = [p.strip() for p in raw_ip.split() if p.strip()]
-                    raw_ip = row[0]
-
                 raw_port = ""
                 raw_delay = ""
                 if ":" in raw_ip:
-                    raw_cand = raw_ip.split("#")[0].strip()
-                    if ":" in raw_cand:
-                        ip_c, p_c = raw_cand.split(":", 1)
-                        if is_valid_host(ip_c) and p_c.isdigit():
-                            raw_ip, raw_port = ip_c, p_c
+                    ip_c, p_c = raw_ip.split(":", 1)
+                    if is_valid_host(ip_c) and p_c.isdigit():
+                        raw_ip, raw_port = ip_c, p_c
 
                 if len(row) == 1:
                     raw_port = raw_port or fn_port
@@ -290,9 +270,6 @@ def parse_cf_csv_content(
 
                 if not raw_port and fn_port:
                     raw_port = fn_port
-                elif not raw_port:
-                    # 默认 Cloudflare TLS 常用端口 443
-                    raw_port = "443"
 
                 if not raw_ip or not raw_port or not is_valid_host(raw_ip) or not raw_port.isdigit():
                     continue
@@ -323,13 +300,13 @@ def parse_cf_csv_content(
                     "cf_location": "",
                     "isp": row_isp,
                     "asn": format_asn_isp(row_asn, row_isp),
-                    "first_seen": fn_time or dt_str,
+                    "first_seen": fn_time,
                     "channel": default_channel,
                     "fail_count": 0,
                 })
             return results
 
-        reader = csv.DictReader(lines, delimiter=delim)
+        reader = csv.DictReader(lines, delimiter=delimiter)
         if not reader.fieldnames:
             return results
 
@@ -474,18 +451,16 @@ def parse_otc_scan_content(
     filename: str = "",
     dt_str: str = ""
 ) -> list[dict]:
-    """解析 OTC 优选扫描导出的文本与 CSV 格式内容 (支持 OTC_SCAN_YX_*.txt, IP:Port 清单及带备注格式)"""
+    """解析 OTC 优选扫描或测速导出的文本/CSV文件内容 (OTC_SCAN_YX_*.txt, 纯 IP:Port 列表等)"""
     fn_asn = ""
     fn_port = ""
     if filename:
         m_fn = re.search(r"(AS\d+)", filename, re.IGNORECASE)
         if m_fn:
             fn_asn = m_fn.group(1).upper()
-        m_p = re.search(r"(?:proxyip[-_]|port[-_]|[-_])(\d{2,5})\b", filename, re.IGNORECASE)
-        if m_p:
-            cand_p = int(m_p.group(1))
-            if 1 <= cand_p <= 65535:
-                fn_port = str(cand_p)
+        m_port = re.search(r"[-_](\d{2,5})(?:\.|$)", filename)
+        if m_port and (1 <= int(m_port.group(1)) <= 65535):
+            fn_port = m_port.group(1)
 
     results = []
     for raw_line in text.splitlines():
@@ -493,47 +468,59 @@ def parse_otc_scan_content(
         if not line or line.startswith("#"):
             continue
 
-        # 多分隔符自适应探测：逗号、制表符、中文逗号、空格
+        # 提取行内可能携带的 # 备注 (如 1.2.3.4:443#NRT 日本东京)
+        line_remark = ""
+        if "#" in line:
+            parts_hash = line.split("#", 1)
+            line = parts_hash[0].strip()
+            line_remark = parts_hash[1].strip()
+            if not line:
+                continue
+
+        # 智能切分：优先使用逗号，其次使用制表符，最后使用多空格
         if "," in line:
-            parts = [p.strip().strip('"') for p in line.split(",") if p.strip()]
+            parts = [p.strip() for p in line.split(",")]
         elif "\t" in line:
-            parts = [p.strip().strip('"') for p in line.split("\t") if p.strip()]
-        elif "，" in line:
-            parts = [p.strip().strip('"') for p in line.split("，") if p.strip()]
+            parts = [p.strip() for p in line.split("\t") if p.strip()]
+        elif " " in line:
+            parts = [p.strip() for p in line.split() if p.strip()]
         else:
-            parts = [p.strip().strip('"') for p in line.split() if p.strip()]
+            parts = [line]
 
         if not parts:
             continue
 
+        first_token = parts[0]
         ip = ""
         port = 0
-        param_parts = []
+        rem_parts = parts[1:]
 
-        # 1. 尝试首项为 IP:Port 组合 (例如 1.2.3.4:443 或 1.2.3.4:443#NRT)
-        if ":" in parts[0]:
-            clean_part0 = parts[0].split("#")[0].strip()
-            if ":" in clean_part0:
-                c_ip, c_port = clean_part0.split(":", 1)
-                if is_valid_host(c_ip) and c_port.isdigit() and 1 <= int(c_port) <= 65535:
-                    ip = c_ip
-                    port = int(c_port)
-                    param_parts = parts[1:]
+        # 1. 检测首项是否携带端口 (如 1.2.3.4:443 或 [2001:db8::1]:443)
+        if ":" in first_token:
+            c_host, _, c_port = first_token.rpartition(":")
+            if c_host and c_port.isdigit() and is_valid_host(c_host):
+                ip = c_host
+                port = int(c_port)
+            elif is_valid_host(first_token):
+                ip = first_token
+        elif is_valid_host(first_token):
+            ip = first_token
 
-        # 2. 尝试首项为纯 IP，次项或其他项为端口
-        if not ip and is_valid_host(parts[0]):
-            ip = parts[0]
-            if len(parts) >= 2 and parts[1].isdigit() and 1 <= int(parts[1]) <= 65535:
-                port = int(parts[1])
-                param_parts = parts[2:]
+        # 若首项未解析出有效 IP，跳过（可能是 CSV 表头或说明行）
+        if not ip or not is_valid_host(ip):
+            continue
+
+        # 2. 若尚未确定端口，依次尝试从 rem_parts[0]、文件名端口或默认 443 获取
+        if port <= 0:
+            if rem_parts and rem_parts[0].isdigit() and 1 <= int(rem_parts[0]) <= 65535:
+                port = int(rem_parts[0])
+                rem_parts = rem_parts[1:]
             elif fn_port:
                 port = int(fn_port)
-                param_parts = parts[1:]
             else:
                 port = 443
-                param_parts = parts[1:]
 
-        if not ip or not (1 <= port <= 65535):
+        if not (1 <= port <= 65535):
             continue
 
         asn = ""
@@ -542,9 +529,8 @@ def parse_otc_scan_content(
         delay_ms = ""
         speed_kbs = ""
 
-        # 依次探测 ASN 编号 (ASxxxx 或纯数字)、Colo位置、延时、速度与 ISP
-        for idx in range(len(param_parts)):
-            p_val = param_parts[idx]
+        # 依次探测 ASN 编号 (ASxxxx 或纯数字)、Colo位置与 ISP
+        for p_val in rem_parts:
             if not p_val or p_val.upper() in ("N/A", "-", "NULL", "NONE"):
                 continue
 
@@ -557,7 +543,7 @@ def parse_otc_scan_content(
             # 2. 匹配纯数字 ASN (如 210644, 212336，扫描器常省略 AS 前缀)
             if p_val.isdigit() and not asn:
                 val_int = int(p_val)
-                if 100 <= val_int <= 4294967295:
+                if 1 <= val_int <= 4294967295:
                     asn = f"AS{val_int}"
                     continue
 
@@ -566,27 +552,13 @@ def parse_otc_scan_content(
                 colo_loc = p_val
                 continue
 
-            # 4. 匹配延迟数值 (如 150ms 或纯整数/小数延迟)
-            if not delay_ms:
-                m_del = re.search(r"^(\d+(?:\.\d+)?)\s*(?:ms)?$", p_val, re.IGNORECASE)
-                if m_del:
-                    delay_ms = int(float(m_del.group(1)))
-                    continue
+            # 4. 识别延迟数值 (如 150ms, 150.5ms, 150)
+            m_d = re.search(r"^(\d+(?:\.\d+)?)\s*(?:ms)?$", p_val, re.IGNORECASE)
+            if m_d and not delay_ms:
+                delay_ms = int(float(m_d.group(1)))
+                continue
 
-            # 5. 匹配下载速度 (如 12.5MB/s, 1024KB/s)
-            if not speed_kbs:
-                m_spd = re.search(r"^(\d+(?:\.\d+)?)\s*([kKmMgG]?[bB]/s)$", p_val)
-                if m_spd:
-                    s_val = float(m_spd.group(1))
-                    s_unit = m_spd.group(2).lower()
-                    if "m" in s_unit:
-                        s_val *= 1024
-                    elif "g" in s_unit:
-                        s_val *= 1024 * 1024
-                    speed_kbs = int(s_val)
-                    continue
-
-            # 6. 识别 ISP 运营商名称 (排除 IPv6、机房位置括号、纯数字及短国家码)
+            # 5. 识别 ISP 运营商名称 (排除 IPv6、机房位置括号、纯数字及短国家码)
             if not isp and ":" not in p_val and "(" not in p_val and not p_val.isdigit():
                 if len(p_val) > 2 and not p_val.startswith("仅"):
                     isp = p_val
@@ -604,14 +576,16 @@ def parse_otc_scan_content(
 
         colo = ""
         loc = colo_loc
-        m = re.match(r"^([A-Z]{3})\s*\((.*?)\)", colo_loc)
-        if m:
-            colo = m.group(1)
-            loc = m.group(2)
-        elif not colo:
-            m_iata = re.search(r"\b([A-Z]{3})\b", colo_loc)
+        if colo_loc:
+            m = re.match(r"^([A-Z]{3})\s*\((.*?)\)", colo_loc)
+            if m:
+                colo = m.group(1)
+                loc = m.group(2)
+        elif line_remark:
+            m_iata = re.search(r"\b([A-Z]{3})\b", line_remark)
             if m_iata:
                 colo = m_iata.group(1)
+            loc = line_remark
 
         if not asn or asn == "AS_UNKNOWN":
             found_asn, found_isp = resolve_ip_asn(ip, isp)

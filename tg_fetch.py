@@ -452,7 +452,7 @@ def load_existing_proxies(
 
 
 def load_existing_cf_ips(filepath: str = OUTPUT_CF_FILE, label: str = "优选 IP") -> dict:
-    """读取本地已保存的优选 IP / ProxyIP，保留历史累积数据（已淘汰进入墓地的节点跳过）"""
+    """读取本地已保存的优选 IP，保留历史累积数据（已淘汰进入墓地的节点跳过）"""
     existing = {}
     if not os.path.exists(filepath):
         return existing
@@ -475,9 +475,9 @@ def load_existing_cf_ips(filepath: str = OUTPUT_CF_FILE, label: str = "优选 IP
                         row["colo"] = row.get("colo", "").replace("`", "").strip()
                         row["cf_location"] = row.get("cf_location", "").replace("`", "").strip()
                         existing[key] = row
-        log.info("已加载本地已存 %s 记录: %d 条（历史有效记录全部保留）", label, len(existing))
+        log.info("已加载本地已存%s记录: %d 条（历史有效记录全部保留）", label, len(existing))
     except Exception as e:
-        log.warning("读取已有 %s 文件 %s 失败: %s", label, filepath, e)
+        log.warning("读取已有%s文件失败: %s", label, e)
     return existing
 
 
@@ -1821,7 +1821,7 @@ async def run_telethon():
                         # 支持自动下载并解析代理文件附件 (如 http_proxies.txt, https_proxies.txt, turn_proxies.txt 等)
                         if msg.file and msg.file.name and msg.file.name.lower().endswith(".txt"):
                             fname_lower = msg.file.name.lower()
-                            if not fname_lower.startswith("otc_scan") and "proxyip" not in fname_lower and any(k in fname_lower for k in ("proxy", "proxies", "http", "turn", "socks")):
+                            if not fname_lower.startswith("otc_scan") and "proxyip" not in fname_lower and "反代" not in fname_lower and any(k in fname_lower for k in ("proxy", "proxies", "http", "turn", "socks")):
                                 try:
                                     doc_bytes = await client.download_media(msg, file=bytes)
                                     if doc_bytes:
@@ -1855,13 +1855,12 @@ async def run_telethon():
                         if msg.file and msg.file.name:
                             fname_lower = msg.file.name.lower()
                             # 1. 反代 ProxyIP 文件 (如 Global-proxyip-443.csv, Global-proxyip-8443.csv, OTC_SCAN_YX_CF-NRT反代.txt 等)
-                            if any(k in fname_lower for k in ("proxyip", "反代")) and fname_lower.endswith((".csv", ".txt")):
+                            if any(k in fname_lower for k in ("proxyip", "proxy_ip", "反代")) and fname_lower.endswith((".csv", ".txt")):
                                 try:
                                     doc_bytes = await client.download_media(msg, file=bytes)
                                     if doc_bytes:
                                         doc_text = doc_bytes.decode("utf-8", errors="ignore")
                                         doc_date_str = msg.date.astimezone(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S") if msg.date else ""
-                                        # 双解析器容错：优先 CSV 表格/无标题解析，未提取到则回退至 OTC 多行文本自适应解析
                                         doc_items = parse_cf_csv_content(doc_text, default_channel=channel_name, filename=msg.file.name, dt_str=doc_date_str)
                                         if not doc_items:
                                             doc_items = parse_otc_scan_content(doc_text, default_channel=channel_name, filename=msg.file.name, dt_str=doc_date_str)
@@ -1906,7 +1905,6 @@ async def run_telethon():
                                     if doc_bytes:
                                         doc_text = doc_bytes.decode("utf-8", errors="ignore")
                                         doc_date_str = msg.date.astimezone(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S") if msg.date else ""
-                                        # 双解析器容错：优先 OTC 文本自适应解析，未提取到则回退至 CSV 表格解析
                                         doc_items = parse_otc_scan_content(doc_text, default_channel=channel_name, filename=msg.file.name, dt_str=doc_date_str)
                                         if not doc_items:
                                             doc_items = parse_cf_csv_content(doc_text, default_channel=channel_name, filename=msg.file.name, dt_str=doc_date_str)
@@ -1968,10 +1966,8 @@ def main():
         except OSError:
             pass
 
-    # 主动修剪磁盘上超过 7 天的过期墓碑条目并原子持久化（prune_tombstone 内部已输出 INFO 统计）
-    pruned = prune_tombstone()
-    if pruned > 0:
-        log.debug("已前置修剪墓地过期死节点: %d 个", pruned)
+    # 主动修剪磁盘上超过 7 天的过期墓碑条目并原子持久化 (函数内已记录日志)
+    prune_tombstone()
 
     if TG_API_ID and TG_API_HASH and TG_SESSION_STR:
         import importlib.util
