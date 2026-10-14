@@ -2042,7 +2042,16 @@
     "AIS-Fibre": "AS133481",
     "STARCAT Co ., LTD.": "AS17529",
     "LG DACOM Corporation": "AS3786",
-    "QTnet, Inc.": "AS7679"
+    "QTnet, Inc.": "AS7679",
+    "Keith.net Incorporated": "AS142285",
+    "DB3 SERVICOS DE TELECOMUNICACOES S.A": "AS28598",
+    "Telecable del Mineral, S. A. de C.V.": "AS28432",
+    "Redes y Telecomunicaciones": "AS27932",
+    "JSC ER-Telecom Holding Tver branch": "AS49048",
+    "GHSX": "AS137718",
+    "Hangzhou Alibaba Advertising Co": "AS37963",
+    "Pacific Wyyerd LLC": "AS400391",
+    "HYUNDAI COMMUNICATIONS & NETWORK": "AS9981"
   },
   "asn_to_isp": {
     "AS174": "Cogent Communications, LLC",
@@ -4071,7 +4080,21 @@
     "AS133481": "AIS-Fibre",
     "AS17529": "STARCAT Co ., LTD.",
     "AS3786": "LG DACOM Corporation",
-    "AS7679": "QTnet, Inc."
+    "AS7679": "QTnet, Inc.",
+    "AS15802": "Emirates Integrated Telecommunications Company PJSC",
+    "AS142285": "Keith.net Incorporated",
+    "AS28598": "DB3 SERVICOS DE TELECOMUNICACOES S.A",
+    "AS42908": "O2 Czech Republic, a.s.",
+    "AS28432": "Telecable del Mineral, S. A. de C.V.",
+    "AS27932": "Redes y Telecomunicaciones",
+    "AS9689": "SK Broadband Co Ltd",
+    "AS49048": "JSC ER-Telecom Holding Tver branch",
+    "AS24444": "China Mobile Communications Corporation",
+    "AS56046": "China Mobile Communications Corporation",
+    "AS137718": "GHSX",
+    "AS37963": "Hangzhou Alibaba Advertising Co",
+    "AS400391": "Pacific Wyyerd LLC",
+    "AS9981": "HYUNDAI COMMUNICATIONS & NETWORK"
   },
   "asn_to_net_type": {
     "AS1311": "banking",
@@ -7279,6 +7302,19 @@
     "AS9595": "datacenter",
     "AS34205": "datacenter",
     "AS38121": "datacenter",
-    "AS17529": "datacenter"
+    "AS17529": "datacenter",
+    "AS15802": "isp",
+    "AS142285": "business",
+    "AS28598": "isp",
+    "AS42908": "isp",
+    "AS28432": "isp",
+    "AS27932": "isp",
+    "AS9689": "isp",
+    "AS49048": "isp",
+    "AS24444": "isp",
+    "AS56046": "isp",
+    "AS137718": "datacenter",
+    "AS400391": "isp",
+    "AS9981": "datacenter"
   }
 }

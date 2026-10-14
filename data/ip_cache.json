@@ -15562,5 +15562,325 @@
     "net_type": "isp",
     "country": "JP",
     "resolved_ip": "59.133.159.32"
+  },
+  "101.126.29.194": {
+    "asn": "AS137718",
+    "isp": "GHSX",
+    "net_type": "datacenter",
+    "country": "CN"
+  },
+  "220.72.165.67": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn262802727.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "220.72.165.67"
+  },
+  "219.100.37.110": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "public-vpn-155.opengw.net": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "219.100.37.110"
+  },
+  "219.100.37.124": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "public-vpn-160.opengw.net": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "219.100.37.124"
+  },
+  "47.146.140.185": {
+    "asn": "AS5650",
+    "isp": "Frontier Communications of America, Inc.",
+    "net_type": "isp",
+    "country": "US"
+  },
+  "vpn963801935.opengw.net": {
+    "asn": "AS5650",
+    "isp": "Frontier Communications of America, Inc.",
+    "net_type": "isp",
+    "country": "US",
+    "resolved_ip": "47.146.140.185"
+  },
+  "220.126.98.19": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn599599318.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "220.126.98.19"
+  },
+  "101.132.248.113": {
+    "asn": "AS37963",
+    "isp": "Hangzhou Alibaba Advertising Co",
+    "net_type": "datacenter",
+    "country": "CN"
+  },
+  "219.100.37.5": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "public-vpn-41.opengw.net": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "219.100.37.5"
+  },
+  "219.100.37.62": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "public-vpn-122.opengw.net": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "219.100.37.62"
+  },
+  "60.42.14.88": {
+    "asn": "AS4713",
+    "isp": "NTT Communications Corporation",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn569190458.opengw.net": {
+    "asn": "AS4713",
+    "isp": "NTT Communications Corporation",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "60.42.14.88"
+  },
+  "150.40.105.10": {
+    "asn": "AS211619",
+    "isp": "MAXKO d.o.o.",
+    "net_type": "datacenter",
+    "country": "HR"
+  },
+  "vpn430861125.opengw.net": {
+    "asn": "AS211619",
+    "isp": "MAXKO d.o.o.",
+    "net_type": "datacenter",
+    "country": "HR",
+    "resolved_ip": "150.40.105.10"
+  },
+  "38.78.164.15": {
+    "asn": "AS400391",
+    "isp": "Pacific Wyyerd LLC",
+    "net_type": "isp",
+    "country": "US"
+  },
+  "vpn752377649.opengw.net": {
+    "asn": "AS400391",
+    "isp": "Pacific Wyyerd LLC",
+    "net_type": "isp",
+    "country": "US",
+    "resolved_ip": "38.78.164.15"
+  },
+  "150.40.105.8": {
+    "asn": "AS211619",
+    "isp": "MAXKO d.o.o.",
+    "net_type": "datacenter",
+    "country": "HR"
+  },
+  "vpn363342659.opengw.net": {
+    "asn": "AS211619",
+    "isp": "MAXKO d.o.o.",
+    "net_type": "datacenter",
+    "country": "HR",
+    "resolved_ip": "150.40.105.8"
+  },
+  "113.59.172.31": {
+    "asn": "AS9981",
+    "isp": "HYUNDAI COMMUNICATIONS & NETWORK",
+    "net_type": "datacenter",
+    "country": "KR"
+  },
+  "vpn451200452.opengw.net": {
+    "asn": "AS9981",
+    "isp": "HYUNDAI COMMUNICATIONS & NETWORK",
+    "net_type": "datacenter",
+    "country": "KR",
+    "resolved_ip": "113.59.172.31"
+  },
+  "203.179.200.136": {
+    "asn": "AS7679",
+    "isp": "QTnet, Inc.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn227553496.opengw.net": {
+    "asn": "AS7679",
+    "isp": "QTnet, Inc.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "203.179.200.136"
+  },
+  "60.153.246.20": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn975325031.opengw.net": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "60.153.246.20"
+  },
+  "101.132.242.147": {
+    "asn": "AS37963",
+    "isp": "Hangzhou Alibaba Advertising Co",
+    "net_type": "datacenter",
+    "country": "CN"
+  },
+  "101.133.171.92": {
+    "asn": "AS37963",
+    "isp": "Hangzhou Alibaba Advertising Co",
+    "net_type": "datacenter",
+    "country": "CN"
+  },
+  "118.70.67.121": {
+    "asn": "AS18403",
+    "isp": "FPT Telecom Company",
+    "net_type": "isp",
+    "country": "VN"
+  },
+  "vpn188693671.opengw.net": {
+    "asn": "AS18403",
+    "isp": "FPT Telecom Company",
+    "net_type": "isp",
+    "country": "VN",
+    "resolved_ip": "118.70.67.121"
+  },
+  "150.40.105.16": {
+    "asn": "AS211619",
+    "isp": "MAXKO d.o.o.",
+    "net_type": "datacenter",
+    "country": "HR"
+  },
+  "vpn192906546.opengw.net": {
+    "asn": "AS211619",
+    "isp": "MAXKO d.o.o.",
+    "net_type": "datacenter",
+    "country": "HR",
+    "resolved_ip": "150.40.105.16"
+  },
+  "101.132.184.217": {
+    "asn": "AS37963",
+    "isp": "Hangzhou Alibaba Advertising Co",
+    "net_type": "datacenter",
+    "country": "CN"
+  },
+  "118.104.8.14": {
+    "asn": "AS18126",
+    "isp": "Chubu Telecommunications Company, Inc.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn987669245.opengw.net": {
+    "asn": "AS18126",
+    "isp": "Chubu Telecommunications Company, Inc.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "118.104.8.14"
+  },
+  "211.196.188.156": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn797866352.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "211.196.188.156"
+  },
+  "101.132.170.88": {
+    "asn": "AS37963",
+    "isp": "Hangzhou Alibaba Advertising Co",
+    "net_type": "datacenter",
+    "country": "CN"
+  },
+  "101.132.43.43": {
+    "asn": "AS37963",
+    "isp": "Hangzhou Alibaba Advertising Co",
+    "net_type": "datacenter",
+    "country": "CN"
+  },
+  "101.132.27.67": {
+    "asn": "AS37963",
+    "isp": "Hangzhou Alibaba Advertising Co",
+    "net_type": "datacenter",
+    "country": "CN"
+  },
+  "92.202.219.84": {
+    "asn": "AS2527",
+    "isp": "Sony Network Communications Inc.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn436514096.opengw.net": {
+    "asn": "AS2527",
+    "isp": "Sony Network Communications Inc.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "92.202.219.84"
+  },
+  "101.132.75.253": {
+    "asn": "AS37963",
+    "isp": "Hangzhou Alibaba Advertising Co",
+    "net_type": "datacenter",
+    "country": "CN"
+  },
+  "101.132.162.200": {
+    "asn": "AS37963",
+    "isp": "Hangzhou Alibaba Advertising Co",
+    "net_type": "datacenter",
+    "country": "CN"
+  },
+  "150.40.105.25": {
+    "asn": "AS211619",
+    "isp": "MAXKO d.o.o.",
+    "net_type": "datacenter",
+    "country": "HR"
+  },
+  "vpn706343823.opengw.net": {
+    "asn": "AS211619",
+    "isp": "MAXKO d.o.o.",
+    "net_type": "datacenter",
+    "country": "HR",
+    "resolved_ip": "150.40.105.25"
   }
 }
