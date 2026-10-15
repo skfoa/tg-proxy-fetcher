@@ -202,6 +202,8 @@ _CORE_BASELINE_NET_TYPES: dict[str, str] = {
     "AS4766": "isp",          # 韩国电信 KT
     "AS9318": "isp",          # 韩国 SK Broadband
     "AS17621": "isp",         # 中国联通上海网络 (China Unicom Shanghai network)
+    "AS14813": "isp",         # Columbus Telecommunications (Barbados) Limited (Flow)
+    "AS29076": "isp",         # Citytelecom LLC (Filanco, citytelecom.ru, 俄罗斯宽带ISP)
     "AS62711": "isp",         # Maxwell Telecom LLC (ipinfo: ISP)
     "AS63150": "isp",         # BAGE CLOUD LLC (机房双ISP/原生住宅IP, ipinfo官方注册类型为ISP)
     # 核心云厂商机房 (权威锁定为 datacenter)
@@ -224,6 +226,9 @@ _CORE_BASELINE_NET_TYPES: dict[str, str] = {
     "AS397373": "datacenter", # H4Y Technologies LLC / HostDare (hostdare.com, 云主机/机房)
     "AS54600": "datacenter",  # PEG TECH INC (misaka.io, 云主机/机房)
     "AS201106": "datacenter", # Spartan Host Ltd (spartanhost.org, VPS/主机)
+    "AS14315": "datacenter",  # 1GSERVERS, LLC (1gservers.com, Phoenix机房)
+    "AS7738": "datacenter",   # V.tal (vtal.com, 巴西国际海缆骨干)
+    "AS33842": "datacenter",  # Citytelecom LLC (CrossTelecom, crosstelecom.ru, 云主机机房)
 }
 
 # 权威已知云厂商与核心骨干网 SSOT 网络类型基准表
@@ -320,7 +325,7 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS402705": "datacenter", # Align Broadband (alignbb.com, ipinfo: inactive/hosting)
     "AS209604": "datacenter", # 2E TELEKOMUNIKASYON LTD STI (2etelekom.com, ipinfo: hosting)
     "AS199669": "datacenter", # Okay-Telecom Ltd. / ATLEX.RU (atlex.ru, ipinfo: hosting)
-    "AS33842": "datacenter",  # Citytelecom LLC (crosstelecom.ru, ipinfo: hosting)
+    "AS33842": "datacenter",  # Citytelecom LLC (CrossTelecom, crosstelecom.ru, ipinfo: hosting)
     "AS62642": "datacenter",  # Bigleaf Networks, Inc. (bigleaf.net, ipinfo: hosting)
     "AS137535": "datacenter", # JT Telecom International / JTTI (jtti.cc, 云主机/机房)
     "AS205548": "datacenter", # Zouter Limited (zouter.io, 云主机/VPS)
@@ -330,6 +335,16 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS201106": "datacenter", # Spartan Host Ltd (spartanhost.org, VPS/主机)
     "AS400951": "datacenter", # Akari Networks LLC (akarinetworks.com, 机房IDC)
     "AS38136": "datacenter",  # Akari Networks Limited (akarinetworks.com, 香港IDC)
+    "AS14315": "datacenter",  # 1GSERVERS, LLC (1gservers.com, Phoenix机房)
+    "AS7738": "datacenter",   # V.tal (vtal.com, 巴西国际海缆骨干)
+    "AS202996": "datacenter", # Ondrej Vrana / Helkor (cbe-hosting.com, 捷克机房)
+    "AS214159": "datacenter", # UAB Cherry Servers (balticservers.com, 立陶宛机房)
+    "AS59642": "datacenter",  # UAB Cherry Servers (balticservers.com, 立陶宛机房)
+    "AS213840": "datacenter", # DDOS PROTECTION LTD (英国高防机房)
+    "AS152324": "datacenter", # 3XNET Co., Ltd. (亚太云主机机房)
+    "AS200239": "datacenter", # Bogahost Bilisim (土耳其主机托管)
+    "AS210993": "datacenter", # Spacecore Solution Ltd (欧洲云主机机房)
+    "AS135636": "datacenter", # PT. RACKH LINTAS ASIA (rackh.co.id, 印尼机房)
 
     # --- [L0 裁决 B: 知名正牌民用宽带 ISP，权威核准为 isp] ---
     "AS1257": "isp",          # Tele2 Sverige AB (tele2.com, 欧洲顶级电信与家庭宽带)
@@ -348,6 +363,11 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS44347": "isp",         # Limited Company "SiNT" (俄罗斯地区ISP)
     "AS24530": "isp",         # PT. Power Telecom Indonesia (Powertel, 印尼ISP)
     "AS274029": "isp",        # KAZAV LATAM E.I.R.L. / ASU TELECOM PERU (秘鲁宽带ISP)
+    "AS14813": "isp",         # Columbus Telecommunications (Barbados) Limited (巴巴多斯电信宽带)
+    "AS29076": "isp",         # Citytelecom LLC (Filanco, citytelecom.ru, 俄罗斯宽带ISP)
+    "AS272605": "isp",        # Grupo Ultra Fibra (巴西宽带ISP)
+    "AS36902": "isp",         # Intelvision Ltd (塞舌尔宽带ISP)
+    "AS24550": "isp",         # Websurfer Nepal Communication System (尼泊尔宽带ISP)
 
     # --- [L0 裁决 C: 核心国际银行金融专网 (人工 SSOT 保护)] ---
     "AS1311": "banking", "AS2600": "banking", "AS3187": "banking", "AS5091": "banking",
@@ -2223,6 +2243,7 @@ HOSTING_EXCLUSIONS = (
     "oracle", "windscribe", "hosttech", "taymaz",
     "mt finance", "mtfinance", "cornseed", "jtti", "zouter",
     "hostdare", "misaka", "spartanhost", "h4y", "peg tech", "vpsus",
+    "1gservers", "cherry servers", "rackh", "spacecore", "ddos protection",
 )
 
 EDU_PATTERNS = (

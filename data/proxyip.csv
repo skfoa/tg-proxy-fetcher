@@ -1804,13 +1804,13 @@ ip,port,tls,delay_ms,speed_kbs,colo,cf_location,asn,isp,first_seen,channel,fail_
 104.168.133.93,443,true,91,,SEA,北美洲 · 西雅图 · 美国,AS54290 Hostwinds LLC.,Hostwinds LLC.,2026-09-16 08:16:57,@danfeng2,0,datacenter
 104.168.133.189,8443,true,91,,SEA,北美洲 · 西雅图,AS54290 Hostwinds LLC.,Hostwinds LLC.,2026-07-27 18:39:31,@danfeng2,0,datacenter
 31.172.69.16,443,true,91,,DFW,北美洲 · 达拉斯-沃斯堡 · 美国,AS219399 Eonix Corporation,Eonix Corporation,2026-07-24 22:15:38,@danfeng2,0,datacenter
-206.168.191.6,443,true,91,,PHX,北美洲 · 菲尼克斯 · 美国,"AS14315 Liahonix LLC (1GSERVERS, LLC)","1GSERVERS, LLC",2026-07-24 22:08:45,@danfeng2,0,datacenter
+206.168.191.6,443,true,91,,PHX,北美洲 · 菲尼克斯 · 美国,"AS14315 1GSERVERS, LLC","1GSERVERS, LLC",2026-07-24 22:08:45,@danfeng2,0,datacenter
 185.245.34.199,443,true,92,0,SJC,北美洲 · Fremont · 美国,AS400992 ZhouyiSat Communications (Huize Holdings LLC),Huize Holdings LLC,2026-10-15 12:44:41,@cmliussss_all,0,datacenter
 89.202.214.38,443,true,92,,DEN,北美洲 · 丹佛 · 美国,AS30058 FDCservers.net,FDCservers.net,2026-09-16 08:35:48,@danfeng2,0,datacenter
 47.251.101.248,443,true,92,,SJC,北美洲 · 圣何塞 · 美国,AS45102 Alibaba Cloud (US),"Alibaba (US) Technology Co., Ltd.",2026-09-16 08:31:56,@danfeng2,0,datacenter
 24.199.104.17,443,true,92,,SJC,北美洲 · 圣何塞 · 美国,AS14061 DigitalOcean,"DigitalOcean, LLC",2026-09-16 08:28:32,@danfeng2,0,datacenter
 173.230.133.87,443,true,92,,ATL,北美洲 · 亚特兰大 · 美国,AS63949 Linode Akamai (Akamai Connected Cloud),Akamai Connected Cloud,2026-09-16 08:22:30,@danfeng2,0,datacenter
-155.103.66.217,443,true,92,,PHX,北美洲 · 菲尼克斯 · 美国,"AS14315 Liahonix LLC (1GSERVERS, LLC)","1GSERVERS, LLC",2026-09-16 08:20:48,@danfeng2,0,datacenter
+155.103.66.217,443,true,92,,PHX,北美洲 · 菲尼克斯 · 美国,"AS14315 1GSERVERS, LLC","1GSERVERS, LLC",2026-09-16 08:20:48,@danfeng2,0,datacenter
 144.202.85.180,443,true,92,,SEA,北美洲 · 西雅图 · 美国,"AS20473 Vultr (The Constant Company, LLC)","The Constant Company, LLC",2026-09-16 08:19:12,@danfeng2,0,datacenter
 107.172.214.211,443,true,92,,SJC,北美洲 · 圣何塞 · 美国,AS36352 HostPapa,HostPapa,2026-09-16 08:17:21,@danfeng2,0,datacenter
 100.21.45.198,443,true,92,,PDX,北美洲 · 波特兰 · 美国,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",2026-09-16 08:16:39,@danfeng2,0,datacenter
@@ -1831,7 +1831,7 @@ ip,port,tls,delay_ms,speed_kbs,colo,cf_location,asn,isp,first_seen,channel,fail_
 173.231.53.72,443,true,93,,LAX,北美洲 · 拉斯维加斯 · 美国,"AS18450 WebNX, Inc.","WebNX, Inc.",2026-07-24 21:54:52,@danfeng2,0,datacenter
 155.117.198.180,443,true,93,,LAX,北美洲 · 洛杉矶 · 美国,AS400951 Akari Networks,Akari Networks LLC,2026-07-24 21:49:10,@danfeng2,0,datacenter
 23.172.217.213,2053,true,94,0,SJC,北美洲 · Fremont · 美国,AS400992 ZhouyiSat Communications (VertexLink Inc),VertexLink Inc,2026-10-15 12:44:41,@cmliussss_all,0,datacenter
-85.121.240.132,443,true,94,,PHX,北美洲 · 菲尼克斯 · 美国,"AS14315 Liahonix LLC (1GSERVERS, LLC)","1GSERVERS, LLC",2026-09-16 08:35:02,@danfeng2,0,datacenter
+85.121.240.132,443,true,94,,PHX,北美洲 · 菲尼克斯 · 美国,"AS14315 1GSERVERS, LLC","1GSERVERS, LLC",2026-09-16 08:35:02,@danfeng2,0,datacenter
 54.187.51.34,443,true,94,,PDX,北美洲 · 波特兰 · 美国,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",2026-09-16 08:32:37,@danfeng2,0,datacenter
 23.83.225.204,443,true,94,,LAX,北美洲 · 洛杉矶 · 美国,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,2026-09-16 08:28:29,@danfeng2,0,datacenter
 23.166.168.174,443,true,94,,LAX,北美洲 · 洛杉矶 · 美国,AS8796 FASTNET DATA INC,FASTNET DATA INC,2026-09-16 08:28:17,@danfeng2,0,datacenter
@@ -1861,12 +1861,12 @@ ip,port,tls,delay_ms,speed_kbs,colo,cf_location,asn,isp,first_seen,channel,fail_
 35.164.47.153,443,true,96,,PDX,北美洲 · 波特兰 · 美国,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",2026-09-16 08:29:51,@danfeng2,0,datacenter
 23.145.48.207,443,true,96,,SEA,北美洲 · 西雅图 · 美国,AS201106 SpartanHost (Spartan Host Ltd),Spartan Host Ltd,2026-09-16 08:28:16,@danfeng2,0,datacenter
 216.36.82.4,443,true,96,,LAX,北美洲 · 洛杉矶 · 美国,AS3257 GTT Communications,GTT Communications Inc.,2026-09-16 08:27:30,@danfeng2,0,datacenter
-206.168.191.2,443,true,96,,PHX,北美洲 · 菲尼克斯 · 美国,"AS14315 Liahonix LLC (1GSERVERS, LLC)","1GSERVERS, LLC",2026-09-16 08:26:13,@danfeng2,0,datacenter
+206.168.191.2,443,true,96,,PHX,北美洲 · 菲尼克斯 · 美国,"AS14315 1GSERVERS, LLC","1GSERVERS, LLC",2026-09-16 08:26:13,@danfeng2,0,datacenter
 192.204.33.150,443,true,96,,LAX,北美洲 · 洛杉矶 · 美国,"AS2914 NTT America, Inc.","NTT America, Inc.",2026-09-16 08:24:42,@danfeng2,0,isp
 191.101.166.154,443,true,96,,DFW,北美洲 · 达拉斯-沃斯堡 · 美国,AS397423 Tier.Net Technologies LLC,Tier.Net Technologies LLC,2026-09-16 08:24:33,@danfeng2,0,datacenter
 147.45.60.98,443,true,96,,ATL,北美洲 · 亚特兰大 · 美国,AS215540 Global Connectivity Solutions Llp,Global Connectivity Solutions Llp,2026-09-16 08:19:54,@danfeng2,0,datacenter
 104.168.12.11,443,true,96,,SJC,北美洲 · 圣何塞 · 美国,AS36352 HostPapa,HostPapa,2026-09-16 08:16:57,@danfeng2,0,datacenter
-103.196.20.14,443,true,96,,PHX,北美洲 · 菲尼克斯 · 美国,"AS14315 Liahonix LLC (1GSERVERS, LLC)","1GSERVERS, LLC",2026-09-16 08:16:49,@danfeng2,0,datacenter
+103.196.20.14,443,true,96,,PHX,北美洲 · 菲尼克斯 · 美国,"AS14315 1GSERVERS, LLC","1GSERVERS, LLC",2026-09-16 08:16:49,@danfeng2,0,datacenter
 23.254.235.53,8443,true,96,,LAX,北美洲 · 洛杉矶,AS36352 HostPapa,HostPapa,2026-07-27 18:50:14,@danfeng2,0,datacenter
 107.172.82.229,8443,true,96,,SJC,北美洲 · 圣何塞,AS36352 HostPapa,HostPapa,2026-07-27 18:39:44,@danfeng2,0,datacenter
 172.252.125.72,443,true,96,,LAX,北美洲 · 洛杉矶 · 美国,AS209604 2E TELEKOMUNIKASYON LTD STI,2e Telekomunikasyon Ltd Sti,2026-07-24 21:54:43,@danfeng2,0,datacenter
@@ -1915,7 +1915,7 @@ ip,port,tls,delay_ms,speed_kbs,colo,cf_location,asn,isp,first_seen,channel,fail_
 44.231.49.131,443,true,101,,PDX,北美洲 · 波特兰 · 美国,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",2026-09-16 08:30:33,@danfeng2,0,datacenter
 35.212.229.224,443,true,101,,SEA,北美洲 · 西雅图 · 美国,AS15169 Google Cloud (Google LLC),Google LLC,2026-09-16 08:29:54,@danfeng2,0,datacenter
 3.33.157.34,443,true,101,,SEA,北美洲 · 杜勒斯 · 美国,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",2026-09-16 08:29:42,@danfeng2,0,datacenter
-206.168.191.3,443,true,101,,PHX,北美洲 · 菲尼克斯 · 美国,"AS14315 Liahonix LLC (1GSERVERS, LLC)","1GSERVERS, LLC",2026-09-16 08:26:13,@danfeng2,0,datacenter
+206.168.191.3,443,true,101,,PHX,北美洲 · 菲尼克斯 · 美国,"AS14315 1GSERVERS, LLC","1GSERVERS, LLC",2026-09-16 08:26:13,@danfeng2,0,datacenter
 184.34.96.129,443,true,101,,PDX,北美洲 · 波特兰 · 美国,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",2026-09-16 08:23:11,@danfeng2,0,datacenter
 144.202.91.168,443,true,101,,SEA,北美洲 · 西雅图 · 美国,"AS20473 Vultr (The Constant Company, LLC)","The Constant Company, LLC",2026-09-16 08:19:12,@danfeng2,0,datacenter
 137.220.33.177,443,true,101,,SEA,北美洲 · 西雅图 · 美国,"AS20473 Vultr (The Constant Company, LLC)","The Constant Company, LLC",2026-09-16 08:18:33,@danfeng2,0,datacenter
@@ -2000,7 +2000,7 @@ ip,port,tls,delay_ms,speed_kbs,colo,cf_location,asn,isp,first_seen,channel,fail_
 207.246.66.85,443,true,109,,MIA,北美洲 · 迈阿密 · 美国,"AS20473 Vultr (The Constant Company, LLC)","The Constant Company, LLC",2026-09-16 08:26:33,@danfeng2,0,datacenter
 13.216.157.105,443,true,109,,IAD,北美洲 · 杜勒斯 · 美国,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",2026-09-16 08:18:15,@danfeng2,0,datacenter
 107.175.194.64,443,true,109,,SJC,北美洲 · 圣何塞 · 美国,AS36352 HostPapa,HostPapa,2026-09-16 08:17:24,@danfeng2,0,datacenter
-103.196.20.155,8443,true,109,,PHX,北美洲 · 菲尼克斯,"AS14315 Liahonix LLC (1GSERVERS, LLC)","1GSERVERS, LLC",2026-07-27 18:39:24,@danfeng2,0,datacenter
+103.196.20.155,8443,true,109,,PHX,北美洲 · 菲尼克斯,"AS14315 1GSERVERS, LLC","1GSERVERS, LLC",2026-07-27 18:39:24,@danfeng2,0,datacenter
 209.200.235.110,443,true,109,,SEA,北美洲 · 西雅图 · 美国,AS21743 Atlas Networks Corporation,Atlas Networks Corporation,2026-07-24 22:09:41,@danfeng2,0,datacenter
 172.86.123.37,443,true,109,,DFW,北美洲 · 达拉斯-沃斯堡 · 美国,AS14956 RouterHosting LLC,RouterHosting LLC,2026-07-24 21:54:46,@danfeng2,0,datacenter
 157.250.202.78,443,true,109,,DFW,北美洲 · 达拉斯-沃斯堡 · 美国,"AS19318 Interserver, Inc","Interserver, Inc",2026-07-24 21:49:46,@danfeng2,0,datacenter
@@ -2013,7 +2013,7 @@ ip,port,tls,delay_ms,speed_kbs,colo,cf_location,asn,isp,first_seen,channel,fail_
 64.81.32.64,443,true,111,,LAX,北美洲 · 洛杉矶 · 美国,AS3257 GTT Communications,GTT Communications Inc.,2026-09-16 08:33:18,@danfeng2,0,datacenter
 44.254.175.141,443,true,111,,PDX,北美洲 · 波特兰 · 美国,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",2026-09-16 08:30:33,@danfeng2,0,datacenter
 170.106.199.181,443,true,111,,SJC,北美洲 · 圣何塞 · 美国,AS132203 Tencent Cloud,Tencent Cloud,2026-09-16 08:22:08,@danfeng2,0,datacenter
-103.196.20.236,443,true,111,,PHX,北美洲 · 菲尼克斯 · 美国,"AS14315 Liahonix LLC (1GSERVERS, LLC)","1GSERVERS, LLC",2026-09-16 08:16:49,@danfeng2,0,datacenter
+103.196.20.236,443,true,111,,PHX,北美洲 · 菲尼克斯 · 美国,"AS14315 1GSERVERS, LLC","1GSERVERS, LLC",2026-09-16 08:16:49,@danfeng2,0,datacenter
 100.62.155.55,443,true,111,,IAD,北美洲 · 杜勒斯 · 美国,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",2026-09-16 08:16:45,@danfeng2,0,datacenter
 84.32.61.234,8443,true,111,,ORD,北美洲 · 芝加哥,AS204770 UAB Cherry Servers,UAB Cherry Servers,2026-07-27 18:57:56,@danfeng2,0,datacenter
 198.12.121.32,443,true,111,,SJC,北美洲 · 圣何塞 · 美国,AS36352 HostPapa,HostPapa,2026-07-24 22:07:33,@danfeng2,0,datacenter
@@ -2851,7 +2851,7 @@ ip,port,tls,delay_ms,speed_kbs,colo,cf_location,asn,isp,first_seen,channel,fail_
 54.86.152.23,443,true,145,,IAD,北美洲 · 杜勒斯 · 美国,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",2026-07-24 22:29:42,@danfeng2,0,datacenter
 54.80.203.215,443,true,145,,IAD,北美洲 · 杜勒斯 · 美国,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",2026-07-24 22:29:40,@danfeng2,0,datacenter
 95.182.114.139,443,true,146,,MCI,北美洲 · 堪萨斯城 · 美国,AS211273 Cloud Software - FZCO (Cgi Global Limited),Cgi Global Limited,2026-09-16 08:36:50,@danfeng2,0,datacenter
-85.121.240.5,443,true,146,,DFW,北美洲 · 达拉斯-沃斯堡 · 美国,"AS14315 Liahonix LLC (1GSERVERS, LLC)","1GSERVERS, LLC",2026-09-16 08:35:02,@danfeng2,0,datacenter
+85.121.240.5,443,true,146,,DFW,北美洲 · 达拉斯-沃斯堡 · 美国,"AS14315 1GSERVERS, LLC","1GSERVERS, LLC",2026-09-16 08:35:02,@danfeng2,0,datacenter
 54.156.165.159,443,true,146,,IAD,北美洲 · 杜勒斯 · 美国,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",2026-09-16 08:32:35,@danfeng2,0,datacenter
 54.147.182.108,443,true,146,,IAD,北美洲 · 杜勒斯 · 美国,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",2026-09-16 08:32:34,@danfeng2,0,datacenter
 52.71.104.118,443,true,146,,IAD,北美洲 · 杜勒斯 · 美国,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",2026-09-16 08:32:30,@danfeng2,0,datacenter
@@ -2953,7 +2953,7 @@ ip,port,tls,delay_ms,speed_kbs,colo,cf_location,asn,isp,first_seen,channel,fail_
 32.197.2.248,443,true,149,,IAD,北美洲 · 杜勒斯 · 美国,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",2026-09-16 08:29:38,@danfeng2,0,datacenter
 32.198.244.220,443,true,149,,IAD,北美洲 · 杜勒斯 · 美国,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",2026-09-16 08:29:38,@danfeng2,0,datacenter
 3.214.123.115,443,true,149,,IAD,北美洲 · 杜勒斯 · 美国,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",2026-09-16 08:29:34,@danfeng2,0,datacenter
-206.168.191.4,443,true,149,,PHX,北美洲 · 菲尼克斯 · 美国,"AS14315 Liahonix LLC (1GSERVERS, LLC)","1GSERVERS, LLC",2026-09-16 08:26:13,@danfeng2,0,datacenter
+206.168.191.4,443,true,149,,PHX,北美洲 · 菲尼克斯 · 美国,"AS14315 1GSERVERS, LLC","1GSERVERS, LLC",2026-09-16 08:26:13,@danfeng2,0,datacenter
 184.73.234.124,443,true,149,,IAD,北美洲 · 杜勒斯 · 美国,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",2026-09-16 08:23:11,@danfeng2,0,datacenter
 132.145.198.201,443,true,149,,IAD,北美洲 · 杜勒斯 · 美国,AS31898 Oracle Cloud (Oracle Corporation),Oracle Corporation,2026-09-16 08:18:14,@danfeng2,0,datacenter
 107.170.240.26,443,true,149,,SJC,北美洲 · 圣何塞 · 美国,AS14061 DigitalOcean,"DigitalOcean, LLC",2026-09-16 08:17:20,@danfeng2,0,datacenter
@@ -3428,7 +3428,7 @@ ip,port,tls,delay_ms,speed_kbs,colo,cf_location,asn,isp,first_seen,channel,fail_
 44.219.136.92,443,true,165,,IAD,北美洲 · 杜勒斯 · 美国,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",2026-07-24 22:21:02,@danfeng2,0,datacenter
 23.158.72.68,443,true,165,,SLC,北美洲 · 盐湖城 · 美国,"AS63150 BAGE CLOUD LLC (FiberState, LLC)","FiberState, LLC",2026-07-24 22:14:34,@danfeng2,0,isp
 93.127.133.99,443,true,166,,MCI,北美洲 · 堪萨斯城 · 美国,AS401479 Database Mart LLC,Database Mart LLC,2026-09-16 08:36:27,@danfeng2,0,datacenter
-85.121.240.92,443,true,166,,DFW,北美洲 · 达拉斯-沃斯堡 · 美国,"AS14315 Liahonix LLC (1GSERVERS, LLC)","1GSERVERS, LLC",2026-09-16 08:35:02,@danfeng2,0,datacenter
+85.121.240.92,443,true,166,,DFW,北美洲 · 达拉斯-沃斯堡 · 美国,"AS14315 1GSERVERS, LLC","1GSERVERS, LLC",2026-09-16 08:35:02,@danfeng2,0,datacenter
 70.39.179.17,443,true,166,,LAX,北美洲 · 洛杉矶 · 美国,AS3257 GTT Communications,GTT Communications Inc.,2026-09-16 08:33:36,@danfeng2,0,datacenter
 66.154.125.153,443,true,166,,IAD,北美洲 · 杜勒斯 · 美国,AS35916 MULTACOM CORPORATION,MULTACOM CORPORATION,2026-09-16 08:33:25,@danfeng2,0,datacenter
 52.72.158.17,443,true,166,,IAD,北美洲 · 杜勒斯 · 美国,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",2026-09-16 08:32:30,@danfeng2,0,datacenter
@@ -3895,7 +3895,7 @@ ip,port,tls,delay_ms,speed_kbs,colo,cf_location,asn,isp,first_seen,channel,fail_
 182.255.91.36,443,true,187,,LAX,北美洲 · 拉斯维加斯 · 美国,AS35916 MULTACOM CORPORATION,MULTACOM CORPORATION,2026-09-16 08:23:09,@danfeng2,0,datacenter
 174.138.46.11,443,true,187,,EWR,北美洲 · 纽瓦克 · 美国,AS14061 DigitalOcean,"DigitalOcean, LLC",2026-09-16 08:22:33,@danfeng2,0,datacenter
 163.47.40.183,443,true,187,,LAX,北美洲 · 拉斯维加斯 · 美国,AS35916 MULTACOM CORPORATION,MULTACOM CORPORATION,2026-09-16 08:21:30,@danfeng2,0,datacenter
-108.59.244.109,443,true,187,,DFW,北美洲 · 洛杉矶 · 美国,AS14315 Liahonix LLC,Liahonix LLC,2026-09-16 08:17:29,@danfeng2,0,datacenter
+108.59.244.109,443,true,187,,DFW,北美洲 · 洛杉矶 · 美国,"AS14315 1GSERVERS, LLC","1GSERVERS, LLC",2026-09-16 08:17:29,@danfeng2,0,datacenter
 104.238.129.180,443,true,187,,EWR,北美洲 · 纽瓦克 · 美国,"AS20473 Vultr (The Constant Company, LLC)","The Constant Company, LLC",2026-09-16 08:17:02,@danfeng2,0,datacenter
 185.92.182.212,8443,true,187,,MCI,北美洲 · 堪萨斯城,AS211273 Cloud Software - FZCO (Cgi Global Limited),Cgi Global Limited,2026-07-27 18:46:08,@danfeng2,0,datacenter
 178.128.67.112,8443,true,187,,SJC,北美洲 · 圣何塞,AS14061 DigitalOcean,"DigitalOcean, LLC",2026-07-27 18:44:41,@danfeng2,0,datacenter
