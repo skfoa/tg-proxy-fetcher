@@ -4758,7 +4758,7 @@
 139.162.82.44,443,true,237,,NRT,亚洲 · 东京 · 日本,AS63949 Linode Akamai (Akamai Connected Cloud),Akamai Connected Cloud,2026-09-16 08:18:51,@danfeng2,0,datacenter
 103.7.137.210,443,true,237,,LAX,北美洲 · 拉斯维加斯 · 美国,AS35916 MULTACOM CORPORATION,MULTACOM CORPORATION,2026-09-16 08:16:53,@danfeng2,0,datacenter
 104.168.114.147,8443,true,237,,PIT,北美洲 · 多伦多,AS36352 HostPapa,HostPapa,2026-07-27 18:39:31,@danfeng2,0,datacenter
-82.22.26.212,443,true,237,,NRT,亚洲 · 东京 · 日本,AS206069 Cornseed Limited,Cornseed Limited,2026-07-24 22:38:11,@danfeng2,0,isp
+82.22.26.212,443,true,237,,NRT,亚洲 · 东京 · 日本,AS206069 Cornseed Limited,Cornseed Limited,2026-07-24 22:38:11,@danfeng2,0,datacenter
 23.177.184.143,443,true,238,0,SJC,北美洲 · Fremont · 美国,AS400992 ZhouyiSat Communications (Huize Holdings LLC),Huize Holdings LLC,2026-10-15 12:44:41,@cmliussss_all,0,datacenter
 13.196.179.169,443,true,238,0,NRT,亚洲 · Tokyo · 日本,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",2026-10-15 12:44:41,@cmliussss_all,0,datacenter
 23.27.52.174,8443,true,238,0,NRT,亚洲 · Tokyo · 日本,AS149440 Evoxt,Evoxt.com,2026-10-15 12:44:41,@cmliussss_all,0,datacenter
@@ -4800,8 +4800,8 @@
 216.23.82.224,443,true,240,0,NRT,亚洲 · Tokyo · 日本,AS205548 Zouter,ZOUTER TOKYO,2026-10-15 12:44:41,@cmliussss_all,0,datacenter
 166.88.99.208,8443,true,240,0,KIX,亚洲 · Osaka · 日本,AS149440 Evoxt,Evoxt.com,2026-10-15 12:44:41,@cmliussss_all,0,datacenter
 103.238.129.130,443,true,240,0,NRT,亚洲 · Kanda-jinbōchō · 日本,AS51847 ByteVirt LLC,ByteVirt LLC,2026-10-15 12:44:41,@cmliussss_all,0,datacenter
-64.204.48.68,443,true,240,0,NRT,亚洲 · Tokyo · 日本,AS206069 Cornseed Limited,Cornseed Limited,2026-10-15 12:44:41,@cmliussss_all,0,isp
-82.22.26.190,443,true,240,0,NRT,亚洲 · Tokyo · 日本,AS206069 Cornseed Limited,Cornseed Limited,2026-10-15 12:44:41,@cmliussss_all,0,isp
+64.204.48.68,443,true,240,0,NRT,亚洲 · Tokyo · 日本,AS206069 Cornseed Limited,Cornseed Limited,2026-10-15 12:44:41,@cmliussss_all,0,datacenter
+82.22.26.190,443,true,240,0,NRT,亚洲 · Tokyo · 日本,AS206069 Cornseed Limited,Cornseed Limited,2026-10-15 12:44:41,@cmliussss_all,0,datacenter
 166.88.97.220,8443,true,240,0,KIX,亚洲 · Osaka · 日本,AS149440 Evoxt,Evoxt.com,2026-10-15 12:44:41,@cmliussss_all,0,datacenter
 23.27.11.249,8443,true,240,0,KIX,亚洲 · Osaka · 日本,AS149440 Evoxt,Evoxt.com,2026-10-15 12:44:41,@cmliussss_all,0,datacenter
 13.114.61.209,443,true,240,0,NRT,亚洲 · Tokyo · 日本,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",2026-10-15 12:44:41,@cmliussss_all,0,datacenter
@@ -5139,7 +5139,7 @@
 194.68.27.154,8443,true,257,,NRT,亚洲 · 东京,AS9009 M247,M247 Europe SRL,2026-07-27 18:47:45,@danfeng2,0,datacenter
 45.120.157.69,443,true,257,,NRT,亚洲 · 东京 · 日本,AS134835 Starry Network,Starry Network Limited,2026-07-24 22:21:08,@danfeng2,0,datacenter
 54.250.165.210,443,true,258,0,NRT,亚洲 · Tokyo · 日本,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",2026-10-15 12:44:41,@cmliussss_all,0,datacenter
-64.204.49.136,8443,true,258,0,NRT,亚洲 · Tokyo · 日本,AS206069 Cornseed Limited,Cornseed Limited,2026-10-15 12:44:41,@cmliussss_all,0,isp
+64.204.49.136,8443,true,258,0,NRT,亚洲 · Tokyo · 日本,AS206069 Cornseed Limited,Cornseed Limited,2026-10-15 12:44:41,@cmliussss_all,0,datacenter
 166.88.95.194,8443,true,258,0,KIX,亚洲 · Osaka · 日本,AS149440 Evoxt,Evoxt.com,2026-10-15 12:44:41,@cmliussss_all,0,datacenter
 23.27.201.85,443,true,258,0,NRT,亚洲 · Tokyo · 日本,AS149440 Evoxt,Evoxt.com,2026-10-15 12:44:41,@cmliussss_all,0,datacenter
 54.65.168.160,443,true,258,0,NRT,亚洲 · Tokyo · 日本,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",2026-10-15 12:44:41,@cmliussss_all,0,datacenter

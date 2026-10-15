@@ -211,6 +211,7 @@ _CORE_BASELINE_NET_TYPES: dict[str, str] = {
     "AS207143": "datacenter", # hosttech GmbH (瑞士机房/主机托管)
     "AS216054": "datacenter", # Taymaz Gostaran Naghshe Almas Co. (Ltd) (算力IDC)
     "AS214822": "datacenter", # MT FINANCE LLC (算力/主机机房)
+    "AS206069": "datacenter", # Cornseed Limited (IDC/主机机房)
 }
 
 # 权威已知云厂商与核心骨干网 SSOT 网络类型基准表
@@ -307,6 +308,7 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS207143": "datacenter", # hosttech GmbH (瑞士机房/主机托管)
     "AS216054": "datacenter", # Taymaz Gostaran Naghshe Almas Co. (Ltd) (算力IDC)
     "AS214822": "datacenter", # MT FINANCE LLC (算力/主机机房)
+    "AS206069": "datacenter", # Cornseed Limited (IDC/主机机房)
 
     # --- [L0 裁决 B: 知名正牌民用宽带 ISP，人工确证为 isp] ---
     "AS1257": "isp",          # Tele2 Sverige AB (欧洲顶级电信与家庭宽带)
@@ -2187,7 +2189,7 @@ HOSTING_EXCLUSIONS = (
     "xtom", "synlinq", "tzulo", "drosys", "dromatics", "nktele",
     "moedove", "fiberxpress", "skyquantum", "gsl networks", "idc cube", "idc",
     "oracle", "windscribe", "hosttech", "taymaz",
-    "mt finance", "mtfinance",
+    "mt finance", "mtfinance", "cornseed",
 )
 
 EDU_PATTERNS = (
