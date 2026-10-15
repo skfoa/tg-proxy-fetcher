@@ -1,7 +1,7 @@
 ﻿url,proto,host,port,delay_ms,fail_count,status,colo,country,egress_ip,asn,isp,net_type,first_seen,source
 https://12.221.146.147:9443,https,12.221.146.147,9443,167,0,alive,DFW,US,12.221.146.161,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",isp,2026-10-09 00:00:00,EDT-Pages
 https://103.127.242.229:7000,https,103.127.242.229,7000,219,0,alive,NRT,JP,103.127.242.229,"AS137535 JT Telecom (Hong Kong Communications International Co., limited)","Hong Kong Communications International Co., limited",isp,2026-10-12 21:49:55,EDT-Pages
-https://209.170.227.253:443,https,209.170.227.253,443,245,0,alive,SEA,US,209.170.227.253,"AS62642 IT Group NW, LLC","IT Group NW, LLC",isp,2026-10-09 00:00:00,EDT-Pages
+https://209.170.227.253:443,https,209.170.227.253,443,245,0,alive,SEA,US,209.170.227.253,"AS62642 IT Group NW, LLC","IT Group NW, LLC",datacenter,2026-10-09 00:00:00,EDT-Pages
 https://133.9.6.10:443,https,133.9.6.10,443,264,0,alive,NRT,JP,133.9.6.10,AS17956 Japan Network Information Center,Japan Network Information Center,education,2026-10-15 10:08:09,EDT-Pages
 https://120.232.204.58:31343,https,120.232.204.58,31343,280,0,alive,HKG,HK,1.36.116.51,AS4760 HKT,Hong Kong Telecommunications HKT Limited Mass Internet,isp,2026-10-09 00:00:00,EDT-Pages
 https://12.202.180.10:9443,https,12.202.180.10,9443,282,0,alive,ORD,US,12.202.180.115,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",isp,2026-10-09 00:00:00,EDT-Pages
@@ -78,7 +78,7 @@ https://84.72.72.153:443,https,84.72.72.153,443,1032,0,alive,ZRH,CH,84.72.72.153
 https://134.1.7.9:443,https,134.1.7.9,443,1041,0,alive,HAM,DE,134.1.7.9,AS680 Awinet,Awinet,education,2026-10-09 00:00:00,EDT-Pages
 https://62.210.27.111:443,https,62.210.27.111,443,1046,0,alive,CDG,FR,209.131.65.213,AS214143 SysLevel SAS,SysLevel SAS,isp,2026-10-09 00:00:00,EDT-Pages
 https://129.205.246.123:443,https,129.205.246.123,443,1046,0,alive,GBE,BW,129.205.246.123,AS37678 BOTSWANA FIBRE NETWORKS Proprietary Limited,BOTSWANA FIBRE NETWORKS Proprietary Limited,isp,2026-10-15 10:08:09,EDT-Pages
-https://170.199.233.89:443,https,170.199.233.89,443,1047,0,alive,ATL,US,170.199.233.89,"AS62642 Bigleaf Networks, Inc.","Bigleaf Networks, Inc.",isp,2026-10-09 00:00:00,EDT-Pages
+https://170.199.233.89:443,https,170.199.233.89,443,1047,0,alive,ATL,US,170.199.233.89,"AS62642 Bigleaf Networks, Inc.","Bigleaf Networks, Inc.",datacenter,2026-10-09 00:00:00,EDT-Pages
 https://160.242.47.197:444,https,160.242.47.197,444,1062,0,alive,JNB,NA,160.242.47.182,AS33763 PARATUS-NA,PARATUS-NA,isp,2026-10-15 10:08:09,EDT-Pages
 https://200.52.72.14:443,https,200.52.72.14,443,1078,0,alive,QRO,MX,200.52.72.14,"AS14178 Megacable Comunicaciones de Mexico, S.A. de C.V.","Megacable Comunicaciones de Mexico, S.A. de C.V.",isp,2026-10-15 10:08:09,EDT-Pages
 https://195.80.165.154:443,https,195.80.165.154,443,1078,0,alive,BTS,SK,212.55.225.242,AS31679 Slovanet a.s.,Slovanet a.s.,isp,2026-10-15 10:08:09,EDT-Pages

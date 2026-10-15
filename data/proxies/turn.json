@@ -476,7 +476,7 @@
     "asn": "19515",
     "asOrganization": "Oricom Internet inc.",
     "isp": "Oricom Internet inc.",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
@@ -626,7 +626,7 @@
     "asn": "270369",
     "asOrganization": "Naveganet Comercio e Serviço LTDA",
     "isp": "Naveganet Comercio e Serviço LTDA",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
@@ -4436,7 +4436,7 @@
     "asn": "210806",
     "asOrganization": "Strong Blue Conseil & Telecom SASU",
     "isp": "Strong Blue Conseil & Telecom SASU",
-    "net_type": "isp",
+    "net_type": "business",
     "source": "@danfeng_chat"
   },
   {
@@ -4871,7 +4871,7 @@
     "asn": "8339",
     "asOrganization": "kabelplus GmbH",
     "isp": "kabelplus GmbH",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
@@ -5351,7 +5351,7 @@
     "asn": "273639",
     "asOrganization": "Utra NET",
     "isp": "Utra NET",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
@@ -6011,7 +6011,7 @@
     "asn": "9070",
     "asOrganization": "\"Cooolbox\" AD",
     "isp": "\"Cooolbox\" AD",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
@@ -6206,7 +6206,7 @@
     "asn": "9070",
     "asOrganization": "\"Cooolbox\" AD",
     "isp": "\"Cooolbox\" AD",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
@@ -6521,7 +6521,7 @@
     "asn": "35508",
     "asOrganization": "TeraNet LLC",
     "isp": "TeraNet LLC",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
@@ -6596,7 +6596,7 @@
     "asn": "24936",
     "asOrganization": "Plusinfo OOO",
     "isp": "Plusinfo OOO",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
@@ -6716,7 +6716,7 @@
     "asn": "25341",
     "asOrganization": "\"Nauchno proizvodstvennaya Firma \"Raspredelennaya Obrabotka Informacii\" LLC",
     "isp": "\"Nauchno proizvodstvennaya Firma \"Raspredelennaya Obrabotka Informacii\" LLC",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
@@ -7061,7 +7061,7 @@
     "asn": "50409",
     "asOrganization": "GK Osnova JSC",
     "isp": "GK Osnova JSC",
-    "net_type": "datacenter",
+    "net_type": "business",
     "source": "@danfeng_chat"
   },
   {
@@ -7196,7 +7196,7 @@
     "asn": "136823",
     "asOrganization": "PT. Arka Data Primatama",
     "isp": "PT. Arka Data Primatama",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
@@ -7226,7 +7226,7 @@
     "asn": "270384",
     "asOrganization": "OTILIA ANTONIA CELSO",
     "isp": "OTILIA ANTONIA CELSO",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
@@ -7331,7 +7331,7 @@
     "asn": "271185",
     "asOrganization": "Brtele Tecnologia Ltda",
     "isp": "Brtele Tecnologia Ltda",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
@@ -7466,7 +7466,7 @@
     "asn": "136823",
     "asOrganization": "PT. Arka Data Primatama",
     "isp": "PT. Arka Data Primatama",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
@@ -7496,7 +7496,7 @@
     "asn": "6704",
     "asOrganization": "Citylan LLC",
     "isp": "Citylan LLC",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
@@ -7826,7 +7826,7 @@
     "asn": "52015",
     "asOrganization": "Dancer LLC",
     "isp": "Dancer LLC",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
@@ -8141,7 +8141,7 @@
     "asn": "134756",
     "asOrganization": "China Telecom",
     "isp": "China Telecom",
-    "net_type": "isp",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -8186,7 +8186,7 @@
     "asn": "52015",
     "asOrganization": "Dancer LLC",
     "isp": "Dancer LLC",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
@@ -9281,7 +9281,7 @@
     "asn": "17638",
     "asOrganization": "ASN for TIANJIN Provincial Net of CT",
     "isp": "ASN for TIANJIN Provincial Net of CT",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {

@@ -263,63 +263,69 @@ ASN_DATABASE_REL_PATH = os.path.join("data", "asn_database.json")
 # L0: 人工确证网络类型裁决表 (Manual SSOT Overrides: 核心公有云/数据中心机房/知名宽带ISP/银行金融专网)
 MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     # --- [L0 裁决 A: 头部公有云、IDC 与 VPS 主机商，严格锁定为 datacenter] ---
-    "AS16509": "datacenter",  # Amazon AWS / Amazon.com, Inc.
-    "AS14618": "datacenter",  # Amazon.com / AWS
-    "AS8075": "datacenter",   # Microsoft Azure
-    "AS45102": "datacenter",  # Alibaba Cloud
-    "AS132203": "datacenter", # Tencent Cloud
-    "AS31898": "datacenter",  # Oracle Cloud
-    "AS54253": "datacenter",  # Oracle Corporation
-    "AS3214": "datacenter",   # xTom GmbH (知名 VPS 主机商)
-    "AS3258": "datacenter",   # xTom Tokyo (VirMach/xTom 机房)
-    "AS4785": "datacenter",   # xTom Osaka (xTom 机房)
-    "AS6233": "datacenter",   # xTom San Jose (xTom 机房)
-    "AS7720": "datacenter",   # Skywolf Cloud (云主机机房)
-    "AS8888": "datacenter",   # xTom APAC (xTom 机房)
-    "AS9312": "datacenter",   # xTom Hong Kong (xTom 机房)
-    "AS979": "datacenter",    # NetLab Global (机房)
-    "AS16814": "datacenter",  # Connecting Servers Ltd. (服务器托管机房)
-    "AS22295": "datacenter",  # Advin Servers (VPS 主机商)
+    "AS16509": "datacenter",  # Amazon AWS / Amazon.com, Inc. (amazon.com)
+    "AS14618": "datacenter",  # Amazon.com / AWS (amazon.com)
+    "AS8075": "datacenter",   # Microsoft Corporation / Azure (microsoft.com)
+    "AS45102": "datacenter",  # Alibaba (US) Technology Co., Ltd. (alibabagroup.com)
+    "AS132203": "datacenter", # Tencent Building, Kejizhongyi Avenue (tencent.com)
+    "AS31898": "datacenter",  # Oracle Corporation (oracle.com)
+    "AS3214": "datacenter",   # xTom GmbH (xtom.com, 知名 VPS/主机商)
+    "AS3258": "datacenter",   # xTom Tokyo / VirMach (xtom.com)
+    "AS4785": "datacenter",   # xTom Osaka (xtom.com)
+    "AS6233": "datacenter",   # xTom San Jose (xtom.com)
+    "AS7720": "datacenter",   # Skywolf Cloud (skywolf.net)
+    "AS8888": "datacenter",   # xTom APAC (xtom.com)
+    "AS9312": "datacenter",   # xTom Hong Kong (xtom.com)
+    "AS979": "datacenter",    # NetLab Global (as979.net, 国际机房)
+    "AS22295": "datacenter",  # Advin Services LLC (advinservers.com, VPS 主机商)
     "AS22781": "datacenter",  # Black Oak Computers Inc (算力服务器)
-    "AS34665": "datacenter",  # PIN Datacenter (机房)
-    "AS35540": "datacenter",  # OVH Telecom (OVH 欧洲机房)
-    "AS39618": "datacenter",  # HostCram LLC (主机服务商)
-    "AS44382": "datacenter",  # FibaCloud (云服务器机房)
-    "AS45090": "datacenter",  # 成都西维数码 / 西部数码 (知名国内 IDC)
-    "AS49870": "datacenter",  # Alsycon Cloud Hosting (云主机托管)
-    "AS55933": "datacenter",  # Cloudie Limited (云主机托管)
-    "AS56971": "datacenter",  # CGI GLOBAL LIMITED / Cloud (云主机托管)
-    "AS61112": "datacenter",  # AKILE / AkileCloud (云服务器机房)
-    "AS62651": "datacenter",  # Black Oak Computers MidAtlantic (算力服务器)
-    "AS134677": "datacenter", # Dromatics Systems Pte Ltd (机房 IDC)
-    "AS135130": "datacenter", # Anik Computer & Networking (算力机房)
-    "AS136258": "datacenter", # BrainStorm Network, Inc. (机房)
-    "AS138915": "datacenter", # UCloud / Kaopu Cloud HK Limited (云主机)
-    "AS141947": "datacenter", # PT Loveika Host Nusantara (主机托管)
-    "AS146943": "datacenter", # Tier 4 Cloud Services (数据中心)
-    "AS149440": "datacenter", # Evoxt / Evoxt Sdn. Bhd. (VPS 主机商)
-    "AS197275": "datacenter", # Link Telecom NN Ltd. (机房网络)
-    "AS198610": "datacenter", # Beget LLC (云主机托管)
-    "AS202448": "datacenter", # MVPS LTD (VPS 主机商)
-    "AS206206": "datacenter", # Kurdistan Net Company for Computer (算力机房)
-    "AS206216": "datacenter", # Advin Servers (VPS 主机商)
-    "AS206675": "datacenter", # PumpCloud JP (云主机机房)
-    "AS207847": "datacenter", # CloudBlast LLC (云主机)
-    "AS214478": "datacenter", # Sakura Clouds LLC (云服务器)
-    "AS397540": "datacenter", # Windscribe Limited (VPN/代理机房)
-    "AS207143": "datacenter", # hosttech GmbH (瑞士机房/主机托管)
-    "AS216054": "datacenter", # Taymaz Gostaran Naghshe Almas Co. (Ltd) (算力IDC)
-    "AS214822": "datacenter", # MT FINANCE LLC (算力/主机机房)
-    "AS206069": "datacenter", # Cornseed Limited (IDC/主机机房)
-    "AS200912": "datacenter", # vpslayer.net (Joel Krause, ipinfo官方注册类型为hosting)
+    "AS34343": "datacenter",  # BIP Backbone ASN / Eweka (eweka.nl, ipinfo核准为hosting)
+    "AS39618": "datacenter",  # HostCram LLC (hostcram.com, 主机商)
+    "AS44382": "datacenter",  # FibaCloud (fibacloud.com, 云服务器机房)
+    "AS45090": "datacenter",  # 腾讯云节点/西部数码 (tencent.com, 权威机房)
+    "AS49870": "datacenter",  # Alsycon B.V. (as49870.net, 云主机托管)
+    "AS55933": "datacenter",  # Cloudie Limited (worria.com, 云主机托管)
+    "AS56971": "datacenter",  # AS56971 Cloud (hostvds.com, 云主机)
+    "AS61112": "datacenter",  # AkileCloud Network (akilecloud.com, 云服务器机房)
+    "AS62651": "datacenter",  # Strong Technology, LLC (strongtechnology.net, 算力服务器)
+    "AS134677": "datacenter", # Dromatics Systems Pte Ltd (drosys.com, 机房 IDC)
+    "AS136258": "datacenter", # BrainStorm Network, Inc (oneprovider.com, 机房)
+    "AS138915": "datacenter", # Kaopu Cloud HK Limited (kaopucloud.com, 云主机)
+    "AS146943": "datacenter", # Tier 4 Cloud Services (tier4.cloud, 数据中心)
+    "AS149440": "datacenter", # Evoxt Sdn. Bhd. (evoxt.com, VPS 主机商)
+    "AS198610": "datacenter", # Beget LLC (beget.com, 云主机托管)
+    "AS202448": "datacenter", # MVPS LTD (mvps.net, VPS 主机商)
+    "AS206216": "datacenter", # Advin Services LLC (advinservers.com, VPS 主机商)
+    "AS206675": "datacenter", # PumpCloud JP / PAN-LIAN (pumpcloud.net, 云主机机房)
+    "AS207847": "datacenter", # CloudBlast LLC (cloudblast.io, 云主机)
+    "AS214478": "datacenter", # Sakura Clouds LLC (sakuraclouds.com, 云服务器)
+    "AS397540": "datacenter", # Windscribe (windscribe.com, VPN/代理机房)
+    "AS207143": "datacenter", # hosttech GmbH (hosttech.ch, 瑞士机房/主机托管)
+    "AS216054": "datacenter", # Taymaz Gostaran Naghshe Almas (viphost.cloud, 算力IDC)
+    "AS214822": "datacenter", # MT FINANCE LLC (ruvds.com, 云主机机房)
+    "AS206069": "datacenter", # Cornseed Limited (cornseed.tech, IDC/主机机房)
+    "AS200912": "datacenter", # Joel Krause (vpslayer.net, ipinfo核准为hosting)
+    "AS216475": "datacenter", # NKtelecom INC (nktele.com, ipinfo: hosting)
+    "AS55799": "datacenter",  # IPTELECOM ASIA (iptelecom.asia, ipinfo: hosting)
+    "AS135357": "datacenter", # HONG KONG KOWLOON TELECOMMUNICATIONS (as3491.net, ipinfo: hosting)
+    "AS402705": "datacenter", # Align Broadband (alignbb.com, ipinfo: inactive/hosting)
+    "AS209604": "datacenter", # 2E TELEKOMUNIKASYON LTD STI (2etelekom.com, ipinfo: hosting)
+    "AS199669": "datacenter", # Okay-Telecom Ltd. / ATLEX.RU (atlex.ru, ipinfo: hosting)
+    "AS33842": "datacenter",  # Citytelecom LLC (crosstelecom.ru, ipinfo: hosting)
+    "AS62642": "datacenter",  # Bigleaf Networks, Inc. (bigleaf.net, ipinfo: hosting)
 
-    # --- [L0 裁决 B: 知名正牌民用宽带 ISP，人工确证为 isp] ---
-    "AS1257": "isp",          # Tele2 Sverige AB (欧洲顶级电信与家庭宽带)
-    "AS18106": "isp",         # ViewQwest (新加坡/马来西亚知名光纤宽带 ISP)
-    "AS34343": "isp",         # Eweka Internet Services B.V. (荷兰宽带)
-    "AS9891": "isp",          # CS LOXINFO (泰国主流电信运营商)
-    "AS63150": "isp",         # BAGE CLOUD LLC (机房广播双ISP, 权威ipinfo核准为ISP)
-    "AS3226": "isp",          # OOO NI (Mark-ITT, 俄罗斯老牌宽带运营商 mark.ru, ipinfo核准为ISP)
+    # --- [L0 裁决 B: 知名正牌民用宽带 ISP，权威核准为 isp] ---
+    "AS1257": "isp",          # Tele2 Sverige AB (tele2.com, 欧洲顶级电信与家庭宽带)
+    "AS18106": "isp",         # Viewqwest Pte Ltd (viewqwest.com, 新加坡知名光纤宽带 ISP)
+    "AS9891": "isp",          # CS LOXINFO (csloxinfo.com, 泰国主流电信运营商)
+    "AS63150": "isp",         # BAGE CLOUD LLC (bage.dev, 双ISP广播, 权威ipinfo核准为ISP)
+    "AS3226": "isp",          # OOO NI (mark.ru, Mark-ITT 俄罗斯老牌宽带运营商, 权威ipinfo核准为ISP)
+    "AS4787": "isp",          # PT Cyberindo Aditama (cbn.id, 印尼知名民用光纤宽带 CBN)
+    "AS135130": "isp",        # Anik Computer & Networking (aniknetwork.net, 孟加拉民用宽带ISP)
+    "AS197275": "isp",        # Link Telecom NN Ltd. (lt-nn.net, 俄罗斯下诺夫哥罗德电信运营商)
+    "AS16814": "isp",         # NSS S.A. / IPLAN (iplan.com.ar, 阿根廷主流光纤运营商)
+    "AS34665": "isp",         # Petersburg Internet Network (pindc.ru, 圣彼得堡电信与宽带运营商)
+    "AS35540": "isp",         # OVH SAS / OVH Telecom (ovhcloud.com, 法国电信与宽带接入网)
 
     # --- [L0 裁决 C: 核心国际银行金融专网 (人工 SSOT 保护)] ---
     "AS1311": "banking", "AS2600": "banking", "AS3187": "banking", "AS5091": "banking",
@@ -328,7 +334,6 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS9016": "banking", "AS9099": "banking", "AS9118": "banking", "AS9128": "banking",
     "AS9221": "banking", "AS9487": "banking", "AS9522": "banking", "AS9630": "banking",
     "AS9772": "banking", "AS9863": "banking", "AS25883": "banking", "AS207986": "banking",
-    "AS4787": "banking",
 }
 
 
@@ -2217,7 +2222,7 @@ BIZ_PATTERNS = (
 
 ISP_RES_PATTERNS = (
     "residential", "consumer broadband", "ftth", "fiber to the home", "adsl customer", "cable internet",
-    "telecommunication", "telecommunications", "telecom", "telekom", "broadband",
+    "broadband",
     "cable tv", "cable corporation", "wisp", "wireless multi service",
     "odido", "wisper", "inalan", "radiokomunikace", "radiografica", "informsvyaz", "bashinformsvyaz",
     "superloop", "hyperoptic", "viewqwest", "wyyerd",
@@ -2416,8 +2421,8 @@ def save_proxyip_by_country(rows: list, output_dir: str) -> int:
         country = extract_country(r.get("cf_location"), r.get("colo"))
         groups.setdefault(country, []).append(r)
 
-        # 复用已打标属性，缺失时兜底补齐
-        nt = r.get("net_type") or classify_asn(r.get("asn", ""), r.get("isp", ""))
+        # 始终优先使用权威 classify_asn 定性，确保数据库或规则变更时自动同步纠正
+        nt = classify_asn(r.get("asn", ""), r.get("isp", ""))
         r["net_type"] = nt
         if nt in SPECIAL_NET_TYPE_FILES:
             type_groups.setdefault(nt, []).append(r)

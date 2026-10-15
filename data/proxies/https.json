@@ -41,7 +41,7 @@
     "asn": "62642",
     "asOrganization": "IT Group NW, LLC",
     "isp": "IT Group NW, LLC",
-    "net_type": "isp",
+    "net_type": "datacenter",
     "source": "EDT-Pages"
   },
   {
@@ -1196,7 +1196,7 @@
     "asn": "62642",
     "asOrganization": "Bigleaf Networks, Inc.",
     "isp": "Bigleaf Networks, Inc.",
-    "net_type": "isp",
+    "net_type": "datacenter",
     "source": "EDT-Pages"
   },
   {

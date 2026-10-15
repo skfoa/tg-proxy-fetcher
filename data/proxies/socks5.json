@@ -1826,7 +1826,7 @@
     "asn": "133770",
     "asOrganization": "H M COMMUNICATION",
     "isp": "H M COMMUNICATION",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
@@ -1871,7 +1871,7 @@
     "asn": "135834",
     "asOrganization": "Multicraft Digital Technologies Private Limited",
     "isp": "Multicraft Digital Technologies Private Limited",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
@@ -1946,7 +1946,7 @@
     "asn": "134153",
     "asOrganization": "Xplore Net BD",
     "isp": "Xplore Net BD",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
@@ -1961,7 +1961,7 @@
     "asn": "137953",
     "asOrganization": "Bismillah IT Solution",
     "isp": "Bismillah IT Solution",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
@@ -1976,7 +1976,7 @@
     "asn": "134153",
     "asOrganization": "Xplore Net BD",
     "isp": "Xplore Net BD",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
@@ -1991,7 +1991,7 @@
     "asn": "134153",
     "asOrganization": "Xplore Net BD",
     "isp": "Xplore Net BD",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
@@ -2231,7 +2231,7 @@
     "asn": "132298",
     "asOrganization": "Antaranga Dot Com Ltd",
     "isp": "Antaranga Dot Com Ltd",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {

@@ -120,18 +120,18 @@ socks5://test123:test123@109.104.155.18:1080,socks5,109.104.155.18,1080,1085,0,a
 socks5://216.68.128.121:4145,socks5,216.68.128.121,4145,1086,0,alive,CVG,US,216.68.128.121,AS6181 CINCINNATI BELL,CINCINNATI BELL,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://abc123:abc123@103.238.72.56:1080,socks5,103.238.72.56,1080,1103,0,alive,HAN,VN,103.238.72.56,AS24088 Hanoi Telecom Joint Stock Company - HCMC Branch,Hanoi Telecom Joint Stock Company - HCMC Branch,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://root:123456@101.89.159.229:1080,socks5,101.89.159.229,1080,1186,0,alive,LAX,CN,101.89.159.229,AS4811 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
-socks5://11:11@103.156.238.48:1080,socks5,103.156.238.48,1080,1191,0,alive,DAC,BD,103.156.238.51,AS133770 H M COMMUNICATION,H M COMMUNICATION,datacenter,2026-10-01 00:00:00,@danfeng_chat
+socks5://11:11@103.156.238.48:1080,socks5,103.156.238.48,1080,1191,0,alive,DAC,BD,103.156.238.51,AS133770 H M COMMUNICATION,H M COMMUNICATION,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://112.5.33.179:999,socks5,112.5.33.179,999,1192,0,alive,LHR,CN,112.5.33.179,AS9808 China Mobile,China Mobile Communications Corporation,isp,2026-10-14 12:57:52,EDT-Pages
 socks5://test:test@103.79.183.34:1080,socks5,103.79.183.34,1080,1239,0,alive,DAC,BD,103.79.183.34,AS136009 SpeedNet,SpeedNet,isp,2026-10-01 00:00:00,@danfeng_chat
-socks5://ss:ss@103.80.116.190:1080,socks5,103.80.116.190,1080,1262,0,alive,BOM,IN,103.185.244.238,AS135834 Multicraft Digital Technologies Private Limited,Multicraft Digital Technologies Private Limited,datacenter,2026-10-01 00:00:00,@danfeng_chat
+socks5://ss:ss@103.80.116.190:1080,socks5,103.80.116.190,1080,1262,0,alive,BOM,IN,103.185.244.238,AS135834 Multicraft Digital Technologies Private Limited,Multicraft Digital Technologies Private Limited,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://ss:ss@103.14.72.168:1080,socks5,103.14.72.168,1080,1270,0,alive,DAC,BD,103.14.72.168,AS137967 DigiCon Telecommunication Ltd,Digicon Telecommunication Ltd,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://root:123456@59.36.137.51:1080,socks5,59.36.137.51,1080,1289,0,alive,FRA,CN,59.36.137.51,AS4134 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://root:123456@101.91.233.238:1080,socks5,101.91.233.238,1080,1296,0,alive,LAX,CN,101.91.233.238,AS4811 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://ss:ss@103.85.238.43:1080,socks5,103.85.238.43,1080,1316,0,alive,DAC,BD,103.14.72.170,AS137967 DigiCon Telecommunication Ltd,Digicon Telecommunication Ltd,isp,2026-10-01 00:00:00,@danfeng_chat
-socks5://demo:demo@103.138.26.77:1080,socks5,103.138.26.77,1080,1324,0,alive,DAC,BD,103.96.106.235,AS134153 Xplore Net BD,Xplore Net BD,datacenter,2026-10-01 00:00:00,@danfeng_chat
-socks5://1:1@103.243.244.133:1080,socks5,103.243.244.133,1080,1332,0,alive,CGP,BD,103.243.244.133,AS137953 Bismillah IT Solution,Bismillah IT Solution,datacenter,2026-10-01 00:00:00,@danfeng_chat
-socks5://demo:demo@103.138.26.161:1080,socks5,103.138.26.161,1080,1338,0,alive,DAC,BD,103.96.106.235,AS134153 Xplore Net BD,Xplore Net BD,datacenter,2026-10-01 00:00:00,@danfeng_chat
-socks5://demo:demo@103.138.26.73:1080,socks5,103.138.26.73,1080,1360,0,alive,DAC,BD,103.96.106.235,AS134153 Xplore Net BD,Xplore Net BD,datacenter,2026-10-01 00:00:00,@danfeng_chat
+socks5://demo:demo@103.138.26.77:1080,socks5,103.138.26.77,1080,1324,0,alive,DAC,BD,103.96.106.235,AS134153 Xplore Net BD,Xplore Net BD,isp,2026-10-01 00:00:00,@danfeng_chat
+socks5://1:1@103.243.244.133:1080,socks5,103.243.244.133,1080,1332,0,alive,CGP,BD,103.243.244.133,AS137953 Bismillah IT Solution,Bismillah IT Solution,isp,2026-10-01 00:00:00,@danfeng_chat
+socks5://demo:demo@103.138.26.161:1080,socks5,103.138.26.161,1080,1338,0,alive,DAC,BD,103.96.106.235,AS134153 Xplore Net BD,Xplore Net BD,isp,2026-10-01 00:00:00,@danfeng_chat
+socks5://demo:demo@103.138.26.73:1080,socks5,103.138.26.73,1080,1360,0,alive,DAC,BD,103.96.106.235,AS134153 Xplore Net BD,Xplore Net BD,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://12345678:12345678@101.42.44.92:1080,socks5,101.42.44.92,1080,1408,0,alive,LAX,CN,101.42.44.92,AS45090 Tencent Cloud,Tencent Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://root:123456@101.89.207.142:1080,socks5,101.89.207.142,1080,1411,0,alive,FRA,CN,101.89.207.142,AS4811 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://root:123456@59.36.80.120:1080,socks5,59.36.80.120,1080,1439,0,alive,LAX,CN,59.36.80.120,AS4134 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
@@ -147,7 +147,7 @@ socks5://123:123@152.32.192.43:1080,socks5,152.32.192.43,1080,2011,0,alive,HKG,H
 socks5://109.195.215.208:1080,socks5,109.195.215.208,1080,2055,0,alive,DME,RU,109.195.215.208,AS56377 JSC ER-Telecom Holding Magnitogorsk branch,JSC ER-Telecom Holding Magnitogorsk branch,isp,2026-10-13 14:49:54,EDT-Pages
 socks5://111:111@106.55.143.100:1080,socks5,106.55.143.100,1080,2070,0,alive,FRA,CN,106.55.143.100,AS45090 Tencent Cloud,Tencent Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://45.74.31.47:4874,socks5,45.74.31.47,4874,2136,0,alive,CGK,ID,182.253.126.69,AS17451 BIZNET-PREPAID-BLOCK,BIZNET-PREPAID-BLOCK,isp,2026-10-15 12:44:41,EDT-Pages
-socks5://test:test@103.135.252.30:1080,socks5,103.135.252.30,1080,2191,0,alive,DAC,BD,103.135.252.30,AS132298 Antaranga Dot Com Ltd,Antaranga Dot Com Ltd,datacenter,2026-10-01 00:00:00,@danfeng_chat
+socks5://test:test@103.135.252.30:1080,socks5,103.135.252.30,1080,2191,0,alive,DAC,BD,103.135.252.30,AS132298 Antaranga Dot Com Ltd,Antaranga Dot Com Ltd,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://vpn:vpn@101.126.33.223:1080,socks5,101.126.33.223,1080,2230,0,alive,FRA,CN,101.126.33.223,AS137718 GHSX,GHSX,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://72.49.49.11:31034,socks5,72.49.49.11,31034,2265,0,alive,CVG,US,72.49.49.11,AS6181 CINCINNATI BELL,CINCINNATI BELL,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://45.74.31.41:4687,socks5,45.74.31.41,4687,2337,0,alive,NRT,JP,60.43.137.242,AS4713 NTT Communications Corporation (Open Computer Network),Open Computer Network,isp,2026-10-15 12:44:41,EDT-Pages

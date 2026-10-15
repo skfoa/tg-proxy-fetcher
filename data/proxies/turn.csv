@@ -30,7 +30,7 @@ turn://3.141.160.4:3478,turn,3.141.160.4,3478,128,0,alive,-,US,3.141.160.4,AS165
 turn://3.98.192.101:3479,turn,3.98.192.101,3479,132,0,alive,-,CA,3.98.192.101,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://198.50.120.23:3478,turn,198.50.120.23,3478,136,0,alive,-,CA,198.50.120.23,AS32613 Leaseweb Canada Inc,Leaseweb Canada Inc,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://167.114.210.26:3478,turn,167.114.210.26,3478,140,0,alive,-,CA,167.114.210.26,AS16276 OVH,OVH,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://208.111.83.108:3478,turn,208.111.83.108,3478,156,0,alive,-,CA,208.111.83.108,AS19515 Oricom Internet inc,Oricom Internet inc.,datacenter,2026-10-01 00:00:00,@danfeng_chat
+turn://208.111.83.108:3478,turn,208.111.83.108,3478,156,0,alive,-,CA,208.111.83.108,AS19515 Oricom Internet inc,Oricom Internet inc.,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://148.113.173.148:3478,turn,148.113.173.148,3478,166,0,alive,-,CA,148.113.173.148,AS16276 OVH,OVH,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://210.189.253.230:3478,turn,210.189.253.230,3478,217,0,alive,-,JP,210.189.253.230,AS4694 IDC Frontier Inc.,IDC Frontier Inc.,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://8.216.43.195:3478,turn,8.216.43.195,3478,218,0,alive,-,JP,8.216.43.195,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -40,7 +40,7 @@ turn://34.84.3.228:3478,turn,34.84.3.228,3478,220,0,alive,-,JP,34.84.3.228,AS396
 turn://47.91.1.19:3478,turn,47.91.1.19,3478,222,0,alive,-,JP,47.91.1.19,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://test:test@111.171.194.230:3479,turn,111.171.194.230,3479,225,0,alive,-,JP,111.171.194.230,AS55374 Fujitsu Limited,FUJITSU LIMITED,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://test:test@111.171.194.230:3478,turn,111.171.194.230,3478,241,0,alive,-,JP,111.171.194.230,AS55374 Fujitsu Limited,FUJITSU LIMITED,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://190.89.144.81:3478,turn,190.89.144.81,3478,249,0,alive,-,BR,190.89.144.81,AS270369 Naveganet Comercio e Serviço LTDA,Naveganet Comercio e Serviço LTDA,datacenter,2026-10-01 00:00:00,@danfeng_chat
+turn://190.89.144.81:3478,turn,190.89.144.81,3478,249,0,alive,-,BR,190.89.144.81,AS270369 Naveganet Comercio e Serviço LTDA,Naveganet Comercio e Serviço LTDA,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://149.102.131.141:3478,turn,149.102.131.141,3478,252,0,alive,-,GB,149.102.131.141,AS51167 Contabo,Contabo,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://52.16.253.175:3478,turn,52.16.253.175,3478,254,0,alive,-,IE,52.16.253.175,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://49.247.170.173:3478,turn,49.247.170.173,3478,258,0,alive,-,KR,49.247.170.173,AS38700 SMILESERV,SMILESERV,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -294,7 +294,7 @@ turn://162.55.165.243:3478,turn,162.55.165.243,3478,283,0,alive,-,DE,162.55.165.
 turn://158.255.211.91:3479,turn,158.255.211.91,3479,283,0,alive,-,AT,158.255.211.91,AS57169 EDIS GmbH,EDIS GmbH,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://213.109.160.247:3478,turn,213.109.160.247,3478,284,0,alive,-,DE,213.109.160.247,AS197540 Netcup,Netcup,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://46.225.52.214:3478,turn,46.225.52.214,3478,285,0,alive,-,DE,46.225.52.214,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://185.37.11.52:3478,turn,185.37.11.52,3478,285,0,alive,-,FR,185.37.11.52,AS210806 Strong Blue Conseil & Telecom SASU,Strong Blue Conseil & Telecom SASU,isp,2026-10-01 00:00:00,@danfeng_chat
+turn://185.37.11.52:3478,turn,185.37.11.52,3478,285,0,alive,-,FR,185.37.11.52,AS210806 Strong Blue Conseil & Telecom SASU,Strong Blue Conseil & Telecom SASU,business,2026-10-01 00:00:00,@danfeng_chat
 turn://46.4.65.22:3478,turn,46.4.65.22,3478,285,0,alive,-,DE,46.4.65.22,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://46.224.40.124:3478,turn,46.224.40.124,3478,285,0,alive,-,DE,46.224.40.124,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://144.76.229.226:3478,turn,144.76.229.226,3478,285,0,alive,-,DE,144.76.229.226,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -323,7 +323,7 @@ turn://144.24.249.21:3478,turn,144.24.249.21,3478,292,0,alive,-,CH,144.24.249.21
 turn://185.75.192.192:3479,turn,185.75.192.192,3479,293,0,alive,-,HU,185.75.192.192,AS208154 ELIN.hu Informatikai Szolgaltato es Tanacsado Kft.,ELIN.hu Informatikai Szolgaltato es Tanacsado Kft.,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://159.69.54.170:3478,turn,159.69.54.170,3478,293,0,alive,-,DE,159.69.54.170,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://128.140.120.162:3478,turn,128.140.120.162,3478,294,0,alive,-,DE,128.140.120.162,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://195.230.172.166:3478,turn,195.230.172.166,3478,294,0,alive,-,AT,195.230.172.166,AS8339 kabelplus GmbH,kabelplus GmbH,datacenter,2026-10-01 00:00:00,@danfeng_chat
+turn://195.230.172.166:3478,turn,195.230.172.166,3478,294,0,alive,-,AT,195.230.172.166,AS8339 kabelplus GmbH,kabelplus GmbH,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://91.220.179.192:3478,turn,91.220.179.192,3478,294,0,alive,-,AT,91.220.179.192,AS21013 Brunner-Webhosting,Brunner-Webhosting,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://140.86.211.130:3478,turn,140.86.211.130,3478,294,0,alive,-,CH,140.86.211.130,AS31898 Oracle Cloud,Oracle Cloud,datacenter,2026-10-08 14:09:40,@danfeng_chat
 turn://85.215.47.56:3478,turn,85.215.47.56,3478,295,0,alive,-,DE,85.215.47.56,AS8560 IONOS SE,IONOS SE,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -355,7 +355,7 @@ turn://51.75.205.44:3479,turn,51.75.205.44,3479,306,0,alive,-,FR,51.75.205.44,AS
 turn://47.76.28.111:3479,turn,47.76.28.111,3479,307,0,alive,-,HK,47.76.28.111,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://47.243.51.3:3478,turn,47.243.51.3,3478,307,0,alive,-,HK,47.243.51.3,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://156.226.108.94:3478,turn,156.226.108.94,3478,308,0,alive,-,HK,156.226.108.94,AS135097 LUOGELANG LIMITED,LUOGELANG (FRANCE) LIMITED,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://190.9.112.10:3478,turn,190.9.112.10,3478,309,0,alive,-,BR,190.9.112.10,AS273639 Utra NET,Utra NET,datacenter,2026-10-01 00:00:00,@danfeng_chat
+turn://190.9.112.10:3478,turn,190.9.112.10,3478,309,0,alive,-,BR,190.9.112.10,AS273639 Utra NET,Utra NET,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://114.34.87.173:3479,turn,114.34.87.173,3479,309,0,alive,-,TW,114.34.87.173,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://156.226.108.73:3478,turn,156.226.108.73,3478,309,0,alive,-,HK,156.226.108.73,AS135097 LUOGELANG LIMITED,LUOGELANG (FRANCE) LIMITED,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://83.147.241.60:3479,turn,83.147.241.60,3479,311,0,alive,-,BG,83.147.241.60,AS200740 FIRST SERVER LIMITED,FIRST SERVER LIMITED,datacenter,2026-10-13 14:49:54,@otcfxq
@@ -399,7 +399,7 @@ turn://65.21.126.228:3478,turn,65.21.126.228,3478,321,0,alive,-,FI,65.21.126.228
 turn://95.216.152.223:3478,turn,95.216.152.223,3478,321,0,alive,-,FI,95.216.152.223,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://95.216.137.124:3478,turn,95.216.137.124,3478,321,0,alive,-,FI,95.216.137.124,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://37.27.244.74:3478,turn,37.27.244.74,3478,322,0,alive,-,FI,37.27.244.74,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://94.155.35.12:3479,turn,94.155.35.12,3479,322,0,alive,-,BG,94.155.35.12,"AS9070 ""Cooolbox"" AD","""Cooolbox"" AD",datacenter,2026-10-01 00:00:00,@danfeng_chat
+turn://94.155.35.12:3479,turn,94.155.35.12,3479,322,0,alive,-,BG,94.155.35.12,"AS9070 ""Cooolbox"" AD","""Cooolbox"" AD",isp,2026-10-01 00:00:00,@danfeng_chat
 turn://65.109.129.67:3478,turn,65.109.129.67,3478,322,0,alive,-,FI,65.109.129.67,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://46.62.210.49:3478,turn,46.62.210.49,3478,322,0,alive,-,FI,46.62.210.49,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://65.109.68.171:3478,turn,65.109.68.171,3478,322,0,alive,-,FI,65.109.68.171,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -412,7 +412,7 @@ turn://65.108.95.223:3479,turn,65.108.95.223,3479,323,0,alive,-,FI,65.108.95.223
 turn://37.27.35.56:3478,turn,37.27.35.56,3478,323,0,alive,-,FI,37.27.35.56,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://65.108.158.202:3478,turn,65.108.158.202,3478,323,0,alive,-,FI,65.108.158.202,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://65.108.95.223:3478,turn,65.108.95.223,3478,323,0,alive,-,FI,65.108.95.223,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://94.155.35.12:3478,turn,94.155.35.12,3478,323,0,alive,-,BG,94.155.35.12,"AS9070 ""Cooolbox"" AD","""Cooolbox"" AD",datacenter,2026-10-01 00:00:00,@danfeng_chat
+turn://94.155.35.12:3478,turn,94.155.35.12,3478,323,0,alive,-,BG,94.155.35.12,"AS9070 ""Cooolbox"" AD","""Cooolbox"" AD",isp,2026-10-01 00:00:00,@danfeng_chat
 turn://89.167.86.118:3478,turn,89.167.86.118,3478,323,0,alive,-,DE,89.167.86.118,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://204.168.138.65:3478,turn,204.168.138.65,3478,323,0,alive,-,FI,204.168.138.65,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://65.109.238.211:3478,turn,65.109.238.211,3478,324,0,alive,-,FI,65.109.238.211,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -433,12 +433,12 @@ turn://37.27.29.172:3478,turn,37.27.29.172,3478,327,0,alive,-,FI,37.27.29.172,AS
 turn://94.141.161.213:3479,turn,94.141.161.213,3479,327,0,alive,-,DE,94.141.161.213,AS215590 DpkgSoft International Limited,DpkgSoft International Limited,datacenter,2026-10-08 14:09:40,@danfeng_chat
 turn://157.180.11.119:3478,turn,157.180.11.119,3478,328,0,alive,-,FI,157.180.11.119,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://109.196.167.66:3478,turn,109.196.167.66,3478,329,0,alive,-,RU,109.196.167.66,AS212247 IT Services Ltd,IT Services Ltd,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://81.27.244.138:3478,turn,81.27.244.138,3478,331,0,alive,-,RU,81.27.244.138,AS35508 TeraNet LLC,TeraNet LLC,datacenter,2026-10-01 00:00:00,@danfeng_chat
+turn://81.27.244.138:3478,turn,81.27.244.138,3478,331,0,alive,-,RU,81.27.244.138,AS35508 TeraNet LLC,TeraNet LLC,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://test:1234@178.255.40.33:3478,turn,178.255.40.33,3478,332,0,alive,-,PL,178.255.40.33,AS197155 Artnet Sp. z o.o.,Artnet Sp. z o.o.,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://95.217.81.124:3478,turn,95.217.81.124,3478,332,0,alive,-,FI,95.217.81.124,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://65.109.116.126:3478,turn,65.109.116.126,3478,332,0,alive,-,FI,65.109.116.126,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://43.255.29.31:3478,turn,43.255.29.31,3478,332,0,alive,-,HK,43.255.29.31,AS133199 SonderCloud Limited,SonderCloud Limited,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://217.150.203.242:3478,turn,217.150.203.242,3478,332,0,alive,-,RU,217.150.203.242,AS24936 Plusinfo OOO,Plusinfo OOO,datacenter,2026-10-01 00:00:00,@danfeng_chat
+turn://217.150.203.242:3478,turn,217.150.203.242,3478,332,0,alive,-,RU,217.150.203.242,AS24936 Plusinfo OOO,Plusinfo OOO,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://135.181.218.216:3479,turn,135.181.218.216,3479,333,0,alive,-,FI,135.181.218.216,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://156.226.108.71:3478,turn,156.226.108.71,3478,333,0,alive,-,HK,156.226.108.71,AS135097 LUOGELANG LIMITED,LUOGELANG (FRANCE) LIMITED,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://82.148.13.41:3478,turn,82.148.13.41,3478,333,0,alive,-,RU,82.148.13.41,AS50340 JSC Selectel,JSC Selectel,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -446,7 +446,7 @@ turn://5.8.74.107:3478,turn,5.8.74.107,3478,334,0,alive,-,RU,5.8.74.107,AS50340 
 turn://65.109.34.230:3478,turn,65.109.34.230,3478,334,0,alive,-,FI,65.109.34.230,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://146.59.95.129:3478,turn,146.59.95.129,3478,337,0,alive,-,PL,146.59.95.129,AS16276 OVH,OVH,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://151.241.155.144:3478,turn,151.241.155.144,3478,338,0,alive,-,FI,151.241.155.144,AS57043 Hostkey B.V.,Hostkey B.V.,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://185.75.180.59:3478,turn,185.75.180.59,3478,339,0,alive,-,RU,185.75.180.59,"AS25341 ""Nauchno proizvodstvennaya Firma ""Raspredelennaya Obrabotka Informacii"" LLC","""Nauchno proizvodstvennaya Firma ""Raspredelennaya Obrabotka Informacii"" LLC",datacenter,2026-10-01 00:00:00,@danfeng_chat
+turn://185.75.180.59:3478,turn,185.75.180.59,3478,339,0,alive,-,RU,185.75.180.59,"AS25341 ""Nauchno proizvodstvennaya Firma ""Raspredelennaya Obrabotka Informacii"" LLC","""Nauchno proizvodstvennaya Firma ""Raspredelennaya Obrabotka Informacii"" LLC",isp,2026-10-01 00:00:00,@danfeng_chat
 turn://65.21.192.217:3479,turn,65.21.192.217,3479,339,0,alive,-,FI,65.21.192.217,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://95.217.68.123:3478,turn,95.217.68.123,3478,339,0,alive,-,FI,95.217.68.123,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://95.216.118.105:3478,turn,95.216.118.105,3478,339,0,alive,-,FI,95.216.118.105,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -469,7 +469,7 @@ turn://144.76.157.140:3479,turn,144.76.157.140,3479,365,0,alive,-,DE,144.76.157.
 turn://167.235.100.214:3478,turn,167.235.100.214,3478,365,0,alive,-,DE,167.235.100.214,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://118.163.170.1:3478,turn,118.163.170.1,3478,365,0,alive,-,TW,118.163.170.1,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://46.225.115.51:3478,turn,46.225.115.51,3478,365,0,alive,-,DE,46.225.115.51,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://46.17.253.147:3478,turn,46.17.253.147,3478,367,0,alive,-,RU,46.17.253.147,AS50409 GK Osnova JSC,GK Osnova JSC,datacenter,2026-10-01 00:00:00,@danfeng_chat
+turn://46.17.253.147:3478,turn,46.17.253.147,3478,367,0,alive,-,RU,46.17.253.147,AS50409 GK Osnova JSC,GK Osnova JSC,business,2026-10-01 00:00:00,@danfeng_chat
 turn://95.216.14.179:3478,turn,95.216.14.179,3478,369,0,alive,-,FI,95.216.14.179,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://183.203.166.162:3478,turn,183.203.166.162,3478,370,0,alive,-,CN,183.203.166.162,AS56042 China Mobile Communications Corporation,China Mobile communications corporation,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://8.219.133.155:3479,turn,8.219.133.155,3479,371,0,alive,-,SG,8.219.133.155,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -478,16 +478,16 @@ turn://int.demo.zhudian.store:3479,turn,int.demo.zhudian.store,3479,375,0,alive,
 turn://int.demo.zhudian.store:3478,turn,int.demo.zhudian.store,3478,378,0,alive,-,CN,101.132.248.113,AS37963 Hangzhou Alibaba Advertising Co,Hangzhou Alibaba Advertising Co,datacenter,2026-10-14 12:57:52,@otcfxq
 turn://101.132.242.147:3479,turn,101.132.242.147,3479,378,0,alive,-,CN,101.132.242.147,AS37963 Hangzhou Alibaba Advertising Co,Hangzhou Alibaba Advertising Co,datacenter,2026-10-14 12:57:52,@otcfxq
 turn://vvlsj.com:3478,turn,vvlsj.com,3478,379,0,alive,-,CN,101.133.171.92,AS37963 Hangzhou Alibaba Advertising Co,Hangzhou Alibaba Advertising Co,datacenter,2026-10-14 12:57:52,@otcfxq
-turn://103.92.225.135:3478,turn,103.92.225.135,3478,379,0,alive,-,ID,103.92.225.135,AS136823 PT. Arka Data Primatama,PT. Arka Data Primatama,datacenter,2026-10-01 00:00:00,@danfeng_chat
+turn://103.92.225.135:3478,turn,103.92.225.135,3478,379,0,alive,-,ID,103.92.225.135,AS136823 PT. Arka Data Primatama,PT. Arka Data Primatama,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://121.43.140.205:3479,turn,121.43.140.205,3479,380,0,alive,-,CN,121.43.140.205,AS37963 Hangzhou Alibaba Advertising Co,"Hangzhou Alibaba Advertising Co., Ltd.",datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://190.89.177.14:3478,turn,190.89.177.14,3478,380,0,alive,-,BR,190.89.177.14,AS270384 Otilia Antonia Celso,OTILIA ANTONIA CELSO,datacenter,2026-10-01 00:00:00,@danfeng_chat
+turn://190.89.177.14:3478,turn,190.89.177.14,3478,380,0,alive,-,BR,190.89.177.14,AS270384 Otilia Antonia Celso,OTILIA ANTONIA CELSO,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://101.132.170.88:3478,turn,101.132.170.88,3478,381,0,alive,-,CN,101.132.170.88,AS37963 Hangzhou Alibaba Advertising Co,Hangzhou Alibaba Advertising Co,datacenter,2026-10-14 12:57:52,@otcfxq
 turn://47.116.198.53:3478,turn,47.116.198.53,3478,382,0,alive,-,CN,47.116.198.53,AS37963 Hangzhou Alibaba Advertising Co,"Hangzhou Alibaba Advertising Co., Ltd.",datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://101.132.184.217:3478,turn,101.132.184.217,3478,382,0,alive,-,CN,101.132.184.217,AS37963 Hangzhou Alibaba Advertising Co,Hangzhou Alibaba Advertising Co,datacenter,2026-10-14 12:57:52,@otcfxq
 turn://101.132.248.113:3479,turn,101.132.248.113,3479,383,0,alive,-,CN,101.132.248.113,AS37963 Hangzhou Alibaba Advertising Co,Hangzhou Alibaba Advertising Co,datacenter,2026-10-14 12:57:52,@otcfxq
 turn://101.132.43.43:3478,turn,101.132.43.43,3478,384,0,alive,-,CN,101.132.43.43,AS37963 Hangzhou Alibaba Advertising Co,Hangzhou Alibaba Advertising Co,datacenter,2026-10-14 12:57:52,@otcfxq
 turn://101.132.242.147:3478,turn,101.132.242.147,3478,384,0,alive,-,CN,101.132.242.147,AS37963 Hangzhou Alibaba Advertising Co,Hangzhou Alibaba Advertising Co,datacenter,2026-10-14 12:57:52,@otcfxq
-turn://190.5.208.24:3478,turn,190.5.208.24,3478,385,0,alive,-,BR,190.5.208.24,AS271185 Brtele Tecnologia Ltda,Brtele Tecnologia Ltda,datacenter,2026-10-01 00:00:00,@danfeng_chat
+turn://190.5.208.24:3478,turn,190.5.208.24,3478,385,0,alive,-,BR,190.5.208.24,AS271185 Brtele Tecnologia Ltda,Brtele Tecnologia Ltda,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://123.207.39.87:3478,turn,123.207.39.87,3478,386,0,alive,-,CN,123.207.39.87,AS45090 Tencent Cloud,Tencent Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://101.133.171.92:3478,turn,101.133.171.92,3478,387,0,alive,-,CN,101.133.171.92,AS37963 Hangzhou Alibaba Advertising Co,Hangzhou Alibaba Advertising Co,datacenter,2026-10-14 12:57:52,@otcfxq
 turn://8.136.113.183:3478,turn,8.136.113.183,3478,388,0,alive,-,CN,8.136.113.183,AS37963 Hangzhou Alibaba Advertising Co,"Hangzhou Alibaba Advertising Co., Ltd.",datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -496,9 +496,9 @@ turn://47.99.184.62:3479,turn,47.99.184.62,3479,388,0,alive,-,CN,47.99.184.62,AS
 turn://1.15.227.161:3478,turn,1.15.227.161,3478,389,0,alive,-,CN,1.15.227.161,AS45090 Tencent Cloud,Tencent Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://118.178.229.144:3479,turn,118.178.229.144,3479,389,0,alive,-,CN,118.178.229.144,AS37963 Hangzhou Alibaba Advertising Co,"Hangzhou Alibaba Advertising Co., Ltd.",datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://120.27.218.167:3478,turn,120.27.218.167,3478,389,0,alive,-,CN,120.27.218.167,AS37963 Hangzhou Alibaba Advertising Co,Hangzhou Alibaba Advertising Co,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://103.92.225.135:3479,turn,103.92.225.135,3479,390,0,alive,-,ID,103.92.225.135,AS136823 PT. Arka Data Primatama,PT. Arka Data Primatama,datacenter,2026-10-01 00:00:00,@danfeng_chat
+turn://103.92.225.135:3479,turn,103.92.225.135,3479,390,0,alive,-,ID,103.92.225.135,AS136823 PT. Arka Data Primatama,PT. Arka Data Primatama,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://101.132.188.25:3478,turn,101.132.188.25,3478,390,0,alive,-,CN,101.132.188.25,AS37963 Hangzhou Alibaba Advertising Co,Hangzhou Alibaba Advertising Co,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://185.123.41.118:3478,turn,185.123.41.118,3478,393,0,alive,-,RU,185.123.41.118,AS6704 Citylan LLC,Citylan LLC,datacenter,2026-10-01 00:00:00,@danfeng_chat
+turn://185.123.41.118:3478,turn,185.123.41.118,3478,393,0,alive,-,RU,185.123.41.118,AS6704 Citylan LLC,Citylan LLC,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://sales.toway.ai:3478,turn,sales.toway.ai,3478,394,0,alive,-,CN,101.132.184.217,AS37963 Hangzhou Alibaba Advertising Co,Hangzhou Alibaba Advertising Co,datacenter,2026-10-14 12:57:52,@otcfxq
 turn://159.69.111.197:3478,turn,159.69.111.197,3478,395,0,alive,-,DE,159.69.111.197,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://112.90.50.11:3479,turn,112.90.50.11,3479,395,0,alive,-,CN,112.90.50.11,AS17816 China Unicom CHINA169 Guangdong Province Network,China Unicom CHINA169 Guangdong Province Network,isp,2026-10-01 00:00:00,@danfeng_chat
@@ -520,7 +520,7 @@ turn://47.114.104.13:3479,turn,47.114.104.13,3479,404,0,alive,-,CN,47.114.104.13
 turn://47.95.114.47:5350,turn,47.95.114.47,5350,405,0,alive,-,CN,47.95.114.47,AS37963 Hangzhou Alibaba Advertising Co,"Hangzhou Alibaba Advertising Co., Ltd.",datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://217.12.37.2:3478,turn,217.12.37.2,3478,406,0,alive,-,RU,217.12.37.2,AS198610 Beget LLC,Beget LLC,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://139.199.66.223:3478,turn,139.199.66.223,3478,407,0,alive,-,CN,139.199.66.223,AS45090 Tencent Cloud,Tencent Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://46.39.0.53:3479,turn,46.39.0.53,3479,408,0,alive,-,RU,46.39.0.53,AS52015 Dancer LLC,Dancer LLC,datacenter,2026-10-01 00:00:00,@danfeng_chat
+turn://46.39.0.53:3479,turn,46.39.0.53,3479,408,0,alive,-,RU,46.39.0.53,AS52015 Dancer LLC,Dancer LLC,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://47.99.184.62:3478,turn,47.99.184.62,3478,410,0,alive,-,CN,47.99.184.62,AS37963 Hangzhou Alibaba Advertising Co,"Hangzhou Alibaba Advertising Co., Ltd.",datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://8.136.113.183:3479,turn,8.136.113.183,3479,410,0,alive,-,CN,8.136.113.183,AS37963 Hangzhou Alibaba Advertising Co,"Hangzhou Alibaba Advertising Co., Ltd.",datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://47.105.56.46:3478,turn,47.105.56.46,3478,411,0,alive,-,CN,47.105.56.46,AS37963 Hangzhou Alibaba Advertising Co,Hangzhou Alibaba Advertising Co,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -541,10 +541,10 @@ turn://8.130.54.220:3478,turn,8.130.54.220,3478,421,0,alive,-,CN,8.130.54.220,AS
 turn://81.85.75.252:3478,turn,81.85.75.252,3478,423,0,alive,-,KG,81.85.75.252,AS50053 Anton Levin,Anton Levin,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://182.61.59.185:3478,turn,182.61.59.185,3478,423,0,alive,-,CN,182.61.59.185,AS38365 Baidu Cloud,Baidu Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://8.130.55.156:3478,turn,8.130.55.156,3478,423,0,alive,-,CN,8.130.55.156,AS37963 Hangzhou Alibaba Advertising Co,Hangzhou Alibaba Advertising Co,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://180.102.135.166:3479,turn,180.102.135.166,3479,423,0,alive,-,CN,180.102.135.166,AS134756 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
+turn://180.102.135.166:3479,turn,180.102.135.166,3479,423,0,alive,-,CN,180.102.135.166,AS134756 China Telecom,China Telecom,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://47.92.218.112:3478,turn,47.92.218.112,3478,424,0,alive,-,CN,47.92.218.112,AS37963 Hangzhou Alibaba Advertising Co,Hangzhou Alibaba Advertising Co,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://106.54.164.16:3478,turn,106.54.164.16,3478,424,0,alive,-,CN,106.54.164.16,AS45090 Tencent Cloud,Tencent Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://46.39.0.53:3478,turn,46.39.0.53,3478,427,0,alive,-,RU,46.39.0.53,AS52015 Dancer LLC,Dancer LLC,datacenter,2026-10-01 00:00:00,@danfeng_chat
+turn://46.39.0.53:3478,turn,46.39.0.53,3478,427,0,alive,-,RU,46.39.0.53,AS52015 Dancer LLC,Dancer LLC,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://1.92.64.153:3478,turn,1.92.64.153,3478,428,0,alive,-,CN,1.92.64.153,AS55990 Huawei Cloud Service data center,Huawei Cloud Service data center,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://167.235.205.83:3478,turn,167.235.205.83,3478,430,0,alive,-,DE,167.235.205.83,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://168.119.186.158:3478,turn,168.119.186.158,3478,430,0,alive,-,DE,168.119.186.158,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -617,5 +617,5 @@ turn://120.55.55.6:3478,turn,120.55.55.6,3478,1063,0,alive,-,CN,120.55.55.6,AS37
 turn://52.76.5.46:3478,turn,52.76.5.46,3478,1169,0,alive,-,SG,52.76.5.46,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://47.99.50.91:3478,turn,47.99.50.91,3478,1186,0,alive,-,CN,47.99.50.91,AS37963 Hangzhou Alibaba Advertising Co,Hangzhou Alibaba Advertising Co,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://64.227.181.9:3478,turn,64.227.181.9,3478,1228,0,alive,-,IN,64.227.181.9,AS14061 DigitalOcean,DigitalOcean,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://123.150.1.2:3478,turn,123.150.1.2,3478,1479,0,alive,-,CN,123.150.1.2,AS17638 ASN for TIANJIN Provincial Net of CT,ASN for TIANJIN Provincial Net of CT,datacenter,2026-10-01 00:00:00,@danfeng_chat
+turn://123.150.1.2:3478,turn,123.150.1.2,3478,1479,0,alive,-,CN,123.150.1.2,AS17638 ASN for TIANJIN Provincial Net of CT,ASN for TIANJIN Provincial Net of CT,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://159.75.236.44:3478,turn,159.75.236.44,3478,1669,0,alive,-,CN,159.75.236.44,AS45090 Tencent Cloud,Tencent Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat

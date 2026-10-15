@@ -2036,7 +2036,7 @@
     "asn": "58351",
     "asOrganization": "IE Dudin Dmitriy Viktorovich",
     "isp": "IE Dudin Dmitriy Viktorovich",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "vpngate"
   },
   {
@@ -2936,7 +2936,7 @@
     "asn": "9762",
     "asOrganization": "kt HCN Co.,Ltd.",
     "isp": "kt HCN Co.,Ltd.",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "vpngate"
   },
   {
@@ -2996,7 +2996,7 @@
     "asn": "196949",
     "asOrganization": "Natalia Sergeevna Filicheva",
     "isp": "Natalia Sergeevna Filicheva",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "vpngate"
   },
   {
@@ -3041,7 +3041,7 @@
     "asn": "18268",
     "asOrganization": "Naganoken Kyodou Densan Co.Ltd.",
     "isp": "Naganoken Kyodou Densan Co.Ltd.",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "vpngate"
   },
   {
@@ -5096,7 +5096,7 @@
     "asn": "44347",
     "asOrganization": "Limited Company \"SiNT\"",
     "isp": "Limited Company \"SiNT\"",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "vpngate"
   },
   {
@@ -5846,7 +5846,7 @@
     "asn": "37892",
     "asOrganization": "Cable Media WAIWAI Co.,Ltd.",
     "isp": "Cable Media WAIWAI Co.,Ltd.",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "vpngate"
   },
   {
@@ -6221,7 +6221,7 @@
     "asn": "55430",
     "asOrganization": "Starhub Ltd.",
     "isp": "Starhub Ltd.",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "vpngate"
   },
   {
