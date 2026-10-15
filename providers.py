@@ -142,7 +142,7 @@ KNOWN_CLOUD_PROVIDERS = {
     "xnnet": ("AS6134", "Xnnet"),
     "jttelecom": ("AS137535", "JT Telecom"),
     "maxwell": ("AS62711", "Maxwell Telecom"),
-    "as56971": ("AS56971", "AS56971 Cloud"),
+    "as56971": ("AS56971", "CGI GLOBAL LIMITED"),
     "as3800": ("AS3800", "AS3800 LLC"),
     "ace": ("AS139341", "ACE Data Center"),
     "baykov": ("AS41745", "Baykov Ilya"),
@@ -282,10 +282,10 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS34343": "datacenter",  # BIP Backbone ASN / Eweka (eweka.nl, ipinfo核准为hosting)
     "AS39618": "datacenter",  # HostCram LLC (hostcram.com, 主机商)
     "AS44382": "datacenter",  # FibaCloud (fibacloud.com, 云服务器机房)
-    "AS45090": "datacenter",  # 腾讯云节点/西部数码 (tencent.com, 权威机房)
+    "AS45090": "datacenter",  # 腾讯云 (Shenzhen Tencent Computer Systems Company Limited, tencent.com)
     "AS49870": "datacenter",  # Alsycon B.V. (as49870.net, 云主机托管)
     "AS55933": "datacenter",  # Cloudie Limited (worria.com, 云主机托管)
-    "AS56971": "datacenter",  # AS56971 Cloud (hostvds.com, 云主机)
+    "AS56971": "datacenter",  # CGI GLOBAL LIMITED (hostvds.com, 香港云主机)
     "AS61112": "datacenter",  # AkileCloud Network (akilecloud.com, 云服务器机房)
     "AS62651": "datacenter",  # Strong Technology, LLC (strongtechnology.net, 算力服务器)
     "AS134677": "datacenter", # Dromatics Systems Pte Ltd (drosys.com, 机房 IDC)
@@ -323,7 +323,7 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS4787": "isp",          # PT Cyberindo Aditama (cbn.id, 印尼知名民用光纤宽带 CBN)
     "AS135130": "isp",        # Anik Computer & Networking (aniknetwork.net, 孟加拉民用宽带ISP)
     "AS197275": "isp",        # Link Telecom NN Ltd. (lt-nn.net, 俄罗斯下诺夫哥罗德电信运营商)
-    "AS16814": "isp",         # NSS S.A. / IPLAN (iplan.com.ar, 阿根廷主流光纤运营商)
+    "AS16814": "isp",         # NSS S.A. (IPLAN Telecomunicaciones, iplan.com.ar, 阿根廷主流光纤运营商)
     "AS34665": "isp",         # Petersburg Internet Network (pindc.ru, 圣彼得堡电信与宽带运营商)
     "AS35540": "isp",         # OVH SAS / OVH Telecom (ovhcloud.com, 法国电信与宽带接入网)
 
