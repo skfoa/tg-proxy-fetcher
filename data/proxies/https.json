@@ -1140,6 +1140,21 @@
     "source": "EDT-Pages"
   },
   {
+    "proxy": "https://134.1.7.9:443",
+    "protocol": "https",
+    "ip": "134.1.7.9",
+    "port": 443,
+    "country": "DE",
+    "country_name": "德国",
+    "country_cn": "德国",
+    "country_emoji": "🇩🇪",
+    "asn": "680",
+    "asOrganization": "Awinet",
+    "isp": "Awinet",
+    "net_type": "education",
+    "source": "EDT-Pages"
+  },
+  {
     "proxy": "https://62.210.27.111:443",
     "protocol": "https",
     "ip": "62.210.27.111",
@@ -1335,6 +1350,36 @@
     "source": "EDT-Pages"
   },
   {
+    "proxy": "https://113.23.216.128:9088",
+    "protocol": "https",
+    "ip": "113.23.216.128",
+    "port": 9088,
+    "country": "MY",
+    "country_name": "马来西亚",
+    "country_cn": "马来西亚",
+    "country_emoji": "🇲🇾",
+    "asn": "38182",
+    "asOrganization": "Webserver Dedicated Hosting",
+    "isp": "Webserver Dedicated Hosting",
+    "net_type": "isp",
+    "source": "EDT-Pages"
+  },
+  {
+    "proxy": "https://88.135.143.159:443",
+    "protocol": "https",
+    "ip": "88.135.143.159",
+    "port": 443,
+    "country": "LV",
+    "country_name": "LV",
+    "country_cn": "LV",
+    "country_emoji": "🇱🇻",
+    "asn": "24589",
+    "asOrganization": "Telenet SIA",
+    "isp": "Telenet SIA",
+    "net_type": "isp",
+    "source": "EDT-Pages"
+  },
+  {
     "proxy": "https://82.96.128.175:8090",
     "protocol": "https",
     "ip": "82.96.128.175",
@@ -1422,6 +1467,21 @@
     "asOrganization": "ARNES",
     "isp": "ARNES",
     "net_type": "education",
+    "source": "EDT-Pages"
+  },
+  {
+    "proxy": "https://217.108.6.203:443",
+    "protocol": "https",
+    "ip": "217.108.6.203",
+    "port": 443,
+    "country": "FR",
+    "country_name": "法国",
+    "country_cn": "法国",
+    "country_emoji": "🇫🇷",
+    "asn": "16347",
+    "asOrganization": "UNYC SAS",
+    "isp": "UNYC SAS",
+    "net_type": "isp",
     "source": "EDT-Pages"
   },
   {
@@ -1571,6 +1631,21 @@
     "asn": "8400",
     "asOrganization": "TELEKOM SRBIJA a.d.",
     "isp": "TELEKOM SRBIJA a.d.",
+    "net_type": "isp",
+    "source": "EDT-Pages"
+  },
+  {
+    "proxy": "https://113.23.216.129:9088",
+    "protocol": "https",
+    "ip": "113.23.216.129",
+    "port": 9088,
+    "country": "MY",
+    "country_name": "马来西亚",
+    "country_cn": "马来西亚",
+    "country_emoji": "🇲🇾",
+    "asn": "38182",
+    "asOrganization": "Webserver Dedicated Hosting",
+    "isp": "Webserver Dedicated Hosting",
     "net_type": "isp",
     "source": "EDT-Pages"
   },
@@ -2250,6 +2325,21 @@
     "source": "EDT-Pages"
   },
   {
+    "proxy": "https://181.126.49.38:443",
+    "protocol": "https",
+    "ip": "181.126.49.38",
+    "port": 443,
+    "country": "PY",
+    "country_name": "PY",
+    "country_cn": "PY",
+    "country_emoji": "🇵🇾",
+    "asn": "23201",
+    "asOrganization": "Telecel S.A.",
+    "isp": "Telecel S.A.",
+    "net_type": "isp",
+    "source": "EDT-Pages"
+  },
+  {
     "proxy": "https://162.191.87.112:8443",
     "protocol": "https",
     "ip": "162.191.87.112",
@@ -2367,6 +2457,21 @@
     "asOrganization": "Vodafone Americas",
     "isp": "Vodafone Americas",
     "net_type": "isp",
+    "source": "EDT-Pages"
+  },
+  {
+    "proxy": "https://14.99.141.239:443",
+    "protocol": "https",
+    "ip": "14.99.141.239",
+    "port": 443,
+    "country": "IN",
+    "country_name": "印度",
+    "country_cn": "印度",
+    "country_emoji": "🇮🇳",
+    "asn": "7633",
+    "asOrganization": "Software Technology Parks of India",
+    "isp": "Software Technology Parks of India",
+    "net_type": "government",
     "source": "EDT-Pages"
   },
   {
@@ -3483,6 +3588,21 @@
     "proxy": "https://79.188.239.44:8443",
     "protocol": "https",
     "ip": "79.188.239.44",
+    "port": 8443,
+    "country": "PL",
+    "country_name": "波兰",
+    "country_cn": "波兰",
+    "country_emoji": "🇵🇱",
+    "asn": "5617",
+    "asOrganization": "static IP",
+    "isp": "static IP",
+    "net_type": "isp",
+    "source": "EDT-Pages"
+  },
+  {
+    "proxy": "https://79.188.239.41:8443",
+    "protocol": "https",
+    "ip": "79.188.239.41",
     "port": 8443,
     "country": "PL",
     "country_name": "波兰",
