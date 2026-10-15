@@ -102,6 +102,7 @@ KNOWN_CLOUD_PROVIDERS = {
     "windscribe": ("AS397540", "Windscribe Limited"),
     "hosttech": ("AS207143", "hosttech GmbH"),
     "taymaz": ("AS216054", "Taymaz Gostaran Naghshe Almas"),
+    "mtfinance": ("AS214822", "MT FINANCE LLC"),
     # 下游分销/租户品牌（无独立 ASN，现网美西等节点复用 DigitalOcean AS14061；first-win 确保反查标准名锁定为 DigitalOcean）
     "bagevm": ("AS14061", "BageVM"),
     "netlab": ("AS979", "NetLab"),
@@ -209,6 +210,7 @@ _CORE_BASELINE_NET_TYPES: dict[str, str] = {
     "AS397540": "datacenter", # Windscribe Limited (VPN/代理机房)
     "AS207143": "datacenter", # hosttech GmbH (瑞士机房/主机托管)
     "AS216054": "datacenter", # Taymaz Gostaran Naghshe Almas Co. (Ltd) (算力IDC)
+    "AS214822": "datacenter", # MT FINANCE LLC (算力/主机机房)
 }
 
 # 权威已知云厂商与核心骨干网 SSOT 网络类型基准表
@@ -304,6 +306,7 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS397540": "datacenter", # Windscribe Limited (VPN/代理机房)
     "AS207143": "datacenter", # hosttech GmbH (瑞士机房/主机托管)
     "AS216054": "datacenter", # Taymaz Gostaran Naghshe Almas Co. (Ltd) (算力IDC)
+    "AS214822": "datacenter", # MT FINANCE LLC (算力/主机机房)
 
     # --- [L0 裁决 B: 知名正牌民用宽带 ISP，人工确证为 isp] ---
     "AS1257": "isp",          # Tele2 Sverige AB (欧洲顶级电信与家庭宽带)
@@ -2184,6 +2187,7 @@ HOSTING_EXCLUSIONS = (
     "xtom", "synlinq", "tzulo", "drosys", "dromatics", "nktele",
     "moedove", "fiberxpress", "skyquantum", "gsl networks", "idc cube", "idc",
     "oracle", "windscribe", "hosttech", "taymaz",
+    "mt finance", "mtfinance",
 )
 
 EDU_PATTERNS = (
@@ -2353,11 +2357,7 @@ def classify_asn(asn_str: str | None, isp_str: str | None = "") -> str:
     if any(p in text for p in GOV_PATTERNS):
         return "government"
 
-    # 3. 识别银行与金融专网 (对中央银行、信用社与知名金融机构)
-    if any(p in text for p in BANKING_PATTERNS):
-        return "banking"
-
-    # 4. 排除机房/主机商（对短词如 host/vps/colo 使用独立单词边界匹配，杜绝 ghost/colorado 等误杀）
+    # 3. 排除机房/主机商（对短词如 host/vps/colo 使用独立单词边界匹配，杜绝 ghost/colorado 等误杀）
     is_hosting = False
     for h in HOSTING_EXCLUSIONS:
         if len(h) <= 4:
@@ -2370,6 +2370,10 @@ def classify_asn(asn_str: str | None, isp_str: str | None = "") -> str:
 
     if is_hosting:
         return "datacenter"
+
+    # 4. 识别银行与金融专网 (对中央银行、信用社与知名金融机构)
+    if any(p in text for p in BANKING_PATTERNS):
+        return "banking"
 
     # 5. 识别商业专线
     if any(p in text for p in BIZ_PATTERNS):
