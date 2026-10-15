@@ -345,6 +345,12 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS200239": "datacenter", # Bogahost Bilisim (土耳其主机托管)
     "AS210993": "datacenter", # Spacecore Solution Ltd (欧洲云主机机房)
     "AS135636": "datacenter", # PT. RACKH LINTAS ASIA (rackh.co.id, 印尼机房)
+    "AS1299": "datacenter",   # Arelion Sweden AB / Telia Carrier (Tier 1 国际骨干/中继机房, 非民用宽带)
+    "AS3257": "datacenter",   # GTT Communications (Tier 1 国际骨干/中继机房, 非民用宽带)
+    "AS58682": "datacenter",  # Level3 Carrier Limited / Lumen (Tier 1 国际骨干中继, 非民用宽带)
+    "AS273961": "datacenter", # Cogent Communications (国际骨干中继机房)
+    "AS273007": "datacenter", # Cogent Communications (国际骨干中继机房)
+    "AS274414": "datacenter", # Cogent Communications (国际骨干中继机房)
 
     # --- [L0 裁决 B: 知名正牌民用宽带 ISP，权威核准为 isp] ---
     "AS1257": "isp",          # Tele2 Sverige AB (tele2.com, 欧洲顶级电信与家庭宽带)
@@ -368,6 +374,17 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS272605": "isp",        # Grupo Ultra Fibra (巴西宽带ISP)
     "AS36902": "isp",         # Intelvision Ltd (塞舌尔宽带ISP)
     "AS24550": "isp",         # Websurfer Nepal Communication System (尼泊尔宽带ISP)
+    "AS14593": "isp",         # SpaceX Services / Starlink (星链低轨卫星民用宽带)
+    "AS134760": "isp",        # CHINANET Hebei (中国电信河北民用原生宽带)
+    "AS134420": "isp",        # CHINANET Chongqing (中国电信重庆民用原生宽带)
+    "AS137694": "isp",        # CHINANET Xinjiang (中国电信新疆民用原生宽带)
+    "AS137697": "isp",        # CHINANET Jiangsu (中国电信江苏民用原生宽带)
+    "AS4773": "isp",          # M1 LIMITED (新加坡主流电信与家庭光纤宽带)
+    "AS17547": "isp",         # M1 NET LTD (新加坡 M1 宽带网)
+    "AS8708": "isp",          # DIGI ROMANIA S.A. (罗马尼亚第一大民用光纤宽带)
+    "AS27699": "isp",         # TELEFÔNICA BRASIL S.A / Vivo (巴西第一大电信与民用光纤宽带)
+    "AS7004": "isp",          # TELEFÓNICA CHILE S.A. / Movistar (智利第一大民用光纤宽带)
+    "AS131429": "isp",        # MobiFone (越南主流移动通信与手机蜂窝宽带)
 
     # --- [L0 裁决 C: 核心国际银行金融专网 (人工 SSOT 保护)] ---
     "AS1311": "banking", "AS2600": "banking", "AS3187": "banking", "AS5091": "banking",
@@ -376,6 +393,14 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS9016": "banking", "AS9099": "banking", "AS9118": "banking", "AS9128": "banking",
     "AS9221": "banking", "AS9487": "banking", "AS9522": "banking", "AS9630": "banking",
     "AS9772": "banking", "AS9863": "banking", "AS25883": "banking", "AS207986": "banking",
+
+    # --- [L0 裁决 D: 核心学术科研教育网 (权威核准为 education)] ---
+    "AS9488": "education",    # Seoul National University / SNU (首尔大学)
+    "AS199578": "education",  # Verein zur Foerderung eines Deutschen Forschungsnetzes e.V. (DFN, 德国国家科研教育网)
+    "AS3132": "education",    # Red Cientifica Peruana / RCP (秘鲁科研学术网)
+
+    # --- [L0 裁决 E: 商业企业专线与骨干中继 (权威核准为 business)] ---
+    "AS174": "business",      # Cogent Communications, LLC (Tier 1 国际骨干/企业中继专线, 非民用宽带)
 }
 
 
