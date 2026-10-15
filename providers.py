@@ -337,7 +337,7 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS38136": "datacenter",  # Akari Networks Limited (akarinetworks.com, 香港IDC)
     "AS14315": "datacenter",  # 1GSERVERS, LLC (1gservers.com, Phoenix机房)
     "AS7738": "datacenter",   # V.tal (vtal.com, 巴西国际海缆骨干)
-    "AS202996": "datacenter", # Ondrej Vrana / Helkor (cbe-hosting.com, 捷克机房)
+    "AS202996": "datacenter", # Helkor (Ondrej Vrana, cbe-hosting.com, 捷克机房)
     "AS214159": "datacenter", # UAB Cherry Servers (balticservers.com, 立陶宛机房)
     "AS59642": "datacenter",  # UAB Cherry Servers (balticservers.com, 立陶宛机房)
     "AS213840": "datacenter", # DDOS PROTECTION LTD (英国高防机房)

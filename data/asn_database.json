@@ -945,7 +945,7 @@
     "U1Host": "AS213877",
     "UAB Bacloud": "AS61272",
     "UAB Baltnetos komunikacijos": "AS15440",
-    "UAB Cherry Servers": "AS214159",
+    "UAB Cherry Servers": "AS204770",
     "UAB ESNET": "AS61053",
     "UAB Interneto vizija": "AS212531",
     "UCloud": "AS138915",
@@ -2153,7 +2153,13 @@
     "Websurfer Nepal": "AS24550",
     "PT. RACKH LINTAS ASIA": "AS135636",
     "rackh.co.id": "AS135636",
-    "Vtal Rede Neutra": "AS7738"
+    "Vtal Rede Neutra": "AS7738",
+    "Cherry Servers": "AS204770",
+    "CHERRYSERVERS3-AS": "AS204770",
+    "CHERRYSERVERS5-AS": "AS214159",
+    "Helkor": "AS202996",
+    "Ondrej Vrana": "AS202996",
+    "Helkor (Ondrej Vrana)": "AS202996"
   },
   "asn_to_isp": {
     "AS174": "Cogent Communications, LLC",
@@ -3298,7 +3304,7 @@
     "AS274029": "KAZAV LATAM E.I.R.L.",
     "AS153719": "Queens link technology Inc.",
     "AS41281": "KeFF Networks Ltd",
-    "AS202996": "Ondrej Vrana (Helkor)",
+    "AS202996": "Helkor (Ondrej Vrana)",
     "AS150208": "CV Sinar Kencana",
     "AS38071": "Nationwide Internet & Data Connectivity Provider",
     "AS152059": "CV Brawijaya Giga Network",
