@@ -365,12 +365,14 @@ async def probe_http(
     max_latency_ms: int = 0,
 ) -> tuple[bool, int, str, str, str, str]:
     """
-    HTTP / HTTPS 代理鉴真：
+    HTTP / HTTPS 代理双模稳健鉴真 (RFC 7230 正向代理绝对 URI + RFC 2817 SSL CONNECT 443 隧道)：
     1. 若 is_ssl=True (HTTPS 代理)，首先与代理服务器完成 TLS 加密握手 (支持老旧版本与 SECLEVEL=0)
-    2. 发送 CONNECT speed.cloudflare.com:80 隧道请求 (若有账密带 Proxy-Authorization)
-    3. 穿透隧道发送 GET /cdn-cgi/trace 并提取 colo, country 与 egress_ip
-    4. 若 CONNECT 阶段无响应或超时直接判死；仅当收到明确的非 200 HTTP 响应（如 403/405）时才回退至 Forward GET
-    5. 若配置了 max_latency_ms (>0) 且总探测延迟超过该上限，直接判定为 slow_timeout 淘汰
+    2. 阶段 1 (高速直通): 优先发送标准 RFC 7230 §5.3.2 绝对 URI GET 请求 (GET http://speed.cloudflare.com/cdn-cgi/trace)
+       - 单 RTT 直接穿透，若返回 200 OK 并解析出 colo/ip 即判定存活
+    3. 阶段 2 (隧道回退): 若代理不支持绝对 URI (如专职隧道网关)，自动回退发送标准 CONNECT speed.cloudflare.com:443 隧道请求
+       - 严禁向 80 端口发送 CONNECT（避免触发 Squid/Apache 等标准代理的安全 ACL 403 阻断）
+       - 隧道返回 200 Connection Established 即可判定存活
+    4. 延迟保护: 若配置了 max_latency_ms (>0) 且总探测延迟超过上限，判定为 slow_timeout 淘汰
     返回 (is_alive, delay_ms, status, colo, country, egress_ip)
     """
     connect_host = host
@@ -396,30 +398,71 @@ async def probe_http(
         is_ip = bool(re.match(r"^\d{1,3}(?:\.\d{1,3}){3}$", host))
         sni = None if is_ip else host
 
+    auth_header = ""
+    if user and pwd:
+        cred = base64.b64encode(f"{user}:{pwd}".encode()).decode()
+        auth_header = f"Proxy-Authorization: Basic {cred}\r\n"
+
     t0 = time.monotonic()
+
+    # --- 阶段 1: 优先尝试标准 HTTP 正向代理绝对路径穿透 (RFC 7230 §5.3.2 绝对 URI 请求模式，单 RTT 高速探测) ---
+    writer = None
     try:
         reader, writer = await asyncio.wait_for(
             asyncio.open_connection(connect_host, port, ssl=ssl_ctx, server_hostname=sni),
             timeout=connect_timeout,
         )
-    except asyncio.TimeoutError:
-        return False, 0, "timeout", "", "", ""
-    except ssl.SSLError as e:
-        log.debug("HTTP(S) 节点 TLS 握手异常 [%s:%s]: %s", host, port, e)
-        return False, 0, "tls_err", "", "", ""
-    except Exception:
-        return False, 0, "conn_err", "", "", ""
+        forward_req = (
+            f"GET http://{PROBE_HOST}{PROBE_PATH} HTTP/1.1\r\n"
+            f"Host: {PROBE_HOST}\r\n"
+            f"{auth_header}"
+            f"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36\r\n"
+            f"Proxy-Connection: close\r\n"
+            f"Connection: close\r\n"
+            f"\r\n"
+        ).encode("latin1")
+        writer.write(forward_req)
+        await asyncio.wait_for(writer.drain(), timeout=connect_timeout)
 
+        resp = await asyncio.wait_for(reader.read(2048), timeout=http_timeout)
+        await safe_close_writer(writer)
+        writer = None
+
+        resp_text = resp.decode("utf-8", errors="ignore") if resp else ""
+        first_line = resp_text.splitlines()[0] if resp_text else ""
+
+        if re.search(r"\b200\b", first_line) and ("colo=" in resp_text or "ip=" in resp_text):
+            lat = max(1, int((time.monotonic() - t0) * 1000))
+            colo_match = re.search(r"\bcolo=([A-Za-z0-9]+)\b", resp_text)
+            colo = colo_match.group(1).upper() if colo_match else ""
+            loc_match = re.search(r"\bloc=([A-Za-z]{2})\b", resp_text)
+            country = loc_match.group(1).upper() if loc_match else ""
+            ip_match = re.search(r"\bip=([0-9a-fA-F.:]+)\b", resp_text)
+            egress_ip = ip_match.group(1).strip() if ip_match else ""
+            if max_latency_ms > 0 and lat > max_latency_ms:
+                return False, lat, "slow_timeout", "", "", ""
+            return True, lat, "alive", colo, country, egress_ip
+    except (asyncio.TimeoutError, ssl.SSLError, ConnectionRefusedError, ConnectionResetError, BrokenPipeError, socket.gaierror, OSError):
+        if writer is not None:
+            await safe_close_writer(writer)
+            writer = None
+    except Exception as e:
+        log.debug("HTTP(S) 绝对 URI 探测异常 [%s:%s]: %s", host, port, e)
+        if writer is not None:
+            await safe_close_writer(writer)
+            writer = None
+
+    # --- 阶段 2: 回退标准 CONNECT 443 隧道探测 (RFC 2817 / RFC 7231 §4.3.6) ---
+    t0_connect = time.monotonic()
+    writer = None
     try:
-        auth_header = ""
-        if user and pwd:
-            cred = base64.b64encode(f"{user}:{pwd}".encode()).decode()
-            auth_header = f"Proxy-Authorization: Basic {cred}\r\n"
-
-        # 尝试标准 CONNECT 隧道
+        reader, writer = await asyncio.wait_for(
+            asyncio.open_connection(connect_host, port, ssl=ssl_ctx, server_hostname=sni),
+            timeout=connect_timeout,
+        )
         connect_req = (
-            f"CONNECT {PROBE_HOST}:{PROBE_PORT} HTTP/1.1\r\n"
-            f"Host: {PROBE_HOST}:{PROBE_PORT}\r\n"
+            f"CONNECT {PROBE_HOST}:443 HTTP/1.1\r\n"
+            f"Host: {PROBE_HOST}:443\r\n"
             f"{auth_header}"
             f"Proxy-Connection: close\r\n"
             f"Connection: close\r\n"
@@ -428,55 +471,20 @@ async def probe_http(
         writer.write(connect_req)
         await asyncio.wait_for(writer.drain(), timeout=connect_timeout)
 
-        try:
-            resp = await asyncio.wait_for(reader.read(1024), timeout=connect_timeout)
-        except asyncio.TimeoutError:
-            lat = max(1, int((time.monotonic() - t0) * 1000))
-            await safe_close_writer(writer)
-            writer = None
-            return False, lat, "http_connect_timeout", "", "", ""
+        resp = await asyncio.wait_for(reader.read(1024), timeout=connect_timeout)
+        await safe_close_writer(writer)
+        writer = None
 
-        if not resp:
-            lat = max(1, int((time.monotonic() - t0) * 1000))
-            await safe_close_writer(writer)
-            writer = None
-            return False, lat, "conn_reset", "", "", ""
-
-        resp_text = resp.decode("latin1", errors="ignore")
+        resp_text = resp.decode("latin1", errors="ignore") if resp else ""
         first_line = resp_text.splitlines()[0] if resp_text else ""
 
         if re.search(r"\b200\b", first_line):
-            # 隧道建立成功，发送 HTTP 穿透
-            probe = (
-                f"GET {PROBE_PATH} HTTP/1.1\r\n"
-                f"Host: {PROBE_HOST}\r\n"
-                f"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36\r\n"
-                f"Connection: close\r\n"
-                f"\r\n"
-            ).encode("latin1")
-            writer.write(probe)
-            await asyncio.wait_for(writer.drain(), timeout=http_timeout)
-            http_resp = await read_full_response(reader, http_timeout, need_body=True)
-            http_text = http_resp.decode("utf-8", errors="ignore")
-            colo_match = re.search(r"\bcolo=([A-Za-z0-9]+)\b", http_text)
-            colo = colo_match.group(1).upper() if colo_match else ""
-            loc_match = re.search(r"\bloc=([A-Za-z]{2})\b", http_text)
-            country = loc_match.group(1).upper() if loc_match else ""
-            ip_match = re.search(r"\bip=([0-9a-fA-F.:]+)\b", http_text)
-            egress_ip = ip_match.group(1).strip() if ip_match else ""
-            lat = max(1, int((time.monotonic() - t0) * 1000))
-            probe_first_line = http_text.splitlines()[0] if http_text else ""
-            if re.search(r"\b200\b", probe_first_line) and colo:
-                if max_latency_ms > 0 and lat > max_latency_ms:
-                    return False, lat, "slow_timeout", "", "", ""
-                return True, lat, "alive", colo, country, egress_ip
-            # 隧道已成功建立但目标穿透失败，直接判死
-            return False, lat, "http_fail", "", "", ""
+            lat = max(1, int((time.monotonic() - t0_connect) * 1000))
+            if max_latency_ms > 0 and lat > max_latency_ms:
+                return False, lat, "slow_timeout", "", "", ""
+            return True, lat, "alive", "-", "", connect_host
 
-        # CONNECT 返回非 200 响应（如 400/403/405/502 等拒绝对外建联），直接判定失败淘汰，彻底杜绝二次重连耗时
-        lat = max(1, int((time.monotonic() - t0) * 1000))
-        await safe_close_writer(writer)
-        writer = None
+        lat = max(1, int((time.monotonic() - t0_connect) * 1000))
         return False, lat, "http_connect_fail", "", "", ""
     except asyncio.TimeoutError:
         return False, 0, "timeout", "", "", ""
