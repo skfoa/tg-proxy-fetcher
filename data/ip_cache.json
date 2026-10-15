@@ -15882,5 +15882,128 @@
     "net_type": "datacenter",
     "country": "HR",
     "resolved_ip": "150.40.105.25"
+  },
+  "118.43.46.209": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn533782617.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "118.43.46.209"
+  },
+  "211.198.114.85": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn538086362.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "211.198.114.85"
+  },
+  "136.33.113.84": {
+    "asn": "AS16591",
+    "isp": "Google Fiber Inc.",
+    "net_type": "isp",
+    "country": "US"
+  },
+  "vpn794685154.opengw.net": {
+    "asn": "AS16591",
+    "isp": "Google Fiber Inc.",
+    "net_type": "isp",
+    "country": "US",
+    "resolved_ip": "136.33.113.84"
+  },
+  "112.69.216.77": {
+    "asn": "AS17511",
+    "isp": "OPTAGE Inc.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn381848834.opengw.net": {
+    "asn": "AS17511",
+    "isp": "OPTAGE Inc.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "112.69.216.77"
+  },
+  "14.36.80.182": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn811418738.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "14.36.80.182"
+  },
+  "182.170.104.77": {
+    "asn": "AS2527",
+    "isp": "Sony Network Communications Inc.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn154774581.opengw.net": {
+    "asn": "AS2527",
+    "isp": "Sony Network Communications Inc.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "182.170.104.77"
+  },
+  "219.28.138.78": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn475501975.opengw.net": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "219.28.138.78"
+  },
+  "122.42.193.245": {
+    "asn": "AS17858",
+    "isp": "LG POWERCOMM",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn872330602.opengw.net": {
+    "asn": "AS17858",
+    "isp": "LG POWERCOMM",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "122.42.193.245"
+  },
+  "126.88.155.137": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn172725659.opengw.net": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "126.88.155.137"
+  },
+  "133.123.244.41": {
+    "asn": "AS7522",
+    "isp": "STNet, Incorporated",
+    "net_type": "isp",
+    "country": "JP"
   }
 }

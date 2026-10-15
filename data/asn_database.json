@@ -2051,7 +2051,14 @@
     "GHSX": "AS137718",
     "Hangzhou Alibaba Advertising Co": "AS37963",
     "Pacific Wyyerd LLC": "AS400391",
-    "HYUNDAI COMMUNICATIONS & NETWORK": "AS9981"
+    "HYUNDAI COMMUNICATIONS & NETWORK": "AS9981",
+    "United Enterprises & CO Ltd.": "AS151638",
+    "COLOMBIATEL TELECOMUNICACIONES": "AS266877",
+    "Live Fibernet": "AS138746",
+    "Henet Telecomunicacoes Ltda": "AS52974",
+    "Orbitel Telecomunicações e Informática Ltda": "AS266087",
+    "Massachusetts Institute of Technology": "AS3",
+    "Google Fiber Inc.": "AS16591"
   },
   "asn_to_isp": {
     "AS174": "Cogent Communications, LLC",
@@ -4094,7 +4101,16 @@
     "AS137718": "GHSX",
     "AS37963": "Hangzhou Alibaba Advertising Co",
     "AS400391": "Pacific Wyyerd LLC",
-    "AS9981": "HYUNDAI COMMUNICATIONS & NETWORK"
+    "AS9981": "HYUNDAI COMMUNICATIONS & NETWORK",
+    "AS151638": "United Enterprises & CO Ltd.",
+    "AS266877": "COLOMBIATEL TELECOMUNICACIONES",
+    "AS138746": "Live Fibernet",
+    "AS52974": "Henet Telecomunicacoes Ltda",
+    "AS266087": "Orbitel Telecomunicações e Informática Ltda",
+    "AS3": "Massachusetts Institute of Technology",
+    "AS56042": "China Mobile Communications Corporation",
+    "AS24547": "China Mobile Communications Corporation",
+    "AS16591": "Google Fiber Inc."
   },
   "asn_to_net_type": {
     "AS1311": "banking",
@@ -7315,6 +7331,14 @@
     "AS56046": "isp",
     "AS137718": "datacenter",
     "AS400391": "isp",
-    "AS9981": "datacenter"
+    "AS9981": "datacenter",
+    "AS151638": "business",
+    "AS266877": "isp",
+    "AS138746": "isp",
+    "AS52974": "isp",
+    "AS266087": "isp",
+    "AS3": "education",
+    "AS56042": "isp",
+    "AS24547": "isp"
   }
 }
