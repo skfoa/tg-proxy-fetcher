@@ -92,12 +92,13 @@ KNOWN_CLOUD_PROVIDERS = {
     "racknerd": ("AS36352", "RackNerd"),
     "buyvm": ("AS53667", "BuyVM FranTech"),
     "frantech": ("AS53667", "BuyVM FranTech"),
-    "hostdare": ("AS397373", "HostDare"),
+    "h4y": ("AS397373", "H4Y Technologies LLC"),
+    "hostdare": ("AS397373", "H4Y Technologies LLC"),  # 品牌 HostDare 挂载于 H4Y Technologies LLC
     "pegtech": ("AS54600", "PEG TECH INC"),
-    "misaka": ("AS54600", "Misaka"),
+    "misaka": ("AS54600", "PEG TECH INC"),             # 品牌 Misaka 挂载于 PEG TECH INC
     "kurun": ("AS13768", "Kurun Cloud"),
-    "spartan": ("AS201106", "SpartanHost"),
-    "spartanhost": ("AS201106", "SpartanHost"),
+    "spartan": ("AS201106", "Spartan Host Ltd"),       # 品牌 SpartanHost
+    "spartanhost": ("AS201106", "Spartan Host Ltd"),
     "wap": ("AS149798", "WAP.ac"),
     "windscribe": ("AS397540", "Windscribe Limited"),
     "hosttech": ("AS207143", "hosttech GmbH"),
@@ -218,6 +219,9 @@ _CORE_BASELINE_NET_TYPES: dict[str, str] = {
     "AS206069": "datacenter", # Cornseed Limited (IDC/主机机房)
     "AS137535": "datacenter", # JT Telecom International / JTTI (jtti.cc, 云主机/机房)
     "AS205548": "datacenter", # Zouter Limited (zouter.io, 云主机/VPS)
+    "AS397373": "datacenter", # H4Y Technologies LLC / HostDare (hostdare.com, 云主机/机房)
+    "AS54600": "datacenter",  # PEG TECH INC (misaka.io, 云主机/机房)
+    "AS201106": "datacenter", # Spartan Host Ltd (spartanhost.org, VPS/主机)
 }
 
 # 权威已知云厂商与核心骨干网 SSOT 网络类型基准表
@@ -318,6 +322,9 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS62642": "datacenter",  # Bigleaf Networks, Inc. (bigleaf.net, ipinfo: hosting)
     "AS137535": "datacenter", # JT Telecom International / JTTI (jtti.cc, 云主机/机房)
     "AS205548": "datacenter", # Zouter Limited (zouter.io, 云主机/VPS)
+    "AS397373": "datacenter", # H4Y Technologies LLC / HostDare (hostdare.com, 云主机/机房)
+    "AS54600": "datacenter",  # PEG TECH INC (misaka.io, 云主机/机房)
+    "AS201106": "datacenter", # Spartan Host Ltd (spartanhost.org, VPS/主机)
 
     # --- [L0 裁决 B: 知名正牌民用宽带 ISP，权威核准为 isp] ---
     "AS1257": "isp",          # Tele2 Sverige AB (tele2.com, 欧洲顶级电信与家庭宽带)
@@ -2205,6 +2212,7 @@ HOSTING_EXCLUSIONS = (
     "moedove", "fiberxpress", "skyquantum", "gsl networks", "idc cube", "idc",
     "oracle", "windscribe", "hosttech", "taymaz",
     "mt finance", "mtfinance", "cornseed", "jtti", "zouter",
+    "hostdare", "misaka", "spartanhost", "h4y", "peg tech",
 )
 
 EDU_PATTERNS = (

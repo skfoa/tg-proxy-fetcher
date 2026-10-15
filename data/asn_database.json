@@ -2117,7 +2117,13 @@
     "jtti.cc": "AS137535",
     "JT TELECOM INTERNATIONAL PTE. LTD.": "AS137535",
     "Zouter Limited": "AS205548",
-    "zouter.io": "AS205548"
+    "zouter.io": "AS205548",
+    "hostdare.com": "AS397373",
+    "H4Y-TECHNOLOGIES": "AS397373",
+    "misaka.io": "AS54600",
+    "PEG-SV": "AS54600",
+    "Spartan Host Ltd": "AS201106",
+    "spartanhost.org": "AS201106"
   },
   "asn_to_isp": {
     "AS174": "Cogent Communications, LLC",
@@ -2832,7 +2838,7 @@
     "AS201048": "Denis Terehov",
     "AS201061": "GITC ApS",
     "AS201094": "Mulgin Alexander Sergeevich",
-    "AS201106": "SpartanHost",
+    "AS201106": "Spartan Host Ltd",
     "AS201575": "TradeZone LLC",
     "AS201601": "Astrec Data OU",
     "AS201667": "ASMBP LLC",
@@ -3098,7 +3104,7 @@
     "AS396982": "Google Cloud",
     "AS397032": "SPARKED HOST LLC",
     "AS397270": "NetInformatik Inc.",
-    "AS397373": "HostDare",
+    "AS397373": "H4Y Technologies LLC",
     "AS397423": "Tier.Net Technologies LLC",
     "AS397730": "coresdev, LLC",
     "AS398101": "GoDaddy.com, LLC",
