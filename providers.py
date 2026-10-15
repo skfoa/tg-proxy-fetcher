@@ -214,7 +214,7 @@ _CORE_BASELINE_NET_TYPES: dict[str, str] = {
     "AS216054": "datacenter", # Taymaz Gostaran Naghshe Almas Co. (Ltd) (算力IDC)
     "AS214822": "datacenter", # MT FINANCE LLC (算力/主机机房)
     "AS206069": "datacenter", # Cornseed Limited (IDC/主机机房)
-    "AS63150": "datacenter",  # BAGE CLOUD LLC (云服务器机房)
+    "AS63150": "isp",         # BAGE CLOUD LLC (机房双ISP/原生住宅IP, ipinfo官方注册类型为ISP)
 }
 
 # 权威已知云厂商与核心骨干网 SSOT 网络类型基准表
@@ -291,7 +291,6 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS56971": "datacenter",  # CGI GLOBAL LIMITED / Cloud (云主机托管)
     "AS61112": "datacenter",  # AKILE / AkileCloud (云服务器机房)
     "AS62651": "datacenter",  # Black Oak Computers MidAtlantic (算力服务器)
-    "AS63150": "datacenter",  # BAGE CLOUD LLC (云服务器)
     "AS134677": "datacenter", # Dromatics Systems Pte Ltd (机房 IDC)
     "AS135130": "datacenter", # Anik Computer & Networking (算力机房)
     "AS136258": "datacenter", # BrainStorm Network, Inc. (机房)
@@ -318,6 +317,7 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS18106": "isp",         # ViewQwest (新加坡/马来西亚知名光纤宽带 ISP)
     "AS34343": "isp",         # Eweka Internet Services B.V. (荷兰宽带)
     "AS9891": "isp",          # CS LOXINFO (泰国主流电信运营商)
+    "AS63150": "isp",         # BAGE CLOUD LLC (机房广播双ISP, 权威ipinfo核准为ISP)
 
     # --- [L0 裁决 C: 核心国际银行金融专网 (人工 SSOT 保护)] ---
     "AS1311": "banking", "AS2600": "banking", "AS3187": "banking", "AS5091": "banking",
@@ -2192,7 +2192,7 @@ HOSTING_EXCLUSIONS = (
     "xtom", "synlinq", "tzulo", "drosys", "dromatics", "nktele",
     "moedove", "fiberxpress", "skyquantum", "gsl networks", "idc cube", "idc",
     "oracle", "windscribe", "hosttech", "taymaz",
-    "mt finance", "mtfinance", "cornseed", "bagecloud", "bage cloud",
+    "mt finance", "mtfinance", "cornseed",
 )
 
 EDU_PATTERNS = (
