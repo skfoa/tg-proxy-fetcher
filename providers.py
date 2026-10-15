@@ -200,6 +200,8 @@ _CORE_BASELINE_NET_TYPES: dict[str, str] = {
     "AS4760": "isp",          # 香港电讯 HKT
     "AS4766": "isp",          # 韩国电信 KT
     "AS9318": "isp",          # 韩国 SK Broadband
+    "AS62711": "isp",         # Maxwell Telecom LLC (ipinfo: ISP)
+    "AS63150": "isp",         # BAGE CLOUD LLC (机房双ISP/原生住宅IP, ipinfo官方注册类型为ISP)
     # 核心云厂商机房 (权威锁定为 datacenter)
     "AS13335": "datacenter",  # Cloudflare
     "AS15169": "datacenter",  # Google
@@ -216,8 +218,6 @@ _CORE_BASELINE_NET_TYPES: dict[str, str] = {
     "AS206069": "datacenter", # Cornseed Limited (IDC/主机机房)
     "AS137535": "datacenter", # JT Telecom International / JTTI (jtti.cc, 云主机/机房)
     "AS205548": "datacenter", # Zouter Limited (zouter.io, 云主机/VPS)
-    "AS62711": "isp",         # Maxwell Telecom LLC (ipinfo: ISP)
-    "AS63150": "isp",         # BAGE CLOUD LLC (机房双ISP/原生住宅IP, ipinfo官方注册类型为ISP)
 }
 
 # 权威已知云厂商与核心骨干网 SSOT 网络类型基准表
