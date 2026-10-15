@@ -201,6 +201,7 @@ _CORE_BASELINE_NET_TYPES: dict[str, str] = {
     "AS4760": "isp",          # 香港电讯 HKT
     "AS4766": "isp",          # 韩国电信 KT
     "AS9318": "isp",          # 韩国 SK Broadband
+    "AS17621": "isp",         # 中国联通上海网络 (China Unicom Shanghai network)
     "AS62711": "isp",         # Maxwell Telecom LLC (ipinfo: ISP)
     "AS63150": "isp",         # BAGE CLOUD LLC (机房双ISP/原生住宅IP, ipinfo官方注册类型为ISP)
     # 核心云厂商机房 (权威锁定为 datacenter)
@@ -219,6 +220,7 @@ _CORE_BASELINE_NET_TYPES: dict[str, str] = {
     "AS206069": "datacenter", # Cornseed Limited (IDC/主机机房)
     "AS137535": "datacenter", # JT Telecom International / JTTI (jtti.cc, 云主机/机房)
     "AS205548": "datacenter", # Zouter Limited (zouter.io, 云主机/VPS)
+    "AS202147": "datacenter", # VPSUS LTD (vpsus.com, 云主机/VPS)
     "AS397373": "datacenter", # H4Y Technologies LLC / HostDare (hostdare.com, 云主机/机房)
     "AS54600": "datacenter",  # PEG TECH INC (misaka.io, 云主机/机房)
     "AS201106": "datacenter", # Spartan Host Ltd (spartanhost.org, VPS/主机)
@@ -322,9 +324,12 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS62642": "datacenter",  # Bigleaf Networks, Inc. (bigleaf.net, ipinfo: hosting)
     "AS137535": "datacenter", # JT Telecom International / JTTI (jtti.cc, 云主机/机房)
     "AS205548": "datacenter", # Zouter Limited (zouter.io, 云主机/VPS)
+    "AS202147": "datacenter", # VPSUS LTD (vpsus.com, 云主机/VPS)
     "AS397373": "datacenter", # H4Y Technologies LLC / HostDare (hostdare.com, 云主机/机房)
     "AS54600": "datacenter",  # PEG TECH INC (misaka.io, 云主机/机房)
     "AS201106": "datacenter", # Spartan Host Ltd (spartanhost.org, VPS/主机)
+    "AS400951": "datacenter", # Akari Networks LLC (akarinetworks.com, 机房IDC)
+    "AS38136": "datacenter",  # Akari Networks Limited (akarinetworks.com, 香港IDC)
 
     # --- [L0 裁决 B: 知名正牌民用宽带 ISP，权威核准为 isp] ---
     "AS1257": "isp",          # Tele2 Sverige AB (tele2.com, 欧洲顶级电信与家庭宽带)
@@ -338,6 +343,11 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS16814": "isp",         # NSS S.A. (IPLAN Telecomunicaciones, iplan.com.ar, 阿根廷主流光纤运营商)
     "AS34665": "isp",         # Petersburg Internet Network (pindc.ru, 圣彼得堡电信与宽带运营商)
     "AS35540": "isp",         # OVH SAS / OVH Telecom (ovhcloud.com, 法国电信与宽带接入网)
+    "AS17621": "isp",         # China Unicom Shanghai network (中国联通上海网络)
+    "AS25341": "isp",         # NPF ROI LLC (cstnet.ru, 俄罗斯宽带ISP)
+    "AS44347": "isp",         # Limited Company "SiNT" (俄罗斯地区ISP)
+    "AS24530": "isp",         # PT. Power Telecom Indonesia (Powertel, 印尼ISP)
+    "AS274029": "isp",        # KAZAV LATAM E.I.R.L. / ASU TELECOM PERU (秘鲁宽带ISP)
 
     # --- [L0 裁决 C: 核心国际银行金融专网 (人工 SSOT 保护)] ---
     "AS1311": "banking", "AS2600": "banking", "AS3187": "banking", "AS5091": "banking",
@@ -2212,7 +2222,7 @@ HOSTING_EXCLUSIONS = (
     "moedove", "fiberxpress", "skyquantum", "gsl networks", "idc cube", "idc",
     "oracle", "windscribe", "hosttech", "taymaz",
     "mt finance", "mtfinance", "cornseed", "jtti", "zouter",
-    "hostdare", "misaka", "spartanhost", "h4y", "peg tech",
+    "hostdare", "misaka", "spartanhost", "h4y", "peg tech", "vpsus",
 )
 
 EDU_PATTERNS = (
