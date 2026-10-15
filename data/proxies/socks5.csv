@@ -118,16 +118,16 @@ socks5://8888:8888@8.210.220.230:6666,socks5,8.210.220.230,6666,1049,0,alive,HKG
 socks5://66.42.224.229:41679,socks5,66.42.224.229,41679,1071,0,alive,CVG,US,66.42.224.229,AS6181 CINCINNATI BELL,CINCINNATI BELL,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://test123:test123@109.104.155.18:1080,socks5,109.104.155.18,1080,1085,0,alive,GRU,BR,109.104.155.18,AS136258 BrainStorm Network,BrainStorm Network,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://216.68.128.121:4145,socks5,216.68.128.121,4145,1086,0,alive,CVG,US,216.68.128.121,AS6181 CINCINNATI BELL,CINCINNATI BELL,isp,2026-10-09 22:46:01,EDT-Pages
-socks5://abc123:abc123@103.238.72.56:1080,socks5,103.238.72.56,1080,1103,0,alive,HAN,VN,103.238.72.56,AS24088 Hanoi Telecom Joint Stock Company - HCMC Branch,Hanoi Telecom Joint Stock Company - HCMC Branch,datacenter,2026-10-01 00:00:00,@danfeng_chat
+socks5://abc123:abc123@103.238.72.56:1080,socks5,103.238.72.56,1080,1103,0,alive,HAN,VN,103.238.72.56,AS24088 Hanoi Telecom Joint Stock Company - HCMC Branch,Hanoi Telecom Joint Stock Company - HCMC Branch,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://root:123456@101.89.159.229:1080,socks5,101.89.159.229,1080,1186,0,alive,LAX,CN,101.89.159.229,AS4811 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://11:11@103.156.238.48:1080,socks5,103.156.238.48,1080,1191,0,alive,DAC,BD,103.156.238.51,AS133770 H M COMMUNICATION,H M COMMUNICATION,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://112.5.33.179:999,socks5,112.5.33.179,999,1192,0,alive,LHR,CN,112.5.33.179,AS9808 China Mobile,China Mobile Communications Corporation,isp,2026-10-14 12:57:52,EDT-Pages
 socks5://test:test@103.79.183.34:1080,socks5,103.79.183.34,1080,1239,0,alive,DAC,BD,103.79.183.34,AS136009 SpeedNet,SpeedNet,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://ss:ss@103.80.116.190:1080,socks5,103.80.116.190,1080,1262,0,alive,BOM,IN,103.185.244.238,AS135834 Multicraft Digital Technologies Private Limited,Multicraft Digital Technologies Private Limited,datacenter,2026-10-01 00:00:00,@danfeng_chat
-socks5://ss:ss@103.14.72.168:1080,socks5,103.14.72.168,1080,1270,0,alive,DAC,BD,103.14.72.168,AS137967 DigiCon Telecommunication Ltd,Digicon Telecommunication Ltd,datacenter,2026-10-01 00:00:00,@danfeng_chat
+socks5://ss:ss@103.14.72.168:1080,socks5,103.14.72.168,1080,1270,0,alive,DAC,BD,103.14.72.168,AS137967 DigiCon Telecommunication Ltd,Digicon Telecommunication Ltd,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://root:123456@59.36.137.51:1080,socks5,59.36.137.51,1080,1289,0,alive,FRA,CN,59.36.137.51,AS4134 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://root:123456@101.91.233.238:1080,socks5,101.91.233.238,1080,1296,0,alive,LAX,CN,101.91.233.238,AS4811 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
-socks5://ss:ss@103.85.238.43:1080,socks5,103.85.238.43,1080,1316,0,alive,DAC,BD,103.14.72.170,AS137967 DigiCon Telecommunication Ltd,Digicon Telecommunication Ltd,datacenter,2026-10-01 00:00:00,@danfeng_chat
+socks5://ss:ss@103.85.238.43:1080,socks5,103.85.238.43,1080,1316,0,alive,DAC,BD,103.14.72.170,AS137967 DigiCon Telecommunication Ltd,Digicon Telecommunication Ltd,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://demo:demo@103.138.26.77:1080,socks5,103.138.26.77,1080,1324,0,alive,DAC,BD,103.96.106.235,AS134153 Xplore Net BD,Xplore Net BD,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://1:1@103.243.244.133:1080,socks5,103.243.244.133,1080,1332,0,alive,CGP,BD,103.243.244.133,AS137953 Bismillah IT Solution,Bismillah IT Solution,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://demo:demo@103.138.26.161:1080,socks5,103.138.26.161,1080,1338,0,alive,DAC,BD,103.96.106.235,AS134153 Xplore Net BD,Xplore Net BD,datacenter,2026-10-01 00:00:00,@danfeng_chat

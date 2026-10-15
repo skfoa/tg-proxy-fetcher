@@ -1796,7 +1796,7 @@
     "asn": "24088",
     "asOrganization": "Hanoi Telecom Joint Stock Company - HCMC Branch",
     "isp": "Hanoi Telecom Joint Stock Company - HCMC Branch",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
@@ -1886,7 +1886,7 @@
     "asn": "137967",
     "asOrganization": "Digicon Telecommunication Ltd",
     "isp": "Digicon Telecommunication Ltd",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
@@ -1931,7 +1931,7 @@
     "asn": "137967",
     "asOrganization": "Digicon Telecommunication Ltd",
     "isp": "Digicon Telecommunication Ltd",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {

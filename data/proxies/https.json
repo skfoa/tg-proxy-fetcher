@@ -1511,7 +1511,7 @@
     "asn": "3226",
     "asOrganization": "OOO NI",
     "isp": "OOO NI",
-    "net_type": "isp",
+    "net_type": "datacenter",
     "source": "EDT-Pages"
   },
   {

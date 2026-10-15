@@ -4436,7 +4436,7 @@
     "asn": "210806",
     "asOrganization": "Strong Blue Conseil & Telecom SASU",
     "isp": "Strong Blue Conseil & Telecom SASU",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {

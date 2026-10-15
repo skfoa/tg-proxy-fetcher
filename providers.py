@@ -311,6 +311,8 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS216054": "datacenter", # Taymaz Gostaran Naghshe Almas Co. (Ltd) (算力IDC)
     "AS214822": "datacenter", # MT FINANCE LLC (算力/主机机房)
     "AS206069": "datacenter", # Cornseed Limited (IDC/主机机房)
+    "AS3226": "datacenter",   # VPSUS LTD (VPS主机商)
+    "AS200912": "datacenter", # vpslayer.net (VPS主机商)
 
     # --- [L0 裁决 B: 知名正牌民用宽带 ISP，人工确证为 isp] ---
     "AS1257": "isp",          # Tele2 Sverige AB (欧洲顶级电信与家庭宽带)
@@ -2215,6 +2217,9 @@ BIZ_PATTERNS = (
 
 ISP_RES_PATTERNS = (
     "residential", "consumer broadband", "ftth", "fiber to the home", "adsl customer", "cable internet",
+    "telecommunication", "telecommunications", "telecom", "telekom", "broadband",
+    "cable tv", "cable corporation", "wisp", "wireless multi service",
+    "odido", "wisper", "inalan", "radiokomunikace", "radiografica", "informsvyaz", "bashinformsvyaz",
     "superloop", "hyperoptic", "viewqwest", "wyyerd",
     "sony network", "chubu telecom", "internet initiative", "optage", "eo hikari",
     "biglobe", "so-net", "docomo", "softbank", "kddi", "chunghwa", "hinet",

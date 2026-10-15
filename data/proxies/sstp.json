@@ -1826,7 +1826,7 @@
     "asn": "50427",
     "asOrganization": "Orion Telecom LLC",
     "isp": "Orion Telecom LLC",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "vpngate"
   },
   {
@@ -3716,7 +3716,7 @@
     "asn": "9981",
     "asOrganization": "Saero Network Service LTD",
     "isp": "Saero Network Service LTD",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "vpngate"
   },
   {
@@ -5111,7 +5111,7 @@
     "asn": "34896",
     "asOrganization": "Vostoktelecom Telephone Company Limited Liability Company",
     "isp": "Vostoktelecom Telephone Company Limited Liability Company",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "vpngate"
   },
   {
@@ -6476,7 +6476,7 @@
     "asn": "34205",
     "asOrganization": "Telephone&Telegraph Station",
     "isp": "Telephone&Telegraph Station",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "vpngate"
   },
   {
