@@ -2062,7 +2062,8 @@
     "Windscribe Limited": "AS397540",
     "hosttech GmbH": "AS207143",
     "Taymaz Gostaran Naghshe Almas Co. (Ltd)": "AS216054",
-    "Bage Cloud": "AS63150"
+    "Bage Cloud": "AS63150",
+    "OOO NI": "AS3226"
   },
   "asn_to_isp": {
     "AS174": "Cogent Communications, LLC",
@@ -2094,7 +2095,7 @@
     "AS3214": "xTom GmbH",
     "AS3215": "Orange",
     "AS3223": "Voxility LLP",
-    "AS3226": "VPSUS LTD",
+    "AS3226": "OOO NI",
     "AS3243": "Servicos De Comunicacoes E Multimedia S.A.",
     "AS3257": "GTT Communications",
     "AS3258": "VirMach",
@@ -5032,7 +5033,7 @@
     "AS3209": "isp",
     "AS3215": "isp",
     "AS3216": "isp",
-    "AS3226": "datacenter",
+    "AS3226": "isp",
     "AS3243": "isp",
     "AS3257": "datacenter",
     "AS3269": "isp",

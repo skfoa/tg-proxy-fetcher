@@ -311,8 +311,7 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS216054": "datacenter", # Taymaz Gostaran Naghshe Almas Co. (Ltd) (算力IDC)
     "AS214822": "datacenter", # MT FINANCE LLC (算力/主机机房)
     "AS206069": "datacenter", # Cornseed Limited (IDC/主机机房)
-    "AS3226": "datacenter",   # VPSUS LTD (VPS主机商)
-    "AS200912": "datacenter", # vpslayer.net (VPS主机商)
+    "AS200912": "datacenter", # vpslayer.net (Joel Krause, ipinfo官方注册类型为hosting)
 
     # --- [L0 裁决 B: 知名正牌民用宽带 ISP，人工确证为 isp] ---
     "AS1257": "isp",          # Tele2 Sverige AB (欧洲顶级电信与家庭宽带)
@@ -320,6 +319,7 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS34343": "isp",         # Eweka Internet Services B.V. (荷兰宽带)
     "AS9891": "isp",          # CS LOXINFO (泰国主流电信运营商)
     "AS63150": "isp",         # BAGE CLOUD LLC (机房广播双ISP, 权威ipinfo核准为ISP)
+    "AS3226": "isp",          # OOO NI (Mark-ITT, 俄罗斯老牌宽带运营商 mark.ru, ipinfo核准为ISP)
 
     # --- [L0 裁决 C: 核心国际银行金融专网 (人工 SSOT 保护)] ---
     "AS1311": "banking", "AS2600": "banking", "AS3187": "banking", "AS5091": "banking",
