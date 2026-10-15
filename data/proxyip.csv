@@ -1,4 +1,4 @@
-﻿ip,port,tls,delay_ms,speed_kbs,colo,cf_location,asn,isp,first_seen,channel,fail_count,net_type
+ip,port,tls,delay_ms,speed_kbs,colo,cf_location,asn,isp,first_seen,channel,fail_count,net_type
 192.80.63.51,443,true,21,,PHX,北美洲 · 菲尼克斯 · 美国,AS11782 Perfecto Mobile Inc,Perfecto Mobile Inc,2026-09-16 08:24:48,@danfeng2,0,business
 45.76.79.239,443,true,22,,LAX,北美洲 · 洛杉矶 · 美国,"AS20473 Vultr (The Constant Company, LLC)","The Constant Company, LLC",2026-09-16 08:31:15,@danfeng2,0,datacenter
 38.95.78.202,443,true,22,,LAX,北美洲 · 洛杉矶 · 美国,AS1054 Zont LLC,Zont LLC,2026-09-16 08:30:20,@danfeng2,0,datacenter
@@ -19627,7 +19627,7 @@
 160.22.16.203,443,true,531,,SIN,亚洲 · 新加坡,AS45899 VNPT Corp (VIETNAM POSTS AND TELECOMMUNICATIONS GROUP),VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,2026-07-24 21:50:41,@danfeng2,0,isp
 111.229.185.152,8443,true,532,0,NRT,亚洲 · Tokyo · 日本,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",2026-10-15 12:44:41,@cmliussss_all,0,datacenter
 152.53.131.209,443,true,532,,FRA,欧洲 · 汉堡 · 德国,AS197540 Netcup,netcup GmbH,2026-09-16 08:20:31,@danfeng2,0,datacenter
-142.248.137.22,443,true,532,,NRT,亚洲 · 东京 · 日本,AS137535 JT Telecom,JT TELECOM INTERNATIONAL PTE.LTD.,2026-09-16 08:19:01,@danfeng2,0,isp
+142.248.137.22,443,true,532,,NRT,亚洲 · 东京 · 日本,AS137535 JT Telecom,JT TELECOM INTERNATIONAL PTE.LTD.,2026-09-16 08:19:01,@danfeng2,0,datacenter
 78.24.223.147,8443,true,532,,FRA,欧洲 · 法兰克福,AS29182 JSC IOT,JSC IOT,2026-07-27 18:57:14,@danfeng2,0,datacenter
 2.59.219.220,443,true,533,0,ZRH,欧洲 · Zürich · 瑞士,AS200019 Alexhost Srl (ALEXHOST S.R.L.),ALEXHOST S.R.L.,2026-10-15 12:44:41,@cmliussss_all,0,datacenter
 45.9.13.251,443,true,533,,MXP,欧洲 · 米兰 · 意大利,AS33993 UFO Hosting LLC,UFO Hosting LLC,2026-09-16 08:31:24,@danfeng2,0,datacenter
@@ -20627,7 +20627,7 @@
 31.56.7.154,443,true,2681,,FRA,欧洲 · 法兰克福 · 德国,AS214677 DELUXHOST,DELUXHOST,2026-09-16 08:28:47,@danfeng2,0,datacenter
 89.125.113.191,443,true,2702,,TLL,欧洲 · 塔林 · 爱沙尼亚,AS209378 Inios Oy,Inios Oy,2026-07-24 22:41:28,@danfeng2,0,datacenter
 5.34.222.223,8443,true,2941,,NRT,亚洲 · 东京,AS400951 Akari Networks,Akari Networks,2026-07-27 18:53:40,@danfeng2,0,datacenter
-45.194.18.109,443,true,2991,0,SIN,亚洲 · Singapore · 新加坡,"AS137535 JT Telecom (HONG KONG COMMUNICATIONS INTERNATIONAL CO.,LIMITED)","HONG KONG COMMUNICATIONS INTERNATIONAL CO.,LIMITED",2026-10-13 14:49:53,@cmliussss_all,0,isp
+45.194.18.109,443,true,2991,0,SIN,亚洲 · Singapore · 新加坡,"AS137535 JT Telecom (HONG KONG COMMUNICATIONS INTERNATIONAL CO.,LIMITED)","HONG KONG COMMUNICATIONS INTERNATIONAL CO.,LIMITED",2026-10-13 14:49:53,@cmliussss_all,0,datacenter
 159.194.230.89,8443,true,3027,0,ARN,欧洲 · Saint Petersburg · 俄罗斯,AS198610 Beget LLC,Beget LLC,2026-10-15 12:44:41,@cmliussss_all,0,datacenter
 77.91.76.197,443,true,3036,,FRA,欧洲 · 法兰克福 · 德国,AS216127 International Hosting Company Limited,International Hosting Company Limited,2026-09-16 08:33:55,@danfeng2,0,datacenter
 37.143.129.168,443,true,3103,0,ARN,欧洲 · Helsinki · 芬兰,AS136258 BrainStorm Network (Oneprovider.com - Helsinki Infrastructure),Oneprovider.com - Helsinki Infrastructure,2026-10-15 12:44:41,@cmliussss_all,0,datacenter
@@ -20809,7 +20809,7 @@
 78.17.177.154,443,true,298,,TLL,欧洲 · 塔林 · 爱沙尼亚,AS219147 Moskalev Georgiy (Brainoza OU),Brainoza OU,2026-09-16 08:34:03,@danfeng2,1,datacenter
 78.17.177.2,443,true,299,,TLL,欧洲 · 塔林 · 爱沙尼亚,AS219147 Moskalev Georgiy (Brainoza OU),Brainoza OU,2026-09-16 08:34:07,@danfeng2,1,datacenter
 78.17.177.230,443,true,299,,TLL,欧洲 · 塔林 · 爱沙尼亚,AS219147 Moskalev Georgiy (Brainoza OU),Brainoza OU,2026-09-16 08:34:06,@danfeng2,1,datacenter
-142.248.139.25,443,true,299,,NRT,亚洲 · 东京 · 日本,AS137535 JT Telecom,JT TELECOM INTERNATIONAL PTE.LTD.,2026-09-16 08:19:01,@danfeng2,1,isp
+142.248.139.25,443,true,299,,NRT,亚洲 · 东京 · 日本,AS137535 JT Telecom,JT TELECOM INTERNATIONAL PTE.LTD.,2026-09-16 08:19:01,@danfeng2,1,datacenter
 78.17.177.95,443,true,300,,TLL,欧洲 · 塔林 · 爱沙尼亚,AS219147 Moskalev Georgiy (Brainoza OU),Brainoza OU,2026-09-16 08:34:11,@danfeng2,1,datacenter
 78.17.177.93,443,true,300,,TLL,欧洲 · 塔林 · 爱沙尼亚,AS219147 Moskalev Georgiy (Brainoza OU),Brainoza OU,2026-09-16 08:34:11,@danfeng2,1,datacenter
 78.17.177.20,443,true,300,,TLL,欧洲 · 塔林 · 爱沙尼亚,AS219147 Moskalev Georgiy (Brainoza OU),Brainoza OU,2026-09-16 08:34:05,@danfeng2,1,datacenter
@@ -22247,7 +22247,7 @@
 38.246.230.77,443,true,0,0,LAX,北美洲 · Los Angeles · 美国,AS979 NetLab,NetLab,2026-10-15 12:44:41,@cmliussss_all,1,datacenter
 85.155.224.76,443,true,0,0,NRT,亚洲 · Tokyo · 日本,AS6939 Hurricane Electric LLC,Hurricane Electric LLC,2026-10-15 12:44:41,@cmliussss_all,1,isp
 185.105.117.222,443,true,0,0,ARN,欧洲 · Moscow · 俄罗斯,AS209641 PSERVERS Enterprise Network,PSERVERS Enterprise Network,2026-10-15 12:44:41,@cmliussss_all,1,datacenter
-177.5.66.59,443,true,0,0,SIN,亚洲 · Singapore · 新加坡,AS137535 JT Telecom,JT TELECOM INTERNATIONAL PTE.LTD.,2026-10-15 12:44:41,@cmliussss_all,1,isp
+177.5.66.59,443,true,0,0,SIN,亚洲 · Singapore · 新加坡,AS137535 JT Telecom,JT TELECOM INTERNATIONAL PTE.LTD.,2026-10-15 12:44:41,@cmliussss_all,1,datacenter
 99.63.206.163,443,true,0,0,ORD,北美洲 · Palatine · 美国,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",2026-10-15 12:44:41,@cmliussss_all,1,isp
 202.144.195.135,443,true,0,0,NRT,亚洲 · Tokyo · 日本,AS63916 IPTELECOM Global (Techavenue International Ltd),Techavenue International Ltd,2026-10-15 12:44:41,@cmliussss_all,1,isp
 217.26.28.224,8443,true,0,0,ARN,欧洲 · Moscow · 俄罗斯,AS198610 Beget LLC,Beget LLC,2026-10-15 12:44:41,@cmliussss_all,1,datacenter

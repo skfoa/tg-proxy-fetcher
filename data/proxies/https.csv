@@ -1,6 +1,6 @@
 ﻿url,proto,host,port,delay_ms,fail_count,status,colo,country,egress_ip,asn,isp,net_type,first_seen,source
 https://12.221.146.147:9443,https,12.221.146.147,9443,167,0,alive,DFW,US,12.221.146.161,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",isp,2026-10-09 00:00:00,EDT-Pages
-https://103.127.242.229:7000,https,103.127.242.229,7000,219,0,alive,NRT,JP,103.127.242.229,"AS137535 JT Telecom (Hong Kong Communications International Co., limited)","Hong Kong Communications International Co., limited",isp,2026-10-12 21:49:55,EDT-Pages
+https://103.127.242.229:7000,https,103.127.242.229,7000,219,0,alive,NRT,JP,103.127.242.229,"AS137535 JT Telecom (Hong Kong Communications International Co., limited)","Hong Kong Communications International Co., limited",datacenter,2026-10-12 21:49:55,EDT-Pages
 https://209.170.227.253:443,https,209.170.227.253,443,245,0,alive,SEA,US,209.170.227.253,"AS62642 IT Group NW, LLC","IT Group NW, LLC",datacenter,2026-10-09 00:00:00,EDT-Pages
 https://133.9.6.10:443,https,133.9.6.10,443,264,0,alive,NRT,JP,133.9.6.10,AS17956 Japan Network Information Center,Japan Network Information Center,education,2026-10-15 10:08:09,EDT-Pages
 https://120.232.204.58:31343,https,120.232.204.58,31343,280,0,alive,HKG,HK,1.36.116.51,AS4760 HKT,Hong Kong Telecommunications HKT Limited Mass Internet,isp,2026-10-09 00:00:00,EDT-Pages

@@ -214,6 +214,9 @@ _CORE_BASELINE_NET_TYPES: dict[str, str] = {
     "AS216054": "datacenter", # Taymaz Gostaran Naghshe Almas Co. (Ltd) (算力IDC)
     "AS214822": "datacenter", # MT FINANCE LLC (算力/主机机房)
     "AS206069": "datacenter", # Cornseed Limited (IDC/主机机房)
+    "AS137535": "datacenter", # JT Telecom International / JTTI (jtti.cc, 云主机/机房)
+    "AS205548": "datacenter", # Zouter Limited (zouter.io, 云主机/VPS)
+    "AS62711": "isp",         # Maxwell Telecom LLC (ipinfo: ISP)
     "AS63150": "isp",         # BAGE CLOUD LLC (机房双ISP/原生住宅IP, ipinfo官方注册类型为ISP)
 }
 
@@ -224,7 +227,7 @@ for _asn, _isp in AUTHORITATIVE_CLOUD_ASNS.items():
         AUTHORITATIVE_CLOUD_NET_TYPES[_asn] = _CORE_BASELINE_NET_TYPES[_asn]
     else:
         text = f"{_asn} {_isp}".lower()
-        if any(p in text for p in ("telecom", "unicom", "mobile", "broadband", "hinet")):
+        if any(p in text for p in ("china telecom", "korea telecom", "chunghwa telecom", "unicom", "mobile", "broadband", "hinet")):
             AUTHORITATIVE_CLOUD_NET_TYPES[_asn] = "isp"
         else:
             AUTHORITATIVE_CLOUD_NET_TYPES[_asn] = "datacenter"
@@ -313,6 +316,8 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS199669": "datacenter", # Okay-Telecom Ltd. / ATLEX.RU (atlex.ru, ipinfo: hosting)
     "AS33842": "datacenter",  # Citytelecom LLC (crosstelecom.ru, ipinfo: hosting)
     "AS62642": "datacenter",  # Bigleaf Networks, Inc. (bigleaf.net, ipinfo: hosting)
+    "AS137535": "datacenter", # JT Telecom International / JTTI (jtti.cc, 云主机/机房)
+    "AS205548": "datacenter", # Zouter Limited (zouter.io, 云主机/VPS)
 
     # --- [L0 裁决 B: 知名正牌民用宽带 ISP，权威核准为 isp] ---
     "AS1257": "isp",          # Tele2 Sverige AB (tele2.com, 欧洲顶级电信与家庭宽带)
@@ -2199,7 +2204,7 @@ HOSTING_EXCLUSIONS = (
     "xtom", "synlinq", "tzulo", "drosys", "dromatics", "nktele",
     "moedove", "fiberxpress", "skyquantum", "gsl networks", "idc cube", "idc",
     "oracle", "windscribe", "hosttech", "taymaz",
-    "mt finance", "mtfinance", "cornseed",
+    "mt finance", "mtfinance", "cornseed", "jtti", "zouter",
 )
 
 EDU_PATTERNS = (
