@@ -103,6 +103,8 @@ KNOWN_CLOUD_PROVIDERS = {
     "hosttech": ("AS207143", "hosttech GmbH"),
     "taymaz": ("AS216054", "Taymaz Gostaran Naghshe Almas"),
     "mtfinance": ("AS214822", "MT FINANCE LLC"),
+    "bagecloud": ("AS63150", "Bage Cloud"),
+    "bage": ("AS63150", "Bage Cloud"),
     # 下游分销/租户品牌（无独立 ASN，现网美西等节点复用 DigitalOcean AS14061；first-win 确保反查标准名锁定为 DigitalOcean）
     "bagevm": ("AS14061", "BageVM"),
     "netlab": ("AS979", "NetLab"),
@@ -212,6 +214,7 @@ _CORE_BASELINE_NET_TYPES: dict[str, str] = {
     "AS216054": "datacenter", # Taymaz Gostaran Naghshe Almas Co. (Ltd) (算力IDC)
     "AS214822": "datacenter", # MT FINANCE LLC (算力/主机机房)
     "AS206069": "datacenter", # Cornseed Limited (IDC/主机机房)
+    "AS63150": "datacenter",  # BAGE CLOUD LLC (云服务器机房)
 }
 
 # 权威已知云厂商与核心骨干网 SSOT 网络类型基准表
@@ -2189,7 +2192,7 @@ HOSTING_EXCLUSIONS = (
     "xtom", "synlinq", "tzulo", "drosys", "dromatics", "nktele",
     "moedove", "fiberxpress", "skyquantum", "gsl networks", "idc cube", "idc",
     "oracle", "windscribe", "hosttech", "taymaz",
-    "mt finance", "mtfinance", "cornseed",
+    "mt finance", "mtfinance", "cornseed", "bagecloud", "bage cloud",
 )
 
 EDU_PATTERNS = (

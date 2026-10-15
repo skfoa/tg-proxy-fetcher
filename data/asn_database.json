@@ -2061,7 +2061,8 @@
     "Google Fiber Inc.": "AS16591",
     "Windscribe Limited": "AS397540",
     "hosttech GmbH": "AS207143",
-    "Taymaz Gostaran Naghshe Almas Co. (Ltd)": "AS216054"
+    "Taymaz Gostaran Naghshe Almas Co. (Ltd)": "AS216054",
+    "Bage Cloud": "AS63150"
   },
   "asn_to_isp": {
     "AS174": "Cogent Communications, LLC",
@@ -2615,7 +2616,7 @@
     "AS62711": "Maxwell Telecom",
     "AS63018": "Dedicated.com",
     "AS63023": "Ipxo LLC",
-    "AS63150": "BAGE CLOUD LLC",
+    "AS63150": "Bage Cloud",
     "AS63199": "CDS Global Cloud Co., Ltd",
     "AS63473": "HostHatch, LLC",
     "AS63734": "365 Online technology joint stock company",
