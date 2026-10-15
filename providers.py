@@ -99,6 +99,9 @@ KNOWN_CLOUD_PROVIDERS = {
     "spartan": ("AS201106", "SpartanHost"),
     "spartanhost": ("AS201106", "SpartanHost"),
     "wap": ("AS149798", "WAP.ac"),
+    "windscribe": ("AS397540", "Windscribe Limited"),
+    "hosttech": ("AS207143", "hosttech GmbH"),
+    "taymaz": ("AS216054", "Taymaz Gostaran Naghshe Almas"),
     # 下游分销/租户品牌（无独立 ASN，现网美西等节点复用 DigitalOcean AS14061；first-win 确保反查标准名锁定为 DigitalOcean）
     "bagevm": ("AS14061", "BageVM"),
     "netlab": ("AS979", "NetLab"),
@@ -203,6 +206,9 @@ _CORE_BASELINE_NET_TYPES: dict[str, str] = {
     "AS132203": "datacenter", # Tencent Cloud
     "AS31898": "datacenter",  # Oracle Cloud
     "AS54253": "datacenter",  # Oracle Corporation
+    "AS397540": "datacenter", # Windscribe Limited (VPN/代理机房)
+    "AS207143": "datacenter", # hosttech GmbH (瑞士机房/主机托管)
+    "AS216054": "datacenter", # Taymaz Gostaran Naghshe Almas Co. (Ltd) (算力IDC)
 }
 
 # 权威已知云厂商与核心骨干网 SSOT 网络类型基准表
@@ -295,6 +301,9 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS206675": "datacenter", # PumpCloud JP (云主机机房)
     "AS207847": "datacenter", # CloudBlast LLC (云主机)
     "AS214478": "datacenter", # Sakura Clouds LLC (云服务器)
+    "AS397540": "datacenter", # Windscribe Limited (VPN/代理机房)
+    "AS207143": "datacenter", # hosttech GmbH (瑞士机房/主机托管)
+    "AS216054": "datacenter", # Taymaz Gostaran Naghshe Almas Co. (Ltd) (算力IDC)
 
     # --- [L0 裁决 B: 知名正牌民用宽带 ISP，人工确证为 isp] ---
     "AS1257": "isp",          # Tele2 Sverige AB (欧洲顶级电信与家庭宽带)
@@ -536,6 +545,11 @@ def save_asn_database(
         for auth_asn, auth_type in AUTHORITATIVE_CLOUD_NET_TYPES.items():
             if clean_a2nt.get(auth_asn) != auth_type:
                 clean_a2nt[auth_asn] = auth_type
+
+        # 人工裁决表保护：锁定 MANUAL_OVERRIDE_NET_TYPES，确保人工核准的机房与民用宽带不被覆盖
+        for man_asn, man_type in MANUAL_OVERRIDE_NET_TYPES.items():
+            if clean_a2nt.get(man_asn) != man_type:
+                clean_a2nt[man_asn] = man_type
 
         # 自愈补齐：若 clean_a2i 中的 ASN 尚未被 clean_a2nt 分类，自动利用 classify_asn 补齐网络类型，确保 100% 覆盖
         for asn_code, isp_name in clean_a2i.items():
@@ -2169,6 +2183,7 @@ HOSTING_EXCLUSIONS = (
     "frantech", "vmiss", "dmit", "akile", "bytevirt", "bandwagon",
     "xtom", "synlinq", "tzulo", "drosys", "dromatics", "nktele",
     "moedove", "fiberxpress", "skyquantum", "gsl networks", "idc cube", "idc",
+    "oracle", "windscribe", "hosttech", "taymaz",
 )
 
 EDU_PATTERNS = (
