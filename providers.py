@@ -246,54 +246,34 @@ log = logging.getLogger("providers")
 
 ASN_DATABASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "asn_database.json")
 ASN_DATABASE_REL_PATH = os.path.join("data", "asn_database.json")
-PEERINGDB_SNAPSHOT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "peeringdb_snapshot.json")
-PEERINGDB_SNAPSHOT_REL_PATH = os.path.join("data", "peeringdb_snapshot.json")
 
 
-def load_peeringdb_snapshot(custom_path: str = "") -> dict[str, str]:
-    """加载本地离线 PeeringDB 事实快照 (ASN -> info_type)"""
-    target = custom_path or (PEERINGDB_SNAPSHOT_PATH if os.path.isfile(PEERINGDB_SNAPSHOT_PATH) else PEERINGDB_SNAPSHOT_REL_PATH)
-    if not os.path.isfile(target):
-        return {}
-    try:
-        with open(target, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            if isinstance(data, dict):
-                return {str(k).upper(): str(v).strip() for k, v in data.items()}
-    except Exception as e:
-        log.warning("加载 peeringdb_snapshot.json 异常: %s", e)
-    return {}
-
-
-# L1: PeeringDB 官方枚举受控映射表 (标准事实映射)
-PEERINGDB_INFO_TYPE_MAP: dict[str, str] = {
-    "Cable/DSL/ISP": "isp",
-    "Content": "datacenter",
-    "Enterprise": "business",
-    "Educational/Research": "education",
-    "Government": "government",
-    "Route Server": "datacenter",
-    "Route Collector": "datacenter",
-}
-
-# L0: 人工冲突裁决表 (SSOT Overrides: 仅记录人工确证与 PeeringDB info_type 冲突/偏标/缺失的条目)
+# L0: 人工确证网络类型裁决表 (Manual SSOT Overrides: 核心公有云/数据中心机房/知名宽带ISP/银行金融专网)
 MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
-    # --- [L0 裁决 A: IDC/VPS 主机商在 PeeringDB 虚标为 Cable/DSL/ISP，人工压制为 datacenter] ---
-    "AS3214": "datacenter",   # xTom GmbH (知名 VPS 主机商，PeeringDB 自标 Cable/DSL/ISP)
+    # --- [L0 裁决 A: 头部公有云、IDC 与 VPS 主机商，严格锁定为 datacenter] ---
+    "AS16509": "datacenter",  # Amazon AWS / Amazon.com, Inc.
+    "AS14618": "datacenter",  # Amazon.com / AWS
+    "AS8075": "datacenter",   # Microsoft Azure
+    "AS45102": "datacenter",  # Alibaba Cloud
+    "AS132203": "datacenter", # Tencent Cloud
+    "AS31898": "datacenter",  # Oracle Cloud
+    "AS54253": "datacenter",  # Oracle Corporation
+    "AS3214": "datacenter",   # xTom GmbH (知名 VPS 主机商)
     "AS3258": "datacenter",   # xTom Tokyo (VirMach/xTom 机房)
     "AS4785": "datacenter",   # xTom Osaka (xTom 机房)
     "AS6233": "datacenter",   # xTom San Jose (xTom 机房)
     "AS7720": "datacenter",   # Skywolf Cloud (云主机机房)
     "AS8888": "datacenter",   # xTom APAC (xTom 机房)
     "AS9312": "datacenter",   # xTom Hong Kong (xTom 机房)
+    "AS979": "datacenter",    # NetLab Global (机房)
     "AS16814": "datacenter",  # Connecting Servers Ltd. (服务器托管机房)
     "AS22295": "datacenter",  # Advin Servers (VPS 主机商)
     "AS22781": "datacenter",  # Black Oak Computers Inc (算力服务器)
     "AS34665": "datacenter",  # PIN Datacenter (机房)
     "AS35540": "datacenter",  # OVH Telecom (OVH 欧洲机房)
-    "AS39618": "datacenter",  # HostCram LLC (主机服务商，PeeringDB 虚标 Cable/DSL/ISP)
+    "AS39618": "datacenter",  # HostCram LLC (主机服务商)
     "AS44382": "datacenter",  # FibaCloud (云服务器机房)
-    "AS45090": "datacenter",  # 成都西维数码 / 西部数码 (知名国内 IDC，PeeringDB 虚标 Cable/DSL/ISP)
+    "AS45090": "datacenter",  # 成都西维数码 / 西部数码 (知名国内 IDC)
     "AS49870": "datacenter",  # Alsycon Cloud Hosting (云主机托管)
     "AS55933": "datacenter",  # Cloudie Limited (云主机托管)
     "AS56971": "datacenter",  # CGI GLOBAL LIMITED / Cloud (云主机托管)
@@ -302,22 +282,27 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS63150": "datacenter",  # BAGE CLOUD LLC (云服务器)
     "AS134677": "datacenter", # Dromatics Systems Pte Ltd (机房 IDC)
     "AS135130": "datacenter", # Anik Computer & Networking (算力机房)
+    "AS136258": "datacenter", # BrainStorm Network, Inc. (机房)
+    "AS138915": "datacenter", # UCloud / Kaopu Cloud HK Limited (云主机)
     "AS141947": "datacenter", # PT Loveika Host Nusantara (主机托管)
     "AS146943": "datacenter", # Tier 4 Cloud Services (数据中心)
+    "AS149440": "datacenter", # Evoxt / Evoxt Sdn. Bhd. (VPS 主机商)
     "AS197275": "datacenter", # Link Telecom NN Ltd. (机房网络)
+    "AS198610": "datacenter", # Beget LLC (云主机托管)
+    "AS202448": "datacenter", # MVPS LTD (VPS 主机商)
     "AS206206": "datacenter", # Kurdistan Net Company for Computer (算力机房)
     "AS206216": "datacenter", # Advin Servers (VPS 主机商)
     "AS206675": "datacenter", # PumpCloud JP (云主机机房)
     "AS207847": "datacenter", # CloudBlast LLC (云主机)
     "AS214478": "datacenter", # Sakura Clouds LLC (云服务器)
 
-    # --- [L0 裁决 B: 知名正牌民用宽带 ISP 在 PeeringDB 偏标，人工纠偏为 isp] ---
-    "AS1257": "isp",          # Tele2 Sverige AB (欧洲顶级电信与家庭宽带，PeeringDB 偏标为 Content)
-    "AS18106": "isp",         # ViewQwest (新加坡/马来西亚知名光纤宽带 ISP，PeeringDB 泛标为 NSP)
-    "AS34343": "isp",         # Eweka Internet Services B.V. (荷兰宽带，PeeringDB 偏标为 Content)
-    "AS9891": "isp",          # CS LOXINFO (泰国主流电信运营商，PeeringDB 偏标为 Content)
+    # --- [L0 裁决 B: 知名正牌民用宽带 ISP，人工确证为 isp] ---
+    "AS1257": "isp",          # Tele2 Sverige AB (欧洲顶级电信与家庭宽带)
+    "AS18106": "isp",         # ViewQwest (新加坡/马来西亚知名光纤宽带 ISP)
+    "AS34343": "isp",         # Eweka Internet Services B.V. (荷兰宽带)
+    "AS9891": "isp",          # CS LOXINFO (泰国主流电信运营商)
 
-    # --- [L0 裁决 C: 核心国际银行金融专网 (PeeringDB 枚举无 banking，人工 SSOT 保护)] ---
+    # --- [L0 裁决 C: 核心国际银行金融专网 (人工 SSOT 保护)] ---
     "AS1311": "banking", "AS2600": "banking", "AS3187": "banking", "AS5091": "banking",
     "AS5458": "banking", "AS6674": "banking", "AS6773": "banking", "AS7609": "banking",
     "AS7630": "banking", "AS7820": "banking", "AS8373": "banking", "AS8435": "banking",
@@ -634,19 +619,13 @@ for _asn, _isp in ASN_DATABASE_ASN_TO_ISP.items():
 SORTED_CLOUD_PROVIDER_KEYS = tuple(sorted(KNOWN_CLOUD_PROVIDERS.keys(), key=len, reverse=True))
 ASN_DATABASE_ISP_LOWER = {k.lower(): (v, k) for k, v in ASN_DATABASE_ISP_TO_ASN.items()}
 
-# 运行时 ASN 精准网络类型对照表 (从持久化库与 PeeringDB 事实快照构建，并受 L0 冲突裁决表最高优先级锁定保护)
-PEERINGDB_SNAPSHOT: dict[str, str] = load_peeringdb_snapshot()
+# 运行时 ASN 精准网络类型对照表 (从权威持久化数据库与云厂商基准构建，受人工裁决表最高优先级锁定保护)
 ASN_EXACT_NET_TYPE: dict[str, str] = dict(ASN_DATABASE_ASN_TO_NET_TYPE)
 
-# 1. 融入 PeeringDB 离线事实快照 (L1)
-for _asn, _itype in PEERINGDB_SNAPSHOT.items():
-    if _itype in PEERINGDB_INFO_TYPE_MAP:
-        ASN_EXACT_NET_TYPE[_asn] = PEERINGDB_INFO_TYPE_MAP[_itype]
-
-# 2. 权威云厂商 SSOT 纯净性锁定
+# 1. 权威已知云厂商与核心骨干网 SSOT 纯净性锁定
 ASN_EXACT_NET_TYPE.update(AUTHORITATIVE_CLOUD_NET_TYPES)
 
-# 3. 人工冲突裁决表 (L0) 最高优先级锁定覆盖 (专治 PeeringDB 虚标/偏标/缺失)
+# 2. 人工网络类型裁决表 (L0) 最高优先级锁定覆盖
 ASN_EXACT_NET_TYPE.update(MANUAL_OVERRIDE_NET_TYPES)
 
 
@@ -2299,9 +2278,9 @@ def _extract_asn_code(asn_str: str | None, isp_str: str | None = "") -> str | No
 def is_asn_recorded(asn_str: str | None, isp_str: str | None = "") -> bool:
     """
     判断目标节点是否免于触发『未收录 ASN 补库告警』：
-    - 返回 True：该 AS 编号已被权威对照表收录（含 L0 裁决表、L1 PeeringDB 快照、ASN 基础库），
+    - 返回 True：该 AS 编号已被权威对照表收录（含人工裁决表、ASN 基础数据库、权威云厂商），
                  或节点本身无有效 AS 编号（无需作为新 ASN 告警）。
-    - 返回 False：提取到了有效 AS 编号，但该编号尚未被内置库或 PeeringDB 快照收录（提示补充）。
+    - 返回 False：提取到了有效 AS 编号，但该编号尚未被内置库收录（提示补充）。
     注：无有效 ASN 编号时返回 True，是为避免将缺少 ASN 元数据的正常节点误报为待补充的新自治系统。
     """
     code = _extract_asn_code(asn_str, isp_str)
@@ -2309,7 +2288,6 @@ def is_asn_recorded(asn_str: str | None, isp_str: str | None = "") -> bool:
         return True
     return (
         code in MANUAL_OVERRIDE_NET_TYPES
-        or code in PEERINGDB_SNAPSHOT
         or code in ASN_EXACT_NET_TYPE
         or code in ASN_TO_PROVIDER
         or code in ASN_DATABASE_ASN_TO_ISP
@@ -2318,11 +2296,17 @@ def is_asn_recorded(asn_str: str | None, isp_str: str | None = "") -> bool:
 
 def classify_asn(asn_str: str | None, isp_str: str | None = "") -> str:
     """
-    根据 BGP 广播的 ASN 编号、机构名称与 ISP 归属进行多维度网络类型属性分类 (四级架构 L0~L3)：
-      [L0] 人工冲突裁决表 (SSOT Overrides)：针对 PeeringDB 虚标/偏标与核心金融专网的前置人工裁决
-      [L1] PeeringDB 事实快照 (Authoritative Snapshot)：覆盖 74%+ 全球主流自治系统自主登记事实
-      [L2] 高置信度收窄词根保守回退 (Strict Pattern Fallback)：对未披露或 NSP 骨干网利用收窄强词根保守判定
-      [L3] 安全降级兜底 (Default Fallback)：其余一律安全降级为 datacenter 机房
+    根据 BGP 广播的 ASN 编号、机构名称与 ISP 归属进行多维度网络类型属性分类 (四级架构 Tier 1~4)：
+      [Tier 1] 人工裁决表 (Manual SSOT Overrides)：针对已确证的核心专网与特例的人工高优先级裁决
+      [Tier 2] 权威持久化 ASN 库 (Authoritative Local DB)：来自 3200+ 条经深度校准的权威 ASN 库与权威云厂商基准
+      [Tier 3] 高置信度模式匹配 (Strict Pattern Fallback)：
+               - 1. 学术科研网 (education)
+               - 2. 政府政务网 (government)
+               - 3. 银行金融专网 (banking)
+               - 4. 机房/云厂商排除 (HOSTING_EXCLUSIONS -> datacenter)
+               - 5. 商业固定专线 (business)
+               - 6. 电信民用原生宽带 (isp)
+      [Tier 4] 安全降级兜底 (Default Fallback)：其余一律安全降级为 datacenter 机房
     返回类型：
       - education: 高校与学术科研网
       - government: 政府政务与国家公共网
@@ -2333,22 +2317,15 @@ def classify_asn(asn_str: str | None, isp_str: str | None = "") -> str:
     """
     asn_code = _extract_asn_code(asn_str, isp_str)
 
-    # [L0] 人工冲突裁决表 (最高优先级覆盖，专治 PeeringDB 虚标/偏标与核心金融)
+    # [Tier 1] 人工高优先级裁决 (最高优先级覆盖)
     if asn_code and asn_code in MANUAL_OVERRIDE_NET_TYPES:
         return MANUAL_OVERRIDE_NET_TYPES[asn_code]
 
-    # [L1] PeeringDB 权威事实离线快照直查
-    if asn_code and asn_code in PEERINGDB_SNAPSHOT:
-        pdb_itype = PEERINGDB_SNAPSHOT[asn_code]
-        if pdb_itype in PEERINGDB_INFO_TYPE_MAP:
-            return PEERINGDB_INFO_TYPE_MAP[pdb_itype]
-        # 若为 NSP / Network Services / Non-Profit / "" (Not Disclosed)，安全穿透至 L2
-
-    # 若在已有精准对照表中 (如通过在线解析或持久化库收录)
+    # [Tier 2] 权威精准对照表 (包含持久化 ASN 库与权威云厂商 SSOT)
     if asn_code and asn_code in ASN_EXACT_NET_TYPE:
         return ASN_EXACT_NET_TYPE[asn_code]
 
-    # [L2] 高置信度收窄词根保守回退 (Pattern Fallback)
+    # [Tier 3] 高置信度模式匹配 (Pattern Fallback)
     text = f"{asn_str or ''} {isp_str or ''}".lower().strip()
     if not text:
         return "datacenter"
@@ -2376,15 +2353,18 @@ def classify_asn(asn_str: str | None, isp_str: str | None = "") -> str:
             is_hosting = True
             break
 
+    if is_hosting:
+        return "datacenter"
+
     # 5. 识别商业专线
-    if any(p in text for p in BIZ_PATTERNS) and not is_hosting:
+    if any(p in text for p in BIZ_PATTERNS):
         return "business"
 
     # 6. 识别电信运营商原生宽带 (仅高置信度强词根)
-    if any(p in text for p in ISP_RES_PATTERNS) and not is_hosting:
+    if any(p in text for p in ISP_RES_PATTERNS):
         return "isp"
 
-    # [L3] 安全降级兜底 (Default Fallback)
+    # [Tier 4] 安全降级兜底 (Default Fallback)
     return "datacenter"
 
 

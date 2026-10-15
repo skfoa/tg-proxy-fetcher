@@ -3,7 +3,7 @@ socks5://admin:123456@179.255.152.25:1080,socks5,179.255.152.25,1080,55,0,alive,
 socks5://user1:pass1@154.17.15.8:1080,socks5,154.17.15.8,1080,55,0,alive,LAX,US,154.17.15.8,AS906 DMIT,DMIT,datacenter,2026-10-12 15:18:13,@otcfxq
 socks5://user1:pass1@154.21.91.106:1080,socks5,154.21.91.106,1080,56,0,alive,LAX,US,154.21.91.106,AS906 DMIT,DMIT,datacenter,2026-10-12 15:18:13,@otcfxq
 socks5://user1:pass1@154.17.10.5:1080,socks5,154.17.10.5,1080,59,0,alive,LAX,US,154.17.10.5,AS906 DMIT,DMIT,datacenter,2026-10-12 15:18:13,@otcfxq
-socks5://proxyuser:proxypass@23.177.185.234:1080,socks5,23.177.185.234,1080,135,0,alive,SJC,US,23.177.185.234,AS400992 ZhouyiSat Communications,ZhouyiSat Communications,isp,2026-10-01 00:00:00,@danfeng_chat
+socks5://proxyuser:proxypass@23.177.185.234:1080,socks5,23.177.185.234,1080,135,0,alive,SJC,US,23.177.185.234,AS400992 ZhouyiSat Communications,ZhouyiSat Communications,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://test123:test123@23.158.200.158:1080,socks5,23.158.200.158,1080,150,0,alive,LAX,US,23.158.200.158,AS63023 Ipxo LLC,Ipxo LLC,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://asd123:asd123@136.175.177.78:1080,socks5,136.175.177.78,1080,184,0,alive,LAX,US,136.175.177.78,AS906 DMIT,DMIT,datacenter,2026-10-12 15:18:13,@otcfxq
 socks5://test123:test123@23.238.34.20:1080,socks5,23.238.34.20,1080,283,0,alive,DFW,US,23.254.136.103,AS54290 Hostwinds LLC.,Hostwinds LLC.,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -12,7 +12,6 @@ socks5://199.66.182.243:4145,socks5,199.66.182.243,4145,397,0,alive,ATL,US,199.6
 socks5://216.105.143.146:4145,socks5,216.105.143.146,4145,401,0,alive,ATL,US,216.105.143.146,AS20081 NET2ATLANTA.COM LLC,NET2ATLANTA.COM LLC,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://199.66.183.226:4145,socks5,199.66.183.226,4145,403,0,alive,ATL,US,199.66.183.226,AS20081 NET2ATLANTA.COM LLC,NET2ATLANTA.COM LLC,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://216.105.130.131:4145,socks5,216.105.130.131,4145,407,0,alive,ATL,US,216.105.130.131,AS20081 NET2ATLANTA.COM LLC,NET2ATLANTA.COM LLC,isp,2026-10-09 22:46:01,EDT-Pages
-socks5://158.101.8.92:1080,socks5,158.101.8.92,1080,505,0,alive,AMS,US,192.42.116.19,AS215125 SURF B.V.,SURF B.V.,education,2026-10-15 12:44:41,EDT-Pages
 socks5://test123:test123@104.219.233.124:1080,socks5,104.219.233.124,1080,511,0,alive,ORD,US,104.219.233.124,AS27176 DataWagon LLC,DataWagon LLC,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://72.194.42.131:4145,socks5,72.194.42.131,4145,524,0,alive,ATL,US,72.194.42.131,"AS22773 Cox Communications Inc. (Cox Communications, Inc.)","Cox Communications, Inc.",isp,2026-10-09 22:46:01,EDT-Pages
 socks5://72.194.42.156:4145,socks5,72.194.42.156,4145,529,0,alive,ATL,US,72.194.42.156,"AS22773 Cox Communications Inc. (Cox Communications, Inc.)","Cox Communications, Inc.",isp,2026-10-09 22:46:01,EDT-Pages
@@ -75,7 +74,6 @@ socks5://72.195.34.35:27360,socks5,72.195.34.35,27360,575,0,alive,ATL,US,72.195.
 socks5://98.188.47.150:4145,socks5,98.188.47.150,4145,575,0,alive,ATL,US,98.188.47.150,AS22773 Cox Communications Inc.,Cox Communications,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://24.249.199.4:4145,socks5,24.249.199.4,4145,576,0,alive,ATL,US,24.249.199.4,AS22773 Cox Communications Inc.,Cox Communications,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://98.175.31.222:4145,socks5,98.175.31.222,4145,577,0,alive,ATL,US,98.175.31.222,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-09 22:46:01,EDT-Pages
-socks5://35.73.138.133:443,socks5,35.73.138.133,443,583,0,alive,NRT,JP,35.73.138.133,AS16509 Amazon AWS (Amazon Data Services Japan),Amazon Data Services Japan,business,2026-10-15 12:44:41,EDT-Pages
 socks5://98.170.57.231:4145,socks5,98.170.57.231,4145,585,0,alive,ATL,US,98.170.57.231,AS22773 Cox Communications Inc.,Cox Communications,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://98.182.147.97:4145,socks5,98.182.147.97,4145,588,0,alive,ATL,US,98.182.147.97,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://72.195.114.169:4145,socks5,72.195.114.169,4145,592,0,alive,ATL,US,72.195.114.169,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-09 22:46:01,EDT-Pages
@@ -104,30 +102,27 @@ socks5://8888:8888@8.210.157.4:6666,socks5,8.210.157.4,6666,811,0,alive,HKG,HK,8
 socks5://6666:6666@8.210.222.7:6666,socks5,8.210.222.7,6666,814,0,alive,HKG,HK,8.210.222.7,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://6666:6666@8.210.224.195:6666,socks5,8.210.224.195,6666,818,0,alive,HKG,HK,8.210.224.195,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://174.75.211.193:4145,socks5,174.75.211.193,4145,821,0,alive,ATL,US,174.75.211.193,AS22773 Cox Communications Inc.,Cox Communications,isp,2026-10-09 22:46:01,EDT-Pages
-socks5://37.18.73.60:5566,socks5,37.18.73.60,5566,845,0,alive,AMS,US,192.42.116.105,AS215125 SURF B.V.,SURF B.V.,education,2026-10-13 14:49:54,EDT-Pages
 socks5://123:123@165.154.23.8:1080,socks5,165.154.23.8,1080,847,0,alive,HKG,HK,165.154.23.8,AS135377 UCLOUD INFORMATION TECHNOLOGY (HK) LIMITED,UCLOUD INFORMATION TECHNOLOGY (HK) LIMITED,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://123:123@101.36.126.84:1080,socks5,101.36.126.84,1080,872,0,alive,HKG,HK,101.36.126.84,AS135377 UCLOUD INFORMATION TECHNOLOGY (HK) LIMITED,UCLOUD INFORMATION TECHNOLOGY (HK) LIMITED,datacenter,2026-10-09 14:13:10,@danfeng_chat
 socks5://174.64.199.82:4145,socks5,174.64.199.82,4145,891,0,alive,ATL,US,174.64.199.82,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://888888:888888@8.210.165.193:5555,socks5,8.210.165.193,5555,892,0,alive,HKG,HK,8.210.165.193,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
-socks5://test123:test123@168.222.247.40:1080,socks5,168.222.247.40,1080,894,0,alive,FRA,DE,168.222.247.40,AS136258 BrainStorm Network,BrainStorm Network,business,2026-10-01 00:00:00,@danfeng_chat
+socks5://test123:test123@168.222.247.40:1080,socks5,168.222.247.40,1080,894,0,alive,FRA,DE,168.222.247.40,AS136258 BrainStorm Network,BrainStorm Network,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://123:123@152.32.186.245:1080,socks5,152.32.186.245,1080,898,0,alive,HKG,HK,152.32.186.245,AS135377 UCLOUD INFORMATION TECHNOLOGY (HK) LIMITED,UCLOUD INFORMATION TECHNOLOGY (HK) LIMITED,datacenter,2026-10-01 00:00:00,@danfeng_chat
-socks5://45.61.129.165:9050,socks5,45.61.129.165,9050,904,0,alive,AMS,US,192.42.116.95,AS215125 SURF B.V.,SURF B.V.,education,2026-10-13 14:49:54,EDT-Pages
-socks5://test123:test123@103.75.119.242:1080,socks5,103.75.119.242,1080,905,0,alive,SYD,AU,103.75.119.242,AS136258 BrainStorm Network,BrainStorm Network,business,2026-10-01 00:00:00,@danfeng_chat
+socks5://test123:test123@103.75.119.242:1080,socks5,103.75.119.242,1080,905,0,alive,SYD,AU,103.75.119.242,AS136258 BrainStorm Network,BrainStorm Network,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://195.239.55.171:1080,socks5,195.239.55.171,1080,927,0,alive,DME,RU,195.239.55.171,AS3216 PJSC Vimpelcom,PJSC Vimpelcom,isp,2026-10-15 12:44:41,EDT-Pages
-socks5://test123:test123@37.143.130.57:1080,socks5,37.143.130.57,1080,956,0,alive,MAD,ES,37.143.130.57,AS136258 BrainStorm Network,BrainStorm Network,business,2026-10-01 00:00:00,@danfeng_chat
-socks5://1:1@103.133.69.139:1080,socks5,103.133.69.139,1080,977,0,alive,CGK,ID,103.133.69.139,AS38320 PT Ekakarya Graha Flora (PT Maxindo Mitra Solusi),PT Maxindo Mitra Solusi,isp,2026-10-01 00:00:00,@danfeng_chat
+socks5://test123:test123@37.143.130.57:1080,socks5,37.143.130.57,1080,956,0,alive,MAD,ES,37.143.130.57,AS136258 BrainStorm Network,BrainStorm Network,datacenter,2026-10-01 00:00:00,@danfeng_chat
+socks5://1:1@103.133.69.139:1080,socks5,103.133.69.139,1080,977,0,alive,CGK,ID,103.133.69.139,AS38320 PT Ekakarya Graha Flora (PT Maxindo Mitra Solusi),PT Maxindo Mitra Solusi,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://216.105.128.144:4145,socks5,216.105.128.144,4145,979,0,alive,ATL,US,216.105.128.144,AS20081 NET2ATLANTA.COM LLC,NET2ATLANTA.COM LLC,isp,2026-10-09 22:46:01,EDT-Pages
-socks5://1:1@103.234.255.178:1080,socks5,103.234.255.178,1080,1018,0,alive,SIN,ID,103.234.255.178,AS38320 PT Ekakarya Graha Flora (PT Maxindo Mitra Solusi),PT Maxindo Mitra Solusi,isp,2026-10-01 00:00:00,@danfeng_chat
+socks5://1:1@103.234.255.178:1080,socks5,103.234.255.178,1080,1018,0,alive,SIN,ID,103.234.255.178,AS38320 PT Ekakarya Graha Flora (PT Maxindo Mitra Solusi),PT Maxindo Mitra Solusi,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://8888:8888@8.210.220.230:6666,socks5,8.210.220.230,6666,1049,0,alive,HKG,HK,8.210.220.230,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://66.42.224.229:41679,socks5,66.42.224.229,41679,1071,0,alive,CVG,US,66.42.224.229,AS6181 CINCINNATI BELL,CINCINNATI BELL,isp,2026-10-09 22:46:01,EDT-Pages
-socks5://test123:test123@109.104.155.18:1080,socks5,109.104.155.18,1080,1085,0,alive,GRU,BR,109.104.155.18,AS136258 BrainStorm Network,BrainStorm Network,business,2026-10-01 00:00:00,@danfeng_chat
+socks5://test123:test123@109.104.155.18:1080,socks5,109.104.155.18,1080,1085,0,alive,GRU,BR,109.104.155.18,AS136258 BrainStorm Network,BrainStorm Network,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://216.68.128.121:4145,socks5,216.68.128.121,4145,1086,0,alive,CVG,US,216.68.128.121,AS6181 CINCINNATI BELL,CINCINNATI BELL,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://abc123:abc123@103.238.72.56:1080,socks5,103.238.72.56,1080,1103,0,alive,HAN,VN,103.238.72.56,AS24088 Hanoi Telecom Joint Stock Company - HCMC Branch,Hanoi Telecom Joint Stock Company - HCMC Branch,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://root:123456@101.89.159.229:1080,socks5,101.89.159.229,1080,1186,0,alive,LAX,CN,101.89.159.229,AS4811 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://11:11@103.156.238.48:1080,socks5,103.156.238.48,1080,1191,0,alive,DAC,BD,103.156.238.51,AS133770 H M COMMUNICATION,H M COMMUNICATION,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://112.5.33.179:999,socks5,112.5.33.179,999,1192,0,alive,LHR,CN,112.5.33.179,AS9808 China Mobile,China Mobile Communications Corporation,isp,2026-10-14 12:57:52,EDT-Pages
 socks5://test:test@103.79.183.34:1080,socks5,103.79.183.34,1080,1239,0,alive,DAC,BD,103.79.183.34,AS136009 SpeedNet,SpeedNet,isp,2026-10-01 00:00:00,@danfeng_chat
-socks5://171.25.158.95:1080,socks5,171.25.158.95,1080,1253,0,alive,ARN,SE,171.25.158.95,AS35100 Patrik Lagerman (Vaxjo NET C2IP),Vaxjo NET C2IP,isp,2026-10-13 14:49:54,EDT-Pages
 socks5://ss:ss@103.80.116.190:1080,socks5,103.80.116.190,1080,1262,0,alive,BOM,IN,103.185.244.238,AS135834 Multicraft Digital Technologies Private Limited,Multicraft Digital Technologies Private Limited,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://ss:ss@103.14.72.168:1080,socks5,103.14.72.168,1080,1270,0,alive,DAC,BD,103.14.72.168,AS137967 DigiCon Telecommunication Ltd,Digicon Telecommunication Ltd,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://root:123456@59.36.137.51:1080,socks5,59.36.137.51,1080,1289,0,alive,FRA,CN,59.36.137.51,AS4134 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
@@ -146,7 +141,7 @@ socks5://69.61.200.104:36181,socks5,69.61.200.104,36181,1711,0,alive,CVG,US,69.6
 socks5://root:123456@61.171.50.57:1080,socks5,61.171.50.57,1080,1825,0,alive,FRA,CN,61.171.50.57,AS4811 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://root:123456@61.171.95.65:1080,socks5,61.171.95.65,1080,1853,0,alive,LAX,CN,61.171.95.65,AS4811 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://root:123456@61.171.51.87:1080,socks5,61.171.51.87,1080,1870,0,alive,LAX,CN,61.171.51.87,AS4811 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
-socks5://test123:test123@31.40.212.146:1080,socks5,31.40.212.146,1080,1883,0,alive,EZE,AR,31.40.212.146,AS136258 BrainStorm Network,BrainStorm Network,business,2026-10-01 00:00:00,@danfeng_chat
+socks5://test123:test123@31.40.212.146:1080,socks5,31.40.212.146,1080,1883,0,alive,EZE,AR,31.40.212.146,AS136258 BrainStorm Network,BrainStorm Network,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://118.71.140.246:1080,socks5,118.71.140.246,1080,1905,0,alive,HKG,VN,118.71.140.246,AS18403 FPT Telecom Company (Vung dia chi IP cap cho dich vu IPTV tai Ha Noi),Vung dia chi IP cap cho dich vu IPTV tai Ha Noi,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://123:123@152.32.192.43:1080,socks5,152.32.192.43,1080,2011,0,alive,HKG,HK,152.32.192.43,AS135377 UCLOUD INFORMATION TECHNOLOGY (HK) LIMITED,UCLOUD INFORMATION TECHNOLOGY (HK) LIMITED,datacenter,2026-10-06 14:25:18,@danfeng_chat
 socks5://109.195.215.208:1080,socks5,109.195.215.208,1080,2055,0,alive,DME,RU,109.195.215.208,AS56377 JSC ER-Telecom Holding Magnitogorsk branch,JSC ER-Telecom Holding Magnitogorsk branch,isp,2026-10-13 14:49:54,EDT-Pages
@@ -159,54 +154,39 @@ socks5://45.74.31.41:4687,socks5,45.74.31.41,4687,2337,0,alive,NRT,JP,60.43.137.
 socks5://6666:6666@59.36.140.209:1080,socks5,59.36.140.209,1080,2388,0,alive,LAX,CN,59.36.140.209,AS4134 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://208.102.51.6:58208,socks5,208.102.51.6,58208,2411,0,alive,CVG,US,208.102.51.6,AS6181 CINCINNATI BELL,CINCINNATI BELL,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://88888:88888@8.210.36.244:1080,socks5,8.210.36.244,1080,2807,0,alive,HKG,HK,8.210.36.244,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
-socks5://103.100.158.115:10809,socks5,103.100.158.115,10809,2852,0,alive,NRT,JP,103.100.158.115,"AS51847 Toko Communications Co., Ltd.","Toko Communications Co., Ltd.",isp,2026-10-13 14:49:54,EDT-Pages
 socks5://149.40.242.118:1080,socks5,149.40.242.118,1080,2989,0,alive,KHI,PK,149.40.242.118,"AS174 Cogent Communications, LLC (Pvt)",Transworld Associates (Pvt) Ltd.,business,2026-10-15 12:44:41,EDT-Pages
 socks5://root:123456@61.171.54.239:1080,socks5,61.171.54.239,1080,3074,0,alive,FRA,CN,61.171.54.239,AS4811 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://112.169.210.64:1080,socks5,112.169.210.64,1080,3336,0,alive,ICN,KR,112.169.210.64,AS4766 Korea Telecom (KT),KT,isp,2026-10-12 15:18:13,EDT-Pages
 socks5://123456:123456@8.209.226.46:1080,socks5,8.209.226.46,1080,691,1,timeout,NRT,JP,8.209.226.46,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://123456:123456@8.209.205.237:1080,socks5,8.209.205.237,1080,696,1,timeout,NRT,JP,8.209.205.237,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
-socks5://67.205.161.254:9050,socks5,67.205.161.254,9050,1241,1,timeout,AMS,US,192.42.116.115,AS215125 SURF B.V.,SURF B.V.,education,2026-10-13 14:49:54,EDT-Pages
 socks5://148.251.68.232:8888,socks5,148.251.68.232,8888,1266,1,timeout,JNB,ZA,102.129.182.175,AS395793 Arisk Communications inc.,Arisk Communications inc.,isp,2026-10-09 22:46:01,EDT-Pages
-socks5://110.39.13.162:1080,socks5,110.39.13.162,1080,1276,1,conn_reset,KHI,PK,110.39.13.162,AS38264 National Wimax/IMS environment,National Wimax/IMS environment,isp,2026-10-14 12:57:52,EDT-Pages
 socks5://49.13.22.249:10807,socks5,49.13.22.249,10807,1434,1,timeout,SCL,CL,50.118.223.95,"AS174 Cogent Communications, LLC (Private Customer)",Private Customer,business,2026-10-14 12:57:52,EDT-Pages
-socks5://103.136.107.70:1080,socks5,103.136.107.70,1080,2188,1,conn_reset,DAC,BD,103.136.107.70,AS134599 Jagobd IT SolutionsRampura,Jagobd IT SolutionsRampura,isp,2026-10-13 14:49:54,EDT-Pages
-socks5://220.158.232.118:1080,socks5,220.158.232.118,1080,3267,1,timeout,PNH,KH,220.158.232.118,AS38623 BUCT COMMUNICATION,BUCT COMMUNICATION,isp,2026-10-13 14:49:54,EDT-Pages
-socks5://31.129.107.119:443,socks5,31.129.107.119,443,0,1,fail,,RU,31.129.107.119,AS198610 Beget LLC,Beget LLC,business,2026-10-15 12:44:41,EDT-Pages
 socks5://116.104.251.199:1111,socks5,116.104.251.199,1111,0,1,timeout,,VN,171.224.213.197,AS7552 Viettel Group,Viettel Group,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://45.74.31.47:4858,socks5,45.74.31.47,4858,0,1,timeout,,ID,182.253.126.69,AS17451 Biznet Networks,Biznet Networks,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://45.74.31.47:4659,socks5,45.74.31.47,4659,0,1,timeout,,ID,182.253.126.69,AS17451 BIZNET-PREPAID-BLOCK,BIZNET-PREPAID-BLOCK,isp,2026-10-15 12:44:41,EDT-Pages
-socks5://45.74.31.40:11933,socks5,45.74.31.40,11933,0,1,fail,,JP,35.73.97.127,AS16509 Amazon AWS (Amazon Data Services Japan),Amazon Data Services Japan,business,2026-10-15 12:44:41,EDT-Pages
 socks5://45.74.31.41:6355,socks5,45.74.31.41,6355,0,1,timeout,,ID,182.253.126.69,AS17451 BIZNET-PREPAID-BLOCK,BIZNET-PREPAID-BLOCK,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://167.99.3.26:9005,socks5,167.99.3.26,9005,0,1,conn_reset,,US,88.216.98.23,AS7029 Private Customer,Private Customer,isp,2026-10-15 12:44:41,EDT-Pages
-socks5://154.223.77.54:10002,socks5,154.223.77.54,10002,0,1,timeout,,HK,154.223.77.54,AS138915 UCloud (Kaopu Cloud HK Limited),Kaopu Cloud HK Limited,business,2026-10-15 12:44:41,EDT-Pages
 socks5://116.104.251.199:1085,socks5,116.104.251.199,1085,0,1,timeout,,VN,58.187.44.85,AS18403 FPT Telecom Company,FPT Telecom Company,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://167.99.3.26:8126,socks5,167.99.3.26,8126,0,1,conn_reset,,US,172.85.99.97,"AS5650 Frontier Communications of America, Inc. (Private Customer)",Private Customer,isp,2026-10-15 12:44:41,EDT-Pages
-socks5://64.83.14.6:555,socks5,64.83.14.6,555,0,1,timeout,,US,64.83.14.6,AS979 NetLab,NetLab Global,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://45.74.31.46:5501,socks5,45.74.31.46,5501,0,1,timeout,,ID,182.253.126.69,AS17451 Biznet Networks,Biznet Networks,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://46.100.94.217:1080,socks5,46.100.94.217,1080,0,1,timeout,,IR,46.100.94.217,AS58224 Telecommunication Company of Azarbayejan Sharghi,Telecommunication Company of Azarbayejan Sharghi,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://45.74.31.41:5305,socks5,45.74.31.41,5305,0,1,fail,,VN,202.92.4.71,AS135905 iNET Media Company Limited,iNET Media Company Limited,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://27.73.208.144:1100,socks5,27.73.208.144,1100,0,1,timeout,,VN,116.101.14.169,AS7552 Viettel Group,Viettel Group,isp,2026-10-15 12:44:41,EDT-Pages
-socks5://213.139.210.13:1080,socks5,213.139.210.13,1080,0,1,timeout,,RU,213.139.210.13,AS198610 Beget LLC,Beget LLC,business,2026-10-15 12:44:41,EDT-Pages
 socks5://120.133.82.62:44046,socks5,120.133.82.62,44046,0,1,timeout,,CN,124.88.142.204,AS4837 China Unicom,China Unicom XinJiang province network,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://120.133.82.62:44221,socks5,120.133.82.62,44221,0,1,timeout,,CN,219.145.103.106,AS4134 China Telecom (CHINANET Shanxi SN province network),CHINANET Shanxi SN province network,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://58.144.196.192:39105,socks5,58.144.196.192,39105,0,1,timeout,,CN,220.192.60.125,AS4837 China Unicom,China Unicom,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://45.74.31.46:5391,socks5,45.74.31.46,5391,0,1,timeout,,VN,180.93.146.113,AS7602 Sai gon Postel Corporation (Saigon Postel Corporation),Saigon Postel Corporation,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://120.133.82.62:44005,socks5,120.133.82.62,44005,0,1,timeout,,CN,120.208.9.117,AS56042 China Mobile Communications Corporation,China Mobile Communications Corporation,isp,2026-10-15 12:44:41,EDT-Pages
-socks5://45.74.31.41:8155,socks5,45.74.31.41,8155,0,1,timeout,,IN,103.250.149.106,AS45916 Gtpl Broadband Pvt. Ltd.,GTPL Broadband Pvt. Ltd.,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://5.75.133.113:10807,socks5,5.75.133.113,10807,2120,2,timeout,ZRH,CH,147.90.236.63,"AS174 Cogent Communications, LLC (Private Customer)",Private Customer,business,2026-10-12 21:49:55,EDT-Pages
 socks5://45.74.31.42:4604,socks5,45.74.31.42,4604,0,2,timeout,,ID,182.253.126.69,AS17451 BIZNET-PREPAID-BLOCK,BIZNET-PREPAID-BLOCK,isp,2026-10-14 12:57:52,EDT-Pages
 socks5://120.133.82.62:44098,socks5,120.133.82.62,44098,0,2,timeout,,CN,120.227.196.195,AS56047 China Mobile Communications Corporation,China Mobile Communications Corporation,isp,2026-10-14 12:57:52,EDT-Pages
 socks5://45.74.31.40:4759,socks5,45.74.31.40,4759,0,2,fail,,ID,182.253.126.69,AS17451 BIZNET-PREPAID-BLOCK,BIZNET-PREPAID-BLOCK,isp,2026-10-14 12:57:52,EDT-Pages
-socks5://45.74.31.42:9198,socks5,45.74.31.42,9198,0,2,timeout,,IN,103.250.149.106,AS45916 Gtpl Broadband Pvt. Ltd.,GTPL Broadband Pvt. Ltd.,isp,2026-10-14 12:57:52,EDT-Pages
-socks5://45.74.31.47:16613,socks5,45.74.31.47,16613,0,2,fail,,VN,103.74.121.5,AS135967 Branch of BachKim Network solutions jsc,Branch of BachKim Network solutions jsc,business,2026-10-14 12:57:52,EDT-Pages
-socks5://91.90.25.95:1080,socks5,91.90.25.95,1080,0,2,timeout,,SE,91.90.25.92,AS35100 Patrik Lagerman,Patrik Lagerman,isp,2026-10-14 12:57:52,EDT-Pages
 socks5://159.196.163.64:80,socks5,159.196.163.64,80,0,2,conn_reset,,AU,159.196.163.64,AS4764 Aussie Broadband Ltd,Aussie Broadband Ltd,isp,2026-10-14 12:57:52,EDT-Pages
 socks5://45.74.31.47:5941,socks5,45.74.31.47,5941,0,2,timeout,,ID,182.253.126.69,AS17451 Biznet Networks,Biznet Networks,isp,2026-10-14 12:57:52,EDT-Pages
 socks5://120.133.82.62:44115,socks5,120.133.82.62,44115,0,2,timeout,,CN,171.95.183.173,AS4134 China Telecom (CHINANET Sichuan province network),CHINANET Sichuan province network,isp,2026-10-14 12:57:52,EDT-Pages
 socks5://45.74.31.41:6514,socks5,45.74.31.41,6514,0,2,timeout,,ID,182.253.126.69,AS17451 BIZNET-PREPAID-BLOCK,BIZNET-PREPAID-BLOCK,isp,2026-10-14 12:57:52,EDT-Pages
 socks5://45.74.31.47:4815,socks5,45.74.31.47,4815,0,2,timeout,,ID,182.253.126.69,AS17451 Biznet Networks,Biznet Networks,isp,2026-10-14 12:57:52,EDT-Pages
 socks5://120.133.82.62:44033,socks5,120.133.82.62,44033,0,2,timeout,,CN,39.154.173.16,AS9808 China Mobile,China Mobile Communications Corporation,isp,2026-10-14 12:57:52,EDT-Pages
-socks5://45.74.31.46:5549,socks5,45.74.31.46,5549,0,2,fail,,JP,35.79.60.160,AS16509 Amazon AWS (Amazon Data Services Japan),Amazon Data Services Japan,business,2026-10-14 12:57:52,EDT-Pages
 socks5://45.74.31.42:5963,socks5,45.74.31.42,5963,0,2,timeout,,ID,182.253.126.69,AS17451 Biznet Networks,Biznet Networks,isp,2026-10-14 12:57:52,EDT-Pages
 socks5://120.133.82.62:44157,socks5,120.133.82.62,44157,0,2,timeout,,CN,114.103.49.215,AS4134 China Telecom (CHINANET anhui province network),CHINANET anhui province network,isp,2026-10-14 12:57:52,EDT-Pages
 socks5://124.128.96.68:64077,socks5,124.128.96.68,64077,0,2,fail,,CN,39.144.112.22,AS24444 China Mobile Communications Corporation,China Mobile Communications Corporation,isp,2026-10-14 12:57:52,EDT-Pages

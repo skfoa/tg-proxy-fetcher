@@ -3,7 +3,7 @@ socks5://admin:123456@179.255.152.25:1080,socks5,179.255.152.25,1080,55,0,alive,
 socks5://user1:pass1@154.17.15.8:1080,socks5,154.17.15.8,1080,55,0,alive,LAX,US,154.17.15.8,AS906 DMIT,DMIT,datacenter,2026-10-12 15:18:13,@otcfxq
 socks5://user1:pass1@154.21.91.106:1080,socks5,154.21.91.106,1080,56,0,alive,LAX,US,154.21.91.106,AS906 DMIT,DMIT,datacenter,2026-10-12 15:18:13,@otcfxq
 socks5://user1:pass1@154.17.10.5:1080,socks5,154.17.10.5,1080,59,0,alive,LAX,US,154.17.10.5,AS906 DMIT,DMIT,datacenter,2026-10-12 15:18:13,@otcfxq
-socks5://proxyuser:proxypass@23.177.185.234:1080,socks5,23.177.185.234,1080,135,0,alive,SJC,US,23.177.185.234,AS400992 ZhouyiSat Communications,ZhouyiSat Communications,isp,2026-10-01 00:00:00,@danfeng_chat
+socks5://proxyuser:proxypass@23.177.185.234:1080,socks5,23.177.185.234,1080,135,0,alive,SJC,US,23.177.185.234,AS400992 ZhouyiSat Communications,ZhouyiSat Communications,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://test123:test123@23.158.200.158:1080,socks5,23.158.200.158,1080,150,0,alive,LAX,US,23.158.200.158,AS63023 Ipxo LLC,Ipxo LLC,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://asd123:asd123@136.175.177.78:1080,socks5,136.175.177.78,1080,184,0,alive,LAX,US,136.175.177.78,AS906 DMIT,DMIT,datacenter,2026-10-12 15:18:13,@otcfxq
 socks5://test123:test123@23.238.34.20:1080,socks5,23.238.34.20,1080,283,0,alive,DFW,US,23.254.136.103,AS54290 Hostwinds LLC.,Hostwinds LLC.,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -12,7 +12,6 @@ socks5://199.66.182.243:4145,socks5,199.66.182.243,4145,397,0,alive,ATL,US,199.6
 socks5://216.105.143.146:4145,socks5,216.105.143.146,4145,401,0,alive,ATL,US,216.105.143.146,AS20081 NET2ATLANTA.COM LLC,NET2ATLANTA.COM LLC,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://199.66.183.226:4145,socks5,199.66.183.226,4145,403,0,alive,ATL,US,199.66.183.226,AS20081 NET2ATLANTA.COM LLC,NET2ATLANTA.COM LLC,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://216.105.130.131:4145,socks5,216.105.130.131,4145,407,0,alive,ATL,US,216.105.130.131,AS20081 NET2ATLANTA.COM LLC,NET2ATLANTA.COM LLC,isp,2026-10-09 22:46:01,EDT-Pages
-socks5://158.101.8.92:1080,socks5,158.101.8.92,1080,505,0,alive,AMS,US,192.42.116.19,AS215125 SURF B.V.,SURF B.V.,education,2026-10-15 12:44:41,EDT-Pages
 socks5://test123:test123@104.219.233.124:1080,socks5,104.219.233.124,1080,511,0,alive,ORD,US,104.219.233.124,AS27176 DataWagon LLC,DataWagon LLC,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://72.194.42.131:4145,socks5,72.194.42.131,4145,524,0,alive,ATL,US,72.194.42.131,"AS22773 Cox Communications Inc. (Cox Communications, Inc.)","Cox Communications, Inc.",isp,2026-10-09 22:46:01,EDT-Pages
 socks5://72.194.42.156:4145,socks5,72.194.42.156,4145,529,0,alive,ATL,US,72.194.42.156,"AS22773 Cox Communications Inc. (Cox Communications, Inc.)","Cox Communications, Inc.",isp,2026-10-09 22:46:01,EDT-Pages
@@ -75,7 +74,6 @@ socks5://72.195.34.35:27360,socks5,72.195.34.35,27360,575,0,alive,ATL,US,72.195.
 socks5://98.188.47.150:4145,socks5,98.188.47.150,4145,575,0,alive,ATL,US,98.188.47.150,AS22773 Cox Communications Inc.,Cox Communications,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://24.249.199.4:4145,socks5,24.249.199.4,4145,576,0,alive,ATL,US,24.249.199.4,AS22773 Cox Communications Inc.,Cox Communications,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://98.175.31.222:4145,socks5,98.175.31.222,4145,577,0,alive,ATL,US,98.175.31.222,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-09 22:46:01,EDT-Pages
-socks5://35.73.138.133:443,socks5,35.73.138.133,443,583,0,alive,NRT,JP,35.73.138.133,AS16509 Amazon AWS (Amazon Data Services Japan),Amazon Data Services Japan,business,2026-10-15 12:44:41,EDT-Pages
 socks5://98.170.57.231:4145,socks5,98.170.57.231,4145,585,0,alive,ATL,US,98.170.57.231,AS22773 Cox Communications Inc.,Cox Communications,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://98.182.147.97:4145,socks5,98.182.147.97,4145,588,0,alive,ATL,US,98.182.147.97,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://72.195.114.169:4145,socks5,72.195.114.169,4145,592,0,alive,ATL,US,72.195.114.169,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-09 22:46:01,EDT-Pages
@@ -104,30 +102,27 @@ socks5://8888:8888@8.210.157.4:6666,socks5,8.210.157.4,6666,811,0,alive,HKG,HK,8
 socks5://6666:6666@8.210.222.7:6666,socks5,8.210.222.7,6666,814,0,alive,HKG,HK,8.210.222.7,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://6666:6666@8.210.224.195:6666,socks5,8.210.224.195,6666,818,0,alive,HKG,HK,8.210.224.195,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://174.75.211.193:4145,socks5,174.75.211.193,4145,821,0,alive,ATL,US,174.75.211.193,AS22773 Cox Communications Inc.,Cox Communications,isp,2026-10-09 22:46:01,EDT-Pages
-socks5://37.18.73.60:5566,socks5,37.18.73.60,5566,845,0,alive,AMS,US,192.42.116.105,AS215125 SURF B.V.,SURF B.V.,education,2026-10-13 14:49:54,EDT-Pages
 socks5://123:123@165.154.23.8:1080,socks5,165.154.23.8,1080,847,0,alive,HKG,HK,165.154.23.8,AS135377 UCLOUD INFORMATION TECHNOLOGY (HK) LIMITED,UCLOUD INFORMATION TECHNOLOGY (HK) LIMITED,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://123:123@101.36.126.84:1080,socks5,101.36.126.84,1080,872,0,alive,HKG,HK,101.36.126.84,AS135377 UCLOUD INFORMATION TECHNOLOGY (HK) LIMITED,UCLOUD INFORMATION TECHNOLOGY (HK) LIMITED,datacenter,2026-10-09 14:13:10,@danfeng_chat
 socks5://174.64.199.82:4145,socks5,174.64.199.82,4145,891,0,alive,ATL,US,174.64.199.82,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://888888:888888@8.210.165.193:5555,socks5,8.210.165.193,5555,892,0,alive,HKG,HK,8.210.165.193,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
-socks5://test123:test123@168.222.247.40:1080,socks5,168.222.247.40,1080,894,0,alive,FRA,DE,168.222.247.40,AS136258 BrainStorm Network,BrainStorm Network,business,2026-10-01 00:00:00,@danfeng_chat
+socks5://test123:test123@168.222.247.40:1080,socks5,168.222.247.40,1080,894,0,alive,FRA,DE,168.222.247.40,AS136258 BrainStorm Network,BrainStorm Network,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://123:123@152.32.186.245:1080,socks5,152.32.186.245,1080,898,0,alive,HKG,HK,152.32.186.245,AS135377 UCLOUD INFORMATION TECHNOLOGY (HK) LIMITED,UCLOUD INFORMATION TECHNOLOGY (HK) LIMITED,datacenter,2026-10-01 00:00:00,@danfeng_chat
-socks5://45.61.129.165:9050,socks5,45.61.129.165,9050,904,0,alive,AMS,US,192.42.116.95,AS215125 SURF B.V.,SURF B.V.,education,2026-10-13 14:49:54,EDT-Pages
-socks5://test123:test123@103.75.119.242:1080,socks5,103.75.119.242,1080,905,0,alive,SYD,AU,103.75.119.242,AS136258 BrainStorm Network,BrainStorm Network,business,2026-10-01 00:00:00,@danfeng_chat
+socks5://test123:test123@103.75.119.242:1080,socks5,103.75.119.242,1080,905,0,alive,SYD,AU,103.75.119.242,AS136258 BrainStorm Network,BrainStorm Network,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://195.239.55.171:1080,socks5,195.239.55.171,1080,927,0,alive,DME,RU,195.239.55.171,AS3216 PJSC Vimpelcom,PJSC Vimpelcom,isp,2026-10-15 12:44:41,EDT-Pages
-socks5://test123:test123@37.143.130.57:1080,socks5,37.143.130.57,1080,956,0,alive,MAD,ES,37.143.130.57,AS136258 BrainStorm Network,BrainStorm Network,business,2026-10-01 00:00:00,@danfeng_chat
-socks5://1:1@103.133.69.139:1080,socks5,103.133.69.139,1080,977,0,alive,CGK,ID,103.133.69.139,AS38320 PT Ekakarya Graha Flora (PT Maxindo Mitra Solusi),PT Maxindo Mitra Solusi,isp,2026-10-01 00:00:00,@danfeng_chat
+socks5://test123:test123@37.143.130.57:1080,socks5,37.143.130.57,1080,956,0,alive,MAD,ES,37.143.130.57,AS136258 BrainStorm Network,BrainStorm Network,datacenter,2026-10-01 00:00:00,@danfeng_chat
+socks5://1:1@103.133.69.139:1080,socks5,103.133.69.139,1080,977,0,alive,CGK,ID,103.133.69.139,AS38320 PT Ekakarya Graha Flora (PT Maxindo Mitra Solusi),PT Maxindo Mitra Solusi,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://216.105.128.144:4145,socks5,216.105.128.144,4145,979,0,alive,ATL,US,216.105.128.144,AS20081 NET2ATLANTA.COM LLC,NET2ATLANTA.COM LLC,isp,2026-10-09 22:46:01,EDT-Pages
-socks5://1:1@103.234.255.178:1080,socks5,103.234.255.178,1080,1018,0,alive,SIN,ID,103.234.255.178,AS38320 PT Ekakarya Graha Flora (PT Maxindo Mitra Solusi),PT Maxindo Mitra Solusi,isp,2026-10-01 00:00:00,@danfeng_chat
+socks5://1:1@103.234.255.178:1080,socks5,103.234.255.178,1080,1018,0,alive,SIN,ID,103.234.255.178,AS38320 PT Ekakarya Graha Flora (PT Maxindo Mitra Solusi),PT Maxindo Mitra Solusi,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://8888:8888@8.210.220.230:6666,socks5,8.210.220.230,6666,1049,0,alive,HKG,HK,8.210.220.230,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://66.42.224.229:41679,socks5,66.42.224.229,41679,1071,0,alive,CVG,US,66.42.224.229,AS6181 CINCINNATI BELL,CINCINNATI BELL,isp,2026-10-09 22:46:01,EDT-Pages
-socks5://test123:test123@109.104.155.18:1080,socks5,109.104.155.18,1080,1085,0,alive,GRU,BR,109.104.155.18,AS136258 BrainStorm Network,BrainStorm Network,business,2026-10-01 00:00:00,@danfeng_chat
+socks5://test123:test123@109.104.155.18:1080,socks5,109.104.155.18,1080,1085,0,alive,GRU,BR,109.104.155.18,AS136258 BrainStorm Network,BrainStorm Network,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://216.68.128.121:4145,socks5,216.68.128.121,4145,1086,0,alive,CVG,US,216.68.128.121,AS6181 CINCINNATI BELL,CINCINNATI BELL,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://abc123:abc123@103.238.72.56:1080,socks5,103.238.72.56,1080,1103,0,alive,HAN,VN,103.238.72.56,AS24088 Hanoi Telecom Joint Stock Company - HCMC Branch,Hanoi Telecom Joint Stock Company - HCMC Branch,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://root:123456@101.89.159.229:1080,socks5,101.89.159.229,1080,1186,0,alive,LAX,CN,101.89.159.229,AS4811 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://11:11@103.156.238.48:1080,socks5,103.156.238.48,1080,1191,0,alive,DAC,BD,103.156.238.51,AS133770 H M COMMUNICATION,H M COMMUNICATION,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://112.5.33.179:999,socks5,112.5.33.179,999,1192,0,alive,LHR,CN,112.5.33.179,AS9808 China Mobile,China Mobile Communications Corporation,isp,2026-10-14 12:57:52,EDT-Pages
 socks5://test:test@103.79.183.34:1080,socks5,103.79.183.34,1080,1239,0,alive,DAC,BD,103.79.183.34,AS136009 SpeedNet,SpeedNet,isp,2026-10-01 00:00:00,@danfeng_chat
-socks5://171.25.158.95:1080,socks5,171.25.158.95,1080,1253,0,alive,ARN,SE,171.25.158.95,AS35100 Patrik Lagerman (Vaxjo NET C2IP),Vaxjo NET C2IP,isp,2026-10-13 14:49:54,EDT-Pages
 socks5://ss:ss@103.80.116.190:1080,socks5,103.80.116.190,1080,1262,0,alive,BOM,IN,103.185.244.238,AS135834 Multicraft Digital Technologies Private Limited,Multicraft Digital Technologies Private Limited,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://ss:ss@103.14.72.168:1080,socks5,103.14.72.168,1080,1270,0,alive,DAC,BD,103.14.72.168,AS137967 DigiCon Telecommunication Ltd,Digicon Telecommunication Ltd,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://root:123456@59.36.137.51:1080,socks5,59.36.137.51,1080,1289,0,alive,FRA,CN,59.36.137.51,AS4134 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
@@ -146,7 +141,7 @@ socks5://69.61.200.104:36181,socks5,69.61.200.104,36181,1711,0,alive,CVG,US,69.6
 socks5://root:123456@61.171.50.57:1080,socks5,61.171.50.57,1080,1825,0,alive,FRA,CN,61.171.50.57,AS4811 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://root:123456@61.171.95.65:1080,socks5,61.171.95.65,1080,1853,0,alive,LAX,CN,61.171.95.65,AS4811 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://root:123456@61.171.51.87:1080,socks5,61.171.51.87,1080,1870,0,alive,LAX,CN,61.171.51.87,AS4811 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
-socks5://test123:test123@31.40.212.146:1080,socks5,31.40.212.146,1080,1883,0,alive,EZE,AR,31.40.212.146,AS136258 BrainStorm Network,BrainStorm Network,business,2026-10-01 00:00:00,@danfeng_chat
+socks5://test123:test123@31.40.212.146:1080,socks5,31.40.212.146,1080,1883,0,alive,EZE,AR,31.40.212.146,AS136258 BrainStorm Network,BrainStorm Network,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://118.71.140.246:1080,socks5,118.71.140.246,1080,1905,0,alive,HKG,VN,118.71.140.246,AS18403 FPT Telecom Company (Vung dia chi IP cap cho dich vu IPTV tai Ha Noi),Vung dia chi IP cap cho dich vu IPTV tai Ha Noi,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://123:123@152.32.192.43:1080,socks5,152.32.192.43,1080,2011,0,alive,HKG,HK,152.32.192.43,AS135377 UCLOUD INFORMATION TECHNOLOGY (HK) LIMITED,UCLOUD INFORMATION TECHNOLOGY (HK) LIMITED,datacenter,2026-10-06 14:25:18,@danfeng_chat
 socks5://109.195.215.208:1080,socks5,109.195.215.208,1080,2055,0,alive,DME,RU,109.195.215.208,AS56377 JSC ER-Telecom Holding Magnitogorsk branch,JSC ER-Telecom Holding Magnitogorsk branch,isp,2026-10-13 14:49:54,EDT-Pages
@@ -159,128 +154,90 @@ socks5://45.74.31.41:4687,socks5,45.74.31.41,4687,2337,0,alive,NRT,JP,60.43.137.
 socks5://6666:6666@59.36.140.209:1080,socks5,59.36.140.209,1080,2388,0,alive,LAX,CN,59.36.140.209,AS4134 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://208.102.51.6:58208,socks5,208.102.51.6,58208,2411,0,alive,CVG,US,208.102.51.6,AS6181 CINCINNATI BELL,CINCINNATI BELL,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://88888:88888@8.210.36.244:1080,socks5,8.210.36.244,1080,2807,0,alive,HKG,HK,8.210.36.244,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
-socks5://103.100.158.115:10809,socks5,103.100.158.115,10809,2852,0,alive,NRT,JP,103.100.158.115,"AS51847 Toko Communications Co., Ltd.","Toko Communications Co., Ltd.",isp,2026-10-13 14:49:54,EDT-Pages
 socks5://149.40.242.118:1080,socks5,149.40.242.118,1080,2989,0,alive,KHI,PK,149.40.242.118,"AS174 Cogent Communications, LLC (Pvt)",Transworld Associates (Pvt) Ltd.,business,2026-10-15 12:44:41,EDT-Pages
 socks5://root:123456@61.171.54.239:1080,socks5,61.171.54.239,1080,3074,0,alive,FRA,CN,61.171.54.239,AS4811 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://112.169.210.64:1080,socks5,112.169.210.64,1080,3336,0,alive,ICN,KR,112.169.210.64,AS4766 Korea Telecom (KT),KT,isp,2026-10-12 15:18:13,EDT-Pages
 socks5://123456:123456@8.209.226.46:1080,socks5,8.209.226.46,1080,691,1,timeout,NRT,JP,8.209.226.46,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://123456:123456@8.209.205.237:1080,socks5,8.209.205.237,1080,696,1,timeout,NRT,JP,8.209.205.237,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
-socks5://67.205.161.254:9050,socks5,67.205.161.254,9050,1241,1,timeout,AMS,US,192.42.116.115,AS215125 SURF B.V.,SURF B.V.,education,2026-10-13 14:49:54,EDT-Pages
 socks5://148.251.68.232:8888,socks5,148.251.68.232,8888,1266,1,timeout,JNB,ZA,102.129.182.175,AS395793 Arisk Communications inc.,Arisk Communications inc.,isp,2026-10-09 22:46:01,EDT-Pages
-socks5://110.39.13.162:1080,socks5,110.39.13.162,1080,1276,1,conn_reset,KHI,PK,110.39.13.162,AS38264 National Wimax/IMS environment,National Wimax/IMS environment,isp,2026-10-14 12:57:52,EDT-Pages
 socks5://49.13.22.249:10807,socks5,49.13.22.249,10807,1434,1,timeout,SCL,CL,50.118.223.95,"AS174 Cogent Communications, LLC (Private Customer)",Private Customer,business,2026-10-14 12:57:52,EDT-Pages
-socks5://103.136.107.70:1080,socks5,103.136.107.70,1080,2188,1,conn_reset,DAC,BD,103.136.107.70,AS134599 Jagobd IT SolutionsRampura,Jagobd IT SolutionsRampura,isp,2026-10-13 14:49:54,EDT-Pages
-socks5://220.158.232.118:1080,socks5,220.158.232.118,1080,3267,1,timeout,PNH,KH,220.158.232.118,AS38623 BUCT COMMUNICATION,BUCT COMMUNICATION,isp,2026-10-13 14:49:54,EDT-Pages
-socks5://31.129.107.119:443,socks5,31.129.107.119,443,0,1,fail,,RU,31.129.107.119,AS198610 Beget LLC,Beget LLC,business,2026-10-15 12:44:41,EDT-Pages
 socks5://116.104.251.199:1111,socks5,116.104.251.199,1111,0,1,timeout,,VN,171.224.213.197,AS7552 Viettel Group,Viettel Group,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://45.74.31.47:4858,socks5,45.74.31.47,4858,0,1,timeout,,ID,182.253.126.69,AS17451 Biznet Networks,Biznet Networks,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://45.74.31.47:4659,socks5,45.74.31.47,4659,0,1,timeout,,ID,182.253.126.69,AS17451 BIZNET-PREPAID-BLOCK,BIZNET-PREPAID-BLOCK,isp,2026-10-15 12:44:41,EDT-Pages
-socks5://45.74.31.40:11933,socks5,45.74.31.40,11933,0,1,fail,,JP,35.73.97.127,AS16509 Amazon AWS (Amazon Data Services Japan),Amazon Data Services Japan,business,2026-10-15 12:44:41,EDT-Pages
 socks5://45.74.31.41:6355,socks5,45.74.31.41,6355,0,1,timeout,,ID,182.253.126.69,AS17451 BIZNET-PREPAID-BLOCK,BIZNET-PREPAID-BLOCK,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://167.99.3.26:9005,socks5,167.99.3.26,9005,0,1,conn_reset,,US,88.216.98.23,AS7029 Private Customer,Private Customer,isp,2026-10-15 12:44:41,EDT-Pages
-socks5://154.223.77.54:10002,socks5,154.223.77.54,10002,0,1,timeout,,HK,154.223.77.54,AS138915 UCloud (Kaopu Cloud HK Limited),Kaopu Cloud HK Limited,business,2026-10-15 12:44:41,EDT-Pages
 socks5://116.104.251.199:1085,socks5,116.104.251.199,1085,0,1,timeout,,VN,58.187.44.85,AS18403 FPT Telecom Company,FPT Telecom Company,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://167.99.3.26:8126,socks5,167.99.3.26,8126,0,1,conn_reset,,US,172.85.99.97,"AS5650 Frontier Communications of America, Inc. (Private Customer)",Private Customer,isp,2026-10-15 12:44:41,EDT-Pages
-socks5://64.83.14.6:555,socks5,64.83.14.6,555,0,1,timeout,,US,64.83.14.6,AS979 NetLab,NetLab Global,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://45.74.31.46:5501,socks5,45.74.31.46,5501,0,1,timeout,,ID,182.253.126.69,AS17451 Biznet Networks,Biznet Networks,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://46.100.94.217:1080,socks5,46.100.94.217,1080,0,1,timeout,,IR,46.100.94.217,AS58224 Telecommunication Company of Azarbayejan Sharghi,Telecommunication Company of Azarbayejan Sharghi,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://45.74.31.41:5305,socks5,45.74.31.41,5305,0,1,fail,,VN,202.92.4.71,AS135905 iNET Media Company Limited,iNET Media Company Limited,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://27.73.208.144:1100,socks5,27.73.208.144,1100,0,1,timeout,,VN,116.101.14.169,AS7552 Viettel Group,Viettel Group,isp,2026-10-15 12:44:41,EDT-Pages
-socks5://213.139.210.13:1080,socks5,213.139.210.13,1080,0,1,timeout,,RU,213.139.210.13,AS198610 Beget LLC,Beget LLC,business,2026-10-15 12:44:41,EDT-Pages
 socks5://120.133.82.62:44046,socks5,120.133.82.62,44046,0,1,timeout,,CN,124.88.142.204,AS4837 China Unicom,China Unicom XinJiang province network,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://120.133.82.62:44221,socks5,120.133.82.62,44221,0,1,timeout,,CN,219.145.103.106,AS4134 China Telecom (CHINANET Shanxi SN province network),CHINANET Shanxi SN province network,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://58.144.196.192:39105,socks5,58.144.196.192,39105,0,1,timeout,,CN,220.192.60.125,AS4837 China Unicom,China Unicom,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://45.74.31.46:5391,socks5,45.74.31.46,5391,0,1,timeout,,VN,180.93.146.113,AS7602 Sai gon Postel Corporation (Saigon Postel Corporation),Saigon Postel Corporation,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://120.133.82.62:44005,socks5,120.133.82.62,44005,0,1,timeout,,CN,120.208.9.117,AS56042 China Mobile Communications Corporation,China Mobile Communications Corporation,isp,2026-10-15 12:44:41,EDT-Pages
-socks5://45.74.31.41:8155,socks5,45.74.31.41,8155,0,1,timeout,,IN,103.250.149.106,AS45916 Gtpl Broadband Pvt. Ltd.,GTPL Broadband Pvt. Ltd.,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://5.75.133.113:10807,socks5,5.75.133.113,10807,2120,2,timeout,ZRH,CH,147.90.236.63,"AS174 Cogent Communications, LLC (Private Customer)",Private Customer,business,2026-10-12 21:49:55,EDT-Pages
 socks5://45.74.31.42:4604,socks5,45.74.31.42,4604,0,2,timeout,,ID,182.253.126.69,AS17451 BIZNET-PREPAID-BLOCK,BIZNET-PREPAID-BLOCK,isp,2026-10-14 12:57:52,EDT-Pages
 socks5://120.133.82.62:44098,socks5,120.133.82.62,44098,0,2,timeout,,CN,120.227.196.195,AS56047 China Mobile Communications Corporation,China Mobile Communications Corporation,isp,2026-10-14 12:57:52,EDT-Pages
 socks5://45.74.31.40:4759,socks5,45.74.31.40,4759,0,2,fail,,ID,182.253.126.69,AS17451 BIZNET-PREPAID-BLOCK,BIZNET-PREPAID-BLOCK,isp,2026-10-14 12:57:52,EDT-Pages
-socks5://45.74.31.42:9198,socks5,45.74.31.42,9198,0,2,timeout,,IN,103.250.149.106,AS45916 Gtpl Broadband Pvt. Ltd.,GTPL Broadband Pvt. Ltd.,isp,2026-10-14 12:57:52,EDT-Pages
-socks5://45.74.31.47:16613,socks5,45.74.31.47,16613,0,2,fail,,VN,103.74.121.5,AS135967 Branch of BachKim Network solutions jsc,Branch of BachKim Network solutions jsc,business,2026-10-14 12:57:52,EDT-Pages
-socks5://91.90.25.95:1080,socks5,91.90.25.95,1080,0,2,timeout,,SE,91.90.25.92,AS35100 Patrik Lagerman,Patrik Lagerman,isp,2026-10-14 12:57:52,EDT-Pages
 socks5://159.196.163.64:80,socks5,159.196.163.64,80,0,2,conn_reset,,AU,159.196.163.64,AS4764 Aussie Broadband Ltd,Aussie Broadband Ltd,isp,2026-10-14 12:57:52,EDT-Pages
 socks5://45.74.31.47:5941,socks5,45.74.31.47,5941,0,2,timeout,,ID,182.253.126.69,AS17451 Biznet Networks,Biznet Networks,isp,2026-10-14 12:57:52,EDT-Pages
 socks5://120.133.82.62:44115,socks5,120.133.82.62,44115,0,2,timeout,,CN,171.95.183.173,AS4134 China Telecom (CHINANET Sichuan province network),CHINANET Sichuan province network,isp,2026-10-14 12:57:52,EDT-Pages
 socks5://45.74.31.41:6514,socks5,45.74.31.41,6514,0,2,timeout,,ID,182.253.126.69,AS17451 BIZNET-PREPAID-BLOCK,BIZNET-PREPAID-BLOCK,isp,2026-10-14 12:57:52,EDT-Pages
 socks5://45.74.31.47:4815,socks5,45.74.31.47,4815,0,2,timeout,,ID,182.253.126.69,AS17451 Biznet Networks,Biznet Networks,isp,2026-10-14 12:57:52,EDT-Pages
 socks5://120.133.82.62:44033,socks5,120.133.82.62,44033,0,2,timeout,,CN,39.154.173.16,AS9808 China Mobile,China Mobile Communications Corporation,isp,2026-10-14 12:57:52,EDT-Pages
-socks5://45.74.31.46:5549,socks5,45.74.31.46,5549,0,2,fail,,JP,35.79.60.160,AS16509 Amazon AWS (Amazon Data Services Japan),Amazon Data Services Japan,business,2026-10-14 12:57:52,EDT-Pages
 socks5://45.74.31.42:5963,socks5,45.74.31.42,5963,0,2,timeout,,ID,182.253.126.69,AS17451 Biznet Networks,Biznet Networks,isp,2026-10-14 12:57:52,EDT-Pages
 socks5://120.133.82.62:44157,socks5,120.133.82.62,44157,0,2,timeout,,CN,114.103.49.215,AS4134 China Telecom (CHINANET anhui province network),CHINANET anhui province network,isp,2026-10-14 12:57:52,EDT-Pages
 socks5://124.128.96.68:64077,socks5,124.128.96.68,64077,0,2,fail,,CN,39.144.112.22,AS24444 China Mobile Communications Corporation,China Mobile Communications Corporation,isp,2026-10-14 12:57:52,EDT-Pages
 socks5://124.128.96.68:64159,socks5,124.128.96.68,64159,0,2,fail,,CN,36.150.158.17,AS56046 China Mobile Communications Corporation,China Mobile Communications Corporation,isp,2026-10-14 12:57:52,EDT-Pages
 http://131.196.13.233:999,http,131.196.13.233,999,492,0,alive,GYE,EC,131.196.13.233,AS52468 NEGOCIOS Y TELEFONIA NEDETEL S.A.,NEGOCIOS Y TELEFONIA NEDETEL S.A.,isp,2026-10-15 12:44:41,EDT-Pages
-http://18.190.253.157:26235,http,18.190.253.157,26235,566,0,alive,AMS,NL,192.42.116.20,AS215125 TOR EXIT AND MORE,TOR EXIT AND MORE,education,2026-10-15 12:44:41,EDT-Pages
 http://113.192.30.240:8080,http,113.192.30.240,8080,593,0,alive,CGK,ID,113.192.30.240,AS149360 PT. HITECH SMART SERVICE,PT. HITECH SMART SERVICE,isp,2026-10-15 12:44:41,EDT-Pages
 http://124.105.42.227:8081,http,124.105.42.227,8081,596,0,alive,HKG,PH,124.105.42.227,AS9299 Philippine Long Distance Telephone Company (IPG),IPG,isp,2026-10-15 12:44:41,EDT-Pages
 http://41.128.90.51:1976,http,41.128.90.51,1976,613,0,alive,MRS,EG,41.128.90.51,AS24863 Link Egypt (Link.NET),Link Egypt (Link.NET),isp,2026-10-12 21:49:55,EDT-Pages
 http://41.128.72.138:1981,http,41.128.72.138,1981,613,0,alive,MRS,EG,41.128.72.141,AS24863 Link Egypt (Link.NET),Link Egypt (Link.NET),isp,2026-10-15 12:44:41,EDT-Pages
 http://41.128.90.51:1981,http,41.128.90.51,1981,617,0,alive,MRS,EG,41.128.90.51,AS24863 Link Egypt (Link.NET),Link Egypt (Link.NET),isp,2026-10-12 21:49:55,EDT-Pages
 http://103.133.26.50:8080,http,103.133.26.50,8080,623,0,alive,SIN,ID,103.133.24.37,AS138130 PT PHATRIA INTI PERSADA,PT PHATRIA INTI PERSADA,isp,2026-10-12 15:18:13,EDT-Pages
-http://203.201.190.33:8080,http,203.201.190.33,8080,628,0,alive,CGK,ID,203.201.190.33,AS154833 PT WIRA HASTA JITU,PT WIRA HASTA JITU,isp,2026-10-15 12:44:41,EDT-Pages
 http://103.133.26.73:3128,http,103.133.26.73,3128,635,0,alive,CGK,ID,103.178.42.17,AS138130 PT PHATRIA INTI PERSADA,PT PHATRIA INTI PERSADA,isp,2026-10-12 15:18:13,EDT-Pages
 http://1.20.178.251:80,http,1.20.178.251,80,660,0,alive,BKK,TH,1.20.178.251,AS23969 TOT Mobile Co LTD,TOT Mobile Co LTD,isp,2026-10-15 12:44:41,EDT-Pages
-http://34.207.102.197:32421,http,34.207.102.197,32421,679,0,alive,MAN,NL,193.149.187.228,AS215125 TOR EXIT AND MORE,TOR EXIT AND MORE,education,2026-10-15 12:44:41,EDT-Pages
 http://41.196.16.226:1976,http,41.196.16.226,1976,723,0,alive,MRS,EG,41.196.16.226,AS24863 Link Egypt (Link.NET),Link Egypt,isp,2026-10-15 12:44:41,EDT-Pages
 http://102.244.78.61:8084,http,102.244.78.61,8084,848,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-09 22:46:01,EDT-Pages
 http://102.244.78.61:8080,http,102.244.78.61,8080,850,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-09 22:46:01,EDT-Pages
 http://102.244.78.61:8085,http,102.244.78.61,8085,856,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-09 22:46:01,EDT-Pages
 http://102.244.78.61:8087,http,102.244.78.61,8087,866,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-09 22:46:01,EDT-Pages
-http://51.17.99.116:14668,http,51.17.99.116,14668,871,0,alive,AMS,US,192.42.116.116,AS215125 SURF B.V.,SURF B.V.,education,2026-10-15 12:44:41,EDT-Pages
 http://160.19.41.47:80,http,160.19.41.47,80,901,0,alive,CCU,IN,122.176.99.218,AS24560 BHARTI TELENET LTD. NEW DELHI,BHARTI TELENET LTD. NEW DELHI,isp,2026-10-15 12:44:41,EDT-Pages
 http://45.245.208.180:8080,http,45.245.208.180,8080,903,0,alive,MRS,EG,45.245.208.180,AS24863 Link Egypt (Link.NET),Link Egypt (Link.NET),isp,2026-10-14 12:57:52,EDT-Pages
 http://200.76.169.46:999,http,200.76.169.46,999,916,0,alive,QRO,MX,189.206.189.150,"AS11172 Alestra, S. de R.L. de C.V.","Alestra, S. de R.L. de C.V.",isp,2026-10-15 12:44:41,EDT-Pages
 http://210.213.99.36:8081,http,210.213.99.36,8081,1026,0,alive,HKG,PH,210.213.99.36,AS9299 Philippine Long Distance Telephone Company (SMEDGM2026010840183_ENTERPRISE CLIENT),SMEDGM2026010840183_ENTERPRISE CLIENT,isp,2026-10-15 12:44:41,EDT-Pages
-http://56.155.73.159:36185,http,56.155.73.159,36185,1092,0,alive,AMS,US,192.42.116.16,AS215125 SURF B.V.,SURF B.V.,education,2026-10-15 12:44:41,EDT-Pages
-http://56.155.73.159:29191,http,56.155.73.159,29191,1121,0,alive,AMS,US,192.42.116.16,AS215125 SURF B.V.,SURF B.V.,education,2026-10-15 12:44:41,EDT-Pages
 http://123.121.134.141:8888,http,123.121.134.141,8888,1152,0,alive,LAX,CN,123.121.134.141,AS4808 China Unicom Beijing province network,China Unicom Beijing province network,isp,2026-10-14 12:57:52,EDT-Pages
-http://185.195.254.72:5432,http,185.195.254.72,5432,1167,0,alive,IST,TR,185.195.254.72,AS206119 Veganet Teknolojileri ve Hizmetleri LTD STI,Veganet Teknolojileri ve Hizmetleri LTD STI,business,2026-10-09 22:46:01,EDT-Pages
+http://185.195.254.72:5432,http,185.195.254.72,5432,1167,0,alive,IST,TR,185.195.254.72,AS206119 Veganet Teknolojileri ve Hizmetleri LTD STI,Veganet Teknolojileri ve Hizmetleri LTD STI,isp,2026-10-09 22:46:01,EDT-Pages
 http://114.245.153.111:8888,http,114.245.153.111,8888,1172,0,alive,LAX,CN,2408:8207:2502:33e0:8805:88df:2ec3:6a1a,AS4808 China Unicom,China Unicom,isp,2026-10-15 12:44:41,EDT-Pages
-http://42.96.15.210:60001,http,42.96.15.210,60001,1209,0,alive,HKG,VN,2403:6a40:0:15:e954:a237:c45c:6621,AS135967 Bach Kim Network solutions Join stock company,Bach Kim Network solutions Join stock company,business,2026-10-13 14:49:54,EDT-Pages
 http://103.25.220.18:8085,http,103.25.220.18,8085,1235,0,alive,MNL,PH,103.25.220.99,AS146954 IMJWANKLIK INTERNET COMMUNICATION SERVICES,IMJWANKLIK INTERNET COMMUNICATION SERVICES,isp,2026-10-15 12:44:41,EDT-Pages
 http://49.149.95.151:8080,http,49.149.95.151,8080,1256,0,alive,HKG,PH,49.149.95.151,AS9299 Philippine Long Distance Telephone Company (HOME_DSL),HOME_DSL,isp,2026-10-15 12:44:41,EDT-Pages
-http://18.61.230.250:6218,http,18.61.230.250,6218,1319,0,alive,OSL,US,185.243.218.231,AS215125 SURF B.V.,SURF B.V.,education,2026-10-15 12:44:41,EDT-Pages
 http://191.102.72.74:8080,http,191.102.72.74,8080,1323,0,alive,BOG,CO,191.102.72.74,AS262186 TV AZTECA SUCURSAL COLOMBIA,TV AZTECA SUCURSAL COLOMBIA,isp,2026-10-15 12:44:41,EDT-Pages
-http://163.227.248.71:8181,http,163.227.248.71,8181,1332,0,alive,CGK,ID,163.227.248.17,AS153895 PT Rajasa Sinergi Komunikasi,PT Rajasa Sinergi Komunikasi,isp,2026-10-14 12:57:52,EDT-Pages
 http://1.20.101.24:8080,http,1.20.101.24,8080,1404,0,alive,BKK,TH,1.20.101.24,AS23969 TOT Mobile Co LTD,TOT Mobile Co LTD,isp,2026-10-15 12:44:41,EDT-Pages
 http://111.206.4.163:18888,http,111.206.4.163,18888,1442,0,alive,HKG,CN,111.206.4.163,AS4808 China Unicom Beijing province network,China Unicom Beijing province network,isp,2026-10-09 22:46:01,EDT-Pages
 http://119.93.158.162:9090,http,119.93.158.162,9090,1598,0,alive,HKG,PH,119.93.158.162,AS9299 Philippine Long Distance Telephone Company (IPG),IPG,isp,2026-10-14 12:57:52,EDT-Pages
 http://103.172.23.250:1080,http,103.172.23.250,1080,1635,0,alive,CGK,ID,103.172.23.250,AS147127 PT Tujuhlangit Lintas Nusantara,PT Tujuhlangit Lintas Nusantara,isp,2026-10-15 12:44:41,EDT-Pages
-http://103.171.245.124:8090,http,103.171.245.124,8090,1662,0,alive,CGK,ID,103.171.244.214,AS141674 CV Amanda Network Grup,CV Amanda Network Grup,isp,2026-10-15 12:44:41,EDT-Pages
 http://202.58.75.98:7777,http,202.58.75.98,7777,1679,0,alive,CGK,ID,202.58.75.70,AS138886 PT Data Buana Nusantara,PT Data Buana Nusantara,isp,2026-10-15 12:44:41,EDT-Pages
-http://13.215.184.250:9898,http,13.215.184.250,9898,1696,0,alive,AMS,US,45.66.35.27,AS215125 SURF B.V.,SURF B.V.,education,2026-10-15 12:44:41,EDT-Pages
 http://102.68.76.247:5566,http,102.68.76.247,5566,1802,0,alive,NBO,KE,102.211.147.69,AS328490 Unwired Communications Ltd,Unwired Communications Ltd,isp,2026-10-15 12:44:41,EDT-Pages
-http://47.129.105.10:41552,http,47.129.105.10,41552,1807,0,alive,EWR,US,65.87.223.26,AS215125 SURF B.V.,SURF B.V.,education,2026-10-15 12:44:41,EDT-Pages
 http://123.121.75.126:8888,http,123.121.75.126,8888,1836,0,alive,LAX,CN,123.121.75.126,AS4808 China Unicom,China Unicom,isp,2026-10-14 12:57:52,EDT-Pages
 http://103.132.53.139:8080,http,103.132.53.139,8080,1878,0,alive,CGK,ID,103.132.53.139,AS138123 PT. ADEAKSA INDO JAYATAMA,PT. ADEAKSA INDO JAYATAMA,isp,2026-10-15 12:44:41,EDT-Pages
-http://35.183.29.62:8181,http,35.183.29.62,8181,1891,0,alive,CDG,US,203.55.81.1,AS215125 SURF B.V.,SURF B.V.,education,2026-10-15 12:44:41,EDT-Pages
 http://160.19.41.50:80,http,160.19.41.50,80,1910,0,alive,BOM,IN,182.65.204.8,AS24560,"Bharti Airtel Limited, 101,Santhome High Road,Chennai,TN",isp,2026-10-15 12:44:41,EDT-Pages
 http://139.135.182.132:8081,http,139.135.182.132,8081,2025,0,alive,MNL,PH,139.135.182.132,AS17639 Converge ICT SME Customer,Converge ICT SME Customer,isp,2026-10-15 12:44:41,EDT-Pages
 http://200.10.31.42:8081,http,200.10.31.42,8081,2100,0,alive,BOG,CO,200.10.31.42,AS270075 SUPER REDES S.A.S,SUPER REDES S.A.S,isp,2026-10-15 12:44:41,EDT-Pages
-http://108.137.124.195:9118,http,108.137.124.195,9118,2198,0,alive,AMS,US,192.42.116.118,AS215125 SURF B.V.,SURF B.V.,education,2026-10-15 12:44:41,EDT-Pages
-https://35.84.133.236:8443,https,35.84.133.236,8443,159,0,alive,PDX,US,35.84.133.236,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",business,2026-10-13 14:49:54,EDT-Pages
-https://44.248.167.117:8443,https,44.248.167.117,8443,160,0,alive,PDX,US,44.248.167.117,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",business,2026-10-13 14:49:54,EDT-Pages
-https://44.229.69.166:8443,https,44.229.69.166,8443,166,0,alive,PDX,US,44.229.69.166,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",business,2026-10-13 14:49:54,EDT-Pages
 https://12.221.146.147:9443,https,12.221.146.147,9443,167,0,alive,DFW,US,12.221.146.161,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",isp,2026-10-09 00:00:00,EDT-Pages
-https://44.243.87.160:8443,https,44.243.87.160,8443,170,0,alive,PDX,US,44.243.87.160,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",business,2026-10-13 14:49:54,EDT-Pages
-https://54.190.176.228:8443,https,54.190.176.228,8443,175,0,alive,PDX,US,54.190.176.228,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",business,2026-10-13 14:49:54,EDT-Pages
 https://64.98.50.100:443,https,64.98.50.100,443,205,0,alive,DEN,US,64.98.50.100,AS32133 Ting Fiber Inc.,Ting Fiber Inc.,isp,2026-10-09 00:00:00,EDT-Pages
 https://170.199.233.89:443,https,170.199.233.89,443,229,0,alive,ATL,US,170.199.233.85,"AS62642 Bigleaf Networks, Inc.","Bigleaf Networks, Inc.",isp,2026-10-09 00:00:00,EDT-Pages
 https://209.170.227.253:443,https,209.170.227.253,443,245,0,alive,SEA,US,209.170.227.253,"AS62642 IT Group NW, LLC","IT Group NW, LLC",isp,2026-10-09 00:00:00,EDT-Pages
-https://154.202.118.108:443,https,154.202.118.108,443,248,0,alive,IAD,US,66.92.227.30,AS3257 GTT Communications (GTT-CUSTOMER),GTT-CUSTOMER,datacenter,2026-10-09 00:00:00,EDT-Pages
-https://35.183.131.26:443,https,35.183.131.26,443,277,0,alive,YUL,CA,35.183.131.26,AS16509 Amazon AWS (Amazon Data Services Canada),Amazon Data Services Canada,business,2026-10-13 14:49:54,EDT-Pages
-https://3.133.140.176:8443,https,3.133.140.176,8443,277,0,alive,CMH,US,3.133.140.176,AS16509 Amazon AWS (Amazon Technologies Inc.),Amazon Technologies Inc.,business,2026-10-13 14:49:54,EDT-Pages
 https://12.202.180.10:9443,https,12.202.180.10,9443,282,0,alive,ORD,US,12.202.180.115,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",isp,2026-10-09 00:00:00,EDT-Pages
 https://181.215.52.122:9443,https,181.215.52.122,9443,291,0,alive,YYZ,CA,181.215.52.126,AS397540 Private Customer,Private Customer,isp,2026-10-09 00:00:00,EDT-Pages
 https://181.215.52.101:9443,https,181.215.52.101,9443,294,0,alive,YYZ,CA,181.215.52.118,AS397540 Private Customer,Private Customer,isp,2026-10-09 00:00:00,EDT-Pages
 https://181.215.52.40:9443,https,181.215.52.40,9443,299,0,alive,YYZ,CA,181.215.52.43,AS397540 Private Customer,Private Customer,isp,2026-10-09 00:00:00,EDT-Pages
 https://181.215.52.25:9443,https,181.215.52.25,9443,311,0,alive,YYZ,CA,181.215.52.29,AS397540 Private Customer,Private Customer,isp,2026-10-09 00:00:00,EDT-Pages
-https://3.148.0.140:443,https,3.148.0.140,443,314,0,alive,CMH,US,3.148.0.140,AS16509 Amazon AWS (Amazon Technologies Inc.),Amazon Technologies Inc.,business,2026-10-13 14:49:54,EDT-Pages
 https://66.153.187.90:8090,https,66.153.187.90,8090,322,0,alive,ATL,US,66.153.187.90,AS21565 Nations Title Agency Carolina s,Nations Title Agency Carolina s,isp,2026-10-09 00:00:00,EDT-Pages
 https://181.215.52.16:9443,https,181.215.52.16,9443,326,0,alive,YYZ,CA,181.215.52.16,AS397540 Private Customer,Private Customer,isp,2026-10-15 12:44:41,EDT-Pages
-https://96.5.129.85:443,https,96.5.129.85,443,328,0,alive,SEA,US,96.5.129.121,AS11686 Zayo Bandwidth,Zayo Bandwidth,education,2026-10-09 00:00:00,EDT-Pages
+https://96.5.129.85:443,https,96.5.129.85,443,328,0,alive,SEA,US,96.5.129.121,AS11686 Zayo Bandwidth,Zayo Bandwidth,isp,2026-10-09 00:00:00,EDT-Pages
 https://181.215.52.16:443,https,181.215.52.16,443,346,0,alive,YYZ,CA,181.215.52.16,AS397540 Private Customer,Private Customer,isp,2026-10-09 00:00:00,EDT-Pages
 https://66.64.100.66:443,https,66.64.100.66,443,357,0,alive,MCI,US,66.64.100.66,AS18712 Everfast Fiber Networks LLC,Everfast Fiber Networks LLC,isp,2026-10-09 00:00:00,EDT-Pages
 https://24.225.10.211:443,https,24.225.10.211,443,379,0,alive,DEN,US,24.225.10.210,"AS14155 RURAL TELEPHONE SERVICE COMPANY, INC.","RURAL TELEPHONE SERVICE COMPANY, INC.",isp,2026-10-09 00:00:00,EDT-Pages
@@ -290,138 +247,72 @@ https://162.244.227.36:443,https,162.244.227.36,443,398,0,alive,OMA,US,162.244.2
 https://24.142.229.178:8090,https,24.142.229.178,8090,426,0,alive,ATL,US,24.142.229.178,AS11426 Charter Communications Inc,Charter Communications Inc,isp,2026-10-09 00:00:00,EDT-Pages
 https://50.76.211.251:8090,https,50.76.211.251,8090,429,0,alive,MEM,US,50.76.211.250,"AS7922 Comcast Cable Communications, LLC","Comcast Cable Communications, LLC",isp,2026-10-09 00:00:00,EDT-Pages
 https://103.135.244.2:9443,https,103.135.244.2,9443,467,0,alive,NRT,JP,103.135.244.16,AS138652 Super Godzilla Communications GK,Super Godzilla Communications GK,isp,2026-10-09 00:00:00,EDT-Pages
-https://18.200.158.139:443,https,18.200.158.139,443,482,0,alive,DUB,IE,18.203.204.227,AS16509 Amazon AWS (Amazon Data Services Ireland Limited),Amazon Data Services Ireland Limited,business,2026-10-13 14:49:54,EDT-Pages
-https://34.249.214.108:443,https,34.249.214.108,443,492,0,alive,DUB,IE,54.76.117.126,AS16509 Amazon AWS (Amazon Technologies Inc.),Amazon Technologies Inc.,business,2026-10-13 14:49:54,EDT-Pages
 https://184.188.139.2:8090,https,184.188.139.2,8090,498,0,alive,IAD,US,184.188.139.2,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-09 00:00:00,EDT-Pages
 https://207.5.30.9:443,https,207.5.30.9,443,519,0,alive,ATL,US,207.5.30.9,"AS22646 Hargray Communications Group, Inc.","Hargray Communications Group, Inc.",isp,2026-10-09 00:00:00,EDT-Pages
-https://13.39.161.60:443,https,13.39.161.60,443,536,0,alive,CDG,FR,13.39.161.60,AS16509 Amazon AWS (Amazon Data Services France),Amazon Data Services France,business,2026-10-13 14:49:54,EDT-Pages
-https://13.39.161.227:443,https,13.39.161.227,443,536,0,alive,CDG,FR,13.39.161.227,AS16509 Amazon AWS (Amazon Data Services France),Amazon Data Services France,business,2026-10-13 14:49:54,EDT-Pages
-https://13.38.52.27:443,https,13.38.52.27,443,538,0,alive,CDG,FR,13.38.52.27,AS16509 Amazon AWS (Amazon Data Services France),Amazon Data Services France,business,2026-10-13 14:49:54,EDT-Pages
-https://13.39.163.65:443,https,13.39.163.65,443,542,0,alive,CDG,FR,13.39.163.65,AS16509 Amazon AWS (Amazon Data Services France),Amazon Data Services France,business,2026-10-13 14:49:54,EDT-Pages
-https://13.39.163.162:443,https,13.39.163.162,443,542,0,alive,CDG,FR,13.39.163.162,AS16509 Amazon AWS (Amazon Data Services France),Amazon Data Services France,business,2026-10-13 14:49:54,EDT-Pages
-https://13.39.234.25:443,https,13.39.234.25,443,543,0,alive,CDG,FR,13.39.234.25,AS16509 Amazon AWS (Amazon Data Services France),Amazon Data Services France,business,2026-10-13 14:49:54,EDT-Pages
-https://13.39.235.20:443,https,13.39.235.20,443,543,0,alive,CDG,FR,13.39.235.20,AS16509 Amazon AWS (Amazon Data Services France),Amazon Data Services France,business,2026-10-13 14:49:54,EDT-Pages
 https://206.253.147.105:8090,https,206.253.147.105,8090,544,0,alive,IAD,US,206.253.147.105,"AS14615 PBT Communications, Inc.","PBT Communications, Inc.",isp,2026-10-09 00:00:00,EDT-Pages
 https://82.65.162.76:443,https,82.65.162.76,443,552,0,alive,CDG,FR,82.65.162.76,AS12322 Free SAS,Free SAS,isp,2026-10-09 00:00:00,EDT-Pages
 https://72.28.165.185:8090,https,72.28.165.185,8090,557,0,alive,ATL,US,72.28.165.185,"AS11776 Atlantic Broadband, LLC","Atlantic Broadband, LLC",isp,2026-10-09 00:00:00,EDT-Pages
 https://58.120.141.74:443,https,58.120.141.74,443,558,0,alive,ICN,KR,58.120.141.78,AS9318 SK Broadband,SK Broadband Co Ltd,isp,2026-10-09 00:00:00,EDT-Pages
-https://13.39.234.248:443,https,13.39.234.248,443,563,0,alive,CDG,FR,13.39.234.248,AS16509 Amazon AWS (Amazon Data Services France),Amazon Data Services France,business,2026-10-13 14:49:54,EDT-Pages
 https://62.210.147.2:443,https,62.210.147.2,443,566,0,alive,CDG,FR,209.131.65.213,AS214143 SysLevel SAS,SysLevel SAS,isp,2026-10-09 00:00:00,EDT-Pages
-https://185.221.132.226:9443,https,185.221.132.226,9443,566,0,alive,LUX,LU,185.221.132.236,AS206804 EstNOC OU (ESTNOC-GLOBAL),ESTNOC-GLOBAL,business,2026-10-13 14:49:54,EDT-Pages
 https://190.213.55.167:443,https,190.213.55.167,443,570,0,alive,POS,TT,190.213.55.167,AS27665 Columbus Communications Trinidad Limited.,Columbus Communications Trinidad Limited.,isp,2026-10-09 00:00:00,EDT-Pages
 https://62.210.27.111:443,https,62.210.27.111,443,579,0,alive,CDG,FR,209.131.65.213,AS214143 SysLevel SAS,SysLevel SAS,isp,2026-10-09 00:00:00,EDT-Pages
 https://50.184.176.222:8090,https,50.184.176.222,8090,583,0,alive,JAX,US,50.184.176.222,"AS7922 Comcast Cable Communications, LLC","Comcast Cable Communications, LLC",isp,2026-10-09 00:00:00,EDT-Pages
 https://31.32.19.111:8081,https,31.32.19.111,8081,590,0,alive,CDG,FR,31.32.19.111,AS5410 Bouygues Telecom SA,Bouygues Telecom SA,isp,2026-10-09 00:00:00,EDT-Pages
-https://185.221.132.242:443,https,185.221.132.242,443,594,0,alive,LUX,LU,185.221.132.247,AS206804 EstNOC OU (ESTNOC-GLOBAL),ESTNOC-GLOBAL,business,2026-10-13 14:49:54,EDT-Pages
 https://62.210.70.194:443,https,62.210.70.194,443,595,0,alive,CDG,FR,209.131.65.213,AS214143 SysLevel SAS,SysLevel SAS,isp,2026-10-09 00:00:00,EDT-Pages
-https://91.92.250.33:443,https,91.92.250.33,443,596,0,alive,WAW,PL,91.92.250.33,AS31130 RapidSpace,RapidSpace,business,2026-10-13 14:49:54,EDT-Pages
 https://82.66.235.221:443,https,82.66.235.221,443,603,0,alive,CDG,FR,2a01:e0a:1018:8c90:be24:11ff:fe98:e8b1,AS12322 Free SAS,Free SAS,isp,2026-10-09 00:00:00,EDT-Pages
 https://80.124.109.22:8090,https,80.124.109.22,8090,606,0,alive,CDG,FR,80.124.109.22,AS15557 Societe Francaise Du Radiotelephone - SFR SA,Societe Francaise Du Radiotelephone - SFR SA,isp,2026-10-09 00:00:00,EDT-Pages
 https://147.157.130.1:443,https,147.157.130.1,443,608,0,alive,NRT,JP,147.157.130.1,AS2907 Tsukuba College of Technology,Tsukuba College of Technology,education,2026-10-09 00:00:00,EDT-Pages
 https://12.202.180.118:443,https,12.202.180.118,443,612,0,alive,ORD,US,12.202.180.135,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",isp,2026-10-09 00:00:00,EDT-Pages
 https://82.96.128.175:8090,https,82.96.128.175,8090,617,0,alive,CDG,FR,82.96.128.175,AS199636 Free Pro SAS,Free Pro SAS,business,2026-10-09 00:00:00,EDT-Pages
 https://114.33.6.158:443,https,114.33.6.158,443,620,0,alive,TPE,TW,114.33.6.158,AS3462 Chunghwa Telecom HiNet (Chunghwa Telecom Data Communication Business Group),Chunghwa Telecom Data Communication Business Group,isp,2026-10-09 00:00:00,EDT-Pages
-https://54.75.103.167:443,https,54.75.103.167,443,620,0,alive,DUB,IE,54.75.103.167,AS16509 Amazon AWS (Amazon Technologies Inc.),Amazon Technologies Inc.,business,2026-10-13 14:49:54,EDT-Pages
-https://54.75.50.179:443,https,54.75.50.179,443,620,0,alive,DUB,IE,54.75.50.179,AS16509 Amazon AWS (Amazon Technologies Inc.),Amazon Technologies Inc.,business,2026-10-13 14:49:54,EDT-Pages
 https://176.94.74.21:443,https,176.94.74.21,443,625,0,alive,FRA,DE,176.94.74.21,AS3209 Vodafone GmbH,Vodafone GmbH,isp,2026-10-09 00:00:00,EDT-Pages
-https://38.76.140.254:8443,https,38.76.140.254,8443,634,0,alive,HKG,HK,2400:c800:109:20c:18c3:f11a:7179:af19,"AS137897 PAN-LIAN TECHNOLOGY CO., LIMITED (PCCW IMS Ltd PCCW Business Internet Access)",PCCW IMS Ltd PCCW Business Internet Access,isp,2026-10-13 14:49:54,EDT-Pages
-https://79.142.77.63:9443,https,79.142.77.63,9443,636,0,alive,ARN,SE,79.142.77.72,AS51430 AltusHost B.V.,AltusHost B.V.,business,2026-10-13 14:49:54,EDT-Pages
-https://151.242.183.28:443,https,151.242.183.28,443,638,0,alive,HKG,HK,2403:27c0:c03:1::71,"AS137897 PAN-LIAN TECHNOLOGY CO., LIMITED (XING XUN TECH LIMITED)",XING XUN TECH LIMITED,isp,2026-10-13 14:49:54,EDT-Pages
 https://95.153.31.66:443,https,95.153.31.66,443,646,0,alive,TLL,EE,95.153.31.78,AS1257 Tele2 Sverige AB,Tele2 Sverige AB,isp,2026-10-09 00:00:00,EDT-Pages
 https://95.153.32.2:9443,https,95.153.32.2,9443,648,0,alive,TLL,EE,95.153.32.2,AS1257 Tele2 Sverige AB,Tele2 Sverige AB,isp,2026-10-09 00:00:00,EDT-Pages
-https://202.85.53.25:443,https,202.85.53.25,443,659,0,alive,HKG,HK,2403:27c0:c03:1::71,"AS137897 PAN-LIAN TECHNOLOGY CO., LIMITED (XING XUN TECH LIMITED)",XING XUN TECH LIMITED,isp,2026-10-13 14:49:54,EDT-Pages
 https://188.77.69.184:443,https,188.77.69.184,443,668,0,alive,MAD,ES,188.77.69.184,AS12479 Jazztel triple play services,Jazztel triple play services,isp,2026-10-09 00:00:00,EDT-Pages
 https://217.92.132.233:443,https,217.92.132.233,443,679,0,alive,TXL,DE,2003:a:4:e500:215:5dff:fe83:c00b,AS3320 Deutsche Telekom AG,Deutsche Telekom AG,isp,2026-10-09 00:00:00,EDT-Pages
-https://35.75.219.119:443,https,35.75.219.119,443,683,0,alive,NRT,JP,18.180.43.143,AS16509 Amazon AWS (Amazon Data Services Japan),Amazon Data Services Japan,business,2026-10-13 14:49:54,EDT-Pages
 https://62.90.77.30:443,https,62.90.77.30,443,689,0,alive,TLV,IL,62.90.77.18,AS1680 Cellcom Fixed Line Communication L.P,Cellcom Fixed Line Communication L.P,isp,2026-10-09 00:00:00,EDT-Pages
-https://192.159.101.174:9443,https,192.159.101.174,9443,690,0,alive,ARN,EE,192.159.101.168,AS206804 EstNOC OU (ESTNOC-GLOBAL),ESTNOC-GLOBAL,business,2026-10-13 14:49:54,EDT-Pages
 https://185.225.28.50:443,https,185.225.28.50,443,694,0,alive,SOF,MK,185.225.28.62,AS205119 TELEKS DOOEL Skopje,TELEKS DOOEL Skopje,isp,2026-10-09 00:00:00,EDT-Pages
 https://107.91.88.70:8443,https,107.91.88.70,8443,709,0,alive,SJC,US,107.91.88.70,"AS20057 AT&T Enterprises, LLC","AT&T Enterprises, LLC",isp,2026-10-09 00:00:00,EDT-Pages
 https://98.101.229.212:8090,https,98.101.229.212,8090,714,0,alive,ATL,US,98.101.229.210,AS11426 Charter Communications Inc,Charter Communications Inc,isp,2026-10-09 00:00:00,EDT-Pages
-https://18.143.116.224:443,https,18.143.116.224,443,720,0,alive,SIN,SG,18.143.116.224,AS16509 Amazon AWS (Amazon Data Services Singapore),Amazon Data Services Singapore,business,2026-10-13 14:49:54,EDT-Pages
 https://217.210.129.243:443,https,217.210.129.243,443,735,0,alive,CPH,SE,217.210.129.243,AS3301 Telia Company AB,Telia Company AB,isp,2026-10-09 00:00:00,EDT-Pages
 https://46.199.75.105:443,https,46.199.75.105,443,738,0,alive,LCA,CY,46.199.75.109,AS6866 Cyprus Telecommunications Authority,Cyprus Telecommunications Authority,isp,2026-10-09 00:00:00,EDT-Pages
 https://103.86.116.118:443,https,103.86.116.118,443,760,0,alive,CGK,ID,103.86.116.118,AS150552 PT Link Data Sumber Barokah,PT Link Data Sumber Barokah,isp,2026-10-09 00:00:00,EDT-Pages
 https://103.86.117.202:443,https,103.86.117.202,443,760,0,alive,CGK,ID,103.86.116.118,AS150552 PT Link Data Sumber Barokah,PT Link Data Sumber Barokah,isp,2026-10-09 00:00:00,EDT-Pages
 https://31.186.220.204:443,https,31.186.220.204,443,769,0,alive,WAW,PL,31.186.220.204,AS9141 P4 Sp. z o.o.,P4 Sp. z o.o.,isp,2026-10-09 00:00:00,EDT-Pages
-https://85.203.39.130:443,https,85.203.39.130,443,777,0,alive,ARN,LV,85.203.39.134,AS206804 EstNOC OU (ESTNOC-GLOBAL),ESTNOC-GLOBAL,business,2026-10-13 14:49:54,EDT-Pages
-https://45.133.192.194:9443,https,45.133.192.194,9443,778,0,alive,AMS,IS,45.133.192.205,AS206804 EstNOC OU (ESTNOC-GLOBAL),ESTNOC-GLOBAL,business,2026-10-13 14:49:54,EDT-Pages
-https://109.190.196.5:8090,https,109.190.196.5,8090,787,0,alive,CDG,FR,109.190.196.5,AS35540 OVH SAS,OVH SAS,datacenter,2026-10-09 00:00:00,EDT-Pages
 https://103.153.135.118:443,https,103.153.135.118,443,789,0,alive,CGK,ID,103.153.135.118,AS140464 PT Widara Media Informasi,PT Widara Media Informasi,isp,2026-10-09 00:00:00,EDT-Pages
 https://178.219.43.226:443,https,178.219.43.226,443,795,0,alive,DME,RU,178.219.43.226,AS51077 Modern Technologies Ltd.,Modern Technologies Ltd.,isp,2026-10-09 00:00:00,EDT-Pages
 https://170.210.44.231:443,https,170.210.44.231,443,808,0,alive,SCL,AR,170.210.44.235,AS4270 Red de Interconexion Universitaria,Red de Interconexion Universitaria,education,2026-10-09 00:00:00,EDT-Pages
 https://162.191.87.112:8443,https,162.191.87.112,8443,821,0,alive,ORD,US,162.191.87.112,"AS21928 T-Mobile USA, Inc.","T-Mobile USA, Inc.",isp,2026-10-09 00:00:00,EDT-Pages
 https://162.191.235.197:8443,https,162.191.235.197,8443,829,0,alive,ORD,US,162.191.235.197,"AS21928 T-Mobile USA, Inc.","T-Mobile USA, Inc.",isp,2026-10-09 00:00:00,EDT-Pages
-https://103.58.150.11:443,https,103.58.150.11,443,838,0,alive,BKK,TH,103.58.150.16,AS63989 DE-CORP,DE-CORP,business,2026-10-13 14:49:54,EDT-Pages
-https://103.22.182.254:443,https,103.22.182.254,443,840,0,alive,BKK,TH,103.22.182.235,"AS56309 Siamdata Communication Co.,Ltd. (Readyidc CO.,LTD.)","Readyidc CO.,LTD.",isp,2026-10-13 14:49:54,EDT-Pages
-https://18.144.86.139:4398,https,18.144.86.139,4398,852,0,alive,AMS,US,204.137.14.92,AS215125 SURF B.V.,SURF B.V.,education,2026-10-15 12:44:41,EDT-Pages
 https://80.15.99.54:8090,https,80.15.99.54,8090,860,0,alive,MRS,FR,80.15.99.54,AS3215 Orange,Orange S.A.,isp,2026-10-09 00:00:00,EDT-Pages
 https://213.207.132.2:9443,https,213.207.132.2,9443,861,0,alive,MRS,CY,213.207.132.14,AS15805 Epic Ltd,Epic Ltd,isp,2026-10-09 00:00:00,EDT-Pages
 https://95.229.15.89:443,https,95.229.15.89,443,862,0,alive,MXP,IT,95.229.15.89,AS3269 Telecom Italia S.p.A.,Telecom Italia S.p.A.,isp,2026-10-09 00:00:00,EDT-Pages
 https://213.207.130.34:443,https,213.207.130.34,443,865,0,alive,MRS,CY,213.207.130.42,AS15805 Epic Ltd,Epic Ltd,isp,2026-10-09 00:00:00,EDT-Pages
 https://217.181.201.254:8090,https,217.181.201.254,8090,871,0,alive,CDG,FR,217.181.201.254,AS8399 SEWAN SAS,SEWAN SAS,isp,2026-10-09 00:00:00,EDT-Pages
-https://52.214.92.206:5014,https,52.214.92.206,5014,876,0,alive,DFW,US,204.8.96.145,AS215125 SURF B.V.,SURF B.V.,education,2026-10-15 12:44:41,EDT-Pages
-https://78.14.19.3:12632,https,78.14.19.3,12632,881,0,alive,AMS,US,192.42.116.106,AS215125 SURF B.V.,SURF B.V.,education,2026-10-15 12:44:41,EDT-Pages
 https://14.225.71.128:8443,https,14.225.71.128,8443,892,0,alive,HKG,VN,14.225.71.128,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group,isp,2026-10-09 00:00:00,EDT-Pages
 https://179.96.182.182:443,https,179.96.182.182,443,894,0,alive,GIG,BR,187.92.203.235,AS10429 TELEFÔNICA BRASIL S.A,TELEFÔNICA BRASIL S.A,isp,2026-10-09 00:00:00,EDT-Pages
 https://185.10.240.95:9443,https,185.10.240.95,9443,898,0,alive,FRA,IR,185.10.240.95,AS29049 Leased IPv4 Blocks,Leased IPv4 Blocks,isp,2026-10-12 15:18:13,EDT-Pages
 https://120.232.204.58:31343,https,120.232.204.58,31343,899,0,alive,HKG,HK,58.152.58.60,AS4760 HKT,Hong Kong Telecommunications HKT Limited Mass Internet,isp,2026-10-09 00:00:00,EDT-Pages
 https://109.116.41.154:443,https,109.116.41.154,443,913,0,alive,FCO,IT,109.116.41.154,AS30722 Vodafone Italia S.p.A.,Vodafone Italia S.p.A.,isp,2026-10-09 00:00:00,EDT-Pages
 https://83.172.143.53:4443,https,83.172.143.53,4443,915,0,alive,CDG,FR,83.172.143.53,AS25540 INIT SYS SAS,INIT SYS SAS,isp,2026-10-09 00:00:00,EDT-Pages
-https://118.184.140.90:1443,https,118.184.140.90,1443,952,0,alive,NRT,JP,45.115.33.126,AS5065 Bunny Communications LLC,Bunny Communications LLC,isp,2026-10-13 14:49:54,EDT-Pages
 https://14.225.71.128:443,https,14.225.71.128,443,953,0,alive,HKG,VN,14.225.71.128,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group,isp,2026-10-09 00:00:00,EDT-Pages
 https://14.225.19.28:8443,https,14.225.19.28,8443,954,0,alive,HKG,VN,14.225.19.28,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group,isp,2026-10-09 00:00:00,EDT-Pages
 https://93.71.245.84:8090,https,93.71.245.84,8090,962,0,alive,FCO,IT,93.71.245.84,AS30722 IP pool assigned to VF DSL customers,IP pool assigned to VF DSL customers,isp,2026-10-09 00:00:00,EDT-Pages
-https://16.174.124.173:58080,https,16.174.124.173,58080,975,0,alive,AMS,US,192.42.116.110,AS215125 SURF B.V.,SURF B.V.,education,2026-10-15 12:44:41,EDT-Pages
 https://80.24.34.107:8090,https,80.24.34.107,8090,1031,0,alive,MAD,ES,80.24.34.107,AS3352 Red de servicios IP,Red de servicios IP,isp,2026-10-09 00:00:00,EDT-Pages
 https://162.191.226.246:9443,https,162.191.226.246,9443,1035,0,alive,ORD,US,162.191.226.246,"AS21928 T-Mobile USA, Inc.","T-Mobile USA, Inc.",isp,2026-10-09 00:00:00,EDT-Pages
-https://103.26.207.94:9443,https,103.26.207.94,9443,1035,0,alive,DEL,IN,103.26.207.222,AS132335 LEAPSWITCH NETWORKS PRIVATE LIMITED,LEAPSWITCH NETWORKS PRIVATE LIMITED,isp,2026-10-13 14:49:54,EDT-Pages
-https://141.98.19.221:443,https,141.98.19.221,443,1037,0,alive,BKK,TH,141.98.19.68,"AS56309 Siamdata Communication Co.,Ltd. (Legaco Networks B.V.)",Legaco Networks B.V.,isp,2026-10-13 14:49:54,EDT-Pages
 https://194.186.179.62:443,https,194.186.179.62,443,1050,0,alive,DME,RU,194.186.179.62,AS3216 PJSC Vimpelcom,PJSC Vimpelcom,isp,2026-10-09 00:00:00,EDT-Pages
-https://103.26.207.103:443,https,103.26.207.103,443,1054,0,alive,DEL,IN,103.26.207.133,AS132335 LEAPSWITCH NETWORKS PRIVATE LIMITED,LEAPSWITCH NETWORKS PRIVATE LIMITED,isp,2026-10-13 14:49:54,EDT-Pages
 https://91.243.118.217:443,https,91.243.118.217,443,1056,0,alive,MXP,IT,91.243.118.217,AS212559 LUMIA NETWORK SRL,LUMIA NETWORK SRL,isp,2026-10-09 00:00:00,EDT-Pages
 https://93.42.177.250:443,https,93.42.177.250,443,1098,0,alive,FCO,IT,93.42.177.250,AS12874 Infrastructure for Fastwebs main location,Infrastructure for Fastwebs main location,isp,2026-10-15 12:44:41,EDT-Pages
 https://130.180.211.56:443,https,130.180.211.56,443,1156,0,alive,CDG,FR,185.210.108.69,AS24904 K-sys SA,K-sys SA,isp,2026-10-09 00:00:00,EDT-Pages
-https://34.240.10.214:443,https,34.240.10.214,443,1159,0,alive,DUB,IE,34.240.10.214,AS16509 Amazon AWS (Amazon Data Services Ireland Limited),Amazon Data Services Ireland Limited,business,2026-10-14 12:57:52,EDT-Pages
-https://16.52.81.236:20869,https,16.52.81.236,20869,1168,0,alive,SJC,US,23.129.64.168,AS215125 SURF B.V.,SURF B.V.,education,2026-10-15 12:44:41,EDT-Pages
 https://118.184.157.67:4443,https,118.184.157.67,4443,1204,0,alive,LAX,CN,118.184.157.67,"AS23650 ChangZhou Bitcomm Software Technology Co., Limited","ChangZhou Bitcomm Software Technology Co., Limited",isp,2026-10-09 00:00:00,EDT-Pages
 https://110.173.188.221:443,https,110.173.188.221,443,1215,0,alive,BOM,IN,110.173.188.221,AS17426 PRIMENET GLOBAL LTD.,PRIMENET GLOBAL LTD.,isp,2026-10-09 00:00:00,EDT-Pages
 https://107.91.88.78:8443,https,107.91.88.78,8443,1249,0,alive,SJC,US,107.91.88.78,"AS20057 AT&T Enterprises, LLC","AT&T Enterprises, LLC",isp,2026-10-09 00:00:00,EDT-Pages
-https://185.187.43.38:8090,https,185.187.43.38,8090,1286,0,alive,MXP,IT,185.187.43.38,AS199324 DODONET S.R.L. - dodonet network,DODONET S.R.L. - dodonet network,isp,2026-10-13 14:49:54,EDT-Pages
-https://118.184.157.67:1443,https,118.184.157.67,1443,1289,0,alive,NRT,JP,45.115.33.126,AS5065 Bunny Communications LLC,Bunny Communications LLC,isp,2026-10-13 14:49:54,EDT-Pages
 https://82.64.255.151:443,https,82.64.255.151,443,1306,0,alive,CDG,FR,2a01:e0a:ea5:74b0:be24:11ff:fe75:8c7f,AS12322 Free SAS,Free SAS,isp,2026-10-09 00:00:00,EDT-Pages
-https://40.177.104.199:12406,https,40.177.104.199,12406,1341,0,alive,ARN,NL,171.25.193.35,AS215125 TOR EXIT AND MORE,TOR EXIT AND MORE,education,2026-10-15 12:44:41,EDT-Pages
 https://107.91.88.6:8443,https,107.91.88.6,8443,1454,0,alive,SJC,US,107.91.88.6,"AS20057 AT&T Enterprises, LLC","AT&T Enterprises, LLC",isp,2026-10-09 00:00:00,EDT-Pages
-https://13.212.218.38:443,https,13.212.218.38,443,1491,0,alive,SIN,SG,13.212.218.38,AS16509 Amazon AWS (Amazon Data Services Singapore),Amazon Data Services Singapore,business,2026-10-13 14:49:54,EDT-Pages
-https://15.232.45.244:8552,https,15.232.45.244,8552,1690,0,alive,AMS,US,192.42.116.60,AS215125 SURF B.V.,SURF B.V.,education,2026-10-15 12:44:41,EDT-Pages
-https://192.159.101.178:9443,https,192.159.101.178,9443,2375,0,alive,ARN,EE,192.159.101.189,AS206804 EstNOC OU (ESTNOC-GLOBAL),ESTNOC-GLOBAL,business,2026-10-13 14:49:54,EDT-Pages
 https://103.127.242.229:7000,https,103.127.242.229,7000,3511,0,alive,NRT,JP,103.127.242.229,"AS137535 JT Telecom (Hong Kong Communications International Co., limited)","Hong Kong Communications International Co., limited",isp,2026-10-12 21:49:55,EDT-Pages
-https://51.16.4.39:53446,https,51.16.4.39,53446,4141,0,alive,AMS,NL,192.42.116.16,AS215125 TOR EXIT AND MORE,TOR EXIT AND MORE,education,2026-10-15 12:44:41,EDT-Pages
-https://35.78.252.142:12509,https,35.78.252.142,12509,4292,0,alive,TXL,US,185.220.101.189,AS215125 SURF B.V.,SURF B.V.,education,2026-10-15 12:44:41,EDT-Pages
 https://24.121.152.67:443,https,24.121.152.67,443,5431,0,alive,SAN,US,24.121.152.67,AS19108 Optimum,Optimum,isp,2026-10-09 00:00:00,EDT-Pages
-https://3.123.17.247:443,https,3.123.17.247,443,488,1,timeout,FRA,DE,3.123.17.247,AS16509 Amazon AWS (A100 ROW GmbH),A100 ROW GmbH,business,2026-10-13 14:49:54,EDT-Pages
-https://63.178.219.243:443,https,63.178.219.243,443,488,1,timeout,FRA,DE,63.178.219.243,AS16509 Amazon AWS (A100 ROW GmbH),A100 ROW GmbH,business,2026-10-13 14:49:54,EDT-Pages
-https://3.123.4.170:443,https,3.123.4.170,443,491,1,timeout,FRA,DE,3.123.4.170,AS16509 Amazon AWS (A100 ROW GmbH),A100 ROW GmbH,business,2026-10-13 14:49:54,EDT-Pages
-https://54.93.245.241:443,https,54.93.245.241,443,495,1,timeout,FRA,DE,54.93.245.241,AS16509 Amazon AWS (A100 ROW GmbH),A100 ROW GmbH,business,2026-10-13 14:49:54,EDT-Pages
-https://54.93.62.167:443,https,54.93.62.167,443,501,1,timeout,FRA,DE,54.93.62.167,AS16509 Amazon AWS (A100 ROW GmbH),A100 ROW GmbH,business,2026-10-13 14:49:54,EDT-Pages
-https://63.178.219.106:443,https,63.178.219.106,443,501,1,timeout,FRA,DE,63.178.219.106,AS16509 Amazon AWS (A100 ROW GmbH),A100 ROW GmbH,business,2026-10-13 14:49:54,EDT-Pages
-https://54.93.84.17:443,https,54.93.84.17,443,507,1,timeout,FRA,DE,54.93.84.17,AS16509 Amazon AWS (A100 ROW GmbH),A100 ROW GmbH,business,2026-10-13 14:49:54,EDT-Pages
-https://3.123.18.173:443,https,3.123.18.173,443,513,1,timeout,FRA,DE,3.123.18.173,AS16509 Amazon AWS (A100 ROW GmbH),A100 ROW GmbH,business,2026-10-13 14:49:54,EDT-Pages
-https://63.178.11.137:443,https,63.178.11.137,443,514,1,timeout,FRA,DE,63.178.11.137,AS16509 Amazon AWS (A100 ROW GmbH),A100 ROW GmbH,business,2026-10-13 14:49:54,EDT-Pages
-https://63.176.175.86:443,https,63.176.175.86,443,520,1,timeout,FRA,DE,63.176.175.86,AS16509 Amazon AWS (A100 ROW GmbH),A100 ROW GmbH,business,2026-10-13 14:49:54,EDT-Pages
-https://18.157.168.96:443,https,18.157.168.96,443,520,1,timeout,FRA,DE,18.157.168.96,AS16509 Amazon AWS (A100 ROW GmbH),A100 ROW GmbH,business,2026-10-14 12:57:52,EDT-Pages
-https://63.178.236.106:443,https,63.178.236.106,443,524,1,timeout,FRA,DE,63.178.236.106,AS16509 Amazon AWS (A100 ROW GmbH),A100 ROW GmbH,business,2026-10-13 14:49:54,EDT-Pages
-https://18.153.95.104:443,https,18.153.95.104,443,525,1,timeout,FRA,DE,18.153.95.104,AS16509 Amazon AWS (A100 ROW GmbH),A100 ROW GmbH,business,2026-10-13 14:49:54,EDT-Pages
-https://18.157.167.33:443,https,18.157.167.33,443,545,1,timeout,FRA,DE,18.157.167.33,AS16509 Amazon AWS (A100 ROW GmbH),A100 ROW GmbH,business,2026-10-14 12:57:52,EDT-Pages
 https://83.206.1.225:8090,https,83.206.1.225,8090,636,1,timeout,MRS,FR,83.206.1.225,AS3215 Orange,Orange S.A.,isp,2026-10-09 00:00:00,EDT-Pages
-https://63.178.15.217:443,https,63.178.15.217,443,686,1,timeout,FRA,DE,63.178.15.217,AS16509 Amazon AWS (A100 ROW GmbH),A100 ROW GmbH,business,2026-10-13 14:49:54,EDT-Pages
-https://18.157.165.235:443,https,18.157.165.235,443,883,1,timeout,FRA,DE,18.157.165.235,AS16509 Amazon AWS (A100 ROW GmbH),A100 ROW GmbH,business,2026-10-14 12:57:52,EDT-Pages
-https://3.68.216.71:443,https,3.68.216.71,443,907,1,timeout,FRA,DE,3.68.216.71,AS16509 Amazon AWS (A100 ROW GmbH),A100 ROW GmbH,business,2026-10-13 14:49:54,EDT-Pages
 https://162.191.139.40:8443,https,162.191.139.40,8443,5499,1,timeout,ORD,US,162.191.139.40,"AS21928 T-Mobile USA, Inc.","T-Mobile USA, Inc.",isp,2026-10-09 00:00:00,EDT-Pages
-https://51.85.44.149:9090,https,51.85.44.149,9090,0,1,conn_reset,,NL,192.42.116.144,AS215125 TOR EXIT AND MORE,TOR EXIT AND MORE,education,2026-10-15 12:44:41,EDT-Pages
-https://52.195.147.51:8088,https,52.195.147.51,8088,0,1,conn_reset,,US,192.42.116.16,AS215125 SURF B.V.,SURF B.V.,education,2026-10-15 12:44:41,EDT-Pages
-https://18.231.214.206:42576,https,18.231.214.206,42576,0,1,conn_reset,,US,192.42.116.117,AS215125 SURF B.V.,SURF B.V.,education,2026-10-15 12:44:41,EDT-Pages
-https://35.183.127.162:999,https,35.183.127.162,999,0,1,conn_reset,,US,192.42.116.13,AS215125 SURF B.V.,SURF B.V.,education,2026-10-15 12:44:41,EDT-Pages
 https://66.249.146.210:443,https,66.249.146.210,443,1009,2,http_connect_timeout,MIA,AG,66.249.146.210,AS396304 Digicel,Digicel,isp,2026-10-09 00:00:00,EDT-Pages
 https://66.210.50.131:443,https,66.210.50.131,443,0,2,timeout,,US,66.210.50.131,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-14 12:57:52,EDT-Pages
 turn://154.17.29.151:3478,turn,154.17.29.151,3478,16,0,alive,-,US,154.17.29.151,AS906 DMIT,DMIT,datacenter,2026-10-12 15:18:13,@otcfxq
@@ -446,20 +337,20 @@ turn://98.92.92.232:3478,turn,98.92.92.232,3478,104,0,alive,-,US,98.92.92.232,AS
 turn://test:test123@18.211.4.58:3478,turn,18.211.4.58,3478,105,0,alive,-,US,18.211.4.58,AS14618 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://52.73.142.131:3478,turn,52.73.142.131,3478,105,0,alive,-,US,52.73.142.131,AS14618 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://35.184.211.53:3478,turn,35.184.211.53,3478,107,0,alive,-,US,35.184.211.53,AS396982 Google Cloud,Google Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://test:test@52.15.136.248:3478,turn,52.15.136.248,3478,111,0,alive,-,US,52.15.136.248,AS16509 Amazon AWS,Amazon AWS,business,2026-10-01 00:00:00,@danfeng_chat
+turn://test:test@52.15.136.248:3478,turn,52.15.136.248,3478,111,0,alive,-,US,52.15.136.248,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://205.209.114.249:3478,turn,205.209.114.249,3478,112,0,alive,-,US,205.209.114.249,"AS19318 Interserver, Inc","Interserver, Inc",datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://45.33.67.9:3478,turn,45.33.67.9,3478,113,0,alive,-,US,45.33.67.9,AS63949 Linode Akamai,Linode Akamai,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://172.104.9.232:3478,turn,172.104.9.232,3478,115,0,alive,-,US,172.104.9.232,AS63949 Linode Akamai,Linode Akamai,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://root:root@16.59.191.240:3478,turn,16.59.191.240,3478,119,0,alive,-,US,16.59.191.240,AS16509 Amazon AWS,Amazon AWS,business,2026-10-01 00:00:00,@danfeng_chat
-turn://3.141.160.4:3478,turn,3.141.160.4,3478,128,0,alive,-,US,3.141.160.4,AS16509 Amazon AWS,Amazon AWS,business,2026-10-01 00:00:00,@danfeng_chat
-turn://3.98.192.101:3479,turn,3.98.192.101,3479,132,0,alive,-,CA,3.98.192.101,AS16509 Amazon AWS,Amazon AWS,business,2026-10-01 00:00:00,@danfeng_chat
+turn://root:root@16.59.191.240:3478,turn,16.59.191.240,3478,119,0,alive,-,US,16.59.191.240,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
+turn://3.141.160.4:3478,turn,3.141.160.4,3478,128,0,alive,-,US,3.141.160.4,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
+turn://3.98.192.101:3479,turn,3.98.192.101,3479,132,0,alive,-,CA,3.98.192.101,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://198.50.120.23:3478,turn,198.50.120.23,3478,136,0,alive,-,CA,198.50.120.23,AS32613 Leaseweb Canada Inc,Leaseweb Canada Inc,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://167.114.210.26:3478,turn,167.114.210.26,3478,140,0,alive,-,CA,167.114.210.26,AS16276 OVH,OVH,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://208.111.83.108:3478,turn,208.111.83.108,3478,156,0,alive,-,CA,208.111.83.108,AS19515 Oricom Internet inc,Oricom Internet inc.,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://148.113.173.148:3478,turn,148.113.173.148,3478,166,0,alive,-,CA,148.113.173.148,AS16276 OVH,OVH,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://210.189.253.230:3478,turn,210.189.253.230,3478,217,0,alive,-,JP,210.189.253.230,AS4694 IDC Frontier Inc.,IDC Frontier Inc.,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://8.216.43.195:3478,turn,8.216.43.195,3478,218,0,alive,-,JP,8.216.43.195,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://52.68.107.126:3478,turn,52.68.107.126,3478,218,0,alive,-,JP,52.68.107.126,AS16509 Amazon AWS,Amazon AWS,business,2026-10-01 00:00:00,@danfeng_chat
+turn://52.68.107.126:3478,turn,52.68.107.126,3478,218,0,alive,-,JP,52.68.107.126,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://47.91.1.19:3479,turn,47.91.1.19,3479,218,0,alive,-,JP,47.91.1.19,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://34.84.3.228:3478,turn,34.84.3.228,3478,220,0,alive,-,JP,34.84.3.228,AS396982 Google Cloud,Google Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://47.91.1.19:3478,turn,47.91.1.19,3478,222,0,alive,-,JP,47.91.1.19,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -467,7 +358,7 @@ turn://test:test@111.171.194.230:3479,turn,111.171.194.230,3479,225,0,alive,-,JP
 turn://test:test@111.171.194.230:3478,turn,111.171.194.230,3478,241,0,alive,-,JP,111.171.194.230,AS55374 Fujitsu Limited,FUJITSU LIMITED,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://190.89.144.81:3478,turn,190.89.144.81,3478,249,0,alive,-,BR,190.89.144.81,AS270369 Naveganet Comercio e Serviço LTDA,Naveganet Comercio e Serviço LTDA,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://149.102.131.141:3478,turn,149.102.131.141,3478,252,0,alive,-,GB,149.102.131.141,AS51167 Contabo,Contabo,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://52.16.253.175:3478,turn,52.16.253.175,3478,254,0,alive,-,IE,52.16.253.175,AS16509 Amazon AWS,Amazon AWS,business,2026-10-01 00:00:00,@danfeng_chat
+turn://52.16.253.175:3478,turn,52.16.253.175,3478,254,0,alive,-,IE,52.16.253.175,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://49.247.170.173:3478,turn,49.247.170.173,3478,258,0,alive,-,KR,49.247.170.173,AS38700 SMILESERV,SMILESERV,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://112.175.27.114:3478,turn,112.175.27.114,3478,258,0,alive,-,KR,112.175.27.114,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://20.196.231.152:3478,turn,20.196.231.152,3478,259,0,alive,-,KR,20.196.231.152,AS8075 Microsoft Azure,Microsoft Azure,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -480,8 +371,8 @@ turn://47.254.158.57:3479,turn,47.254.158.57,3479,263,0,alive,-,DE,47.254.158.57
 turn://34.38.18.250:3478,turn,34.38.18.250,3478,263,0,alive,-,BE,34.38.18.250,AS396982 Google Cloud,Google Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://0i2.ru:3479,turn,0i2.ru,3479,263,0,alive,-,DE,95.81.94.213,AS200740 FIRST SERVER LIMITED,FIRST SERVER LIMITED,datacenter,2026-10-13 14:49:54,@otcfxq
 turn://0i2.ru:3478,turn,0i2.ru,3478,263,0,alive,-,DE,95.81.94.213,AS200740 FIRST SERVER LIMITED,FIRST SERVER LIMITED,datacenter,2026-10-13 14:49:54,@otcfxq
-turn://3.123.146.165:3478,turn,3.123.146.165,3478,265,0,alive,-,DE,3.123.146.165,AS16509 Amazon AWS,Amazon AWS,business,2026-10-01 00:00:00,@danfeng_chat
-turn://52.79.103.192:3478,turn,52.79.103.192,3478,267,0,alive,-,KR,52.79.103.192,AS16509 Amazon AWS,Amazon AWS,business,2026-10-01 00:00:00,@danfeng_chat
+turn://3.123.146.165:3478,turn,3.123.146.165,3478,265,0,alive,-,DE,3.123.146.165,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
+turn://52.79.103.192:3478,turn,52.79.103.192,3478,267,0,alive,-,KR,52.79.103.192,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://163.172.65.136:3478,turn,163.172.65.136,3478,267,0,alive,-,FR,163.172.65.136,AS12876 Scaleway,Scaleway,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://91.99.203.170:3478,turn,91.99.203.170,3478,267,0,alive,-,DE,91.99.203.170,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://159.69.216.88:3478,turn,159.69.216.88,3478,268,0,alive,-,DE,159.69.216.88,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -548,7 +439,7 @@ turn://188.40.55.100:3478,turn,188.40.55.100,3478,270,0,alive,-,DE,188.40.55.100
 turn://159.69.31.173:3478,turn,159.69.31.173,3478,270,0,alive,-,DE,159.69.31.173,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://91.107.234.133:3478,turn,91.107.234.133,3478,270,0,alive,-,DE,91.107.234.133,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://144.76.196.246:3479,turn,144.76.196.246,3479,270,0,alive,-,DE,144.76.196.246,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://user:pass@52.79.95.204:3478,turn,52.79.95.204,3478,270,0,alive,-,KR,52.79.95.204,AS16509 Amazon AWS,Amazon AWS,business,2026-10-01 00:00:00,@danfeng_chat
+turn://user:pass@52.79.95.204:3478,turn,52.79.95.204,3478,270,0,alive,-,KR,52.79.95.204,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://176.9.57.94:3479,turn,176.9.57.94,3479,270,0,alive,-,DE,176.9.57.94,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://144.76.157.140:3478,turn,144.76.157.140,3478,270,0,alive,-,DE,144.76.157.140,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://138.201.205.241:3478,turn,138.201.205.241,3478,270,0,alive,-,DE,138.201.205.241,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -663,11 +554,11 @@ turn://46.224.133.126:3478,turn,46.224.133.126,3478,275,0,alive,-,DE,46.224.133.
 turn://88.99.166.21:3478,turn,88.99.166.21,3478,275,0,alive,-,DE,88.99.166.21,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://94.103.99.221:3478,turn,94.103.99.221,3478,275,0,alive,-,CH,94.103.99.221,AS49457 OpenBusiness Ltd / SwissCenter / SwissLink,OpenBusiness Ltd / SwissCenter / SwissLink,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://5.75.231.152:3478,turn,5.75.231.152,3478,275,0,alive,-,DE,5.75.231.152,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://52.78.67.223:3478,turn,52.78.67.223,3478,275,0,alive,-,KR,52.78.67.223,AS16509 Amazon AWS,Amazon AWS,business,2026-10-01 00:00:00,@danfeng_chat
+turn://52.78.67.223:3478,turn,52.78.67.223,3478,275,0,alive,-,KR,52.78.67.223,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://185.252.235.116:3478,turn,185.252.235.116,3478,275,0,alive,-,FR,185.252.235.116,AS51167 Contabo,Contabo,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://88.198.225.215:3478,turn,88.198.225.215,3478,275,0,alive,-,DE,88.198.225.215,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://178.18.240.231:3478,turn,178.18.240.231,3478,276,0,alive,-,FR,178.18.240.231,AS51167 Contabo,Contabo,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://user:pass@52.79.169.67:3478,turn,52.79.169.67,3478,276,0,alive,-,KR,52.79.169.67,AS16509 Amazon AWS,Amazon AWS,business,2026-10-01 00:00:00,@danfeng_chat
+turn://user:pass@52.79.169.67:3478,turn,52.79.169.67,3478,276,0,alive,-,KR,52.79.169.67,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://185.252.235.116:3479,turn,185.252.235.116,3479,277,0,alive,-,FR,185.252.235.116,AS51167 Contabo,Contabo,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://46.224.229.209:3478,turn,46.224.229.209,3478,277,0,alive,-,DE,46.224.229.209,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://91.99.93.10:3478,turn,91.99.93.10,3478,277,0,alive,-,DE,91.99.93.10,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -710,13 +601,13 @@ turn://94.130.65.161:3479,turn,94.130.65.161,3479,282,0,alive,-,DE,94.130.65.161
 turn://116.202.196.205:3478,turn,116.202.196.205,3478,282,0,alive,-,DE,116.202.196.205,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://37.205.9.233:3479,turn,37.205.9.233,3479,282,0,alive,-,CZ,37.205.9.233,AS24971 MasterDC s.r.o.,MasterDC s.r.o.,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://138.199.144.129:3478,turn,138.199.144.129,3478,282,0,alive,-,DE,138.199.144.129,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://158.255.211.91:3478,turn,158.255.211.91,3478,283,0,alive,-,AT,158.255.211.91,AS57169 EDIS GmbH,EDIS GmbH,business,2026-10-01 00:00:00,@danfeng_chat
+turn://158.255.211.91:3478,turn,158.255.211.91,3478,283,0,alive,-,AT,158.255.211.91,AS57169 EDIS GmbH,EDIS GmbH,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://112.175.27.114:3479,turn,112.175.27.114,3479,283,0,alive,-,KR,112.175.27.114,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://188.245.155.147:3478,turn,188.245.155.147,3478,283,0,alive,-,DE,188.245.155.147,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://91.99.98.172:3478,turn,91.99.98.172,3478,283,0,alive,-,DE,91.99.98.172,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://138.201.140.219:3478,turn,138.201.140.219,3478,283,0,alive,-,DE,138.201.140.219,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://162.55.165.243:3478,turn,162.55.165.243,3478,283,0,alive,-,DE,162.55.165.243,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://158.255.211.91:3479,turn,158.255.211.91,3479,283,0,alive,-,AT,158.255.211.91,AS57169 EDIS GmbH,EDIS GmbH,business,2026-10-01 00:00:00,@danfeng_chat
+turn://158.255.211.91:3479,turn,158.255.211.91,3479,283,0,alive,-,AT,158.255.211.91,AS57169 EDIS GmbH,EDIS GmbH,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://213.109.160.247:3478,turn,213.109.160.247,3478,284,0,alive,-,DE,213.109.160.247,AS197540 Netcup,Netcup,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://46.225.52.214:3478,turn,46.225.52.214,3478,285,0,alive,-,DE,46.225.52.214,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://185.37.11.52:3478,turn,185.37.11.52,3478,285,0,alive,-,FR,185.37.11.52,AS210806 Strong Blue Conseil & Telecom SASU,Strong Blue Conseil & Telecom SASU,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -760,8 +651,8 @@ turn://116.202.233.162:3478,turn,116.202.233.162,3478,296,0,alive,-,DE,116.202.2
 turn://117.186.254.34:3478,turn,117.186.254.34,3478,296,0,alive,-,CN,117.186.254.34,AS24400 China Mobile Communications Corporation - shanghai company,China Mobile communications corporation,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://91.220.179.192:3479,turn,91.220.179.192,3479,296,0,alive,-,AT,91.220.179.192,AS21013 Brunner-Webhosting,Brunner-Webhosting,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://81.169.210.168:3479,turn,81.169.210.168,3479,296,0,alive,-,DE,81.169.210.168,AS6724 Strato AG,Strato AG,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://54.177.144.169:3478,turn,54.177.144.169,3478,297,0,alive,-,US,54.177.144.169,AS16509 Amazon AWS,Amazon AWS,business,2026-10-01 00:00:00,@danfeng_chat
-turn://52.65.89.220:3478,turn,52.65.89.220,3478,297,0,alive,-,AU,52.65.89.220,AS16509 Amazon AWS,Amazon AWS,business,2026-10-01 00:00:00,@danfeng_chat
+turn://54.177.144.169:3478,turn,54.177.144.169,3478,297,0,alive,-,US,54.177.144.169,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
+turn://52.65.89.220:3478,turn,52.65.89.220,3478,297,0,alive,-,AU,52.65.89.220,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://94.130.140.55:3478,turn,94.130.140.55,3478,298,0,alive,-,DE,94.130.140.55,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://137.74.195.9:3479,turn,137.74.195.9,3479,299,0,alive,-,FR,137.74.195.9,AS16276 OVH,OVH,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://141.94.26.179:3478,turn,141.94.26.179,3478,299,0,alive,-,FR,141.94.26.179,AS16276 OVH,OVH,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -818,7 +709,7 @@ turn://65.109.61.171:3478,turn,65.109.61.171,3478,320,0,alive,-,FI,65.109.61.171
 turn://65.108.49.196:3478,turn,65.108.49.196,3478,320,0,alive,-,FI,65.108.49.196,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://37.27.187.180:3478,turn,37.27.187.180,3478,321,0,alive,-,FI,37.27.187.180,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://204.168.214.101:3478,turn,204.168.214.101,3478,321,0,alive,-,FI,204.168.214.101,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://31.77.202.216:3478,turn,31.77.202.216,3478,321,0,alive,-,FI,31.77.202.216,AS215590 DpkgSoft International Limited,DpkgSoft International Limited,business,2026-10-08 14:09:40,@danfeng_chat
+turn://31.77.202.216:3478,turn,31.77.202.216,3478,321,0,alive,-,FI,31.77.202.216,AS215590 DpkgSoft International Limited,DpkgSoft International Limited,datacenter,2026-10-08 14:09:40,@danfeng_chat
 turn://test:1234@178.255.40.33:3479,turn,178.255.40.33,3479,321,0,alive,-,PL,178.255.40.33,AS197155 Artnet Sp. z o.o.,Artnet Sp. z o.o.,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://65.21.126.228:3478,turn,65.21.126.228,3478,321,0,alive,-,FI,65.21.126.228,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://95.216.152.223:3478,turn,95.216.152.223,3478,321,0,alive,-,FI,95.216.152.223,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -846,7 +737,7 @@ turn://146.59.95.129:3479,turn,146.59.95.129,3479,324,0,alive,-,PL,146.59.95.129
 turn://37.27.31.240:3478,turn,37.27.31.240,3478,324,0,alive,-,FI,37.27.31.240,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://65.21.252.14:3478,turn,65.21.252.14,3478,324,0,alive,-,FI,65.21.252.14,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://95.216.143.105:3478,turn,95.216.143.105,3478,324,0,alive,-,FI,95.216.143.105,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://chat.welza.ru:3478,turn,chat.welza.ru,3478,325,0,alive,-,FI,31.77.202.216,AS215590 DpkgSoft International Limited,DpkgSoft International Limited,business,2026-10-08 14:09:40,@danfeng_chat
+turn://chat.welza.ru:3478,turn,chat.welza.ru,3478,325,0,alive,-,FI,31.77.202.216,AS215590 DpkgSoft International Limited,DpkgSoft International Limited,datacenter,2026-10-08 14:09:40,@danfeng_chat
 turn://156.226.108.74:3478,turn,156.226.108.74,3478,326,0,alive,-,HK,156.226.108.74,AS135097 LUOGELANG LIMITED,LUOGELANG (FRANCE) LIMITED,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://37.27.20.77:3478,turn,37.27.20.77,3478,326,0,alive,-,FI,37.27.20.77,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://37.27.21.182:3478,turn,37.27.21.182,3478,326,0,alive,-,FI,37.27.21.182,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -855,7 +746,7 @@ turn://95.216.18.230:3478,turn,95.216.18.230,3478,327,0,alive,-,FI,95.216.18.230
 turn://37.27.6.5:3478,turn,37.27.6.5,3478,327,0,alive,-,FI,37.27.6.5,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://82.148.13.28:3478,turn,82.148.13.28,3478,327,0,alive,-,RU,82.148.13.28,AS50340 JSC Selectel,JSC Selectel,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://37.27.29.172:3478,turn,37.27.29.172,3478,327,0,alive,-,FI,37.27.29.172,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://94.141.161.213:3479,turn,94.141.161.213,3479,327,0,alive,-,DE,94.141.161.213,AS215590 DpkgSoft International Limited,DpkgSoft International Limited,business,2026-10-08 14:09:40,@danfeng_chat
+turn://94.141.161.213:3479,turn,94.141.161.213,3479,327,0,alive,-,DE,94.141.161.213,AS215590 DpkgSoft International Limited,DpkgSoft International Limited,datacenter,2026-10-08 14:09:40,@danfeng_chat
 turn://157.180.11.119:3478,turn,157.180.11.119,3478,328,0,alive,-,FI,157.180.11.119,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://109.196.167.66:3478,turn,109.196.167.66,3478,329,0,alive,-,RU,109.196.167.66,AS212247 IT Services Ltd,IT Services Ltd,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://81.27.244.138:3478,turn,81.27.244.138,3478,331,0,alive,-,RU,81.27.244.138,AS35508 TeraNet LLC,TeraNet LLC,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -876,7 +767,7 @@ turn://65.21.192.217:3479,turn,65.21.192.217,3479,339,0,alive,-,FI,65.21.192.217
 turn://95.217.68.123:3478,turn,95.217.68.123,3478,339,0,alive,-,FI,95.217.68.123,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://95.216.118.105:3478,turn,95.216.118.105,3478,339,0,alive,-,FI,95.216.118.105,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://95.216.195.120:3479,turn,95.216.195.120,3479,339,0,alive,-,FI,95.216.195.120,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://sel.benzin.dpdns.org:3479,turn,sel.benzin.dpdns.org,3479,342,0,alive,-,DE,94.141.161.213,AS215590 DpkgSoft International Limited,DpkgSoft International Limited,business,2026-10-08 14:09:40,@danfeng_chat
+turn://sel.benzin.dpdns.org:3479,turn,sel.benzin.dpdns.org,3479,342,0,alive,-,DE,94.141.161.213,AS215590 DpkgSoft International Limited,DpkgSoft International Limited,datacenter,2026-10-08 14:09:40,@danfeng_chat
 turn://45.132.247.215:3478,turn,45.132.247.215,3478,347,0,alive,-,DE,45.132.247.215,AS197540 Netcup,Netcup,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://62.141.51.126:3478,turn,62.141.51.126,3478,347,0,alive,-,DE,62.141.51.126,AS31103 Keyweb AG IP Network,Keyweb AG IP Network,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://116.203.192.114:3478,turn,116.203.192.114,3478,347,0,alive,-,DE,116.203.192.114,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -884,11 +775,11 @@ turn://195.201.119.15:3478,turn,195.201.119.15,3478,347,0,alive,-,DE,195.201.119
 turn://8.219.133.155:3478,turn,8.219.133.155,3478,350,0,alive,-,SG,8.219.133.155,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://65.21.149.123:3478,turn,65.21.149.123,3478,351,0,alive,-,FI,65.21.149.123,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://95.217.42.117:3478,turn,95.217.42.117,3478,354,0,alive,-,FI,95.217.42.117,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://52.77.231.121:3478,turn,52.77.231.121,3478,354,0,alive,-,SG,52.77.231.121,AS16509 Amazon AWS,Amazon AWS,business,2026-10-01 00:00:00,@danfeng_chat
+turn://52.77.231.121:3478,turn,52.77.231.121,3478,354,0,alive,-,SG,52.77.231.121,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://8.219.130.135:3478,turn,8.219.130.135,3478,354,0,alive,-,SG,8.219.130.135,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://183.201.94.95:3478,turn,183.201.94.95,3478,356,0,alive,-,CN,183.201.94.95,AS132510 China Mobile communications corporation,China Mobile communications corporation,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://172.188.59.133:3478,turn,172.188.59.133,3478,356,0,alive,-,SG,172.188.59.133,AS8075 Microsoft Azure,Microsoft Azure,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://18.143.247.42:3478,turn,18.143.247.42,3478,358,0,alive,-,SG,18.143.247.42,AS16509 Amazon AWS,Amazon AWS,business,2026-10-01 00:00:00,@danfeng_chat
+turn://18.143.247.42:3478,turn,18.143.247.42,3478,358,0,alive,-,SG,18.143.247.42,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://47.245.114.70:3479,turn,47.245.114.70,3479,361,0,alive,-,SG,47.245.114.70,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://144.76.157.140:3479,turn,144.76.157.140,3479,365,0,alive,-,DE,144.76.157.140,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://167.235.100.214:3478,turn,167.235.100.214,3478,365,0,alive,-,DE,167.235.100.214,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -943,7 +834,7 @@ turn://120.77.244.229:3478,turn,120.77.244.229,3478,403,0,alive,-,CN,120.77.244.
 turn://47.98.199.22:3478,turn,47.98.199.22,3478,403,0,alive,-,CN,47.98.199.22,AS37963 Hangzhou Alibaba Advertising Co,Hangzhou Alibaba Advertising Co,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://47.114.104.13:3479,turn,47.114.104.13,3479,404,0,alive,-,CN,47.114.104.13,AS37963 Hangzhou Alibaba Advertising Co,"Hangzhou Alibaba Advertising Co., Ltd.",datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://47.95.114.47:5350,turn,47.95.114.47,5350,405,0,alive,-,CN,47.95.114.47,AS37963 Hangzhou Alibaba Advertising Co,"Hangzhou Alibaba Advertising Co., Ltd.",datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://217.12.37.2:3478,turn,217.12.37.2,3478,406,0,alive,-,RU,217.12.37.2,AS198610 Beget LLC,Beget LLC,business,2026-10-01 00:00:00,@danfeng_chat
+turn://217.12.37.2:3478,turn,217.12.37.2,3478,406,0,alive,-,RU,217.12.37.2,AS198610 Beget LLC,Beget LLC,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://139.199.66.223:3478,turn,139.199.66.223,3478,407,0,alive,-,CN,139.199.66.223,AS45090 Tencent Cloud,Tencent Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://46.39.0.53:3479,turn,46.39.0.53,3479,408,0,alive,-,RU,46.39.0.53,AS52015 Dancer LLC,Dancer LLC,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://47.99.184.62:3478,turn,47.99.184.62,3478,410,0,alive,-,CN,47.99.184.62,AS37963 Hangzhou Alibaba Advertising Co,"Hangzhou Alibaba Advertising Co., Ltd.",datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -986,9 +877,9 @@ turn://157.90.159.13:3478,turn,157.90.159.13,3478,448,0,alive,-,DE,157.90.159.13
 turn://211.90.156.232:3478,turn,211.90.156.232,3478,451,0,alive,-,CN,211.90.156.232,AS4837 China Unicom,China Unicom,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://47.95.114.47:3479,turn,47.95.114.47,3479,458,0,alive,-,CN,47.95.114.47,AS37963 Hangzhou Alibaba Advertising Co,"Hangzhou Alibaba Advertising Co., Ltd.",datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://122.143.2.124:3478,turn,122.143.2.124,3478,459,0,alive,-,CN,122.143.2.124,AS4837 China Unicom,China Unicom,isp,2026-10-01 00:00:00,@danfeng_chat
-turn://52.66.134.140:3478,turn,52.66.134.140,3478,461,0,alive,-,IN,52.66.134.140,AS16509 Amazon AWS,Amazon AWS,business,2026-10-01 00:00:00,@danfeng_chat
-turn://52.66.209.215:3478,turn,52.66.209.215,3478,462,0,alive,-,IN,52.66.209.215,AS16509 Amazon AWS,Amazon AWS,business,2026-10-01 00:00:00,@danfeng_chat
-turn://65.0.199.22:3478,turn,65.0.199.22,3478,462,0,alive,-,IN,65.0.199.22,AS16509 Amazon AWS,Amazon AWS,business,2026-10-01 00:00:00,@danfeng_chat
+turn://52.66.134.140:3478,turn,52.66.134.140,3478,461,0,alive,-,IN,52.66.134.140,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
+turn://52.66.209.215:3478,turn,52.66.209.215,3478,462,0,alive,-,IN,52.66.209.215,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
+turn://65.0.199.22:3478,turn,65.0.199.22,3478,462,0,alive,-,IN,65.0.199.22,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://47.245.114.70:3478,turn,47.245.114.70,3478,463,0,alive,-,SG,47.245.114.70,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://140.245.205.142:3478,turn,140.245.205.142,3478,463,0,alive,-,IN,140.245.205.142,AS31898 Oracle Cloud,Oracle Cloud,datacenter,2026-10-08 14:09:40,@danfeng_chat
 turn://110.184.206.131:3478,turn,110.184.206.131,3478,464,0,alive,-,CN,110.184.206.131,AS4134 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
@@ -997,13 +888,13 @@ turn://23.88.60.65:3479,turn,23.88.60.65,3479,466,0,alive,-,DE,23.88.60.65,AS249
 turn://5.9.111.228:3478,turn,5.9.111.228,3478,466,0,alive,-,DE,5.9.111.228,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://213.239.202.216:3478,turn,213.239.202.216,3478,466,0,alive,-,DE,213.239.202.216,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://167.235.63.123:3478,turn,167.235.63.123,3478,466,0,alive,-,DE,167.235.63.123,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://myuser:mypassword@52.66.165.251:3478,turn,52.66.165.251,3478,466,0,alive,-,IN,52.66.165.251,AS16509 Amazon AWS,Amazon AWS,business,2026-10-01 00:00:00,@danfeng_chat
+turn://myuser:mypassword@52.66.165.251:3478,turn,52.66.165.251,3478,466,0,alive,-,IN,52.66.165.251,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://150.242.13.67:3478,turn,150.242.13.67,3478,469,0,alive,-,IN,150.242.13.67,AS133296 Web Werks India Pvt. Ltd.,Web Werks India Pvt. Ltd.,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://103.125.217.26:3478,turn,103.125.217.26,3478,469,0,alive,-,SG,103.125.217.26,AS36007 Marketingboys B.V,Marketingboys B.V,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://39.105.109.161:3478,turn,39.105.109.161,3478,471,0,alive,-,CN,39.105.109.161,AS37963 Hangzhou Alibaba Advertising Co,"Hangzhou Alibaba Advertising Co., Ltd.",datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://52.66.209.215:3479,turn,52.66.209.215,3479,472,0,alive,-,IN,52.66.209.215,AS16509 Amazon AWS,Amazon AWS,business,2026-10-01 00:00:00,@danfeng_chat
+turn://52.66.209.215:3479,turn,52.66.209.215,3479,472,0,alive,-,IN,52.66.209.215,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://95.216.167.103:3478,turn,95.216.167.103,3478,479,0,alive,-,FI,95.216.167.103,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://13.232.116.108:3478,turn,13.232.116.108,3478,480,0,alive,-,IN,13.232.116.108,AS16509 Amazon AWS,Amazon AWS,business,2026-10-01 00:00:00,@danfeng_chat
+turn://13.232.116.108:3478,turn,13.232.116.108,3478,480,0,alive,-,IN,13.232.116.108,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://8.217.50.64:3478,turn,8.217.50.64,3478,508,0,alive,-,HK,8.217.50.64,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://95.217.200.110:3478,turn,95.217.200.110,3478,508,0,alive,-,FI,95.217.200.110,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://168.119.237.81:3479,turn,168.119.237.81,3479,522,0,alive,-,DE,168.119.237.81,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -1027,7 +918,7 @@ turn://101.132.248.113:3478,turn,101.132.248.113,3478,717,0,alive,-,CN,101.132.2
 turn://65.108.227.38:3478,turn,65.108.227.38,3478,720,0,alive,-,FI,65.108.227.38,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://221.178.103.142:3478,turn,221.178.103.142,3478,762,0,alive,-,CN,221.178.103.142,AS9808 China Mobile,China Mobile,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://47.254.158.57:3478,turn,47.254.158.57,3478,779,0,alive,-,DE,47.254.158.57,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://3.98.192.101:3478,turn,3.98.192.101,3478,798,0,alive,-,CA,3.98.192.101,AS16509 Amazon AWS,Amazon AWS,business,2026-10-01 00:00:00,@danfeng_chat
+turn://3.98.192.101:3478,turn,3.98.192.101,3478,798,0,alive,-,CA,3.98.192.101,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://78.46.174.244:3478,turn,78.46.174.244,3478,808,0,alive,-,DE,78.46.174.244,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://46.4.225.77:3478,turn,46.4.225.77,3478,810,0,alive,-,DE,46.4.225.77,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://test:test123@178.250.157.153:3478,turn,178.250.157.153,3478,893,0,alive,-,RU,178.250.157.153,AS29182 JSC IOT,JSC IOT,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -1039,7 +930,7 @@ turn://167.235.139.220:3478,turn,167.235.139.220,3478,985,0,alive,-,DE,167.235.1
 turn://5.9.150.28:3478,turn,5.9.150.28,3478,1006,0,alive,-,DE,5.9.150.28,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://94.103.93.110:3478,turn,94.103.93.110,3478,1031,0,alive,-,RU,94.103.93.110,AS48282 Hosting technology LTD,Hosting technology LTD,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://120.55.55.6:3478,turn,120.55.55.6,3478,1063,0,alive,-,CN,120.55.55.6,AS37963 Hangzhou Alibaba Advertising Co,"Hangzhou Alibaba Advertising Co., Ltd.",datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://52.76.5.46:3478,turn,52.76.5.46,3478,1169,0,alive,-,SG,52.76.5.46,AS16509 Amazon AWS,Amazon AWS,business,2026-10-01 00:00:00,@danfeng_chat
+turn://52.76.5.46:3478,turn,52.76.5.46,3478,1169,0,alive,-,SG,52.76.5.46,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://47.99.50.91:3478,turn,47.99.50.91,3478,1186,0,alive,-,CN,47.99.50.91,AS37963 Hangzhou Alibaba Advertising Co,Hangzhou Alibaba Advertising Co,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://64.227.181.9:3478,turn,64.227.181.9,3478,1228,0,alive,-,IN,64.227.181.9,AS14061 DigitalOcean,DigitalOcean,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://123.150.1.2:3478,turn,123.150.1.2,3478,1479,0,alive,-,CN,123.150.1.2,AS17638 ASN for TIANJIN Provincial Net of CT,ASN for TIANJIN Provincial Net of CT,datacenter,2026-10-01 00:00:00,@danfeng_chat

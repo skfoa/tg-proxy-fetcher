@@ -71,7 +71,7 @@
     "asn": "400992",
     "asOrganization": "ZhouyiSat Communications",
     "isp": "ZhouyiSat Communications",
-    "net_type": "isp",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -192,21 +192,6 @@
     "asOrganization": "NET2ATLANTA.COM LLC",
     "isp": "NET2ATLANTA.COM LLC",
     "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "socks5://158.101.8.92:1080",
-    "protocol": "socks5",
-    "ip": "158.101.8.92",
-    "port": 1080,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "215125",
-    "asOrganization": "SURF B.V.",
-    "isp": "SURF B.V.",
-    "net_type": "education",
     "source": "EDT-Pages"
   },
   {
@@ -1140,21 +1125,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "socks5://35.73.138.133:443",
-    "protocol": "socks5",
-    "ip": "35.73.138.133",
-    "port": 443,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "16509",
-    "asOrganization": "Amazon Data Services Japan",
-    "isp": "Amazon Data Services Japan",
-    "net_type": "business",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "socks5://98.170.57.231:4145",
     "protocol": "socks5",
     "ip": "98.170.57.231",
@@ -1575,21 +1545,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "socks5://37.18.73.60:5566",
-    "protocol": "socks5",
-    "ip": "37.18.73.60",
-    "port": 5566,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "215125",
-    "asOrganization": "SURF B.V.",
-    "isp": "SURF B.V.",
-    "net_type": "education",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "socks5://123:123@165.154.23.8:1080",
     "protocol": "socks5",
     "ip": "165.154.23.8",
@@ -1661,7 +1616,7 @@
     "asn": "136258",
     "asOrganization": "BrainStorm Network",
     "isp": "BrainStorm Network",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -1680,21 +1635,6 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "socks5://45.61.129.165:9050",
-    "protocol": "socks5",
-    "ip": "45.61.129.165",
-    "port": 9050,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "215125",
-    "asOrganization": "SURF B.V.",
-    "isp": "SURF B.V.",
-    "net_type": "education",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "socks5://test123:test123@103.75.119.242:1080",
     "protocol": "socks5",
     "ip": "103.75.119.242",
@@ -1706,7 +1646,7 @@
     "asn": "136258",
     "asOrganization": "BrainStorm Network",
     "isp": "BrainStorm Network",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -1736,7 +1676,7 @@
     "asn": "136258",
     "asOrganization": "BrainStorm Network",
     "isp": "BrainStorm Network",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -1751,7 +1691,7 @@
     "asn": "38320",
     "asOrganization": "PT Maxindo Mitra Solusi",
     "isp": "PT Maxindo Mitra Solusi",
-    "net_type": "isp",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -1781,7 +1721,7 @@
     "asn": "38320",
     "asOrganization": "PT Maxindo Mitra Solusi",
     "isp": "PT Maxindo Mitra Solusi",
-    "net_type": "isp",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -1826,7 +1766,7 @@
     "asn": "136258",
     "asOrganization": "BrainStorm Network",
     "isp": "BrainStorm Network",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -1918,21 +1858,6 @@
     "isp": "SpeedNet",
     "net_type": "isp",
     "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "socks5://171.25.158.95:1080",
-    "protocol": "socks5",
-    "ip": "171.25.158.95",
-    "port": 1080,
-    "country": "SE",
-    "country_name": "瑞典",
-    "country_cn": "瑞典",
-    "country_emoji": "🇸🇪",
-    "asn": "35100",
-    "asOrganization": "Vaxjo NET C2IP",
-    "isp": "Vaxjo NET C2IP",
-    "net_type": "isp",
-    "source": "EDT-Pages"
   },
   {
     "proxy": "socks5://ss:ss@103.80.116.190:1080",
@@ -2216,7 +2141,7 @@
     "asn": "136258",
     "asOrganization": "BrainStorm Network",
     "isp": "BrainStorm Network",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -2400,21 +2325,6 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "socks5://103.100.158.115:10809",
-    "protocol": "socks5",
-    "ip": "103.100.158.115",
-    "port": 10809,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "51847",
-    "asOrganization": "Toko Communications Co., Ltd.",
-    "isp": "Toko Communications Co., Ltd.",
-    "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "socks5://149.40.242.118:1080",
     "protocol": "socks5",
     "ip": "149.40.242.118",
@@ -2490,21 +2400,6 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "socks5://67.205.161.254:9050",
-    "protocol": "socks5",
-    "ip": "67.205.161.254",
-    "port": 9050,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "215125",
-    "asOrganization": "SURF B.V.",
-    "isp": "SURF B.V.",
-    "net_type": "education",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "socks5://148.251.68.232:8888",
     "protocol": "socks5",
     "ip": "148.251.68.232",
@@ -2520,21 +2415,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "socks5://110.39.13.162:1080",
-    "protocol": "socks5",
-    "ip": "110.39.13.162",
-    "port": 1080,
-    "country": "PK",
-    "country_name": "PK",
-    "country_cn": "PK",
-    "country_emoji": "🇵🇰",
-    "asn": "38264",
-    "asOrganization": "National Wimax/IMS environment",
-    "isp": "National Wimax/IMS environment",
-    "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "socks5://49.13.22.249:10807",
     "protocol": "socks5",
     "ip": "49.13.22.249",
@@ -2546,51 +2426,6 @@
     "asn": "174",
     "asOrganization": "Private Customer",
     "isp": "Private Customer",
-    "net_type": "business",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "socks5://103.136.107.70:1080",
-    "protocol": "socks5",
-    "ip": "103.136.107.70",
-    "port": 1080,
-    "country": "BD",
-    "country_name": "BD",
-    "country_cn": "BD",
-    "country_emoji": "🇧🇩",
-    "asn": "134599",
-    "asOrganization": "Jagobd IT SolutionsRampura",
-    "isp": "Jagobd IT SolutionsRampura",
-    "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "socks5://220.158.232.118:1080",
-    "protocol": "socks5",
-    "ip": "220.158.232.118",
-    "port": 1080,
-    "country": "KH",
-    "country_name": "KH",
-    "country_cn": "KH",
-    "country_emoji": "🇰🇭",
-    "asn": "38623",
-    "asOrganization": "BUCT COMMUNICATION",
-    "isp": "BUCT COMMUNICATION",
-    "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "socks5://31.129.107.119:443",
-    "protocol": "socks5",
-    "ip": "31.129.107.119",
-    "port": 443,
-    "country": "RU",
-    "country_name": "俄罗斯",
-    "country_cn": "俄罗斯",
-    "country_emoji": "🇷🇺",
-    "asn": "198610",
-    "asOrganization": "Beget LLC",
-    "isp": "Beget LLC",
     "net_type": "business",
     "source": "EDT-Pages"
   },
@@ -2640,21 +2475,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "socks5://45.74.31.40:11933",
-    "protocol": "socks5",
-    "ip": "45.74.31.40",
-    "port": 11933,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "16509",
-    "asOrganization": "Amazon Data Services Japan",
-    "isp": "Amazon Data Services Japan",
-    "net_type": "business",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "socks5://45.74.31.41:6355",
     "protocol": "socks5",
     "ip": "45.74.31.41",
@@ -2685,21 +2505,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "socks5://154.223.77.54:10002",
-    "protocol": "socks5",
-    "ip": "154.223.77.54",
-    "port": 10002,
-    "country": "HK",
-    "country_name": "中国香港",
-    "country_cn": "中国香港",
-    "country_emoji": "🇭🇰",
-    "asn": "138915",
-    "asOrganization": "Kaopu Cloud HK Limited",
-    "isp": "Kaopu Cloud HK Limited",
-    "net_type": "business",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "socks5://116.104.251.199:1085",
     "protocol": "socks5",
     "ip": "116.104.251.199",
@@ -2726,21 +2531,6 @@
     "asn": "5650",
     "asOrganization": "Private Customer",
     "isp": "Private Customer",
-    "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "socks5://64.83.14.6:555",
-    "protocol": "socks5",
-    "ip": "64.83.14.6",
-    "port": 555,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "979",
-    "asOrganization": "NetLab Global",
-    "isp": "NetLab Global",
     "net_type": "isp",
     "source": "EDT-Pages"
   },
@@ -2802,21 +2592,6 @@
     "asOrganization": "Viettel Group",
     "isp": "Viettel Group",
     "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "socks5://213.139.210.13:1080",
-    "protocol": "socks5",
-    "ip": "213.139.210.13",
-    "port": 1080,
-    "country": "RU",
-    "country_name": "俄罗斯",
-    "country_cn": "俄罗斯",
-    "country_emoji": "🇷🇺",
-    "asn": "198610",
-    "asOrganization": "Beget LLC",
-    "isp": "Beget LLC",
-    "net_type": "business",
     "source": "EDT-Pages"
   },
   {
@@ -2895,21 +2670,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "socks5://45.74.31.41:8155",
-    "protocol": "socks5",
-    "ip": "45.74.31.41",
-    "port": 8155,
-    "country": "IN",
-    "country_name": "印度",
-    "country_cn": "印度",
-    "country_emoji": "🇮🇳",
-    "asn": "45916",
-    "asOrganization": "GTPL Broadband Pvt. Ltd.",
-    "isp": "GTPL Broadband Pvt. Ltd.",
-    "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "socks5://5.75.133.113:10807",
     "protocol": "socks5",
     "ip": "5.75.133.113",
@@ -2966,51 +2726,6 @@
     "asn": "17451",
     "asOrganization": "BIZNET-PREPAID-BLOCK",
     "isp": "BIZNET-PREPAID-BLOCK",
-    "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "socks5://45.74.31.42:9198",
-    "protocol": "socks5",
-    "ip": "45.74.31.42",
-    "port": 9198,
-    "country": "IN",
-    "country_name": "印度",
-    "country_cn": "印度",
-    "country_emoji": "🇮🇳",
-    "asn": "45916",
-    "asOrganization": "GTPL Broadband Pvt. Ltd.",
-    "isp": "GTPL Broadband Pvt. Ltd.",
-    "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "socks5://45.74.31.47:16613",
-    "protocol": "socks5",
-    "ip": "45.74.31.47",
-    "port": 16613,
-    "country": "VN",
-    "country_name": "越南",
-    "country_cn": "越南",
-    "country_emoji": "🇻🇳",
-    "asn": "135967",
-    "asOrganization": "Branch of BachKim Network solutions jsc",
-    "isp": "Branch of BachKim Network solutions jsc",
-    "net_type": "business",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "socks5://91.90.25.95:1080",
-    "protocol": "socks5",
-    "ip": "91.90.25.95",
-    "port": 1080,
-    "country": "SE",
-    "country_name": "瑞典",
-    "country_cn": "瑞典",
-    "country_emoji": "🇸🇪",
-    "asn": "35100",
-    "asOrganization": "Patrik Lagerman",
-    "isp": "Patrik Lagerman",
     "net_type": "isp",
     "source": "EDT-Pages"
   },
@@ -3102,21 +2817,6 @@
     "asOrganization": "China Mobile Communications Corporation",
     "isp": "China Mobile Communications Corporation",
     "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "socks5://45.74.31.46:5549",
-    "protocol": "socks5",
-    "ip": "45.74.31.46",
-    "port": 5549,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "16509",
-    "asOrganization": "Amazon Data Services Japan",
-    "isp": "Amazon Data Services Japan",
-    "net_type": "business",
     "source": "EDT-Pages"
   },
   {

@@ -341,7 +341,7 @@
     "asn": "16509",
     "asOrganization": "Amazon AWS",
     "isp": "Amazon AWS",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -401,7 +401,7 @@
     "asn": "16509",
     "asOrganization": "Amazon AWS",
     "isp": "Amazon AWS",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -416,7 +416,7 @@
     "asn": "16509",
     "asOrganization": "Amazon AWS",
     "isp": "Amazon AWS",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -431,7 +431,7 @@
     "asn": "16509",
     "asOrganization": "Amazon AWS",
     "isp": "Amazon AWS",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -536,7 +536,7 @@
     "asn": "16509",
     "asOrganization": "Amazon AWS",
     "isp": "Amazon AWS",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -656,7 +656,7 @@
     "asn": "16509",
     "asOrganization": "Amazon AWS",
     "isp": "Amazon AWS",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -851,7 +851,7 @@
     "asn": "16509",
     "asOrganization": "Amazon AWS",
     "isp": "Amazon AWS",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -866,7 +866,7 @@
     "asn": "16509",
     "asOrganization": "Amazon AWS",
     "isp": "Amazon AWS",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -1871,7 +1871,7 @@
     "asn": "16509",
     "asOrganization": "Amazon AWS",
     "isp": "Amazon AWS",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -3596,7 +3596,7 @@
     "asn": "16509",
     "asOrganization": "Amazon AWS",
     "isp": "Amazon AWS",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -3656,7 +3656,7 @@
     "asn": "16509",
     "asOrganization": "Amazon AWS",
     "isp": "Amazon AWS",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -4301,7 +4301,7 @@
     "asn": "57169",
     "asOrganization": "EDIS GmbH",
     "isp": "EDIS GmbH",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -4391,7 +4391,7 @@
     "asn": "57169",
     "asOrganization": "EDIS GmbH",
     "isp": "EDIS GmbH",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -5051,7 +5051,7 @@
     "asn": "16509",
     "asOrganization": "Amazon AWS",
     "isp": "Amazon AWS",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -5066,7 +5066,7 @@
     "asn": "16509",
     "asOrganization": "Amazon AWS",
     "isp": "Amazon AWS",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -5921,7 +5921,7 @@
     "asn": "215590",
     "asOrganization": "DpkgSoft International Limited",
     "isp": "DpkgSoft International Limited",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -6341,7 +6341,7 @@
     "asn": "215590",
     "asOrganization": "DpkgSoft International Limited",
     "isp": "DpkgSoft International Limited",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -6476,7 +6476,7 @@
     "asn": "215590",
     "asOrganization": "DpkgSoft International Limited",
     "isp": "DpkgSoft International Limited",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -6791,7 +6791,7 @@
     "asn": "215590",
     "asOrganization": "DpkgSoft International Limited",
     "isp": "DpkgSoft International Limited",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -6911,7 +6911,7 @@
     "asn": "16509",
     "asOrganization": "Amazon AWS",
     "isp": "Amazon AWS",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -6971,7 +6971,7 @@
     "asn": "16509",
     "asOrganization": "Amazon AWS",
     "isp": "Amazon AWS",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -7796,7 +7796,7 @@
     "asn": "198610",
     "asOrganization": "Beget LLC",
     "isp": "Beget LLC",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -8441,7 +8441,7 @@
     "asn": "16509",
     "asOrganization": "Amazon AWS",
     "isp": "Amazon AWS",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -8456,7 +8456,7 @@
     "asn": "16509",
     "asOrganization": "Amazon AWS",
     "isp": "Amazon AWS",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -8471,7 +8471,7 @@
     "asn": "16509",
     "asOrganization": "Amazon AWS",
     "isp": "Amazon AWS",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -8606,7 +8606,7 @@
     "asn": "16509",
     "asOrganization": "Amazon AWS",
     "isp": "Amazon AWS",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -8666,7 +8666,7 @@
     "asn": "16509",
     "asOrganization": "Amazon AWS",
     "isp": "Amazon AWS",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -8696,7 +8696,7 @@
     "asn": "16509",
     "asOrganization": "Amazon AWS",
     "isp": "Amazon AWS",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -9056,7 +9056,7 @@
     "asn": "16509",
     "asOrganization": "Amazon AWS",
     "isp": "Amazon AWS",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {
@@ -9236,7 +9236,7 @@
     "asn": "16509",
     "asOrganization": "Amazon AWS",
     "isp": "Amazon AWS",
-    "net_type": "business",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   },
   {

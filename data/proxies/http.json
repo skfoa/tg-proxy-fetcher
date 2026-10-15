@@ -15,21 +15,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "http://18.190.253.157:26235",
-    "protocol": "http",
-    "ip": "18.190.253.157",
-    "port": 26235,
-    "country": "NL",
-    "country_name": "荷兰",
-    "country_cn": "荷兰",
-    "country_emoji": "🇳🇱",
-    "asn": "215125",
-    "asOrganization": "TOR EXIT AND MORE",
-    "isp": "TOR EXIT AND MORE",
-    "net_type": "education",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "http://113.192.30.240:8080",
     "protocol": "http",
     "ip": "113.192.30.240",
@@ -120,21 +105,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "http://203.201.190.33:8080",
-    "protocol": "http",
-    "ip": "203.201.190.33",
-    "port": 8080,
-    "country": "ID",
-    "country_name": "印度尼西亚",
-    "country_cn": "印度尼西亚",
-    "country_emoji": "🇮🇩",
-    "asn": "154833",
-    "asOrganization": "PT WIRA HASTA JITU",
-    "isp": "PT WIRA HASTA JITU",
-    "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "http://103.133.26.73:3128",
     "protocol": "http",
     "ip": "103.133.26.73",
@@ -162,21 +132,6 @@
     "asOrganization": "TOT Mobile Co LTD",
     "isp": "TOT Mobile Co LTD",
     "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "http://34.207.102.197:32421",
-    "protocol": "http",
-    "ip": "34.207.102.197",
-    "port": 32421,
-    "country": "NL",
-    "country_name": "荷兰",
-    "country_cn": "荷兰",
-    "country_emoji": "🇳🇱",
-    "asn": "215125",
-    "asOrganization": "TOR EXIT AND MORE",
-    "isp": "TOR EXIT AND MORE",
-    "net_type": "education",
     "source": "EDT-Pages"
   },
   {
@@ -255,21 +210,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "http://51.17.99.116:14668",
-    "protocol": "http",
-    "ip": "51.17.99.116",
-    "port": 14668,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "215125",
-    "asOrganization": "SURF B.V.",
-    "isp": "SURF B.V.",
-    "net_type": "education",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "http://160.19.41.47:80",
     "protocol": "http",
     "ip": "160.19.41.47",
@@ -330,36 +270,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "http://56.155.73.159:36185",
-    "protocol": "http",
-    "ip": "56.155.73.159",
-    "port": 36185,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "215125",
-    "asOrganization": "SURF B.V.",
-    "isp": "SURF B.V.",
-    "net_type": "education",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "http://56.155.73.159:29191",
-    "protocol": "http",
-    "ip": "56.155.73.159",
-    "port": 29191,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "215125",
-    "asOrganization": "SURF B.V.",
-    "isp": "SURF B.V.",
-    "net_type": "education",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "http://123.121.134.141:8888",
     "protocol": "http",
     "ip": "123.121.134.141",
@@ -386,7 +296,7 @@
     "asn": "206119",
     "asOrganization": "Veganet Teknolojileri ve Hizmetleri LTD STI",
     "isp": "Veganet Teknolojileri ve Hizmetleri LTD STI",
-    "net_type": "business",
+    "net_type": "isp",
     "source": "EDT-Pages"
   },
   {
@@ -402,21 +312,6 @@
     "asOrganization": "China Unicom",
     "isp": "China Unicom",
     "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "http://42.96.15.210:60001",
-    "protocol": "http",
-    "ip": "42.96.15.210",
-    "port": 60001,
-    "country": "VN",
-    "country_name": "越南",
-    "country_cn": "越南",
-    "country_emoji": "🇻🇳",
-    "asn": "135967",
-    "asOrganization": "Bach Kim Network solutions Join stock company",
-    "isp": "Bach Kim Network solutions Join stock company",
-    "net_type": "business",
     "source": "EDT-Pages"
   },
   {
@@ -450,21 +345,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "http://18.61.230.250:6218",
-    "protocol": "http",
-    "ip": "18.61.230.250",
-    "port": 6218,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "215125",
-    "asOrganization": "SURF B.V.",
-    "isp": "SURF B.V.",
-    "net_type": "education",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "http://191.102.72.74:8080",
     "protocol": "http",
     "ip": "191.102.72.74",
@@ -476,21 +356,6 @@
     "asn": "262186",
     "asOrganization": "TV AZTECA SUCURSAL COLOMBIA",
     "isp": "TV AZTECA SUCURSAL COLOMBIA",
-    "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "http://163.227.248.71:8181",
-    "protocol": "http",
-    "ip": "163.227.248.71",
-    "port": 8181,
-    "country": "ID",
-    "country_name": "印度尼西亚",
-    "country_cn": "印度尼西亚",
-    "country_emoji": "🇮🇩",
-    "asn": "153895",
-    "asOrganization": "PT Rajasa Sinergi Komunikasi",
-    "isp": "PT Rajasa Sinergi Komunikasi",
     "net_type": "isp",
     "source": "EDT-Pages"
   },
@@ -555,21 +420,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "http://103.171.245.124:8090",
-    "protocol": "http",
-    "ip": "103.171.245.124",
-    "port": 8090,
-    "country": "ID",
-    "country_name": "印度尼西亚",
-    "country_cn": "印度尼西亚",
-    "country_emoji": "🇮🇩",
-    "asn": "141674",
-    "asOrganization": "CV Amanda Network Grup",
-    "isp": "CV Amanda Network Grup",
-    "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "http://202.58.75.98:7777",
     "protocol": "http",
     "ip": "202.58.75.98",
@@ -585,21 +435,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "http://13.215.184.250:9898",
-    "protocol": "http",
-    "ip": "13.215.184.250",
-    "port": 9898,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "215125",
-    "asOrganization": "SURF B.V.",
-    "isp": "SURF B.V.",
-    "net_type": "education",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "http://102.68.76.247:5566",
     "protocol": "http",
     "ip": "102.68.76.247",
@@ -612,21 +447,6 @@
     "asOrganization": "Unwired Communications Ltd",
     "isp": "Unwired Communications Ltd",
     "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "http://47.129.105.10:41552",
-    "protocol": "http",
-    "ip": "47.129.105.10",
-    "port": 41552,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "215125",
-    "asOrganization": "SURF B.V.",
-    "isp": "SURF B.V.",
-    "net_type": "education",
     "source": "EDT-Pages"
   },
   {
@@ -657,21 +477,6 @@
     "asOrganization": "PT. ADEAKSA INDO JAYATAMA",
     "isp": "PT. ADEAKSA INDO JAYATAMA",
     "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "http://35.183.29.62:8181",
-    "protocol": "http",
-    "ip": "35.183.29.62",
-    "port": 8181,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "215125",
-    "asOrganization": "SURF B.V.",
-    "isp": "SURF B.V.",
-    "net_type": "education",
     "source": "EDT-Pages"
   },
   {
@@ -717,21 +522,6 @@
     "asOrganization": "SUPER REDES S.A.S",
     "isp": "SUPER REDES S.A.S",
     "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "http://108.137.124.195:9118",
-    "protocol": "http",
-    "ip": "108.137.124.195",
-    "port": 9118,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "215125",
-    "asOrganization": "SURF B.V.",
-    "isp": "SURF B.V.",
-    "net_type": "education",
     "source": "EDT-Pages"
   }
 ]
