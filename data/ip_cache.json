@@ -16005,5 +16005,174 @@
     "isp": "STNet, Incorporated",
     "net_type": "isp",
     "country": "JP"
+  },
+  "43.247.133.122": {
+    "asn": "AS932",
+    "isp": "VH Global Limited",
+    "net_type": "datacenter",
+    "country": "HK"
+  },
+  "gfweddogyunoscar.opengw.net": {
+    "asn": "AS932",
+    "isp": "VH Global Limited",
+    "net_type": "datacenter",
+    "country": "HK",
+    "resolved_ip": "43.247.133.122"
+  },
+  "121.134.86.232": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn464739503.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "121.134.86.232"
+  },
+  "39.122.143.188": {
+    "asn": "AS9318",
+    "isp": "SK Broadband",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn209711346.opengw.net": {
+    "asn": "AS9318",
+    "isp": "SK Broadband",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "39.122.143.188"
+  },
+  "14.37.134.238": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn541474874.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "14.37.134.238"
+  },
+  "101.140.206.204": {
+    "asn": "AS17511",
+    "isp": "OPTAGE Inc.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn436193779.opengw.net": {
+    "asn": "AS17511",
+    "isp": "OPTAGE Inc.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "101.140.206.204"
+  },
+  "121.136.113.227": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "shooran.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "121.136.113.227"
+  },
+  "75.134.243.0": {
+    "asn": "AS20115",
+    "isp": "Charter Communications",
+    "net_type": "isp",
+    "country": "US"
+  },
+  "vpn288975910.opengw.net": {
+    "asn": "AS20115",
+    "isp": "Charter Communications",
+    "net_type": "isp",
+    "country": "US",
+    "resolved_ip": "75.134.243.0"
+  },
+  "125.136.43.108": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn736555992.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "125.136.43.108"
+  },
+  "27.117.225.40": {
+    "asn": "AS9756",
+    "isp": "SK Broadband Co Ltd",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn217330954.opengw.net": {
+    "asn": "AS9756",
+    "isp": "SK Broadband Co Ltd",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "27.117.225.40"
+  },
+  "113.190.254.210": {
+    "asn": "AS45899",
+    "isp": "VNPT Corp",
+    "net_type": "isp",
+    "country": "VN"
+  },
+  "vpn717907557.opengw.net": {
+    "asn": "AS45899",
+    "isp": "VNPT Corp",
+    "net_type": "isp",
+    "country": "VN",
+    "resolved_ip": "113.190.254.210"
+  },
+  "216.251.205.242": {
+    "asn": "AS15153",
+    "isp": "StarVision, Inc.",
+    "net_type": "datacenter",
+    "country": "US"
+  },
+  "vpn426489163.opengw.net": {
+    "asn": "AS15153",
+    "isp": "StarVision, Inc.",
+    "net_type": "datacenter",
+    "country": "US",
+    "resolved_ip": "216.251.205.242"
+  },
+  "46.48.186.75": {
+    "asn": "AS12389",
+    "isp": "Primorye NET",
+    "net_type": "isp",
+    "country": "RU"
+  },
+  "vpn241694986.opengw.net": {
+    "asn": "AS12389",
+    "isp": "Primorye NET",
+    "net_type": "isp",
+    "country": "RU",
+    "resolved_ip": "46.48.186.75"
+  },
+  "125.30.13.89": {
+    "asn": "AS2497",
+    "isp": "Internet Initiative Japan Inc.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn813691071.opengw.net": {
+    "asn": "AS2497",
+    "isp": "Internet Initiative Japan Inc.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "125.30.13.89"
   }
 }

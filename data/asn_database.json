@@ -2159,7 +2159,11 @@
     "CHERRYSERVERS5-AS": "AS214159",
     "Helkor": "AS202996",
     "Ondrej Vrana": "AS202996",
-    "Helkor (Ondrej Vrana)": "AS202996"
+    "Helkor (Ondrej Vrana)": "AS202996",
+    "WIN-Broadband": "AS138623",
+    "Maisha Home Broadband Limited": "AS329773",
+    "Charter Communications": "AS20115",
+    "StarVision, Inc.": "AS15153"
   },
   "asn_to_isp": {
     "AS174": "Cogent Communications, LLC",
@@ -4262,7 +4266,13 @@
     "AS37892": "Cable Media WAIWAI Co.,Ltd.",
     "AS9762": "kt HCN Co.,Ltd.",
     "AS62642": "Bigleaf Networks, Inc.",
-    "AS202147": "VPSUS LTD"
+    "AS202147": "VPSUS LTD",
+    "AS138623": "WIN-Broadband",
+    "AS329773": "Maisha Home Broadband Limited",
+    "AS932": "VH Global Limited",
+    "AS20115": "Charter Communications",
+    "AS9756": "SK Broadband Co Ltd",
+    "AS15153": "StarVision, Inc."
   },
   "asn_to_net_type": {
     "AS1311": "banking",
@@ -7539,6 +7549,11 @@
     "AS196949": "isp",
     "AS37892": "isp",
     "AS9762": "isp",
-    "AS202147": "datacenter"
+    "AS202147": "datacenter",
+    "AS138623": "isp",
+    "AS329773": "isp",
+    "AS932": "datacenter",
+    "AS9756": "isp",
+    "AS15153": "datacenter"
   }
 }
