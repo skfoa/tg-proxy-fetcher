@@ -91,10 +91,113 @@ def extract_proxies(text: str) -> list[tuple[str, str]]:
     return results
 
 
+RE_CF_IP = re.compile(r"IP地址[:：]\s*(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})")
+RE_CF_PORT = re.compile(r"端口[:：]\s*(\d{1,5})")
+RE_CF_TLS = re.compile(r"TLS[:：]\s*(true|false)", re.IGNORECASE)
+RE_CF_ASN = re.compile(r"ASN编号[:：]\s*([^\r\n]+)")
+RE_CF_ISP = re.compile(r"运营商[:：]\s*([^\r\n]+)")
+RE_CF_COLO = re.compile(r"数据中心[:：]\s*([A-Za-z0-9]+)")
+RE_CF_LOC = re.compile(r"CF落地位置[:：].*?🌐\s*([^\r\n]+)", re.DOTALL)
+RE_CF_DELAY = re.compile(r"网络延迟[:：]\s*(\d+(?:\.\d+)?)\s*ms")
+RE_CF_SPEED = re.compile(r"(?:下载)?速度(?:\s*[\(\[（]\s*([a-zA-Z/]+)\s*[\)\]）])?[:：]\s*(\d+(?:\.\d+)?)\s*([a-zA-Z/]+)?")
+RE_CF_TIME = re.compile(r"(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})")
+RE_CF_SOURCE = re.compile(r"IP来源[:：]\s*([@\w]+)")
+RE_AS_CODE = re.compile(r"(AS\d+)", re.IGNORECASE)
+RE_SPEED_EXTRACT = re.compile(r"(\d+(?:\.\d+)?)\s*([a-zA-Z/]+)?")
+
+
+def parse_speed_to_kbs(
+    val_or_str: str | float | int,
+    unit: str = "",
+    *,
+    mb_hint: bool = False,
+) -> str | int:
+    """
+    统一将各种格式的测速值统一转换为 kB/s 整数：
+    - 支持单位: GB/s, Gbps, MB/s, Mbps, kB/s, kbps, B/s, bps 等
+    - 支持无单位时根据数值范围或列头提示 (mb_hint) 自动判定
+    - 无法解析或非法值返回空字符串 ""
+    """
+    if val_or_str is None or val_or_str == "":
+        return ""
+
+    if isinstance(val_or_str, str) and not unit:
+        m = RE_SPEED_EXTRACT.search(val_or_str.strip())
+        if m:
+            val_or_str = m.group(1)
+            unit = m.group(2) or ""
+
+    try:
+        val = float(val_or_str)
+    except (ValueError, TypeError):
+        return ""
+
+    unit = (unit or "").lower().strip()
+    if not unit:
+        if mb_hint:
+            unit = "mb/s"
+        else:
+            # 缺乏单位时启发式判定：主流 CF 测速工具（如 CloudflareST）小数值 (< 50) 通常为 MB/s，大数值通常为 kB/s
+            unit = "mb/s" if val < 50 else "kb/s"
+
+    if "gbps" in unit or "gb/s" in unit:
+        val *= (1024 * 1024) / 8 if "bps" in unit else (1024 * 1024)
+    elif "gb" in unit or unit == "g":
+        val *= 1024 * 1024
+    elif "mbps" in unit or "mb/s" in unit:
+        val *= (1024 / 8) if "bps" in unit else 1024
+    elif "mb" in unit or unit == "m":
+        val *= 1024
+    elif "kbps" in unit or "kb/s" in unit:
+        val = (val / 8) if "bps" in unit else val
+    elif "kb" in unit or unit == "k":
+        pass
+    elif "bps" in unit:
+        val /= (1024 * 8)
+    elif "b/s" in unit or "byte" in unit or unit == "b":
+        val /= 1024
+
+    return max(0, int(val))
+
+
+def resolve_and_clean_asn(ip: str, raw_asn: str = "", raw_isp: str = "") -> tuple[str, str]:
+    """
+    统一解析与补全 (asn, isp)：
+    1. 从 raw_asn 中正则提取标准 AS\d+ 编号；
+    2. 兼容 ASN/ISP 列反转（如 raw_asn 全为组织名称）；
+    3. 若缺少有效 ASN，查持久化库或在线反查 (resolve_ip_asn) 补全；
+    4. 返回 (asn_code, isp_name)。
+    """
+    raw_asn = (raw_asn or "").strip()
+    raw_isp = (raw_isp or "").strip()
+
+    asn_clean = ""
+    if raw_asn:
+        m_asn = RE_AS_CODE.search(raw_asn)
+        if m_asn:
+            asn_clean = m_asn.group(1).upper()
+            if not raw_isp:
+                rem_isp = raw_asn[m_asn.end():].strip().strip("-").strip()
+                if rem_isp:
+                    raw_isp = rem_isp
+        else:
+            if not raw_isp and raw_asn != "-":
+                raw_isp = raw_asn
+
+    if not asn_clean or asn_clean == "AS_UNKNOWN":
+        found_asn, found_isp = resolve_ip_asn(ip, raw_isp)
+        if found_asn:
+            asn_clean = found_asn
+            if not raw_isp and found_isp:
+                raw_isp = found_isp
+
+    return asn_clean or raw_asn, raw_isp
+
+
 def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
     """从单条优选 IP 消息卡片中提取结构化字段"""
-    ip_m = re.search(r"IP地址[:：]\s*(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})", text)
-    port_m = re.search(r"端口[:：]\s*(\d{1,5})", text)
+    ip_m = RE_CF_IP.search(text)
+    port_m = RE_CF_PORT.search(text)
     if not ip_m or not port_m:
         return None
 
@@ -103,67 +206,27 @@ def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
     if not is_valid_host(ip) or not (1 <= int(port) <= 65535):
         return None
 
-    tls_m = re.search(r"TLS[:：]\s*(true|false)", text, re.IGNORECASE)
-    asn_m = re.search(r"ASN编号[:：]\s*([^\r\n]+)", text)
-    isp_m = re.search(r"运营商[:：]\s*([^\r\n]+)", text)
-    colo_m = re.search(r"数据中心[:：]\s*([A-Za-z0-9]+)", text)
-    cf_loc_m = re.search(r"CF落地位置[:：].*?🌐\s*([^\r\n]+)", text, re.DOTALL)
-    delay_m = re.search(r"网络延迟[:：]\s*(\d+(?:\.\d+)?)\s*ms", text)
-    speed_m = re.search(r"(?:下载)?速度(?:\s*[\(\[（]\s*([a-zA-Z/]+)\s*[\)\]）])?[:：]\s*(\d+(?:\.\d+)?)\s*([a-zA-Z/]+)?", text)
+    tls_m = RE_CF_TLS.search(text)
+    asn_m = RE_CF_ASN.search(text)
+    isp_m = RE_CF_ISP.search(text)
+    colo_m = RE_CF_COLO.search(text)
+    cf_loc_m = RE_CF_LOC.search(text)
+    delay_m = RE_CF_DELAY.search(text)
+    speed_m = RE_CF_SPEED.search(text)
     speed_kbs = ""
     if speed_m:
-        val = float(speed_m.group(2))
-        unit = (speed_m.group(1) or speed_m.group(3) or "").lower().strip()
-        if not unit:
-            # 缺乏单位时启发式判定：主流 CF 测速工具（如 CloudflareST）小数值 (< 50) 通常为 MB/s，大数值通常为 kB/s
-            unit = "mb/s" if val < 50 else "kb/s"
+        val = speed_m.group(2)
+        unit = speed_m.group(1) or speed_m.group(3) or ""
+        speed_kbs = parse_speed_to_kbs(val, unit)
 
-        if "gbps" in unit or "gb/s" in unit:
-            val *= (1024 * 1024) / 8 if "bps" in unit else (1024 * 1024)
-        elif "gb" in unit or unit == "g":
-            val *= 1024 * 1024
-        elif "mbps" in unit or "mb/s" in unit:
-            val *= (1024 / 8) if "bps" in unit else 1024
-        elif "mb" in unit or unit == "m":
-            val *= 1024
-        elif "kbps" in unit or "kb/s" in unit:
-            val = (val / 8) if "bps" in unit else val
-        elif "kb" in unit or unit == "k":
-            pass
-        elif "bps" in unit:
-            val /= (1024 * 8)
-        elif "b/s" in unit or "byte" in unit or unit == "b":
-            val /= 1024
-
-        speed_kbs = max(0, int(val))
-
-    time_m = re.search(r"(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})", text)
-    source_m = re.search(r"IP来源[:：]\s*([@\w]+)", text)
+    time_m = RE_CF_TIME.search(text)
+    source_m = RE_CF_SOURCE.search(text)
 
     raw_asn = asn_m.group(1).replace("`", "").strip() if asn_m else ""
     raw_isp = isp_m.group(1).replace("`", "").strip() if isp_m else ""
 
-    m_asn = re.search(r"(AS\d+)", raw_asn, re.IGNORECASE)
-    if m_asn:
-        asn_clean = m_asn.group(1).upper()
-        if not raw_isp:
-            rem_isp = raw_asn[m_asn.end():].strip().strip("-").strip()
-            if rem_isp:
-                raw_isp = rem_isp
-    else:
-        if not raw_isp and raw_asn and raw_asn != "-":
-            raw_isp = raw_asn
-        asn_clean = ""
-
-    # 智能补全：若数据行缺少 ASN，查持久化库或在线反查并补充入库
-    if not asn_clean or asn_clean == "AS_UNKNOWN":
-        found_asn, found_isp = resolve_ip_asn(ip, raw_isp)
-        if found_asn:
-            asn_clean = found_asn
-            if not raw_isp and found_isp:
-                raw_isp = found_isp
-
-    final_asn = format_asn_isp(asn_clean or raw_asn, raw_isp)
+    asn_val, raw_isp = resolve_and_clean_asn(ip, raw_asn, raw_isp)
+    final_asn = format_asn_isp(asn_val, raw_isp)
 
     return {
         "ip": ip,
@@ -281,14 +344,7 @@ def parse_cf_csv_content(
                 if m_delay:
                     delay_ms = int(float(m_delay.group(1)))
 
-                row_asn = fn_asn
-                row_isp = fn_isp
-                if not row_asn or row_asn == "AS_UNKNOWN":
-                    found_asn, found_isp = resolve_ip_asn(raw_ip, row_isp)
-                    if found_asn:
-                        row_asn = found_asn
-                        if not row_isp and found_isp:
-                            row_isp = found_isp
+                row_asn, row_isp = resolve_and_clean_asn(raw_ip, fn_asn, fn_isp)
 
                 results.append({
                     "ip": raw_ip,
@@ -373,16 +429,7 @@ def parse_cf_csv_content(
                 delay_ms = int(float(m_delay.group(1)))
 
             raw_speed = row.get(field_map.get("speed", ""), "").strip()
-            speed_kbs = ""
-            m_speed = re.search(r"(\d+(?:\.\d+)?)\s*([kKmMgG]?[bB]/s)?", raw_speed)
-            if m_speed:
-                val = float(m_speed.group(1))
-                unit = (m_speed.group(2) or "").lower()
-                if "m" in unit or (not unit and speed_unit_is_mb):
-                    val *= 1024
-                elif "g" in unit:
-                    val *= 1024 * 1024
-                speed_kbs = int(val)
+            speed_kbs = parse_speed_to_kbs(raw_speed, mb_hint=speed_unit_is_mb)
 
             colo = row.get(field_map.get("colo", ""), "").strip()
 
@@ -401,26 +448,7 @@ def parse_cf_csv_content(
             if not raw_isp or raw_isp == "-":
                 raw_isp = fn_isp
 
-            m_asn = re.search(r"(AS\d+)", raw_asn, re.IGNORECASE)
-            if m_asn:
-                asn_clean = m_asn.group(1).upper()
-                if not raw_isp:
-                    rem_isp = raw_asn[m_asn.end():].strip().strip("-").strip()
-                    if rem_isp:
-                        raw_isp = rem_isp
-            else:
-                # 若 raw_asn 中完全没有 AS\\d+ 编号（如全是组织名称 "GTHost", "Amazon.com, Inc." 等），说明原数据将服务商写在了 ASN 列
-                if not raw_isp and raw_asn and raw_asn != "-":
-                    raw_isp = raw_asn
-                asn_clean = ""
-
-            # 智能补全：若数据行缺少 ASN，查持久化库或在线反查并补充入库
-            if not asn_clean or asn_clean == "AS_UNKNOWN":
-                found_asn, found_isp = resolve_ip_asn(raw_ip, raw_isp)
-                if found_asn:
-                    asn_clean = found_asn
-                    if not raw_isp and found_isp:
-                        raw_isp = found_isp
+            asn_val, raw_isp = resolve_and_clean_asn(raw_ip, raw_asn, raw_isp)
 
             raw_time = row.get(field_map.get("time", ""), "").strip()
             first_seen = normalize_timestamp(raw_time, fn_time)
@@ -434,7 +462,7 @@ def parse_cf_csv_content(
                 "colo": colo,
                 "cf_location": cf_location,
                 "isp": raw_isp,
-                "asn": format_asn_isp(asn_clean or raw_asn, raw_isp),
+                "asn": format_asn_isp(asn_val, raw_isp),
                 "first_seen": first_seen,
                 "channel": default_channel,
                 "fail_count": 0,
@@ -587,12 +615,7 @@ def parse_otc_scan_content(
                 colo = m_iata.group(1)
             loc = line_remark
 
-        if not asn or asn == "AS_UNKNOWN":
-            found_asn, found_isp = resolve_ip_asn(ip, isp)
-            if found_asn:
-                asn = found_asn
-                if not isp and found_isp:
-                    isp = found_isp
+        asn, isp = resolve_and_clean_asn(ip, asn, isp)
 
         tls = "true" if port in (443, 8443, 2053, 2083, 2087, 2096) else "false"
 

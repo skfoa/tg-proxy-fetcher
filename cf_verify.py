@@ -628,118 +628,84 @@ def _cf_sort_key(x):
 
 
 # ---------- 主流程 ----------
+async def _verify_and_persist(csv_path: str, tag: str, args, on_save) -> dict:
+    rows = load_csv(csv_path)
+    total = len(rows)
+    res = {
+        "pass": 0,
+        "eliminated": 0,
+        "survivors": 0,
+        "f1": 0,
+        "f2": 0,
+        "buf_new": 0,
+        "buf_rec": 0,
+    }
+    if not rows:
+        log.info(">>> %s 文件不存在或无数据，跳过%s校验", csv_path, tag)
+        return res
+
+    log.info(">>> 开始校验%s IP (%s): 共 %d 条...", tag, csv_path, total)
+    await verify_all(
+        rows,
+        tag=tag,
+        concurrency=args.concurrency,
+        timeout=args.timeout,
+        http_timeout=args.http_timeout,
+    )
+
+    survivors = [
+        r for r in rows
+        if safe_int(r.get("fail_count"), 0) < args.max_fails and not r.get("_invalid")
+    ]
+    eliminated = total - len(survivors)
+    res["pass"] = sum(1 for r in rows if safe_int(r.get("fail_count"), 0) == 0)
+    res["eliminated"] = eliminated
+    res["survivors"] = len(survivors)
+    res["f1"] = sum(1 for r in survivors if safe_int(r.get("fail_count"), 0) == 1)
+    res["f2"] = sum(1 for r in survivors if safe_int(r.get("fail_count"), 0) == 2)
+    res["buf_new"] = sum(
+        1 for r in rows
+        if safe_int(r.get("fail_count"), 0) > 0
+        and safe_int(r.get("fail_count"), 0) < args.max_fails
+        and safe_int(r.get("_old_fc"), 0) == 0
+    )
+    res["buf_rec"] = sum(
+        1 for r in rows
+        if safe_int(r.get("fail_count"), 0) == 0
+        and safe_int(r.get("_old_fc"), 0) > 0
+    )
+
+    if eliminated > 0:
+        log.info("[%s] 淘汰剔除 %d 条连续失败 >= %d 次的死节点", tag, eliminated, args.max_fails)
+        dead_nodes = [r for r in rows if safe_int(r.get("fail_count"), 0) >= args.max_fails or r.get("_invalid")]
+        dead_keys = [canonical_key(r.get("ip", ""), r.get("port", 0)) for r in dead_nodes]
+        newly_tombstoned = record_tombstone(dead_keys)
+        log.info("[%s 墓地] 已登记 %d 个淘汰死节点至墓地冷却库 (新增: %d 个, 隔离期 7 天)", tag, len(dead_keys), newly_tombstoned)
+    else:
+        log.info("[%s] 本次无节点达到连续失败 %d 次的淘汰阈值", tag, args.max_fails)
+
+    if on_save:
+        on_save(survivors)
+
+    return res
+
+
 async def async_main(args):
     t_start = time.time()
 
     # ================= 1. 校验单条优选 IP (cf_ips) =================
-    cf_rows = load_csv(CF_CSV)
-    cf_total = len(cf_rows)
-    cf_pass = 0
-    cf_eliminated = 0
-    cf_survivors_len = 0
-
-    cf_f1 = 0
-    cf_f2 = 0
-    cf_buf_new = 0
-    cf_buf_rec = 0
-    if cf_rows:
-        log.info(">>> 开始校验单条优选 IP (%s): 共 %d 条...", CF_CSV, cf_total)
-        await verify_all(
-            cf_rows,
-            tag="单条优选",
-            concurrency=args.concurrency,
-            timeout=args.timeout,
-            http_timeout=args.http_timeout,
-        )
-
-        cf_pass = sum(1 for r in cf_rows if safe_int(r.get("fail_count"), 0) == 0)
-        cf_survivors = [
-            r for r in cf_rows
-            if safe_int(r.get("fail_count"), 0) < args.max_fails and not r.get("_invalid")
-        ]
-        cf_eliminated = cf_total - len(cf_survivors)
-        cf_survivors_len = len(cf_survivors)
-        cf_f1 = sum(1 for r in cf_survivors if safe_int(r.get("fail_count"), 0) == 1)
-        cf_f2 = sum(1 for r in cf_survivors if safe_int(r.get("fail_count"), 0) == 2)
-        cf_buf_new = sum(
-            1 for r in cf_rows
-            if safe_int(r.get("fail_count"), 0) > 0
-            and safe_int(r.get("fail_count"), 0) < args.max_fails
-            and safe_int(r.get("_old_fc"), 0) == 0
-        )
-        cf_buf_rec = sum(
-            1 for r in cf_rows
-            if safe_int(r.get("fail_count"), 0) == 0
-            and safe_int(r.get("_old_fc"), 0) > 0
-        )
-        if cf_eliminated > 0:
-            log.info("[单条优选] 淘汰剔除 %d 条连续失败 >= %d 次的死节点", cf_eliminated, args.max_fails)
-            dead_nodes = [r for r in cf_rows if safe_int(r.get("fail_count"), 0) >= args.max_fails or r.get("_invalid")]
-            dead_keys = [canonical_key(r.get("ip", ""), r.get("port", 0)) for r in dead_nodes]
-            newly_tombstoned = record_tombstone(dead_keys)
-            log.info("[单条优选 墓地] 已登记 %d 个淘汰死节点至墓地冷却库 (新增: %d 个, 隔离期 7 天)", len(dead_keys), newly_tombstoned)
-        else:
-            log.info("[单条优选] 本次无节点达到连续失败 %d 次的淘汰阈值", args.max_fails)
-
+    def _save_cf_track(survivors):
         # 稳定双重排序：先按 first_seen 降序（最新获取优先），再按 (fail_count, delay_ms) 升序（质量优先）
-        cf_survivors.sort(key=lambda x: x.get("first_seen", ""), reverse=True)
-        cf_survivors.sort(key=_cf_sort_key)
-        save_cf_ips(cf_survivors, CF_CSV, CF_TXT)
-    else:
-        log.info(">>> %s 文件不存在或无数据，跳过单条优选校验", CF_CSV)
+        survivors.sort(key=lambda x: x.get("first_seen", ""), reverse=True)
+        survivors.sort(key=_cf_sort_key)
+        save_cf_ips(survivors, CF_CSV, CF_TXT)
+
+    cf_res = await _verify_and_persist(CF_CSV, "单条优选", args, _save_cf_track)
 
     # ================= 2. 校验扫描优选 IP (scan_ips) =================
-    scan_rows = load_csv(SCAN_CSV)
-    scan_total = len(scan_rows)
-    scan_pass = 0
-    scan_eliminated = 0
-    scan_survivors_len = 0
-    scan_f1 = 0
-    scan_f2 = 0
-    scan_buf_new = 0
-    scan_buf_rec = 0
-
-    if scan_rows:
-        log.info(">>> 开始校验扫描优选 IP (%s): 共 %d 条...", SCAN_CSV, scan_total)
-        await verify_all(
-            scan_rows,
-            tag="扫描优选",
-            concurrency=args.concurrency,
-            timeout=args.timeout,
-            http_timeout=args.http_timeout,
-        )
-
-        scan_pass = sum(1 for r in scan_rows if safe_int(r.get("fail_count"), 0) == 0)
-        scan_survivors = [
-            r for r in scan_rows
-            if safe_int(r.get("fail_count"), 0) < args.max_fails and not r.get("_invalid")
-        ]
-        scan_eliminated = scan_total - len(scan_survivors)
-        scan_survivors_len = len(scan_survivors)
-        scan_f1 = sum(1 for r in scan_survivors if safe_int(r.get("fail_count"), 0) == 1)
-        scan_f2 = sum(1 for r in scan_survivors if safe_int(r.get("fail_count"), 0) == 2)
-        scan_buf_new = sum(
-            1 for r in scan_rows
-            if safe_int(r.get("fail_count"), 0) > 0
-            and safe_int(r.get("fail_count"), 0) < args.max_fails
-            and safe_int(r.get("_old_fc"), 0) == 0
-        )
-        scan_buf_rec = sum(
-            1 for r in scan_rows
-            if safe_int(r.get("fail_count"), 0) == 0
-            and safe_int(r.get("_old_fc"), 0) > 0
-        )
-        if scan_eliminated > 0:
-            log.info("[扫描优选] 淘汰剔除 %d 条连续失败 >= %d 次的死节点", scan_eliminated, args.max_fails)
-            dead_nodes = [r for r in scan_rows if safe_int(r.get("fail_count"), 0) >= args.max_fails or r.get("_invalid")]
-            dead_keys = [canonical_key(r.get("ip", ""), r.get("port", 0)) for r in dead_nodes]
-            newly_tombstoned = record_tombstone(dead_keys)
-            log.info("[扫描优选 墓地] 已登记 %d 个淘汰死节点至墓地冷却库 (新增: %d 个, 隔离期 7 天)", len(dead_keys), newly_tombstoned)
-        else:
-            log.info("[扫描优选] 本次无节点达到连续失败 %d 次的淘汰阈值", args.max_fails)
-
+    def _save_scan_track(survivors):
         asn_groups = defaultdict(list)
-        for row in scan_survivors:
+        for row in survivors:
             asn_clean = clean_asn(row.get("asn", ""), row.get("isp", ""))
             row["asn"] = format_asn_isp(row.get("asn", ""), row.get("isp", ""))
             asn_groups[asn_clean].append(row)
@@ -753,30 +719,39 @@ async def async_main(args):
         save_scan_csv(all_sorted_scan, SCAN_CSV)
         save_scan_txt(all_sorted_scan, SCAN_TXT)
         save_scan_dir(asn_groups, SCAN_DIR)
-    else:
-        log.info(">>> %s 文件不存在或无数据，跳过扫描优选校验", SCAN_CSV)
+
+    scan_res = await _verify_and_persist(SCAN_CSV, "扫描优选", args, _save_scan_track)
 
     elapsed = time.time() - t_start
-    log.info("全部优选 IP 两阶段校验流程圆满完成，总耗时 %.2f 秒 (单条缓冲: %d [新增: %d, 取消: %d] | 扫描缓冲: %d [新增: %d, 取消: %d])", elapsed, (cf_survivors_len - cf_pass), cf_buf_new, cf_buf_rec, (scan_survivors_len - scan_pass), scan_buf_new, scan_buf_rec)
+    log.info(
+        "全部优选 IP 两阶段校验流程圆满完成，总耗时 %.2f 秒 (单条缓冲: %d [新增: %d, 取消: %d] | 扫描缓冲: %d [新增: %d, 取消: %d])",
+        elapsed,
+        (cf_res["survivors"] - cf_res["pass"]),
+        cf_res["buf_new"],
+        cf_res["buf_rec"],
+        (scan_res["survivors"] - scan_res["pass"]),
+        scan_res["buf_new"],
+        scan_res["buf_rec"],
+    )
 
     send_verify_notification(
-        cf_pass=cf_pass,
-        cf_eliminated=cf_eliminated,
-        cf_survivors=cf_survivors_len,
-        scan_pass=scan_pass,
-        scan_eliminated=scan_eliminated,
-        scan_survivors=scan_survivors_len,
+        cf_pass=cf_res["pass"],
+        cf_eliminated=cf_res["eliminated"],
+        cf_survivors=cf_res["survivors"],
+        scan_pass=scan_res["pass"],
+        scan_eliminated=scan_res["eliminated"],
+        scan_survivors=scan_res["survivors"],
         concurrency=args.concurrency,
         max_fails=args.max_fails,
         elapsed_verify=elapsed,
-        cf_f1=cf_f1,
-        cf_f2=cf_f2,
-        scan_f1=scan_f1,
-        scan_f2=scan_f2,
-        cf_buf_new=cf_buf_new,
-        cf_buf_rec=cf_buf_rec,
-        scan_buf_new=scan_buf_new,
-        scan_buf_rec=scan_buf_rec,
+        cf_f1=cf_res["f1"],
+        cf_f2=cf_res["f2"],
+        scan_f1=scan_res["f1"],
+        scan_f2=scan_res["f2"],
+        cf_buf_new=cf_res["buf_new"],
+        cf_buf_rec=cf_res["buf_rec"],
+        scan_buf_new=scan_res["buf_new"],
+        scan_buf_rec=scan_res["buf_rec"],
     )
 
 
