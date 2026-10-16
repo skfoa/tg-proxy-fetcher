@@ -1344,12 +1344,19 @@ def get_keyed_lock(key: str) -> asyncio.Lock:
 
 
 def safe_int(value, default: int = 0) -> int:
-    """安全将值转为整数，转换失败或为空时返回默认值"""
+    """安全将值转为整数，转换失败或为空时返回默认值 (兼容浮点数字符串，如 '156.4' -> 156)"""
     if value is None:
         return default
     try:
+        if isinstance(value, (int, float)):
+            return int(value)
         s = str(value).strip()
-        return int(s) if s else default
+        if not s:
+            return default
+        try:
+            return int(s)
+        except ValueError:
+            return int(float(s))
     except (ValueError, TypeError):
         return default
 
@@ -1437,6 +1444,7 @@ _ALIAS_RE = re.compile(r"\((.*?)\)")
 _ALIAS_STRIP_RE = re.compile(r"\s*\(.*?\)")
 
 
+@functools.lru_cache(maxsize=4096)
 def format_asn_isp(raw_asn: str, raw_isp: str = "") -> str:
     """
     格式化生成『ASN + 服务商名称』一体化直观标签（如 AS906 DMIT, AS13335 Cloudflare）：
@@ -1788,6 +1796,7 @@ COUNTRY_FLAGS = {
 }
 
 
+@functools.lru_cache(maxsize=2048)
 def extract_country(cf_location: str | None, colo: str | None) -> str:
     """
     根据 cf_location (如 '北美洲 · 洛杉矶 · 美国') 或 Cloudflare colo 机房三字代码 (如 'LAX')
@@ -2386,6 +2395,7 @@ _ASN_WITH_PREFIX_RE = re.compile(r"\bAS\s*(\d+)\b", re.IGNORECASE)
 _PURE_NUMBER_RE = re.compile(r"^\s*(\d+)\s*$")
 
 
+@functools.lru_cache(maxsize=4096)
 def _extract_asn_code(asn_str: str | None, isp_str: str | None = "") -> str | None:
     """
     智能提取规范的 AS 编号 (如 AS4760)：
@@ -2432,6 +2442,7 @@ def is_asn_recorded(asn_str: str | None, isp_str: str | None = "") -> bool:
     )
 
 
+@functools.lru_cache(maxsize=4096)
 def classify_asn(asn_str: str | None, isp_str: str | None = "") -> str:
     """
     根据 BGP 广播的 ASN 编号、机构名称与 ISP 归属进行多维度网络类型属性分类 (四级架构 Tier 1~4)：
