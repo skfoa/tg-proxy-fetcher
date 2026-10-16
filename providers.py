@@ -966,8 +966,11 @@ def resolve_domain_to_ip(domain: str) -> str:
     if not domain or not isinstance(domain, str):
         return ""
     clean = domain.strip().lower()
-    if is_valid_public_ip(clean):
-        return clean
+    try:
+        ip_obj = ipaddress.ip_address(clean)
+        return clean if is_valid_public_ip(clean) else ""
+    except ValueError:
+        pass
     # 识别知名机房模式化反向 PTR 域名 (如 Hetzner: static.D.C.B.A.clients.your-server.de -> A.B.C.D)
     m_hetzner = re.match(r"^static\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.clients\.your-server\.de$", clean)
     if m_hetzner:

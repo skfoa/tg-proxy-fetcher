@@ -25,6 +25,7 @@ import atexit
 import base64
 import concurrent.futures
 import csv
+import ipaddress
 import json
 import logging
 import os
@@ -67,6 +68,7 @@ from providers import (
     is_valid_public_ip,
     resolve_domain_to_ip,
     atomic_write_text,
+    atomic_write_json,
 )
 
 # 确保本地 .env 加载
@@ -249,6 +251,17 @@ async def check_sstp_exit_cf_worker(
 
 # ---------- 协议探测实现 ----------
 
+def is_ip_literal(host: str) -> bool:
+    """快速判断 host 是否为 IP 字面量地址 (IPv4/IPv6)，杜绝向 DoH 发起无意义的 IP 域名反解"""
+    if not host or not isinstance(host, str):
+        return False
+    try:
+        ipaddress.ip_address(host.strip())
+        return True
+    except Exception:
+        return False
+
+
 async def probe_socks5(
     host: str,
     port: int,
@@ -267,20 +280,18 @@ async def probe_socks5(
     返回 (is_alive, delay_ms, status, colo, country, egress_ip)
     """
     connect_host = host
-    if not is_valid_public_ip(host):
+    if not is_ip_literal(host):
         resolved = await asyncio.to_thread(resolve_domain_to_ip, host)
         if resolved and is_valid_public_ip(resolved):
             connect_host = resolved
     t0 = time.monotonic()
+    writer = None
     try:
         reader, writer = await asyncio.wait_for(
             asyncio.open_connection(connect_host, port),
             timeout=connect_timeout,
         )
-    except Exception:
-        return False, 0, "conn_err", "", "", ""
 
-    try:
         # 步骤 2: 协商认证方式
         if user and pwd:
             writer.write(b"\x05\x02\x00\x02")
@@ -334,6 +345,8 @@ async def probe_socks5(
             await asyncio.wait_for(reader.readexactly(dlen + 2), timeout=connect_timeout)
         elif atyp == 0x04:  # IPv6: 16 字节 IP + 2 字节端口
             await asyncio.wait_for(reader.readexactly(18), timeout=connect_timeout)
+        else:
+            return False, 0, "bad_handshake", "", "", ""
 
         # 步骤 5: HTTP GET /cdn-cgi/trace
         http_req = (
@@ -363,7 +376,10 @@ async def probe_socks5(
         return False, lat, "http_fail", "", "", ""
     except asyncio.TimeoutError:
         return False, 0, "timeout", "", "", ""
-    except (ConnectionRefusedError, ConnectionResetError, BrokenPipeError) as e:
+    except ConnectionRefusedError:
+        log.debug("SOCKS5 节点端口拒绝连接 [%s:%s]", host, port)
+        return False, 0, "conn_err", "", "", ""
+    except (ConnectionResetError, BrokenPipeError) as e:
         log.debug("SOCKS5 节点重置/断开 [%s:%s]: %s", host, port, e)
         return False, 0, "conn_reset", "", "", ""
     except (socket.gaierror, OSError) as e:
@@ -373,7 +389,8 @@ async def probe_socks5(
         log.debug("SOCKS5 节点未知探测异常 [%s:%s]: %s", host, port, e)
         return False, 0, "fail", "", "", ""
     finally:
-        await safe_close_writer(writer)
+        if writer is not None:
+            await safe_close_writer(writer)
 
 
 async def probe_http(
@@ -394,7 +411,7 @@ async def probe_http(
     返回 (is_alive, delay_ms, status, colo, country, egress_ip)
     """
     connect_host = host
-    if not is_valid_public_ip(host):
+    if not is_ip_literal(host):
         resolved = await asyncio.to_thread(resolve_domain_to_ip, host)
         if resolved and is_valid_public_ip(resolved):
             connect_host = resolved
@@ -486,13 +503,13 @@ async def probe_https(
     返回 (is_alive, delay_ms, status, colo, country, egress_ip)
     """
     connect_host = host
-    if not is_valid_public_ip(host):
+    is_ip = is_ip_literal(host)
+    if not is_ip:
         resolved = await asyncio.to_thread(resolve_domain_to_ip, host)
         if resolved and is_valid_public_ip(resolved):
             connect_host = resolved
 
     ssl_ctx = INSECURE_SSL_CTX
-    is_ip = bool(re.match(r"^\d{1,3}(?:\.\d{1,3}){3}$", host))
     sni = None if is_ip else host
 
     auth_header = ""
@@ -504,11 +521,14 @@ async def probe_https(
 
     # --- 阶段 1: 优先尝试 RFC 7230 §5.3.2 绝对 URI GET 深度穿透 (提取真实 colo 与 egress_ip) ---
     writer = None
+    connected = False
+    stage1_err_status: str | None = None
     try:
         reader, writer = await asyncio.wait_for(
             asyncio.open_connection(connect_host, port, ssl=ssl_ctx, server_hostname=sni),
             timeout=connect_timeout,
         )
+        connected = True
         forward_req = (
             f"GET http://{PROBE_HOST}{PROBE_PATH} HTTP/1.1\r\n"
             f"Host: {PROBE_HOST}\r\n"
@@ -538,15 +558,33 @@ async def probe_https(
             if max_latency_ms > 0 and lat > max_latency_ms:
                 return False, lat, "slow_timeout", "", "", ""
             return True, lat, "alive", colo, country, egress_ip
-    except (asyncio.TimeoutError, ssl.SSLError, ConnectionRefusedError, ConnectionResetError, BrokenPipeError, socket.gaierror, OSError):
-        if writer is not None:
-            await safe_close_writer(writer)
-            writer = None
+    except asyncio.TimeoutError:
+        if not connected:
+            # 建立 TLS 连接超时，对端不可达，直接返回避免进入阶段 2 造成二次超时叠加
+            stage1_err_status = "timeout"
+    except ssl.SSLError as e:
+        log.debug("HTTPS 节点 TLS 握手异常 [%s:%s]: %s", host, port, e)
+        stage1_err_status = "tls_err"
+    except ConnectionRefusedError:
+        log.debug("HTTPS 节点端口拒绝连接 [%s:%s]", host, port)
+        stage1_err_status = "conn_err"
+    except (socket.gaierror, OSError) as e:
+        log.debug("HTTPS 节点网络/DNS异常 [%s:%s]: %s", host, port, e)
+        stage1_err_status = "conn_err"
+    except (ConnectionResetError, BrokenPipeError) as e:
+        log.debug("HTTPS 节点重置/断开 [%s:%s]: %s", host, port, e)
+        if not connected:
+            stage1_err_status = "conn_reset"
     except Exception as e:
         log.debug("HTTPS 绝对 URI 探测异常 [%s:%s]: %s", host, port, e)
+    finally:
         if writer is not None:
             await safe_close_writer(writer)
             writer = None
+
+    # 若阶段 1 在传输层 (TCP/TLS/DNS) 即发生确定性硬故障或连接超时，直接返回对应状态，避免进入阶段 2 造成二次超时叠加
+    if stage1_err_status:
+        return False, 0, stage1_err_status, "", "", ""
 
     # --- 阶段 2: 回退标准 CONNECT 443 隧道探测 (RFC 2817 / RFC 7231 §4.3.6) ---
     t0_connect = time.monotonic()
@@ -621,20 +659,18 @@ async def probe_turn(
     返回 (is_alive, delay_ms, status, colo, country, egress_ip)
     """
     connect_host = host
-    if not is_valid_public_ip(host):
+    if not is_ip_literal(host):
         resolved = await asyncio.to_thread(resolve_domain_to_ip, host)
         if resolved and is_valid_public_ip(resolved):
             connect_host = resolved
     t0 = time.monotonic()
+    writer = None
     try:
         reader, writer = await asyncio.wait_for(
             asyncio.open_connection(connect_host, port),
             timeout=connect_timeout,
         )
-    except Exception:
-        return False, 0, "conn_err", "", "", ""
 
-    try:
         tx_id = os.urandom(12)
         # Type: 0x0001 (Binding Request), Length: 0x0000, Magic Cookie: 0x2112A442
         req = b"\x00\x01\x00\x00\x21\x12\xa4\x42" + tx_id
@@ -649,7 +685,10 @@ async def probe_turn(
         return False, lat, "stun_fail", "", "", ""
     except asyncio.TimeoutError:
         return False, 0, "timeout", "", "", ""
-    except (ConnectionRefusedError, ConnectionResetError, BrokenPipeError) as e:
+    except ConnectionRefusedError:
+        log.debug("TURN 节点端口拒绝连接 [%s:%s]", host, port)
+        return False, 0, "conn_err", "", "", ""
+    except (ConnectionResetError, BrokenPipeError) as e:
         log.debug("TURN 节点重置/断开 [%s:%s]: %s", host, port, e)
         return False, 0, "conn_reset", "", "", ""
     except (socket.gaierror, OSError) as e:
@@ -659,7 +698,8 @@ async def probe_turn(
         log.debug("TURN 节点未知探测异常 [%s:%s]: %s", host, port, e)
         return False, 0, "fail", "", "", ""
     finally:
-        await safe_close_writer(writer)
+        if writer is not None:
+            await safe_close_writer(writer)
 
 
 async def probe_sstp(
@@ -680,8 +720,8 @@ async def probe_sstp(
     """
     ctx = INSECURE_SSL_CTX
 
-    # RFC 6066: 纯 IPv4 地址不应作为 TLS SNI 发送
-    is_ip = bool(re.match(r"^\d{1,3}(?:\.\d{1,3}){3}$", host))
+    # RFC 6066: 纯 IP 地址不应作为 TLS SNI 发送
+    is_ip = is_ip_literal(host)
     sni = None if is_ip else host
 
     # 对域名进行异步安全解析 (DoH 权威防 DNS 污染)，若能解析出公网 IP 则优先直连真实 IP，并将原域名作为 TLS SNI 发送
@@ -692,15 +732,13 @@ async def probe_sstp(
             connect_host = resolved
 
     t0 = time.monotonic()
+    writer = None
     try:
         reader, writer = await asyncio.wait_for(
             asyncio.open_connection(connect_host, port, ssl=ctx, server_hostname=sni),
             timeout=connect_timeout,
         )
-    except Exception:
-        return False, 0, "conn_err", "", "", ""
 
-    try:
         uri = "/sra_{BA195980-CD49-458b-9E23-C84EE0ADCD75}/"
         req = (
             f"SSTP_DUPLEX_POST {uri} HTTP/1.1\r\n"
@@ -724,7 +762,13 @@ async def probe_sstp(
         return False, lat, "sstp_fail", "", "", ""
     except asyncio.TimeoutError:
         return False, 0, "timeout", "", "", ""
-    except (ConnectionRefusedError, ConnectionResetError, BrokenPipeError) as e:
+    except ssl.SSLError as e:
+        log.debug("SSTP 节点 TLS 握手异常 [%s:%s]: %s", host, port, e)
+        return False, 0, "tls_err", "", "", ""
+    except ConnectionRefusedError:
+        log.debug("SSTP 节点端口拒绝连接 [%s:%s]", host, port)
+        return False, 0, "conn_err", "", "", ""
+    except (ConnectionResetError, BrokenPipeError) as e:
         log.debug("SSTP 节点重置/断开 [%s:%s]: %s", host, port, e)
         return False, 0, "conn_reset", "", "", ""
     except (socket.gaierror, OSError) as e:
@@ -734,7 +778,8 @@ async def probe_sstp(
         log.debug("SSTP 节点未知探测异常 [%s:%s]: %s", host, port, e)
         return False, 0, "fail", "", "", ""
     finally:
-        await safe_close_writer(writer)
+        if writer is not None:
+            await safe_close_writer(writer)
 
 
 async def probe_single(
@@ -754,7 +799,7 @@ async def probe_single(
     async with sem:
         proto = row.get("proto", "socks5").lower()
         host = row.get("host", "")
-        port = int(row.get("port", 0))
+        port = safe_int(row.get("port"), 0)
         user = row.get("user") or None
         pwd = row.get("pwd") or None
 
@@ -1375,7 +1420,11 @@ async def async_main(args):
     if eliminated > 0:
         log.info("[通用代理 淘汰] 剔除 %d 条达到淘汰阈值的死节点 (HTTP专属: >= %d 次, 其余协议: >= %d 次)", eliminated, h_mf, args.max_fails)
         dead_nodes = [r for r in results if not _is_survivor(r)]
-        dead_keys = [canonical_key(r.get("host", ""), r.get("port", 0)) for r in dead_nodes]
+        dead_keys = [
+            canonical_key(r.get("host", ""), r.get("port", 0))
+            for r in dead_nodes
+            if r.get("host") and safe_int(r.get("port"), 0) > 0
+        ]
         newly_tombstoned = record_tombstone(dead_keys)
         log.info("[通用代理 墓地] 已登记 %d 个淘汰死节点至墓地冷却库 (新增: %d 个, 隔离期 7 天)", len(dead_keys), newly_tombstoned)
     else:
@@ -1425,9 +1474,7 @@ async def async_main(args):
             stats["socks_fail_2"] = proxies_f2
             stats["socks_buf_new"] = proxies_buf_new
             stats["socks_buf_rec"] = proxies_buf_rec
-            stats["socks_avg_delay_ms"] = avg_delay
-            with open(fetch_stats_file, "w", encoding="utf-8") as f:
-                json.dump(stats, f, ensure_ascii=False, indent=2)
+            atomic_write_json(fetch_stats_file, stats)
             log.info("已将通用代理质检统计写入 %s (并入统一卡片)", fetch_stats_file)
         except Exception as e:
             log.warning("写入 %s 失败: %s", fetch_stats_file, e)
