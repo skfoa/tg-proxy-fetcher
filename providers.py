@@ -104,6 +104,11 @@ KNOWN_CLOUD_PROVIDERS = {
     "hosttech": ("AS207143", "hosttech GmbH"),
     "taymaz": ("AS216054", "Taymaz Gostaran Naghshe Almas"),
     "mtfinance": ("AS214822", "MT FINANCE LLC"),
+    "tothost": ("AS151873", "TOTHOST"),
+    "serverion": ("AS213035", "Serverion B.V."),
+    "softshell": ("AS213035", "Serverion B.V."),      # 品牌 SoftShellWeb 挂载于 Serverion B.V.
+    "softshellweb": ("AS213035", "Serverion B.V."),
+    "fiberstate": ("AS26042", "FiberState, LLC"),
     "bagecloud": ("AS63150", "Bage Cloud"),
     "bage": ("AS63150", "Bage Cloud"),
     # 下游分销/租户品牌（无独立 ASN，现网美西等节点复用 DigitalOcean AS14061；first-win 确保反查标准名锁定为 DigitalOcean）
@@ -229,6 +234,10 @@ _CORE_BASELINE_NET_TYPES: dict[str, str] = {
     "AS14315": "datacenter",  # 1GSERVERS, LLC (1gservers.com, Phoenix机房)
     "AS7738": "datacenter",   # V.tal (vtal.com, 巴西国际海缆骨干)
     "AS33842": "datacenter",  # Citytelecom LLC (CrossTelecom, crosstelecom.ru, 云主机机房)
+    "AS151873": "datacenter", # TOTHOST SOLUTIONS AND TECHNOLOGIES COMPANY LIMITED (tothost.vn, 越南VPS/机房)
+    "AS213035": "datacenter", # Serverion B.V. (serverion.com, 荷兰机房/主机托管, SoftShellWeb上游)
+    "AS26042": "datacenter",  # FiberState, LLC (ipinfo: Hosting)
+    "AS142078": "education",  # CERNET FITI Nodes (清华大学/未来互联网试验设施教育网节点)
 }
 
 # 权威已知云厂商与核心骨干网 SSOT 网络类型基准表
@@ -411,6 +420,9 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS273961": "datacenter", # Cogent Communications (国际骨干中继机房)
     "AS273007": "datacenter", # Cogent Communications (国际骨干中继机房)
     "AS274414": "datacenter", # Cogent Communications (国际骨干中继机房)
+    "AS151873": "datacenter", # TOTHOST SOLUTIONS AND TECHNOLOGIES COMPANY LIMITED (tothost.vn, 越南VPS/机房)
+    "AS213035": "datacenter", # Serverion B.V. (serverion.com, 荷兰机房/主机托管, SoftShellWeb上游)
+    "AS26042": "datacenter",  # FiberState, LLC (ipinfo: Hosting)
 
     # --- [L0 裁决 B: 知名正牌民用宽带 ISP，权威核准为 isp] ---
     "AS1257": "isp",          # Tele2 Sverige AB (tele2.com, 欧洲顶级电信与家庭宽带)
@@ -458,6 +470,7 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS9488": "education",    # Seoul National University / SNU (首尔大学)
     "AS199578": "education",  # Verein zur Foerderung eines Deutschen Forschungsnetzes e.V. (DFN, 德国国家科研教育网)
     "AS3132": "education",    # Red Cientifica Peruana / RCP (秘鲁科研学术网)
+    "AS142078": "education",  # CERNET FITI Nodes (清华大学/未来互联网试验设施教育网节点)
 
     # --- [L0 裁决 E: 商业企业专线与骨干中继 (权威核准为 business)] ---
     "AS174": "business",      # Cogent Communications, LLC (Tier 1 国际骨干/企业中继专线, 非民用宽带)
@@ -2311,6 +2324,7 @@ HOSTING_EXCLUSIONS = (
     "mt finance", "mtfinance", "cornseed", "jtti", "zouter",
     "hostdare", "misaka", "spartanhost", "h4y", "peg tech", "vpsus",
     "1gservers", "cherry servers", "rackh", "spacecore", "ddos protection",
+    "tothost", "serverion", "softshell", "softshellweb", "fiberstate",
 )
 
 _HOSTING_SHORT_RE = {

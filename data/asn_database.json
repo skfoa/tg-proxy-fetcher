@@ -4274,7 +4274,11 @@
     "AS20115": "Charter Communications",
     "AS9756": "SK Broadband Co Ltd",
     "AS15153": "StarVision, Inc.",
-    "AS9316": "DACOM-PUBNETPLUS"
+    "AS9316": "DACOM-PUBNETPLUS",
+    "AS142078": "CERNET",
+    "AS151873": "TOTHOST SOLUTIONS AND TECHNOLOGIES COMPANY LIMITED",
+    "AS213035": "Serverion B.V.",
+    "AS26042": "FiberState, LLC"
   },
   "asn_to_net_type": {
     "AS1311": "banking",
@@ -7556,6 +7560,8 @@
     "AS329773": "isp",
     "AS932": "datacenter",
     "AS9756": "isp",
-    "AS15153": "datacenter"
+    "AS15153": "datacenter",
+    "AS142078": "education",
+    "AS213035": "datacenter"
   }
 }
