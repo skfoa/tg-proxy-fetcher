@@ -36,6 +36,7 @@ import ssl
 import struct
 import sys
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 from datetime import datetime, timezone, timedelta
@@ -209,8 +210,38 @@ def build_sstp_url(host: str, port: int, user: str | None = None, pwd: str | Non
     return f"sstp://{u}:{p}@{h}:{port}"
 
 
-def _sync_cf_check(endpoint: str, proxy_url: str, timeout: float = 15.0) -> dict | None:
-    """同步调用 Cloudflare Worker 代理检测接口"""
+def check_cf_worker_health(endpoint: str, timeout: float = 6.0) -> bool:
+    """
+    质检开始前，对 Cloudflare Worker 外部检测端点进行全局健康探针校验。
+    探测 /locations 或 / 根路径，确认端点在线可用、域名正确且未欠费或被封禁。
+    若探测失败，则安全熔断并全局降级为本地轻量握手探测，避免单节点频繁失败或卡顿。
+    """
+    clean_ep = normalize_endpoint(endpoint)
+    if not clean_ep:
+        return False
+    probe_urls = [f"{clean_ep}/locations", f"{clean_ep}/"]
+    for target in probe_urls:
+        try:
+            req = urllib.request.Request(
+                target,
+                headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) tg-proxy-fetcher"},
+            )
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                if resp.status in (200, 204):
+                    return True
+        except Exception as e:
+            log.debug("Cloudflare Worker 端点健康探针 [%s] 异常: %s", target, e)
+    return False
+
+
+def _sync_cf_check(endpoint: str, proxy_url: str, timeout: float = 18.0) -> dict:
+    """
+    同步调用 Cloudflare Worker 代理检测接口。
+    Worker 内部超时通常为 12s，将 Python 端超时放宽至 18s 以便完整接收 Worker 的超时返回。
+    结构化捕获 HTTP 4xx/5xx 与网络层异常，返回标准 dict：
+      - 成功/明确失败: {"success": True/False, "error": ..., "exit": ..., "responseTime": ...}
+      - 网络/HTTP崩溃: {"success": False, "error": "...", "network_error": True}
+    """
     target_url = f"{endpoint}/check?proxy={urllib.parse.quote(proxy_url)}"
     req = urllib.request.Request(
         target_url,
@@ -218,13 +249,28 @@ def _sync_cf_check(endpoint: str, proxy_url: str, timeout: float = 15.0) -> dict
     )
     try:
         with urllib.request.urlopen(req, timeout=timeout) as resp:
-            if resp.status == 200:
-                body = resp.read().decode("utf-8")
-                return json.loads(body)
+            body = resp.read().decode("utf-8", errors="ignore")
+            data = json.loads(body)
+            if isinstance(data, dict):
+                return data
+            return {"success": False, "error": "invalid_worker_json"}
+    except urllib.error.HTTPError as he:
+        # Worker 在抛出 400/500/524 时响应体可能附带结构化 JSON 错误说明
+        try:
+            body = he.read().decode("utf-8", errors="ignore")
+            data = json.loads(body)
+            if isinstance(data, dict):
+                return data
+        except Exception:
+            pass
+        log.debug("Cloudflare Worker SSTP 质检 HTTP 异常 [%s]: HTTP %s %s", proxy_url, he.code, he.reason)
+        return {"success": False, "error": f"HTTP {he.code}: {he.reason}", "http_code": he.code}
+    except (urllib.error.URLError, TimeoutError, OSError) as ne:
+        log.debug("Cloudflare Worker SSTP 网络超时/故障 [%s]: %s", proxy_url, ne)
+        return {"success": False, "error": f"network_error: {ne}", "network_error": True}
     except Exception as e:
-        log.debug("Cloudflare Worker SSTP 质检请求失败 [%s]: %s", proxy_url, e)
-        return None
-    return None
+        log.debug("Cloudflare Worker SSTP 质检未决异常 [%s]: %s", proxy_url, e)
+        return {"success": False, "error": str(e)}
 
 
 async def check_sstp_exit_cf_worker(
@@ -233,17 +279,17 @@ async def check_sstp_exit_cf_worker(
     port: int,
     user: str | None = None,
     pwd: str | None = None,
-    timeout: float = 15.0,
+    timeout: float = 18.0,
     executor: concurrent.futures.ThreadPoolExecutor | None = None,
-) -> dict | None:
+) -> dict:
     """
     异步调用 Cloudflare Worker 端点针对存活的 SSTP 节点执行深层 PPP 隧道鉴真与出口 IP 探测。
     使用独立的高并发 ThreadPoolExecutor 分派同步 HTTP 探测，打破默认 6 线程瓶颈。
-    返回 Worker 返回的 dict 数据结构；若端点不可用、网络异常或超时，则返回 None（平滑回退，不阻断流程）。
+    返回标准 dict 结构（始终保证含 success 字段，绝不返回 None）。
     """
     clean_ep = normalize_endpoint(endpoint)
     if not clean_ep:
-        return None
+        return {"success": False, "error": "endpoint_empty"}
     proxy_url = build_sstp_url(host, port, user, pwd)
     exec_pool = executor or get_cf_check_executor()
     loop = asyncio.get_running_loop()
@@ -830,52 +876,47 @@ async def probe_single(
             )
         elif proto == "sstp":
             if cf_check_endpoint:
-                # SSTP 优先直通 Cloudflare Worker 进行端到端全隧道 PPP 拨号与出口探测，单步到位，免除本地重复握手与超时叠加
+                # SSTP 直通 Cloudflare Worker 进行端到端全隧道 PPP 拨号与出口探测，单步到位
                 t_cf0 = time.monotonic()
                 cf_res = await check_sstp_exit_cf_worker(
-                    cf_check_endpoint, host, port, user, pwd, executor=cf_executor
+                    cf_check_endpoint, host, port, user, pwd, timeout=18.0, executor=cf_executor
                 )
-                if cf_res is not None:
-                    if cf_res.get("success"):
-                        is_alive = True
-                        calc_delay = max(1, int((time.monotonic() - t_cf0) * 1000))
-                        delay_ms = safe_int(
-                            cf_res.get("responseTime") or cf_res.get("latency_ms") or cf_res.get("time") or calc_delay,
-                            calc_delay,
-                        )
-                        status = "alive"
-                        colo = "-"
-                        country = ""
-                        egress_ip = ""
-                        exit_info = cf_res.get("exit") or {}
-                        exit_ip = str(exit_info.get("ip") or "").strip()
-                        if is_valid_public_ip(exit_ip):
-                            egress_ip = exit_ip
-                        c_code = str(exit_info.get("country_code") or exit_info.get("country") or "").strip().upper()
-                        if c_code:
-                            country = c_code
-                        # 若 Worker 已附带 ASN/ISP 归属，直接结构化丰富
-                        asn_obj = exit_info.get("asn") or {}
-                        cf_asn = str(asn_obj.get("asn") or "").strip()
-                        cf_isp = str(asn_obj.get("name") or asn_obj.get("org") or "").strip()
-                        if cf_asn:
-                            row["asn"] = format_asn_isp(cf_asn, cf_isp)
-                            row["isp"] = cf_isp
-                            row["net_type"] = classify_asn(cf_asn, cf_isp)
-                    else:
-                        # Cloudflare Worker 全隧道 PPP 握手失败（含连接超时、服务端拨号故障等）
-                        is_alive = False
-                        delay_ms = 0
-                        status = "sstp_vpn_fail"
-                        colo = ""
-                        country = ""
-                        egress_ip = ""
-                else:
-                    # 容灾备选：Worker 端点调用异常/网络不可达时，平滑降级执行本地轻量握手探测
-                    log.debug("SSTP 节点 [%s:%s] CF Worker 检测不可达，平滑降级至本地轻量握手", host, port)
-                    is_alive, delay_ms, status, colo, country, egress_ip = await probe_sstp(
-                        host, port, user, pwd, sstp_timeout, max(http_timeout, SSTP_READ_TIMEOUT)
+                if cf_res.get("success"):
+                    is_alive = True
+                    calc_delay = max(1, int((time.monotonic() - t_cf0) * 1000))
+                    delay_ms = safe_int(
+                        cf_res.get("responseTime") or cf_res.get("latency_ms") or cf_res.get("time") or calc_delay,
+                        calc_delay,
                     )
+                    status = "alive"
+                    colo = "-"
+                    country = ""
+                    egress_ip = ""
+                    exit_info = cf_res.get("exit") or {}
+                    exit_ip = str(exit_info.get("ip") or "").strip()
+                    if is_valid_public_ip(exit_ip):
+                        egress_ip = exit_ip
+                    c_code = str(exit_info.get("country_code") or exit_info.get("country") or "").strip().upper()
+                    if c_code:
+                        country = c_code
+                    # 若 Worker 已附带 ASN/ISP 归属，直接结构化丰富
+                    asn_obj = exit_info.get("asn") or {}
+                    cf_asn = str(asn_obj.get("asn") or "").strip()
+                    cf_isp = str(asn_obj.get("name") or asn_obj.get("org") or "").strip()
+                    if cf_asn:
+                        row["asn"] = format_asn_isp(cf_asn, cf_isp)
+                        row["isp"] = cf_isp
+                        row["net_type"] = classify_asn(cf_asn, cf_isp)
+                else:
+                    # Cloudflare Worker 全隧道 PPP 握手失败、超时或服务端关闭连接（铁证死节点，绝不降级至本地握手假活）
+                    err_msg = cf_res.get("error", "sstp_vpn_fail")
+                    log.debug("SSTP 节点 [%s:%s] Worker 全隧道拨号失败: %s", host, port, err_msg)
+                    is_alive = False
+                    delay_ms = 0
+                    status = "sstp_vpn_fail"
+                    colo = ""
+                    country = ""
+                    egress_ip = ""
             else:
                 # 未配置外部检测端点，执行本地轻量握手探测（无外部依赖）
                 is_alive, delay_ms, status, colo, country, egress_ip = await probe_sstp(
@@ -1330,12 +1371,21 @@ async def async_main(args):
     cf_concurrency = getattr(args, "cf_concurrency", CF_CONCURRENCY)
     cf_executor = None
     if cf_endpoint:
-        cf_executor = get_cf_check_executor(max_workers=cf_concurrency)
-        log.info(
-            "SSTP 启用 Cloudflare Worker 独占直连穿透鉴真与出口探测端点: %s (专用并发: %d)",
-            cf_endpoint,
-            cf_concurrency,
-        )
+        # 质检启动前对 Worker 端点进行单次健康探针校验，若端点自身不可达则全局安全熔断降级
+        is_worker_ok = await asyncio.to_thread(check_cf_worker_health, cf_endpoint)
+        if is_worker_ok:
+            cf_executor = get_cf_check_executor(max_workers=cf_concurrency)
+            log.info(
+                "SSTP 启用 Cloudflare Worker 独占直连穿透鉴真与出口探测端点: %s (专用并发: %d)",
+                cf_endpoint,
+                cf_concurrency,
+            )
+        else:
+            log.warning(
+                "⚠️ Cloudflare Worker 端点 [%s] 健康探针失败 (不可达/响应异常)，本轮 SSTP 将全局熔断降级为本地轻量握手探测（结果不含全隧道 PPP 验证）",
+                cf_endpoint,
+            )
+            cf_endpoint = ""
     else:
         log.info("SSTP 未配置外部检测端点，采用本地解析轻量直连出口（无外部依赖）")
 
