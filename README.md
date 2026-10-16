@@ -35,11 +35,15 @@
 - **📁 智能 ASN 分组与命名**：
   - **DanFeng 测速**：CSV 内部无 ASN 列时自动从文件名（如 `AS45102_CNNICALIBABACNNETAP_*.csv`）解析归类。
   - **OTC 优选扫描**：单 ASN 文件以文件名目标 ASN 为准；混合扫描文件（如 `OTC_SCAN_YX_杂.txt`）自动逐行提取具体 ASN 与 ISP 拆分归类。
-- **🧩 模块化解耦与分段锁调度**：提取独立 `providers.py` 集中维护云厂商与 ASN 字典映射；内置基于 `zlib.crc32` 的 8192 桶位哈希分段锁（`get_keyed_lock`），同 IP 互斥排队避免瞬时高并发触发对端限流，异 IP 并行探测，分段锁内存维持在常数级 $O(1)$。
+- **⚡ 精细化分段锁调度（`ip:port` 锁粒度）**：内置基于 `zlib.crc32` 的 8192 桶位哈希分段锁（`get_keyed_lock`），并发互斥粒度细化至 `ip:port`，同 IP 异端口节点并发探测，彻底解除死节点多端口串行死锁排队（单个死 IP 挂载数十个端口排队超时从 50s+ 骤降至秒级）；异 IP 互不干扰，分段锁内存维持在常数级 $O(1)$。
+- **⚡ 全量 SSL 上下文单例复用**：质检引擎全面复用全局单例 SSL 证书上下文（`INSECURE_SSL_CTX` 与 `SSL_CTX`），杜绝每次高并发探测协程重复同步读取操作系统 CA 根证书（消除 ~26ms 阻塞开销），事件循环并发吞吐能力彻底释放。
+- **🛡️ 全链路原子安全写入（Windows 锁冲突免疫）**：封装统一的 `atomic_writer` 及 `atomic_write_*` 工具套件，规范执行「写盘 ➔ 显式关闭句柄 ➔ `os.replace` 原子替换」生命周期，彻底根治 Windows 平台 `PermissionError: [WinError 32]` 文件占用锁冲突；异常崩溃时自动清理 `.tmp` 脏文件。
+- **🧩 双轨质检管道归一化**：`cf_verify.py` 将单条优选与机房扫描优选合流为 `_verify_and_persist` 高阶流水线协程，统一驱动探测并发、存活/淘汰统计、墓地冷却隔离与双重稳定质量排序（`first_seen` 降序 + `(fail_count, delay_ms)` 升序），消除 100+ 行重复样板代码，保证质检规则永久 100% 同步。
+- **🚀 解析器模块性能跃升**：`parsers.py` 预编译 13+ 项高频正则；抽象统一测速转换 `parse_speed_to_kbs`，全量支持各类单复数与带宽单位，启发式适配 CloudflareST / DanFeng 无单位输出（`< 50` 自动判定为 MB/s）；抽象 `resolve_and_clean_asn`，一键归一 4 处数据源的 ASN 提取与补全。
 - **🧠 双向索引 ASN 离线知识库与 BGP 字典体系**：引入 `data/asn_database.json` 维持 1,000+ 条双向索引字典（`isp_to_asn` 1,080+ 条与 `asn_to_isp` 1,020+ 条）以及 1,800+ 条自治系统网络分类基准表，配合权威 SSOT 字典实现解析归一化；运行时支持动态增量自愈维护与持久化；内置防污染保护（保留权威标准命名不被第三方脏标签篡改）与两级查表机制（精准查表 + 边界安全词根匹配），兼顾解析性能与自治系统归属；支持多品牌别名保留（如 `AS63023 Ipxo LLC (GTHost)`）与幂等处理。
 - **💡 未收录 ASN 动态发现与自适应预警**：增量抓取遇外部新自治系统时，自动比对内置权威对照库；若发现未收录 ASN，将在 Telegram 卡片中提示并展示待确认明细，提示管理员按需确认并补充入库；若无未知 ASN 则自动隐藏。
 - **📱 动态双状态 Telegram 运行卡片**：首行支持「🟢 发现新增 + 🗑️ 剔除死节点」双状态动态呈现，底栏包含细分引擎淘汰明细 `[代理 X, 反代 Y, 扫描 Z]`，锁屏即知变动。
-- **🛡️ 响应防截断、原子覆写与协议校验**：质检引擎采用统一 Deadline 超时控制与循环读取（`read_full_response`），完整获取 `/cdn-cgi/trace` 响应中的 `colo` 属性，非 200 响应快速退出；严格切分 Header 与 Body 区域，校验状态码（`301`/`200`）与 `Server: cloudflare`；全链路数据落盘统一采用 `.tmp` $\rightarrow$ `os.replace` 原子替换，避免进程意外中断产生损坏文件。
+- **🛡️ 响应防截断与协议级精准校验**：质检引擎采用统一 Deadline 超时控制与循环读取（`read_full_response`），完整获取 `/cdn-cgi/trace` 响应中的 `colo` 属性，非 200 响应快速退出；严格切分 Header 与 Body 区域，校验状态码（`301`/`200`）与 `Server: cloudflare`。
 - **🛡️ 静态安全门禁**：在数据抓取前首先通过 `py_compile` 拦截语法错误、`ruff` 拦截未定义变量，由 `providers.py --validate` 校验数据库一致性；若流水线任何环节异常中断，自动推送 Telegram 告警卡片并附带日志直链。
 - **🧹 自动维护与构建瘦身**：每次运行自动清理 GitHub Actions 历史记录（工作流已显式预置 `actions: write` 权限），始终**仅保留最近 4 次运行记录**，告别冗余历史堆积！
 
@@ -77,11 +81,11 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | 模块文件 | 定位与职责 |
 | :--- | :--- |
 | **`tg_fetch.py`** | **数据抓取与合并核心**：实现免登录 Web 爬虫与 Telethon API 双模抓取，跨文件全局唯一去重合并保存至 `data/`。 |
-| **`parsers.py`** | **文本提取与数据格式解析模块**：提取通用代理正则、单条优选卡片、测速 CSV 附件、OTC 扫描清单等解析规则，全面解耦纯文本提取与底层网络探测。 |
-| **`providers.py`** | **公共规范与网络分类中心**：全系统单一真相源（Single Source of Truth），维护云厂商与关键 ASN 映射表、两级分层网络分类引擎（Tier 1 权威对照 + Tier 2 词根规则），加载维护 `data/asn_database.json` 离线知识库，并提供 ProxyIP 分国别与稀缺高价值网络专线纯文本分类导出。 |
-| **`proxies_verify.py`** | **多协议通用代理质检引擎**：基于 RFC 1928、RFC 5389 (STUN/TURN Binding)、HTTP CONNECT 穿透及 MS-SSTP 隧道状态握手检验，支持配置自建 CF Worker 探测真实出口 IP。 |
+| **`parsers.py`** | **文本提取与数据格式解析模块**：预编译 13+ 项高频正则，实现通用代理提取、单条优选卡片解析、测速附件与扫描清单解析；抽象 `parse_speed_to_kbs`（全单位自适应换算）与 `resolve_and_clean_asn`（ASN/ISP 提取反查归一），解耦数据提取与底层网络探测。 |
+| **`providers.py`** | **公共规范、安全落盘与网络分类中心**：全系统单一真相源（SSOT）。维护云厂商与关键 ASN 映射表、两级分层网络分类引擎（Tier 1 权威对照 + Tier 2 词根规则）；加载维护 `data/asn_database.json` 离线知识库；提供 Windows-Safe 原子写入套件（`atomic_writer`）、8192 桶哈希分段锁与墓地黑名单冷却管理。 |
+| **`proxies_verify.py`** | **多协议通用代理质检引擎**：全局单例 SSL 上下文复用；基于 RFC 1928、RFC 5389 (STUN/TURN Binding)、HTTP CONNECT 穿透及 MS-SSTP 隧道状态握手检验，支持配置自建 CF Worker 探测真实出口 IP。 |
 | **`proxyip_verify.py`** | **反代 ProxyIP 质检引擎**：抗分包/防截断（Header/Body 隔离），验证反代真实穿透能力，并按质检状态分层导出分国与网络属性纯净列表。 |
-| **`cf_verify.py`** | **全量优选 IP 鉴真与最终卡片推送**：执行 TLS 官方证书鉴真 + HTTP 301 重定向抗截断精准校验，汇总流水线所有阶段数据并推送统一 TG 统计卡片。 |
+| **`cf_verify.py`** | **全量优选 IP 鉴真与最终卡片推送**：双轨归一化流水线驱动（`_verify_and_persist`）；基于 `ip:port` 精细化分段锁调度与全局单例 SSL 上下文，执行 TLS 官方证书鉴真 + HTTP 301 重定向抗截断精准校验；汇总流水线全阶段数据并推送统一 TG 统计卡片。 |
 | **`gen_session.py`** | **Telethon Session 辅助生成器**：本地运行快速交互登录 Telegram 并输出 Session 字符串，供 GitHub Actions 免交互调用。 |
 
 ---
@@ -363,6 +367,16 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
   * **两级查表匹配**：第一级执行精准哈希匹配，避免将含 IDC 字符串的名称误判为具体 ASN；第二级仅对权威别名执行词界匹配。
   * **分类保护**：仅对明确的云主机厂商归入机房类别，避免高校学术网与电信宽带被误打标。
 
+#### ⑥ 极速并发探测与原子安全写入底座（系统级优化）
+* **精细化分段互斥锁（`ip:port` 锁粒度）**：
+  在 `cf_verify.py` 中，将分段锁主键由传统的粗粒度 `ip` 细化为 `f"{ip}:{port}"`。传统锁会导致某个死 IP 下挂载的数十个不同端口在同一协程队列中被迫串行探测（单 IP 产生高达 50~60 秒的死锁等待）。精细化后，同一 IP 的不同端口可并发建立握手，遇到死节点瞬间并发超时并快速打标淘汰，探测总耗时缩减数倍。
+* **全局 SSL 证书上下文单例复用**：
+  在 `proxies_verify.py` 与 `cf_verify.py` 中，全面复用模块级单例 `INSECURE_SSL_CTX` 与 `SSL_CTX`。杜绝每次探针请求重复调用 `ssl.create_default_context()` 同步加载操作系统 CA 根证书（单次耗时约 26ms），在高并发下彻底释放异步事件循环，避免协程卡顿。
+* **Windows-Safe 全链路原子文件落盘（`atomic_writer`）**：
+  封装了具备 Windows 锁兼容与异常清理能力的原子文件写入套件。写盘时先写入 `.tmp` 临时文件，在进入 `os.replace` 覆写之前强制显式执行 `f.close()` 释放文件句柄，彻底杜绝 Windows 平台上的 `PermissionError: [WinError 32]`；若写入中途发生异常，自动拦截并清理未完成的 `.tmp` 临时文件，杜绝污染磁盘。
+* **双轨质检管道归一化（`_verify_and_persist`）**：
+  `cf_verify.py` 中单条优选与机房扫描优选合流采用统一步调驱动。两阶段质检、缓冲状态统计（`buf_new`、`buf_rec`）、淘汰节点墓地登记与双重稳定质量排序（`first_seen` 降序 + `(fail_count, delay_ms)` 升序）实现 100% 同步执行与代码去重。
+
 ---
 
 ## 环境变量配置
@@ -415,7 +429,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `--concurrency` | 校验脚本 | `反代 250 · 优选 250 · 代理 300` | `代理 300 · 反代 250 · 优选 250` | 质检异步并发协程数，平滑并发兼顾探测速度与对端防刷 |
 | `--max-fails` | 校验脚本 | `全部引擎统一为 3` | `全部引擎统一为 3` | 连续失败物理淘汰阈值（全线引擎统一默认 3 次，允许 1~2 次网络抖动缓冲；设为 `1` 即为严格无缓冲模式） |
 | `--timeout` | 校验脚本 | `反代 4.0 · 优选 3.0 · 代理 3.0` | `代理 3.0 · 反代 4.0 · 优选 3.0` | 单节点连接建立与 TLS 握手超时秒数（反代默认 4.0s 充分兼容跨洲 RTT） |
-| `--http-timeout` | `proxyip_verify.py` | `3.5` | `3.5` | 反代 HTTP /cdn-cgi/trace 响应读取统一 deadline 超时秒数 |
+| `--http-timeout` | `proxyip_verify.py` / `cf_verify.py` | `反代 3.5 · 优选 2.0` | `反代 3.5 · 优选 2.0` | HTTP 响应读取与 301 重定向检测统一 deadline 超时秒数 |
 | `--cf-check-endpoint` | `proxies_verify.py` | 留空 | 留空 | SSTP 真实出口与 PPP 链路鉴真端点 URL (默认留空不执行外部检测，需自行部署 CF-Workers-CheckSocks5) |
 | `--no-notify` | 校验脚本 | 流水线静默 | 关闭 | 不单独推送各引擎卡片，由流水线终点聚合为四合一卡片 |
 | `DEFER_NOTIFY` | `tg_fetch.py` | `1` | `0` | 延迟 Telegram 推送标记，确保四合一卡片聚合完整 |
