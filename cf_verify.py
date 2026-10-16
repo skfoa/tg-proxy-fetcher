@@ -191,7 +191,7 @@ async def verify_all(
 
     async def _check(row: dict):
         nonlocal pass_count, fail_count_total, completed
-        fc = int(row.get("fail_count") or 0)
+        fc = safe_int(row.get("fail_count"), 0)
         row["_old_fc"] = fc
 
         ip = (row.get("ip") or "").strip()
@@ -678,7 +678,11 @@ async def _verify_and_persist(csv_path: str, tag: str, args, on_save) -> dict:
     if eliminated > 0:
         log.info("[%s] 淘汰剔除 %d 条连续失败 >= %d 次的死节点", tag, eliminated, args.max_fails)
         dead_nodes = [r for r in rows if safe_int(r.get("fail_count"), 0) >= args.max_fails or r.get("_invalid")]
-        dead_keys = [canonical_key(r.get("ip", ""), r.get("port", 0)) for r in dead_nodes]
+        dead_keys = [
+            canonical_key(r.get("ip", ""), r.get("port", 0))
+            for r in dead_nodes
+            if (r.get("ip") or "").strip() and safe_int(r.get("port"), 0) > 0
+        ]
         newly_tombstoned = record_tombstone(dead_keys)
         log.info("[%s 墓地] 已登记 %d 个淘汰死节点至墓地冷却库 (新增: %d 个, 隔离期 7 天)", tag, len(dead_keys), newly_tombstoned)
     else:
@@ -734,25 +738,28 @@ async def async_main(args):
         scan_res["buf_rec"],
     )
 
-    send_verify_notification(
-        cf_pass=cf_res["pass"],
-        cf_eliminated=cf_res["eliminated"],
-        cf_survivors=cf_res["survivors"],
-        scan_pass=scan_res["pass"],
-        scan_eliminated=scan_res["eliminated"],
-        scan_survivors=scan_res["survivors"],
-        concurrency=args.concurrency,
-        max_fails=args.max_fails,
-        elapsed_verify=elapsed,
-        cf_f1=cf_res["f1"],
-        cf_f2=cf_res["f2"],
-        scan_f1=scan_res["f1"],
-        scan_f2=scan_res["f2"],
-        cf_buf_new=cf_res["buf_new"],
-        cf_buf_rec=cf_res["buf_rec"],
-        scan_buf_new=scan_res["buf_new"],
-        scan_buf_rec=scan_res["buf_rec"],
-    )
+    if not getattr(args, "no_notify", False):
+        send_verify_notification(
+            cf_pass=cf_res["pass"],
+            cf_eliminated=cf_res["eliminated"],
+            cf_survivors=cf_res["survivors"],
+            scan_pass=scan_res["pass"],
+            scan_eliminated=scan_res["eliminated"],
+            scan_survivors=scan_res["survivors"],
+            concurrency=args.concurrency,
+            max_fails=args.max_fails,
+            elapsed_verify=elapsed,
+            cf_f1=cf_res["f1"],
+            cf_f2=cf_res["f2"],
+            scan_f1=scan_res["f1"],
+            scan_f2=scan_res["f2"],
+            cf_buf_new=cf_res["buf_new"],
+            cf_buf_rec=cf_res["buf_rec"],
+            scan_buf_new=scan_res["buf_new"],
+            scan_buf_rec=scan_res["buf_rec"],
+        )
+    else:
+        log.info("指定了 --no-notify，跳过 Telegram 卡片推送")
 
 
 def main():
@@ -761,6 +768,7 @@ def main():
     parser.add_argument("--max-fails", type=int, default=MAX_FAILS, help=f"连续失败淘汰阈值 (默认 {MAX_FAILS})")
     parser.add_argument("--timeout", type=float, default=TIMEOUT, help="单节点连接与 TLS 握手超时秒数 (默认 3.0)")
     parser.add_argument("--http-timeout", type=float, default=HTTP_TIMEOUT, help="单节点 HTTP 校验超时秒数 (默认 2.0)")
+    parser.add_argument("--no-notify", action="store_true", help="静默模式，不发送 Telegram 质检通知")
     args = parser.parse_args()
 
     asyncio.run(async_main(args))
