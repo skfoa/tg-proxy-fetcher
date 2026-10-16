@@ -1643,7 +1643,7 @@ def format_diff(new_c: int, upd_c: int) -> str:
 # ---------------------------------------------------------------------------
 
 RE_HTTP_301 = re.compile(rb"^HTTP/\d\.\d\s+301\b")
-RE_SERVER_CF = re.compile(rb"(?im)^server:\s*cloudflare\s*$")
+RE_SERVER_CF = re.compile(rb"(?im)^server:\s*[^\r\n]*\bcloudflare\b")
 
 
 async def read_full_response(

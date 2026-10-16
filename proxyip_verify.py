@@ -165,7 +165,8 @@ async def probe_proxyip(
 
         is_alive = is_200 and is_cf and bool(colo)
         return is_alive, latency_ms, colo
-    except Exception:
+    except Exception as e:
+        log.debug("ProxyIP 探测异常 [%s:%d]: %s", ip, port, e)
         return False, 0, ""
     finally:
         if writer is not None:
