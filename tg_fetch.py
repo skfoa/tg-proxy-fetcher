@@ -75,6 +75,7 @@ from providers import (
     resolve_asn_online,
     atomic_writer,
     atomic_write_text,
+    atomic_write_json,
 )
 from parsers import (
     extract_proxies,
@@ -523,8 +524,7 @@ def send_tg_notification(
             "channels": [ch for ch in PROXY_CHANNELS + CF_IP_CHANNELS if ch],
         }
         try:
-            with open(FETCH_STATS_FILE, "w", encoding="utf-8") as sf:
-                json.dump(stats_data, sf, ensure_ascii=False, indent=2)
+            atomic_write_json(FETCH_STATS_FILE, stats_data)
             log.info("已将抓取阶段统计暂存至 %s (等待优选 IP 校验后统一推送)", FETCH_STATS_FILE)
             return
         except Exception as e:
@@ -732,7 +732,7 @@ def auto_enrich_and_save_asns(unrecorded_items: list[dict], proxy: str = "") -> 
                 sample_ip = str(item.get("ip") or "").strip()
 
                 # 若组织名缺失且存在有效公网 IP，尝试轻量在线反查一次获取标准组织名 (隔离超时与异常)
-                if not org and sample_ip and not is_tombstoned(f"{sample_ip}:0", {}):
+                if not org and sample_ip and is_valid_host(sample_ip):
                     try:
                         resolved_code, resolved_isp = resolve_asn_online(sample_ip)
                         if resolved_code == code and resolved_isp:
@@ -820,7 +820,7 @@ def fetch_edt_proxies(
     data = []
 
     def _fetch_single_mirror(u: str) -> tuple[str, list]:
-        txt = fetch_web_page(u, proxy=proxy)
+        txt = fetch_web_page(u, proxy=proxy, timeout=int(timeout))
         if not txt or not txt.strip().startswith("["):
             raise ValueError("内容为空或非有效 JSON 列表")
         parsed = json.loads(txt)
@@ -1407,6 +1407,10 @@ def merge_and_save(
     scraped_cf_ips = {k: v for k, v in scraped_cf_ips.items() if not is_tombstoned(k, tombstone)}
     scraped_scan_ips = {k: v for k, v in scraped_scan_ips.items() if not is_tombstoned(k, tombstone)}
     scraped_proxyips = {k: v for k, v in scraped_proxyips.items() if not is_tombstoned(k, tombstone)}
+    existing_proxies = {k: v for k, v in existing_proxies.items() if not is_tombstoned(k, tombstone)}
+    existing_cf_ips = {k: v for k, v in existing_cf_ips.items() if not is_tombstoned(k, tombstone)}
+    existing_scan_ips = {k: v for k, v in existing_scan_ips.items() if not is_tombstoned(k, tombstone)}
+    existing_proxyips = {k: v for k, v in existing_proxyips.items() if not is_tombstoned(k, tombstone)}
 
     new_proxy_cnt = sum(1 for k in scraped_proxies if k not in existing_proxies)
     updated_proxy_cnt = sum(1 for k in scraped_proxies if k in existing_proxies)
