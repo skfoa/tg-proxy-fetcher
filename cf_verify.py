@@ -53,6 +53,8 @@ from providers import (
     format_buffer_badge,
     format_diff,
     save_scan_ips_by_asn as save_scan_dir,
+    atomic_writer,
+    atomic_write_text,
 )
 
 # 确保本地 .env 加载
@@ -265,36 +267,30 @@ def load_csv(path: str) -> list:
 # --- 单条优选 IP 保存逻辑 ---
 def save_cf_ips(rows: list, csv_path: str = CF_CSV, txt_path: str = CF_TXT):
     """覆写 cf_ips.csv 与 cf_ips.txt（仅保留存活节点，剔除死节点；原子写入防截断）"""
-    tmp_csv = f"{csv_path}.tmp"
-    with open(tmp_csv, "w", encoding="utf-8-sig", newline="") as f:
+    with atomic_writer(csv_path, encoding="utf-8-sig", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
         writer.writeheader()
         for row in rows:
             writer.writerow(row)
-    os.replace(tmp_csv, csv_path)
     log.info("已覆写保存 %s: %d 条记录", csv_path, len(rows))
 
-    tmp_txt = f"{txt_path}.tmp"
-    with open(tmp_txt, "w", encoding="utf-8") as f:
+    with atomic_writer(txt_path, encoding="utf-8") as f:
         for r in rows:
             ip = str(r.get("ip") or "").strip()
             port = safe_int(r.get("port"), 0)
             if ip and 1 <= port <= 65535:
                 f.write(f"{ip}:{port}\n")
-    os.replace(tmp_txt, txt_path)
     log.info("已覆写保存 %s: %d 行 IP:Port", txt_path, len(rows))
 
 
 # --- 扫描测速优选 IP 保存逻辑 ---
 def save_scan_csv(rows: list, path: str = SCAN_CSV):
     """覆写 scan_ips.csv（仅保留存活节点，剔除死节点；原子写入防截断）"""
-    tmp_path = f"{path}.tmp"
-    with open(tmp_path, "w", encoding="utf-8-sig", newline="") as f:
+    with atomic_writer(path, encoding="utf-8-sig", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
         writer.writeheader()
         for row in rows:
             writer.writerow(row)
-    os.replace(tmp_path, path)
     log.info("已覆写保存 %s: %d 条记录", path, len(rows))
 
 
@@ -311,10 +307,7 @@ def save_scan_txt(rows_or_groups, path: str = SCAN_TXT):
         rows = rows_or_groups
 
     content = format_scan_ips_txt(rows)
-    tmp_path = f"{path}.tmp"
-    with open(tmp_path, "w", encoding="utf-8") as f:
-        f.write(content)
-    os.replace(tmp_path, path)
+    atomic_write_text(path, content, encoding="utf-8")
     log.info("已按质检缓冲状态分层保存 %s: %d 条记录", path, len(rows))
 
 

@@ -66,6 +66,7 @@ from providers import (
     ASN_DATABASE_ASN_TO_ISP,
     is_valid_public_ip,
     resolve_domain_to_ip,
+    atomic_write_text,
 )
 
 # 确保本地 .env 加载
@@ -1146,10 +1147,7 @@ def save_proxies_data(
 
     # 写入 proxies.txt (纯文本 URL 清单，按协议分段归类；原子写入防截断)
     formatted_txt = format_proxies_txt(survivors)
-    tmp_txt = f"{txt_path}.tmp"
-    with open(tmp_txt, "w", encoding="utf-8") as f:
-        f.write(formatted_txt)
-    os.replace(tmp_txt, txt_path)
+    atomic_write_text(txt_path, formatted_txt, encoding="utf-8")
     log.info("已按协议分段覆写保存 %s: %d 个高可用节点", txt_path, len(survivors))
 
     # 按协议拆分独立文件至 data/proxies/ 子目录 (.txt, .csv, .json)

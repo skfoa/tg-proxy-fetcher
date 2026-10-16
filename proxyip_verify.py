@@ -54,6 +54,8 @@ from providers import (
     format_buffer_badge,
     RE_SERVER_CF,
     format_asn_isp,
+    atomic_writer,
+    atomic_write_text,
 )
 
 # 确保本地 .env 加载
@@ -217,19 +219,14 @@ def save_proxyip(
         row["asn"] = format_asn_isp(row.get("asn", ""), row.get("isp", ""))
         row["net_type"] = classify_asn(row.get("asn", ""), row.get("isp", ""))
 
-    tmp_csv = f"{csv_path}.tmp"
-    with open(tmp_csv, "w", encoding="utf-8-sig", newline="") as f:
+    with atomic_writer(csv_path, encoding="utf-8-sig", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
         writer.writeheader()
         for row in rows:
             writer.writerow(row)
-    os.replace(tmp_csv, csv_path)
     log.info("已覆写保存 %s: %d 条记录 (含 fail_count, net_type 列)", csv_path, len(rows))
 
-    tmp_txt = f"{txt_path}.tmp"
-    with open(tmp_txt, "w", encoding="utf-8") as f:
-        f.write(format_proxyip_txt(rows))
-    os.replace(tmp_txt, txt_path)
+    atomic_write_text(txt_path, format_proxyip_txt(rows), encoding="utf-8")
     log.info("已按质检状态分层保存 %s: %d 条记录", txt_path, len(rows))
 
     split_cnt = save_proxyip_by_country(rows, dir_path)

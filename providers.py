@@ -251,6 +251,7 @@ for _asn, _isp in AUTHORITATIVE_CLOUD_ASNS.items():
 
 import asyncio
 import concurrent.futures
+import contextlib
 import csv
 import functools
 import ipaddress
@@ -266,6 +267,65 @@ import zlib
 from datetime import datetime, timedelta, timezone
 
 log = logging.getLogger("providers")
+
+
+# ---------- 原子写入与安全落盘工具 (Atomic File Operations) ----------
+
+@contextlib.contextmanager
+def atomic_writer(
+    path: str,
+    mode: str = "w",
+    encoding: str | None = "utf-8",
+    newline: str | None = None,
+):
+    """
+    上下文管理器：安全原子写入文件（tmp -> os.replace）。
+    1. 自动确保目标目录存在；
+    2. 写入 {path}.tmp 临时文件；
+    3. 正常退出时显式关闭文件句柄后再执行 os.replace 覆写目标文件（彻底消除 Windows 平台占用锁冲突）；
+    4. 遇异常退出时立即关闭句柄并清理未完成的 .tmp 临时文件，杜绝遗留脏数据。
+
+    用法：
+        with atomic_writer("data/nodes.csv", encoding="utf-8-sig", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=...)
+            writer.writeheader()
+    """
+    d = os.path.dirname(os.path.abspath(path))
+    if d:
+        os.makedirs(d, exist_ok=True)
+    tmp = f"{path}.tmp"
+    is_binary = "b" in mode
+    enc = None if is_binary else encoding
+    nl = None if is_binary else newline
+    f = open(tmp, mode, encoding=enc, newline=nl)
+    try:
+        yield f
+        f.close()
+        os.replace(tmp, path)
+    except Exception:
+        f.close()
+        if os.path.exists(tmp):
+            with contextlib.suppress(OSError):
+                os.remove(tmp)
+        raise
+
+
+def atomic_write_bytes(path: str, data: bytes) -> None:
+    """原子覆写二进制字节数据"""
+    with atomic_writer(path, mode="wb") as f:
+        f.write(data)
+
+
+def atomic_write_text(path: str, text: str, encoding: str = "utf-8") -> None:
+    """原子覆写纯文本数据"""
+    with atomic_writer(path, mode="w", encoding=encoding) as f:
+        f.write(text)
+
+
+def atomic_write_json(path: str, obj, *, indent: int = 2) -> None:
+    """原子序列化并覆写 JSON 数据"""
+    text = json.dumps(obj, ensure_ascii=False, indent=indent)
+    atomic_write_text(path, text, encoding="utf-8")
 
 
 # ---------- 持久化 ASN 数据库加载与在线动态解析补库 ----------
@@ -667,20 +727,14 @@ def save_asn_database(
             except Exception:
                 pass
 
-        os.makedirs(os.path.dirname(target_path), exist_ok=True)
-        tmp_target = f"{target_path}.tmp"
-        with open(tmp_target, "w", encoding="utf-8") as f:
-            json.dump(
-                {
-                    "isp_to_asn": clean_i2a,
-                    "asn_to_isp": clean_a2i,
-                    "asn_to_net_type": clean_a2nt,
-                },
-                f,
-                ensure_ascii=False,
-                indent=2,
-            )
-        os.replace(tmp_target, target_path)
+        atomic_write_json(
+            target_path,
+            {
+                "isp_to_asn": clean_i2a,
+                "asn_to_isp": clean_a2i,
+                "asn_to_net_type": clean_a2nt,
+            },
+        )
         # 仅当写入默认系统数据库时才同步更新进程全局单例运行时字典
         if not db_path or os.path.abspath(target_path) == os.path.abspath(ASN_DATABASE_PATH):
             ASN_DATABASE_ASN_TO_NET_TYPE.update(clean_a2nt)
@@ -689,11 +743,6 @@ def save_asn_database(
         return True
     except Exception as e:
         log.warning("保存 asn_database.json 异常: %s", e)
-        if "tmp_target" in locals() and os.path.exists(tmp_target):
-            try:
-                os.remove(tmp_target)
-            except OSError:
-                pass
         return False
 
 
@@ -856,19 +905,10 @@ def load_ip_cache() -> dict[str, dict]:
 def save_ip_cache(cache: dict[str, dict], filepath: str = ""):
     """持久化保存 IP/域名 -> ASN/ISP/net_type 缓存字典至 data/ip_cache.json（原子写入）"""
     target_path = filepath or IP_CACHE_PATH
-    os.makedirs(os.path.dirname(target_path), exist_ok=True)
-    tmp_path = f"{target_path}.tmp"
     try:
-        with open(tmp_path, "w", encoding="utf-8") as f:
-            json.dump(cache, f, ensure_ascii=False, indent=2)
-        os.replace(tmp_path, target_path)
+        atomic_write_json(target_path, cache)
     except Exception as e:
         log.warning("保存 %s 异常: %s", target_path, e)
-        if os.path.exists(tmp_path):
-            try:
-                os.remove(tmp_path)
-            except OSError:
-                pass
 
 
 def is_valid_public_ip(ip_str: str) -> bool:
@@ -1388,6 +1428,15 @@ def clean_asn(raw_asn: str, isp: str = "") -> str:
     return "AS_UNKNOWN"
 
 
+# 预编译 format_asn_isp 热点地址过滤与别名匹配正则
+_ADDR_RE = re.compile(
+    r"(?:\b(?:building|avenue|road|street|floor|suite|room|district|highway|jalan|bldg|kejizhongyi)\b|大厦|大楼|写字楼|园区|胡同|街道|号院)",
+    re.IGNORECASE,
+)
+_ALIAS_RE = re.compile(r"\((.*?)\)")
+_ALIAS_STRIP_RE = re.compile(r"\s*\(.*?\)")
+
+
 def format_asn_isp(raw_asn: str, raw_isp: str = "") -> str:
     """
     格式化生成『ASN + 服务商名称』一体化直观标签（如 AS906 DMIT, AS13335 Cloudflare）：
@@ -1431,23 +1480,22 @@ def format_asn_isp(raw_asn: str, raw_isp: str = "") -> str:
                     return clean_a
                 return clean_i or "AS_UNKNOWN"
 
-    _addr_pattern = r"(?:\b(?:building|avenue|road|street|floor|suite|room|district|highway|jalan|bldg|kejizhongyi)\b|大厦|大楼|写字楼|园区|胡同|街道|号院)"
-    if suffix and re.search(_addr_pattern, suffix, re.IGNORECASE):
+    if suffix and _ADDR_RE.search(suffix):
         suffix = ""
-    if clean_i and re.search(_addr_pattern, clean_i, re.IGNORECASE):
+    if clean_i and _ADDR_RE.search(clean_i):
         clean_i = ""
 
     # 提取 suffix 中已有的别名括号内容，避免多轮调用导致别名丢失或嵌套
-    existing_aliases = re.findall(r"\((.*?)\)", suffix)
+    existing_aliases = _ALIAS_RE.findall(suffix)
     existing_alias = " ".join(a.strip() for a in existing_aliases if a.strip())
     if existing_aliases:
-        suffix = re.sub(r"\s*\(.*?\)", "", suffix).strip()
+        suffix = _ALIAS_STRIP_RE.sub("", suffix).strip()
 
     # 权威单一真相源 (SSOT) 优先：若在已收录权威字典中，采用权威统一名称
     auth_isp = ASN_TO_PROVIDER.get(code, "")
     if auth_isp:
         candidate_alias = clean_i or existing_alias or suffix
-        cand_aliases = re.findall(r"\((.*?)\)", candidate_alias)
+        cand_aliases = _ALIAS_RE.findall(candidate_alias)
         alias = " ".join(a.strip() for a in cand_aliases if a.strip()) if cand_aliases else candidate_alias.strip()
 
         if alias and alias.upper() not in ("-", "NONE", "UNKNOWN", "AS_UNKNOWN", "NULL"):
@@ -1895,6 +1943,7 @@ COUNTRY_NAME_MAP: dict[str, str] = {
 }
 
 
+@functools.lru_cache(maxsize=512)
 def country_code_to_emoji(country_code: str) -> str:
     """将 ISO 3166-1 alpha-2 国家/地区代码转换为标准国旗 Emoji 表情（如 US -> 🇺🇸, JP -> 🇯🇵）"""
     if not country_code or len(country_code) != 2 or not country_code.isalpha():
@@ -2037,13 +2086,7 @@ def save_proxies_json(rows: list, json_path: str = "data/proxies.json") -> int:
     按协议分组与延迟排序，直接适配 EDT-Toolkit / 油猴脚本及第三方 API 调用。
     """
     json_list = [format_proxy_json_item(r) for r in rows if isinstance(r, dict) and r.get("url")]
-    dir_name = os.path.dirname(os.path.abspath(json_path))
-    if dir_name:
-        os.makedirs(dir_name, exist_ok=True)
-    tmp_json = f"{json_path}.tmp"
-    with open(tmp_json, "w", encoding="utf-8") as f:
-        json.dump(json_list, f, ensure_ascii=False, indent=2)
-    os.replace(tmp_json, json_path)
+    atomic_write_json(json_path, json_list)
     log.info("已覆写保存 %s: %d 个全量代理节点 (标准 JSON 格式)", json_path, len(json_list))
     return len(json_list)
 
@@ -2120,35 +2163,27 @@ def save_proxies_by_protocol(rows: list, output_dir: str = "data/proxies") -> di
         # 1. 保存纯文本单协议列表（原子写入）
         txt_fname = f"{safe_proto}.txt"
         txt_filepath = os.path.join(output_dir, txt_fname)
-        tmp_txt = f"{txt_filepath}.tmp"
         lines = [f"# {title} - {len(items)} 个\n"]
         for _, _, url, _ in items:
             lines.append(f"{url}\n")
-        with open(tmp_txt, "w", encoding="utf-8") as f:
-            f.writelines(lines)
-        os.replace(tmp_txt, txt_filepath)
+        atomic_write_text(txt_filepath, "".join(lines))
         active_files.add(txt_fname)
 
         # 2. 保存纯净单协议结构化 CSV（原子写入）
         csv_fname = f"{safe_proto}.csv"
         csv_filepath = os.path.join(output_dir, csv_fname)
-        tmp_csv = f"{csv_filepath}.tmp"
-        with open(tmp_csv, "w", encoding="utf-8-sig", newline="") as f:
+        with atomic_writer(csv_filepath, encoding="utf-8-sig", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=PROXY_CSV_FIELDS, extrasaction="ignore")
             writer.writeheader()
             for _, _, _, r_dict in items:
                 writer.writerow(r_dict)
-        os.replace(tmp_csv, csv_filepath)
         active_files.add(csv_fname)
 
         # 3. 保存标准化单协议 JSON 接口数据（原子写入，完美兼容 EDT-Toolkit / 油猴脚本）
         json_fname = f"{safe_proto}.json"
         json_filepath = os.path.join(output_dir, json_fname)
-        tmp_json = f"{json_filepath}.tmp"
         json_list = [format_proxy_json_item(r_dict) for _, _, _, r_dict in items]
-        with open(tmp_json, "w", encoding="utf-8") as f:
-            json.dump(json_list, f, ensure_ascii=False, indent=2)
-        os.replace(tmp_json, json_filepath)
+        atomic_write_json(json_filepath, json_list)
         active_files.add(json_fname)
 
         result_counts[proto] = len(items)
@@ -2232,16 +2267,11 @@ def save_proxies_csv(rows: list, csv_path: str = "data/proxies.csv") -> int:
 
     formatted_rows.sort(key=_sort_key)
 
-    dir_name = os.path.dirname(os.path.abspath(csv_path))
-    if dir_name:
-        os.makedirs(dir_name, exist_ok=True)
-    tmp_csv = f"{csv_path}.tmp"
-    with open(tmp_csv, "w", encoding="utf-8-sig", newline="") as f:
+    with atomic_writer(csv_path, encoding="utf-8-sig", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=PROXY_CSV_FIELDS, extrasaction="ignore")
         writer.writeheader()
         for r in formatted_rows:
             writer.writerow(r)
-    os.replace(tmp_csv, csv_path)
     log.info("已按协议分块覆写保存 %s: %d 条质检状态记录 (无交错混杂)", csv_path, len(formatted_rows))
     return len(formatted_rows)
 
@@ -2270,6 +2300,11 @@ HOSTING_EXCLUSIONS = (
     "hostdare", "misaka", "spartanhost", "h4y", "peg tech", "vpsus",
     "1gservers", "cherry servers", "rackh", "spacecore", "ddos protection",
 )
+
+_HOSTING_SHORT_RE = {
+    h: re.compile(rf"\b{re.escape(h)}\b", re.IGNORECASE)
+    for h in HOSTING_EXCLUSIONS if len(h) <= 4
+}
 
 EDU_PATTERNS = (
     "university", "college", "school", "education", "cernet",
@@ -2441,11 +2476,11 @@ def classify_asn(asn_str: str | None, isp_str: str | None = "") -> str:
     if any(p in text for p in GOV_PATTERNS):
         return "government"
 
-    # 3. 排除机房/主机商（对短词如 host/vps/colo 使用独立单词边界匹配，杜绝 ghost/colorado 等误杀）
+    # 3. 排除机房/主机商（对短词如 host/vps/colo 使用独立预编译单词边界匹配，杜绝 ghost/colorado 等误杀）
     is_hosting = False
     for h in HOSTING_EXCLUSIONS:
         if len(h) <= 4:
-            if re.search(rf"\b{re.escape(h)}\b", text, re.IGNORECASE):
+            if _HOSTING_SHORT_RE[h].search(text):
                 is_hosting = True
                 break
         elif h in text:
@@ -2525,8 +2560,7 @@ def save_proxyip_by_country(rows: list, output_dir: str) -> int:
         if not lines:
             continue
         filepath = os.path.join(output_dir, fname)
-        with open(filepath, "w", encoding="utf-8") as f:
-            f.writelines(lines)
+        atomic_write_text(filepath, "".join(lines))
         active_files.add(fname)
 
     # 清理已不存在或旧命名格式的 .txt 文件（保留 .gitkeep 等非 txt 标记文件，以及 custom_ / manual_ 用户自定义文件）
@@ -2573,8 +2607,6 @@ def save_scan_ips_by_asn(asn_groups: dict, output_dir: str) -> int:
         else:
             fname = f"{safe_asn}.txt"
         fpath = os.path.join(output_dir, fname)
-        tmp_fpath = f"{fpath}.tmp"
-
         valid_rows = [
             r for r in group
             if r.get("ip") and safe_int(r.get("port"), 0) > 0 and safe_int(r.get("port"), 0) <= 65535
@@ -2582,10 +2614,9 @@ def save_scan_ips_by_asn(asn_groups: dict, output_dir: str) -> int:
         if not valid_rows:
             continue
 
-        with open(tmp_fpath, "w", encoding="utf-8") as f:
+        with atomic_writer(fpath) as f:
             for r in sorted(valid_rows, key=lambda x: (x.get("ip", ""), safe_int(x.get("port"), 0))):
                 f.write(f"{r['ip']}:{safe_int(r.get('port'), 0)}\n")
-        os.replace(tmp_fpath, fpath)
         active_files.add(fname)
 
     # 移除已无活跃 IP 的旧分组文件（保留 .gitkeep 保持目录结构）
@@ -2715,14 +2746,8 @@ def prune_tombstone(
             pruned_count += 1
 
     if pruned_count > 0:
-        dir_name = os.path.dirname(os.path.abspath(target_path))
-        if dir_name:
-            os.makedirs(dir_name, exist_ok=True)
-        tmp_path = f"{target_path}.tmp"
         try:
-            with open(tmp_path, "w", encoding="utf-8") as f:
-                json.dump(valid, f, ensure_ascii=False, indent=2)
-            os.replace(tmp_path, target_path)
+            atomic_write_json(target_path, valid)
             _TOMBSTONE_CACHE = valid
             _TOMBSTONE_CACHE_FILE = target_path
             try:
@@ -2732,11 +2757,6 @@ def prune_tombstone(
             log.info("已主动修剪墓地文件 %s: 剔除 %d 个超过 %d 天的过期条目 (剩余: %d 个)", target_path, pruned_count, max_age_days, len(valid))
         except Exception as e:
             log.warning("写回修剪后的墓地文件 %s 失败: %s", target_path, e)
-            if os.path.exists(tmp_path):
-                try:
-                    os.remove(tmp_path)
-                except OSError:
-                    pass
 
     return pruned_count
 
@@ -2769,14 +2789,8 @@ def record_tombstone(
             new_count += 1
         tombstone[clean_k] = now
 
-    dir_name = os.path.dirname(os.path.abspath(filepath))
-    if dir_name:
-        os.makedirs(dir_name, exist_ok=True)
-    tmp_path = f"{filepath}.tmp"
     try:
-        with open(tmp_path, "w", encoding="utf-8") as f:
-            json.dump(tombstone, f, ensure_ascii=False, indent=2)
-        os.replace(tmp_path, filepath)
+        atomic_write_json(filepath, tombstone)
         try:
             _TOMBSTONE_CACHE = tombstone
             _TOMBSTONE_CACHE_FILE = filepath
@@ -2785,11 +2799,6 @@ def record_tombstone(
             _TOMBSTONE_CACHE = None
     except Exception as e:
         log.warning("写入墓地文件 %s 失败: %s", filepath, e)
-        if os.path.exists(tmp_path):
-            try:
-                os.remove(tmp_path)
-            except OSError:
-                pass
     return new_count
 
 

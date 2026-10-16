@@ -73,6 +73,8 @@ from providers import (
     load_asn_database,
     save_asn_database,
     resolve_asn_online,
+    atomic_writer,
+    atomic_write_text,
 )
 from parsers import (
     extract_proxies,
@@ -1240,10 +1242,7 @@ def save_and_notify(
     # 1. 保存通用代理总表（proxies.txt）并按协议独立拆分（原子写入）
     os.makedirs(DATA_DIR, exist_ok=True)
     formatted_proxies = format_proxies_txt(list(final_proxies.values()))
-    tmp_proxy_file = f"{OUTPUT_PROXY_FILE}.tmp"
-    with open(tmp_proxy_file, "w", encoding="utf-8") as f:
-        f.write(formatted_proxies)
-    os.replace(tmp_proxy_file, OUTPUT_PROXY_FILE)
+    atomic_write_text(OUTPUT_PROXY_FILE, formatted_proxies)
     log.info("已按协议分段保存通用代理总文件: %s (%d 个全量累积节点)", OUTPUT_PROXY_FILE, len(final_proxies))
 
     proto_counts = save_proxies_by_protocol(list(final_proxies.values()), OUTPUT_PROXIES_DIR)
@@ -1257,24 +1256,20 @@ def save_and_notify(
         key=lambda item: item.get("first_seen", ""),
         reverse=True,
     )
-    tmp_cf_file = f"{OUTPUT_CF_FILE}.tmp"
-    with open(tmp_cf_file, "w", encoding="utf-8-sig", newline="") as f:
+    with atomic_writer(OUTPUT_CF_FILE, encoding="utf-8-sig", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=CF_CSV_FIELDS, extrasaction="ignore")
         writer.writeheader()
         for row in sorted_cf_ips:
             row.setdefault("fail_count", 0)
             writer.writerow(row)
-    os.replace(tmp_cf_file, OUTPUT_CF_FILE)
     log.info("已保存单条优选IP文件: %s (%d 条全量累积记录)", OUTPUT_CF_FILE, len(sorted_cf_ips))
 
-    tmp_cf_txt = f"{OUTPUT_CF_TXT}.tmp"
-    with open(tmp_cf_txt, "w", encoding="utf-8") as f:
+    with atomic_writer(OUTPUT_CF_TXT, encoding="utf-8") as f:
         for row in sorted_cf_ips:
             ip = str(row.get("ip") or "").strip()
             port = safe_int(row.get("port"), 0)
             if ip and 1 <= port <= 65535:
                 f.write(f"{ip}:{port}\n")
-    os.replace(tmp_cf_txt, OUTPUT_CF_TXT)
     log.info("已保存单条优选IP纯文本: %s (%d 行 IP:Port)", OUTPUT_CF_TXT, len(sorted_cf_ips))
 
     # 3. 保存文件/扫描优选 IP（按 ASN 智能去重、分组归类与独立拆分；原子写入）
@@ -1297,20 +1292,15 @@ def save_and_notify(
             group_rows = sorted(asn_groups[asn_name], key=lambda x: x.get("first_seen", ""), reverse=True)
             all_sorted_scan_rows.extend(group_rows)
 
-        tmp_scan_file = f"{OUTPUT_SCAN_FILE}.tmp"
-        with open(tmp_scan_file, "w", encoding="utf-8-sig", newline="") as f:
+        with atomic_writer(OUTPUT_SCAN_FILE, encoding="utf-8-sig", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=CF_CSV_FIELDS, extrasaction="ignore")
             writer.writeheader()
             for row in all_sorted_scan_rows:
                 row.setdefault("fail_count", 0)
                 writer.writerow(row)
-        os.replace(tmp_scan_file, OUTPUT_SCAN_FILE)
         log.info("已保存扫描优选IP表格: %s (%d 条全量累积记录)", OUTPUT_SCAN_FILE, len(all_sorted_scan_rows))
 
-        tmp_scan_txt = f"{OUTPUT_SCAN_TXT}.tmp"
-        with open(tmp_scan_txt, "w", encoding="utf-8") as f:
-            f.write(format_scan_ips_txt(all_sorted_scan_rows))
-        os.replace(tmp_scan_txt, OUTPUT_SCAN_TXT)
+        atomic_write_text(OUTPUT_SCAN_TXT, format_scan_ips_txt(all_sorted_scan_rows))
         log.info("已按质检缓冲状态分层保存扫描优选IP汇总文本: %s (%d 行/条记录)", OUTPUT_SCAN_TXT, len(all_sorted_scan_rows))
 
         save_scan_ips_by_asn(asn_groups, OUTPUT_SCAN_DIR)
@@ -1329,8 +1319,7 @@ def save_and_notify(
             key=_proxyip_sort_key,
             reverse=True,
         )
-        tmp_proxyip_file = f"{OUTPUT_PROXYIP_FILE}.tmp"
-        with open(tmp_proxyip_file, "w", encoding="utf-8-sig", newline="") as f:
+        with atomic_writer(OUTPUT_PROXYIP_FILE, encoding="utf-8-sig", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=PROXYIP_CSV_FIELDS, extrasaction="ignore")
             writer.writeheader()
             for row in sorted_proxyips:
@@ -1338,13 +1327,9 @@ def save_and_notify(
                 row["asn"] = format_asn_isp(row.get("asn", ""), row.get("isp", ""))
                 row["net_type"] = classify_asn(row.get("asn", ""), row.get("isp", ""))
                 writer.writerow(row)
-        os.replace(tmp_proxyip_file, OUTPUT_PROXYIP_FILE)
         log.info("已保存反代 ProxyIP 表格: %s (%d 条全量累积记录)", OUTPUT_PROXYIP_FILE, len(sorted_proxyips))
 
-        tmp_proxyip_txt = f"{OUTPUT_PROXYIP_TXT}.tmp"
-        with open(tmp_proxyip_txt, "w", encoding="utf-8") as f:
-            f.write(format_proxyip_txt(sorted_proxyips))
-        os.replace(tmp_proxyip_txt, OUTPUT_PROXYIP_TXT)
+        atomic_write_text(OUTPUT_PROXYIP_TXT, format_proxyip_txt(sorted_proxyips))
         log.info("已保存反代 ProxyIP 纯文本: %s (%d 行/条记录，按质检状态分层)", OUTPUT_PROXYIP_TXT, len(sorted_proxyips))
 
         proxyip_split_cnt = save_proxyip_by_country(sorted_proxyips, OUTPUT_PROXYIP_DIR)
