@@ -205,10 +205,11 @@ def build_sstp_url(host: str, port: int, user: str | None = None, pwd: str | Non
     """构建标准 SSTP 代理 URL (VPNGate 默认缺省账密为 vpn / vpn)"""
     u = user or "vpn"
     p = pwd or "vpn"
-    return f"sstp://{u}:{p}@{host}:{port}"
+    h = f"[{host}]" if (":" in host and not host.startswith("[")) else host
+    return f"sstp://{u}:{p}@{h}:{port}"
 
 
-def _sync_cf_check(endpoint: str, proxy_url: str, timeout: float = 12.0) -> dict | None:
+def _sync_cf_check(endpoint: str, proxy_url: str, timeout: float = 15.0) -> dict | None:
     """同步调用 Cloudflare Worker 代理检测接口"""
     target_url = f"{endpoint}/check?proxy={urllib.parse.quote(proxy_url)}"
     req = urllib.request.Request(
@@ -232,7 +233,7 @@ async def check_sstp_exit_cf_worker(
     port: int,
     user: str | None = None,
     pwd: str | None = None,
-    timeout: float = 12.0,
+    timeout: float = 15.0,
     executor: concurrent.futures.ThreadPoolExecutor | None = None,
 ) -> dict | None:
     """
@@ -838,22 +839,25 @@ async def probe_single(
                     if cf_res.get("success"):
                         is_alive = True
                         calc_delay = max(1, int((time.monotonic() - t_cf0) * 1000))
-                        delay_ms = safe_int(cf_res.get("latency_ms") or cf_res.get("time") or calc_delay, calc_delay)
+                        delay_ms = safe_int(
+                            cf_res.get("responseTime") or cf_res.get("latency_ms") or cf_res.get("time") or calc_delay,
+                            calc_delay,
+                        )
                         status = "alive"
                         colo = "-"
                         country = ""
                         egress_ip = ""
                         exit_info = cf_res.get("exit") or {}
-                        exit_ip = (exit_info.get("ip") or "").strip()
+                        exit_ip = str(exit_info.get("ip") or "").strip()
                         if is_valid_public_ip(exit_ip):
                             egress_ip = exit_ip
-                        c_code = (exit_info.get("country_code") or "").strip().upper()
+                        c_code = str(exit_info.get("country_code") or exit_info.get("country") or "").strip().upper()
                         if c_code:
                             country = c_code
                         # 若 Worker 已附带 ASN/ISP 归属，直接结构化丰富
                         asn_obj = exit_info.get("asn") or {}
-                        cf_asn = (asn_obj.get("asn") or "").strip()
-                        cf_isp = (asn_obj.get("name") or "").strip()
+                        cf_asn = str(asn_obj.get("asn") or "").strip()
+                        cf_isp = str(asn_obj.get("name") or asn_obj.get("org") or "").strip()
                         if cf_asn:
                             row["asn"] = format_asn_isp(cf_asn, cf_isp)
                             row["isp"] = cf_isp
