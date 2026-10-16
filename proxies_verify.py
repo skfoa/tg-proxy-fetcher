@@ -123,6 +123,8 @@ FATAL_FAIL_STATUSES = {
     "http_connect_fail",      # HTTP 代理端明确拒绝 CONNECT 隧道 (400/403/405/502 等)
     "tls_err",                # TLS 握手异常 (非 SSL/TLS 服务)
     "stun_fail",              # STUN/TURN Magic Cookie 校验失败 (非 STUN 服务)
+    "stun_not_turn",          # 响应非 TURN Allocate 报文 (纯 STUN 服务，无中继能力)
+    "http_connect_no_colo",   # HTTPS 代理 CONNECT 隧道建立后无法读取有效 trace/colo 报文 (假 200 代理)
     "sstp_fail",              # SSTP 隧道请求返回非 200 (非 SSTP 服务)
     "unknown_proto",          # 未知协议
 }
@@ -633,7 +635,7 @@ async def probe_https(
     if stage1_err_status:
         return False, 0, stage1_err_status, "", "", ""
 
-    # --- 阶段 2: 回退标准 CONNECT 443 隧道探测 (RFC 2817 / RFC 7231 §4.3.6) ---
+    # --- 阶段 2: 回退标准 CONNECT 隧道深度穿透探测 (RFC 2817 / RFC 7231 §4.3.6) ---
     t0_connect = time.monotonic()
     writer = None
     try:
@@ -642,8 +644,8 @@ async def probe_https(
             timeout=connect_timeout,
         )
         connect_req = (
-            f"CONNECT {PROBE_HOST}:443 HTTP/1.1\r\n"
-            f"Host: {PROBE_HOST}:443\r\n"
+            f"CONNECT {PROBE_HOST}:{PROBE_PORT} HTTP/1.1\r\n"
+            f"Host: {PROBE_HOST}:{PROBE_PORT}\r\n"
             f"{auth_header}"
             f"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36\r\n"
             f"Proxy-Connection: close\r\n"
@@ -653,24 +655,50 @@ async def probe_https(
         writer.write(connect_req)
         await asyncio.wait_for(writer.drain(), timeout=connect_timeout)
 
+        # 校验代理端的 CONNECT 建立响应 (必须包含 HTTP 200 Connection Established)
         resp = await asyncio.wait_for(reader.read(1024), timeout=connect_timeout)
-        await safe_close_writer(writer)
-        writer = None
-
         resp_text = resp.decode("latin1", errors="ignore") if resp else ""
         first_line = resp_text.splitlines()[0] if resp_text else ""
 
-        if RE_HTTP_200.search(first_line):
+        if not RE_HTTP_200.search(first_line):
             lat = max(1, int((time.monotonic() - t0_connect) * 1000))
+            if RE_HTTP_407.search(first_line):
+                status = "auth_fail" if (user and pwd) else "auth_required_missing"
+                return False, lat, status, "", "", ""
+            return False, lat, "http_connect_fail", "", "", ""
+
+        # 阶段 2b: CONNECT 隧道建立成功后，必须向目标发送真实 GET /cdn-cgi/trace 校验 colo/ip 穿透回传
+        trace_req = (
+            f"GET {PROBE_PATH} HTTP/1.1\r\n"
+            f"Host: {PROBE_HOST}\r\n"
+            f"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) tg-proxy-fetcher\r\n"
+            f"Connection: close\r\n"
+            f"\r\n"
+        ).encode("latin1")
+        writer.write(trace_req)
+        await asyncio.wait_for(writer.drain(), timeout=connect_timeout)
+
+        trace_resp = await read_full_response(reader, http_timeout, need_body=True)
+        await safe_close_writer(writer)
+        writer = None
+
+        trace_text = trace_resp.decode("utf-8", errors="ignore") if trace_resp else ""
+        trace_first_line = trace_text.splitlines()[0] if trace_text else ""
+
+        if RE_HTTP_200.search(trace_first_line) and ("colo=" in trace_text or "ip=" in trace_text):
+            lat = max(1, int((time.monotonic() - t0_connect) * 1000))
+            colo_match = RE_COLO.search(trace_text)
+            colo = colo_match.group(1).upper() if colo_match else ""
+            loc_match = RE_LOC.search(trace_text)
+            country = loc_match.group(1).upper() if loc_match else ""
+            ip_match = RE_IP.search(trace_text)
+            egress_ip = ip_match.group(1).strip() if ip_match else ""
             if max_latency_ms > 0 and lat > max_latency_ms:
                 return False, lat, "slow_timeout", "", "", ""
-            return True, lat, "alive", "-", "", connect_host
+            return True, lat, "alive", colo, country, egress_ip
 
         lat = max(1, int((time.monotonic() - t0_connect) * 1000))
-        if RE_HTTP_407.search(first_line):
-            status = "auth_fail" if (user and pwd) else "auth_required_missing"
-            return False, lat, status, "", "", ""
-        return False, lat, "http_connect_fail", "", "", ""
+        return False, lat, "http_connect_no_colo", "", "", ""
     except asyncio.TimeoutError:
         return False, 0, "timeout", "", "", ""
     except ssl.SSLError as e:
@@ -719,16 +747,24 @@ async def probe_turn(
         )
 
         tx_id = os.urandom(12)
-        # Type: 0x0001 (Binding Request), Length: 0x0000, Magic Cookie: 0x2112A442
-        req = b"\x00\x01\x00\x00\x21\x12\xa4\x42" + tx_id
-        writer.write(req)
+        # RFC 5766 §6.2 TURN Allocate 请求 (Type: 0x0003, Length: 0x0008, Magic Cookie: 0x2112A442)
+        # 属性 0x0019 (REQUESTED-TRANSPORT, 长度 4 字节, 协议值 0x11 = 17 UDP + 3 字节保留对齐)
+        allocate_req = (
+            b"\x00\x03\x00\x08\x21\x12\xa4\x42" + tx_id +
+            b"\x00\x19\x00\x04\x11\x00\x00\x00"
+        )
+        writer.write(allocate_req)
         await asyncio.wait_for(writer.drain(), timeout=connect_timeout)
 
         resp = await asyncio.wait_for(reader.read(1024), timeout=read_timeout)
         lat = max(1, int((time.monotonic() - t0) * 1000))
 
+        # 校验 STUN Magic Cookie 与 Transaction ID，并验证服务端支持 TURN Allocate (0x0103成功或0x0113鉴权挑战)
         if len(resp) >= 20 and resp[4:8] == b"\x21\x12\xa4\x42" and resp[8:20] == tx_id:
-            return True, lat, "alive", "-", "", connect_host
+            msg_type = resp[0:2]
+            if msg_type in (b"\x01\x03", b"\x01\x13"):
+                return True, lat, "alive", "-", "", connect_host
+            return False, lat, "stun_not_turn", "", "", ""
         return False, lat, "stun_fail", "", "", ""
     except asyncio.TimeoutError:
         return False, 0, "timeout", "", "", ""
@@ -908,15 +944,25 @@ async def probe_single(
                         row["isp"] = cf_isp
                         row["net_type"] = classify_asn(cf_asn, cf_isp)
                 else:
-                    # Cloudflare Worker 全隧道 PPP 握手失败、超时或服务端关闭连接（铁证死节点，绝不降级至本地握手假活）
-                    err_msg = cf_res.get("error", "sstp_vpn_fail")
-                    log.debug("SSTP 节点 [%s:%s] Worker 全隧道拨号失败: %s", host, port, err_msg)
-                    is_alive = False
-                    delay_ms = 0
-                    status = "sstp_vpn_fail"
-                    colo = ""
-                    country = ""
-                    egress_ip = ""
+                    if cf_res.get("network_error"):
+                        # Worker 侧网络抖动或请求 Worker 自身超时，不应归罪节点；保持原状态，不递增 fail_count
+                        log.debug("SSTP 节点 [%s:%s] 遇到 Worker 侧网络抖动: %s", host, port, cf_res.get("error"))
+                        is_alive = False
+                        delay_ms = 0
+                        status = "worker_unreachable"
+                        colo = ""
+                        country = ""
+                        egress_ip = ""
+                    else:
+                        # 节点在 Worker 端全隧道 PPP 协商失败（如连接被服务端关闭、隧道拨号超时）
+                        err_msg = cf_res.get("error", "sstp_vpn_fail")
+                        log.debug("SSTP 节点 [%s:%s] Worker 全隧道拨号失败: %s", host, port, err_msg)
+                        is_alive = False
+                        delay_ms = 0
+                        status = "sstp_vpn_fail"
+                        colo = ""
+                        country = ""
+                        egress_ip = ""
             else:
                 # 未配置外部检测端点，执行本地轻量握手探测（无外部依赖）
                 is_alive, delay_ms, status, colo, country, egress_ip = await probe_sstp(
@@ -940,6 +986,8 @@ async def probe_single(
             eff_max_fails = http_max_fails if proto == "http" else max_fails
             if status in FATAL_FAIL_STATUSES:
                 row["fail_count"] = eff_max_fails
+            elif status == "worker_unreachable":
+                row["fail_count"] = fc  # Worker 侧网络抖动，保持原有 fail_count，不扣节点分数
             else:
                 row["fail_count"] = fc + 1
             if not row.get("delay_ms"):
