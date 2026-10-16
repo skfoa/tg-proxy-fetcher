@@ -259,7 +259,7 @@ def parse_cf_csv_content(
     if filename:
         fn_lower = filename.lower()
         # 1. 优先从文件名正则匹配 AS 编号与 ISP (支持 DanFeng 命名规范，如 AS45102_CNNICALIBABACNNETAP_20260906_190653.csv, AS61112_AkileCloud_Network_20260831_012345.csv)
-        base_fn = os.path.basename(filename)
+        base_fn = os.path.basename(filename.replace("\\", "/"))
         m_fn = re.search(r"(?i)(?P<asn>AS\d+)_(?P<isp>.+?)(?:_(?P<date>\d{8})_(?P<time>\d{6}))?\.(?:csv|txt)$", base_fn)
         if m_fn:
             fn_asn = m_fn.group("asn").upper()
