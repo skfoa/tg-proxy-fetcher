@@ -125,6 +125,26 @@ FATAL_FAIL_STATUSES = {
 
 CSV_FIELDS = PROXY_CSV_FIELDS
 
+# 复用全局宽容 SSL 证书上下文，避免高并发下每次探测重复加载系统 CA 证书与解析 cipher 导致事件循环冻结
+INSECURE_SSL_CTX = ssl.create_default_context()
+INSECURE_SSL_CTX.check_hostname = False
+INSECURE_SSL_CTX.verify_mode = ssl.CERT_NONE
+try:
+    INSECURE_SSL_CTX.minimum_version = ssl.TLSVersion.MINIMUM_SUPPORTED
+except Exception:
+    pass
+try:
+    INSECURE_SSL_CTX.set_ciphers("DEFAULT:@SECLEVEL=0")
+except Exception:
+    pass
+
+# 预编译高频响应解析正则，避免协程密集调用中的重复正则解析与查表开销
+RE_COLO = re.compile(r"\bcolo=([A-Za-z0-9]+)\b")
+RE_LOC = re.compile(r"\bloc=([A-Za-z]{2})\b")
+RE_IP = re.compile(r"\bip=([0-9a-fA-F.:]+)\b")
+RE_HTTP_200 = re.compile(r"\b200\b")
+RE_HTTP_407 = re.compile(r"\b407\b")
+
 CF_CHECK_ENDPOINT = os.getenv("CF_CHECK_ENDPOINT", "").strip()
 CF_CONCURRENCY = safe_int(os.getenv("CF_CONCURRENCY"), 32)
 _CF_CHECK_EXECUTOR: concurrent.futures.ThreadPoolExecutor | None = None
@@ -328,16 +348,16 @@ async def probe_socks5(
         http_resp = await read_full_response(reader, http_timeout, need_body=True)
         http_text = http_resp.decode("utf-8", errors="ignore")
 
-        colo_match = re.search(r"\bcolo=([A-Za-z0-9]+)\b", http_text)
+        colo_match = RE_COLO.search(http_text)
         colo = colo_match.group(1).upper() if colo_match else ""
-        loc_match = re.search(r"\bloc=([A-Za-z]{2})\b", http_text)
+        loc_match = RE_LOC.search(http_text)
         country = loc_match.group(1).upper() if loc_match else ""
-        ip_match = re.search(r"\bip=([0-9a-fA-F.:]+)\b", http_text)
+        ip_match = RE_IP.search(http_text)
         egress_ip = ip_match.group(1).strip() if ip_match else ""
         lat = max(1, int((time.monotonic() - t0) * 1000))
 
         first_line = http_text.splitlines()[0] if http_text else ""
-        if re.search(r"\b200\b", first_line) and colo:
+        if RE_HTTP_200.search(first_line) and colo:
             return True, lat, "alive", colo, country, egress_ip
         return False, lat, "http_fail", "", "", ""
     except asyncio.TimeoutError:
@@ -409,21 +429,21 @@ async def probe_http(
         first_line = resp_text.splitlines()[0] if resp_text else ""
 
         # 严格鉴真：不仅首行必须包含 200，且正文必须能解析出有效的 colo= 机房码，证明真实穿透至 Cloudflare 边缘节点
-        colo_match = re.search(r"\bcolo=([A-Za-z0-9]+)\b", resp_text)
+        colo_match = RE_COLO.search(resp_text)
         colo = colo_match.group(1).upper() if colo_match else ""
 
-        if re.search(r"\b200\b", first_line) and colo:
+        if RE_HTTP_200.search(first_line) and colo:
             lat = max(1, int((time.monotonic() - t0) * 1000))
-            loc_match = re.search(r"\bloc=([A-Za-z]{2})\b", resp_text)
+            loc_match = RE_LOC.search(resp_text)
             country = loc_match.group(1).upper() if loc_match else ""
-            ip_match = re.search(r"\bip=([0-9a-fA-F.:]+)\b", resp_text)
+            ip_match = RE_IP.search(resp_text)
             egress_ip = ip_match.group(1).strip() if ip_match else ""
             if max_latency_ms > 0 and lat > max_latency_ms:
                 return False, lat, "slow_timeout", "", "", ""
             return True, lat, "alive", colo, country, egress_ip
 
         lat = max(1, int((time.monotonic() - t0) * 1000))
-        if re.search(r"\b407\b", first_line):
+        if RE_HTTP_407.search(first_line):
             status = "auth_fail" if (user and pwd) else "auth_required_missing"
             return False, lat, status, "", "", ""
         return False, lat, "http_fail", "", "", ""
@@ -470,17 +490,7 @@ async def probe_https(
         if resolved and is_valid_public_ip(resolved):
             connect_host = resolved
 
-    ssl_ctx = ssl.create_default_context()
-    ssl_ctx.check_hostname = False
-    ssl_ctx.verify_mode = ssl.CERT_NONE
-    try:
-        ssl_ctx.minimum_version = ssl.TLSVersion.MINIMUM_SUPPORTED
-    except Exception:
-        pass
-    try:
-        ssl_ctx.set_ciphers("DEFAULT:@SECLEVEL=0")
-    except Exception:
-        pass
+    ssl_ctx = INSECURE_SSL_CTX
     is_ip = bool(re.match(r"^\d{1,3}(?:\.\d{1,3}){3}$", host))
     sni = None if is_ip else host
 
@@ -516,13 +526,13 @@ async def probe_https(
         resp_text = resp.decode("utf-8", errors="ignore") if resp else ""
         first_line = resp_text.splitlines()[0] if resp_text else ""
 
-        if re.search(r"\b200\b", first_line) and ("colo=" in resp_text or "ip=" in resp_text):
+        if RE_HTTP_200.search(first_line) and ("colo=" in resp_text or "ip=" in resp_text):
             lat = max(1, int((time.monotonic() - t0) * 1000))
-            colo_match = re.search(r"\bcolo=([A-Za-z0-9]+)\b", resp_text)
+            colo_match = RE_COLO.search(resp_text)
             colo = colo_match.group(1).upper() if colo_match else ""
-            loc_match = re.search(r"\bloc=([A-Za-z]{2})\b", resp_text)
+            loc_match = RE_LOC.search(resp_text)
             country = loc_match.group(1).upper() if loc_match else ""
-            ip_match = re.search(r"\bip=([0-9a-fA-F.:]+)\b", resp_text)
+            ip_match = RE_IP.search(resp_text)
             egress_ip = ip_match.group(1).strip() if ip_match else ""
             if max_latency_ms > 0 and lat > max_latency_ms:
                 return False, lat, "slow_timeout", "", "", ""
@@ -564,14 +574,14 @@ async def probe_https(
         resp_text = resp.decode("latin1", errors="ignore") if resp else ""
         first_line = resp_text.splitlines()[0] if resp_text else ""
 
-        if re.search(r"\b200\b", first_line):
+        if RE_HTTP_200.search(first_line):
             lat = max(1, int((time.monotonic() - t0_connect) * 1000))
             if max_latency_ms > 0 and lat > max_latency_ms:
                 return False, lat, "slow_timeout", "", "", ""
             return True, lat, "alive", "-", "", connect_host
 
         lat = max(1, int((time.monotonic() - t0_connect) * 1000))
-        if re.search(r"\b407\b", first_line):
+        if RE_HTTP_407.search(first_line):
             status = "auth_fail" if (user and pwd) else "auth_required_missing"
             return False, lat, status, "", "", ""
         return False, lat, "http_connect_fail", "", "", ""
@@ -667,17 +677,7 @@ async def probe_sstp(
     3. 校验服务端是否返回 HTTP/1.1 200 OK，确认 SSTP 隧道服务活跃就绪
     返回 (is_alive, delay_ms, status, colo, country, egress_ip)
     """
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
-    try:
-        ctx.minimum_version = ssl.TLSVersion.MINIMUM_SUPPORTED
-    except Exception:
-        pass
-    try:
-        ctx.set_ciphers("DEFAULT:@SECLEVEL=0")
-    except Exception:
-        pass
+    ctx = INSECURE_SSL_CTX
 
     # RFC 6066: 纯 IPv4 地址不应作为 TLS SNI 发送
     is_ip = bool(re.match(r"^\d{1,3}(?:\.\d{1,3}){3}$", host))

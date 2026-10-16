@@ -202,9 +202,9 @@ async def verify_all(
             fail_count_total += 1
             return
 
-        async with get_keyed_lock(ip):
-            async with sem:
-                alive, latency = await probe_ip(ip, port, connect_timeout=timeout, http_timeout=http_timeout)
+        lock_key = f"{ip}:{port}"
+        async with get_keyed_lock(lock_key), sem:
+            alive, latency = await probe_ip(ip, port, connect_timeout=timeout, http_timeout=http_timeout)
 
         completed += 1
         if alive:
