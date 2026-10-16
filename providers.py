@@ -967,7 +967,7 @@ def resolve_domain_to_ip(domain: str) -> str:
         return ""
     clean = domain.strip().lower()
     try:
-        ip_obj = ipaddress.ip_address(clean)
+        ipaddress.ip_address(clean)
         return clean if is_valid_public_ip(clean) else ""
     except ValueError:
         pass
