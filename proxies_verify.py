@@ -4,9 +4,10 @@
 
 针对 proxies.txt（涵盖 SOCKS5, HTTP, HTTPS, TURN, SSTP 协议代理）进行应用层真实穿透校验：
   1. SOCKS5: RFC 1928 / RFC 1929 五步握手状态机 (无密码/有密码) -> CONNECT speed.cloudflare.com:80 -> GET /cdn-cgi/trace 校验 200 + Server: cloudflare + 正则解析 colo
-  2. HTTP/HTTPS: 标准 CONNECT speed.cloudflare.com:443 隧道单阶段敏捷鉴真 (支持 Proxy-Authorization 认证与毫秒级极速淘汰)
-  3. TURN: STUN Binding Request over TCP (RFC 5389)，校验 20 字节头部 Magic Cookie (0x2112A442) 及 Transaction ID
-  4. SSTP: MS-SSTP 标准双工信道 (TLS 握手 + SSTP_DUPLEX_POST)，校验 200 OK 确认服务就绪
+  2. HTTP (明文): RFC 7230 正向代理绝对路径穿透 (单 RTT 直通 speed.cloudflare.com:80，强制校验 200 + colo 机房码，单次判死杜绝二次回退叠加)
+  3. HTTPS (加密): TLS 握手 (支持老旧版本与 SECLEVEL=0) -> RFC 7230 绝对 URI GET 深度穿透校验 colo (回退至 CONNECT 443 隧道)
+  4. TURN: STUN Binding Request over TCP (RFC 5389)，校验 20 字节头部 Magic Cookie (0x2112A442) 及 Transaction ID
+  5. SSTP: MS-SSTP 标准双工信道 (TLS 握手 + SSTP_DUPLEX_POST)，校验 200 OK 确认服务就绪
 
 淘汰与状态聚合机制：
   - 极致纯净模式 (--strict 或 --max-fails 1): 仅保留 100% 测试通过的存活节点，一次失败即彻底剔除
@@ -97,7 +98,7 @@ PROBE_PORT = 80
 
 TIMEOUT = 3.0
 HTTP_TIMEOUT = 2.5
-HTTP_PROBE_TIMEOUT = 1.0
+HTTP_PROBE_TIMEOUT = 2.0
 HTTP_MAX_LATENCY_MS = 2500
 SSTP_TIMEOUT = 8.0
 SSTP_READ_TIMEOUT = 4.0
@@ -361,16 +362,14 @@ async def probe_http(
     pwd: str | None,
     connect_timeout: float = TIMEOUT,
     http_timeout: float = HTTP_TIMEOUT,
-    is_ssl: bool = False,
     max_latency_ms: int = 0,
 ) -> tuple[bool, int, str, str, str, str]:
     """
-    HTTP / HTTPS 代理标准 CONNECT 443 隧道鉴真 (RFC 2817 / RFC 7231 §4.3.6)：
-    1. 若 is_ssl=True (HTTPS 代理)，首先与代理服务器完成 TLS 加密握手 (支持老旧版本与 SECLEVEL=0)
-    2. 发送标准 CONNECT speed.cloudflare.com:443 隧道建立请求 (支持 Proxy-Authorization 认证与标准关闭头)
-       - 目标端口必须为 443（符合主流代理服务器如 Squid/Apache/Nginx 的默认 Safe_ports 与 SSL_ports ACL 策略）
-       - 代理端响应 200 Connection Established 即证明代理具备有效的外联中继转发能力
-    3. 延迟保护: 若配置了 max_latency_ms (>0) 且总握手响应延迟超过上限，判定为 slow_timeout 淘汰
+    明文 HTTP 代理单阶段标准 RFC 7230 正向代理深度穿透鉴真：
+    1. 目标直通：向代理发送标准绝对 URI 请求 (GET http://speed.cloudflare.com/cdn-cgi/trace HTTP/1.1)
+    2. 严格鉴真：必须收到 200 OK 且正文必须解析出 Cloudflare 的 colo 与 egress_ip，100% 杜绝假 200 代理
+    3. 敏捷判死：单次探测失败（超时、端口拒绝、鉴权失败、非 200 等）立即淘汰，绝不发起第二阶段串行回退
+    4. 延迟保护: 若配置了 max_latency_ms (>0) 且总延迟超过上限，判定为 slow_timeout 淘汰
     返回 (is_alive, delay_ms, status, colo, country, egress_ip)
     """
     connect_host = host
@@ -379,22 +378,111 @@ async def probe_http(
         if resolved and is_valid_public_ip(resolved):
             connect_host = resolved
 
-    ssl_ctx = None
-    sni = None
-    if is_ssl:
-        ssl_ctx = ssl.create_default_context()
-        ssl_ctx.check_hostname = False
-        ssl_ctx.verify_mode = ssl.CERT_NONE
-        try:
-            ssl_ctx.minimum_version = ssl.TLSVersion.MINIMUM_SUPPORTED
-        except Exception:
-            pass
-        try:
-            ssl_ctx.set_ciphers("DEFAULT:@SECLEVEL=0")
-        except Exception:
-            pass
-        is_ip = bool(re.match(r"^\d{1,3}(?:\.\d{1,3}){3}$", host))
-        sni = None if is_ip else host
+    auth_header = ""
+    if user and pwd:
+        cred = base64.b64encode(f"{user}:{pwd}".encode()).decode()
+        auth_header = f"Proxy-Authorization: Basic {cred}\r\n"
+
+    t0 = time.monotonic()
+    writer = None
+    try:
+        reader, writer = await asyncio.wait_for(
+            asyncio.open_connection(connect_host, port),
+            timeout=connect_timeout,
+        )
+        forward_req = (
+            f"GET http://{PROBE_HOST}{PROBE_PATH} HTTP/1.1\r\n"
+            f"Host: {PROBE_HOST}\r\n"
+            f"{auth_header}"
+            f"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36\r\n"
+            f"Connection: close\r\n"
+            f"\r\n"
+        ).encode("latin1")
+        writer.write(forward_req)
+        await asyncio.wait_for(writer.drain(), timeout=connect_timeout)
+
+        resp = await read_full_response(reader, http_timeout, need_body=True)
+        await safe_close_writer(writer)
+        writer = None
+
+        resp_text = resp.decode("utf-8", errors="ignore") if resp else ""
+        first_line = resp_text.splitlines()[0] if resp_text else ""
+
+        # 严格鉴真：不仅首行必须包含 200，且正文必须能解析出有效的 colo= 机房码，证明真实穿透至 Cloudflare 边缘节点
+        colo_match = re.search(r"\bcolo=([A-Za-z0-9]+)\b", resp_text)
+        colo = colo_match.group(1).upper() if colo_match else ""
+
+        if re.search(r"\b200\b", first_line) and colo:
+            lat = max(1, int((time.monotonic() - t0) * 1000))
+            loc_match = re.search(r"\bloc=([A-Za-z]{2})\b", resp_text)
+            country = loc_match.group(1).upper() if loc_match else ""
+            ip_match = re.search(r"\bip=([0-9a-fA-F.:]+)\b", resp_text)
+            egress_ip = ip_match.group(1).strip() if ip_match else ""
+            if max_latency_ms > 0 and lat > max_latency_ms:
+                return False, lat, "slow_timeout", "", "", ""
+            return True, lat, "alive", colo, country, egress_ip
+
+        lat = max(1, int((time.monotonic() - t0) * 1000))
+        if re.search(r"\b407\b", first_line):
+            status = "auth_fail" if (user and pwd) else "auth_required_missing"
+            return False, lat, status, "", "", ""
+        return False, lat, "http_fail", "", "", ""
+    except asyncio.TimeoutError:
+        return False, 0, "timeout", "", "", ""
+    except ConnectionRefusedError:
+        log.debug("HTTP 节点端口拒绝连接 [%s:%s]", host, port)
+        return False, 0, "conn_err", "", "", ""
+    except (ConnectionResetError, BrokenPipeError) as e:
+        log.debug("HTTP 节点重置/断开 [%s:%s]: %s", host, port, e)
+        return False, 0, "conn_reset", "", "", ""
+    except (socket.gaierror, OSError) as e:
+        log.debug("HTTP 节点网络/DNS异常 [%s:%s]: %s", host, port, e)
+        return False, 0, "conn_err", "", "", ""
+    except Exception as e:
+        log.debug("HTTP 节点未知探测异常 [%s:%s]: %s", host, port, e)
+        return False, 0, "fail", "", "", ""
+    finally:
+        if writer is not None:
+            await safe_close_writer(writer)
+
+
+async def probe_https(
+    host: str,
+    port: int,
+    user: str | None,
+    pwd: str | None,
+    connect_timeout: float = 7.0,
+    http_timeout: float = HTTP_TIMEOUT,
+    max_latency_ms: int = 0,
+) -> tuple[bool, int, str, str, str, str]:
+    """
+    HTTPS 代理双模稳健鉴真 (TLS 传输层加密握手 + RFC 7230 穿透优先 + CONNECT 443 隧道回退)：
+    专用于 proto == "https" 的加密代理服务（高校/企业专网为主，存活率高）：
+    1. 首先与代理服务器建立 TLS 加密会话 (支持老旧版本与 SECLEVEL=0)
+    2. 阶段 1: 优先发送 RFC 7230 §5.3.2 绝对 URI GET 请求，校验 200 与解析 colo/ip
+    3. 阶段 2: 回退标准 CONNECT speed.cloudflare.com:443 隧道请求
+    4. 延迟保护: 若配置了 max_latency_ms (>0) 且总探测延迟超过上限，判定为 slow_timeout 淘汰
+    返回 (is_alive, delay_ms, status, colo, country, egress_ip)
+    """
+    connect_host = host
+    if not is_valid_public_ip(host):
+        resolved = await asyncio.to_thread(resolve_domain_to_ip, host)
+        if resolved and is_valid_public_ip(resolved):
+            connect_host = resolved
+
+    ssl_ctx = ssl.create_default_context()
+    ssl_ctx.check_hostname = False
+    ssl_ctx.verify_mode = ssl.CERT_NONE
+    try:
+        ssl_ctx.minimum_version = ssl.TLSVersion.MINIMUM_SUPPORTED
+    except Exception:
+        pass
+    try:
+        ssl_ctx.set_ciphers("DEFAULT:@SECLEVEL=0")
+    except Exception:
+        pass
+    is_ip = bool(re.match(r"^\d{1,3}(?:\.\d{1,3}){3}$", host))
+    sni = None if is_ip else host
 
     auth_header = ""
     if user and pwd:
@@ -402,6 +490,55 @@ async def probe_http(
         auth_header = f"Proxy-Authorization: Basic {cred}\r\n"
 
     t0 = time.monotonic()
+
+    # --- 阶段 1: 优先尝试 RFC 7230 §5.3.2 绝对 URI GET 深度穿透 (提取真实 colo 与 egress_ip) ---
+    writer = None
+    try:
+        reader, writer = await asyncio.wait_for(
+            asyncio.open_connection(connect_host, port, ssl=ssl_ctx, server_hostname=sni),
+            timeout=connect_timeout,
+        )
+        forward_req = (
+            f"GET http://{PROBE_HOST}{PROBE_PATH} HTTP/1.1\r\n"
+            f"Host: {PROBE_HOST}\r\n"
+            f"{auth_header}"
+            f"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36\r\n"
+            f"Connection: close\r\n"
+            f"\r\n"
+        ).encode("latin1")
+        writer.write(forward_req)
+        await asyncio.wait_for(writer.drain(), timeout=connect_timeout)
+
+        resp = await read_full_response(reader, http_timeout, need_body=True)
+        await safe_close_writer(writer)
+        writer = None
+
+        resp_text = resp.decode("utf-8", errors="ignore") if resp else ""
+        first_line = resp_text.splitlines()[0] if resp_text else ""
+
+        if re.search(r"\b200\b", first_line) and ("colo=" in resp_text or "ip=" in resp_text):
+            lat = max(1, int((time.monotonic() - t0) * 1000))
+            colo_match = re.search(r"\bcolo=([A-Za-z0-9]+)\b", resp_text)
+            colo = colo_match.group(1).upper() if colo_match else ""
+            loc_match = re.search(r"\bloc=([A-Za-z]{2})\b", resp_text)
+            country = loc_match.group(1).upper() if loc_match else ""
+            ip_match = re.search(r"\bip=([0-9a-fA-F.:]+)\b", resp_text)
+            egress_ip = ip_match.group(1).strip() if ip_match else ""
+            if max_latency_ms > 0 and lat > max_latency_ms:
+                return False, lat, "slow_timeout", "", "", ""
+            return True, lat, "alive", colo, country, egress_ip
+    except (asyncio.TimeoutError, ssl.SSLError, ConnectionRefusedError, ConnectionResetError, BrokenPipeError, socket.gaierror, OSError):
+        if writer is not None:
+            await safe_close_writer(writer)
+            writer = None
+    except Exception as e:
+        log.debug("HTTPS 绝对 URI 探测异常 [%s:%s]: %s", host, port, e)
+        if writer is not None:
+            await safe_close_writer(writer)
+            writer = None
+
+    # --- 阶段 2: 回退标准 CONNECT 443 隧道探测 (RFC 2817 / RFC 7231 §4.3.6) ---
+    t0_connect = time.monotonic()
     writer = None
     try:
         reader, writer = await asyncio.wait_for(
@@ -420,7 +557,7 @@ async def probe_http(
         writer.write(connect_req)
         await asyncio.wait_for(writer.drain(), timeout=connect_timeout)
 
-        resp = await asyncio.wait_for(reader.read(1024), timeout=http_timeout)
+        resp = await asyncio.wait_for(reader.read(1024), timeout=connect_timeout)
         await safe_close_writer(writer)
         writer = None
 
@@ -428,12 +565,12 @@ async def probe_http(
         first_line = resp_text.splitlines()[0] if resp_text else ""
 
         if re.search(r"\b200\b", first_line):
-            lat = max(1, int((time.monotonic() - t0) * 1000))
+            lat = max(1, int((time.monotonic() - t0_connect) * 1000))
             if max_latency_ms > 0 and lat > max_latency_ms:
                 return False, lat, "slow_timeout", "", "", ""
             return True, lat, "alive", "-", "", connect_host
 
-        lat = max(1, int((time.monotonic() - t0) * 1000))
+        lat = max(1, int((time.monotonic() - t0_connect) * 1000))
         if re.search(r"\b407\b", first_line):
             status = "auth_fail" if (user and pwd) else "auth_required_missing"
             return False, lat, status, "", "", ""
@@ -441,19 +578,19 @@ async def probe_http(
     except asyncio.TimeoutError:
         return False, 0, "timeout", "", "", ""
     except ssl.SSLError as e:
-        log.debug("HTTP(S) 节点 TLS 握手异常 [%s:%s]: %s", host, port, e)
+        log.debug("HTTPS 节点 TLS 握手异常 [%s:%s]: %s", host, port, e)
         return False, 0, "tls_err", "", "", ""
     except ConnectionRefusedError:
-        log.debug("HTTP 节点端口拒绝连接 [%s:%s]", host, port)
+        log.debug("HTTPS 节点端口拒绝连接 [%s:%s]", host, port)
         return False, 0, "conn_err", "", "", ""
     except (ConnectionResetError, BrokenPipeError) as e:
-        log.debug("HTTP 节点重置/断开 [%s:%s]: %s", host, port, e)
+        log.debug("HTTPS 节点重置/断开 [%s:%s]: %s", host, port, e)
         return False, 0, "conn_reset", "", "", ""
     except (socket.gaierror, OSError) as e:
-        log.debug("HTTP 节点网络/DNS异常 [%s:%s]: %s", host, port, e)
+        log.debug("HTTPS 节点网络/DNS异常 [%s:%s]: %s", host, port, e)
         return False, 0, "conn_err", "", "", ""
     except Exception as e:
-        log.debug("HTTP 节点未知探测异常 [%s:%s]: %s", host, port, e)
+        log.debug("HTTPS 节点未知探测异常 [%s:%s]: %s", host, port, e)
         return False, 0, "fail", "", "", ""
     finally:
         if writer is not None:
@@ -634,12 +771,11 @@ async def probe_single(
                 pwd,
                 h_conn_to,
                 h_read_to,
-                is_ssl=False,
                 max_latency_ms=http_max_latency_ms,
             )
         elif proto == "https":
-            is_alive, delay_ms, status, colo, country, egress_ip = await probe_http(
-                host, port, user, pwd, max(timeout, 7.0), http_timeout, is_ssl=True
+            is_alive, delay_ms, status, colo, country, egress_ip = await probe_https(
+                host, port, user, pwd, max(timeout, 7.0), http_timeout
             )
         elif proto == "turn":
             is_alive, delay_ms, status, colo, country, egress_ip = await probe_turn(
