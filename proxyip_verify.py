@@ -56,6 +56,7 @@ from providers import (
     format_asn_isp,
     atomic_writer,
     atomic_write_text,
+    atomic_write_json,
 )
 
 # 确保本地 .env 加载
@@ -102,6 +103,14 @@ CSV_FIELDS = [
 SSL_CTX = ssl.create_default_context()
 SSL_CTX.check_hostname = False
 SSL_CTX.verify_mode = ssl.CERT_NONE
+try:
+    SSL_CTX.minimum_version = ssl.TLSVersion.MINIMUM_SUPPORTED
+except Exception:
+    pass
+try:
+    SSL_CTX.set_ciphers("DEFAULT:@SECLEVEL=0")
+except Exception:
+    pass
 
 
 # 预编译正则，高并发下零重复编译开销
@@ -124,6 +133,7 @@ async def probe_proxyip(
         is_alive=False -> 探测失败，latency_ms 为 0，colo 为空字符串
     """
     t0 = time.monotonic()
+    writer = None
     try:
         reader, writer = await asyncio.wait_for(
             asyncio.open_connection(ip, port, ssl=SSL_CTX, server_hostname=PROBE_HOST),
@@ -131,10 +141,7 @@ async def probe_proxyip(
         )
         t1 = time.monotonic()
         latency_ms = max(1, int((t1 - t0) * 1000))
-    except Exception:
-        return False, 0, ""
 
-    try:
         req = (
             f"GET {PROBE_PATH} HTTP/1.1\r\n"
             f"Host: {PROBE_HOST}\r\n"
@@ -161,7 +168,8 @@ async def probe_proxyip(
     except Exception:
         return False, 0, ""
     finally:
-        await safe_close_writer(writer)
+        if writer is not None:
+            await safe_close_writer(writer)
 
 
 # ---------- 数据加载与保存 ----------
@@ -269,11 +277,7 @@ async def verify_proxyips(
         fc = _get_fc(row)
         row["_old_fc"] = fc
 
-        port_raw = row.get("port", 0)
-        try:
-            port = int(port_raw)
-        except (ValueError, TypeError):
-            port = 0
+        port = safe_int(row.get("port"), 0)
 
         ip = (row.get("ip") or "").strip()
         if not ip or port <= 0 or port > 65535:
@@ -332,6 +336,7 @@ def send_proxyip_notification(
     fail_2: int = 0,
     buf_new: int = 0,
     buf_rec: int = 0,
+    avg_delay: int = 0,
 ):
     """推送独立的 ProxyIP 穿透质检统计 TG 卡片"""
     token = TG_BOT_TOKEN
@@ -376,11 +381,14 @@ def send_proxyip_notification(
 
     footer_line = f"\n{div}\n" + " · ".join(footer_parts)
 
+    delay_str = f"\n⚡ <b>存活均延</b>：<code>{avg_delay}ms</code>" if avg_delay > 0 else ""
+
     message = (
         f"{header}\n"
         f"{div}\n"
         f"📅 <b>时间</b>：{date_str} (北京时间)\n"
-        f"🛡️ <b>池内节点</b>：<code>{survivors}</code> 条 ({status_line})\n"
+        f"🛡️ <b>池内节点</b>：<code>{survivors}</code> 条 ({status_line})"
+        f"{delay_str}\n"
         f"🗑️ <b>淘汰死节点</b>：{elim_str}\n"
         f"⚙️ <b>质检规格</b>：/cdn-cgi/trace 穿透鉴真 · {concurrency} 并发\n"
         f"{footer_line}"
@@ -440,7 +448,11 @@ async def async_main(args):
     if eliminated > 0:
         log.info("[ProxyIP 淘汰] 剔除 %d 条连续失败 >= %d 次的死节点", eliminated, args.max_fails)
         dead_nodes = [r for r in rows if _get_fc(r) >= args.max_fails]
-        dead_keys = [canonical_key(r.get("ip", ""), r.get("port", 0)) for r in dead_nodes]
+        dead_keys = [
+            canonical_key(r.get("ip", ""), r.get("port", 0))
+            for r in dead_nodes
+            if r.get("ip") and safe_int(r.get("port"), 0) > 0
+        ]
         newly_tombstoned = record_tombstone(dead_keys)
         log.info("[ProxyIP 墓地] 已登记 %d 个淘汰死节点至墓地冷却库 (新增: %d 个, 隔离期 7 天)", len(dead_keys), newly_tombstoned)
     else:
@@ -476,8 +488,7 @@ async def async_main(args):
             stats["proxyip_elapsed"] = elapsed
             stats["proxyip_max_fails"] = args.max_fails
             stats["proxyip_avg_delay_ms"] = avg_delay
-            with open(fetch_stats_file, "w", encoding="utf-8") as f:
-                json.dump(stats, f, ensure_ascii=False, indent=2)
+            atomic_write_json(fetch_stats_file, stats)
             log.info("已将 ProxyIP 质检统计写入 %s (并入统一卡片)", fetch_stats_file)
         except Exception as e:
             log.warning("写入 %s 失败: %s", fetch_stats_file, e)
@@ -496,6 +507,7 @@ async def async_main(args):
             fail_2=proxyip_f2,
             buf_new=proxyip_buf_new,
             buf_rec=proxyip_buf_rec,
+            avg_delay=avg_delay,
         )
     else:
         log.info("已并入流水线或指定了 --no-notify，跳过独立卡片推送，由统一卡片汇总发送")
