@@ -40,6 +40,9 @@ PROXY_URL_RE = re.compile(
 )
 
 
+RE_DOMAIN_LABEL = re.compile(r"^[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$")
+
+
 def is_valid_host(host: str) -> bool:
     """验证主机名是否为有效 IPv4 地址或域名 (RFC 1035 / RFC 1123)"""
     if not host or len(host) > 253:
@@ -48,10 +51,7 @@ def is_valid_host(host: str) -> bool:
     if len(parts) == 4 and all(p.isascii() and p.isdigit() for p in parts):
         return all(0 <= int(p) <= 255 for p in parts)
     if len(parts) >= 2 and parts[-1].isalpha() and len(parts[-1]) >= 2:
-        return all(
-            0 < len(part) <= 63 and bool(re.match(r"^[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$", part))
-            for part in parts
-        )
+        return all(0 < len(part) <= 63 and bool(RE_DOMAIN_LABEL.match(part)) for part in parts)
     return False
 
 
@@ -553,12 +553,28 @@ def parse_otc_scan_content(
 
         asn = ""
         isp = ""
-        colo_loc = ""
+        colo = ""
+        loc = ""
         delay_ms = ""
         speed_kbs = ""
 
-        # 依次探测 ASN 编号 (ASxxxx 或纯数字)、Colo位置与 ISP
-        for p_val in rem_parts:
+        # 0. 预处理 rem_parts：若存在被空格切散的 IATA 航线机房码与括号备注（如 HKG (中国-香港)），或括号内部包含空格，予以合并
+        merged_parts = []
+        i = 0
+        while i < len(rem_parts):
+            p_cur = rem_parts[i]
+            if i + 1 < len(rem_parts) and p_cur.isupper() and len(p_cur) == 3 and rem_parts[i + 1].startswith("("):
+                merged_parts.append(p_cur + " " + rem_parts[i + 1])
+                i += 2
+            elif p_cur.startswith("(") and not p_cur.endswith(")") and i + 1 < len(rem_parts):
+                merged_parts.append(p_cur + " " + rem_parts[i + 1])
+                i += 2
+            else:
+                merged_parts.append(p_cur)
+                i += 1
+
+        # 依次探测 ASN 编号 (ASxxxx 或纯数字)、Colo位置、延时、速度与 ISP
+        for p_val in merged_parts:
             if not p_val or p_val.upper() in ("N/A", "-", "NULL", "NONE"):
                 continue
 
@@ -568,25 +584,44 @@ def parse_otc_scan_content(
                 asn = m_a.group(1).upper()
                 continue
 
-            # 2. 匹配纯数字 ASN (如 210644, 212336，扫描器常省略 AS 前缀)
-            if p_val.isdigit() and not asn:
+            # 2. 匹配测速下载带宽 (如 12.5MB/s, 1024KB/s, 100Mbps)
+            m_spd = re.search(r"^(\d+(?:\.\d+)?)\s*([kKmMgG]?[bB]/s|[kKmMgG]?bps)$", p_val, re.IGNORECASE)
+            if m_spd and not speed_kbs:
+                speed_kbs = parse_speed_to_kbs(p_val)
+                continue
+
+            # 3. 匹配显式带 ms 结尾的延迟数值 (如 145ms, 145.5ms)
+            m_del = re.search(r"^(\d+(?:\.\d+)?)\s*ms$", p_val, re.IGNORECASE)
+            if m_del and not delay_ms:
+                delay_ms = int(float(m_del.group(1)))
+                continue
+
+            # 4. 匹配机房位置字段 (如 HKG (中国-香港), FRA (德国-法兰克福), (中国-香港))
+            if "(" in p_val and ")" in p_val and not loc:
+                m_cl = re.match(r"^([A-Z]{3})\s*\((.*?)\)", p_val)
+                if m_cl:
+                    colo = m_cl.group(1)
+                    loc = m_cl.group(2)
+                else:
+                    loc = p_val.strip("()")
+                continue
+
+            # 5. 独立匹配纯三位大写 IATA 机房码 (如 HKG, SJC, NRT, FRA)
+            if p_val.isupper() and len(p_val) == 3 and not colo:
+                colo = p_val
+                continue
+
+            # 6. 识别纯数字：延迟 vs 纯数字 ASN 启发式区分
+            if p_val.isdigit():
                 val_int = int(p_val)
-                if 1 <= val_int <= 4294967295:
+                # 典型网络延迟大多分布在 1-3000ms 之间，若尚未提取到延迟则优先填补延迟
+                if not delay_ms and val_int < 3000:
+                    delay_ms = val_int
+                elif not asn and val_int >= 1000:
                     asn = f"AS{val_int}"
-                    continue
-
-            # 3. 匹配机房位置字段 (如 HKG (中国-香港), FRA (德国-法兰克福))
-            if "(" in p_val and ")" in p_val and not colo_loc:
-                colo_loc = p_val
                 continue
 
-            # 4. 识别延迟数值 (如 150ms, 150.5ms, 150)
-            m_d = re.search(r"^(\d+(?:\.\d+)?)\s*(?:ms)?$", p_val, re.IGNORECASE)
-            if m_d and not delay_ms:
-                delay_ms = int(float(m_d.group(1)))
-                continue
-
-            # 5. 识别 ISP 运营商名称 (排除 IPv6、机房位置括号、纯数字及短国家码)
+            # 7. 识别 ISP 运营商名称 (排除 IPv6、机房位置括号、纯数字及短国家码)
             if not isp and ":" not in p_val and "(" not in p_val and not p_val.isdigit():
                 if len(p_val) > 2 and not p_val.startswith("仅"):
                     isp = p_val
@@ -602,17 +637,11 @@ def parse_otc_scan_content(
         if not isp and asn and asn != "AS_UNKNOWN" and asn in ASN_TO_PROVIDER:
             isp = ASN_TO_PROVIDER[asn]
 
-        colo = ""
-        loc = colo_loc
-        if colo_loc:
-            m = re.match(r"^([A-Z]{3})\s*\((.*?)\)", colo_loc)
-            if m:
-                colo = m.group(1)
-                loc = m.group(2)
-        elif line_remark:
+        if not colo and line_remark:
             m_iata = re.search(r"\b([A-Z]{3})\b", line_remark)
             if m_iata:
                 colo = m_iata.group(1)
+        if not loc and line_remark:
             loc = line_remark
 
         asn, isp = resolve_and_clean_asn(ip, asn, isp)
@@ -636,6 +665,19 @@ def parse_otc_scan_content(
     return results
 
 
+RE_ATTACHMENT_PROXY_1 = re.compile(
+    r"^(?P<url>(?P<proto>socks5|http|https|turn|sstp)://(?:[^\s#@]+@[^@\s#]+@|[^\s#@]+@)?(?P<host>(?:\d{1,3}\.){3}\d{1,3}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}):(?P<port>\d{1,5}))",
+    re.IGNORECASE,
+)
+RE_ATTACHMENT_PROXY_2 = re.compile(
+    r"(?P<url>(?P<proto>socks5|http|https|turn|sstp)://(?:[^\s#@]+@)?(?P<host>(?:\d{1,3}\.){3}\d{1,3}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}):(?P<port>\d{1,5}))",
+    re.IGNORECASE,
+)
+RE_ATTACHMENT_PROXY_RAW = re.compile(
+    r"^((?:\d{1,3}\.){3}\d{1,3}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}):(\d{1,5})(?:@([a-zA-Z0-9]+))?"
+)
+
+
 def parse_proxy_attachment_content(text: str) -> list[tuple[str, str]]:
     """解析频道代理附件内容 (如 http_proxies.txt, https_proxies.txt, turn_proxies.txt 等)"""
     results = []
@@ -645,11 +687,7 @@ def parse_proxy_attachment_content(text: str) -> list[tuple[str, str]]:
         if not line or line.startswith("#"):
             continue
         # 1. 优先匹配行首标准代理格式（提取最真实的认证与节点信息，忽略后续 PTR 别名和中文评注）
-        m = re.match(
-            r"^(?P<url>(?P<proto>socks5|http|https|turn|sstp)://(?:[^\s#@]+@[^@\s#]+@|[^\s#@]+@)?(?P<host>(?:\d{1,3}\.){3}\d{1,3}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}):(?P<port>\d{1,5}))",
-            line,
-            re.IGNORECASE,
-        )
+        m = RE_ATTACHMENT_PROXY_1.match(line)
         if m:
             host = m.group("host")
             port = m.group("port")
@@ -662,11 +700,7 @@ def parse_proxy_attachment_content(text: str) -> list[tuple[str, str]]:
                 continue
 
         # 2. 回退普通提取（容错）
-        m_any = re.search(
-            r"(?P<url>(?P<proto>socks5|http|https|turn|sstp)://(?:[^\s#@]+@)?(?P<host>(?:\d{1,3}\.){3}\d{1,3}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}):(?P<port>\d{1,5}))",
-            line,
-            re.IGNORECASE,
-        )
+        m_any = RE_ATTACHMENT_PROXY_2.search(line)
         if m_any:
             host = m_any.group("host")
             port = m_any.group("port")
@@ -679,7 +713,7 @@ def parse_proxy_attachment_content(text: str) -> list[tuple[str, str]]:
                 continue
 
         # 3. 支持无 URL 协议头纯 IP:Port 或 IP:Port@proto 格式 (如 1.1.1.1:8080 或 2.2.2.2:1080@socks5)
-        m_raw = re.match(r"^((?:\d{1,3}\.){3}\d{1,3}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}):(\d{1,5})(?:@([a-zA-Z0-9]+))?", line)
+        m_raw = RE_ATTACHMENT_PROXY_RAW.match(line)
         if m_raw:
             host = m_raw.group(1)
             port = m_raw.group(2)
