@@ -287,7 +287,7 @@ async def verify_proxyips(
             return
 
         lock_key = f"{ip}:{port}"
-        async with get_keyed_lock(lock_key), sem:
+        async with sem, get_keyed_lock(lock_key):
             alive, latency, colo = await probe_proxyip(
                 ip, port, connect_timeout=timeout, http_timeout=http_timeout
             )

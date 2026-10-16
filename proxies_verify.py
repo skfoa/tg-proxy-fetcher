@@ -25,6 +25,7 @@ import atexit
 import base64
 import concurrent.futures
 import csv
+import functools
 import ipaddress
 import json
 import logging
@@ -300,6 +301,7 @@ async def check_sstp_exit_cf_worker(
 
 # ---------- 协议探测实现 ----------
 
+@functools.lru_cache(maxsize=8192)
 def is_ip_literal(host: str) -> bool:
     """快速判断 host 是否为 IP 字面量地址 (IPv4/IPv6)，杜绝向 DoH 发起无意义的 IP 域名反解"""
     if not host or not isinstance(host, str):
@@ -867,7 +869,7 @@ async def probe_sstp(
 
 async def probe_single(
     row: dict,
-    sem: asyncio.Semaphore,
+    sem: asyncio.Semaphore | None = None,
     timeout: float = TIMEOUT,
     http_timeout: float = HTTP_TIMEOUT,
     sstp_timeout: float = SSTP_TIMEOUT,
@@ -879,127 +881,142 @@ async def probe_single(
     http_max_fails: int = HTTP_MAX_FAILS,
 ) -> dict:
     """协议分流路由与执行"""
-    async with sem:
-        proto = row.get("proto", "socks5").lower()
-        host = row.get("host", "")
-        port = safe_int(row.get("port"), 0)
-        user = row.get("user") or None
-        pwd = row.get("pwd") or None
+    if sem is not None:
+        async with sem:
+            return await probe_single(
+                row,
+                sem=None,
+                timeout=timeout,
+                http_timeout=http_timeout,
+                sstp_timeout=sstp_timeout,
+                cf_check_endpoint=cf_check_endpoint,
+                cf_executor=cf_executor,
+                http_probe_timeout=http_probe_timeout,
+                http_max_latency_ms=http_max_latency_ms,
+                max_fails=max_fails,
+                http_max_fails=http_max_fails,
+            )
 
-        if proto == "socks5":
-            is_alive, delay_ms, status, colo, country, egress_ip = await probe_socks5(
-                host, port, user, pwd, timeout, http_timeout
+    proto = row.get("proto", "socks5").lower()
+    host = row.get("host", "")
+    port = safe_int(row.get("port"), 0)
+    user = row.get("user") or None
+    pwd = row.get("pwd") or None
+
+    if proto == "socks5":
+        is_alive, delay_ms, status, colo, country, egress_ip = await probe_socks5(
+            host, port, user, pwd, timeout, http_timeout
+        )
+    elif proto == "http":
+        h_conn_to = min(timeout, http_probe_timeout)
+        h_read_to = min(http_timeout, http_probe_timeout)
+        is_alive, delay_ms, status, colo, country, egress_ip = await probe_http(
+            host,
+            port,
+            user,
+            pwd,
+            h_conn_to,
+            h_read_to,
+            max_latency_ms=http_max_latency_ms,
+        )
+    elif proto == "https":
+        is_alive, delay_ms, status, colo, country, egress_ip = await probe_https(
+            host, port, user, pwd, max(timeout, 7.0), http_timeout
+        )
+    elif proto == "turn":
+        is_alive, delay_ms, status, colo, country, egress_ip = await probe_turn(
+            host, port, timeout, http_timeout
+        )
+    elif proto == "sstp":
+        if cf_check_endpoint:
+            # SSTP 直通 Cloudflare Worker 进行端到端全隧道 PPP 拨号与出口探测，单步到位
+            t_cf0 = time.monotonic()
+            cf_res = await check_sstp_exit_cf_worker(
+                cf_check_endpoint, host, port, user, pwd, timeout=18.0, executor=cf_executor
             )
-        elif proto == "http":
-            h_conn_to = min(timeout, http_probe_timeout)
-            h_read_to = min(http_timeout, http_probe_timeout)
-            is_alive, delay_ms, status, colo, country, egress_ip = await probe_http(
-                host,
-                port,
-                user,
-                pwd,
-                h_conn_to,
-                h_read_to,
-                max_latency_ms=http_max_latency_ms,
-            )
-        elif proto == "https":
-            is_alive, delay_ms, status, colo, country, egress_ip = await probe_https(
-                host, port, user, pwd, max(timeout, 7.0), http_timeout
-            )
-        elif proto == "turn":
-            is_alive, delay_ms, status, colo, country, egress_ip = await probe_turn(
-                host, port, timeout, http_timeout
-            )
-        elif proto == "sstp":
-            if cf_check_endpoint:
-                # SSTP 直通 Cloudflare Worker 进行端到端全隧道 PPP 拨号与出口探测，单步到位
-                t_cf0 = time.monotonic()
-                cf_res = await check_sstp_exit_cf_worker(
-                    cf_check_endpoint, host, port, user, pwd, timeout=18.0, executor=cf_executor
+            if cf_res.get("success"):
+                is_alive = True
+                calc_delay = max(1, int((time.monotonic() - t_cf0) * 1000))
+                delay_ms = safe_int(
+                    cf_res.get("responseTime") or cf_res.get("latency_ms") or cf_res.get("time") or calc_delay,
+                    calc_delay,
                 )
-                if cf_res.get("success"):
-                    is_alive = True
-                    calc_delay = max(1, int((time.monotonic() - t_cf0) * 1000))
-                    delay_ms = safe_int(
-                        cf_res.get("responseTime") or cf_res.get("latency_ms") or cf_res.get("time") or calc_delay,
-                        calc_delay,
-                    )
-                    status = "alive"
-                    colo = "-"
+                status = "alive"
+                colo = "-"
+                country = ""
+                egress_ip = ""
+                exit_info = cf_res.get("exit") or {}
+                exit_ip = str(exit_info.get("ip") or "").strip()
+                if is_valid_public_ip(exit_ip):
+                    egress_ip = exit_ip
+                c_code = str(exit_info.get("country_code") or exit_info.get("country") or "").strip().upper()
+                if c_code:
+                    country = c_code
+                # 若 Worker 已附带 ASN/ISP 归属，直接结构化丰富
+                asn_obj = exit_info.get("asn") or {}
+                cf_asn = str(asn_obj.get("asn") or "").strip()
+                cf_isp = str(asn_obj.get("name") or asn_obj.get("org") or "").strip()
+                if cf_asn:
+                    row["asn"] = format_asn_isp(cf_asn, cf_isp)
+                    row["isp"] = cf_isp
+                    row["net_type"] = classify_asn(cf_asn, cf_isp)
+            else:
+                if cf_res.get("network_error"):
+                    # Worker 侧网络抖动或请求 Worker 自身超时，不应归罪节点；保持原状态，不递增 fail_count
+                    log.debug("SSTP 节点 [%s:%s] 遇到 Worker 侧网络抖动: %s", host, port, cf_res.get("error"))
+                    is_alive = False
+                    delay_ms = 0
+                    status = "worker_unreachable"
+                    colo = ""
                     country = ""
                     egress_ip = ""
-                    exit_info = cf_res.get("exit") or {}
-                    exit_ip = str(exit_info.get("ip") or "").strip()
-                    if is_valid_public_ip(exit_ip):
-                        egress_ip = exit_ip
-                    c_code = str(exit_info.get("country_code") or exit_info.get("country") or "").strip().upper()
-                    if c_code:
-                        country = c_code
-                    # 若 Worker 已附带 ASN/ISP 归属，直接结构化丰富
-                    asn_obj = exit_info.get("asn") or {}
-                    cf_asn = str(asn_obj.get("asn") or "").strip()
-                    cf_isp = str(asn_obj.get("name") or asn_obj.get("org") or "").strip()
-                    if cf_asn:
-                        row["asn"] = format_asn_isp(cf_asn, cf_isp)
-                        row["isp"] = cf_isp
-                        row["net_type"] = classify_asn(cf_asn, cf_isp)
                 else:
-                    if cf_res.get("network_error"):
-                        # Worker 侧网络抖动或请求 Worker 自身超时，不应归罪节点；保持原状态，不递增 fail_count
-                        log.debug("SSTP 节点 [%s:%s] 遇到 Worker 侧网络抖动: %s", host, port, cf_res.get("error"))
-                        is_alive = False
-                        delay_ms = 0
-                        status = "worker_unreachable"
-                        colo = ""
-                        country = ""
-                        egress_ip = ""
-                    else:
-                        # 节点在 Worker 端全隧道 PPP 协商失败（如连接被服务端关闭、隧道拨号超时）
-                        err_msg = cf_res.get("error", "sstp_vpn_fail")
-                        log.debug("SSTP 节点 [%s:%s] Worker 全隧道拨号失败: %s", host, port, err_msg)
-                        is_alive = False
-                        delay_ms = 0
-                        status = "sstp_vpn_fail"
-                        colo = ""
-                        country = ""
-                        egress_ip = ""
-            else:
-                # 未配置外部检测端点，执行本地轻量握手探测（无外部依赖）
-                is_alive, delay_ms, status, colo, country, egress_ip = await probe_sstp(
-                    host, port, user, pwd, sstp_timeout, max(http_timeout, SSTP_READ_TIMEOUT)
-                )
+                    # 节点在 Worker 端全隧道 PPP 协商失败（如连接被服务端关闭、隧道拨号超时）
+                    err_msg = cf_res.get("error", "sstp_vpn_fail")
+                    log.debug("SSTP 节点 [%s:%s] Worker 全隧道拨号失败: %s", host, port, err_msg)
+                    is_alive = False
+                    delay_ms = 0
+                    status = "sstp_vpn_fail"
+                    colo = ""
+                    country = ""
+                    egress_ip = ""
         else:
-            is_alive, delay_ms, status, colo, country, egress_ip = False, 0, "unknown_proto", "", "", ""
+            # 未配置外部检测端点，执行本地轻量握手探测（无外部依赖）
+            is_alive, delay_ms, status, colo, country, egress_ip = await probe_sstp(
+                host, port, user, pwd, sstp_timeout, max(http_timeout, SSTP_READ_TIMEOUT)
+            )
+    else:
+        is_alive, delay_ms, status, colo, country, egress_ip = False, 0, "unknown_proto", "", "", ""
 
-        row["is_alive"] = is_alive
-        row["status"] = status
+    row["is_alive"] = is_alive
+    row["status"] = status
 
-        fc = safe_int(row.get("fail_count"), 0)
-        row["_old_fc"] = fc
-        if is_alive:
-            row["fail_count"] = 0
-            row["delay_ms"] = delay_ms
-            row["colo"] = colo
-            row["country"] = country or row.get("country", "")
-            row["egress_ip"] = egress_ip or row.get("egress_ip", "")
+    fc = safe_int(row.get("fail_count"), 0)
+    row["_old_fc"] = fc
+    if is_alive:
+        row["fail_count"] = 0
+        row["delay_ms"] = delay_ms
+        row["colo"] = colo
+        row["country"] = country or row.get("country", "")
+        row["egress_ip"] = egress_ip or row.get("egress_ip", "")
+    else:
+        eff_max_fails = http_max_fails if proto == "http" else max_fails
+        if status in FATAL_FAIL_STATUSES:
+            row["fail_count"] = eff_max_fails
+        elif status == "worker_unreachable":
+            row["fail_count"] = fc  # Worker 侧网络抖动，保持原有 fail_count，不扣节点分数
         else:
-            eff_max_fails = http_max_fails if proto == "http" else max_fails
-            if status in FATAL_FAIL_STATUSES:
-                row["fail_count"] = eff_max_fails
-            elif status == "worker_unreachable":
-                row["fail_count"] = fc  # Worker 侧网络抖动，保持原有 fail_count，不扣节点分数
-            else:
-                row["fail_count"] = fc + 1
-            if not row.get("delay_ms"):
-                row["delay_ms"] = 0
-            row.setdefault("country", row.get("country", ""))
-            row.setdefault("egress_ip", row.get("egress_ip", ""))
-            row.setdefault("asn", row.get("asn", ""))
-            row.setdefault("isp", row.get("isp", ""))
-            row.setdefault("net_type", row.get("net_type", ""))
-            row.setdefault("source", row.get("source", ""))
+            row["fail_count"] = fc + 1
+        if not row.get("delay_ms"):
+            row["delay_ms"] = 0
+        row.setdefault("country", row.get("country", ""))
+        row.setdefault("egress_ip", row.get("egress_ip", ""))
+        row.setdefault("asn", row.get("asn", ""))
+        row.setdefault("isp", row.get("isp", ""))
+        row.setdefault("net_type", row.get("net_type", ""))
+        row.setdefault("source", row.get("source", ""))
 
-        return row
+    return row
 
 
 # ---------- 数据加载与保存 ----------
@@ -1442,20 +1459,21 @@ async def async_main(args):
         host = r.get("host", "")
         port = r.get("port", 0)
         lock_key = f"{host}:{port}"
-        async with get_keyed_lock(lock_key):
-            res = await probe_single(
-                r,
-                sem,
-                args.timeout,
-                args.http_timeout,
-                args.sstp_timeout,
-                cf_check_endpoint=cf_endpoint,
-                cf_executor=cf_executor,
-                http_probe_timeout=h_to,
-                http_max_latency_ms=h_lat,
-                max_fails=args.max_fails,
-                http_max_fails=h_mf,
-            )
+        async with sem:
+            async with get_keyed_lock(lock_key):
+                res = await probe_single(
+                    r,
+                    sem=None,
+                    timeout=args.timeout,
+                    http_timeout=args.http_timeout,
+                    sstp_timeout=args.sstp_timeout,
+                    cf_check_endpoint=cf_endpoint,
+                    cf_executor=cf_executor,
+                    http_probe_timeout=h_to,
+                    http_max_latency_ms=h_lat,
+                    max_fails=args.max_fails,
+                    http_max_fails=h_mf,
+                )
         completed += 1
 
         proto = res.get("proto", "unknown")
