@@ -506,13 +506,15 @@ def send_verify_notification(
         elif proxyips_count > 0:
             proxyip_line = f"🔀 <b>反代 ProxyIP</b>：<code>{proxyips_count}</code> 条 ({format_diff(new_proxyips, updated_proxyips)})\n"
 
-        verify_items = [
-            f"   • 优选检验：TLS 握手 + HTTP 301 ({concurrency} 并发)",
-        ]
+        specs = ["优选 TLS+301"]
         if proxies_verified:
-            verify_items.append("   • 代理检验：RFC 1928 全协议穿透鉴真")
+            specs.append("代理多协议穿透")
         if proxyip_verified:
-            verify_items.append("   • 反代检验：/cdn-cgi/trace 穿透鉴真")
+            specs.append("反代 CDN 鉴真")
+        spec_str = f" ({' · '.join(specs)})" if specs else ""
+        verify_items = [
+            f"   • 质检规范：全链路穿透鉴真{spec_str}",
+        ]
 
         total_buf_new = (
             fetch_stats.get("proxies_buf_new", fetch_stats.get("socks_buf_new", 0))

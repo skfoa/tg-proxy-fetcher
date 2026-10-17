@@ -1382,7 +1382,7 @@ def send_proxies_notification(
         f"📊 <b>协议分布</b>：\n{proto_str}"
         f"{net_str}\n"
         f"{div}\n"
-        f"⚙️ <b>检测规格</b>：RFC 1928 中继穿透 · {concurrency} 并发\n"
+        f"⚙️ <b>检测规格</b>：多协议全链路穿透 · {concurrency} 并发\n"
         f"⏱️ <b>质检耗时</b>：{elapsed:.1f}s\n"
     )
 
