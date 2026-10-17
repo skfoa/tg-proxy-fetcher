@@ -5546,7 +5546,7 @@
     "AS23679": "isp",
     "AS23688": "isp",
     "AS23700": "isp",
-    "AS23724": "isp",
+    "AS23724": "datacenter",
     "AS23783": "isp",
     "AS23889": "isp",
     "AS23923": "isp",
@@ -7614,6 +7614,7 @@
     "AS59019": "datacenter",
     "AS137280": "datacenter",
     "AS198100": "datacenter",
-    "AS20071": "datacenter"
+    "AS20071": "datacenter",
+    "AS396986": "datacenter"
   }
 }

@@ -8902,10 +8902,10 @@
 86.53.110.15,443,true,1737,,FRA,欧洲 · 法兰克福 · 德国,AS3257 GTT Communications,GTT Communications Inc.,2026-10-02 00:22:15,@danfeng_chat,0
 216.36.88.130,443,true,33,,LAX,北美洲 · 洛杉矶 · 美国,AS3257 GTT Communications,GTT Communications Inc.,2026-10-02 00:19:26,@danfeng_chat,2
 103.53.80.84,443,true,391,,TPE,中国-台北,AS3258 xTom Japan (Hostsymbol Pte. Ltd.),Hostsymbol Pte. Ltd.,2026-09-23 08:23:46,@otcfxq,0
-45.153.246.5,443,true,424,,HKG,中国-香港,AS3258 xTom Japan (xTom Japan Corporation),xTom Japan Corporation,2026-09-23 08:23:46,@otcfxq,0
+45.153.246.5,443,true,424,,HKG,中国-香港,AS3258 xTom Japan Corporation,xTom Japan Corporation,2026-09-23 08:23:46,@otcfxq,0
 45.143.234.108,443,true,457,,TPE,中国-台北,AS3258 xTom Japan (xTom GmbH),xTom GmbH,2026-09-23 08:23:46,@otcfxq,0
 103.53.80.24,443,true,469,,NRT,亚太 · 日本东京,AS3258 xTom Japan (XTOMTOKYO),XTOMTOKYO,2026-09-29 08:38:13,@danfeng_chat,0
-45.66.129.36,443,true,496,,TPE,中国-台北,AS3258 xTom Japan (xTom Japan Corporation),xTom Japan Corporation,2026-09-23 08:23:46,@otcfxq,0
+45.66.129.36,443,true,496,,TPE,中国-台北,AS3258 xTom Japan Corporation,xTom Japan Corporation,2026-09-23 08:23:46,@otcfxq,0
 45.94.40.102,443,true,1816,,NRT,亚太 · 日本东京,AS3258 xTom Japan (XTOMTOKYO),XTOMTOKYO,2026-09-29 08:38:13,@danfeng_chat,0
 45.129.8.49,443,true,2826,,NRT,亚太 · 日本东京,AS3258 xTom Japan (XTOMTOKYO),XTOMTOKYO,2026-09-29 08:38:13,@danfeng_chat,1
 151.242.180.19,443,true,582,,HKG,亚洲 · 香港,"AS3356 Level 3 Communications (Level 3 Parent, LLC)","Level 3 Parent, LLC",2026-10-02 00:15:19,@danfeng_chat,0
@@ -12984,7 +12984,7 @@
 179.255.123.150,2053,true,227,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-10-16 18:36:36,@otcfxq,0
 179.253.231.31,443,true,227,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-10-16 18:36:36,@otcfxq,0
 179.253.254.16,8443,true,227,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-10-16 18:36:36,@otcfxq,0
-179.255.137.148,443,true,228,,LAX,美国-洛杉矶,AS906 DMIT (Cloudflare London LLC),Cloudflare London LLC,2026-10-16 18:36:36,@otcfxq,0
+179.255.137.148,443,true,228,,LAX,美国-洛杉矶,AS906 DMIT Cloud Services,DMIT Cloud Services,2026-10-16 18:36:36,@otcfxq,0
 179.255.115.23,8443,true,228,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-10-16 18:36:36,@otcfxq,0
 179.253.225.245,8443,true,229,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-10-16 18:36:36,@otcfxq,0
 179.255.136.151,443,true,229,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-10-16 18:36:36,@otcfxq,0

@@ -173,6 +173,8 @@ KNOWN_CLOUD_PROVIDERS = {
     "desivps": ("AS133619", "DESIVPS"),
     "timeweb": ("AS210976", "Timeweb, LLP"),
     "globaltelehost": ("AS62563", "GlobalTeleHost Corp."),
+    "hexcore": ("AS199144", "HexCore cloud s.r.o."),
+    "edis": ("AS57169", "EDIS GmbH"),
 
     # 运营商骨干与出海线路
     "hinet": ("AS3462", "Chunghwa Telecom HiNet"),
@@ -228,6 +230,11 @@ _CORE_BASELINE_NET_TYPES: dict[str, str] = {
     "AS906": "datacenter",    # DMIT Cloud Services (ipinfo: Hosting)
     "AS214195": "datacenter", # Tres Teknoloji A.S. (ipinfo: Hosting)
     "AS8796": "datacenter",   # FASTNET DATA INC (Kurun Cloud, ipinfo: Hosting)
+    "AS26042": "datacenter",  # FiberState, LLC (ipinfo: Hosting)
+    "AS199144": "datacenter", # HexCore cloud s.r.o. (ipinfo: Hosting)
+    "AS57169": "datacenter",  # EDIS GmbH (ipinfo: Hosting)
+    "AS396986": "datacenter", # Bytedance Inc. (ipinfo: Hosting)
+    "AS23724": "datacenter",  # IDC, China Telecommunications Corporation (ipinfo: Hosting)
     # 核心云厂商机房 (权威锁定为 datacenter)
     "AS13335": "datacenter",  # Cloudflare
     "AS15169": "datacenter",  # Google

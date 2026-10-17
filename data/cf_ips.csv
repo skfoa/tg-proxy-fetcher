@@ -66,7 +66,7 @@
 18.180.25.22,443,true,433,,NRT,亚太 · 日本东京,AS16509 Amazon AWS (Amazon Technologies Inc.),Amazon Technologies Inc.,2026-10-14 00:00:29,@danfeng_chat,0
 154.19.187.81,2052,true,433,,NRT,亚太 · 日本东京,AS149042 Silicon Cloud Global (US) (HONGKONG),"SICLOUD INFORMATION TECHNOLOGY (HONGKONG) CO., LIMITED",2026-10-12 06:00:28,@danfeng_chat,0
 142.248.139.237,51982,true,433,,NRT,亚太 · 日本东京,AS137535 JT Telecom,JT TELECOM INTERNATIONAL PTE.LTD.,2026-09-13 12:00:29,@danfeng_chat,0
-166.88.100.64,22222,true,436,,KIX,亚太 · 大阪,AS149440 Evoxt (Ace Data Centers II),Ace Data Centers II,2026-09-15 12:00:28,@danfeng_chat,0
+166.88.100.64,22222,true,436,,KIX,亚太 · 大阪,AS149440 Evoxt Sdn. Bhd.,Evoxt Sdn. Bhd.,2026-09-15 12:00:28,@danfeng_chat,0
 216.195.205.178,1891,true,437,,NRT,亚太 · 日本东京,AS138997 Eons Data,Eons Data Communications Limited,2026-10-14 18:00:28,@danfeng_chat,0
 166.88.99.195,443,true,437,,KIX,亚太 · 大阪,AS149440 Evoxt,Evoxt Sdn. Bhd.,2026-10-11 18:00:31,@danfeng_chat,0
 154.83.94.119,18181,true,437,,NRT,亚太 · 日本东京,AS61112 AkileCloud (Akile LTD),Akile LTD,2026-10-07 00:00:28,@danfeng_chat,0
@@ -74,10 +74,10 @@
 216.195.203.252,1891,true,437,,NRT,亚太 · 日本东京,AS138997 Eons Data,Eons Data Communications Limited,2026-09-23 18:00:33,@danfeng_chat,0
 147.78.246.169,22658,true,437,,NRT,亚太 · 日本东京,AS3258 VirMach,VIRMACH,2026-09-14 12:00:33,@danfeng_chat,0
 216.236.1.34,1891,true,437,,NRT,亚太 · 日本东京,AS138997 Eons Data,Eons Data Communications Limited,2026-09-11 12:00:27,@danfeng_chat,0
-185.200.65.176,10443,true,438,,NRT,亚太 · 日本东京,AS3258 VirMach (xTom Japan Corporation),xTom Japan Corporation,2026-09-12 12:00:28,@danfeng_chat,0
+185.200.65.176,10443,true,438,,NRT,亚太 · 日本东京,AS3258 xTom Japan Corporation,xTom Japan Corporation,2026-09-12 12:00:28,@danfeng_chat,0
 77.90.35.230,45513,true,440,,SYD,大洋洲 · 澳大利亚悉尼,"AS63473 HostHatch, LLC",HostHatch,2026-10-07 18:00:32,@danfeng_chat,0
 14.137.235.178,443,true,440,,NRT,亚太 · 日本东京,AS2497 Internet Initiative Japan Inc.,Internet Initiative Japan Inc.,2026-10-07 12:00:22,@danfeng_chat,0
-195.245.242.47,10312,true,440,,NRT,亚太 · 日本东京,AS3258 VirMach (xTom Japan Corporation),xTom Japan Corporation,2026-09-28 06:00:30,@danfeng_chat,0
+195.245.242.47,10312,true,440,,NRT,亚太 · 日本东京,AS3258 xTom Japan Corporation,xTom Japan Corporation,2026-09-28 06:00:30,@danfeng_chat,0
 194.122.83.139,24443,true,440,,BOM,亚太 · 印度孟买,AS152179 Global Communication Network,Global Communication Network Limited,2026-09-25 12:00:28,@danfeng_chat,0
 45.120.157.69,443,true,440,,NRT,亚太 · 日本东京,AS134835 Starry Network,Starry Network Limited,2026-09-25 00:00:27,@danfeng_chat,0
 154.31.114.162,8443,true,440,,NRT,亚洲 · 日本东京,AS906 DMIT,DMIT Cloud Services,2026-09-08 16:34:36,@otcfxq,0
@@ -91,11 +91,11 @@
 155.117.83.43,34214,true,467,,HKG,亚太 · 香港,AS50385 HaloCloud,HaloCloud Network Limited,2026-09-29 06:00:31,@danfeng_chat,0
 216.236.51.162,1891,true,467,,HKG,亚太 · 香港,AS138997 Eons Data,Eons Data Communications Limited,2026-09-27 12:00:29,@danfeng_chat,0
 64.83.37.198,20096,true,467,,NRT,亚太 · 日本东京,AS979 NetLab,NetLab Global,2026-09-17 00:00:28,@danfeng_chat,0
-216.23.117.130,443,true,468,,HKG,亚太 · 香港,AS42960 VHGLOBAL (Xnnet LLC),Xnnet LLC,2026-10-12 18:00:33,@danfeng_chat,0
+216.23.117.130,443,true,468,,HKG,亚太 · 香港,AS42960 VH Global Limited,VH Global Limited,2026-10-12 18:00:33,@danfeng_chat,0
 198.176.54.11,33344,true,471,,HKG,亚太 · 香港,AS400618 Prime Security,Prime Security Corp,2026-10-16 18:00:28,@danfeng_chat,0
 96.9.212.206,60093,true,475,,SIN,亚洲 · 新加坡新加坡,AS8888 xTom,xTom Pty Ltd,2026-09-09 10:59:23,@otcfxq,0
 31.57.224.190,19343,true,483,,SIN,亚太 · 新加坡,"AS63473 HostHatch, LLC",HostHatch,2026-10-08 06:00:22,@danfeng_chat,0
-38.55.104.108,443,true,487,,HKG,亚太 · 香港,AS967 VMISS Inc (Xnnet LLC),Xnnet LLC,2026-09-26 00:00:33,@danfeng_chat,0
+38.55.104.108,443,true,487,,HKG,亚太 · 香港,AS932 VH Global (XNNET LLC),XNNET LLC,2026-09-26 00:00:33,@danfeng_chat,0
 38.55.122.83,443,true,488,,HKG,亚太 · 香港,AS6134 Xnnet,Xnnet LLC,2026-10-13 12:00:24,@danfeng_chat,0
 54.251.138.69,443,true,488,,SIN,亚太 · 新加坡,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",2026-10-09 06:00:32,@danfeng_chat,0
 82.109.96.73,443,true,489,,SIN,亚太 · 新加坡,AS142433 DATAWAVE GLOBAL LLC,Datawave Global LLC,2026-09-30 12:00:27,@danfeng_chat,0
@@ -121,7 +121,7 @@
 202.144.192.176,16686,true,435,,NRT,亚太 · 日本东京,AS63916 IPTELECOM Global (IPTELECOM ASIA - Japan Tokyo),IPTELECOM ASIA - Japan Tokyo,2026-09-22 18:00:32,@danfeng_chat,1
 103.103.245.105,443,true,492,,HKG,亚太 · 香港,AS40065 CNSERVERS LLC,Cnservers LLC,2026-10-03 12:00:32,@danfeng_chat,1
 4.236.130.132,443,true,222,,IAD,北美洲 · 美国阿什伯恩,AS8075 Microsoft Azure (Microsoft Corporation),Microsoft Corporation,2026-09-26 12:00:33,@danfeng_chat,2
-166.88.97.57,8443,true,293,,KIX,亚太 · 大阪,AS149440 Evoxt (Ace Data Centers II),Ace Data Centers II,2026-10-09 00:00:32,@danfeng_chat,2
+166.88.97.57,8443,true,293,,KIX,亚太 · 大阪,AS149440 Evoxt Sdn. Bhd.,Evoxt Sdn. Bhd.,2026-10-09 00:00:32,@danfeng_chat,2
 45.8.173.13,443,true,293,,NRT,亚太 · 日本东京,AS197196 Panstar Cloud Limited,Panstar Cloud Limited,2026-10-04 00:00:29,@danfeng_chat,2
-23.27.11.113,8443,true,293,,KIX,亚太 · 大阪,AS149440 Evoxt (Ace Data Centers II),Ace Data Centers II,2026-09-30 00:00:30,@danfeng_chat,2
+23.27.11.113,8443,true,293,,KIX,亚太 · 大阪,AS149440 Evoxt Sdn. Bhd.,Evoxt Sdn. Bhd.,2026-09-30 00:00:30,@danfeng_chat,2
 188.253.125.198,24211,true,749,,SIN,亚太 · 新加坡,AS38136 Akari Networks Limited,Akari Networks Limited,2026-09-27 18:00:28,@danfeng_chat,2

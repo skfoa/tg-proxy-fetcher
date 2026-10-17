@@ -966,7 +966,7 @@ turn://103.125.217.26:3479,turn,103.125.217.26,3479,497,0,alive,-,SG,103.125.217
 turn://47.105.56.46:3478,turn,47.105.56.46,3478,497,0,alive,-,CN,47.105.56.46,AS37963 Hangzhou Alibaba Advertising Co,Hangzhou Alibaba Advertising Co,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://47.115.201.207:3478,turn,47.115.201.207,3478,498,0,alive,-,CN,47.115.201.207,AS37963 Hangzhou Alibaba Advertising Co,"Hangzhou Alibaba Advertising Co., Ltd.",datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://182.92.236.190:3478,turn,182.92.236.190,3478,499,0,alive,-,CN,182.92.236.190,AS37963 Hangzhou Alibaba Advertising Co,Hangzhou Alibaba Advertising Co,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://116.196.117.21:3479,turn,116.196.117.21,3479,501,0,alive,-,CN,116.196.117.21,"AS23724 IDC, China Telecommunications Corporation","IDC, China Telecommunications Corporation",isp,2026-10-01 00:00:00,@danfeng_chat
+turn://116.196.117.21:3479,turn,116.196.117.21,3479,501,0,alive,-,CN,116.196.117.21,"AS23724 IDC, China Telecommunications Corporation","IDC, China Telecommunications Corporation",datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://112.90.177.10:3479,turn,112.90.177.10,3479,504,0,alive,-,CN,112.90.177.10,AS17816 China Unicom IP network China169 Guangdong province (China Unicom CHINA169 Guangdong Province Network),China Unicom CHINA169 Guangdong Province Network,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://120.27.218.167:3478,turn,120.27.218.167,3478,504,0,alive,-,CN,120.27.218.167,AS37963 Hangzhou Alibaba Advertising Co,Hangzhou Alibaba Advertising Co,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://120.233.122.250:3478,turn,120.233.122.250,3478,506,0,alive,-,CN,120.233.122.250,AS9808 China Mobile,China Mobile,isp,2026-10-01 00:00:00,@danfeng_chat
@@ -987,7 +987,7 @@ turn://156.226.108.73:3478,turn,156.226.108.73,3478,521,0,alive,-,HK,156.226.108
 turn://myuser:mypassword@52.66.165.251:3478,turn,52.66.165.251,3478,525,0,alive,-,IN,52.66.165.251,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://123.150.1.2:3478,turn,123.150.1.2,3478,525,0,alive,-,CN,123.150.1.2,AS17638 ASN for TIANJIN Provincial Net of CT,ASN for TIANJIN Provincial Net of CT,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://47.76.28.111:3478,turn,47.76.28.111,3478,526,0,alive,-,HK,47.76.28.111,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
-turn://116.196.117.21:3478,turn,116.196.117.21,3478,526,0,alive,-,CN,116.196.117.21,"AS23724 IDC, China Telecommunications Corporation","IDC, China Telecommunications Corporation",isp,2026-10-01 00:00:00,@danfeng_chat
+turn://116.196.117.21:3478,turn,116.196.117.21,3478,526,0,alive,-,CN,116.196.117.21,"AS23724 IDC, China Telecommunications Corporation","IDC, China Telecommunications Corporation",datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://122.143.2.124:3478,turn,122.143.2.124,3478,536,0,alive,-,CN,122.143.2.124,AS4837 China Unicom,China Unicom,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://180.102.135.166:3479,turn,180.102.135.166,3479,539,0,alive,-,CN,180.102.135.166,AS134756 CHINANET Nanjing Jishan IDC network (China Telecom),China Telecom,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://47.243.51.3:3479,turn,47.243.51.3,3479,541,0,alive,-,HK,47.243.51.3,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -998,7 +998,7 @@ turn://156.226.107.57:3478,turn,156.226.107.57,3478,594,0,alive,-,HK,156.226.107
 turn://120.233.122.253:3478,turn,120.233.122.253,3478,594,0,alive,-,CN,120.233.122.253,AS9808 China Mobile,China Mobile,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://47.99.184.62:3479,turn,47.99.184.62,3479,596,0,alive,-,CN,47.99.184.62,AS37963 Hangzhou Alibaba Advertising Co,"Hangzhou Alibaba Advertising Co., Ltd.",datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://39.91.177.219:3478,turn,39.91.177.219,3478,596,0,alive,-,CN,39.91.177.219,AS4837 China Unicom,China Unicom,isp,2026-10-01 00:00:00,@danfeng_chat
-turn://admin:123456@49.7.64.13:3478,turn,49.7.64.13,3478,623,0,alive,-,CN,49.7.64.13,"AS23724 IDC, China Telecommunications Corporation","IDC, China Telecommunications Corporation",isp,2026-10-01 00:00:00,@danfeng_chat
+turn://admin:123456@49.7.64.13:3478,turn,49.7.64.13,3478,623,0,alive,-,CN,49.7.64.13,"AS23724 IDC, China Telecommunications Corporation","IDC, China Telecommunications Corporation",datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://103.92.225.135:3479,turn,103.92.225.135,3479,632,0,alive,-,ID,103.92.225.135,AS136823 PT. Arka Data Primatama,PT. Arka Data Primatama,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://47.99.184.62:3478,turn,47.99.184.62,3478,637,0,alive,-,CN,47.99.184.62,AS37963 Hangzhou Alibaba Advertising Co,"Hangzhou Alibaba Advertising Co., Ltd.",datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://103.143.81.42:3479,turn,103.143.81.42,3479,641,0,alive,-,HK,103.143.81.42,AS139659 LUCIDACLOUD LIMITED,LUCIDACLOUD LIMITED,datacenter,2026-10-01 00:00:00,@danfeng_chat
