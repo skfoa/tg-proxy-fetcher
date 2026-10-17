@@ -33,15 +33,18 @@ KNOWN_CLOUD_PROVIDERS = {
     "hwcloud": ("AS136907", "Huawei Cloud"),
     "huawei": ("AS136907", "Huawei Cloud"),
     "huaweicloud": ("AS136907", "Huawei Cloud"),
-    "ucloud": ("AS138915", "UCloud"),
+    "ucloud": ("AS135377", "UCloud"),
     "baidu": ("AS38365", "Baidu Cloud"),
     "bce": ("AS38365", "Baidu Cloud"),
     "volcengine": ("AS138699", "ByteDance Volcengine"),
     "bytedance": ("AS138699", "ByteDance Volcengine"),
-    "jdcloud": ("AS44907", "JD Cloud"),
-    "jcloud": ("AS44907", "JD Cloud"),
-    "ksyun": ("AS45062", "Kingsoft Cloud"),
-    "kingsoft": ("AS45062", "Kingsoft Cloud"),
+    "jdcloud": ("AS137753", "JD Cloud"),
+    "jcloud": ("AS137753", "JD Cloud"),
+    "jdcom": ("AS131486", "JD.com"),
+    "ksyun": ("AS59019", "Kingsoft Cloud"),
+    "kingsoft": ("AS59019", "Kingsoft Cloud"),
+    "telegram": ("AS44907", "Telegram Messenger Inc."),
+    "netease": ("AS45062", "NetEase"),
     "qiniu": ("AS152644", "Qiniu Cloud"),
     "qiniucloud": ("AS152644", "Qiniu Cloud"),
 
@@ -65,8 +68,9 @@ KNOWN_CLOUD_PROVIDERS = {
     "ovh": ("AS16276", "OVH"),
     "scaleway": ("AS12876", "Scaleway"),
     "leaseweb": ("AS60781", "Leaseweb"),
-    "kamatera": ("AS35838", "Kamatera"),
+    "kamatera": ("AS36007", "Kamatera"),
     "kamatera_us": ("AS204548", "Kamatera"),
+    "kamatera_eu": ("AS35838", "Kamatera"),
     "amazon_infra": ("AS14618", "Amazon AWS"),
     "google_infra": ("AS396982", "Google Cloud"),
     "softlayer": ("AS36351", "SoftLayer Technologies Inc."),
@@ -84,7 +88,7 @@ KNOWN_CLOUD_PROVIDERS = {
     # 下游分销/租户品牌（无独立 ASN，现网复用阿里云 AS45102 基础设施；first-win 确保反查标准名锁定为 Alibaba Cloud）
     "claw": ("AS45102", "Claw Cloud"),
     "clawcloud": ("AS45102", "Claw Cloud"),
-    "vmiss": ("AS147049", "VMISS"),
+    "vmiss": ("AS967", "VMISS"),
     "contabo": ("AS51167", "Contabo"),
     "netcup": ("AS197540", "Netcup"),
     "hostpapa": ("AS36352", "HostPapa"),
@@ -96,10 +100,11 @@ KNOWN_CLOUD_PROVIDERS = {
     "hostdare": ("AS397373", "H4Y Technologies LLC"),  # 品牌 HostDare 挂载于 H4Y Technologies LLC
     "pegtech": ("AS54600", "PEG TECH INC"),
     "misaka": ("AS54600", "PEG TECH INC"),             # 品牌 Misaka 挂载于 PEG TECH INC
-    "kurun": ("AS13768", "Kurun Cloud"),
+    "kurun": ("AS8796", "Kurun Cloud"),
+    "kuruncloud": ("AS8796", "Kurun Cloud"),
     "spartan": ("AS201106", "Spartan Host Ltd"),       # 品牌 SpartanHost
     "spartanhost": ("AS201106", "Spartan Host Ltd"),
-    "wap": ("AS149798", "WAP.ac"),
+    "wap": ("AS198100", "WAP.ac"),
     "windscribe": ("AS397540", "Windscribe Limited"),
     "hosttech": ("AS207143", "hosttech GmbH"),
     "taymaz": ("AS216054", "Taymaz Gostaran Naghshe Almas"),
@@ -137,7 +142,9 @@ KNOWN_CLOUD_PROVIDERS = {
     "vhglobal": ("AS42960", "VHGLOBAL"),
     "brainstorm": ("AS136258", "BrainStorm Network"),
     "xtom": ("AS8888", "xTom"),
-    "virmach": ("AS3258", "VirMach"),
+    "xtom_jp": ("AS3258", "xTom Japan"),
+    "virmach": ("AS25693", "VirMach"),
+    "virmach_jp": ("AS3258", "VirMach"),
     "gtt": ("AS3257", "GTT Communications"),
     "vtal": ("AS8167", "V.tal"),
     "handynetworks": ("AS30475", "Handy Networks"),
@@ -211,6 +218,11 @@ _CORE_BASELINE_NET_TYPES: dict[str, str] = {
     "AS29076": "isp",         # Citytelecom LLC (Filanco, citytelecom.ru, 俄罗斯宽带ISP)
     "AS62711": "isp",         # Maxwell Telecom LLC (ipinfo: ISP)
     "AS63150": "isp",         # BAGE CLOUD LLC (机房双ISP/原生住宅IP, ipinfo官方注册类型为ISP)
+    "AS174": "isp",           # Cogent Communications, LLC (Tier 1 国际骨干/ISP, ipinfo: ISP)
+    "AS1299": "isp",          # Arelion Sweden AB / Telia (Tier 1 国际骨干/ISP, ipinfo: ISP)
+    "AS3257": "isp",          # GTT Communications Inc. (Tier 1 国际骨干/ISP, ipinfo: ISP)
+    "AS58682": "isp",         # Level3 Carrier Ltd. (Tier 1 国际骨干/ISP, ipinfo: ISP)
+    "AS7738": "isp",          # V.tal (vtal.com, 巴西主流电信与国际海缆, ipinfo: ISP)
     # 核心云厂商机房 (权威锁定为 datacenter)
     "AS13335": "datacenter",  # Cloudflare
     "AS15169": "datacenter",  # Google
@@ -232,11 +244,19 @@ _CORE_BASELINE_NET_TYPES: dict[str, str] = {
     "AS54600": "datacenter",  # PEG TECH INC (misaka.io, 云主机/机房)
     "AS201106": "datacenter", # Spartan Host Ltd (spartanhost.org, VPS/主机)
     "AS14315": "datacenter",  # 1GSERVERS, LLC (1gservers.com, Phoenix机房)
-    "AS7738": "datacenter",   # V.tal (vtal.com, 巴西国际海缆骨干)
     "AS33842": "datacenter",  # Citytelecom LLC (CrossTelecom, crosstelecom.ru, 云主机机房)
     "AS151873": "datacenter", # TOTHOST SOLUTIONS AND TECHNOLOGIES COMPANY LIMITED (tothost.vn, 越南VPS/机房)
     "AS213035": "datacenter", # Serverion B.V. (serverion.com, 荷兰机房/主机托管, SoftShellWeb上游)
     "AS26042": "datacenter",  # FiberState, LLC (ipinfo: Hosting)
+    "AS44907": "datacenter",  # Telegram Messenger Inc.
+    "AS45062": "datacenter",  # NetEase
+    "AS137753": "datacenter", # JD Cloud
+    "AS131486": "datacenter", # JD.com
+    "AS59019": "datacenter",  # Kingsoft Cloud
+    "AS137280": "datacenter", # Kingsoft Cloud
+    "AS135377": "datacenter", # UCloud
+    "AS36007": "datacenter",  # Kamatera
+    "AS25693": "datacenter",  # VirMach
     "AS142078": "education",  # CERNET FITI Nodes (清华大学/未来互联网试验设施教育网节点)
 }
 
@@ -359,7 +379,6 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS7720": "datacenter",   # Skywolf Cloud (skywolf.net)
     "AS8888": "datacenter",   # xTom APAC (xtom.com)
     "AS9312": "datacenter",   # xTom Hong Kong (xtom.com)
-    "AS979": "datacenter",    # NetLab Global (as979.net, 国际机房)
     "AS22295": "datacenter",  # Advin Services LLC (advinservers.com, VPS 主机商)
     "AS22781": "datacenter",  # Black Oak Computers Inc (算力服务器)
     "AS34343": "datacenter",  # BIP Backbone ASN / Eweka (eweka.nl, ipinfo核准为hosting)
@@ -405,7 +424,6 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS400951": "datacenter", # Akari Networks LLC (akarinetworks.com, 机房IDC)
     "AS38136": "datacenter",  # Akari Networks Limited (akarinetworks.com, 香港IDC)
     "AS14315": "datacenter",  # 1GSERVERS, LLC (1gservers.com, Phoenix机房)
-    "AS7738": "datacenter",   # V.tal (vtal.com, 巴西国际海缆骨干)
     "AS202996": "datacenter", # Helkor (Ondrej Vrana, cbe-hosting.com, 捷克机房)
     "AS214159": "datacenter", # UAB Cherry Servers (balticservers.com, 立陶宛机房)
     "AS59642": "datacenter",  # UAB Cherry Servers (balticservers.com, 立陶宛机房)
@@ -414,17 +432,20 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS200239": "datacenter", # Bogahost Bilisim (土耳其主机托管)
     "AS210993": "datacenter", # Spacecore Solution Ltd (欧洲云主机机房)
     "AS135636": "datacenter", # PT. RACKH LINTAS ASIA (rackh.co.id, 印尼机房)
-    "AS1299": "datacenter",   # Arelion Sweden AB / Telia Carrier (Tier 1 国际骨干/中继机房, 非民用宽带)
-    "AS3257": "datacenter",   # GTT Communications (Tier 1 国际骨干/中继机房, 非民用宽带)
-    "AS58682": "datacenter",  # Level3 Carrier Limited / Lumen (Tier 1 国际骨干中继, 非民用宽带)
-    "AS273961": "datacenter", # Cogent Communications (国际骨干中继机房)
-    "AS273007": "datacenter", # Cogent Communications (国际骨干中继机房)
-    "AS274414": "datacenter", # Cogent Communications (国际骨干中继机房)
     "AS151873": "datacenter", # TOTHOST SOLUTIONS AND TECHNOLOGIES COMPANY LIMITED (tothost.vn, 越南VPS/机房)
     "AS213035": "datacenter", # Serverion B.V. (serverion.com, 荷兰机房/主机托管, SoftShellWeb上游)
     "AS26042": "datacenter",  # FiberState, LLC (ipinfo: Hosting)
+    "AS3132": "datacenter",   # Red Cientifica Peruana (rcp.pe, 秘鲁主机/机房, ipinfo: hosting)
 
     # --- [L0 裁决 B: 知名正牌民用宽带 ISP，权威核准为 isp] ---
+    "AS174": "isp",           # Cogent Communications, LLC (Tier 1 国际骨干/ISP, ipinfo: ISP)
+    "AS1299": "isp",          # Arelion Sweden AB / Telia (Tier 1 国际骨干/ISP, ipinfo: ISP)
+    "AS3257": "isp",          # GTT Communications Inc. (Tier 1 国际骨干/ISP, ipinfo: ISP)
+    "AS58682": "isp",         # Level3 Carrier Ltd. (Tier 1 国际骨干/ISP, ipinfo: ISP)
+    "AS7738": "isp",          # V.tal (vtal.com, 巴西主流电信与国际海缆, ipinfo: ISP)
+    "AS273961": "isp",        # LUDWIN GROUP COMPANY SRL (ipinfo: ISP)
+    "AS273007": "isp",        # SPEEDNET, C.A (ipinfo: ISP)
+    "AS274414": "isp",        # Osbaldo Tovar Campero (ipinfo: ISP)
     "AS1257": "isp",          # Tele2 Sverige AB (tele2.com, 欧洲顶级电信与家庭宽带)
     "AS18106": "isp",         # Viewqwest Pte Ltd (viewqwest.com, 新加坡知名光纤宽带 ISP)
     "AS9891": "isp",          # CS LOXINFO (csloxinfo.com, 泰国主流电信运营商)
@@ -469,11 +490,10 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     # --- [L0 裁决 D: 核心学术科研教育网 (权威核准为 education)] ---
     "AS9488": "education",    # Seoul National University / SNU (首尔大学)
     "AS199578": "education",  # Verein zur Foerderung eines Deutschen Forschungsnetzes e.V. (DFN, 德国国家科研教育网)
-    "AS3132": "education",    # Red Cientifica Peruana / RCP (秘鲁科研学术网)
     "AS142078": "education",  # CERNET FITI Nodes (清华大学/未来互联网试验设施教育网节点)
 
     # --- [L0 裁决 E: 商业企业专线与骨干中继 (权威核准为 business)] ---
-    "AS174": "business",      # Cogent Communications, LLC (Tier 1 国际骨干/企业中继专线, 非民用宽带)
+    "AS979": "business",      # NetLab Global (as979.net, 国际机房网络, ipinfo: business)
 }
 
 
