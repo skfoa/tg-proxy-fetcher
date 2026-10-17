@@ -16174,5 +16174,155 @@
     "net_type": "isp",
     "country": "JP",
     "resolved_ip": "125.30.13.89"
+  },
+  "public-vpn-185.opengw.net": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "219.100.37.193"
+  },
+  "126.12.201.41": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn910376751.opengw.net": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "126.12.201.41"
+  },
+  "125.243.170.204": {
+    "asn": "AS9316",
+    "isp": "DACOM-PUBNETPLUS",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn396779784.opengw.net": {
+    "asn": "AS9316",
+    "isp": "DACOM-PUBNETPLUS",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "125.243.170.204"
+  },
+  "90.149.132.107": {
+    "asn": "AS2527",
+    "isp": "Sony Network Communications Inc.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn221936620.opengw.net": {
+    "asn": "AS2527",
+    "isp": "Sony Network Communications Inc.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "90.149.132.107"
+  },
+  "14.40.19.177": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn514391704.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "14.40.19.177"
+  },
+  "219.100.37.81": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "public-vpn-85.opengw.net": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "219.100.37.81"
+  },
+  "221.151.168.106": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn571069303.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "221.151.168.106"
+  },
+  "219.8.46.103": {
+    "asn": "AS18126",
+    "isp": "Chubu Telecommunications Company, Inc.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn158372965.opengw.net": {
+    "asn": "AS18126",
+    "isp": "Chubu Telecommunications Company, Inc.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "219.8.46.103"
+  },
+  "124.150.236.121": {
+    "asn": "AS7679",
+    "isp": "QTnet, Inc.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn408668053.opengw.net": {
+    "asn": "AS7679",
+    "isp": "QTnet, Inc.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "124.150.236.121"
+  },
+  "47.152.39.125": {
+    "asn": "AS5650",
+    "isp": "Frontier Communications of America, Inc.",
+    "net_type": "isp",
+    "country": "US"
+  },
+  "vpn132949429.opengw.net": {
+    "asn": "AS5650",
+    "isp": "Frontier Communications of America, Inc.",
+    "net_type": "isp",
+    "country": "US",
+    "resolved_ip": "47.152.39.125"
+  },
+  "219.100.37.109": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "public-vpn-153.opengw.net": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "219.100.37.109"
+  },
+  "39.115.157.22": {
+    "asn": "AS9318",
+    "isp": "SK Broadband",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn615922420.opengw.net": {
+    "asn": "AS9318",
+    "isp": "SK Broadband",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "39.115.157.22"
   }
 }

@@ -1,14 +1,10 @@
 ﻿url,proto,host,port,delay_ms,fail_count,status,colo,country,egress_ip,asn,isp,net_type,first_seen,source
-http://41.196.16.226:1976,http,41.196.16.226,1976,261,0,alive,-,EG,41.196.16.226,AS24863 Link Egypt (Link.NET),Link Egypt,isp,2026-10-15 12:44:41,EDT-Pages
-http://41.128.90.51:1976,http,41.128.90.51,1976,298,0,alive,-,EG,41.128.90.51,AS24863 Link Egypt (Link.NET),Link Egypt (Link.NET),isp,2026-10-12 21:49:55,EDT-Pages
-http://45.245.208.180:8080,http,45.245.208.180,8080,310,0,alive,-,EG,45.245.208.180,AS24863 Link Egypt (Link.NET),Link Egypt (Link.NET),isp,2026-10-14 12:57:52,EDT-Pages
-http://103.133.26.50:8080,http,103.133.26.50,8080,503,0,alive,-,ID,103.133.26.50,AS138130 PT PHATRIA INTI PERSADA,PT PHATRIA INTI PERSADA,isp,2026-10-12 15:18:13,EDT-Pages
-http://103.133.26.73:3128,http,103.133.26.73,3128,544,0,alive,CGK,ID,103.178.42.17,AS138130 PT PHATRIA INTI PERSADA,PT PHATRIA INTI PERSADA,isp,2026-10-12 15:18:13,EDT-Pages
-http://102.244.78.61:8087,http,102.244.78.61,8087,569,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-09 22:46:01,EDT-Pages
-http://102.244.78.61:8080,http,102.244.78.61,8080,605,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-09 22:46:01,EDT-Pages
-http://102.244.78.61:8085,http,102.244.78.61,8085,637,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-09 22:46:01,EDT-Pages
-http://123.121.75.126:8888,http,123.121.75.126,8888,720,0,alive,-,CN,123.121.75.126,AS4808 China Unicom,China Unicom,isp,2026-10-14 12:57:52,EDT-Pages
-http://185.195.254.72:5432,http,185.195.254.72,5432,765,0,alive,IST,TR,185.195.254.72,AS206119 Veganet Teknolojileri ve Hizmetleri LTD STI,Veganet Teknolojileri ve Hizmetleri LTD STI,isp,2026-10-09 22:46:01,EDT-Pages
-http://102.244.78.61:8084,http,102.244.78.61,8084,909,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-09 22:46:01,EDT-Pages
-http://41.128.90.51:1981,http,41.128.90.51,1981,1353,0,alive,MRS,EG,41.128.90.51,AS24863 Link Egypt (Link.NET),Link Egypt (Link.NET),isp,2026-10-12 21:49:55,EDT-Pages
-http://161.132.45.17:1081,http,161.132.45.17,1081,1493,0,alive,-,PE,161.132.45.17,AS3132 Red Cientifica Peruana,Red Cientifica Peruana,education,2026-10-16 12:36:06,EDT-Pages
+http://185.195.254.72:5432,http,185.195.254.72,5432,332,0,alive,IST,TR,185.195.254.72,AS206119 Veganet Teknolojileri ve Hizmetleri LTD STI,Veganet Teknolojileri ve Hizmetleri LTD STI,isp,2026-10-09 22:46:01,EDT-Pages
+http://41.196.16.226:1976,http,41.196.16.226,1976,350,0,alive,MRS,EG,41.196.16.226,AS24863 Link Egypt (Link.NET),Link Egypt,isp,2026-10-15 12:44:41,EDT-Pages
+http://45.245.208.180:8080,http,45.245.208.180,8080,425,0,alive,MRS,EG,45.245.208.180,AS24863 Link Egypt (Link.NET),Link Egypt (Link.NET),isp,2026-10-14 12:57:52,EDT-Pages
+http://103.133.26.50:8080,http,103.133.26.50,8080,562,0,alive,SIN,ID,103.133.24.37,AS138130 PT PHATRIA INTI PERSADA,PT PHATRIA INTI PERSADA,isp,2026-10-12 15:18:13,EDT-Pages
+http://103.133.26.73:3128,http,103.133.26.73,3128,563,0,alive,CGK,ID,103.178.42.17,AS138130 PT PHATRIA INTI PERSADA,PT PHATRIA INTI PERSADA,isp,2026-10-12 15:18:13,EDT-Pages
+http://102.244.78.61:8084,http,102.244.78.61,8084,604,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-09 22:46:01,EDT-Pages
+http://102.244.78.61:8085,http,102.244.78.61,8085,772,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-09 22:46:01,EDT-Pages
+http://102.244.78.61:8080,http,102.244.78.61,8080,772,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-09 22:46:01,EDT-Pages
+http://102.244.78.61:8087,http,102.244.78.61,8087,792,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-09 22:46:01,EDT-Pages
