@@ -144,7 +144,7 @@ socks5://208.102.51.6:58208,socks5,208.102.51.6,58208,2068,0,alive,CVG,US,208.10
 socks5://root:123456@59.36.80.120:1080,socks5,59.36.80.120,1080,2154,0,alive,LAX,CN,59.36.80.120,AS4134 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://root:123456@101.89.160.59:1080,socks5,101.89.160.59,1080,2161,0,alive,LAX,CN,101.89.160.59,AS4811 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://root:123456@101.89.159.229:1080,socks5,101.89.159.229,1080,2197,0,alive,LAX,CN,101.89.159.229,AS4811 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
-socks5://49.13.22.249:10807,socks5,49.13.22.249,10807,2263,0,alive,PRG,CZ,212.102.39.41,"AS174 Cogent Communications, LLC (Private Customer)",Private Customer,isp,2026-10-14 12:57:52,EDT-Pages
+socks5://49.13.22.249:10807,socks5,49.13.22.249,10807,2263,0,alive,PRG,CZ,212.102.39.41,"AS174 Cogent Communications, LLC (Private Customer)",Private Customer,business,2026-10-14 12:57:52,EDT-Pages
 socks5://vpn:vpn@101.126.33.223:1080,socks5,101.126.33.223,1080,2530,0,alive,FRA,CN,101.126.33.223,AS137718 GHSX,GHSX,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://184.182.240.211:4145,socks5,184.182.240.211,4145,2585,0,alive,ATL,US,184.182.240.211,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://12345678:12345678@101.42.44.92:1080,socks5,101.42.44.92,1080,2635,0,alive,LAX,CN,101.42.44.92,AS45090 Tencent Cloud,Tencent Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -154,7 +154,7 @@ socks5://175.107.30.110:1080,socks5,175.107.30.110,1080,3380,0,alive,KHI,PK,175.
 socks5://121.169.46.116:1090,socks5,121.169.46.116,1090,3810,0,alive,ICN,KR,121.169.46.116,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://14.32.24.79:1080,socks5,14.32.24.79,1080,877,1,timeout,ICN,KR,14.32.24.79,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-15 12:44:41,EDT-Pages
 socks5://116.104.251.199:1111,socks5,116.104.251.199,1111,1156,1,timeout,SIN,VN,117.1.209.15,AS7552 Viettel Group,Viettel Group,isp,2026-10-15 12:44:41,EDT-Pages
-socks5://5.75.133.113:10807,socks5,5.75.133.113,10807,1327,1,timeout,ORD,US,64.113.5.229,"AS174 Cogent Communications, LLC (Private Customer)",Private Customer,isp,2026-10-12 21:49:55,EDT-Pages
+socks5://5.75.133.113:10807,socks5,5.75.133.113,10807,1327,1,timeout,ORD,US,64.113.5.229,"AS174 Cogent Communications, LLC (Private Customer)",Private Customer,business,2026-10-12 21:49:55,EDT-Pages
 http://185.195.254.72:5432,http,185.195.254.72,5432,332,0,alive,IST,TR,185.195.254.72,AS206119 Veganet Teknolojileri ve Hizmetleri LTD STI,Veganet Teknolojileri ve Hizmetleri LTD STI,isp,2026-10-09 22:46:01,EDT-Pages
 http://41.196.16.226:1976,http,41.196.16.226,1976,350,0,alive,MRS,EG,41.196.16.226,AS24863 Link Egypt (Link.NET),Link Egypt,isp,2026-10-15 12:44:41,EDT-Pages
 http://45.245.208.180:8080,http,45.245.208.180,8080,425,0,alive,MRS,EG,45.245.208.180,AS24863 Link Egypt (Link.NET),Link Egypt (Link.NET),isp,2026-10-14 12:57:52,EDT-Pages
@@ -233,7 +233,7 @@ https://190.112.224.179:443,https,190.112.224.179,443,378,0,alive,MIA,CW,190.112
 https://84.72.72.153:443,https,84.72.72.153,443,380,0,alive,ZRH,CH,84.72.72.153,AS6730 Sunrise GmbH (DHCP Scopes),DHCP Scopes,isp,2026-10-15 10:08:09,EDT-Pages
 https://82.64.46.151:8012,https,82.64.46.151,8012,382,0,alive,CDG,FR,82.64.46.151,AS12322 Free SAS,Free SAS,isp,2026-10-15 10:08:09,EDT-Pages
 https://98.101.229.212:8090,https,98.101.229.212,8090,385,0,alive,-,US,98.101.229.212,AS11426 Charter Communications Inc (GLENFOREST SCHOOL),GLENFOREST SCHOOL,isp,2026-10-09 00:00:00,EDT-Pages
-https://149.12.210.39:443,https,149.12.210.39,443,385,0,alive,FRA,FR,149.12.210.39,"AS174 Cogent Communications, LLC (Capinfo)",Capinfo,isp,2026-10-15 10:08:09,EDT-Pages
+https://149.12.210.39:443,https,149.12.210.39,443,385,0,alive,FRA,FR,149.12.210.39,"AS174 Cogent Communications, LLC (Capinfo)",Capinfo,business,2026-10-15 10:08:09,EDT-Pages
 https://138.66.65.52:443,https,138.66.65.52,443,386,0,alive,FCO,IT,138.66.64.251,AS20981 Innovapuglia SPA,Innovapuglia SPA,government,2026-10-15 10:08:09,EDT-Pages
 https://81.180.222.73:443,https,81.180.222.73,443,389,0,alive,OTP,RO,81.180.222.73,AS2614 Universitatea Tehnica Gheorghe Asachi din Iasi,Universitatea Tehnica Gheorghe Asachi din Iasi,education,2026-10-15 10:08:09,EDT-Pages
 https://72.28.165.185:8090,https,72.28.165.185,8090,390,0,alive,-,US,72.28.165.185,"AS11776 Atlantic Broadband, LLC","Atlantic Broadband, LLC",isp,2026-10-09 00:00:00,EDT-Pages

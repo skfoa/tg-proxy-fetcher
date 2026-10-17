@@ -13986,7 +13986,7 @@
 162.141.123.201,8443,true,218,,EWR,北美洲 · 纽瓦克 · 美国,AS395839 HOSTKEY,HOSTKEY B.V.,2026-10-02 00:16:28,@danfeng_chat,0
 209.146.113.98,443,true,225,,LAX,北美洲 · 洛杉矶 · 美国,AS967 VMISS Inc,VMISS Inc,2026-10-02 00:19:06,@danfeng_chat,0
 107.172.186.3,8443,true,228,,LAX,北美洲 · 洛杉矶 · 美国,AS36352 HostPapa,HostPapa,2026-10-02 00:13:42,@danfeng_chat,0
-38.60.89.236,443,true,232,,LAX,北美洲 · 洛杉矶 · 美国,"AS63150 Bage Cloud (FiberState, LLC)","FiberState, LLC",2026-10-02 00:20:24,@danfeng_chat,0
+38.60.89.236,443,true,232,,LAX,北美洲 · 洛杉矶 · 美国,AS8796 Kurun Cloud,KURUN CLOUD INC,2026-10-02 00:20:24,@danfeng_chat,0
 172.86.118.191,443,true,232,,LAX,北美洲 · 洛杉矶 · 美国,AS14956 RouterHosting LLC,RouterHosting LLC,2026-10-02 00:17:20,@danfeng_chat,0
 146.71.85.251,9443,unknown,233,,SLC,北美洲 · 盐湖城 · 美国,"AS26042 FiberState, LLC",SOFTSHELL HOSTING LTD,2026-10-02 00:15:09,@danfeng_chat,0
 153.75.81.16,443,true,234,,LAX,北美洲 · 洛杉矶 · 美国,AS14956 RouterHosting LLC (aurologic GmbH),aurologic GmbH,2026-10-02 00:15:26,@danfeng_chat,0
@@ -14040,18 +14040,18 @@
 192.209.62.87,8443,true,358,,AMS,欧洲 · 阿姆斯特丹 · 荷兰,AS213535 YottaSrc,YottaSrc Cloud & Hosting Services,2026-10-02 00:18:20,@danfeng_chat,0
 104.194.156.155,8443,true,358,,FRA,欧洲 · 法兰克福 · 德国,AS14956 RouterHosting LLC,RouterHosting LLC,2026-10-02 00:13:26,@danfeng_chat,0
 89.30.198.195,443,true,362,,AMS,欧洲 · 阿姆斯特丹 · 荷兰,AS30058 FDCservers.net,WorldStream B.V.,2026-10-02 00:22:27,@danfeng_chat,0
-137.220.202.58,443,true,370,,NRT,亚洲 · 东京 · 日本,AS4134 China Telecom (CTG Server Limited),CTG Server Limited,2026-10-02 00:14:27,@danfeng_chat,0
+137.220.202.58,443,true,370,,NRT,亚洲 · 东京 · 日本,AS152194 CTG Server Limited,CTG Server Limited,2026-10-02 00:14:27,@danfeng_chat,0
 82.139.234.55,443,true,371,,FRA,欧洲 · 法兰克福 · 德国,AS151338 PoloNetwork,PoloNetwork Customer Prefix,2026-10-02 00:21:59,@danfeng_chat,0
 172.86.69.43,443,true,373,,FRA,欧洲 · 法兰克福 · 德国,AS14956 RouterHosting LLC (aurologic GmbH),aurologic GmbH,2026-10-02 00:17:20,@danfeng_chat,0
 162.4.194.35,443,true,380,,NRT,亚洲 · 东京 · 日本,AS197196 Panstar Cloud Limited,"Astrix Co., Ltd.",2026-10-02 00:16:30,@danfeng_chat,0
 192.209.62.163,443,true,384,,AMS,欧洲 · 阿姆斯特丹 · 荷兰,AS213535 YottaSrc,YottaSrc Cloud & Hosting Services,2026-10-02 00:18:19,@danfeng_chat,0
 153.76.122.61,443,true,387,,AMS,欧洲 · 阿姆斯特丹 · 荷兰,AS213535 YottaSrc,YottaSrc Hosting and Cloud Services,2026-10-02 00:15:28,@danfeng_chat,0
 151.244.192.147,443,true,391,,SOF,欧洲 · 索菲亚 · 保加利亚,AS212238 Datacamp Limited,Datacamp Limited,2026-10-02 00:15:21,@danfeng_chat,0
-134.122.194.186,443,true,401,,NRT,亚洲 · 东京 · 日本,AS4134 China Telecom (CTG Server Limited),CTG Server Limited,2026-10-02 00:14:17,@danfeng_chat,0
-137.220.225.111,443,true,413,,NRT,亚洲 · 东京 · 日本,AS4134 China Telecom (CTG Server Limited),CTG Server Limited,2026-10-02 00:14:27,@danfeng_chat,0
+134.122.194.186,443,true,401,,NRT,亚洲 · 东京 · 日本,AS152194 CTG Server Limited,CTG Server Limited,2026-10-02 00:14:17,@danfeng_chat,0
+137.220.225.111,443,true,413,,NRT,亚洲 · 东京 · 日本,AS152194 CTG Server Limited,CTG Server Limited,2026-10-02 00:14:27,@danfeng_chat,0
 85.120.228.60,443,true,415,,OTP,欧洲 · 布加勒斯特 · 罗马尼亚,AS9009 M247 (Hostingbit Srl),Hostingbit Srl,2026-10-02 00:22:13,@danfeng_chat,0
-137.220.202.56,443,true,417,,NRT,亚洲 · 东京 · 日本,AS4134 China Telecom (CTG Server Limited),CTG Server Limited,2026-10-02 00:14:27,@danfeng_chat,0
-137.220.227.163,443,true,434,,NRT,亚洲 · 东京 · 日本,AS4134 China Telecom (CTG Server Limited),CTG Server Limited,2026-10-02 00:14:27,@danfeng_chat,0
+137.220.202.56,443,true,417,,NRT,亚洲 · 东京 · 日本,AS152194 CTG Server Limited,CTG Server Limited,2026-10-02 00:14:27,@danfeng_chat,0
+137.220.227.163,443,true,434,,NRT,亚洲 · 东京 · 日本,AS152194 CTG Server Limited,CTG Server Limited,2026-10-02 00:14:27,@danfeng_chat,0
 202.155.155.41,443,true,439,,HKG,亚洲 · 香港,AS36530 IDC Cube,IDC,2026-10-02 00:18:49,@danfeng_chat,0
 137.220.227.99,443,true,461,,NRT,亚洲 · 东京 · 日本,AS152194 CTG Server Limited,CTG Server Ltd.,2026-10-02 00:14:27,@danfeng_chat,0
 154.36.146.33,443,true,474,,HKG,亚洲 · 香港,AS150452 LANDUPS LIMITED,"PSINet, Inc.",2026-10-02 00:15:39,@danfeng_chat,0
@@ -14066,7 +14066,7 @@
 151.245.90.96,8443,true,559,,HKG,亚洲 · 香港,AS134677 Dromatics Systems Pte Ltd,Dromatics Systems Pte Ltd,2026-10-02 00:15:20,@danfeng_chat,0
 116.251.216.12,8443,true,561,,SIN,亚洲 · 新加坡,AS59211 OneAsiaHost (SG.GS),SG.GS,2026-10-02 00:13:56,@danfeng_chat,0
 23.141.52.44,443,true,562,,SIN,亚洲 · 新加坡,AS152918 Liberally Network LLC (LANDUPS LIMITED),LANDUPS LIMITED,2026-10-02 00:19:35,@danfeng_chat,0
-137.220.225.56,443,true,563,,NRT,亚洲 · 东京 · 日本,AS4134 China Telecom (CTG Server Limited),CTG Server Limited,2026-10-02 00:14:27,@danfeng_chat,0
+137.220.225.56,443,true,563,,NRT,亚洲 · 东京 · 日本,AS152194 CTG Server Limited,CTG Server Limited,2026-10-02 00:14:27,@danfeng_chat,0
 103.192.179.132,443,true,567,,HKG,亚洲 · 香港,AS152918 Liberally Network LLC (LANDUPS LIMITED),LANDUPS LIMITED,2026-10-02 00:13:16,@danfeng_chat,0
 216.195.195.9,443,true,571,,SIN,亚洲 · 新加坡,AS197196 Panstar Cloud Limited,Panstar Cloud Limited,2026-10-02 00:19:22,@danfeng_chat,0
 8.222.70.238,443,true,572,,HKG,亚洲 · 香港,AS45102 Alibaba Cloud (Singapore Telecommunications Ltd),Singapore Telecommunications Ltd,2026-10-02 00:22:02,@danfeng_chat,0
@@ -14096,7 +14096,7 @@
 162.245.221.73,8443,true,719,,HKG,亚洲 · 香港,AS150452 LANDUPS LIMITED,HostUS,2026-10-02 00:16:30,@danfeng_chat,0
 162.245.221.73,9443,unknown,720,,HKG,亚洲 · 香港,AS150452 LANDUPS LIMITED,HostUS,2026-10-02 00:16:30,@danfeng_chat,0
 216.195.195.205,443,true,727,,SIN,亚洲 · 新加坡,AS197196 Panstar Cloud Limited,Panstar Cloud Limited,2026-10-02 00:19:22,@danfeng_chat,0
-137.220.151.249,443,true,732,,SIN,亚洲 · 新加坡,AS4134 China Telecom (CTG Server Limited),CTG Server Limited,2026-10-02 00:14:27,@danfeng_chat,0
+137.220.151.249,443,true,732,,SIN,亚洲 · 新加坡,AS152194 CTG Server Limited,CTG Server Limited,2026-10-02 00:14:27,@danfeng_chat,0
 141.164.54.118,8443,true,734,,LAX,北美洲 · 洛杉矶 · 美国,"AS20473 Vultr (The Constant Company, LLC)","The Constant Company, LLC",2026-10-02 00:14:44,@danfeng_chat,0
 185.92.47.127,8443,true,741,,HKG,亚洲 · 香港,AS152918 Liberally Network LLC,Blackbridge Limited,2026-10-02 00:17:57,@danfeng_chat,0
 2.27.109.35,443,true,797,,HKG,亚洲 · 香港,AS152918 Liberally Network LLC (LANDUPS LIMITED),LANDUPS LIMITED,2026-10-02 00:19:34,@danfeng_chat,0
