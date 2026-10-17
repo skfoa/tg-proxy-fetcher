@@ -225,6 +225,8 @@ _CORE_BASELINE_NET_TYPES: dict[str, str] = {
     "AS3257": "isp",          # GTT Communications Inc. (Tier 1 国际骨干/ISP, ipinfo: ISP)
     "AS58682": "isp",         # Level3 Carrier Ltd. (Tier 1 国际骨干/ISP, ipinfo: ISP)
     "AS7738": "isp",          # V.tal (vtal.com, 巴西主流电信与国际海缆, ipinfo: ISP)
+
+    # 核心云厂商机房 (权威锁定为 datacenter)
     "AS152194": "datacenter", # CTG Server Limited (ipinfo: Hosting)
     "AS20071": "datacenter",  # KUXUEYUN LLC (ipinfo: Hosting)
     "AS906": "datacenter",    # DMIT Cloud Services (ipinfo: Hosting)
@@ -235,7 +237,6 @@ _CORE_BASELINE_NET_TYPES: dict[str, str] = {
     "AS57169": "datacenter",  # EDIS GmbH (ipinfo: Hosting)
     "AS396986": "datacenter", # Bytedance Inc. (ipinfo: Hosting)
     "AS23724": "datacenter",  # IDC, China Telecommunications Corporation (ipinfo: Hosting)
-    # 核心云厂商机房 (权威锁定为 datacenter)
     "AS13335": "datacenter",  # Cloudflare
     "AS15169": "datacenter",  # Google
     "AS16509": "datacenter",  # Amazon AWS
@@ -259,7 +260,6 @@ _CORE_BASELINE_NET_TYPES: dict[str, str] = {
     "AS33842": "datacenter",  # Citytelecom LLC (CrossTelecom, crosstelecom.ru, 云主机机房)
     "AS151873": "datacenter", # TOTHOST SOLUTIONS AND TECHNOLOGIES COMPANY LIMITED (tothost.vn, 越南VPS/机房)
     "AS213035": "datacenter", # Serverion B.V. (serverion.com, 荷兰机房/主机托管, SoftShellWeb上游)
-    "AS26042": "datacenter",  # FiberState, LLC (ipinfo: Hosting)
     "AS44907": "datacenter",  # Telegram Messenger Inc.
     "AS45062": "datacenter",  # NetEase
     "AS137753": "datacenter", # JD Cloud
