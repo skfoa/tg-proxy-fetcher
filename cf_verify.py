@@ -4,8 +4,8 @@ Cloudflare 优选 IP 两阶段主动校验与淘汰引擎 (cf_verify.py)
 
 只要是优选 IP（涵盖 scan_ips 与 cf_ips 全线产物），全部统一执行：
   阶段一：TLS 握手 + CA 证书鉴真（server_hostname=crypto.cloudflare.com 官方证书链，底层校验 Root CA 与 SAN 匹配）
-  阶段二：同一连接发送 HTTP 请求，基于统一 deadline 与 4096B 上限循环读取，经双兼容分隔符严格隔离 Header 与 Body，
-          字节级正则精准匹配状态行 HTTP/X.X 301 与单行 Server: cloudflare（抗报文截断假阴性与伪装头假阳性）
+  阶段二：同一连接发送 HTTP 请求，基于统一 deadline 与 4096B 上限循环读取，经双兼容分隔符隔离 Header 与 Body，
+          字节级正则匹配状态行 HTTP/X.X 301 与 Server: cloudflare，确认 Cloudflare 边缘重定向行为。
 
 淘汰与全流水线汇总机制：
   1. 物理淘汰：连续失败达到阈值（默认 3 次）的死节点，全面从所有产物中永久删除：
@@ -24,6 +24,7 @@ import json
 import logging
 import os
 import random
+import re
 import ssl
 import sys
 import time
@@ -106,20 +107,33 @@ except Exception:
     pass
 
 
+RE_HTTP_STATUS = re.compile(rb"^HTTP/\d\.\d\s+(\d{3})\b")
+
+# 官方 Cloudflare Anycast 诊断基线 IP 池 (共 300 个，覆盖并发 250 槽位)
+OFFICIAL_BASELINE_IPS = [
+    f"104.16.{i}.{j}" for i in range(16, 26) for j in range(1, 11)
+] + [
+    f"104.17.{i}.{j}" for i in range(16, 26) for j in range(1, 11)
+] + [
+    f"172.67.{i}.{j}" for i in range(150, 160) for j in range(1, 11)
+]
+
+
 # ---------- 核心探测函数 ----------
 async def probe_ip(
     ip: str,
     port: int,
     connect_timeout: float = TIMEOUT,
     http_timeout: float = HTTP_TIMEOUT,
-) -> tuple[bool, int]:
+) -> tuple[bool, int, str]:
     """
-    对单个 IP:Port 执行 TLS 握手 + HTTP 301 校验（修复版 v2）。
+    对单个 IP:Port 执行 TLS 握手 + HTTP 301 校验。
 
-    返回 (is_alive, latency_ms):
-        is_alive=True  -> 校验通过，latency_ms 为 TLS 握手与连接延迟 (RTT)
-        is_alive=False -> 校验失败，latency_ms 为 0
+    返回 (is_alive, latency_ms, reason):
+        is_alive=True  -> 校验通过，latency_ms 为 TLS 握手与连接延迟 (RTT)，reason 为 "ok"
+        is_alive=False -> 校验失败，reason 记录具体失败原因 (如 connect_timeout, tls_error, http_timeout, status_502, no_cf_header 等)
     """
+    writer = None
     t0 = time.monotonic()
     try:
         reader, writer = await asyncio.wait_for(
@@ -128,8 +142,14 @@ async def probe_ip(
         )
         t1 = time.monotonic()
         latency_ms = max(1, int((t1 - t0) * 1000))
-    except Exception:
-        return False, 0
+    except asyncio.TimeoutError:
+        return False, 0, "connect_timeout"
+    except (ssl.SSLError, ssl.CertificateError):
+        return False, 0, "tls_error"
+    except (ConnectionRefusedError, OSError):
+        return False, 0, "conn_error"
+    except Exception as e:
+        return False, 0, f"connect_failed_{type(e).__name__}"
 
     try:
         req = (
@@ -143,14 +163,26 @@ async def probe_ip(
         await asyncio.wait_for(writer.drain(), timeout=http_timeout)
 
         resp_bytes = await read_full_response(reader, http_timeout)
+        if not resp_bytes:
+            return False, latency_ms, "empty_response"
+
         header_part, _ = split_header_body(resp_bytes)
+        status_match = RE_HTTP_STATUS.match(header_part)
+        status_code = status_match.group(1).decode("latin1") if status_match else ""
 
         is_301 = bool(RE_HTTP_301.match(header_part))
         is_cf = bool(RE_SERVER_CF.search(header_part))
 
-        return (is_301 and is_cf), latency_ms
-    except Exception:
-        return False, 0
+        if is_301 and is_cf:
+            return True, latency_ms, "ok"
+        elif not is_301:
+            return False, latency_ms, f"status_{status_code}" if status_code else "invalid_http_status"
+        else:
+            return False, latency_ms, "no_cf_header"
+    except asyncio.TimeoutError:
+        return False, latency_ms, "http_timeout"
+    except Exception as e:
+        return False, latency_ms, f"http_error_{type(e).__name__}"
     finally:
         await safe_close_writer(writer)
 
@@ -165,7 +197,7 @@ async def verify_all(
     """
     对传入的所有优选 IP 节点无差别执行阶段一与阶段二探测。
     无论端口与元数据如何，全部执行 TLS 握手与 301 重定向鉴真。
-    原地更新 fail_count 与 delay_ms。
+    原地更新 fail_count 与 delay_ms，并汇总失败原因分布。
     """
     if not rows:
         return rows
@@ -175,6 +207,7 @@ async def verify_all(
     fail_count_total = 0
     completed = 0
     total = len(rows)
+    reasons_counter: dict[str, int] = defaultdict(int)
 
     # 全局显式初始化 _old_fc，确保异常提前返回或空跑时不遗留未定义状态
     for r in rows:
@@ -197,13 +230,16 @@ async def verify_all(
             row["_invalid"] = True
             row["fail_count"] = fc + 1
             fail_count_total += 1
+            reasons_counter["invalid_row"] += 1
             return
 
         lock_key = f"{ip}:{port}"
         async with sem, get_keyed_lock(lock_key):
-            alive, latency = await probe_ip(ip, port, connect_timeout=timeout, http_timeout=http_timeout)
+            alive, latency, reason = await probe_ip(ip, port, connect_timeout=timeout, http_timeout=http_timeout)
 
         completed += 1
+        reasons_counter[reason] += 1
+        row["_reason"] = reason
         if alive:
             row["fail_count"] = 0
             row["delay_ms"] = latency
@@ -219,10 +255,13 @@ async def verify_all(
     tasks = [_check(rows[i]) for i in indices]
     await asyncio.gather(*tasks)
 
+    sorted_reasons = sorted(reasons_counter.items(), key=lambda x: x[1], reverse=True)
+    reason_summary = ", ".join(f"{k}: {v}" for k, v in sorted_reasons)
     log.info(
         "[%s] 校验完成: 共 %d 条 | 验证通过 %d 条, 验证失败 %d 条",
         tag, total, pass_count, fail_count_total,
     )
+    log.info("[%s] 探测原因汇总: %s", tag, reason_summary)
     return rows
 
 
@@ -672,6 +711,24 @@ async def _verify_and_persist(csv_path: str, tag: str, args, on_save) -> dict:
         and safe_int(r.get("_old_fc"), 0) > 0
     )
 
+    res["diag_map"] = {
+        canonical_key(r.get("ip", ""), r.get("port", 0)): {
+            "reason": r.get("_reason", "unknown"),
+            "alive": safe_int(r.get("fail_count"), 0) == 0,
+            "latency": safe_int(r.get("delay_ms"), 0),
+        }
+        for r in rows
+        if (r.get("ip") or "").strip() and safe_int(r.get("port"), 0) > 0
+    }
+
+    if getattr(args, "dry_run", False):
+        log.info("[%s (Dry-Run)] 演练诊断模式：仅统计探测原因，跳过磁盘文件覆写与墓地登记", tag)
+        return res
+
+    # 严格保证保存先于登记墓地：若保存失败触发异常，避免墓地预先登记导致状态不一致
+    if on_save:
+        on_save(survivors)
+
     if eliminated > 0:
         log.info("[%s] 淘汰剔除 %d 条连续失败 >= %d 次的死节点", tag, eliminated, args.max_fails)
         dead_nodes = [r for r in rows if safe_int(r.get("fail_count"), 0) >= args.max_fails or r.get("_invalid")]
@@ -684,9 +741,6 @@ async def _verify_and_persist(csv_path: str, tag: str, args, on_save) -> dict:
         log.info("[%s 墓地] 已登记 %d 个淘汰死节点至墓地冷却库 (新增: %d 个, 隔离期 7 天)", tag, len(dead_keys), newly_tombstoned)
     else:
         log.info("[%s] 本次无节点达到连续失败 %d 次的淘汰阈值", tag, args.max_fails)
-
-    if on_save:
-        on_save(survivors)
 
     return res
 
@@ -723,6 +777,44 @@ async def async_main(args):
 
     scan_res = await _verify_and_persist(SCAN_CSV, "扫描优选", args, _save_scan_track)
 
+    baseline_map = {}
+    if getattr(args, "probe_baseline", False):
+        baseline_rows = [{"ip": ip, "port": "443", "fail_count": 0} for ip in OFFICIAL_BASELINE_IPS]
+        log.info(">>> 开始探测官方基线 IP: 共 %d 条 (并发 %d)...", len(baseline_rows), args.concurrency)
+        await verify_all(
+            baseline_rows,
+            tag="官方基线",
+            concurrency=args.concurrency,
+            timeout=args.timeout,
+            http_timeout=args.http_timeout,
+        )
+        baseline_map = {
+            f"{r['ip']}:{r['port']}": {
+                "reason": r.get("_reason", "unknown"),
+                "alive": safe_int(r.get("fail_count"), 0) == 0,
+                "latency": safe_int(r.get("delay_ms"), 0),
+            }
+            for r in baseline_rows
+        }
+
+    if getattr(args, "diag_output", ""):
+        diag_data = {
+            "timestamp": int(time.time()),
+            "concurrency": args.concurrency,
+            "timeout": args.timeout,
+            "http_timeout": args.http_timeout,
+            "baseline": baseline_map,
+            "cf_ips": cf_res.get("diag_map", {}),
+            "scan_ips": scan_res.get("diag_map", {}),
+        }
+        try:
+            with open(args.diag_output, "w", encoding="utf-8") as f:
+                json.dump(diag_data, f, ensure_ascii=False, indent=2)
+            log.info("已成功导出逐节点诊断结果至 %s (记录总数: %d)",
+                     args.diag_output, len(baseline_map) + len(diag_data["cf_ips"]) + len(diag_data["scan_ips"]))
+        except Exception as e:
+            log.warning("导出诊断结果文件失败: %s", e)
+
     elapsed = time.time() - t_start
     log.info(
         "全部优选 IP 两阶段校验流程圆满完成，总耗时 %.2f 秒 (单条缓冲: %d [新增: %d, 取消: %d] | 扫描缓冲: %d [新增: %d, 取消: %d])",
@@ -735,7 +827,7 @@ async def async_main(args):
         scan_res["buf_rec"],
     )
 
-    if not getattr(args, "no_notify", False):
+    if not getattr(args, "no_notify", False) and not getattr(args, "dry_run", False):
         send_verify_notification(
             cf_pass=cf_res["pass"],
             cf_eliminated=cf_res["eliminated"],
@@ -756,7 +848,7 @@ async def async_main(args):
             scan_buf_rec=scan_res["buf_rec"],
         )
     else:
-        log.info("指定了 --no-notify，跳过 Telegram 卡片推送")
+        log.info("指定了 --no-notify 或 --dry-run，跳过 Telegram 卡片推送")
 
 
 def main():
@@ -766,6 +858,9 @@ def main():
     parser.add_argument("--timeout", type=float, default=TIMEOUT, help="单节点连接与 TLS 握手超时秒数 (默认 3.0)")
     parser.add_argument("--http-timeout", type=float, default=HTTP_TIMEOUT, help="单节点 HTTP 校验超时秒数 (默认 2.0)")
     parser.add_argument("--no-notify", action="store_true", help="静默模式，不发送 Telegram 质检通知")
+    parser.add_argument("--dry-run", action="store_true", help="演练诊断模式，仅探测统计原因，不覆写数据文件也不登记墓地，自动跳过通知")
+    parser.add_argument("--probe-baseline", action="store_true", help="探测 300 个官方 Cloudflare Anycast IP 作为并发与网络基线")
+    parser.add_argument("--diag-output", type=str, default="", help="诊断结果输出 JSON 路径，记录每个节点的探测原因明细")
     args = parser.parse_args()
 
     asyncio.run(async_main(args))

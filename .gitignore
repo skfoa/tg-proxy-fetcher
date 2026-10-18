@@ -12,3 +12,4 @@ data/.fetch_stats.json
 scratch/
 *.tmp
 data/**/*.tmp
+*diag*.json
