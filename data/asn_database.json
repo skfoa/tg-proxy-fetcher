@@ -2188,21 +2188,17 @@
     "Nordic Telecom Regional s.r.o.": "AS42908",
     "Tres Teknoloji A.S.": "AS214195",
     "CCANET Limited": "AS35838",
-    "Bharti Airtel Ltd.": "AS9498",
-    "MAGIT'ST SRL": "AS49468",
-    "Hostkey B.V.": "AS57043",
-    "MITELIS SECURITY LIMITED": "AS203154",
-    "2E TELEKOMUNIKASYON LTD STI": "AS209604",
-    "OC NETWORKS LIMITED": "AS209693",
-    "MT FINANCE LLC": "AS214822",
-    "Forestsnet LTD": "AS219464",
     "Private Customer": "AS134365",
     "Taymaz Gostaran Naghshe Almas": "AS216054",
     "CERNET": "AS142078",
     "Serverion B.V.": "AS213035",
     "FiberState, LLC": "AS26042",
     "CTG Server Limited": "AS152194",
-    "KUXUEYUN LLC": "AS20071"
+    "KUXUEYUN LLC": "AS20071",
+    "Wide Netcom India": "AS139508",
+    "Linknet-Fastnet ASN": "AS23700",
+    "its communications Inc.": "AS9365",
+    "Converge-ict Solution Inc": "AS17639"
   },
   "asn_to_isp": {
     "AS174": "Cogent Communications, LLC",
@@ -4324,7 +4320,12 @@
     "AS36007": "Kamatera",
     "AS198100": "WAP.ac",
     "AS152194": "CTG Server Limited",
-    "AS20071": "KUXUEYUN LLC"
+    "AS20071": "KUXUEYUN LLC",
+    "AS139508": "Wide Netcom India",
+    "AS23700": "Linknet-Fastnet ASN",
+    "AS9365": "its communications Inc.",
+    "AS17639": "Converge-ict Solution Inc",
+    "AS199144": "HexCore cloud s.r.o."
   },
   "asn_to_net_type": {
     "AS1311": "banking",
@@ -6999,7 +7000,7 @@
     "AS9657": "datacenter",
     "AS136428": "datacenter",
     "AS271870": "isp",
-    "AS273961": "datacenter",
+    "AS273961": "isp",
     "AS63945": "datacenter",
     "AS150462": "datacenter",
     "AS6849": "isp",
@@ -7099,7 +7100,7 @@
     "AS9260": "isp",
     "AS57753": "datacenter",
     "AS149971": "datacenter",
-    "AS273007": "datacenter",
+    "AS273007": "isp",
     "AS209059": "datacenter",
     "AS37529": "datacenter",
     "AS214729": "datacenter",
@@ -7346,7 +7347,7 @@
     "AS149320": "datacenter",
     "AS203530": "datacenter",
     "AS262202": "isp",
-    "AS274414": "datacenter",
+    "AS274414": "isp",
     "AS151567": "datacenter",
     "AS8192": "isp",
     "AS273080": "datacenter",
@@ -7615,6 +7616,7 @@
     "AS137280": "datacenter",
     "AS198100": "datacenter",
     "AS20071": "datacenter",
-    "AS396986": "datacenter"
+    "AS396986": "datacenter",
+    "AS139508": "datacenter"
   }
 }

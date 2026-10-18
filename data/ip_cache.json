@@ -16324,5 +16324,187 @@
     "net_type": "isp",
     "country": "KR",
     "resolved_ip": "39.115.157.22"
+  },
+  "219.100.37.63": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "public-vpn-127.opengw.net": {
+    "asn": "AS36599",
+    "isp": "SoftEther",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "219.100.37.63"
+  },
+  "116.94.25.94": {
+    "asn": "AS7679",
+    "isp": "QTnet, Inc.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn401180266.opengw.net": {
+    "asn": "AS7679",
+    "isp": "QTnet, Inc.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "116.94.25.94"
+  },
+  "103.172.220.133": {
+    "asn": "AS139508",
+    "isp": "Wide Netcom India",
+    "net_type": "datacenter",
+    "country": "IN"
+  },
+  "vpn359610091.opengw.net": {
+    "asn": "AS139508",
+    "isp": "Wide Netcom India",
+    "net_type": "datacenter",
+    "country": "IN",
+    "resolved_ip": "103.172.220.133"
+  },
+  "111.95.113.87": {
+    "asn": "AS23700",
+    "isp": "Linknet-Fastnet ASN",
+    "net_type": "isp",
+    "country": "ID"
+  },
+  "vpn817119416.opengw.net": {
+    "asn": "AS23700",
+    "isp": "Linknet-Fastnet ASN",
+    "net_type": "isp",
+    "country": "ID",
+    "resolved_ip": "111.95.113.87"
+  },
+  "116.94.61.88": {
+    "asn": "AS7679",
+    "isp": "QTnet, Inc.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn782112469.opengw.net": {
+    "asn": "AS7679",
+    "isp": "QTnet, Inc.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "116.94.61.88"
+  },
+  "184.82.38.114": {
+    "asn": "AS133481",
+    "isp": "AIS-Fibre",
+    "net_type": "isp",
+    "country": "TH"
+  },
+  "vpn196516751.opengw.net": {
+    "asn": "AS133481",
+    "isp": "AIS-Fibre",
+    "net_type": "isp",
+    "country": "TH",
+    "resolved_ip": "184.82.38.114"
+  },
+  "60.126.0.2": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn711677985.opengw.net": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "60.126.0.2"
+  },
+  "126.163.155.88": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn275348493.opengw.net": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "126.163.155.88"
+  },
+  "14.47.236.43": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn893273760.opengw.net": {
+    "asn": "AS4766",
+    "isp": "Korea Telecom",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "14.47.236.43"
+  },
+  "163.58.201.94": {
+    "asn": "AS9365",
+    "isp": "its communications Inc.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn690984602.opengw.net": {
+    "asn": "AS9365",
+    "isp": "its communications Inc.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "163.58.201.94"
+  },
+  "126.25.190.75": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn437318557.opengw.net": {
+    "asn": "AS17676",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "126.25.190.75"
+  },
+  "111.96.30.151": {
+    "asn": "AS2516",
+    "isp": "KDDI CORPORATION",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn460712024.opengw.net": {
+    "asn": "AS2516",
+    "isp": "KDDI CORPORATION",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "111.96.30.151"
+  },
+  "120.29.68.168": {
+    "asn": "AS17639",
+    "isp": "Converge-ict Solution Inc",
+    "net_type": "isp",
+    "country": "PH"
+  },
+  "vpn919660306.opengw.net": {
+    "asn": "AS17639",
+    "isp": "Converge-ict Solution Inc",
+    "net_type": "isp",
+    "country": "PH",
+    "resolved_ip": "120.29.68.168"
+  },
+  "156.239.242.10": {
+    "asn": "AS62468",
+    "isp": "VpsQuan L.L.C.",
+    "net_type": "datacenter",
+    "country": "US"
+  },
+  "vpn7327190860.opengw.net": {
+    "asn": "AS62468",
+    "isp": "VpsQuan L.L.C.",
+    "net_type": "datacenter",
+    "country": "US",
+    "resolved_ip": "156.239.242.10"
   }
 }
