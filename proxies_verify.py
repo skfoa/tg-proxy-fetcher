@@ -145,6 +145,9 @@ try:
 except Exception:
     pass
 
+# 用于与 Cloudflare 边缘服务器建立内层端到端 TLS 隧道的正规现代 SSL 上下文 (避免 SECLEVEL=0 触发 TLSV1_ALERT_INTERNAL_ERROR)
+CF_SSL_CTX = ssl.create_default_context()
+
 # 预编译高频响应解析正则，避免协程密集调用中的重复正则解析与查表开销
 RE_COLO = re.compile(r"\bcolo=([A-Za-z0-9]+)\b")
 RE_LOC = re.compile(r"\bloc=([A-Za-z]{2})\b")
@@ -646,12 +649,12 @@ async def probe_https(
             timeout=connect_timeout,
         )
         connect_req = (
-            f"CONNECT {PROBE_HOST}:{PROBE_PORT} HTTP/1.1\r\n"
-            f"Host: {PROBE_HOST}:{PROBE_PORT}\r\n"
+            f"CONNECT {PROBE_HOST}:443 HTTP/1.1\r\n"
+            f"Host: {PROBE_HOST}:443\r\n"
             f"{auth_header}"
             f"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36\r\n"
-            f"Proxy-Connection: close\r\n"
-            f"Connection: close\r\n"
+            f"Proxy-Connection: keep-alive\r\n"
+            f"Connection: keep-alive\r\n"
             f"\r\n"
         ).encode("latin1")
         writer.write(connect_req)
@@ -669,7 +672,15 @@ async def probe_https(
                 return False, lat, status, "", "", ""
             return False, lat, "http_connect_fail", "", "", ""
 
-        # 阶段 2b: CONNECT 隧道建立成功后，必须向目标发送真实 GET /cdn-cgi/trace 校验 colo/ip 穿透回传
+        # 阶段 2b: CONNECT 443 隧道建立成功后，升级端到端 TLS (loop.start_tls) 并发送 GET /cdn-cgi/trace
+        loop = asyncio.get_running_loop()
+        protocol = writer.transport.get_protocol()
+        tls_transport = await asyncio.wait_for(
+            loop.start_tls(writer.transport, protocol, sslcontext=CF_SSL_CTX, server_hostname=PROBE_HOST),
+            timeout=connect_timeout,
+        )
+        writer._transport = tls_transport
+
         trace_req = (
             f"GET {PROBE_PATH} HTTP/1.1\r\n"
             f"Host: {PROBE_HOST}\r\n"
