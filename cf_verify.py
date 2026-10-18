@@ -152,6 +152,7 @@ async def probe_ip(
         return False, 0, f"connect_failed_{type(e).__name__}"
 
     try:
+        http_deadline = time.monotonic() + http_timeout
         req = (
             f"GET / HTTP/1.1\r\n"
             f"Host: {PROBE_HOST}\r\n"
@@ -160,9 +161,11 @@ async def probe_ip(
             f"\r\n"
         ).encode("latin1")
         writer.write(req)
-        await asyncio.wait_for(writer.drain(), timeout=http_timeout)
+        drain_timeout = max(0.001, http_deadline - time.monotonic())
+        await asyncio.wait_for(writer.drain(), timeout=drain_timeout)
 
-        resp_bytes = await read_full_response(reader, http_timeout)
+        read_timeout = max(0.001, http_deadline - time.monotonic())
+        resp_bytes = await read_full_response(reader, read_timeout)
         if not resp_bytes:
             return False, latency_ms, "empty_response"
 
@@ -711,15 +714,16 @@ async def _verify_and_persist(csv_path: str, tag: str, args, on_save) -> dict:
         and safe_int(r.get("_old_fc"), 0) > 0
     )
 
-    res["diag_map"] = {
-        canonical_key(r.get("ip", ""), r.get("port", 0)): {
-            "reason": r.get("_reason", "unknown"),
-            "alive": safe_int(r.get("fail_count"), 0) == 0,
-            "latency": safe_int(r.get("delay_ms"), 0),
+    if getattr(args, "diag_output", ""):
+        res["diag_map"] = {
+            canonical_key(r.get("ip", ""), r.get("port", 0)): {
+                "reason": r.get("_reason", "unknown"),
+                "alive": safe_int(r.get("fail_count"), 0) == 0,
+                "latency": safe_int(r.get("delay_ms"), 0),
+            }
+            for r in rows
+            if (r.get("ip") or "").strip() and safe_int(r.get("port"), 0) > 0
         }
-        for r in rows
-        if (r.get("ip") or "").strip() and safe_int(r.get("port"), 0) > 0
-    }
 
     if getattr(args, "dry_run", False):
         log.info("[%s (Dry-Run)] 演练诊断模式：仅统计探测原因，跳过磁盘文件覆写与墓地登记", tag)
