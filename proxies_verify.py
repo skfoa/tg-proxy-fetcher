@@ -619,13 +619,13 @@ async def probe_https(
     except ConnectionRefusedError:
         log.debug("HTTPS 节点端口拒绝连接 [%s:%s]", host, port)
         stage1_err_status = "conn_err"
-    except (socket.gaierror, OSError) as e:
-        log.debug("HTTPS 节点网络/DNS异常 [%s:%s]: %s", host, port, e)
-        stage1_err_status = "conn_err"
     except (ConnectionResetError, BrokenPipeError) as e:
         log.debug("HTTPS 节点重置/断开 [%s:%s]: %s", host, port, e)
         if not connected:
             stage1_err_status = "conn_reset"
+    except (socket.gaierror, OSError) as e:
+        log.debug("HTTPS 节点网络/DNS异常 [%s:%s]: %s", host, port, e)
+        stage1_err_status = "conn_err"
     except Exception as e:
         log.debug("HTTPS 绝对 URI 探测异常 [%s:%s]: %s", host, port, e)
     finally:
