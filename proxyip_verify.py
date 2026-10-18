@@ -3,10 +3,10 @@
 Cloudflare 反代 ProxyIP 穿透质检与淘汰引擎 (proxyip_verify.py)
 
 专门针对反代 ProxyIP（proxyip.csv / proxyip.txt）执行深层应用层协议穿透探测：
-  1. TCP 三次握手 + TLS ClientHello（SNI: speed.cloudflare.com，跳过反代非官方证书校验，超时 4.0s 充分兼容跨洲网络延迟）
+  1. TCP 三次握手 + TLS ClientHello（SNI: speed.cloudflare.com，跳过反代非官方证书校验，超时 4.0s）
   2. HTTP/1.1 GET /cdn-cgi/trace 探针请求（浏览器伪装 UA, Connection: close，读取超时 3.5s）
   3. 严格三维校验：统一 deadline 循环读取（上限 4096B），Header 与 Body 物理隔离，Header 严格校验 HTTP 200 + Server: cloudflare，Body 正则提取有效 colo 机房代号
-  4. 优雅四次挥手关闭连接（writer.close + wait_closed），杜绝 RST 异常
+  4. 优雅关闭连接（writer.close + wait_closed），释放套接字资源
 
 淘汰、属性打标与分层导出机制：
   - 存活节点：fail_count 重置为 0，回填实时 delay_ms、colo 机房码
@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+from collections import defaultdict
 import csv
 import json
 import logging
@@ -114,6 +115,7 @@ except Exception:
 
 
 # 预编译正则，高并发下零重复编译开销
+RE_HTTP_STATUS = re.compile(rb"^HTTP/\d\.\d\s+(\d{3})\b")
 RE_HTTP_200 = re.compile(rb"^HTTP/\d\.\d\s+200\b")
 RE_COLO = re.compile(rb"colo=([A-Za-z0-9]+)", re.IGNORECASE)
 
@@ -124,13 +126,13 @@ async def probe_proxyip(
     port: int,
     connect_timeout: float = TIMEOUT,
     http_timeout: float = HTTP_TIMEOUT,
-) -> tuple[bool, int, str]:
+) -> tuple[bool, int, str, str]:
     """
-    对单个 ProxyIP 节点执行 TLS 穿透 + /cdn-cgi/trace 鉴真（修复版 v2）。
+    对单个 ProxyIP 节点执行 TLS 穿透 + /cdn-cgi/trace 鉴真。
 
-    返回 (is_alive, latency_ms, colo):
-        is_alive=True  -> 探测成功，latency_ms 为握手延迟，colo 为解析到的机房代号
-        is_alive=False -> 探测失败，latency_ms 为 0，colo 为空字符串
+    返回 (is_alive, latency_ms, colo, reason):
+        is_alive=True  -> 探测成功，latency_ms 为握手延迟，colo 为解析到的机房代号，reason 为 "ok"
+        is_alive=False -> 探测失败，reason 记录具体失败原因 (如 connect_timeout, tls_error, http_timeout, status_502, no_cf_header, no_colo 等)
     """
     t0 = time.monotonic()
     writer = None
@@ -141,7 +143,17 @@ async def probe_proxyip(
         )
         t1 = time.monotonic()
         latency_ms = max(1, int((t1 - t0) * 1000))
+    except asyncio.TimeoutError:
+        return False, 0, "", "connect_timeout"
+    except (ssl.SSLError, ssl.CertificateError):
+        return False, 0, "", "tls_error"
+    except (ConnectionRefusedError, OSError):
+        return False, 0, "", "conn_error"
+    except Exception as e:
+        return False, 0, "", f"connect_failed_{type(e).__name__}"
 
+    try:
+        http_deadline = time.monotonic() + http_timeout
         req = (
             f"GET {PROBE_PATH} HTTP/1.1\r\n"
             f"Host: {PROBE_HOST}\r\n"
@@ -151,10 +163,17 @@ async def probe_proxyip(
             f"\r\n"
         ).encode("latin1")
         writer.write(req)
-        await asyncio.wait_for(writer.drain(), timeout=http_timeout)
+        drain_timeout = max(0.001, http_deadline - time.monotonic())
+        await asyncio.wait_for(writer.drain(), timeout=drain_timeout)
 
-        resp_bytes = await read_full_response(reader, http_timeout, need_body=True)
+        read_timeout = max(0.001, http_deadline - time.monotonic())
+        resp_bytes = await read_full_response(reader, read_timeout, need_body=True)
+        if not resp_bytes:
+            return False, latency_ms, "", "empty_response"
+
         header_part, body_part = split_header_body(resp_bytes)
+        status_match = RE_HTTP_STATUS.match(header_part)
+        status_code = status_match.group(1).decode("latin1") if status_match else ""
 
         is_200 = bool(RE_HTTP_200.match(header_part))
         is_cf = bool(RE_SERVER_CF.search(header_part))
@@ -163,11 +182,18 @@ async def probe_proxyip(
         colo_match = RE_COLO.search(body_part)
         colo = colo_match.group(1).decode().upper() if colo_match else ""
 
-        is_alive = is_200 and is_cf and bool(colo)
-        return is_alive, latency_ms, colo
+        if is_200 and is_cf and bool(colo):
+            return True, latency_ms, colo, "ok"
+        elif not is_200:
+            return False, latency_ms, colo, f"status_{status_code}" if status_code else "invalid_http_status"
+        elif not is_cf:
+            return False, latency_ms, colo, "no_cf_header"
+        else:
+            return False, latency_ms, "", "no_colo"
+    except asyncio.TimeoutError:
+        return False, latency_ms, "", "http_timeout"
     except Exception as e:
-        log.debug("ProxyIP 探测异常 [%s:%d]: %s", ip, port, e)
-        return False, 0, ""
+        return False, latency_ms, "", f"http_error_{type(e).__name__}"
     finally:
         if writer is not None:
             await safe_close_writer(writer)
@@ -263,6 +289,7 @@ async def verify_proxyips(
     pass_count = 0
     fail_count_total = 0
     completed = 0
+    reasons_counter: dict[str, int] = defaultdict(int)
 
     # 全局显式初始化 _old_fc，确保异常提前返回或空跑时不遗留未定义状态
     for r in rows:
@@ -285,15 +312,18 @@ async def verify_proxyips(
             completed += 1
             row["fail_count"] = fc + 1
             fail_count_total += 1
+            reasons_counter["invalid_row"] += 1
             return
 
         lock_key = f"{ip}:{port}"
         async with sem, get_keyed_lock(lock_key):
-            alive, latency, colo = await probe_proxyip(
+            alive, latency, colo, reason = await probe_proxyip(
                 ip, port, connect_timeout=timeout, http_timeout=http_timeout
             )
 
         completed += 1
+        reasons_counter[reason] += 1
+        row["_reason"] = reason
         fc = _get_fc(row)
         if alive:
             row["fail_count"] = 0
@@ -314,10 +344,13 @@ async def verify_proxyips(
     tasks = [_check(i) for i in indices]
     await asyncio.gather(*tasks)
 
+    sorted_reasons = sorted(reasons_counter.items(), key=lambda x: x[1], reverse=True)
+    reason_summary = ", ".join(f"{k}: {v}" for k, v in sorted_reasons)
     log.info(
         "[ProxyIP 质检] 校验完成: 共 %d 条 | 存活通过 %d 条 (%.1f%%), 失败标记 %d 条",
         total, pass_count, (pass_count / total * 100) if total else 0, fail_count_total,
     )
+    log.info("[ProxyIP 质检] 探测原因汇总: %s", reason_summary)
     return rows
 
 
@@ -446,6 +479,47 @@ async def async_main(args):
     ]
     avg_delay = int(sum(alive_delays) / len(alive_delays)) if alive_delays else 0
 
+    elapsed = time.time() - t_start
+    log.info("ProxyIP 穿透质检流程执行完毕，总耗时 %.2f 秒 (✅ 存活: %d | 均延: %dms | ⚠️ 缓冲: %d [新增: %d, 取消恢复: %d])", elapsed, pass_count, avg_delay, (survivors_len - pass_count), proxyip_buf_new, proxyip_buf_rec)
+
+    # 导出逐节点诊断结果 (仅在指定参数时生成，无论是否 dry_run)
+    if getattr(args, "diag_output", ""):
+        diag_data = {
+            "timestamp": int(time.time()),
+            "concurrency": args.concurrency,
+            "timeout": args.timeout,
+            "http_timeout": args.http_timeout,
+            "proxyip": {
+                canonical_key(r.get("ip", ""), r.get("port", 0)): {
+                    "reason": r.get("_reason", "unknown"),
+                    "alive": _get_fc(r) == 0,
+                    "latency": safe_int(r.get("delay_ms"), 0),
+                    "colo": r.get("colo", ""),
+                }
+                for r in rows
+                if r.get("ip") and safe_int(r.get("port"), 0) > 0
+            },
+        }
+        try:
+            with open(args.diag_output, "w", encoding="utf-8") as f:
+                json.dump(diag_data, f, ensure_ascii=False, indent=2)
+            log.info("已成功导出 ProxyIP 逐节点诊断结果至 %s", args.diag_output)
+        except Exception as e:
+            log.warning("导出 ProxyIP 诊断结果失败: %s", e)
+
+    # 诊断演练模式：跳过写入、墓地与通知
+    if getattr(args, "dry_run", False):
+        log.info("[ProxyIP (Dry-Run)] 演练诊断模式：仅统计探测原因，跳过磁盘文件覆写与墓地登记")
+        return
+
+    # 保存优先于墓地登记的时序
+    save_proxyip(
+        survivors,
+        csv_path=PROXYIP_CSV,
+        txt_path=PROXYIP_TXT,
+        dir_path=PROXYIP_DIR,
+    )
+
     if eliminated > 0:
         log.info("[ProxyIP 淘汰] 剔除 %d 条连续失败 >= %d 次的死节点", eliminated, args.max_fails)
         dead_nodes = [r for r in rows if _get_fc(r) >= args.max_fails]
@@ -459,19 +533,10 @@ async def async_main(args):
     else:
         log.info("[ProxyIP 淘汰] 本次无节点达到连续失败 %d 次的淘汰阈值", args.max_fails)
 
-    save_proxyip(
-        survivors,
-        csv_path=PROXYIP_CSV,
-        txt_path=PROXYIP_TXT,
-        dir_path=PROXYIP_DIR,
-    )
-
-    elapsed = time.time() - t_start
-    log.info("ProxyIP 穿透质检流程执行完毕，总耗时 %.2f 秒 (✅ 存活: %d | 均延: %dms | ⚠️ 缓冲: %d [新增: %d, 取消恢复: %d])", elapsed, pass_count, avg_delay, (survivors_len - pass_count), proxyip_buf_new, proxyip_buf_rec)
-
     # 若存在 tg_fetch 暂存的抓取统计，将 ProxyIP 质检结果并入其中，由后续统一卡片推送
     fetch_stats_file = os.path.join(DATA_DIR, ".fetch_stats.json")
     has_fetch_stats = os.path.isfile(fetch_stats_file)
+    stats_updated = False
     if has_fetch_stats:
         try:
             with open(fetch_stats_file, "r", encoding="utf-8") as f:
@@ -490,11 +555,13 @@ async def async_main(args):
             stats["proxyip_max_fails"] = args.max_fails
             stats["proxyip_avg_delay_ms"] = avg_delay
             atomic_write_json(fetch_stats_file, stats)
+            stats_updated = True
             log.info("已将 ProxyIP 质检统计写入 %s (并入统一卡片)", fetch_stats_file)
         except Exception as e:
             log.warning("写入 %s 失败: %s", fetch_stats_file, e)
 
-    if not args.no_notify and not has_fetch_stats:
+    # 仅在非流水线或写入统计失败时，由独立卡片兜底推送
+    if not args.no_notify and not stats_updated and not getattr(args, "dry_run", False):
         send_proxyip_notification(
             total=total,
             pass_count=pass_count,
@@ -511,7 +578,7 @@ async def async_main(args):
             avg_delay=avg_delay,
         )
     else:
-        log.info("已并入流水线或指定了 --no-notify，跳过独立卡片推送，由统一卡片汇总发送")
+        log.info("已并入流水线、指定了 --no-notify 或处于 --dry-run，跳过独立卡片推送")
 
 
 def main():
@@ -521,6 +588,8 @@ def main():
     parser.add_argument("--timeout", type=float, default=TIMEOUT, help=f"单节点连接与 TLS 握手超时秒数 (默认 {TIMEOUT})")
     parser.add_argument("--http-timeout", type=float, default=HTTP_TIMEOUT, help=f"单节点 HTTP 校验超时秒数 (默认 {HTTP_TIMEOUT})")
     parser.add_argument("--no-notify", action="store_true", help="静默模式，不单独发送 Telegram 质检通知（供流水线协同使用）")
+    parser.add_argument("--dry-run", action="store_true", help="演练诊断模式，仅探测统计原因，不覆写数据文件也不登记墓地")
+    parser.add_argument("--diag-output", type=str, default="", help="诊断结果输出 JSON 路径，记录每个节点的探测原因明细")
     args = parser.parse_args()
 
     asyncio.run(async_main(args))
