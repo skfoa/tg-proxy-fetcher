@@ -16506,5 +16506,280 @@
     "net_type": "datacenter",
     "country": "US",
     "resolved_ip": "156.239.242.10"
+  },
+  "130.110.103.245": {
+    "asn": "AS31898",
+    "isp": "Oracle Cloud",
+    "net_type": "datacenter",
+    "country": "SA"
+  },
+  "72.180.13.9": {
+    "asn": "AS11427",
+    "isp": "Charter Communications",
+    "net_type": "isp",
+    "country": "US"
+  },
+  "vpn474095859.opengw.net": {
+    "asn": "AS11427",
+    "isp": "Charter Communications",
+    "net_type": "isp",
+    "country": "US",
+    "resolved_ip": "72.180.13.9"
+  },
+  "182.237.232.193": {
+    "asn": "AS17583",
+    "isp": "Keumgang Cable Network",
+    "net_type": "datacenter",
+    "country": "KR"
+  },
+  "vpn994456544.opengw.net": {
+    "asn": "AS17583",
+    "isp": "Keumgang Cable Network",
+    "net_type": "datacenter",
+    "country": "KR",
+    "resolved_ip": "182.237.232.193"
+  },
+  "47.243.92.199": {
+    "asn": "AS45102",
+    "isp": "Alibaba Cloud",
+    "net_type": "datacenter",
+    "country": "HK"
+  },
+  "211.215.5.22": {
+    "asn": "AS9318",
+    "isp": "SK Broadband",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn956238422.opengw.net": {
+    "asn": "AS9318",
+    "isp": "SK Broadband",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "211.215.5.22"
+  },
+  "125.240.231.29": {
+    "asn": "AS17858",
+    "isp": "LG POWERCOMM",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn169225991.opengw.net": {
+    "asn": "AS17858",
+    "isp": "LG POWERCOMM",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "125.240.231.29"
+  },
+  "47.85.161.37": {
+    "asn": "AS45102",
+    "isp": "Alibaba Cloud",
+    "net_type": "datacenter",
+    "country": "US"
+  },
+  "1.237.29.229": {
+    "asn": "AS9318",
+    "isp": "SK Broadband",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn909151443.opengw.net": {
+    "asn": "AS9318",
+    "isp": "SK Broadband",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "1.237.29.229"
+  },
+  "140.238.32.108": {
+    "asn": "AS31898",
+    "isp": "Oracle Cloud",
+    "net_type": "datacenter",
+    "country": "JP"
+  },
+  "216.131.73.250": {
+    "asn": "AS62651",
+    "isp": "Strong Technology",
+    "net_type": "datacenter",
+    "country": "US"
+  },
+  "47.243.152.76": {
+    "asn": "AS45102",
+    "isp": "Alibaba Cloud",
+    "net_type": "datacenter",
+    "country": "HK"
+  },
+  "47.91.65.23": {
+    "asn": "AS45102",
+    "isp": "Alibaba Cloud",
+    "net_type": "datacenter",
+    "country": "DE"
+  },
+  "159.138.24.221": {
+    "asn": "AS136907",
+    "isp": "Huawei Cloud",
+    "net_type": "datacenter",
+    "country": "HK"
+  },
+  "49.165.237.183": {
+    "asn": "AS17858",
+    "isp": "LG POWERCOMM",
+    "net_type": "isp",
+    "country": "KR"
+  },
+  "vpn661203165.opengw.net": {
+    "asn": "AS17858",
+    "isp": "LG POWERCOMM",
+    "net_type": "isp",
+    "country": "KR",
+    "resolved_ip": "49.165.237.183"
+  },
+  "2a10:1fc0::f1ac:6540": {
+    "asn": "AS133398",
+    "isp": "Tele Asia Limited",
+    "net_type": "datacenter",
+    "country": "HK"
+  },
+  "82.162.23.20": {
+    "asn": "AS12389",
+    "isp": "Primorye NET",
+    "net_type": "isp",
+    "country": "RU"
+  },
+  "vpn962043623.opengw.net": {
+    "asn": "AS12389",
+    "isp": "Primorye NET",
+    "net_type": "isp",
+    "country": "RU",
+    "resolved_ip": "82.162.23.20"
+  },
+  "156.59.17.27": {
+    "asn": "AS21859",
+    "isp": "Zenlayer",
+    "net_type": "datacenter",
+    "country": "HK"
+  },
+  "20.44.210.140": {
+    "asn": "AS8075",
+    "isp": "Microsoft Azure",
+    "net_type": "datacenter",
+    "country": "SG"
+  },
+  "47.89.184.18": {
+    "asn": "AS45102",
+    "isp": "Alibaba Cloud",
+    "net_type": "datacenter",
+    "country": "US"
+  },
+  "45.43.60.220": {
+    "asn": "AS135377",
+    "isp": "UCloud",
+    "net_type": "datacenter",
+    "country": "JP"
+  },
+  "8.218.179.191": {
+    "asn": "AS45102",
+    "isp": "Alibaba Cloud",
+    "net_type": "datacenter",
+    "country": "HK"
+  },
+  "121.80.134.206": {
+    "asn": "AS17511",
+    "isp": "OPTAGE Inc.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn131251792.opengw.net": {
+    "asn": "AS17511",
+    "isp": "OPTAGE Inc.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "121.80.134.206"
+  },
+  "181.119.224.25": {
+    "asn": "AS52468",
+    "isp": "Ufinet Panama S.A.",
+    "net_type": "isp",
+    "country": "EC"
+  },
+  "122.246.3.12": {
+    "asn": "AS136188",
+    "isp": "China Telecom",
+    "net_type": "datacenter",
+    "country": "CN"
+  },
+  "123.48.27.243": {
+    "asn": "AS18126",
+    "isp": "Chubu Telecommunications Company, Inc.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn805442422.opengw.net": {
+    "asn": "AS18126",
+    "isp": "Chubu Telecommunications Company, Inc.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "123.48.27.243"
+  },
+  "219.67.73.34": {
+    "asn": "AS4725",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP"
+  },
+  "vpn290770797.opengw.net": {
+    "asn": "AS4725",
+    "isp": "SoftBank Corp.",
+    "net_type": "isp",
+    "country": "JP",
+    "resolved_ip": "219.67.73.34"
+  },
+  "8.209.255.13": {
+    "asn": "AS45102",
+    "isp": "Alibaba Cloud",
+    "net_type": "datacenter",
+    "country": "JP"
+  },
+  "8.213.151.128": {
+    "asn": "AS45102",
+    "isp": "Alibaba Cloud",
+    "net_type": "datacenter",
+    "country": "KR"
+  },
+  "68.183.79.30": {
+    "asn": "AS14061",
+    "isp": "DigitalOcean",
+    "net_type": "datacenter",
+    "country": "DE"
+  },
+  "165.154.162.73": {
+    "asn": "AS135377",
+    "isp": "UCloud",
+    "net_type": "datacenter",
+    "country": "US"
+  },
+  "20.33.10.79": {
+    "asn": "AS8069",
+    "isp": "Microsoft Corporation",
+    "net_type": "datacenter",
+    "country": "ZA"
+  },
+  "47.91.104.88": {
+    "asn": "AS45102",
+    "isp": "Alibaba Cloud",
+    "net_type": "datacenter",
+    "country": "AE"
+  },
+  "109.184.185.237": {
+    "asn": "AS12389",
+    "isp": "Primorye NET",
+    "net_type": "isp",
+    "country": "RU"
+  },
+  "vpn369858513.opengw.net": {
+    "asn": "AS12389",
+    "isp": "Primorye NET",
+    "net_type": "isp",
+    "country": "RU",
+    "resolved_ip": "109.184.185.237"
   }
 }

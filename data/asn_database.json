@@ -2198,7 +2198,11 @@
     "Wide Netcom India": "AS139508",
     "Linknet-Fastnet ASN": "AS23700",
     "its communications Inc.": "AS9365",
-    "Converge-ict Solution Inc": "AS17639"
+    "Converge-ict Solution Inc": "AS17639",
+    "Keumgang Cable Network": "AS17583",
+    "Strong Technology": "AS62651",
+    "Ufinet Panama S.A.": "AS52468",
+    "Microsoft Corporation": "AS8069"
   },
   "asn_to_isp": {
     "AS174": "Cogent Communications, LLC",
@@ -4325,7 +4329,14 @@
     "AS23700": "Linknet-Fastnet ASN",
     "AS9365": "its communications Inc.",
     "AS17639": "Converge-ict Solution Inc",
-    "AS199144": "HexCore cloud s.r.o."
+    "AS199144": "HexCore cloud s.r.o.",
+    "AS11427": "Charter Communications",
+    "AS17583": "Keumgang Cable Network",
+    "AS62651": "Strong Technology",
+    "AS52468": "Ufinet Panama S.A.",
+    "AS136188": "China Telecom",
+    "AS4725": "SoftBank Corp.",
+    "AS8069": "Microsoft Corporation"
   },
   "asn_to_net_type": {
     "AS1311": "banking",
@@ -7617,6 +7628,7 @@
     "AS198100": "datacenter",
     "AS20071": "datacenter",
     "AS396986": "datacenter",
-    "AS139508": "datacenter"
+    "AS139508": "datacenter",
+    "AS17583": "datacenter"
   }
 }
