@@ -2202,7 +2202,14 @@
     "Keumgang Cable Network": "AS17583",
     "Strong Technology": "AS62651",
     "Ufinet Panama S.A.": "AS52468",
-    "Microsoft Corporation": "AS8069"
+    "Microsoft Corporation": "AS8069",
+    "7Global Ltd": "AS40021",
+    "Mobin Net Communication Company (Private Joint Stock)": "AS50810",
+    "British Telecommunications PLC": "AS6871",
+    "Superonline Iletisim Hizmetleri A.S.": "AS34984",
+    "CJSC \"ER-Telecom Holding\" Kazan' branch": "AS41668",
+    "Telenet N.V.": "AS6848",
+    "PS Internet Company LLC": "AS39318"
   },
   "asn_to_isp": {
     "AS174": "Cogent Communications, LLC",
@@ -4336,7 +4343,17 @@
     "AS52468": "Ufinet Panama S.A.",
     "AS136188": "China Telecom",
     "AS4725": "SoftBank Corp.",
-    "AS8069": "Microsoft Corporation"
+    "AS8069": "Microsoft Corporation",
+    "AS40021": "7Global Ltd",
+    "AS50810": "Mobin Net Communication Company (Private Joint Stock)",
+    "AS6871": "British Telecommunications PLC",
+    "AS34984": "Superonline Iletisim Hizmetleri A.S.",
+    "AS20001": "Charter Communications",
+    "AS41668": "CJSC \"ER-Telecom Holding\" Kazan' branch",
+    "AS137266": "China Telecom",
+    "AS209699": "Coaxial Cable LLC",
+    "AS6848": "Telenet N.V.",
+    "AS39318": "PS Internet Company LLC"
   },
   "asn_to_net_type": {
     "AS1311": "banking",
@@ -7629,6 +7646,9 @@
     "AS20071": "datacenter",
     "AS396986": "datacenter",
     "AS139508": "datacenter",
-    "AS17583": "datacenter"
+    "AS17583": "datacenter",
+    "AS50810": "datacenter",
+    "AS41668": "isp",
+    "AS137266": "isp"
   }
 }
