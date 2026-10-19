@@ -109,6 +109,14 @@ except Exception:
 
 RE_HTTP_STATUS = re.compile(rb"^HTTP/\d\.\d\s+(\d{3})\b")
 
+# 确定性硬伤致命状态（端口明确拒绝关闭、空响应断连、脏数据等），当场判死淘汰进墓地
+# 注：tls_error (保护第三方自建反代)、status_502 (源站抖动)、connect_timeout (跨国丢包) 等严格排除在外，充分享受 3 次缓冲容错！
+FATAL_FAIL_STATUSES = {
+    "conn_error",       # 对端端口关闭 (Connection Refused) / 主机不可达，TCP 直接被拒
+    "empty_response",   # 建立连接后一发请求即断开 (假服务/死连接)
+    "invalid_row",      # 格式损坏的脏数据行
+}
+
 # 官方 Cloudflare Anycast 诊断基线 IP 池 (共 300 个，覆盖并发 250 槽位)
 OFFICIAL_BASELINE_IPS = [
     f"104.16.{i}.{j}" for i in range(16, 26) for j in range(1, 11)
@@ -196,11 +204,14 @@ async def verify_all(
     concurrency: int = 250,
     timeout: float = TIMEOUT,
     http_timeout: float = HTTP_TIMEOUT,
+    max_fails: int = MAX_FAILS,
 ) -> list:
     """
     对传入的所有优选 IP 节点无差别执行阶段一与阶段二探测。
     无论端口与元数据如何，全部执行 TLS 握手与 301 重定向鉴真。
     原地更新 fail_count 与 delay_ms，并汇总失败原因分布。
+    对确定性致命硬故障 (conn_error / empty_response / invalid_row) 当场拉满淘汰阈值，
+    对软性抖动 (status_502 / connect_timeout) 及第三方反代 TLS 异常 (tls_error) 保留 3 次缓冲机会。
     """
     if not rows:
         return rows
@@ -227,11 +238,11 @@ async def verify_all(
 
         ip = (row.get("ip") or "").strip()
         port = safe_int(row.get("port"), 0)
-        # 上游 load_csv 已执行过滤，此处为二次边界防御；非法行标记并累加失败计数以快速淘汰
+        # 上游 load_csv 已执行过滤，此处为二次边界防御；非法行标记并拉满失败计数以直接淘汰
         if not ip or port <= 0 or port > 65535:
             completed += 1
             row["_invalid"] = True
-            row["fail_count"] = fc + 1
+            row["fail_count"] = max_fails
             fail_count_total += 1
             reasons_counter["invalid_row"] += 1
             return
@@ -248,7 +259,10 @@ async def verify_all(
             row["delay_ms"] = latency
             pass_count += 1
         else:
-            row["fail_count"] = fc + 1
+            if reason in FATAL_FAIL_STATUSES:
+                row["fail_count"] = max_fails
+            else:
+                row["fail_count"] = fc + 1
             fail_count_total += 1
 
         if completed % 1000 == 0 or completed == total:
@@ -690,6 +704,7 @@ async def _verify_and_persist(csv_path: str, tag: str, args, on_save) -> dict:
         concurrency=args.concurrency,
         timeout=args.timeout,
         http_timeout=args.http_timeout,
+        max_fails=args.max_fails,
     )
 
     survivors = [
