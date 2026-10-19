@@ -1646,6 +1646,48 @@ def merge_and_save(
         else:
             final_proxyips[k] = v
 
+    # 3. 架构准则全局保底分流：
+    # - 凡是非机房节点 (net_type != 'datacenter') 绝对归入 final_proxyips (原生宽带/专线/教育/政务/金融)
+    # - 除此以外的所有节点 (net_type == 'datacenter'，即常规机房) 绝对归入 final_scan_ips (扫描优选机房池)
+    cleaned_scan_ips = {}
+    scan_to_proxy = {}
+    for k, v in final_scan_ips.items():
+        nt = v.get("net_type") or classify_asn(v.get("asn", ""), v.get("isp", ""))
+        v["net_type"] = nt
+        if nt != "datacenter":
+            scan_to_proxy[k] = v
+        else:
+            cleaned_scan_ips[k] = v
+
+    cleaned_proxyips = {}
+    proxy_to_scan = {}
+    for k, v in final_proxyips.items():
+        nt = v.get("net_type") or classify_asn(v.get("asn", ""), v.get("isp", ""))
+        v["net_type"] = nt
+        if nt == "datacenter":
+            proxy_to_scan[k] = v
+        else:
+            cleaned_proxyips[k] = v
+
+    for k, v in scan_to_proxy.items():
+        if k not in cleaned_proxyips:
+            cleaned_proxyips[k] = v
+        else:
+            for mk in ("colo", "cf_location", "isp", "asn", "net_type"):
+                if v.get(mk) and not cleaned_proxyips[k].get(mk):
+                    cleaned_proxyips[k][mk] = v[mk]
+
+    for k, v in proxy_to_scan.items():
+        if k not in cleaned_scan_ips:
+            cleaned_scan_ips[k] = v
+        else:
+            for mk in ("colo", "cf_location", "isp", "asn", "net_type"):
+                if v.get(mk) and not cleaned_scan_ips[k].get(mk):
+                    cleaned_scan_ips[k][mk] = v[mk]
+
+    final_scan_ips = cleaned_scan_ips
+    final_proxyips = cleaned_proxyips
+
     log.info("=" * 50)
     log.info(
         "代理节点增量合并: 历史保留 %d 个, 本次新增 %d 个, 本次更新 %d 个 -> 全量总计 %d 个",
@@ -2001,84 +2043,52 @@ async def run_telethon():
                         # 支持自动下载并解析优选扫描附件与反代 ProxyIP 附件 (独立归入各自集合)
                         if msg.file and msg.file.name:
                             fname_lower = msg.file.name.lower()
-                            # 1. 反代 ProxyIP 文件 (如 Global-proxyip-443.csv, Anti-CF-2026-10-18.csv, OTC_SCAN_YX_CF-NRT反代.txt 等)
-                            if any(k in fname_lower for k in ("proxyip", "proxy_ip", "反代", "anti-cf", "anticf", "anti_cf")) and fname_lower.endswith((".csv", ".txt")):
+                            # 1. 自动识别并下载优选测速/反代附件 (CSV/TXT，含 DanFeng、OTC_SCAN、Anti-CF、ProxyIP 等)
+                            is_scan_or_proxy_file = (
+                                fname_lower.endswith(".csv")
+                                or (fname_lower.endswith(".txt") and any(k in fname_lower for k in ("otc_scan", "proxyip", "proxy_ip", "反代", "anti-cf", "anticf", "anti_cf")))
+                            )
+                            if is_scan_or_proxy_file:
                                 try:
                                     doc_bytes = await client.download_media(msg, file=bytes)
                                     if doc_bytes:
                                         doc_text = doc_bytes.decode("utf-8", errors="ignore")
                                         doc_date_str = msg.date.astimezone(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S") if msg.date else ""
+                                        # 优先 CSV 解析，若失败则尝试 OTC SCAN TXT 解析
                                         doc_items = parse_cf_csv_content(doc_text, default_channel=channel_name, filename=msg.file.name, dt_str=doc_date_str)
                                         if not doc_items:
                                             doc_items = parse_otc_scan_content(doc_text, default_channel=channel_name, filename=msg.file.name, dt_str=doc_date_str)
-                                        doc_added = 0
+                                        
+                                        doc_proxy_added = 0
+                                        doc_scan_added = 0
                                         for cf_item in doc_items:
                                             cf_key = f"{cf_item['ip']}:{cf_item['port']}"
                                             if is_tombstoned(cf_key, tombstone):
                                                 continue
-                                            if cf_key not in scraped_proxyips:
-                                                scraped_proxyips[cf_key] = cf_item
-                                                proxyip_count += 1
-                                                doc_added += 1
-                                        log.info("从频道 %s ProxyIP 附件 %s 中提取 %d 条反代 IP", channel_name, msg.file.name, doc_added)
-                                        # 若属于 Anti-CF 测速反代优选附件，既是反代 IP 也是优选 IP，同步归入扫描优选池
-                                        if any(k in fname_lower for k in ("anti-cf", "anticf", "anti_cf")):
-                                            scan_added = 0
-                                            for cf_item in doc_items:
-                                                cf_key = f"{cf_item['ip']}:{cf_item['port']}"
-                                                if is_tombstoned(cf_key, tombstone):
-                                                    continue
+                                            
+                                            # 架构核心准则：按权威网络类型彻底分流
+                                            # - 非机房节点 (ISP家庭宽带/商业专线/教育科研/政务公用/银行金融) -> 归入 proxyip
+                                            # - 除了非机房的所有节点 (即常规机房 datacenter) -> 归入 scan_ips
+                                            nt = cf_item.get("net_type") or classify_asn(cf_item.get("asn", ""), cf_item.get("isp", ""))
+                                            cf_item["net_type"] = nt
+                                            
+                                            if nt != "datacenter":
+                                                if cf_key not in scraped_proxyips:
+                                                    scraped_proxyips[cf_key] = cf_item
+                                                    proxyip_count += 1
+                                                    doc_proxy_added += 1
+                                            else:
                                                 if cf_key not in scraped_scan_ips:
                                                     scraped_scan_ips[cf_key] = cf_item
                                                     scan_count += 1
-                                                    scan_added += 1
-                                            log.info("从频道 %s Anti-CF 反代优选附件 %s 中同步提取 %d 条扫描优选 IP", channel_name, msg.file.name, scan_added)
+                                                    doc_scan_added += 1
+                                        
+                                        log.info(
+                                            "从频道 %s 附件 %s 中提取并按属性分流: 非机房ProxyIP %d 条, 机房扫描优选 %d 条",
+                                            channel_name, msg.file.name, doc_proxy_added, doc_scan_added
+                                        )
                                 except Exception as e:
-                                    log.warning("下载/解析频道 %s ProxyIP 附件 %s 失败: %s", channel_name, msg.file.name, e)
-                            # 2. 扫描优选 CSV (如 DanFeng AS45102_*.csv)
-                            elif fname_lower.endswith(".csv"):
-                                try:
-                                    doc_bytes = await client.download_media(msg, file=bytes)
-                                    if doc_bytes:
-                                        doc_text = doc_bytes.decode("utf-8", errors="ignore")
-                                        doc_date_str = msg.date.astimezone(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S") if msg.date else ""
-                                        doc_items = parse_cf_csv_content(doc_text, default_channel=channel_name, filename=msg.file.name, dt_str=doc_date_str)
-                                        if not doc_items:
-                                            doc_items = parse_otc_scan_content(doc_text, default_channel=channel_name, filename=msg.file.name, dt_str=doc_date_str)
-                                        doc_added = 0
-                                        for cf_item in doc_items:
-                                            cf_key = f"{cf_item['ip']}:{cf_item['port']}"
-                                            if is_tombstoned(cf_key, tombstone):
-                                                continue
-                                            if cf_key not in scraped_scan_ips:
-                                                scraped_scan_ips[cf_key] = cf_item
-                                                scan_count += 1
-                                                doc_added += 1
-                                        log.info("从频道 %s CSV 附件 %s 中提取 %d 条扫描优选 IP", channel_name, msg.file.name, doc_added)
-                                except Exception as e:
-                                    log.warning("下载/解析频道 %s CSV 附件 %s 失败: %s", channel_name, msg.file.name, e)
-                            # 3. 扫描优选 TXT (如 OTC_SCAN_YX_*.txt)
-                            elif fname_lower.endswith(".txt") and "otc_scan" in fname_lower:
-                                try:
-                                    doc_bytes = await client.download_media(msg, file=bytes)
-                                    if doc_bytes:
-                                        doc_text = doc_bytes.decode("utf-8", errors="ignore")
-                                        doc_date_str = msg.date.astimezone(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S") if msg.date else ""
-                                        doc_items = parse_otc_scan_content(doc_text, default_channel=channel_name, filename=msg.file.name, dt_str=doc_date_str)
-                                        if not doc_items:
-                                            doc_items = parse_cf_csv_content(doc_text, default_channel=channel_name, filename=msg.file.name, dt_str=doc_date_str)
-                                        doc_added = 0
-                                        for cf_item in doc_items:
-                                            cf_key = f"{cf_item['ip']}:{cf_item['port']}"
-                                            if is_tombstoned(cf_key, tombstone):
-                                                continue
-                                            if cf_key not in scraped_scan_ips:
-                                                scraped_scan_ips[cf_key] = cf_item
-                                                scan_count += 1
-                                                doc_added += 1
-                                        log.info("从频道 %s TXT 附件 %s 中提取 %d 条扫描优选 IP", channel_name, msg.file.name, doc_added)
-                                except Exception as e:
-                                    log.warning("下载/解析频道 %s TXT 附件 %s 失败: %s", channel_name, msg.file.name, e)
+                                    log.warning("下载/解析频道 %s 附件 %s 失败: %s", channel_name, msg.file.name, e)
             except FloodWaitError as e:
                 log.warning("频道 %s 扫描时触发 Telegram 频控限制 (等待 %d 秒): %s", channel_name, e.seconds, e)
 
