@@ -16781,5 +16781,236 @@
     "net_type": "isp",
     "country": "RU",
     "resolved_ip": "109.184.185.237"
+  },
+  "149.57.28.9": {
+    "asn": "AS397540 Windscribe Limited",
+    "isp": "Windscribe",
+    "net_type": "datacenter",
+    "country": "CA",
+    "resolved_ip": "149.57.28.251"
+  },
+  "181.215.52.101": {
+    "asn": "AS397540 Windscribe Limited (Private Customer)",
+    "isp": "Private Customer",
+    "net_type": "datacenter",
+    "country": "CA",
+    "resolved_ip": "181.215.52.120"
+  },
+  "181.215.52.25": {
+    "asn": "AS397540 Windscribe Limited (Private Customer)",
+    "isp": "Private Customer",
+    "net_type": "datacenter",
+    "country": "CA",
+    "resolved_ip": "181.215.52.29"
+  },
+  "181.215.52.122": {
+    "asn": "AS397540 Windscribe Limited (Private Customer)",
+    "isp": "Private Customer",
+    "net_type": "datacenter",
+    "country": "CA",
+    "resolved_ip": "181.215.52.127"
+  },
+  "181.215.52.40": {
+    "asn": "AS397540 Windscribe Limited (Private Customer)",
+    "isp": "Private Customer",
+    "net_type": "datacenter",
+    "country": "CA",
+    "resolved_ip": "181.215.52.43"
+  },
+  "185.221.132.242": {
+    "asn": "AS206804 EstNOC OU (ESTNOC-GLOBAL)",
+    "isp": "ESTNOC-GLOBAL",
+    "net_type": "datacenter",
+    "country": "LU",
+    "resolved_ip": "185.221.132.249"
+  },
+  "185.221.132.226": {
+    "asn": "AS206804 EstNOC OU (ESTNOC-GLOBAL)",
+    "isp": "ESTNOC-GLOBAL",
+    "net_type": "datacenter",
+    "country": "LU",
+    "resolved_ip": "185.221.132.235"
+  },
+  "79.142.77.63": {
+    "asn": "AS51430 AltusHost B.V.",
+    "isp": "AltusHost B.V.",
+    "net_type": "datacenter",
+    "country": "SE",
+    "resolved_ip": "79.142.77.77"
+  },
+  "209.170.227.253": {
+    "asn": "AS62642 Bigleaf Networks, Inc. (IT Group NW, LLC)",
+    "isp": "IT Group NW, LLC",
+    "net_type": "datacenter",
+    "country": "US",
+    "resolved_ip": "209.170.227.253"
+  },
+  "192.159.101.174": {
+    "asn": "AS206804 EstNOC OU (ESTNOC-GLOBAL)",
+    "isp": "ESTNOC-GLOBAL",
+    "net_type": "datacenter",
+    "country": "EE",
+    "resolved_ip": "192.159.101.169"
+  },
+  "85.203.39.130": {
+    "asn": "AS206804 EstNOC OU (ESTNOC-GLOBAL)",
+    "isp": "ESTNOC-GLOBAL",
+    "net_type": "datacenter",
+    "country": "LV",
+    "resolved_ip": "85.203.39.141"
+  },
+  "192.159.101.178": {
+    "asn": "AS206804 EstNOC OU (ESTNOC-GLOBAL)",
+    "isp": "ESTNOC-GLOBAL",
+    "net_type": "datacenter",
+    "country": "EE",
+    "resolved_ip": "192.159.101.185"
+  },
+  "45.133.192.194": {
+    "asn": "AS206804 EstNOC OU (ESTNOC-GLOBAL)",
+    "isp": "ESTNOC-GLOBAL",
+    "net_type": "datacenter",
+    "country": "IS",
+    "resolved_ip": "45.133.192.200"
+  },
+  "181.215.52.16": {
+    "asn": "AS397540 Windscribe Limited (Private Customer)",
+    "isp": "Private Customer",
+    "net_type": "datacenter",
+    "country": "CA",
+    "resolved_ip": "181.215.52.16"
+  },
+  "170.168.1.39": {
+    "asn": "AS214822 MT FINANCE LLC",
+    "isp": "MT FINANCE LLC",
+    "net_type": "datacenter",
+    "country": "RU",
+    "resolved_ip": "170.168.1.39"
+  },
+  "91.92.250.33": {
+    "asn": "AS31130 RapidSpace",
+    "isp": "RapidSpace",
+    "net_type": "datacenter",
+    "country": "PL",
+    "resolved_ip": "91.92.250.33"
+  },
+  "188.42.46.2": {
+    "asn": "AS7979 Servers.com, Inc. (root SA)",
+    "isp": "root SA",
+    "net_type": "datacenter",
+    "country": "LU",
+    "resolved_ip": "188.42.46.2"
+  },
+  "195.22.25.125": {
+    "asn": "AS5533 Claranet Portugal S.A",
+    "isp": "Claranet Portugal S.A",
+    "net_type": "datacenter",
+    "country": "PT",
+    "resolved_ip": "195.22.25.122"
+  },
+  "103.22.182.254": {
+    "asn": "AS56309 Siamdata Communication Co.,Ltd. (Readyidc CO.,LTD.)",
+    "isp": "Readyidc CO.,LTD.",
+    "net_type": "datacenter",
+    "country": "TH",
+    "resolved_ip": "103.22.182.235"
+  },
+  "103.58.150.11": {
+    "asn": "AS63989 DE-CORP",
+    "isp": "DE-CORP",
+    "net_type": "datacenter",
+    "country": "TH",
+    "resolved_ip": "103.58.150.16"
+  },
+  "38.76.140.254": {
+    "asn": "AS137897 PAN-LIAN TECHNOLOGY CO., LIMITED (PCCW IMS Ltd PCCW Business Internet Access)",
+    "isp": "PCCW IMS Ltd PCCW Business Internet Access",
+    "net_type": "datacenter",
+    "country": "HK",
+    "resolved_ip": "2400:c800:109:20c:ffd3:c591:62c0:6ba"
+  },
+  "103.26.207.94": {
+    "asn": "AS132335 LEAPSWITCH NETWORKS PRIVATE LIMITED",
+    "isp": "LEAPSWITCH NETWORKS PRIVATE LIMITED",
+    "net_type": "datacenter",
+    "country": "IN",
+    "resolved_ip": "103.26.207.233"
+  },
+  "196.43.240.49": {
+    "asn": "AS37548 ARPCE",
+    "isp": "ARPCE",
+    "net_type": "datacenter",
+    "country": "CG",
+    "resolved_ip": "196.43.240.61"
+  },
+  "141.98.19.221": {
+    "asn": "AS56309 Siamdata Communication Co.,Ltd. (Legaco Networks B.V.)",
+    "isp": "Legaco Networks B.V.",
+    "net_type": "datacenter",
+    "country": "TH",
+    "resolved_ip": "141.98.19.55"
+  },
+  "103.26.207.103": {
+    "asn": "AS132335 LEAPSWITCH NETWORKS PRIVATE LIMITED",
+    "isp": "LEAPSWITCH NETWORKS PRIVATE LIMITED",
+    "net_type": "datacenter",
+    "country": "IN",
+    "resolved_ip": "103.26.207.145"
+  },
+  "185.187.43.38": {
+    "asn": "AS199324 DODONET S.R.L. - dodonet network",
+    "isp": "DODONET S.R.L. - dodonet network",
+    "net_type": "datacenter",
+    "country": "IT",
+    "resolved_ip": "185.187.43.38"
+  },
+  "49.50.72.246": {
+    "asn": "AS55470 nsd cyfuture.com",
+    "isp": "nsd cyfuture.com",
+    "net_type": "datacenter",
+    "country": "IN",
+    "resolved_ip": "49.50.72.246"
+  },
+  "120.232.204.58": {
+    "asn": "AS136258 BrainStorm Network",
+    "isp": "Brainstorm Network, INC",
+    "net_type": "datacenter",
+    "country": "IN",
+    "resolved_ip": "103.97.203.229"
+  },
+  "110.38.225.213": {
+    "asn": "AS38264 National Wimax/IMS environment",
+    "isp": "National Wimax/IMS environment",
+    "net_type": "datacenter",
+    "country": "PK",
+    "resolved_ip": "110.38.225.213"
+  },
+  "210.48.154.99": {
+    "asn": "AS17971 TM VADS DC Hosting",
+    "isp": "TM VADS DC Hosting",
+    "net_type": "datacenter",
+    "country": "MY",
+    "resolved_ip": "210.48.154.99"
+  },
+  "103.127.242.229": {
+    "asn": "AS137535 JT Telecom (Hong Kong Communications International Co., limited)",
+    "isp": "Hong Kong Communications International Co., limited",
+    "net_type": "datacenter",
+    "country": "JP",
+    "resolved_ip": "103.127.242.229"
+  },
+  "151.242.183.28": {
+    "asn": "AS137897 PAN-LIAN TECHNOLOGY CO., LIMITED (XING XUN TECH LIMITED)",
+    "isp": "XING XUN TECH LIMITED",
+    "net_type": "datacenter",
+    "country": "HK",
+    "resolved_ip": "2403:27c0:c03:1::71"
+  },
+  "202.85.53.25": {
+    "asn": "AS137897 PAN-LIAN TECHNOLOGY CO., LIMITED (XING XUN TECH LIMITED)",
+    "isp": "XING XUN TECH LIMITED",
+    "net_type": "datacenter",
+    "country": "HK",
+    "resolved_ip": "2403:27c0:c03:1::71"
   }
 }

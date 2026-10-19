@@ -15,21 +15,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "https://149.57.28.9:443",
-    "protocol": "https",
-    "ip": "149.57.28.9",
-    "port": 443,
-    "country": "CA",
-    "country_name": "加拿大",
-    "country_cn": "加拿大",
-    "country_emoji": "🇨🇦",
-    "asn": "397540",
-    "asOrganization": "Windscribe",
-    "isp": "Windscribe",
-    "net_type": "datacenter",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "https://129.97.50.72:443",
     "protocol": "https",
     "ip": "129.97.50.72",
@@ -57,66 +42,6 @@
     "asOrganization": "ISPNET Communications LLC",
     "isp": "ISPNET Communications LLC",
     "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "https://181.215.52.101:9443",
-    "protocol": "https",
-    "ip": "181.215.52.101",
-    "port": 9443,
-    "country": "CA",
-    "country_name": "加拿大",
-    "country_cn": "加拿大",
-    "country_emoji": "🇨🇦",
-    "asn": "397540",
-    "asOrganization": "Private Customer",
-    "isp": "Private Customer",
-    "net_type": "datacenter",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "https://181.215.52.25:9443",
-    "protocol": "https",
-    "ip": "181.215.52.25",
-    "port": 9443,
-    "country": "CA",
-    "country_name": "加拿大",
-    "country_cn": "加拿大",
-    "country_emoji": "🇨🇦",
-    "asn": "397540",
-    "asOrganization": "Private Customer",
-    "isp": "Private Customer",
-    "net_type": "datacenter",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "https://181.215.52.122:9443",
-    "protocol": "https",
-    "ip": "181.215.52.122",
-    "port": 9443,
-    "country": "CA",
-    "country_name": "加拿大",
-    "country_cn": "加拿大",
-    "country_emoji": "🇨🇦",
-    "asn": "397540",
-    "asOrganization": "Private Customer",
-    "isp": "Private Customer",
-    "net_type": "datacenter",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "https://181.215.52.40:9443",
-    "protocol": "https",
-    "ip": "181.215.52.40",
-    "port": 9443,
-    "country": "CA",
-    "country_name": "加拿大",
-    "country_cn": "加拿大",
-    "country_emoji": "🇨🇦",
-    "asn": "397540",
-    "asOrganization": "Private Customer",
-    "isp": "Private Customer",
-    "net_type": "datacenter",
     "source": "EDT-Pages"
   },
   {
@@ -345,21 +270,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "https://185.221.132.242:443",
-    "protocol": "https",
-    "ip": "185.221.132.242",
-    "port": 443,
-    "country": "LU",
-    "country_name": "LU",
-    "country_cn": "LU",
-    "country_emoji": "🇱🇺",
-    "asn": "206804",
-    "asOrganization": "ESTNOC-GLOBAL",
-    "isp": "ESTNOC-GLOBAL",
-    "net_type": "datacenter",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "https://81.172.178.145:8443",
     "protocol": "https",
     "ip": "81.172.178.145",
@@ -462,21 +372,6 @@
     "asOrganization": "Swisscom Schweiz AG",
     "isp": "Swisscom Schweiz AG",
     "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "https://185.221.132.226:9443",
-    "protocol": "https",
-    "ip": "185.221.132.226",
-    "port": 9443,
-    "country": "LU",
-    "country_name": "LU",
-    "country_cn": "LU",
-    "country_emoji": "🇱🇺",
-    "asn": "206804",
-    "asOrganization": "ESTNOC-GLOBAL",
-    "isp": "ESTNOC-GLOBAL",
-    "net_type": "datacenter",
     "source": "EDT-Pages"
   },
   {
@@ -735,21 +630,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "https://79.142.77.63:9443",
-    "protocol": "https",
-    "ip": "79.142.77.63",
-    "port": 9443,
-    "country": "SE",
-    "country_name": "瑞典",
-    "country_cn": "瑞典",
-    "country_emoji": "🇸🇪",
-    "asn": "51430",
-    "asOrganization": "AltusHost B.V.",
-    "isp": "AltusHost B.V.",
-    "net_type": "datacenter",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "https://217.13.162.5:443",
     "protocol": "https",
     "ip": "217.13.162.5",
@@ -777,21 +657,6 @@
     "asOrganization": "Zdruzenie pouzivatelov Slovenskej akademickej datovej siete SANET",
     "isp": "Zdruzenie pouzivatelov Slovenskej akademickej datovej siete SANET",
     "net_type": "education",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "https://209.170.227.253:443",
-    "protocol": "https",
-    "ip": "209.170.227.253",
-    "port": 443,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "62642",
-    "asOrganization": "IT Group NW, LLC",
-    "isp": "IT Group NW, LLC",
-    "net_type": "datacenter",
     "source": "EDT-Pages"
   },
   {
@@ -915,21 +780,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "https://192.159.101.174:9443",
-    "protocol": "https",
-    "ip": "192.159.101.174",
-    "port": 9443,
-    "country": "EE",
-    "country_name": "EE",
-    "country_cn": "EE",
-    "country_emoji": "🇪🇪",
-    "asn": "206804",
-    "asOrganization": "ESTNOC-GLOBAL",
-    "isp": "ESTNOC-GLOBAL",
-    "net_type": "datacenter",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "https://128.84.46.176:443",
     "protocol": "https",
     "ip": "128.84.46.176",
@@ -1035,21 +885,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "https://85.203.39.130:443",
-    "protocol": "https",
-    "ip": "85.203.39.130",
-    "port": 443,
-    "country": "LV",
-    "country_name": "LV",
-    "country_cn": "LV",
-    "country_emoji": "🇱🇻",
-    "asn": "206804",
-    "asOrganization": "ESTNOC-GLOBAL",
-    "isp": "ESTNOC-GLOBAL",
-    "net_type": "datacenter",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "https://217.108.6.203:443",
     "protocol": "https",
     "ip": "217.108.6.203",
@@ -1140,21 +975,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "https://192.159.101.178:9443",
-    "protocol": "https",
-    "ip": "192.159.101.178",
-    "port": 9443,
-    "country": "EE",
-    "country_name": "EE",
-    "country_cn": "EE",
-    "country_emoji": "🇪🇪",
-    "asn": "206804",
-    "asOrganization": "ESTNOC-GLOBAL",
-    "isp": "ESTNOC-GLOBAL",
-    "net_type": "datacenter",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "https://193.137.38.135:443",
     "protocol": "https",
     "ip": "193.137.38.135",
@@ -1227,21 +1047,6 @@
     "asOrganization": "Sunbeach Communications Inc.",
     "isp": "Sunbeach Communications Inc.",
     "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "https://45.133.192.194:9443",
-    "protocol": "https",
-    "ip": "45.133.192.194",
-    "port": 9443,
-    "country": "IS",
-    "country_name": "IS",
-    "country_cn": "IS",
-    "country_emoji": "🇮🇸",
-    "asn": "206804",
-    "asOrganization": "ESTNOC-GLOBAL",
-    "isp": "ESTNOC-GLOBAL",
-    "net_type": "datacenter",
     "source": "EDT-Pages"
   },
   {
@@ -1635,21 +1440,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "https://181.215.52.16:443",
-    "protocol": "https",
-    "ip": "181.215.52.16",
-    "port": 443,
-    "country": "CA",
-    "country_name": "加拿大",
-    "country_cn": "加拿大",
-    "country_emoji": "🇨🇦",
-    "asn": "397540",
-    "asOrganization": "Private Customer",
-    "isp": "Private Customer",
-    "net_type": "datacenter",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "https://50.184.176.222:8090",
     "protocol": "https",
     "ip": "50.184.176.222",
@@ -1875,21 +1665,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "https://170.168.1.39:443",
-    "protocol": "https",
-    "ip": "170.168.1.39",
-    "port": 443,
-    "country": "RU",
-    "country_name": "俄罗斯",
-    "country_cn": "俄罗斯",
-    "country_emoji": "🇷🇺",
-    "asn": "214822",
-    "asOrganization": "MT FINANCE LLC",
-    "isp": "MT FINANCE LLC",
-    "net_type": "datacenter",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "https://96.5.129.85:443",
     "protocol": "https",
     "ip": "96.5.129.85",
@@ -1965,21 +1740,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "https://91.92.250.33:443",
-    "protocol": "https",
-    "ip": "91.92.250.33",
-    "port": 443,
-    "country": "PL",
-    "country_name": "波兰",
-    "country_cn": "波兰",
-    "country_emoji": "🇵🇱",
-    "asn": "31130",
-    "asOrganization": "RapidSpace",
-    "isp": "RapidSpace",
-    "net_type": "datacenter",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "https://83.172.143.53:4443",
     "protocol": "https",
     "ip": "83.172.143.53",
@@ -2022,21 +1782,6 @@
     "asOrganization": "Telecel S.A.",
     "isp": "Telecel S.A.",
     "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "https://188.42.46.2:443",
-    "protocol": "https",
-    "ip": "188.42.46.2",
-    "port": 443,
-    "country": "LU",
-    "country_name": "LU",
-    "country_cn": "LU",
-    "country_emoji": "🇱🇺",
-    "asn": "7979",
-    "asOrganization": "root SA",
-    "isp": "root SA",
-    "net_type": "datacenter",
     "source": "EDT-Pages"
   },
   {
@@ -2142,21 +1887,6 @@
     "asOrganization": "Telecom Italia S.p.A.",
     "isp": "Telecom Italia S.p.A.",
     "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "https://195.22.25.125:443",
-    "protocol": "https",
-    "ip": "195.22.25.125",
-    "port": 443,
-    "country": "PT",
-    "country_name": "葡萄牙",
-    "country_cn": "葡萄牙",
-    "country_emoji": "🇵🇹",
-    "asn": "5533",
-    "asOrganization": "Claranet Portugal S.A",
-    "isp": "Claranet Portugal S.A",
-    "net_type": "datacenter",
     "source": "EDT-Pages"
   },
   {
@@ -2337,21 +2067,6 @@
     "asOrganization": "Telecel S.A.",
     "isp": "Telecel S.A.",
     "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "https://181.215.52.16:9443",
-    "protocol": "https",
-    "ip": "181.215.52.16",
-    "port": 9443,
-    "country": "CA",
-    "country_name": "加拿大",
-    "country_cn": "加拿大",
-    "country_emoji": "🇨🇦",
-    "asn": "397540",
-    "asOrganization": "Private Customer",
-    "isp": "Private Customer",
-    "net_type": "datacenter",
     "source": "EDT-Pages"
   },
   {
@@ -2625,21 +2340,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "https://103.22.182.254:443",
-    "protocol": "https",
-    "ip": "103.22.182.254",
-    "port": 443,
-    "country": "TH",
-    "country_name": "泰国",
-    "country_cn": "泰国",
-    "country_emoji": "🇹🇭",
-    "asn": "56309",
-    "asOrganization": "Readyidc CO.,LTD.",
-    "isp": "Readyidc CO.,LTD.",
-    "net_type": "datacenter",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "https://66.64.100.66:443",
     "protocol": "https",
     "ip": "66.64.100.66",
@@ -2685,21 +2385,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "https://103.58.150.11:443",
-    "protocol": "https",
-    "ip": "103.58.150.11",
-    "port": 443,
-    "country": "TH",
-    "country_name": "泰国",
-    "country_cn": "泰国",
-    "country_emoji": "🇹🇭",
-    "asn": "63989",
-    "asOrganization": "DE-CORP",
-    "isp": "DE-CORP",
-    "net_type": "datacenter",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "https://201.54.216.54:443",
     "protocol": "https",
     "ip": "201.54.216.54",
@@ -2730,21 +2415,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "https://38.76.140.254:8443",
-    "protocol": "https",
-    "ip": "38.76.140.254",
-    "port": 8443,
-    "country": "HK",
-    "country_name": "中国香港",
-    "country_cn": "中国香港",
-    "country_emoji": "🇭🇰",
-    "asn": "137897",
-    "asOrganization": "PCCW IMS Ltd PCCW Business Internet Access",
-    "isp": "PCCW IMS Ltd PCCW Business Internet Access",
-    "net_type": "datacenter",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "https://217.181.201.254:8090",
     "protocol": "https",
     "ip": "217.181.201.254",
@@ -2772,21 +2442,6 @@
     "asOrganization": "Orange S.A.",
     "isp": "Orange S.A.",
     "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "https://103.26.207.94:9443",
-    "protocol": "https",
-    "ip": "103.26.207.94",
-    "port": 9443,
-    "country": "IN",
-    "country_name": "印度",
-    "country_cn": "印度",
-    "country_emoji": "🇮🇳",
-    "asn": "132335",
-    "asOrganization": "LEAPSWITCH NETWORKS PRIVATE LIMITED",
-    "isp": "LEAPSWITCH NETWORKS PRIVATE LIMITED",
-    "net_type": "datacenter",
     "source": "EDT-Pages"
   },
   {
@@ -2847,21 +2502,6 @@
     "asOrganization": "Massey University",
     "isp": "Massey University",
     "net_type": "education",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "https://196.43.240.49:9443",
-    "protocol": "https",
-    "ip": "196.43.240.49",
-    "port": 9443,
-    "country": "CG",
-    "country_name": "CG",
-    "country_cn": "CG",
-    "country_emoji": "🇨🇬",
-    "asn": "37548",
-    "asOrganization": "ARPCE",
-    "isp": "ARPCE",
-    "net_type": "datacenter",
     "source": "EDT-Pages"
   },
   {
@@ -3180,21 +2820,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "https://141.98.19.221:443",
-    "protocol": "https",
-    "ip": "141.98.19.221",
-    "port": 443,
-    "country": "TH",
-    "country_name": "泰国",
-    "country_cn": "泰国",
-    "country_emoji": "🇹🇭",
-    "asn": "56309",
-    "asOrganization": "Legaco Networks B.V.",
-    "isp": "Legaco Networks B.V.",
-    "net_type": "datacenter",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "https://41.205.129.179:443",
     "protocol": "https",
     "ip": "41.205.129.179",
@@ -3207,21 +2832,6 @@
     "asOrganization": "Telecom Namibia",
     "isp": "Telecom Namibia",
     "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "https://103.26.207.103:443",
-    "protocol": "https",
-    "ip": "103.26.207.103",
-    "port": 443,
-    "country": "IN",
-    "country_name": "印度",
-    "country_cn": "印度",
-    "country_emoji": "🇮🇳",
-    "asn": "132335",
-    "asOrganization": "LEAPSWITCH NETWORKS PRIVATE LIMITED",
-    "isp": "LEAPSWITCH NETWORKS PRIVATE LIMITED",
-    "net_type": "datacenter",
     "source": "EDT-Pages"
   },
   {
@@ -3267,21 +2877,6 @@
     "asOrganization": "eNetworks cc",
     "isp": "eNetworks cc",
     "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "https://185.187.43.38:8090",
-    "protocol": "https",
-    "ip": "185.187.43.38",
-    "port": 8090,
-    "country": "IT",
-    "country_name": "意大利",
-    "country_cn": "意大利",
-    "country_emoji": "🇮🇹",
-    "asn": "199324",
-    "asOrganization": "DODONET S.R.L. - dodonet network",
-    "isp": "DODONET S.R.L. - dodonet network",
-    "net_type": "datacenter",
     "source": "EDT-Pages"
   },
   {
@@ -3465,36 +3060,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "https://49.50.72.246:443",
-    "protocol": "https",
-    "ip": "49.50.72.246",
-    "port": 443,
-    "country": "IN",
-    "country_name": "印度",
-    "country_cn": "印度",
-    "country_emoji": "🇮🇳",
-    "asn": "55470",
-    "asOrganization": "nsd cyfuture.com",
-    "isp": "nsd cyfuture.com",
-    "net_type": "datacenter",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "https://120.232.204.58:52200",
-    "protocol": "https",
-    "ip": "120.232.204.58",
-    "port": 52200,
-    "country": "IN",
-    "country_name": "印度",
-    "country_cn": "印度",
-    "country_emoji": "🇮🇳",
-    "asn": "136258",
-    "asOrganization": "Brainstorm Network, INC",
-    "isp": "Brainstorm Network, INC",
-    "net_type": "datacenter",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "https://91.221.229.86:443",
     "protocol": "https",
     "ip": "91.221.229.86",
@@ -3597,21 +3162,6 @@
     "asOrganization": "Durban Institute of Technology",
     "isp": "Durban Institute of Technology",
     "net_type": "education",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "https://110.38.225.213:443",
-    "protocol": "https",
-    "ip": "110.38.225.213",
-    "port": 443,
-    "country": "PK",
-    "country_name": "PK",
-    "country_cn": "PK",
-    "country_emoji": "🇵🇰",
-    "asn": "38264",
-    "asOrganization": "National Wimax/IMS environment",
-    "isp": "National Wimax/IMS environment",
-    "net_type": "datacenter",
     "source": "EDT-Pages"
   },
   {
@@ -3732,21 +3282,6 @@
     "asOrganization": "Durban Institute of Technology",
     "isp": "Durban Institute of Technology",
     "net_type": "education",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "https://210.48.154.99:443",
-    "protocol": "https",
-    "ip": "210.48.154.99",
-    "port": 443,
-    "country": "MY",
-    "country_name": "马来西亚",
-    "country_cn": "马来西亚",
-    "country_emoji": "🇲🇾",
-    "asn": "17971",
-    "asOrganization": "TM VADS DC Hosting",
-    "isp": "TM VADS DC Hosting",
-    "net_type": "datacenter",
     "source": "EDT-Pages"
   },
   {
@@ -3975,21 +3510,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "https://103.127.242.229:7000",
-    "protocol": "https",
-    "ip": "103.127.242.229",
-    "port": 7000,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "137535",
-    "asOrganization": "Hong Kong Communications International Co., limited",
-    "isp": "Hong Kong Communications International Co., limited",
-    "net_type": "datacenter",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "https://118.184.157.67:4443",
     "protocol": "https",
     "ip": "118.184.157.67",
@@ -4092,36 +3612,6 @@
     "asOrganization": "The Bahamas Telecommunications Company, Ltd.",
     "isp": "The Bahamas Telecommunications Company, Ltd.",
     "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "https://151.242.183.28:443",
-    "protocol": "https",
-    "ip": "151.242.183.28",
-    "port": 443,
-    "country": "HK",
-    "country_name": "中国香港",
-    "country_cn": "中国香港",
-    "country_emoji": "🇭🇰",
-    "asn": "137897",
-    "asOrganization": "XING XUN TECH LIMITED",
-    "isp": "XING XUN TECH LIMITED",
-    "net_type": "datacenter",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "https://202.85.53.25:443",
-    "protocol": "https",
-    "ip": "202.85.53.25",
-    "port": 443,
-    "country": "HK",
-    "country_name": "中国香港",
-    "country_cn": "中国香港",
-    "country_emoji": "🇭🇰",
-    "asn": "137897",
-    "asOrganization": "XING XUN TECH LIMITED",
-    "isp": "XING XUN TECH LIMITED",
-    "net_type": "datacenter",
     "source": "EDT-Pages"
   },
   {
