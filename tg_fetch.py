@@ -2021,6 +2021,18 @@ async def run_telethon():
                                                 proxyip_count += 1
                                                 doc_added += 1
                                         log.info("从频道 %s ProxyIP 附件 %s 中提取 %d 条反代 IP", channel_name, msg.file.name, doc_added)
+                                        # 若属于 Anti-CF 测速反代优选附件，既是反代 IP 也是优选 IP，同步归入扫描优选池
+                                        if any(k in fname_lower for k in ("anti-cf", "anticf", "anti_cf")):
+                                            scan_added = 0
+                                            for cf_item in doc_items:
+                                                cf_key = f"{cf_item['ip']}:{cf_item['port']}"
+                                                if is_tombstoned(cf_key, tombstone):
+                                                    continue
+                                                if cf_key not in scraped_scan_ips:
+                                                    scraped_scan_ips[cf_key] = cf_item
+                                                    scan_count += 1
+                                                    scan_added += 1
+                                            log.info("从频道 %s Anti-CF 反代优选附件 %s 中同步提取 %d 条扫描优选 IP", channel_name, msg.file.name, scan_added)
                                 except Exception as e:
                                     log.warning("下载/解析频道 %s ProxyIP 附件 %s 失败: %s", channel_name, msg.file.name, e)
                             # 2. 扫描优选 CSV (如 DanFeng AS45102_*.csv)
