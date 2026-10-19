@@ -2001,8 +2001,8 @@ async def run_telethon():
                         # 支持自动下载并解析优选扫描附件与反代 ProxyIP 附件 (独立归入各自集合)
                         if msg.file and msg.file.name:
                             fname_lower = msg.file.name.lower()
-                            # 1. 反代 ProxyIP 文件 (如 Global-proxyip-443.csv, Global-proxyip-8443.csv, OTC_SCAN_YX_CF-NRT反代.txt 等)
-                            if any(k in fname_lower for k in ("proxyip", "proxy_ip", "反代")) and fname_lower.endswith((".csv", ".txt")):
+                            # 1. 反代 ProxyIP 文件 (如 Global-proxyip-443.csv, Anti-CF-2026-10-18.csv, OTC_SCAN_YX_CF-NRT反代.txt 等)
+                            if any(k in fname_lower for k in ("proxyip", "proxy_ip", "反代", "anti-cf", "anticf", "anti_cf")) and fname_lower.endswith((".csv", ".txt")):
                                 try:
                                     doc_bytes = await client.download_media(msg, file=bytes)
                                     if doc_bytes:

@@ -181,7 +181,9 @@ def resolve_and_clean_asn(ip: str, raw_asn: str = "", raw_isp: str = "") -> tupl
                 if rem_isp:
                     raw_isp = rem_isp
         else:
-            if not raw_isp and raw_asn != "-":
+            if raw_asn.isdigit():
+                asn_clean = f"AS{raw_asn}"
+            elif not raw_isp and raw_asn != "-":
                 raw_isp = raw_asn
 
     if not asn_clean or asn_clean == "AS_UNKNOWN":
@@ -269,7 +271,7 @@ def parse_cf_csv_content(
                 d = m_fn.group("date")
                 t = m_fn.group("time")
                 fn_time = f"{d[:4]}-{d[4:6]}-{d[6:8]} {t[:2]}:{t[2:4]}:{t[4:6]}"
-        elif not any(bad in fn_lower for bad in ("nsb", "results", "speedtest", "benchmark", "warp", "tunnel")):
+        elif not any(bad in fn_lower for bad in ("nsb", "results", "speedtest", "benchmark", "warp", "tunnel", "anti", "proxyip", "反代")):
             # 2. 从常见云服务器/VPS文件名推断 ASN 与 ISP (如 Aliyun.csv, Tencent.csv, DMIT.csv, Akile.csv 等)
             for key in SORTED_CLOUD_PROVIDER_KEYS:
                 pattern = rf"(?i)(?:^|[^a-z0-9]){re.escape(key)}(?:[^a-z0-9]|$)"
@@ -394,9 +396,13 @@ def parse_cf_csv_content(
                 field_map["region"] = col
             elif any(k in c_clean for k in ("城市", "city")):
                 field_map["city"] = col
-            elif c_clean in ("asn", "as", "asnumber", "asnum") or any(k in c_clean for k in ("as编号", "as号码", "as_number")):
+            elif (
+                c_clean in ("asn", "as", "asnumber", "asnum", "asn_id", "asnid")
+                or any(k in c_clean for k in ("as编号", "as号码", "as号", "as_number", "asn编号", "asn号码", "asn号", "asn_number"))
+                or (c_clean.startswith("asn") and not any(k in c_clean for k in ("组织", "org", "isp", "name", "名称")))
+            ):
                 field_map["asn"] = col
-            elif any(k in c_clean for k in ("运营商", "组织", "org", "isp", "company")):
+            elif any(k in c_clean for k in ("运营商", "组织", "org", "isp", "company", "asn组织", "as组织")):
                 field_map["isp"] = col
             elif any(k in c_clean for k in ("时间", "time", "date")):
                 field_map["time"] = col
@@ -443,6 +449,8 @@ def parse_cf_csv_content(
             raw_asn = row.get(field_map.get("asn", ""), "").replace("`", "").strip()
             if not raw_asn or raw_asn == "-":
                 raw_asn = fn_asn
+            elif raw_asn.isdigit():
+                raw_asn = f"AS{raw_asn}"
 
             raw_isp = row.get(field_map.get("isp", ""), "").replace("`", "").strip()
             if not raw_isp or raw_isp == "-":
