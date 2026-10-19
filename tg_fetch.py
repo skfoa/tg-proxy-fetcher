@@ -68,6 +68,7 @@ from providers import (
     load_tombstone,
     prune_tombstone,
     is_tombstoned,
+    load_ip_cache,
     LEGACY_DEFAULT_FIRST_SEEN,
     AUTHORITATIVE_CLOUD_ASNS,
     load_asn_database,
@@ -262,6 +263,24 @@ def _parse_edt_socks5_urls() -> list[str]:
 EDT_HTTPS_URLS = _parse_edt_https_urls()
 EDT_HTTP_URLS = _parse_edt_http_urls()
 EDT_SOCKS5_URLS = _parse_edt_socks5_urls()
+
+DEFAULT_PROXIFLY_HTTPS_URLS = [
+    "https://raw.githubusercontent.com/proxifly/free-proxy-list/main/proxies/protocols/https/data.json",
+    "https://ghfast.top/https://raw.githubusercontent.com/proxifly/free-proxy-list/main/proxies/protocols/https/data.json",
+    "https://cdn.jsdelivr.net/gh/proxifly/free-proxy-list@main/proxies/protocols/https/data.json",
+]
+
+
+def _parse_proxifly_https_urls() -> list[str]:
+    raw_val = (os.getenv("PROXIFLY_HTTPS_URLS") or os.getenv("PROXIFLY_HTTPS_URL") or "").strip()
+    if raw_val:
+        if raw_val.lower() in ("none", "off", "disable", "false", "0"):
+            return []
+        return [u.strip() for u in re.split(r"[,;\s]+", raw_val) if u.strip().startswith("http")]
+    return list(DEFAULT_PROXIFLY_HTTPS_URLS)
+
+
+PROXIFLY_HTTPS_URLS = _parse_proxifly_https_urls()
 
 DEFAULT_PROXYIP_ZIP_URLS = [
     "https://zip.cm.edu.kg.cmliussss.net/all.json",
@@ -798,12 +817,13 @@ def fetch_edt_proxies(
     tombstone: dict[str, int],
     scraped_proxies: dict[str, dict | str],
     timeout: float = 12.0,
+    ip_cache: dict[str, dict] | None = None,
 ) -> tuple[int, list[dict]]:
     """
     拉取外部 EDT-Pages/Proxy-List 的 {proto}.json 镜像源，
     采用【多镜像并发竞速机制】(Concurrent Racing)：同时向所有候选镜像发起请求，以最先返回有效合法数据的镜像为胜出者并立即采用，彻底避免慢镜像串行阻塞。
     直接过滤剔除机房 (datacenter) 节点，仅抓取保留高价值非机房节点（ISP 宽带、高校教育网、政务网、商业专线），
-    提取 clientIp 为实际 egress_ip，并自动去重与过滤墓地黑名单。
+    提取 clientIp 为实际 egress_ip，并自动去重与过滤墓地黑名单与持久化机房缓存。
     同时动态统计未收录在权威库中的自治系统 (ASN)。
     返回: (有效新增节点数, 未收录 ASN 列表)
     """
@@ -867,6 +887,9 @@ def fetch_edt_proxies(
 
     log.info("成功采用 %s 的 EDT %s 代理源数据: %d 条原始记录", success_url, proto_upper, len(data))
 
+    if ip_cache is None:
+        ip_cache = load_ip_cache()
+
     total_added = 0
     dc_filtered = 0
     unrecorded_asns_map: dict[str, dict] = {}
@@ -886,6 +909,11 @@ def fetch_edt_proxies(
         # 核心策略：严格过滤机房节点，仅保留非机房高价值代理
         net_type = classify_asn(asn_code, org)
         if net_type == "datacenter":
+            dc_filtered += 1
+            continue
+
+        # 前置门禁：查本地持久化 ip_cache，拦截已知数据中心机房 IP
+        if ip_cache and ip_cache.get(ip, {}).get("net_type") in ("datacenter", "hosting"):
             dc_filtered += 1
             continue
 
@@ -951,9 +979,135 @@ def fetch_edt_https_proxies(
     proxy: str,
     tombstone: dict[str, int],
     scraped_proxies: dict[str, dict | str],
+    ip_cache: dict[str, dict] | None = None,
 ) -> tuple[int, list[dict]]:
     """向后兼容历史调用，默认拉取 HTTPS"""
-    return fetch_edt_proxies("https", edt_urls, proxy, tombstone, scraped_proxies)
+    return fetch_edt_proxies("https", edt_urls, proxy, tombstone, scraped_proxies, ip_cache=ip_cache)
+
+
+def fetch_proxifly_https_proxies(
+    urls: list[str],
+    proxy: str,
+    tombstone: dict[str, int],
+    scraped_proxies: dict[str, dict | str],
+    timeout: float = 12.0,
+    ip_cache: dict[str, dict] | None = None,
+) -> int:
+    """
+    拉取外部 Proxifly 单协议 HTTPS 代理源 (proxies/protocols/https/data.json)。
+    采用多镜像并发竞速机制 (Concurrent Racing)。
+    基于本地 tombstone (死节点) 与 ip_cache (已知机房 IP) 进行双重前置离线拦截，
+    直接剔除已知机房，仅将未知 IP 或已知家宽候选追加至待检列表，来源打标为 'proxifly'。
+    """
+    if not urls:
+        return 0
+
+    log.info("-" * 50)
+    log.info("开始拉取 Proxifly 外部 HTTPS 代理源: %d 个候选镜像 (并发竞速模式)", len(urls))
+
+    success_url = ""
+    data = []
+
+    def _fetch_single(u: str) -> tuple[str, list]:
+        txt = fetch_web_page(u, proxy=proxy, timeout=int(timeout))
+        if not txt or not txt.strip().startswith("["):
+            raise ValueError("内容为空或非有效 JSON 列表")
+        parsed = json.loads(txt)
+        if not isinstance(parsed, list) or len(parsed) == 0:
+            raise ValueError("返回 JSON 非列表或无有效节点")
+        return u, parsed
+
+    if len(urls) == 1:
+        try:
+            t0 = time.time()
+            success_url, data = _fetch_single(urls[0])
+            log.info("单源拉取 Proxifly HTTPS 成功: %s (耗时 %.2fs, 记录数 %d)", urls[0], time.time() - t0, len(data))
+        except Exception as e:
+            log.warning("单源拉取 Proxifly 失败: %s (%s)", urls[0], e)
+    else:
+        t_start = time.time()
+        executor = ThreadPoolExecutor(max_workers=min(len(urls), 6), thread_name_prefix="proxifly-race")
+        try:
+            future_to_url = {executor.submit(_fetch_single, u): u for u in urls}
+            for fut in as_completed(future_to_url):
+                cand_u = future_to_url[fut]
+                try:
+                    cand_u, cand_data = fut.result()
+                    success_url = cand_u
+                    data = cand_data
+                    log.info("🏆 Proxifly HTTPS 镜像并发竞速胜出: %s (耗时 %.2fs, 记录数 %d)", cand_u, time.time() - t_start, len(data))
+                    break
+                except Exception as e:
+                    log.debug("候选镜像 %s 竞速未达标: %s", cand_u, e)
+        finally:
+            executor.shutdown(wait=False, cancel_futures=True)
+
+    if not data:
+        log.warning("所有 Proxifly 镜像均未成功返回有效数据，跳过本次拉取")
+        return 0
+
+    log.info("成功采用 %s 的 Proxifly HTTPS 代理源数据: %d 条原始记录", success_url, len(data))
+
+    if ip_cache is None:
+        ip_cache = load_ip_cache()
+
+    total_added = 0
+    tomb_filtered = 0
+    dc_filtered = 0
+
+    for item in data:
+        if not isinstance(item, dict):
+            continue
+        ip = str(item.get("ip") or "").strip()
+        port = safe_int(item.get("port"), 0)
+        if not ip or not (1 <= port <= 65535):
+            continue
+
+        key = f"{ip}:{port}"
+        # 门禁 1: 墓碑黑名单 (淘汰死节点)
+        if is_tombstoned(key, tombstone):
+            tomb_filtered += 1
+            continue
+
+        # 门禁 2: 已知机房 IP 离线前置拦截 (彻底杜绝重复测速)
+        cached = ip_cache.get(ip, {})
+        cached_nt = (cached.get("net_type") or "").strip().lower()
+        if cached_nt in ("datacenter", "hosting"):
+            dc_filtered += 1
+            continue
+
+        geo = item.get("geolocation") or {}
+        country = str(geo.get("country") or "").strip().upper() or cached.get("country", "")
+
+        meta_dict = {
+            "url": f"https://{ip}:{port}",
+            "proto": "https",
+            "host": ip,
+            "port": port,
+            "country": country,
+            "egress_ip": cached.get("resolved_ip", "") or ip,
+            "asn": cached.get("asn", ""),
+            "isp": cached.get("isp", ""),
+            "net_type": cached.get("net_type", ""),
+            "source": "proxifly",
+            "status": "pending",
+        }
+
+        if key not in scraped_proxies:
+            scraped_proxies[key] = meta_dict
+            total_added += 1
+        elif isinstance(scraped_proxies[key], dict):
+            for m_k in ("country", "egress_ip", "asn", "isp", "net_type", "source"):
+                if meta_dict.get(m_k) and not scraped_proxies[key].get(m_k):
+                    scraped_proxies[key][m_k] = meta_dict[m_k]
+
+    log.info(
+        "Proxifly HTTPS 提取完成: 新增待检候选 %d 个 (前置剔除机房 %d 个, 墓碑淘汰 %d 个)",
+        total_added,
+        dc_filtered,
+        tomb_filtered,
+    )
+    return total_added
 
 
 def fetch_zip_proxyips(
@@ -1704,10 +1858,14 @@ def run_web_scraper():
     fetch_external_subscriptions(SUB_URLS, proxy, tombstone, scraped_proxies)
 
     # 1.6 外部 EDT-Pages 多协议代理源抓取 (HTTPS / HTTP / SOCKS5 多镜像容灾、非机房高价值过滤、元数据丰富)
+    ip_cache = load_ip_cache()
     edt_unrec_all = []
     for proto_name, urls in [("https", EDT_HTTPS_URLS), ("http", EDT_HTTP_URLS), ("socks5", EDT_SOCKS5_URLS)]:
-        _, unrec = fetch_edt_proxies(proto_name, urls, proxy, tombstone, scraped_proxies)
+        _, unrec = fetch_edt_proxies(proto_name, urls, proxy, tombstone, scraped_proxies, ip_cache=ip_cache)
         edt_unrec_all.extend(unrec)
+
+    # 1.6.5 外部 Proxifly 开源 HTTPS 代理源抓取 (前置墓碑与持久化机房 IP 双重过滤)
+    fetch_proxifly_https_proxies(PROXIFLY_HTTPS_URLS, proxy, tombstone, scraped_proxies, ip_cache=ip_cache)
 
     # 1.7 外部 ProxyIP 聚合源抓取 (仅收录非机房原生宽带、教育、专线等高价值反代节点)
     scraped_proxyips = {}
@@ -1920,10 +2078,14 @@ async def run_telethon():
         fetch_external_subscriptions(SUB_URLS, web_proxy, tombstone, scraped_proxies)
 
         # 1.6 外部 EDT-Pages 多协议代理源抓取 (HTTPS / HTTP / SOCKS5 多镜像容灾、非机房高价值过滤、元数据丰富)
+        ip_cache = load_ip_cache()
         edt_unrec_all = []
         for proto_name, urls in [("https", EDT_HTTPS_URLS), ("http", EDT_HTTP_URLS), ("socks5", EDT_SOCKS5_URLS)]:
-            _, unrec = fetch_edt_proxies(proto_name, urls, web_proxy, tombstone, scraped_proxies)
+            _, unrec = fetch_edt_proxies(proto_name, urls, web_proxy, tombstone, scraped_proxies, ip_cache=ip_cache)
             edt_unrec_all.extend(unrec)
+
+        # 1.6.5 外部 Proxifly 开源 HTTPS 代理源抓取 (前置墓碑与持久化机房 IP 双重过滤)
+        fetch_proxifly_https_proxies(PROXIFLY_HTTPS_URLS, web_proxy, tombstone, scraped_proxies, ip_cache=ip_cache)
 
         # 1.7 外部 ProxyIP 聚合源抓取 (与频道附件中提取到的 ProxyIP 增量合并，仅收录非机房)
         _, zip_unrec = fetch_zip_proxyips(PROXYIP_ZIP_URLS, web_proxy, tombstone, scraped_proxyips)

@@ -71,6 +71,7 @@ jobs:
           EDT_HTTPS_URLS: ${{ vars.EDT_HTTPS_URLS }}
           EDT_HTTP_URLS: ${{ vars.EDT_HTTP_URLS }}
           EDT_SOCKS5_URLS: ${{ vars.EDT_SOCKS5_URLS }}
+          PROXIFLY_HTTPS_URLS: ${{ vars.PROXIFLY_HTTPS_URLS }}
           DEFER_NOTIFY: "1"
         run: python tg_fetch.py
 

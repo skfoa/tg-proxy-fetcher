@@ -63,6 +63,7 @@ from providers import (
     LEGACY_DEFAULT_FIRST_SEEN,
     resolve_asn_batch_online_async,
     load_ip_cache,
+    save_ip_cache,
     classify_asn,
     format_asn_isp,
     ASN_TO_PROVIDER,
@@ -128,6 +129,7 @@ FATAL_FAIL_STATUSES = {
     "http_connect_no_colo",   # HTTPS 代理 CONNECT 隧道建立后无法读取有效 trace/colo 报文 (假 200 代理)
     "sstp_fail",              # SSTP 隧道请求返回非 200 (非 SSTP 服务)
     "unknown_proto",          # 未知协议
+    "datacenter_rejected",    # 检测出数据中心/机房节点，严禁入库并直接拉满淘汰阈值，阻止进入存活列表与缓冲期
 }
 
 CSV_FIELDS = PROXY_CSV_FIELDS
@@ -208,12 +210,40 @@ def normalize_endpoint(endpoint: str | None) -> str:
     return ep.rstrip("/")
 
 
+_CF_OPENER: urllib.request.OpenerDirector | None = None
+
+
+def get_cf_opener() -> urllib.request.OpenerDirector:
+    """获取或初始化 Cloudflare Worker 专用 HTTP 请求 Opener (自动继承环境/系统代理)"""
+    global _CF_OPENER
+    if _CF_OPENER is None:
+        sys_p = (
+            os.getenv("HTTPS_PROXY")
+            or os.getenv("https_proxy")
+            or os.getenv("ALL_PROXY")
+            or os.getenv("all_proxy")
+            or os.getenv("PROXY")
+            or ""
+        ).strip()
+        handlers: list[urllib.request.BaseHandler] = []
+        if sys_p:
+            handlers.append(urllib.request.ProxyHandler({"http": sys_p, "https": sys_p}))
+        _CF_OPENER = urllib.request.build_opener(*handlers)
+    return _CF_OPENER
+
+
+def build_proxy_url_for_cf(proto: str, host: str, port: int, user: str | None = None, pwd: str | None = None) -> str:
+    """构建用于 Cloudflare Worker 代理检测的完整 URL (包含可选认证信息与 IPv6 括弧)"""
+    auth_part = ""
+    if user and pwd:
+        auth_part = f"{urllib.parse.quote(str(user))}:{urllib.parse.quote(str(pwd))}@"
+    h = f"[{host}]" if (":" in host and not host.startswith("[")) else host
+    return f"{proto}://{auth_part}{h}:{port}"
+
+
 def build_sstp_url(host: str, port: int, user: str | None = None, pwd: str | None = None) -> str:
     """构建标准 SSTP 代理 URL (VPNGate 默认缺省账密为 vpn / vpn)"""
-    u = user or "vpn"
-    p = pwd or "vpn"
-    h = f"[{host}]" if (":" in host and not host.startswith("[")) else host
-    return f"sstp://{u}:{p}@{h}:{port}"
+    return build_proxy_url_for_cf("sstp", host, port, user or "vpn", pwd or "vpn")
 
 
 def check_cf_worker_health(endpoint: str, timeout: float = 6.0) -> bool:
@@ -226,13 +256,14 @@ def check_cf_worker_health(endpoint: str, timeout: float = 6.0) -> bool:
     if not clean_ep:
         return False
     probe_urls = [f"{clean_ep}/locations", f"{clean_ep}/"]
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    }
+    opener = get_cf_opener()
     for target in probe_urls:
         try:
-            req = urllib.request.Request(
-                target,
-                headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) tg-proxy-fetcher"},
-            )
-            with urllib.request.urlopen(req, timeout=timeout) as resp:
+            req = urllib.request.Request(target, headers=headers)
+            with opener.open(req, timeout=timeout) as resp:
                 if resp.status in (200, 204):
                     return True
         except Exception as e:
@@ -249,12 +280,13 @@ def _sync_cf_check(endpoint: str, proxy_url: str, timeout: float = 18.0) -> dict
       - 网络/HTTP崩溃: {"success": False, "error": "...", "network_error": True}
     """
     target_url = f"{endpoint}/check?proxy={urllib.parse.quote(proxy_url)}"
-    req = urllib.request.Request(
-        target_url,
-        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) tg-proxy-fetcher"},
-    )
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    }
+    req = urllib.request.Request(target_url, headers=headers)
+    opener = get_cf_opener()
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
+        with opener.open(req, timeout=timeout) as resp:
             body = resp.read().decode("utf-8", errors="ignore")
             data = json.loads(body)
             if isinstance(data, dict):
@@ -269,14 +301,33 @@ def _sync_cf_check(endpoint: str, proxy_url: str, timeout: float = 18.0) -> dict
                 return data
         except Exception:
             pass
-        log.debug("Cloudflare Worker SSTP 质检 HTTP 异常 [%s]: HTTP %s %s", proxy_url, he.code, he.reason)
+        log.debug("Cloudflare Worker 代理质检 HTTP 异常 [%s]: HTTP %s %s", proxy_url, he.code, he.reason)
         return {"success": False, "error": f"HTTP {he.code}: {he.reason}", "http_code": he.code}
     except (urllib.error.URLError, TimeoutError, OSError) as ne:
-        log.debug("Cloudflare Worker SSTP 网络超时/故障 [%s]: %s", proxy_url, ne)
+        log.debug("Cloudflare Worker 代理网络超时/故障 [%s]: %s", proxy_url, ne)
         return {"success": False, "error": f"network_error: {ne}", "network_error": True}
     except Exception as e:
-        log.debug("Cloudflare Worker SSTP 质检未决异常 [%s]: %s", proxy_url, e)
+        log.debug("Cloudflare Worker 代理质检未决异常 [%s]: %s", proxy_url, e)
         return {"success": False, "error": str(e)}
+
+
+async def check_proxy_exit_cf_worker(
+    endpoint: str,
+    proxy_url: str,
+    timeout: float = 18.0,
+    executor: concurrent.futures.ThreadPoolExecutor | None = None,
+) -> dict:
+    """
+    异步调用 Cloudflare Worker 端点针对指定代理执行直连全链路穿透鉴真与出口 IP/ASN 探测。
+    使用独立的高并发 ThreadPoolExecutor 分派同步 HTTP 探测，打破默认 6 线程瓶颈。
+    返回标准 dict 结构（始终保证含 success 字段，绝不返回 None）。
+    """
+    clean_ep = normalize_endpoint(endpoint)
+    if not clean_ep:
+        return {"success": False, "error": "endpoint_empty"}
+    exec_pool = executor or get_cf_check_executor()
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(exec_pool, _sync_cf_check, clean_ep, proxy_url, timeout)
 
 
 async def check_sstp_exit_cf_worker(
@@ -288,18 +339,43 @@ async def check_sstp_exit_cf_worker(
     timeout: float = 18.0,
     executor: concurrent.futures.ThreadPoolExecutor | None = None,
 ) -> dict:
-    """
-    异步调用 Cloudflare Worker 端点针对存活的 SSTP 节点执行深层 PPP 隧道鉴真与出口 IP 探测。
-    使用独立的高并发 ThreadPoolExecutor 分派同步 HTTP 探测，打破默认 6 线程瓶颈。
-    返回标准 dict 结构（始终保证含 success 字段，绝不返回 None）。
-    """
-    clean_ep = normalize_endpoint(endpoint)
-    if not clean_ep:
-        return {"success": False, "error": "endpoint_empty"}
+    """向后兼容 SSTP 质检专用封装"""
     proxy_url = build_sstp_url(host, port, user, pwd)
-    exec_pool = executor or get_cf_check_executor()
-    loop = asyncio.get_running_loop()
-    return await loop.run_in_executor(exec_pool, _sync_cf_check, clean_ep, proxy_url, timeout)
+    return await check_proxy_exit_cf_worker(endpoint, proxy_url, timeout=timeout, executor=executor)
+
+
+def is_datacenter_result(cf_res: dict) -> bool:
+    """
+    研判 Worker 检测结果是否属于机房/数据中心/公有云。
+    坚决剔除机房，只要原生家庭宽带/住宅 ISP/教育网/专线。
+    """
+    exit_info = cf_res.get("exit") or {}
+    if exit_info.get("is_datacenter") is True:
+        return True
+
+    privacy = exit_info.get("privacy") or {}
+    if privacy.get("is_hosting") is True:
+        return True
+
+    asn_obj = exit_info.get("asn") or {}
+    company_obj = exit_info.get("company") or {}
+
+    asn_type = str(asn_obj.get("type") or "").strip().lower()
+    company_type = str(company_obj.get("type") or "").strip().lower()
+
+    if asn_type in ("hosting", "datacenter") or company_type in ("hosting", "datacenter"):
+        return True
+
+    asn_code = str(asn_obj.get("asn") or "").strip()
+    asn_name = str(asn_obj.get("name") or asn_obj.get("org") or "").strip()
+    company_name = str(company_obj.get("name") or "").strip()
+    isp_str = f"{asn_name} {company_name}".strip()
+
+    nt = classify_asn(asn_code, isp_str)
+    if nt in ("datacenter", "hosting"):
+        return True
+
+    return False
 
 
 # ---------- 协议探测实现 ----------
@@ -931,9 +1007,113 @@ async def probe_single(
             max_latency_ms=http_max_latency_ms,
         )
     elif proto == "https":
-        is_alive, delay_ms, status, colo, country, egress_ip = await probe_https(
-            host, port, user, pwd, max(timeout, 7.0), http_timeout
+        # 核心分流准入控制：
+        # 1. 凡是已有老节点且已确认具备非机房属性 (isp, business, education, government, banking)，走本地轻量高并发 probe_https 极速探针，0 消耗 CF Worker 额度
+        # 2. 凡是新拉取 (source 为 proxifly 等)、未定性或未知属性的 HTTPS 节点，走 CF_CHECK_ENDPOINT 外部端点进行严格住宅/原生宽带准入质检
+        # 3. 坚决剔除机房 (datacenter/hosting)，只要原生住宅与家宽 ISP (以及高校教育网/商业专线)
+        is_known_non_dc = (
+            row.get("source") != "proxifly"
+            and bool(row.get("asn"))
+            and (row.get("net_type") or "").strip().lower() in ("isp", "business", "education", "government", "banking")
         )
+
+        if is_known_non_dc or not cf_check_endpoint:
+            is_alive, delay_ms, status, colo, country, egress_ip = await probe_https(
+                host, port, user, pwd, max(timeout, 7.0), http_timeout
+            )
+        else:
+            t_cf0 = time.monotonic()
+            proxy_url = build_proxy_url_for_cf("https", host, port, user, pwd)
+            cf_res = await check_proxy_exit_cf_worker(
+                cf_check_endpoint, proxy_url, timeout=18.0, executor=cf_executor
+            )
+            if cf_res.get("success"):
+                exit_info = cf_res.get("exit") or {}
+                asn_obj = exit_info.get("asn") or {}
+                cf_asn_raw = str(asn_obj.get("asn") or "").strip()
+                cf_isp_raw = str(asn_obj.get("name") or asn_obj.get("org") or "").strip()
+                clean_asn = cf_asn_raw
+                clean_isp = cf_isp_raw
+                if clean_asn in ASN_TO_PROVIDER:
+                    clean_isp = ASN_TO_PROVIDER[clean_asn]
+
+                exit_ip = str(exit_info.get("ip") or "").strip()
+                if not is_valid_public_ip(exit_ip):
+                    exit_ip = host if is_valid_public_ip(host) else ""
+
+                c_code = str(exit_info.get("country_code") or exit_info.get("country") or "").strip().upper()
+
+                if is_datacenter_result(cf_res):
+                    # 识别为机房/数据中心：拒收淘汰，沉淀至持久化 ip_cache 永久拦截！
+                    is_alive = False
+                    delay_ms = 0
+                    status = "datacenter_rejected"
+                    colo = ""
+                    country = c_code
+                    egress_ip = exit_ip
+                    if host:
+                        row["_cache_update"] = {
+                            "host": host,
+                            "entry": {
+                                "asn": clean_asn,
+                                "isp": clean_isp,
+                                "net_type": "datacenter",
+                                "country": c_code,
+                                "resolved_ip": exit_ip,
+                            },
+                        }
+                    log.info("🚫 拦截到数据中心/机房 HTTPS 节点 [%s:%s] (ASN: %s, ISP: %s)，已移出并记入机房永久黑名单", host, port, clean_asn, clean_isp)
+                else:
+                    # 原生住宅/家宽/教育/专线：准入通过！
+                    is_alive = True
+                    calc_delay = max(1, int((time.monotonic() - t_cf0) * 1000))
+                    delay_ms = safe_int(
+                        cf_res.get("responseTime") or cf_res.get("latency_ms") or cf_res.get("time") or calc_delay,
+                        calc_delay,
+                    )
+                    status = "alive"
+                    colo = str(cf_res.get("colo") or "-").strip().upper() or "-"
+                    country = c_code
+                    egress_ip = exit_ip
+
+                    asn_type = str(asn_obj.get("type") or "").strip().lower()
+                    if asn_type in ("isp", "business", "education", "government", "banking"):
+                        n_type = asn_type
+                    else:
+                        n_type = classify_asn(clean_asn, clean_isp)
+                        if n_type in ("datacenter", "hosting"):
+                            n_type = "isp"
+
+                    row["asn"] = format_asn_isp(clean_asn, clean_isp)
+                    row["isp"] = clean_isp
+                    row["net_type"] = n_type
+
+                    if host:
+                        row["_cache_update"] = {
+                            "host": host,
+                            "entry": {
+                                "asn": clean_asn,
+                                "isp": clean_isp,
+                                "net_type": n_type,
+                                "country": c_code,
+                                "resolved_ip": exit_ip,
+                            },
+                        }
+            else:
+                if cf_res.get("network_error"):
+                    is_alive = False
+                    delay_ms = 0
+                    status = "worker_unreachable"
+                    colo = ""
+                    country = ""
+                    egress_ip = ""
+                else:
+                    is_alive = False
+                    delay_ms = 0
+                    status = "connect_fail"
+                    colo = ""
+                    country = ""
+                    egress_ip = ""
     elif proto == "turn":
         is_alive, delay_ms, status, colo, country, egress_ip = await probe_turn(
             host, port, timeout, http_timeout
@@ -1073,9 +1253,12 @@ def load_proxies_data(
     1. 优先读取 proxies.csv，保留既有 fail_count 与历史统计
     2. 合并 proxies.txt 中新增的节点
     3. 自动过滤墓地黑名单中的冷却期死节点
+    4. 前置离线过滤 ip_cache 中已知数据中心/机房 (datacenter/hosting) 的 HTTPS 代理，实现永久拦截
     """
     tombstone = load_tombstone()
+    ip_cache = load_ip_cache()
     url_map: dict[str, dict] = {}
+    dc_filtered_count = 0
 
     target_csv = csv_path
 
@@ -1094,6 +1277,24 @@ def load_proxies_data(
                     key = canonical_key(parsed["host"], parsed["port"])
                     if is_tombstoned(key, tombstone):
                         continue
+
+                    # 前置拦截已知机房 HTTPS 节点 (针对用户“只要住宅/原生家宽，坚决不要机房”核心诉求)
+                    host = parsed["host"]
+                    proto = parsed["proto"]
+                    cached_nt = (ip_cache.get(host, {}) or {}).get("net_type", "").lower()
+                    row_nt = (r.get("net_type") or "").strip().lower()
+
+                    if proto == "https" and (cached_nt in ("datacenter", "hosting") or row_nt in ("datacenter", "hosting")):
+                        dc_filtered_count += 1
+                        if host not in ip_cache:
+                            ip_cache[host] = {
+                                "asn": r.get("asn", ""),
+                                "isp": r.get("isp", ""),
+                                "net_type": "datacenter",
+                                "country": r.get("country", ""),
+                            }
+                        continue
+
                     parsed["fail_count"] = safe_int(r.get("fail_count"), 0)
                     parsed["delay_ms"] = safe_int(r.get("delay_ms"), 0)
                     parsed["status"] = r.get("status", "pending")
@@ -1106,7 +1307,7 @@ def load_proxies_data(
                     parsed["first_seen"] = r.get("first_seen", "").strip() or LEGACY_DEFAULT_FIRST_SEEN
                     parsed["source"] = r.get("source", "").strip()
                     url_map[url] = parsed
-            log.info("从 %s 加载已有记录 %d 条", target_csv, len(url_map))
+            log.info("从 %s 加载已有记录 %d 条 (离线前置剔除机房 %d 个)", target_csv, len(url_map), dc_filtered_count)
         except Exception as e:
             log.warning("读取 %s 失败: %s", target_csv, e)
 
@@ -1128,6 +1329,9 @@ def load_proxies_data(
                         if parsed:
                             key = canonical_key(parsed["host"], parsed["port"])
                             if is_tombstoned(key, tombstone):
+                                continue
+                            if parsed["proto"] == "https" and (ip_cache.get(parsed["host"], {}) or {}).get("net_type") in ("datacenter", "hosting"):
+                                dc_filtered_count += 1
                                 continue
                             parsed["first_seen"] = now_str
                             url_map[line] = parsed
@@ -1154,6 +1358,13 @@ def load_proxies_data(
                             key = canonical_key(parsed["host"], parsed["port"])
                             if is_tombstoned(key, tombstone):
                                 continue
+                            if parsed["proto"] == "https":
+                                host = parsed["host"]
+                                cached_nt = (ip_cache.get(host, {}) or {}).get("net_type", "").lower()
+                                row_nt = (r.get("net_type") or "").strip().lower()
+                                if cached_nt in ("datacenter", "hosting") or row_nt in ("datacenter", "hosting"):
+                                    dc_filtered_count += 1
+                                    continue
                             parsed["fail_count"] = safe_int(r.get("fail_count"), 0)
                             parsed["delay_ms"] = safe_int(r.get("delay_ms"), 0)
                             parsed["status"] = r.get("status", "pending")
@@ -1181,6 +1392,9 @@ def load_proxies_data(
                                 continue
                             key = canonical_key(parsed["host"], parsed["port"])
                             if is_tombstoned(key, tombstone):
+                                continue
+                            if parsed["proto"] == "https" and (ip_cache.get(parsed["host"], {}) or {}).get("net_type") in ("datacenter", "hosting"):
+                                dc_filtered_count += 1
                                 continue
                             parsed["first_seen"] = now_str
                             url_map[line] = parsed
@@ -1452,18 +1666,18 @@ async def async_main(args):
         if is_worker_ok:
             cf_executor = get_cf_check_executor(max_workers=cf_concurrency)
             log.info(
-                "SSTP 启用 Cloudflare Worker 独占直连穿透鉴真与出口探测端点: %s (专用并发: %d)",
+                "🚀 启用 Cloudflare Worker 独占直连穿透鉴真端点 (SSTP & HTTPS 住宅准入): %s (专用并发: %d)",
                 cf_endpoint,
                 cf_concurrency,
             )
         else:
             log.warning(
-                "⚠️ Cloudflare Worker 端点 [%s] 健康探针失败 (不可达/响应异常)，本轮 SSTP 将全局熔断降级为本地轻量握手探测（结果不含全隧道 PPP 验证）",
+                "⚠️ Cloudflare Worker 端点 [%s] 健康探针失败 (不可达/响应异常)，本轮将全局熔断降级为本地轻量握手探测（HTTPS 住宅严格准入与 SSTP 全隧道探测暂不可用）",
                 cf_endpoint,
             )
             cf_endpoint = ""
     else:
-        log.info("SSTP 未配置外部检测端点，采用本地解析轻量直连出口（无外部依赖）")
+        log.info("未配置外部检测端点 (CF_CHECK_ENDPOINT 留空)，采用本地解析轻量直连（无外部依赖）")
 
     async def _worker(r):
         nonlocal completed, pass_count, fail_count, min_delay
@@ -1516,6 +1730,35 @@ async def async_main(args):
 
     tasks = [_worker(r) for r in rows]
     results = await asyncio.gather(*tasks)
+
+    # 沉淀本轮质检提取出的 IP 网络画像 (包含新检测出的机房黑名单与原生家宽指纹) 至持久化 ip_cache (彻底杜绝重复测速)
+    cache_updates = [r.get("_cache_update") for r in results if r.get("_cache_update")]
+    if cache_updates:
+        persistent_cache = load_ip_cache()
+        added_dc = 0
+        added_isp = 0
+        for upd in cache_updates:
+            h = upd.get("host")
+            entry = upd.get("entry")
+            if h and entry:
+                old_nt = (persistent_cache.get(h) or {}).get("net_type")
+                new_nt = entry.get("net_type")
+                if new_nt == "datacenter" and old_nt != "datacenter":
+                    added_dc += 1
+                elif new_nt != "datacenter" and old_nt != new_nt:
+                    added_isp += 1
+                persistent_cache[h] = entry
+                res_ip = entry.get("resolved_ip")
+                if res_ip and res_ip != h:
+                    persistent_cache[res_ip] = entry
+        save_ip_cache(persistent_cache)
+        log.info(
+            "【持久化 IP 缓存】本轮检测新增/更新画像 %d 个 (永久拦截机房 +%d, 家宽/专线 +%d)，当前总缓存库 %d 条",
+            len(cache_updates),
+            added_dc,
+            added_isp,
+            len(persistent_cache),
+        )
 
     # 幸存者筛选（支持按协议分流淘汰阈值：HTTP 专属严格阈值，其余协议维持 max_fails 缓冲容错）
     def _is_survivor(r):

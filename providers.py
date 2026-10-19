@@ -357,16 +357,16 @@ def atomic_write_bytes(path: str, data: bytes) -> None:
         f.write(data)
 
 
-def atomic_write_text(path: str, text: str, encoding: str = "utf-8") -> None:
-    """原子覆写纯文本数据"""
-    with atomic_writer(path, mode="w", encoding=encoding) as f:
+def atomic_write_text(path: str, text: str, encoding: str = "utf-8", newline: str | None = "\n") -> None:
+    """原子覆写纯文本数据 (跨平台默认严格强制 LF 换行，彻底杜绝 CRLF 污染)"""
+    with atomic_writer(path, mode="w", encoding=encoding, newline=newline) as f:
         f.write(text)
 
 
-def atomic_write_json(path: str, obj, *, indent: int = 2) -> None:
-    """原子序列化并覆写 JSON 数据"""
+def atomic_write_json(path: str, obj, *, indent: int = 2, newline: str | None = "\n") -> None:
+    """原子序列化并覆写 JSON 数据 (跨平台默认严格强制 LF 换行，彻底杜绝 CRLF 污染)"""
     text = json.dumps(obj, ensure_ascii=False, indent=indent)
-    atomic_write_text(path, text, encoding="utf-8")
+    atomic_write_text(path, text, encoding="utf-8", newline=newline)
 
 
 # ---------- 持久化 ASN 数据库加载与在线动态解析补库 ----------
