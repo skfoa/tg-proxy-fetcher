@@ -1816,7 +1816,7 @@ CITY_TO_COUNTRY = {
     "达拉斯-沃斯堡": "美国", "圣何塞": "美国", "洛杉矶": "美国", "杜勒斯": "美国", "迈阿密": "美国",
     "西雅图": "美国", "纽瓦克": "美国", "亚特兰大": "美国", "丹佛": "美国", "凤凰城": "美国",
     "菲尼克斯": "美国", "拉斯维加斯": "美国", "水牛城": "美国", "圣路易斯": "美国",
-    "休斯顿": "美国", "盐湖城": "美国", "檀香山": "美国",
+    "休斯顿": "美国", "盐湖城": "美国", "檀香山": "美国", "Buffalo": "美国", "Salt Lake City": "美国",
     # 德国主要城市
     "柏林": "德国", "法兰克福": "德国", "慕尼黑": "德国", "杜塞尔多夫": "德国", "汉堡": "德国",
     # 其它重点枢纽
@@ -1847,6 +1847,40 @@ COUNTRY_FLAGS = {
     "厄瓜多尔": "🇪🇨", "尼日利亚": "🇳🇬", "北马其顿": "🇲🇰", "哥斯达黎加": "🇨🇷", "多米尼加": "🇩🇴",
     "尼泊尔": "🇳🇵", "巴基斯坦": "🇵🇰", "波多黎各": "🇵🇷", "肯尼亚": "🇰🇪", "黎巴嫩": "🇱🇧",
 }
+
+COUNTRY_TO_CODE = {
+    "美国": "US", "德国": "DE", "荷兰": "NL", "瑞典": "SE", "新加坡": "SG",
+    "日本": "JP", "英国": "UK", "芬兰": "FI", "香港": "HK", "法国": "FR",
+    "波兰": "PL", "爱沙尼亚": "EE", "拉脱维亚": "LV", "瑞士": "CH", "立陶宛": "LT",
+    "西班牙": "ES", "加拿大": "CA", "奥地利": "AT", "保加利亚": "BG", "捷克": "CZ",
+    "韩国": "KR", "印度": "IN", "意大利": "IT", "俄罗斯": "RU", "土耳其": "TR",
+    "台湾": "TW", "澳大利亚": "AU", "丹麦": "DK", "罗马尼亚": "RO", "哈萨克斯坦": "KZ",
+    "巴西": "BR", "挪威": "NO", "比利时": "BE", "亚美尼亚": "AM", "冰岛": "IS",
+    "以色列": "IL", "爱尔兰": "IE", "阿尔巴尼亚": "AL", "孟加拉国": "BD", "斯洛伐克": "SK",
+    "塞浦路斯": "CY", "吉尔吉斯斯坦": "KG", "格鲁吉亚": "GE", "墨西哥": "MX", "智利": "CL",
+    "阿根廷": "AR", "哥伦比亚": "CO", "秘鲁": "PE", "南非": "ZA", "阿联酋": "AE",
+    "科威特": "KW", "卡塔尔": "QA", "沙特阿拉伯": "SA", "希腊": "GR", "匈牙利": "HU",
+    "塞尔维亚": "RS", "克罗地亚": "HR", "葡萄牙": "PT", "乌克兰": "UA", "泰国": "TH",
+    "菲律宾": "PH", "马来西亚": "MY", "印度尼西亚": "ID", "越南": "VN", "新西兰": "NZ",
+    "中国": "CN", "澳门": "MO", "阿曼": "OM", "斯洛文尼亚": "SI", "白俄罗斯": "BY",
+    "厄瓜多尔": "EC", "尼日利亚": "NG", "北马其顿": "MK", "哥斯达黎加": "CR", "多米尼加": "DO",
+    "尼泊尔": "NP", "巴基斯坦": "PK", "波多黎各": "PR", "肯尼亚": "KE", "黎巴嫩": "LB",
+    "乌兹别克斯坦": "UZ", "津巴布韦": "ZW", "阿塞拜疆": "AZ", "其他地区": "OTHER",
+}
+
+
+def get_country_code(country_name: str) -> str:
+    """获取国家或地区的标准 ISO 二字代码"""
+    clean_name = (country_name or "").strip()
+    if clean_name in COUNTRY_TO_CODE:
+        return COUNTRY_TO_CODE[clean_name]
+    flag = COUNTRY_FLAGS.get(clean_name, "")
+    if len(flag) == 2:
+        try:
+            return "".join(chr(ord(c) - 0x1F1E6 + ord('A')) for c in flag)
+        except Exception:
+            pass
+    return ""
 
 
 @functools.lru_cache(maxsize=2048)
@@ -2608,10 +2642,13 @@ def save_proxyip_by_country(rows: list, output_dir: str) -> int:
         if not lines:
             continue
         safe_country = re.sub(r'[\\/:*?"<>|]', "_", country).strip() or "其他地区"
-        fname = f"{safe_country}.txt"
+        code = get_country_code(safe_country) or get_country_code(country)
+        if code:
+            fname = f"{code}_{safe_country}.txt"
+        else:
+            fname = f"{safe_country}.txt"
         filepath = os.path.join(output_dir, fname)
-        with open(filepath, "w", encoding="utf-8") as f:
-            f.writelines(lines)
+        atomic_write_text(filepath, "".join(lines))
         active_files.add(fname)
 
     # 2. 导出高价值特殊网络属性清单（运营商宽带、企业专线、高校教育、政务公用、银行金融）
