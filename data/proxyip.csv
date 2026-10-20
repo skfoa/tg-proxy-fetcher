@@ -175,7 +175,6 @@
 99.240.65.254,443,true,202,,YYZ,北美洲 · 多伦多 · 加拿大,AS812 Rogers Communications Canada Inc.,Rogers Communications Canada Inc.,2026-10-18 21:53:32,@danfeng_chat,0,isp
 99.229.67.145,443,true,167,,YYZ,北美洲 · 多伦多 · 加拿大,AS812 Rogers Communications Canada Inc.,Rogers Communications Canada Inc.,2026-10-18 21:53:31,@danfeng_chat,0,isp
 95.82.176.133,443,true,353,,PRG,欧洲 · 布拉格 · 捷克共和国,"AS31246 O2 Czech Republic, a.s.","O2 Czech Republic, a.s.",2026-10-18 21:53:22,@danfeng_chat,0,isp
-95.31.35.170,443,true,526,,FRA,欧洲 · 法兰克福 · 德国,AS6939 Hurricane Electric LLC,Hurricane Electric LLC,2026-10-18 21:53:22,@danfeng_chat,0,isp
 95.57.50.66,443,true,531,,NQZ,,AS9198 JSC Kazakhtelecom,JSC Kazakhtelecom,2026-10-18 21:53:21,@danfeng_chat,0,isp
 95.188.72.67,443,true,610,,DME,欧洲 · 斯德哥尔摩 · 瑞典,AS12389 Primorye NET (Rostelecom),Rostelecom,2026-10-18 21:53:21,@danfeng_chat,0,isp
 95.171.21.193,443,true,464,,DME,欧洲 · 斯德哥尔摩 · 瑞典,AS48822 Universum bit Ltd.,Universum bit Ltd.,2026-10-18 21:53:18,@danfeng_chat,0,isp
@@ -210,7 +209,6 @@
 91.148.229.96,443,true,700,,ZRH,Lombardy · Milan · 意大利,AS3356 Level 3 Communications (Private Customer),Private Customer,2026-10-18 21:52:59,@danfeng_chat,0,isp
 90.240.168.72,443,true,319,,LHR,欧洲 · 伦敦 · 英国,AS5378 Vodafone Limited,Vodafone Limited,2026-10-18 21:52:57,@danfeng_chat,0,isp
 90.187.84.129,443,true,508,,TXL,欧洲 · 柏林 · 德国,AS3209 Vodafone GmbH,Vodafone GmbH,2026-10-18 21:52:57,@danfeng_chat,0,isp
-89.45.45.145,443,true,671,,FRA,欧洲 · 法兰克福 · 德国,AS6939 Hurricane Electric LLC,Hurricane Electric LLC,2026-10-18 21:52:56,@danfeng_chat,0,isp
 89.34.167.181,443,true,299,,LHR,欧洲 · 伦敦 · 英国,AS56478 Hyperoptic Ltd,Hyperoptic Ltd,2026-10-18 21:52:55,@danfeng_chat,0,isp
 89.128.206.51,443,true,325,,MAD,欧洲 · 马德里 · 西班牙,AS12479 Orange Espagne SA,Orange Espagne SA,2026-10-18 21:52:50,@danfeng_chat,0,isp
 89.125.237.133,443,true,105,,VIE,Prague · 捷克,AS51248 Host-Telecom.com s.r.o. (RCS Technologies FZE LLC),RCS Technologies FZE LLC,2026-10-18 21:52:48,@danfeng_chat,0,isp
@@ -291,6 +289,7 @@
 68.183.234.14,443,true,795,,CDG,Île-de-France · Lizy-sur-Ourcq · 法国,AS15557 Block for xDSL/FTTx customers pools,Block for xDSL/FTTx customers pools,2026-10-18 21:51:52,@danfeng_chat,0,isp
 67.52.192.170,443,true,229,,CMH,北美洲 · 哥伦布 · 美国,AS10796 Charter Communications Inc,Charter Communications Inc,2026-10-18 21:51:51,@danfeng_chat,0,isp
 67.230.160.140,443,true,277,,LAX,北美洲 · 洛杉矶 · 美国,AS22773 Cox Communications Inc.,Cox Communications Inc.,2026-10-18 21:51:50,@danfeng_chat,0,isp
+67.209.183.236,443,true,13,,LAX,California · Los Angeles · 美国,AS6939 Hurricane Electric LLC,Hurricane Electric LLC,2026-10-18 21:51:49,@danfeng_chat,0,isp
 67.200.126.18,443,true,207,,LAX,北美洲 · 洛杉矶 · 美国,AS11404 Wave Broadband,Wave Broadband,2026-10-18 21:51:49,@danfeng_chat,0,isp
 67.200.108.186,443,true,383,,LAX,北美洲 · 洛杉矶 · 美国,AS11404 Wave Broadband,Wave Broadband,2026-10-18 21:51:49,@danfeng_chat,0,isp
 66.183.66.180,443,true,139,,YVR,北美洲 · 温哥华 · 加拿大,AS852 TELUS Communications Inc.,TELUS Communications Inc.,2026-10-18 21:51:47,@danfeng_chat,0,isp
@@ -541,6 +540,7 @@
 38.150.35.61,443,true,224,,LAX,北美洲 · 洛杉矶 · 美国,AS979 NetLab,NetLab Global,2026-10-18 21:50:08,@danfeng_chat,0,business
 38.150.34.78,443,true,260,,LAX,北美洲 · 洛杉矶 · 美国,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",2026-10-18 21:50:08,@danfeng_chat,0,isp
 38.175.201.239,443,true,656,,SEA,北美洲 · 西雅图 · 美国,AS979 NetLab,NetLab Global,2026-10-18 21:50:08,@danfeng_chat,0,business
+38.105.31.127,8443,true,14,,LAX,California · Los Angeles · 美国,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",2026-10-18 21:50:07,@danfeng_chat,0,isp
 38.105.31.66,443,true,62,,LAX,California · Los Angeles · 美国,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",2026-10-18 21:50:07,@danfeng_chat,0,isp
 38.133.154.123,443,true,127,,LAX,北美洲 · 洛杉矶 · 美国,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",2026-10-18 21:50:07,@danfeng_chat,0,isp
 38.127.121.215,443,true,192,,LAX,北美洲 · 洛杉矶 · 美国,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",2026-10-18 21:50:07,@danfeng_chat,0,isp
@@ -916,6 +916,7 @@
 179.255.185.119,443,true,260,,EWR,北美洲 · 纽瓦克 · 美国,AS214238 Host Telecom Ltd,Host Telecom Ltd,2026-10-18 21:46:21,@danfeng_chat,0,isp
 179.255.185.124,443,true,332,,EWR,北美洲 · 纽瓦克 · 美国,AS214238 Host Telecom Ltd,Host Telecom Ltd,2026-10-18 21:46:21,@danfeng_chat,0,isp
 179.255.185.125,443,true,569,,EWR,北美洲 · 纽瓦克 · 美国,AS214238 Host Telecom Ltd,Host Telecom Ltd,2026-10-18 21:46:21,@danfeng_chat,0,isp
+178.78.48.100,443,true,194,,ARN,Sverdlovsk Oblast · Yekaterinburg · 俄罗斯,AS51604 JSC ER-Telecom Holding Yekaterinburg branch,JSC ER-Telecom Holding Yekaterinburg branch,2026-10-18 21:46:14,@danfeng_chat,0,isp
 178.84.251.85,443,true,541,,AMS,欧洲 · 阿姆斯特丹 · 荷兰,AS33915 Vodafone Libertel B.V.,Vodafone Libertel B.V.,2026-10-18 21:46:14,@danfeng_chat,0,isp
 178.24.220.109,443,true,496,,TXL,欧洲 · 柏林 · 德国,AS3209 Vodafone GmbH,Vodafone GmbH,2026-10-18 21:46:11,@danfeng_chat,0,isp
 178.160.195.37,443,true,526,,EVN,欧洲 · 法兰克福 · 德国,AS12297 Telecom Armenia OJSC,Telecom Armenia OJSC,2026-10-18 21:46:07,@danfeng_chat,0,isp
@@ -1021,6 +1022,7 @@
 154.12.52.153,443,true,256,,LAX,北美洲 · 洛杉矶 · 美国,AS979 NetLab,NetLab Global,2026-10-18 21:44:15,@danfeng_chat,0,business
 154.12.53.59,8443,true,350,,LAX,北美洲 · 洛杉矶 · 美国,AS979 NetLab,NetLab Global,2026-10-18 21:44:15,@danfeng_chat,0,business
 153.56.210.94,443,true,448,,IST,欧洲 · 阿尔纳武特柯伊 · 土耳其,AS34984 Superonline Iletisim Hizmetleri A.S.,Superonline Iletisim Hizmetleri A.S.,2026-10-18 21:44:15,@danfeng_chat,0,isp
+153.52.69.62,443,true,168,,VIE,Prague · 捷克,AS51248 Host-Telecom.com s.r.o. (TA Consulting & Services GmbH),TA Consulting & Services GmbH,2026-10-18 21:44:14,@danfeng_chat,0,isp
 153.52.92.66,443,true,376,,IST,欧洲 · 阿尔纳武特柯伊 · 土耳其,AS44620 Netlen Internet Hizmetleri Ltd. Sti.,Netlen Internet Hizmetleri Ltd. Sti.,2026-10-18 21:44:14,@danfeng_chat,0,isp
 149.7.2.142,443,true,202,,LAX,北美洲 · 洛杉矶 · 美国,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",2026-10-18 21:43:56,@danfeng_chat,0,isp
 147.90.235.236,443,true,78,,EWR,北美洲 · 纽瓦克 · 美国,AS27284 Fourplex Telecom LLC,Fourplex Telecom LLC,2026-10-18 21:43:53,@danfeng_chat,0,isp
@@ -1194,6 +1196,7 @@
 93.95.97.23,443,true,118,,FRA,Moscow · 俄罗斯,AS6939 Hurricane Electric LLC,Hurricane Electric LLC,2026-09-16 08:36:30,@danfeng2,0,isp
 93.85.228.233,443,true,434,,WAW,Brest · Baranovichi · 白俄罗斯,AS6697 Republican Unitary Telecommunication Enterprise Beltelecom,BELTELECOM,2026-09-16 08:36:29,@danfeng2,0,isp
 91.146.1.138,443,true,619,,HEL,欧洲 · 赫尔辛基 · 芬兰 · 俄罗斯,AS3226 OOO NI,OOO NI,2026-09-16 08:36:02,@danfeng2,1,isp
+89.45.45.145,443,true,186,,FRA,Hesse · Frankfurt am Main · 德国,AS6939 Hurricane Electric LLC,Hurricane Electric LLC,2026-09-16 08:35:56,@danfeng_chat,0,isp
 85.189.120.41,443,true,430,,MAN,England · London · 英国,AS3257 GTT Communications (GTT - EMEA Ltd.),GTT - EMEA Ltd.,2026-09-16 08:35:07,@danfeng2,0,isp
 84.65.70.215,443,true,244,,LHR,欧洲 · 伦敦 · 英国,AS5378 Vodafone Limited,Vodafone Limited,2026-09-16 08:35:01,@danfeng2,2,isp
 85.117.37.16,443,true,482,,SOF,Tbilisi · 格鲁吉亚,AS20771 Caucasus Online Ltd.,Caucasus Online Ltd.,2026-09-16 08:35:01,@danfeng2,0,isp
@@ -1729,6 +1732,8 @@
 72.89.201.11,30776,unknown,231,,EWR,New York · New York City · 美国,AS701 Verizon Business,Verizon Business,2026-08-29 15:50:24,@danfeng2,0,isp
 70.187.212.88,4444,unknown,276,,DFW,California · Rancho Santa Margarita · US · 美国,AS22773 Cox Communications Inc.,Cox Communications Inc.,2026-08-29 15:50:24,@danfeng2,0,isp
 103.240.198.31,33033,true,216,9689,SIN,Singapore · 新加坡,AS209699 Coaxial Cable LLC,Coaxial Cable LLC,2026-08-13 20:31:23,@danfeng2,0,isp
+216.23.122.71,30508,true,109,14770,HKG,Hong Kong · 香港,AS9269 Hong Kong Broadband Network Ltd.,Hong Kong Broadband Network Ltd,2026-08-13 20:31:20,@danfeng2,0,isp
+216.23.123.211,30611,true,110,270,LHR,England · Wolverhampton · 英国,AS216405 Ionis Group - Ionis Schools of Technology and Management SAS,Ionis Group - Ionis Schools of Technology and Management SAS,2026-08-13 20:31:20,@danfeng2,0,education
 216.23.123.64,30508,true,155,13268,HKG,Hong Kong · 香港,AS9269 Hong Kong Broadband Network Ltd.,Hong Kong Broadband Network Ltd,2026-08-13 20:31:20,@danfeng2,0,isp
 216.23.122.71,30611,true,159,3282,LHR,England · Wolverhampton · 英国,AS216405 Ionis Group - Ionis Schools of Technology and Management SAS,Ionis Group - Ionis Schools of Technology and Management SAS,2026-08-13 20:31:20,@danfeng2,0,education
 216.23.82.48,30508,true,159,337,HKG,Hong Kong · 香港,AS9269 Hong Kong Broadband Network Ltd.,Hong Kong Broadband Network Ltd,2026-08-13 20:31:20,@danfeng2,0,isp
@@ -1757,6 +1762,7 @@
 154.9.240.98,8443,true,199,15345,LAX,California · Los Angeles · 美国,AS979 NetLab,NetLab,2026-07-27 18:43:10,@danfeng2,0,business
 119.246.150.50,8443,true,2305,,HKG,Tuen Mun · 香港,AS9269 Hong Kong Broadband Network Ltd.,Hong Kong Broadband Network Ltd,2026-07-27 18:40:10,@danfeng2,1,isp
 104.202.107.42,8443,true,168,,LAX,California · San Jose · 美国,AS11404 Wave Broadband,Wave Broadband,2026-07-27 18:39:33,@danfeng2,0,isp
+95.31.35.170,443,true,202,,FRA,Hesse · Frankfurt am Main · 德国,AS6939 Hurricane Electric LLC,Hurricane Electric LLC,2026-07-24 22:47:32,@danfeng_chat,0,isp
 83.228.117.233,443,true,527,,SOF,Sofia-Capital · Sofia · 保加利亚,AS8866 Vivacom Bulgaria EAD,Vivacom Bulgaria EAD,2026-07-24 22:38:52,@danfeng2,0,isp
 75.159.228.9,443,true,244,,SEA,Alberta · Edmonton · 加拿大,AS852 TELUS Communications Inc. (TELUS-FIBRE-EDTNABXS),TELUS-FIBRE-EDTNABXS,2026-07-24 22:34:43,@danfeng2,0,isp
 71.245.178.37,443,true,167,,IAD,Pennsylvania · Pittsburgh · 美国,AS701 Verizon Business,Verizon Business,2026-07-24 22:33:54,@danfeng2,0,isp
