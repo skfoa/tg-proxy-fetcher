@@ -2209,7 +2209,10 @@
     "Superonline Iletisim Hizmetleri A.S.": "AS34984",
     "CJSC \"ER-Telecom Holding\" Kazan' branch": "AS41668",
     "Telenet N.V.": "AS6848",
-    "PS Internet Company LLC": "AS39318"
+    "PS Internet Company LLC": "AS39318",
+    "Singtel Fibre Broadband": "AS9506",
+    "Consolidated Communications, Inc.": "AS14051",
+    "Telecentro S.A.": "AS27747"
   },
   "asn_to_isp": {
     "AS174": "Cogent Communications, LLC",
@@ -4353,7 +4356,14 @@
     "AS137266": "China Telecom",
     "AS209699": "Coaxial Cable LLC",
     "AS6848": "Telenet N.V.",
-    "AS39318": "PS Internet Company LLC"
+    "AS39318": "PS Internet Company LLC",
+    "AS9506": "Singtel Fibre Broadband",
+    "AS24165": "UNION BROADBAND NETWORK",
+    "AS4515": "PCCW IMS Ltd (PCCW Business Internet Access)",
+    "AS5511": "Orange",
+    "AS14051": "Consolidated Communications, Inc.",
+    "AS27747": "Telecentro S.A.",
+    "AS17598": "LG HelloVision Corp."
   },
   "asn_to_net_type": {
     "AS1311": "banking",
@@ -7649,6 +7659,13 @@
     "AS17583": "datacenter",
     "AS50810": "datacenter",
     "AS41668": "isp",
-    "AS137266": "isp"
+    "AS137266": "isp",
+    "AS9506": "isp",
+    "AS24165": "isp",
+    "AS4515": "business",
+    "AS5511": "isp",
+    "AS14051": "datacenter",
+    "AS27747": "datacenter",
+    "AS17598": "isp"
   }
 }

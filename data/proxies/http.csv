@@ -1,31 +1,27 @@
 ﻿url,proto,host,port,delay_ms,fail_count,status,colo,country,egress_ip,asn,isp,net_type,first_seen,source
-http://47.85.161.37:3128,http,47.85.161.37,3128,10,0,alive,IAD,US,47.85.161.37,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
-http://47.89.184.18:3128,http,47.89.184.18,3128,11,0,alive,IAD,US,47.89.184.18,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
-http://47.91.65.23:3128,http,47.91.65.23,3128,189,0,alive,FRA,DE,47.91.65.23,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
-http://68.183.79.30:3128,http,68.183.79.30,3128,238,0,alive,FRA,DE,68.183.79.30,AS14061 DigitalOcean,DigitalOcean,datacenter,2026-10-19 12:45:55,@otcfxq
-http://181.119.224.25:8080,http,181.119.224.25,8080,255,0,alive,GYE,EC,181.119.224.25,AS52468 Ufinet Panama S.A.,Ufinet Panama S.A.,isp,2026-10-19 12:45:55,@otcfxq
-http://140.238.32.108:3128,http,140.238.32.108,3128,319,0,alive,NRT,JP,140.238.32.108,AS31898 Oracle Cloud,Oracle Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
-http://47.91.104.88:3128,http,47.91.104.88,3128,352,0,alive,DXB,AE,47.91.104.88,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
-http://185.195.254.72:5432,http,185.195.254.72,5432,374,0,alive,IST,TR,185.195.254.72,AS206119 Veganet Teknolojileri ve Hizmetleri LTD STI,Veganet Teknolojileri ve Hizmetleri LTD STI,isp,2026-10-09 22:46:01,EDT-Pages
-http://8.213.151.128:3128,http,8.213.151.128,3128,385,0,alive,ICN,KR,8.213.151.128,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
-http://47.242.218.151:9026,http,47.242.218.151,9026,405,0,alive,HKG,HK,47.243.152.76,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
-http://47.243.92.199:3128,http,47.243.92.199,3128,406,0,alive,HKG,HK,47.243.92.199,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
-http://47.242.218.151:9028,http,47.242.218.151,9028,408,0,alive,HKG,HK,8.218.179.191,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
-http://45.125.64.215:443,http,45.125.64.215,443,426,0,alive,HKG,HK,2a10:1fc0::f1ac:6540,AS133398 Tele Asia Limited,Tele Asia Limited,datacenter,2026-10-19 12:45:55,@otcfxq
-http://45.245.208.180:8080,http,45.245.208.180,8080,440,0,alive,MRS,EG,45.245.208.180,AS24863 Link Egypt (Link.NET),Link Egypt (Link.NET),isp,2026-10-14 12:57:52,EDT-Pages
-http://130.110.103.245:3128,http,130.110.103.245,3128,484,0,alive,MXP,SA,130.110.103.245,AS31898 Oracle Cloud,Oracle Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
-http://103.133.26.73:3128,http,103.133.26.73,3128,512,0,alive,CGK,ID,103.178.42.17,AS138130 PT PHATRIA INTI PERSADA,PT PHATRIA INTI PERSADA,isp,2026-10-12 15:18:13,EDT-Pages
-http://8.209.255.13:3128,http,8.209.255.13,3128,528,0,alive,NRT,JP,8.209.255.13,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
-http://102.244.78.61:8085,http,102.244.78.61,8085,594,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-09 22:46:01,EDT-Pages
-http://102.244.78.61:8080,http,102.244.78.61,8080,604,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-09 22:46:01,EDT-Pages
-http://102.244.78.61:8084,http,102.244.78.61,8084,610,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-09 22:46:01,EDT-Pages
-http://4.144.146.21:80,http,4.144.146.21,80,664,0,alive,SIN,SG,20.44.210.140,AS8075 Microsoft Azure,Microsoft Azure,datacenter,2026-10-19 12:45:55,@otcfxq
-http://103.133.26.50:8080,http,103.133.26.50,8080,679,0,alive,SIN,ID,103.133.24.37,AS138130 PT PHATRIA INTI PERSADA,PT PHATRIA INTI PERSADA,isp,2026-10-12 15:18:13,EDT-Pages
-http://165.154.162.73:8888,http,165.154.162.73,8888,691,0,alive,LAX,US,165.154.162.73,AS135377 UCloud,UCloud,datacenter,2026-10-19 12:45:55,@otcfxq
-http://102.244.78.61:8087,http,102.244.78.61,8087,730,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-09 22:46:01,EDT-Pages
-http://121.46.226.221:10808,http,121.46.226.221,10808,893,0,alive,HKG,HK,156.59.17.27,AS21859 Zenlayer,Zenlayer,datacenter,2026-10-19 12:45:55,@otcfxq
-http://122.246.3.12:17981,http,122.246.3.12,17981,987,0,alive,FRA,CN,122.246.3.12,AS136188 China Telecom,China Telecom,datacenter,2026-10-19 12:45:55,@otcfxq
-http://20.33.10.79:80,http,20.33.10.79,80,1091,0,alive,JNB,ZA,20.33.10.79,AS8069 Microsoft Corporation,Microsoft Corporation,datacenter,2026-10-19 12:45:55,@otcfxq
-http://159.138.24.221:3128,http,159.138.24.221,3128,1610,0,alive,HKG,HK,159.138.24.221,AS136907 Huawei Cloud,Huawei Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
-http://160.30.204.24:50001,http,160.30.204.24,50001,1896,0,alive,IAD,US,216.131.73.250,AS62651 Strong Technology,Strong Technology,datacenter,2026-10-19 12:45:55,@otcfxq
-http://45.43.60.220:8080,http,45.43.60.220,8080,1899,0,alive,NRT,JP,45.43.60.220,AS135377 UCloud,UCloud,datacenter,2026-10-19 12:45:55,@otcfxq
+http://140.238.32.108:3128,http,140.238.32.108,3128,279,0,alive,NRT,JP,140.238.32.108,AS31898 Oracle Cloud,Oracle Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
+http://47.85.161.37:3128,http,47.85.161.37,3128,322,0,alive,IAD,US,47.85.161.37,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
+http://8.213.151.128:3128,http,8.213.151.128,3128,323,0,alive,ICN,KR,8.213.151.128,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
+http://47.243.92.199:3128,http,47.243.92.199,3128,358,0,alive,HKG,HK,47.243.92.199,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
+http://47.242.218.151:9028,http,47.242.218.151,9028,362,0,alive,HKG,HK,8.218.179.191,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
+http://47.242.218.151:9026,http,47.242.218.151,9026,363,0,alive,HKG,HK,47.243.152.76,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
+http://47.91.104.88:3128,http,47.91.104.88,3128,384,0,alive,DXB,AE,47.91.104.88,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
+http://68.183.79.30:3128,http,68.183.79.30,3128,391,0,alive,FRA,DE,2a03:b0c0:3:f0:0:3:21a8:7000,AS14061 DigitalOcean,DigitalOcean,datacenter,2026-10-19 12:45:55,@otcfxq
+http://4.144.146.21:80,http,4.144.146.21,80,409,0,alive,SIN,SG,20.44.210.140,AS8075 Microsoft Azure,Microsoft Azure,datacenter,2026-10-19 12:45:55,@otcfxq
+http://47.89.184.18:3128,http,47.89.184.18,3128,413,0,alive,IAD,US,47.89.184.18,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
+http://185.195.254.72:5432,http,185.195.254.72,5432,416,0,alive,IST,TR,185.195.254.72,AS206119 Veganet Teknolojileri ve Hizmetleri LTD STI,Veganet Teknolojileri ve Hizmetleri LTD STI,isp,2026-10-09 22:46:01,EDT-Pages
+http://45.125.64.215:443,http,45.125.64.215,443,452,0,alive,HKG,HK,45.125.64.215,AS133398 Tele Asia Limited,Tele Asia Limited,datacenter,2026-10-19 12:45:55,@otcfxq
+http://130.110.103.245:3128,http,130.110.103.245,3128,504,0,alive,MXP,SA,130.110.103.245,AS31898 Oracle Cloud,Oracle Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
+http://165.154.162.73:8888,http,165.154.162.73,8888,515,0,alive,LAX,US,165.154.162.73,AS135377 UCloud,UCloud,datacenter,2026-10-19 12:45:55,@otcfxq
+http://103.133.26.73:3128,http,103.133.26.73,3128,524,0,alive,CGK,ID,103.178.42.17,AS138130 PT PHATRIA INTI PERSADA,PT PHATRIA INTI PERSADA,isp,2026-10-12 15:18:13,EDT-Pages
+http://47.91.65.23:3128,http,47.91.65.23,3128,591,0,alive,FRA,DE,47.91.65.23,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
+http://102.244.78.61:8084,http,102.244.78.61,8084,600,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-09 22:46:01,EDT-Pages
+http://102.244.78.61:8087,http,102.244.78.61,8087,650,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-09 22:46:01,EDT-Pages
+http://102.244.78.61:8080,http,102.244.78.61,8080,650,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-09 22:46:01,EDT-Pages
+http://103.133.26.50:8080,http,103.133.26.50,8080,707,0,alive,SIN,ID,103.133.24.37,AS138130 PT PHATRIA INTI PERSADA,PT PHATRIA INTI PERSADA,isp,2026-10-12 15:18:13,EDT-Pages
+http://8.209.255.13:3128,http,8.209.255.13,3128,717,0,alive,NRT,JP,8.209.255.13,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
+http://122.246.3.12:17981,http,122.246.3.12,17981,817,0,alive,LAX,CN,122.246.3.12,AS136188 China Telecom,China Telecom,datacenter,2026-10-19 12:45:55,@otcfxq
+http://102.244.78.61:8085,http,102.244.78.61,8085,1069,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-09 22:46:01,EDT-Pages
+http://159.138.24.221:3128,http,159.138.24.221,3128,1368,0,alive,HKG,HK,159.138.24.221,AS136907 Huawei Cloud,Huawei Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
+http://20.33.10.79:80,http,20.33.10.79,80,1671,0,alive,JNB,ZA,20.33.10.79,AS8069 Microsoft Corporation,Microsoft Corporation,datacenter,2026-10-19 12:45:55,@otcfxq
+http://121.46.226.221:10808,http,121.46.226.221,10808,1825,0,alive,HKG,HK,156.59.17.27,AS21859 Zenlayer,Zenlayer,datacenter,2026-10-19 12:45:55,@otcfxq
