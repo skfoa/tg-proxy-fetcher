@@ -114,6 +114,19 @@ except Exception:
     pass
 
 
+# 确定性致命硬故障状态集：协议错配、非反代服务、SNI 域名拒绝或鉴真伪装
+# 遇此错误直接判死淘汰（fail_count 直接拉满至 max_fails 并移入墓地冷却库），不进入缓冲期
+FATAL_FAIL_STATUSES = {
+    "no_cf_header",    # 响应头无 Server: cloudflare（假节点、Captive Portal 登录弹窗或运营商劫持）
+    "status_404",      # /cdn-cgi/trace 404（普通 Web 网站，未配置反代转发规则）
+    "status_421",      # 421 Misdirected Request（SNI/Host 域名被反代明确拒绝）
+    "status_400",      # 400 Bad Request（协议畸形或私有协议误录入）
+    "tls_error",       # TLS 握手异常（纯明文 HTTP 端口或 SSL 协议不匹配）
+    "empty_response",  # 建立连接后发送请求立即断开（死连接/假服务）
+    "invalid_row",     # 数据行字段损坏或端口非法
+}
+
+
 # 预编译正则，高并发下零重复编译开销
 RE_HTTP_STATUS = re.compile(rb"^HTTP/\d\.\d\s+(\d{3})\b")
 RE_HTTP_200 = re.compile(rb"^HTTP/\d\.\d\s+200\b")
@@ -274,10 +287,12 @@ async def verify_proxyips(
     concurrency: int = CONCURRENCY,
     timeout: float = TIMEOUT,
     http_timeout: float = HTTP_TIMEOUT,
+    max_fails: int = MAX_FAILS,
 ) -> list:
     """
     并发调度对所有 ProxyIP 进行 /cdn-cgi/trace 穿透鉴真。
     打乱执行顺序以将同 IP 多端口请求自然散列，防止突发流量触发对端防护。
+    对致命硬故障（FATAL_FAIL_STATUSES）直接拉满 fail_count = max_fails 即刻淘汰入墓地。
     原地更新 fail_count、delay_ms、colo。
     返回 rows。
     """
@@ -310,7 +325,7 @@ async def verify_proxyips(
         ip = (row.get("ip") or "").strip()
         if not ip or port <= 0 or port > 65535:
             completed += 1
-            row["fail_count"] = fc + 1
+            row["fail_count"] = max_fails
             fail_count_total += 1
             reasons_counter["invalid_row"] += 1
             return
@@ -332,7 +347,10 @@ async def verify_proxyips(
                 row["colo"] = colo
             pass_count += 1
         else:
-            row["fail_count"] = fc + 1
+            if reason in FATAL_FAIL_STATUSES:
+                row["fail_count"] = max_fails
+            else:
+                row["fail_count"] = fc + 1
             fail_count_total += 1
 
         if completed % 1000 == 0 or completed == total:
@@ -451,6 +469,7 @@ async def async_main(args):
         concurrency=args.concurrency,
         timeout=args.timeout,
         http_timeout=args.http_timeout,
+        max_fails=args.max_fails,
     )
 
     pass_count = sum(1 for r in rows if _get_fc(r) == 0)

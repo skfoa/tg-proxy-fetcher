@@ -365,7 +365,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 #### ② 反代 ProxyIP 穿透质检引擎（`proxyip_verify.py`）
 * **穿透鉴真**：向反代节点发起 TLS 握手，发送 HTTP/1.1 GET `/cdn-cgi/trace` 探针请求。采用统一 Deadline 超时控制与循环读取（`read_full_response`），严格切分 Header 与 Body 区域，校验状态码与 Server 标头，提取有效 `colo` 机房代号。
 * **参数配置**：握手与连接超时设为 `4.0s`（HTTP 读取 `3.5s`），兼容高延迟跨洲网络；默认并发控制为 `250` 协程，配合哈希分段锁平滑调度。
-* **淘汰机制**：连续失败达到阈值（默认 3 次）从 `data/proxyip.txt` 与 `data/proxyip.csv` 中清理剔除，并登记入墓地（`data/tombstone.json`）进行 7 天冷却隔离。
+* **淘汰机制**：对确定性致命硬故障（非 Cloudflare 伪造节点 `no_cf_header`、未配置反代探针 `status_404`、SNI 域名拒绝 `status_421`、协议畸形 `status_400`、纯明文/非 TLS 端口 `tls_error` 等）当场判死拉满阈值淘汰；常规网络抖动/超时/临时风控连续失败达到阈值（默认 3 次）淘汰，并登记入墓地（`data/tombstone.json`）进行 7 天冷却隔离。
 
 #### ③ 优选 IP 两阶段主动鉴真引擎（`cf_verify.py`）
 * **全量优选 IP 覆盖**：优选 IP（涵盖 `data/scan_ips` 扫描测速与 `data/cf_ips` 每日单条）执行两阶段探测：
