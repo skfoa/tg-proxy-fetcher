@@ -36945,5 +36945,17 @@
     "isp": "NUXOA GmbH",
     "net_type": "datacenter",
     "country": "GB"
+  },
+  "130.78.216.246": {
+    "asn": "AS204044",
+    "isp": "Packet Star",
+    "net_type": "datacenter",
+    "country": "GB"
+  },
+  "69.63.223.84": {
+    "asn": "AS906",
+    "isp": "DMIT",
+    "net_type": "datacenter",
+    "country": "US"
   }
 }
