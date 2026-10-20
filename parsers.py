@@ -253,6 +253,7 @@ def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
         "cf_location": cf_loc_m.group(1).replace("`", "").strip() if cf_loc_m else "",
         "isp": raw_isp,
         "asn": final_asn,
+        "raw_asn": asn_val,
         "first_seen": normalize_timestamp(time_m.group(1).strip() if time_m else ""),
         "channel": source_m.group(1).strip() if source_m else default_channel,
         "fail_count": 0,
@@ -371,9 +372,11 @@ def parse_cf_csv_content(
                     "cf_location": "",
                     "isp": row_isp,
                     "asn": format_asn_isp(row_asn, row_isp),
+                    "raw_asn": row_asn,
                     "first_seen": fn_time,
                     "channel": default_channel,
                     "fail_count": 0,
+                    "exit_ip": "",
                 })
             return results
 
@@ -387,37 +390,87 @@ def parse_cf_csv_content(
             if not col:
                 continue
             c_clean = col.strip().lower().replace(" ", "").replace("_", "")
-            if any(k in c_clean for k in ("出站", "egress", "tunnel", "warp", "gateway")):
+
+            # 1. 优先精准提取出口/出站 IP 字段 (严格排除 类型/位置/协议 等干扰属性列)
+            if (
+                c_clean in ("出站ip", "出口ip", "egressip", "exitip", "clientip", "出站", "出口", "egress", "exit")
+                or (
+                    any(k in c_clean for k in ("出站ip", "出口ip", "egressip", "exitip", "clientip"))
+                    and not any(k in c_clean for k in ("类型", "位置", "地区", "国家", "城市", "type", "loc", "status", "asn", "org", "协议"))
+                )
+            ):
+                field_map["exit_ip"] = col
                 continue
-            if any(k in c_clean for k in ("ip地址", "ipaddress", "proxyip")) or c_clean == "ip":
+
+            # 2. 忽略其余出站属性列与隧道/网关标记列，防止污染后续指标提取
+            if any(k in c_clean for k in ("出站", "出口", "egress", "tunnel", "warp", "gateway", "rbi")):
+                continue
+
+            # 3. 频道/数据来源匹配 (如 IP数据来源, 渠道, source)
+            if any(k in c_clean for k in ("ip数据来源", "数据来源", "来源", "渠道", "channel", "source")):
+                field_map["channel"] = col
+
+            # 4. 入口 IP 匹配 (严密排除包含出站/出口字样的干扰列)
+            elif (
+                (any(k in c_clean for k in ("ip地址", "ipaddress", "proxyip", "节点ip", "入口ip")) or c_clean == "ip")
+                and not any(k in c_clean for k in ("出站", "出口", "exit", "egress"))
+            ):
                 field_map["ip"] = col
+
+            # 5. 端口匹配
             elif any(k in c_clean for k in ("端口", "port")):
                 field_map["port"] = col
-            elif any(k in c_clean for k in ("tls", "istls", "ssl")):
+
+            # 6. TLS 开关匹配 (严密排除 TLS版本/TLS协议 等版本信息列)
+            elif (
+                c_clean in ("tls", "istls", "ssl", "is_tls")
+                or (
+                    any(k in c_clean for k in ("tls", "istls", "ssl"))
+                    and not any(k in c_clean for k in ("版本", "version", "ver", "协议", "proto"))
+                )
+            ):
                 field_map["tls"] = col
+
+            # 7. 延迟匹配
             elif any(k in c_clean for k in ("延迟", "delay", "latency", "connectms")):
                 field_map["delay"] = col
+
+            # 8. 速度/带宽匹配
             elif any(k in c_clean for k in ("速度", "speed", "带宽", "bandwidth")):
                 field_map["speed"] = col
                 if "mb" in c_clean:
                     speed_unit_is_mb = True
-            elif any(k in c_clean for k in ("数据中心", "机房", "colo")):
+
+            # 9. 机房/数据中心代码匹配
+            elif any(k in c_clean for k in ("数据中心", "机房", "colo", "dc")):
                 field_map["colo"] = col
-            elif any(k in c_clean for k in ("位置", "location", "country", "国家")):
+
+            # 10. 地理位置多维精细识别 (优先区分中文地理层级与英文/标准地理字段)
+            elif any(k in c_clean for k in ("地区(中文)", "大洲(中文)", "地区中文", "大洲中文", "洲(中文)", "continentcn", "regioncn")):
+                field_map["region_cn"] = col
+            elif any(k in c_clean for k in ("国家(中文)", "国家中文", "countrycn")) or c_clean == "国家":
+                field_map["country_cn"] = col
+            elif any(k in c_clean for k in ("城市(中文)", "城市中文", "citycn")):
+                field_map["city_cn"] = col
+            elif c_clean in ("ip位置", "位置", "location") or any(k in c_clean for k in ("country", "国家代码")):
                 field_map["loc"] = col
-            elif any(k in c_clean for k in ("地区", "省份", "region", "province")):
+            elif any(k in c_clean for k in ("地区", "省份", "region", "province", "continent")):
                 field_map["region"] = col
             elif any(k in c_clean for k in ("城市", "city")):
                 field_map["city"] = col
+
+            # 11. 自治系统 (ASN) 编号与组织匹配
             elif (
                 c_clean in ("asn", "as", "asnumber", "asnum", "asn_id", "asnid")
                 or any(k in c_clean for k in ("as编号", "as号码", "as号", "as_number", "asn编号", "asn号码", "asn号", "asn_number"))
                 or (c_clean.startswith("asn") and not any(k in c_clean for k in ("组织", "org", "isp", "name", "名称")))
             ):
                 field_map["asn"] = col
-            elif any(k in c_clean for k in ("运营商", "组织", "org", "isp", "company", "asn组织", "as组织")):
+            elif any(k in c_clean for k in ("运营商", "组织", "org", "isp", "company", "asn组织", "as组织", "asn名称")):
                 field_map["isp"] = col
-            elif any(k in c_clean for k in ("时间", "time", "date")):
+
+            # 12. 时间戳与测试时间匹配
+            elif any(k in c_clean for k in ("时间戳", "时间", "timestamp", "time", "date")):
                 field_map["time"] = col
 
         for row in reader:
@@ -452,12 +505,34 @@ def parse_cf_csv_content(
 
             colo = row.get(field_map.get("colo", ""), "").strip()
 
+            # 智能拼接地理信息：优先中文完整层级 (大洲/地区 · 国家 · 城市)，若无中文则回退到英文/通用
             loc_parts = []
-            for key in ("region", "city", "loc"):
-                val = row.get(field_map.get(key, ""), "").strip()
-                if val and val != "-" and val not in loc_parts:
-                    loc_parts.append(val)
+            has_cn_loc = any(field_map.get(k) for k in ("region_cn", "country_cn", "city_cn"))
+            if has_cn_loc:
+                for key in ("region_cn", "country_cn", "city_cn"):
+                    val = row.get(field_map.get(key, ""), "").strip()
+                    if val and val.upper() not in ("-", "N/A", "NULL", "NONE") and val not in loc_parts:
+                        loc_parts.append(val)
+            if not loc_parts:
+                for key in ("region", "country", "city", "loc"):
+                    val = row.get(field_map.get(key, ""), "").strip()
+                    if val and val.upper() not in ("-", "N/A", "NULL", "NONE") and val not in loc_parts:
+                        loc_parts.append(val)
             cf_location = " · ".join(loc_parts)
+
+            # 真实出口 IP 提取与校验
+            raw_exit_ip = row.get(field_map.get("exit_ip", ""), "").strip()
+            exit_ip = raw_exit_ip if is_valid_ip(raw_exit_ip) else ""
+
+            # 来源频道提取与格式清洗 (如 TG@danfeng_chat -> @danfeng_chat)
+            raw_channel = row.get(field_map.get("channel", ""), "").strip()
+            row_channel = default_channel
+            if raw_channel:
+                ch_clean = re.sub(r"^(?:tg:?//|telegram:?//|tg:?|telegram:?)", "", raw_channel, flags=re.IGNORECASE).strip()
+                if ch_clean:
+                    if not ch_clean.startswith("@"):
+                        ch_clean = f"@{ch_clean}"
+                    row_channel = ch_clean
 
             raw_asn = row.get(field_map.get("asn", ""), "").replace("`", "").strip()
             if not raw_asn or raw_asn == "-":
@@ -484,9 +559,11 @@ def parse_cf_csv_content(
                 "cf_location": cf_location,
                 "isp": raw_isp,
                 "asn": format_asn_isp(asn_val, raw_isp),
+                "raw_asn": asn_val,
                 "first_seen": first_seen,
-                "channel": default_channel,
+                "channel": row_channel,
                 "fail_count": 0,
+                "exit_ip": exit_ip,
             })
     except Exception as e:
         log.warning("解析 CSV 优选/ProxyIP 数据异常: %s", e)
