@@ -77,6 +77,8 @@ from providers import (
     atomic_writer,
     atomic_write_text,
     atomic_write_json,
+    CHECK_PROXYIP_URL,
+    probe_check_proxyip_api,
 )
 from parsers import (
     extract_proxies,
@@ -2066,14 +2068,39 @@ async def run_telethon():
                                             cf_key = f"{cf_item['ip']}:{cf_item['port']}"
                                             if is_tombstoned(cf_key, tombstone):
                                                 continue
-                                            
-                                            # 架构核心准则：按权威网络类型彻底分流
-                                            # - 非机房节点 (ISP家庭宽带/商业专线/教育科研/政务公用/银行金融) -> 归入 proxyip
-                                            # - 除了非机房的所有节点 (即常规机房 datacenter) -> 归入 scan_ips
-                                            nt = cf_item.get("net_type") or classify_asn(cf_item.get("asn", ""), cf_item.get("isp", ""))
-                                            cf_item["net_type"] = nt
-                                            
-                                            if nt != "datacenter":
+
+                                            # 架构核心准则：优选看入口，ProxyIP 看出口
+                                            exit_ip = cf_item.get("exit_ip") or ""
+                                            raw_asn = cf_item.get("raw_asn") or ""
+
+                                            # 若节点自带 exit_ip，从本地缓存或自治域分类识别出口网络类型
+                                            exit_net_type = ""
+                                            if exit_ip:
+                                                exit_cached = ip_cache.get(exit_ip) or {}
+                                                exit_net_type = exit_cached.get("net_type") or classify_asn(exit_cached.get("asn", ""), exit_cached.get("isp", ""))
+
+                                            # 若缺少有效 ASN 且配置了在线探针端点，执行在线探针补全
+                                            if (not raw_asn or raw_asn == "AS_UNKNOWN") and CHECK_PROXYIP_URL:
+                                                probe_res = probe_check_proxyip_api(cf_item['ip'], int(cf_item['port']))
+                                                if probe_res.get("success"):
+                                                    if not exit_ip and probe_res.get("exit_ip"):
+                                                        exit_ip = probe_res["exit_ip"]
+                                                        cf_item["exit_ip"] = exit_ip
+                                                    if not cf_item.get("colo") and probe_res.get("colo"):
+                                                        cf_item["colo"] = probe_res["colo"]
+                                                    if probe_res.get("net_type"):
+                                                        exit_net_type = probe_res["net_type"]
+
+                                            # 判断入口网络类型
+                                            ingress_net_type = cf_item.get("net_type") or classify_asn(cf_item.get("asn", ""), cf_item.get("isp", ""))
+                                            cf_item["net_type"] = ingress_net_type
+
+                                            # 终极分流：
+                                            # - 出口非机房（家宽/专线等）或入口非机房 -> 坚决划入 proxyip
+                                            # - 只有纯机房优选 -> 归入 scan_ips (以入口 IP 的 ASN 归类分组)
+                                            is_proxyip = (exit_net_type and exit_net_type != "datacenter") or (ingress_net_type and ingress_net_type != "datacenter")
+
+                                            if is_proxyip:
                                                 if cf_key not in scraped_proxyips:
                                                     scraped_proxyips[cf_key] = cf_item
                                                     proxyip_count += 1

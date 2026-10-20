@@ -23,6 +23,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 from collections import defaultdict
+import concurrent.futures
 import csv
 import json
 import logging
@@ -33,6 +34,8 @@ import ssl
 import sys
 import time
 from datetime import datetime, timezone, timedelta
+import urllib.error
+import urllib.request
 
 from providers import (
     load_dotenv,
@@ -58,6 +61,9 @@ from providers import (
     atomic_writer,
     atomic_write_text,
     atomic_write_json,
+    CHECK_PROXYIP_URL,
+    probe_check_proxyip_api,
+    format_check_proxyip_url,
 )
 
 # 确保本地 .env 加载
@@ -92,6 +98,89 @@ TIMEOUT = 4.0        # TCP 建立连接与 TLS 握手超时（实测 4.0s 显著
 HTTP_TIMEOUT = 3.5   # HTTP /cdn-cgi/trace 读取统一 deadline 超时
 CONCURRENCY = 250    # 异步探测协程池并发上限（平滑并发，兼顾速度与对端防刷限流）
 MAX_FAILS = 3        # 连续失败物理淘汰阈值（第 1~2 次缓冲容错，连续 3 次全网不可达永久淘汰）
+
+# Check ProxyIP 外部穿透鉴真端点与多线程并发配置（同 socks5 检测机制）
+CHECK_ENDPOINT = os.getenv("CHECK_PROXYIP_URL", "").strip()
+CHECK_CONCURRENCY = safe_int(os.getenv("CHECK_CONCURRENCY"), 32)
+_CHECK_EXECUTOR: concurrent.futures.ThreadPoolExecutor | None = None
+
+
+def get_check_executor(max_workers: int | None = None) -> concurrent.futures.ThreadPoolExecutor:
+    """获取或惰性初始化 ProxyIP 外部质检专用高并发线程池"""
+    global _CHECK_EXECUTOR
+    if _CHECK_EXECUTOR is None:
+        workers = max_workers if max_workers is not None else CHECK_CONCURRENCY
+        _CHECK_EXECUTOR = concurrent.futures.ThreadPoolExecutor(
+            max_workers=max(1, workers),
+            thread_name_prefix="proxyip_worker",
+        )
+    return _CHECK_EXECUTOR
+
+
+def shutdown_check_executor(wait: bool = False, cancel_futures: bool = True) -> None:
+    """关闭外部质检线程池，释放线程资源"""
+    global _CHECK_EXECUTOR
+    if _CHECK_EXECUTOR is not None:
+        try:
+            if sys.version_info >= (3, 9):
+                _CHECK_EXECUTOR.shutdown(wait=wait, cancel_futures=cancel_futures)
+            else:
+                _CHECK_EXECUTOR.shutdown(wait=wait)
+        except Exception:
+            pass
+        _CHECK_EXECUTOR = None
+
+
+def check_proxyip_endpoint_health(endpoint: str, timeout: float = 6.0) -> bool:
+    """
+    质检开始前，对 Check ProxyIP 外部检测端点进行全局健康探针校验。
+    确认端点在线可用、域名正确且未欠费或被封禁。
+    若探测失败，则安全熔断并全局降级为本地直接探测，避免单节点频繁失败或卡顿。
+    """
+    if not endpoint:
+        return False
+    clean_ep = endpoint.rstrip("/")
+    probe_urls = [clean_ep] if clean_ep.endswith("/check") else [clean_ep, f"{clean_ep}/check"]
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)",
+    }
+    for target in probe_urls:
+        try:
+            req = urllib.request.Request(target, headers=headers)
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                if resp.status in (200, 204):
+                    return True
+        except urllib.error.HTTPError as he:
+            if he.code in (200, 400, 404):
+                return True
+        except Exception as e:
+            log.debug("Check ProxyIP 端点健康探针 [%s] 异常: %s", target, e)
+    return False
+
+
+def _sync_check_proxyip_endpoint(
+    endpoint: str,
+    ip: str,
+    port: int,
+    timeout: float = 7.0,
+) -> tuple[bool, int, str, str, str, str, str]:
+    """
+    同步调用 Check ProxyIP 外部检测接口（在独立线程池中并发执行，不阻塞事件循环，杜绝盲等）。
+    返回 (is_alive, latency_ms, colo, reason, exit_ip, exit_asn, exit_isp)
+    """
+    t0 = time.monotonic()
+    res = probe_check_proxyip_api(ip, port, endpoint=endpoint, timeout=timeout)
+    latency_ms = max(1, int((time.monotonic() - t0) * 1000))
+    if res.get("success"):
+        colo = res.get("colo", "")
+        exit_ip = res.get("exit_ip", "")
+        exit_asn = res.get("exit_asn", "")
+        exit_isp = res.get("exit_isp", "")
+        return True, latency_ms, colo, "ok", exit_ip, exit_asn, exit_isp
+    else:
+        reason = res.get("reason") or (f"status_{res.get('status')}" if res.get('status') else "probe_failed")
+        return False, 0, "", reason, "", "", ""
+
 
 # ProxyIP 纯净数据表字段定义
 CSV_FIELDS = [
@@ -288,9 +377,13 @@ async def verify_proxyips(
     timeout: float = TIMEOUT,
     http_timeout: float = HTTP_TIMEOUT,
     max_fails: int = MAX_FAILS,
+    check_endpoint: str = "",
+    check_executor: concurrent.futures.ThreadPoolExecutor | None = None,
 ) -> list:
     """
-    并发调度对所有 ProxyIP 进行 /cdn-cgi/trace 穿透鉴真。
+    并发调度对所有 ProxyIP 进行穿透鉴真：
+    - 若配置了 check_endpoint，通过外部端点（Check ProxyIP）进行高并发多线程鉴真并提取真实出口与 ASN；
+    - 若未配置端点，则回退为本地原生 TLS 穿透 + /cdn-cgi/trace 校验；
     打乱执行顺序以将同 IP 多端口请求自然散列，防止突发流量触发对端防护。
     对致命硬故障（FATAL_FAIL_STATUSES）直接拉满 fail_count = max_fails 即刻淘汰入墓地。
     原地更新 fail_count、delay_ms、colo。
@@ -332,9 +425,22 @@ async def verify_proxyips(
 
         lock_key = f"{ip}:{port}"
         async with sem, get_keyed_lock(lock_key):
-            alive, latency, colo, reason = await probe_proxyip(
-                ip, port, connect_timeout=timeout, http_timeout=http_timeout
-            )
+            if check_endpoint and check_executor:
+                # 外部端点多线程并发穿透鉴真模式（同 socks5 检测机制，高并发多线程不盲等）
+                loop = asyncio.get_running_loop()
+                alive, latency, colo, reason, exit_ip, exit_asn, exit_isp = await loop.run_in_executor(
+                    check_executor, _sync_check_proxyip_endpoint, check_endpoint, ip, port, timeout
+                )
+                if alive:
+                    if exit_asn:
+                        row["asn"] = format_asn_isp(exit_asn, exit_isp)
+                        row["isp"] = exit_isp
+                        row["net_type"] = classify_asn(exit_asn, exit_isp)
+            else:
+                # 本地直接 TLS 穿透 + /cdn-cgi/trace 鉴真
+                alive, latency, colo, reason = await probe_proxyip(
+                    ip, port, connect_timeout=timeout, http_timeout=http_timeout
+                )
 
         completed += 1
         reasons_counter[reason] += 1
@@ -464,13 +570,42 @@ async def async_main(args):
     total = len(rows)
     log.info(">>> 开始执行 ProxyIP 穿透质检 (%s): 共 %d 条记录...", PROXYIP_CSV, total)
 
-    rows = await verify_proxyips(
-        rows,
-        concurrency=args.concurrency,
-        timeout=args.timeout,
-        http_timeout=args.http_timeout,
-        max_fails=args.max_fails,
-    )
+    endpoint = getattr(args, "check_endpoint", "").strip() or CHECK_ENDPOINT
+    check_concurrency = getattr(args, "check_concurrency", CHECK_CONCURRENCY)
+    check_executor = None
+
+    if endpoint:
+        # 质检启动前对 Check ProxyIP 端点进行单次健康探针校验，若不可达则全局安全熔断降级
+        is_endpoint_ok = await asyncio.to_thread(check_proxyip_endpoint_health, endpoint)
+        if is_endpoint_ok:
+            check_executor = get_check_executor(max_workers=check_concurrency)
+            log.info(
+                "🚀 启用 Check ProxyIP 外部穿透鉴真端点 (并发多线程): %s (专用并发线程: %d)",
+                endpoint,
+                check_concurrency,
+            )
+        else:
+            log.warning(
+                "⚠️ Check ProxyIP 端点 [%s] 健康校验失败 (不可达/响应异常)，本轮将全局熔断降级为本地直接探测",
+                endpoint,
+            )
+            endpoint = ""
+    else:
+        log.info("未配置外部检测端点 (CHECK_PROXYIP_URL 留空)，采用本地直接探测（无外部依赖）")
+
+    try:
+        rows = await verify_proxyips(
+            rows,
+            concurrency=args.concurrency,
+            timeout=args.timeout,
+            http_timeout=args.http_timeout,
+            max_fails=args.max_fails,
+            check_endpoint=endpoint,
+            check_executor=check_executor,
+        )
+    finally:
+        if check_executor:
+            shutdown_check_executor()
 
     pass_count = sum(1 for r in rows if _get_fc(r) == 0)
     fail_count = total - pass_count
@@ -606,6 +741,8 @@ def main():
     parser.add_argument("--max-fails", type=int, default=MAX_FAILS, help=f"连续失败淘汰阈值 (默认 {MAX_FAILS})")
     parser.add_argument("--timeout", type=float, default=TIMEOUT, help=f"单节点连接与 TLS 握手超时秒数 (默认 {TIMEOUT})")
     parser.add_argument("--http-timeout", type=float, default=HTTP_TIMEOUT, help=f"单节点 HTTP 校验超时秒数 (默认 {HTTP_TIMEOUT})")
+    parser.add_argument("--check-endpoint", type=str, default=CHECK_ENDPOINT, help="Check ProxyIP 外部检测端点 URL (默认读取环境变量 CHECK_PROXYIP_URL)")
+    parser.add_argument("--check-concurrency", type=int, default=CHECK_CONCURRENCY, help=f"外部检测端点并发线程数 (默认 {CHECK_CONCURRENCY})")
     parser.add_argument("--no-notify", action="store_true", help="静默模式，不单独发送 Telegram 质检通知（供流水线协同使用）")
     parser.add_argument("--dry-run", action="store_true", help="演练诊断模式，仅探测统计原因，不覆写数据文件也不登记墓地")
     parser.add_argument("--diag-output", type=str, default="", help="诊断结果输出 JSON 路径，记录每个节点的探测原因明细")

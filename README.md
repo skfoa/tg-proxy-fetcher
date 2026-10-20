@@ -441,6 +441,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `EDT_HTTP_URLS` | 专属 HTTP 代理完整 JSON 候选列表（逗号分隔） | 留空（由镜像自动推导） | 可选 | 高级自定义：直接指定抓取非机房 HTTP 代理的完整 JSON 地址列表（支持多源并发竞速，协议级最高优先级） |
 | `EDT_SOCKS5_URLS` | 专属 SOCKS5 代理完整 JSON 候选列表（逗号分隔） | 留空（由镜像自动推导） | 可选 | 高级自定义：直接指定抓取非机房 SOCKS5 代理的完整 JSON 地址列表（支持多源并发竞速，协议级最高优先级） |
 | `CF_CHECK_ENDPOINT` | SSTP 代理出口检测端点 URL | 留空（不执行） | 可选 | 用于存活 SSTP 节点的第二阶段真实出口 IP 与链路鉴真。<br>💡 **需自行部署**：本项目**默认不预设第三方公共端点**（避免占用他人私人项目额度）。推荐使用开源项目 [CF-Workers-CheckSocks5](https://github.com/cmliu/CF-Workers-CheckSocks5) 部署到个人 Cloudflare Workers 免费账号（每日 100,000 次免费请求额度），部署后将个人 Worker 域名填入此处。若留空则仅使用本地探测，完全不调用外部服务。 |
+| `CHECK_PROXYIP_URL` | Check ProxyIP 在线探针检测 API 端点 | 留空（不执行） | 可选 | 配置 [Check ProxyIP](https://check.proxyip.cmliussss.net/) 或后端检测端点（如 `https://api.090227.xyz/check?proxyip=` 或自建 Worker）。配置后系统自动对未知 ASN/ISP 或缺少出口信息的节点进行在线穿透鉴真，提取真实出口 IP 与网络归属；留空则仅依赖本地离线库与自带字段 |
 
 ### 3. 高级调优参数与本地调试对照（可选）
 
@@ -453,6 +454,8 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `--timeout` | 校验脚本 | `反代 4.0 · 优选 3.0 · 代理 3.0` | `代理 3.0 · 反代 4.0 · 优选 3.0` | 单节点连接建立与 TLS 握手超时秒数（反代默认 4.0s 充分兼容跨洲 RTT） |
 | `--http-timeout` | `proxyip_verify.py` / `cf_verify.py` | `反代 3.5 · 优选 2.0` | `反代 3.5 · 优选 2.0` | HTTP 响应读取与 301 重定向检测统一 deadline 超时秒数 |
 | `--cf-check-endpoint` | `proxies_verify.py` | 留空 | 留空 | SSTP 真实出口与 PPP 链路鉴真端点 URL (默认留空不执行外部检测，需自行部署 CF-Workers-CheckSocks5) |
+| `--check-endpoint` | `proxyip_verify.py` | 留空 | 留空 | Check ProxyIP 外部穿透鉴真端点 URL (默认读取环境变量 `CHECK_PROXYIP_URL`，留空使用本地直接探测) |
+| `--check-concurrency` | `proxyip_verify.py` | `32` | `32` | Check ProxyIP 外部穿透鉴真并发线程数 (默认读取环境变量 `CHECK_CONCURRENCY`，并发多线程调度不盲等) |
 | `--no-notify` | 校验脚本 | 流水线静默 | 关闭 | 不单独推送各引擎卡片，由流水线终点聚合为四合一卡片 |
 | `DEFER_NOTIFY` | `tg_fetch.py` | `1` | `0` | 延迟 Telegram 推送标记，确保四合一卡片聚合完整 |
 

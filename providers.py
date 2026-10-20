@@ -1366,6 +1366,7 @@ load_dotenv()
 
 TG_BOT_TOKEN = os.getenv("TG_BOT_TOKEN") or ""
 TG_CHAT_ID = os.getenv("TG_CHAT_ID") or ""
+CHECK_PROXYIP_URL = os.getenv("CHECK_PROXYIP_URL") or ""
 
 
 # =====================================================================
@@ -2950,6 +2951,96 @@ def is_tombstoned(
         return False
     now = int(time.time())
     return (now - ts) < (max_age_days * 86400)
+
+
+# =====================================================================
+# Check ProxyIP 在线探针 API 适配模块 (https://check.proxyip.cmliussss.net/)
+# =====================================================================
+def format_check_proxyip_url(base_url: str, ip: str, port: int) -> str:
+    """智能格式化 Check ProxyIP 请求 URL，自适应各种形态的用户配置"""
+    if not base_url:
+        return ""
+    target = f"{ip}:{port}"
+    u = base_url.strip()
+    if "{target}" in u:
+        return u.replace("{target}", target)
+    if "{ip}" in u and "{port}" in u:
+        return u.replace("{ip}", ip).replace("{port}", str(port))
+    if u.endswith("="):
+        return f"{u}{target}"
+    if "?" in u:
+        sep = "&" if not u.endswith("&") and not u.endswith("?") else ""
+        return f"{u}{sep}proxyip={target}"
+
+    u = u.rstrip("/")
+    if u.endswith("/check"):
+        return f"{u}?proxyip={target}"
+    return f"{u}/check?proxyip={target}"
+
+
+def probe_check_proxyip_api(
+    ip: str,
+    port: int,
+    endpoint: str = "",
+    timeout: float = 6.0,
+) -> dict:
+    """
+    通过 Check ProxyIP API 在线探测节点的出口真实 IP、出口 ASN、机房与地理位置。
+    若 endpoint 留空则使用全局 CHECK_PROXYIP_URL。若未配置任何端点，直接返回 {"success": False}。
+    """
+    ep = endpoint or CHECK_PROXYIP_URL
+    if not ep:
+        return {"success": False, "reason": "no_endpoint"}
+
+    target_url = format_check_proxyip_url(ep, ip, port)
+    if not target_url:
+        return {"success": False, "reason": "invalid_url"}
+
+    try:
+        req = urllib.request.Request(
+            target_url,
+            headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)",
+                "Accept": "application/json",
+            },
+        )
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            if resp.status != 200:
+                return {"success": False, "status": resp.status}
+            data = json.loads(resp.read().decode("utf-8", errors="ignore"))
+            if not isinstance(data, dict):
+                return {"success": False, "reason": "invalid_json"}
+
+            probe = data.get("probe_results", {})
+            exit_info = (
+                probe.get("ipv4", {}).get("exit")
+                or probe.get("ipv6", {}).get("exit")
+                or data.get("exit")
+                or {}
+            )
+
+            exit_ip = exit_info.get("ip") or data.get("exit_ip") or ""
+            exit_asn = exit_info.get("asn") or data.get("exit_asn") or ""
+            exit_isp = exit_info.get("asOrganization") or exit_info.get("org") or data.get("exit_isp") or ""
+            colo = data.get("colo") or probe.get("colo") or ""
+            country = exit_info.get("country") or data.get("country") or ""
+
+            if exit_asn and not str(exit_asn).upper().startswith("AS"):
+                exit_asn = f"AS{exit_asn}"
+
+            net_type = classify_asn(exit_asn, exit_isp) if exit_asn else ""
+
+            return {
+                "success": bool(data.get("success", False)) or bool(exit_ip),
+                "exit_ip": str(exit_ip).strip(),
+                "exit_asn": str(exit_asn).strip().upper(),
+                "exit_isp": str(exit_isp).strip(),
+                "colo": str(colo).strip().upper(),
+                "country": str(country).strip(),
+                "net_type": net_type,
+            }
+    except Exception as e:
+        return {"success": False, "reason": f"request_error_{type(e).__name__}"}
 
 
 if __name__ == "__main__":

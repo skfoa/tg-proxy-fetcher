@@ -11,6 +11,7 @@ Telegram 消息与文件解析器模块 (parsers.py)
 from __future__ import annotations
 
 import csv
+import ipaddress
 import logging
 import os
 import re
@@ -41,6 +42,18 @@ PROXY_URL_RE = re.compile(
 
 
 RE_DOMAIN_LABEL = re.compile(r"^[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$")
+
+
+def is_valid_ip(val: str) -> bool:
+    """严格校验是否为有效 IPv4 或 IPv6 地址"""
+    if not val:
+        return False
+    clean = str(val).strip().strip("[]")
+    try:
+        ipaddress.ip_address(clean)
+        return True
+    except Exception:
+        return False
 
 
 def is_valid_host(host: str) -> bool:
@@ -565,82 +578,129 @@ def parse_otc_scan_content(
         loc = ""
         delay_ms = ""
         speed_kbs = ""
+        exit_ip = ""
 
-        # 0. 预处理 rem_parts：若存在被空格切散的 IATA 航线机房码与括号备注（如 HKG (中国-香港)），或括号内部包含空格，予以合并
-        merged_parts = []
-        i = 0
-        while i < len(rem_parts):
-            p_cur = rem_parts[i]
-            if i + 1 < len(rem_parts) and p_cur.isupper() and len(p_cur) == 3 and rem_parts[i + 1].startswith("("):
-                merged_parts.append(p_cur + " " + rem_parts[i + 1])
-                i += 2
-            elif p_cur.startswith("(") and not p_cur.endswith(")") and i + 1 < len(rem_parts):
-                merged_parts.append(p_cur + " " + rem_parts[i + 1])
-                i += 2
-            else:
-                merged_parts.append(p_cur)
-                i += 1
+        # 特征探测：判断是否为标准的 OTC 7 列优选测速扫描格式
+        # 标准格式: {ip:port},{country},{asn},{isp/org},{colo(loc)},{exit_ip},{ip_stack}
+        is_otc_7col = False
+        if len(parts) >= 6:
+            last_token = parts[-1].strip()
+            # 末尾特征: 仅IPv6, 仅IPv4, 双栈, 纯IPv4 等
+            if "仅ipv" in last_token.lower() or "ipv" in last_token.lower() or "双栈" in last_token:
+                is_otc_7col = True
+            elif len(parts) >= 7 and is_valid_ip(parts[5]):
+                is_otc_7col = True
 
-        # 依次探测 ASN 编号 (ASxxxx 或纯数字)、Colo位置、延时、速度与 ISP
-        for p_val in merged_parts:
-            if not p_val or p_val.upper() in ("N/A", "-", "NULL", "NONE"):
-                continue
+        if is_otc_7col:
+            # 模式 A：精准定长 7 字段解析，杜绝字段错位与误吞
+            c_country = parts[1].strip() if len(parts) > 1 else ""
+            c_asn = parts[2].strip() if len(parts) > 2 else ""
+            c_isp = parts[3].strip() if len(parts) > 3 else ""
+            c_colo_loc = parts[4].strip() if len(parts) > 4 else ""
+            c_exit = parts[5].strip() if len(parts) > 5 else ""
 
-            # 1. 优先匹配带 AS 前缀的编号 (如 AS210644, AS906)
-            m_a = re.search(r"\b(AS\d+)\b", p_val, re.IGNORECASE)
-            if m_a and not asn:
-                asn = m_a.group(1).upper()
-                continue
+            # 1. 提取 ASN (格式如 AS139659)
+            if c_asn:
+                m_a = re.search(r"\b(AS\d+)\b", c_asn, re.IGNORECASE)
+                if m_a:
+                    asn = m_a.group(1).upper()
 
-            # 2. 匹配测速下载带宽 (如 12.5MB/s, 1024KB/s, 100Mbps)
-            m_spd = re.search(r"^(\d+(?:\.\d+)?)\s*([kKmMgG]?[bB]/s|[kKmMgG]?bps)$", p_val, re.IGNORECASE)
-            if m_spd and not speed_kbs:
-                speed_kbs = parse_speed_to_kbs(p_val)
-                continue
+            # 2. 提取 ISP (排除纯数字或 IP 字符串)
+            if c_isp and not is_valid_ip(c_isp) and not c_isp.isdigit():
+                isp = c_isp
 
-            # 3. 匹配显式带 ms 结尾的延迟数值 (如 145ms, 145.5ms)
-            m_del = re.search(r"^(\d+(?:\.\d+)?)\s*ms$", p_val, re.IGNORECASE)
-            if m_del and not delay_ms:
-                delay_ms = int(float(m_del.group(1)))
-                continue
-
-            # 4. 匹配机房位置字段 (如 HKG (中国-香港), FRA (德国-法兰克福), (中国-香港))
-            if "(" in p_val and ")" in p_val and not loc:
-                m_cl = re.match(r"^([A-Z]{3})\s*\((.*?)\)", p_val)
+            # 3. 提取机房代号与位置 (如 HKG (中国-香港))
+            if c_colo_loc:
+                m_cl = re.match(r"^([A-Z]{3})\s*\((.*?)\)", c_colo_loc)
                 if m_cl:
-                    colo = m_cl.group(1)
-                    loc = m_cl.group(2)
+                    colo = m_cl.group(1).upper()
+                    loc = m_cl.group(2).strip()
+                elif len(c_colo_loc) == 3 and c_colo_loc.isupper():
+                    colo = c_colo_loc.upper()
                 else:
-                    loc = p_val.strip("()")
-                continue
+                    loc = c_colo_loc.strip("()")
 
-            # 5. 独立匹配纯三位大写 IATA 机房码 (如 HKG, SJC, NRT, FRA)
-            if p_val.isupper() and len(p_val) == 3 and not colo:
-                colo = p_val
-                continue
+            # 4. 提取真实出口 IP
+            if is_valid_ip(c_exit):
+                exit_ip = c_exit
+        else:
+            # 模式 B：通用自适应启发式解析（兼容 DanFeng 变体、纯 IP 文本、带测速指标文本等）
+            merged_parts = []
+            i = 0
+            while i < len(rem_parts):
+                p_cur = rem_parts[i]
+                if i + 1 < len(rem_parts) and p_cur.isupper() and len(p_cur) == 3 and rem_parts[i + 1].startswith("("):
+                    merged_parts.append(p_cur + " " + rem_parts[i + 1])
+                    i += 2
+                elif p_cur.startswith("(") and not p_cur.endswith(")") and i + 1 < len(rem_parts):
+                    merged_parts.append(p_cur + " " + rem_parts[i + 1])
+                    i += 2
+                else:
+                    merged_parts.append(p_cur)
+                    i += 1
 
-            # 6. 识别纯数字：延迟 vs 纯数字 ASN 启发式区分
-            if p_val.isdigit():
-                val_int = int(p_val)
-                # 典型网络延迟大多分布在 1-3000ms 之间，若尚未提取到延迟则优先填补延迟
-                if not delay_ms and val_int < 3000:
-                    delay_ms = val_int
-                elif not asn and val_int >= 1000:
-                    asn = f"AS{val_int}"
-                continue
+            for p_val in merged_parts:
+                if not p_val or p_val.upper() in ("N/A", "-", "NULL", "NONE"):
+                    continue
 
-            # 7. 识别 ISP 运营商名称 (排除 IPv6、机房位置括号、纯数字及短国家码)
-            if not isp and ":" not in p_val and "(" not in p_val and not p_val.isdigit():
-                if len(p_val) > 2 and not p_val.startswith("仅"):
-                    isp = p_val
+                # 1. 优先匹配带 AS 前缀的编号 (如 AS210644, AS906)
+                m_a = re.search(r"\b(AS\d+)\b", p_val, re.IGNORECASE)
+                if m_a and not asn:
+                    asn = m_a.group(1).upper()
+                    continue
 
-        # 核心 ASN 判定规则：
-        # 1. 若文件名明确指定了目标 ASN（如 OTC_SCAN_YX_AS210644.txt），全文件统一以文件名中目标 ASN 为准；
-        # 2. 若文件名没有 ASN（如混合文件 OTC_SCAN_YX_杂.txt），则直接以该行数据中具体的 ASN 与 ISP 为准；
-        if fn_asn:
+                # 2. 匹配测速下载带宽 (如 12.5MB/s, 1024KB/s, 100Mbps)
+                m_spd = re.search(r"^(\d+(?:\.\d+)?)\s*([kKmMgG]?[bB]/s|[kKmMgG]?bps)$", p_val, re.IGNORECASE)
+                if m_spd and not speed_kbs:
+                    speed_kbs = parse_speed_to_kbs(p_val)
+                    continue
+
+                # 3. 匹配显式带 ms 结尾的延迟数值 (如 145ms, 145.5ms)
+                m_del = re.search(r"^(\d+(?:\.\d+)?)\s*ms$", p_val, re.IGNORECASE)
+                if m_del and not delay_ms:
+                    delay_ms = int(float(m_del.group(1)))
+                    continue
+
+                # 4. 匹配机房位置字段 (如 HKG (中国-香港), FRA (德国-法兰克福), (中国-香港))
+                if "(" in p_val and ")" in p_val and not loc:
+                    m_cl = re.match(r"^([A-Z]{3})\s*\((.*?)\)", p_val)
+                    if m_cl:
+                        colo = m_cl.group(1)
+                        loc = m_cl.group(2)
+                    else:
+                        loc = p_val.strip("()")
+                    continue
+
+                # 5. 独立匹配纯三位大写 IATA 机房码 (如 HKG, SJC, NRT, FRA)
+                if p_val.isupper() and len(p_val) == 3 and not colo:
+                    colo = p_val
+                    continue
+
+                # 6. 识别纯数字：延迟 vs 纯数字 ASN 启发式区分
+                if p_val.isdigit():
+                    val_int = int(p_val)
+                    if not delay_ms and val_int < 3000:
+                        delay_ms = val_int
+                    elif not asn and val_int >= 1000:
+                        asn = f"AS{val_int}"
+                    continue
+
+                # 7. 识别独立出口 IP（合法 IPv4/IPv6 且非当前入口 IP）
+                if not exit_ip and is_valid_ip(p_val) and p_val != ip:
+                    exit_ip = p_val
+                    continue
+
+                # 8. 识别 ISP 运营商名称 (严密排除 IPv6、公网 IP、机房位置括号、纯数字及短国家码)
+                if not isp and ":" not in p_val and "(" not in p_val and not p_val.isdigit():
+                    if len(p_val) > 2 and not p_val.startswith("仅") and not is_valid_ip(p_val) and not is_valid_host(p_val):
+                        isp = p_val
+
+        # 核心 ASN 优先级规则：
+        # 1. 优先使用行内真实提取出的合法 ASN；
+        # 2. 行内无 ASN 时，若文件名明确指定了目标 ASN（如 OTC_SCAN_YX_AS210644.txt），采用文件名 ASN 兜底；
+        # 3. 否则交由 resolve_and_clean_asn 根据 IP 权威反查。
+        if not asn and fn_asn:
             asn = fn_asn
-        elif not asn:
-            asn = "AS_UNKNOWN"
 
         if not isp and asn and asn != "AS_UNKNOWN" and asn in ASN_TO_PROVIDER:
             isp = ASN_TO_PROVIDER[asn]
@@ -652,7 +712,7 @@ def parse_otc_scan_content(
         if not loc and line_remark:
             loc = line_remark
 
-        asn, isp = resolve_and_clean_asn(ip, asn, isp)
+        clean_asn_code, isp = resolve_and_clean_asn(ip, asn, isp)
 
         tls = "true" if port in (443, 8443, 2053, 2083, 2087, 2096) else "false"
 
@@ -665,10 +725,12 @@ def parse_otc_scan_content(
             "colo": colo,
             "cf_location": loc,
             "isp": isp,
-            "asn": format_asn_isp(asn, isp),
+            "asn": format_asn_isp(clean_asn_code, isp),
+            "raw_asn": clean_asn_code,
             "first_seen": dt_str,
             "channel": default_channel,
             "fail_count": 0,
+            "exit_ip": exit_ip,
         })
     return results
 
