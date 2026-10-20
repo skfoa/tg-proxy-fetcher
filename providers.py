@@ -128,6 +128,8 @@ KNOWN_CLOUD_PROVIDERS = {
     "starry": ("AS134835", "Starry Network"),
     "cyberverse": ("AS216211", "Cyberverse"),
     "isif": ("AS209554", "ISIF"),
+    "wawacloud": ("AS402799", "WawaCloud Inc."),
+    "wawa": ("AS402799", "WawaCloud Inc."),
     "evoxt": ("AS149440", "Evoxt"),
     "mvps": ("AS202448", "MVPS"),
     "zouter": ("AS205548", "Zouter"),
@@ -2701,6 +2703,10 @@ def save_scan_ips_by_asn(asn_groups: dict, output_dir: str) -> int:
         if not isp_name:
             isp_name = next((r.get("isp") for r in group if r.get("isp")), "")
 
+        # 严格过滤地址字符串与无意义泛化占位符（如 Private Customer、3rd Floor 等），避免生成脏文件名
+        if isp_name and (_ADDR_RE.search(isp_name) or re.search(r'(?i)^(?:private\s*customer|shared\s*assignment|customer\s*ip|nat\s*pool|undefined)$', isp_name.strip())):
+            isp_name = ""
+
         # 严谨过滤文件名非法字符（特别是 Windows / Linux 路径分隔符 / 与 \，以及冒号等）
         safe_asn = re.sub(r'[\\/:*?"<>|\s]', "_", str(asn_name).strip()).strip(" ._") or "AS_UNKNOWN"
         safe_asn = re.sub(r"_+", "_", safe_asn)
@@ -2717,7 +2723,7 @@ def save_scan_ips_by_asn(asn_groups: dict, output_dir: str) -> int:
         if not valid_rows:
             continue
 
-        with atomic_writer(fpath) as f:
+        with atomic_writer(fpath, encoding="utf-8", newline="\n") as f:
             for r in sorted(valid_rows, key=lambda x: (x.get("ip", ""), safe_int(x.get("port"), 0))):
                 f.write(f"{r['ip']}:{safe_int(r.get('port'), 0)}\n")
         active_files.add(fname)
