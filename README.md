@@ -219,7 +219,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 * 数值字段（`delay_ms`, `speed_kbs`）均为纯数字，并在保存时按**质检状态（`fail_count` 升序）、可用性与低延迟（`delay_ms` 升序）、首次收录时间（`first_seen` 降序）**执行多重稳定质量排序。
 * 全项目共有 4 个核心 CSV 数据表，按用途与结构分为以下 3 大规范体系：
 
-#### ① 优选 IP 测速数据表（`data/cf_ips.csv`、`data/scan_ips.csv`）
+#### ① 优选 IP 测速数据表（`data/cf_ips.csv`）
 *共 12 个字段，记录 Cloudflare 优选 IP 的真实测速指标与机房归属：*
 
 | 字段 | 类型 | 说明 | 示例 |
@@ -230,14 +230,36 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `delay_ms` | 整数 | 网络延迟（毫秒纯数值，便于排序） | `2` |
 | `speed_kbs` | 整数 | 下载速度（kB/s 纯数值，便于排序） | `89086` |
 | `colo` | 字符串 | Cloudflare 数据中心三字代码 | `HKG`、`NRT`、`LAX` |
-| `cf_location` | 字符串 | Cloudflare 落地地理位置 | `亚太 · 香港` |
+| `cf_location` | 字符串 | Cloudflare 接入地理位置 | `亚太 · 香港` |
 | `asn` | 字符串 | **【核心规范】** 『ASN 编号 + 服务商名称』一体化直观标签 | `AS400618 Prime Security Corp.` |
 | `isp` | 字符串 | 自治系统所属运营商 / 托管商组织名称 | `Prime Security Corp.` |
 | `first_seen` | 时间字符串 | 首次收录时间（以第一次抓取入库为准，永久不变） | `2026-09-13 18:00:33` |
 | `channel` | 字符串 | 来源频道 | `@danfeng_chat` / `@otcfxq` |
 | `fail_count` | 整数 | 连续探测失败次数（默认 0，连续失败 ≥ 3 次自动淘汰剔除） | `0` |
 
-#### ② 反代 ProxyIP 穿透与网络属性数据表（`data/proxyip.csv`）
+#### ② 扫描测速反代数据表（`data/scan_ips.csv`，出入口双维度）
+*共 16 个字段，彻底解耦【入口物理网络】与【真实出口落地】：*
+
+| 字段 | 类型 | 说明 | 示例 |
+| :--- | :--- | :--- | :--- |
+| `ip` | 字符串 | 客户端直接连接的入口 IP | `38.92.214.45` |
+| `port` | 整数 | 入口服务端口 | `443` |
+| `tls` | 字符串 | 是否开启 TLS (`true`/`false`) | `true` |
+| `delay_ms` | 整数 | 网络延迟（毫秒纯数值，便于排序） | `149` |
+| `speed_kbs` | 整数 | 下载速度（kB/s 纯数值，便于排序） | `5120` |
+| `colo` | 字符串 | Cloudflare 接入机房三字码 | `SJC` |
+| `cf_location` | 字符串 | Cloudflare 入口接入位置 | `北美洲 · 圣何塞 · 美国` |
+| `asn` | 字符串 | **【入口物理网络】** 入口 IP 的 BGP 广播自治系统 | `AS174 Cogent Communications, LLC` |
+| `isp` | 字符串 | 入口物理运营商 / 托管商组织名称 | `Cogent Communications, LLC` |
+| `first_seen` | 时间字符串 | 首次收录时间 | `2026-10-18 21:50:14` |
+| `channel` | 字符串 | 来源频道 | `@danfeng_chat` |
+| `fail_count` | 整数 | 连续探测失败次数 | `0` |
+| `exit_ip` | 字符串 | **【真实出口落地】** 穿透测试测出的出站落地真实 IP（未测通则为空） | `192.241.216.172` |
+| `exit_asn` | 字符串 | **【真实出口网络】** 最终出站访问目标时的落地 ASN | `AS14061 DigitalOcean, LLC` |
+| `exit_isp` | 字符串 | 最终出站落地的托管商组织名称 | `DigitalOcean, LLC` |
+| `exit_location` | 字符串 | 最终出站落地的地理位置 | `美国 · 旧金山` |
+
+#### ③ 反代 ProxyIP 穿透与网络属性数据表（`data/proxyip.csv`）
 *共 13 个字段，除基础网络字段外，包含 `net_type`（两级分层网络识别）核心资产属性：*
 
 | 字段 | 类型 | 说明 | 示例 |

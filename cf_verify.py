@@ -94,6 +94,7 @@ CSV_FIELDS = [
     "colo", "cf_location", "asn", "isp",
     "first_seen", "channel", "fail_count",
 ]
+SCAN_CSV_FIELDS = CSV_FIELDS + ["exit_ip", "exit_asn", "exit_isp", "exit_location"]
 
 # 复用全局 SSL 证书上下文，避免重复加载系统 CA 证书
 SSL_CTX = ssl.create_default_context()
@@ -338,7 +339,7 @@ def save_cf_ips(rows: list, csv_path: str = CF_CSV, txt_path: str = CF_TXT):
 def save_scan_csv(rows: list, path: str = SCAN_CSV):
     """覆写 scan_ips.csv（仅保留存活节点，剔除死节点；原子写入防截断）"""
     with atomic_writer(path, encoding="utf-8-sig", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
+        writer = csv.DictWriter(f, fieldnames=SCAN_CSV_FIELDS, extrasaction="ignore")
         writer.writeheader()
         for row in rows:
             writer.writerow(row)

@@ -2503,7 +2503,8 @@
     "Peekabo Networks": "AS402139",
     "IDC Cube LLC": "AS402628",
     "RedSwitches Pty LTD": "AS50049",
-    "DataRoom": "AS19624"
+    "DataRoom": "AS19624",
+    "Cloud Fabric, Inc.": "AS8126"
   },
   "asn_to_isp": {
     "AS174": "Cogent Communications, LLC",
@@ -4904,7 +4905,8 @@
     "AS197223": "Wedropcode LTD",
     "AS216311": "Aleksandr Muravja",
     "AS402139": "Peekabo Networks",
-    "AS402628": "IDC Cube LLC"
+    "AS402628": "IDC Cube LLC",
+    "AS8126": "Cloud Fabric, Inc."
   },
   "asn_to_net_type": {
     "AS1311": "banking",
@@ -8339,6 +8341,7 @@
     "AS215415": "datacenter",
     "AS50049": "datacenter",
     "AS216311": "datacenter",
-    "AS402139": "datacenter"
+    "AS402139": "datacenter",
+    "AS8126": "datacenter"
   }
 }

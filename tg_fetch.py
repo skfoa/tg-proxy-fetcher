@@ -333,6 +333,7 @@ CF_CSV_FIELDS = [
     "channel",
     "fail_count",
 ]
+SCAN_CSV_FIELDS = CF_CSV_FIELDS + ["exit_ip", "exit_asn", "exit_isp", "exit_location"]
 PROXYIP_CSV_FIELDS = CF_CSV_FIELDS + ["net_type"]
 
 logging.basicConfig(
@@ -1447,7 +1448,7 @@ def save_and_notify(
             all_sorted_scan_rows.extend(group_rows)
 
         with atomic_writer(OUTPUT_SCAN_FILE, encoding="utf-8-sig", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=CF_CSV_FIELDS, extrasaction="ignore")
+            writer = csv.DictWriter(f, fieldnames=SCAN_CSV_FIELDS, extrasaction="ignore")
             writer.writeheader()
             for row in all_sorted_scan_rows:
                 row.setdefault("fail_count", 0)
