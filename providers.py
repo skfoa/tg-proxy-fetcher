@@ -2686,11 +2686,12 @@ def save_proxyip_by_country(rows: list, output_dir: str) -> int:
     return len(active_files)
 
 
-def save_scan_ips_by_asn(asn_groups: dict, output_dir: str) -> int:
+def save_scan_ips_by_asn(asn_groups: dict, output_dir: str, min_nodes: int = 5) -> int:
     """
     覆写 scan_ips/ 目录下的独立 ASN 纯文本文件（无注释 IP:端口；原子写入防截断）。
-    死节点被淘汰后，其对应的 ASN 文件会即时同步删除该 IP；
-    若某个 ASN 旗下所有 IP 全部死亡淘汰，该 ASN 文本文件也会被自动清除删除（保留 .gitkeep 保持目录结构）。
+    - 活跃节点数 >= min_nodes (默认 5) 的 ASN 生成独立专属文件（如 AS906_DMIT.txt）
+    - 活跃节点数 < min_nodes 的长尾微型 ASN 统一收纳进 OTHER_长尾网络聚合.txt，避免文件碎片化
+    - 死节点被淘汰后，若某个 ASN 文本文件已无活跃 IP，会自动清除删除（保留 .gitkeep 保持目录结构）
     返回生成的独立文件数量。
     """
     if not asn_groups:
@@ -2698,7 +2699,21 @@ def save_scan_ips_by_asn(asn_groups: dict, output_dir: str) -> int:
 
     os.makedirs(output_dir, exist_ok=True)
     active_files = set()
+    other_rows = []
+
     for asn_name, group in asn_groups.items():
+        valid_rows = [
+            r for r in group
+            if r.get("ip") and safe_int(r.get("port"), 0) > 0 and safe_int(r.get("port"), 0) <= 65535
+        ]
+        if not valid_rows:
+            continue
+
+        # 小于 min_nodes 门槛的长尾 ASN，统一收纳进长尾聚合集合
+        if len(valid_rows) < min_nodes:
+            other_rows.extend(valid_rows)
+            continue
+
         isp_name = ASN_TO_PROVIDER.get(asn_name, "")
         if not isp_name:
             isp_name = next((r.get("isp") for r in group if r.get("isp")), "")
@@ -2716,19 +2731,29 @@ def save_scan_ips_by_asn(asn_groups: dict, output_dir: str) -> int:
         else:
             fname = f"{safe_asn}.txt"
         fpath = os.path.join(output_dir, fname)
-        valid_rows = [
-            r for r in group
-            if r.get("ip") and safe_int(r.get("port"), 0) > 0 and safe_int(r.get("port"), 0) <= 65535
-        ]
-        if not valid_rows:
-            continue
 
         with atomic_writer(fpath, encoding="utf-8", newline="\n") as f:
             for r in sorted(valid_rows, key=lambda x: (x.get("ip", ""), safe_int(x.get("port"), 0))):
                 f.write(f"{r['ip']}:{safe_int(r.get('port'), 0)}\n")
         active_files.add(fname)
 
-    # 移除已无活跃 IP 的旧分组文件（保留 .gitkeep 保持目录结构）
+    # 写入长尾网络聚合文件
+    if other_rows:
+        other_fname = "OTHER_长尾网络聚合.txt"
+        other_fpath = os.path.join(output_dir, other_fname)
+        seen_keys = set()
+        unique_other = []
+        for r in other_rows:
+            key = (r.get("ip", ""), safe_int(r.get("port"), 0))
+            if key not in seen_keys:
+                seen_keys.add(key)
+                unique_other.append(r)
+        with atomic_writer(other_fpath, encoding="utf-8", newline="\n") as f:
+            for r in sorted(unique_other, key=lambda x: (x.get("ip", ""), safe_int(x.get("port"), 0))):
+                f.write(f"{r['ip']}:{safe_int(r.get('port'), 0)}\n")
+        active_files.add(other_fname)
+
+    # 移除已无活跃 IP 或已合并进长尾的旧分组文件（保留 .gitkeep 保持目录结构）
     for old_f in os.listdir(output_dir):
         if old_f == ".gitkeep":
             continue
@@ -2743,7 +2768,7 @@ def save_scan_ips_by_asn(asn_groups: dict, output_dir: str) -> int:
             except OSError:
                 pass
 
-    log.info("已覆写更新 %s/ 目录: %d 个独立 ASN 纯文本文件", output_dir, len(active_files))
+    log.info("已覆写更新 %s/ 目录: %d 个独立 ASN 纯文本文件（含长尾聚合）", output_dir, len(active_files))
     return len(active_files)
 
 
