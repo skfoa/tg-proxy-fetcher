@@ -15,7 +15,7 @@ on:
         required: false
         default: ""
       check_proxyip_url:
-        description: "Check ProxyIP 外部穿透鉴真端点 URL (支持 Check ProxyIP 或自建 Worker，留空则读取仓库变量 CHECK_PROXYIP_URL)"
+        description: "Check ProxyIP 外部穿透鉴真端点 URL (仅供 tg_fetch.py 对未知新节点出口鉴真，存活质检统一采用本地原生直接探测)"
         required: false
         default: ""
       edt_mirrors:
@@ -86,9 +86,6 @@ jobs:
         run: python proxies_verify.py --concurrency 300 --max-fails 3 --no-notify
 
       - name: 🔍 ProxyIP 穿透存活质检
-        env:
-          CHECK_PROXYIP_URL: ${{ inputs.check_proxyip_url || vars.CHECK_PROXYIP_URL || secrets.CHECK_PROXYIP_URL || '' }}
-          CHECK_CONCURRENCY: ${{ vars.CHECK_CONCURRENCY || '32' }}
         run: python proxyip_verify.py --concurrency 250 --max-fails 3 --no-notify
 
       - name: 🛡️ 优选 IP 两阶段主动校验（TLS + 301）

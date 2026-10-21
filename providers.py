@@ -3042,7 +3042,14 @@ def probe_check_proxyip_api(
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             if resp.status != 200:
                 return {"success": False, "status": resp.status}
-            data = json.loads(resp.read().decode("utf-8", errors="ignore"))
+            content_type = (resp.headers.get("Content-Type") or "").lower()
+            raw_body = resp.read()
+            if "application/json" not in content_type and not raw_body.strip().startswith(b"{"):
+                return {"success": False, "reason": "waf_challenge_or_html_response"}
+            try:
+                data = json.loads(raw_body.decode("utf-8", errors="ignore"))
+            except Exception:
+                return {"success": False, "reason": "invalid_json"}
             if not isinstance(data, dict):
                 return {"success": False, "reason": "invalid_json"}
 

@@ -97,8 +97,9 @@ HTTP_TIMEOUT = 3.5   # HTTP /cdn-cgi/trace 读取统一 deadline 超时
 CONCURRENCY = 250    # 异步探测协程池并发上限（平滑并发，兼顾速度与对端防刷限流）
 MAX_FAILS = 3        # 连续失败物理淘汰阈值（第 1~2 次缓冲容错，连续 3 次全网不可达永久淘汰）
 
-# Check ProxyIP 外部穿透鉴真端点与多线程并发配置（同 socks5 检测机制）
-CHECK_ENDPOINT = os.getenv("CHECK_PROXYIP_URL", "").strip()
+# 架构准则：ProxyIP 常规存活质检默认强制走本地原生 TLS 穿透探测（零外部依赖、250+ 高并发且无对端风控限流）。
+# 外部 Check ProxyIP 端点仅供 tg_fetch.py 对未知新节点出口信息补全，或在显式传入 --check-endpoint 时作为演练探针。
+CHECK_ENDPOINT = ""
 CHECK_CONCURRENCY = safe_int(os.getenv("CHECK_CONCURRENCY"), 32)
 _CHECK_EXECUTOR: concurrent.futures.ThreadPoolExecutor | None = None
 
@@ -739,7 +740,7 @@ def main():
     parser.add_argument("--max-fails", type=int, default=MAX_FAILS, help=f"连续失败淘汰阈值 (默认 {MAX_FAILS})")
     parser.add_argument("--timeout", type=float, default=TIMEOUT, help=f"单节点连接与 TLS 握手超时秒数 (默认 {TIMEOUT})")
     parser.add_argument("--http-timeout", type=float, default=HTTP_TIMEOUT, help=f"单节点 HTTP 校验超时秒数 (默认 {HTTP_TIMEOUT})")
-    parser.add_argument("--check-endpoint", type=str, default=CHECK_ENDPOINT, help="Check ProxyIP 外部检测端点 URL (默认读取环境变量 CHECK_PROXYIP_URL)")
+    parser.add_argument("--check-endpoint", type=str, default="", help="Check ProxyIP 外部检测端点 URL (留空默认使用本地原生直接探测)")
     parser.add_argument("--check-concurrency", type=int, default=CHECK_CONCURRENCY, help=f"外部检测端点并发线程数 (默认 {CHECK_CONCURRENCY})")
     parser.add_argument("--no-notify", action="store_true", help="静默模式，不单独发送 Telegram 质检通知（供流水线协同使用）")
     parser.add_argument("--dry-run", action="store_true", help="演练诊断模式，仅探测统计原因，不覆写数据文件也不登记墓地")
