@@ -1844,6 +1844,7 @@ CITY_TO_COUNTRY = {
     "多伦多": "加拿大", "蒙特利尔": "加拿大", "温哥华": "加拿大",
     "苏黎世": "瑞士", "日内瓦": "瑞士", "维也纳": "奥地利",
     "马德里": "西班牙", "巴塞罗那": "西班牙", "华沙": "波兰", "布拉格": "捷克",
+    "德黑兰": "伊朗", "Tehran": "伊朗",
 }
 
 COUNTRY_FLAGS = {
@@ -1858,12 +1859,13 @@ COUNTRY_FLAGS = {
     "塞浦路斯": "🇨🇾", "吉尔吉斯斯坦": "🇰🇬", "格鲁吉亚": "🇬🇪", "墨西哥": "🇲🇽", "智利": "🇨🇱",
     "阿根廷": "🇦🇷", "哥伦比亚": "🇨🇴", "秘鲁": "🇵🇪", "南非": "🇿🇦", "阿联酋": "🇦🇪",
     "科威特": "🇰🇼", "卡塔尔": "🇶🇦", "沙特阿拉伯": "🇸🇦", "希腊": "🇬🇷", "匈牙利": "🇭🇺",
-    "塞尔维亚": "🇷🇸", "克罗地亚": "🇭🇷", "葡萄牙": "🇵🇹", "乌克兰": "🇺🇦", "泰国": "🇹🇭",
+    "塞尔维亚": "🇷🇸", "克罗地亚": "🇭🇷", "葡萄牙": "🇵🇹", "乌克兰": "乌克兰", "泰国": "🇹🇭",
     "菲律宾": "🇵🇭", "马来西亚": "🇲🇾", "印度尼西亚": "🇮🇩", "越南": "🇻🇳", "新西兰": "🇳🇿",
     "中国": "🇨🇳", "澳门": "🇲🇴", "阿曼": "🇴🇲", "斯洛文尼亚": "🇸🇮", "白俄罗斯": "🇧🇾",
     "厄瓜多尔": "🇪🇨", "尼日利亚": "🇳🇬", "北马其顿": "🇲🇰", "哥斯达黎加": "🇨🇷", "多米尼加": "🇩🇴",
     "尼泊尔": "🇳🇵", "巴基斯坦": "🇵🇰", "波多黎各": "🇵🇷", "肯尼亚": "🇰🇪", "黎巴嫩": "🇱🇧",
     "乌兹别克斯坦": "🇺🇿", "津巴布韦": "🇿🇼", "阿塞拜疆": "🇦🇿", "埃及": "🇪🇬", "叙利亚": "🇸🇾",
+    "伊朗": "🇮🇷",
 }
 
 COUNTRY_TO_CODE = {
@@ -1883,8 +1885,12 @@ COUNTRY_TO_CODE = {
     "中国": "CN", "澳门": "MO", "阿曼": "OM", "斯洛文尼亚": "SI", "白俄罗斯": "BY",
     "厄瓜多尔": "EC", "尼日利亚": "NG", "北马其顿": "MK", "哥斯达黎加": "CR", "多米尼加": "DO",
     "尼泊尔": "NP", "巴基斯坦": "PK", "波多黎各": "PR", "肯尼亚": "KE", "黎巴嫩": "LB",
-    "乌兹别克斯坦": "UZ", "津巴布韦": "ZW", "阿塞拜疆": "AZ", "埃及": "EG", "叙利亚": "SY", "其他地区": "OTHER",
+    "乌兹别克斯坦": "UZ", "津巴布韦": "ZW", "阿塞拜疆": "AZ", "埃及": "EG", "叙利亚": "SY",
+    "伊朗": "IR", "其他地区": "OTHER",
 }
+
+CODE_TO_COUNTRY = {v: k for k, v in COUNTRY_TO_CODE.items() if k != "其他地区"}
+CODE_TO_COUNTRY["GB"] = "英国"
 
 
 def get_country_code(country_name: str) -> str:
@@ -1904,7 +1910,7 @@ def get_country_code(country_name: str) -> str:
 @functools.lru_cache(maxsize=2048)
 def extract_country(cf_location: str | None, colo: str | None) -> str:
     """
-    根据 cf_location (如 '北美洲 · 洛杉矶 · 美国') 或 Cloudflare colo 机房三字代码 (如 'LAX')
+    根据 cf_location (如 '北美洲 · 美国 · 洛杉矶') 或 Cloudflare colo 机房三字代码 (如 'LAX')
     提取标准化的国家/地区名称。
     """
     cf_location = (cf_location or "").strip()
@@ -1912,19 +1918,22 @@ def extract_country(cf_location: str | None, colo: str | None) -> str:
 
     def _normalize_name(name: str) -> str:
         name = name.strip()
-        if name in ("捷克共和国", "捷克"):
+        uname = name.upper()
+        if uname in CODE_TO_COUNTRY:
+            return CODE_TO_COUNTRY[uname]
+        if name in ("捷克共和国", "捷克", "Czechia", "Czech Republic"):
             return "捷克"
-        if name in ("俄罗斯联邦", "俄罗斯"):
+        if name in ("俄罗斯联邦", "俄罗斯", "Russia", "Russian Federation"):
             return "俄罗斯"
-        if name in ("阿拉伯联合酋长国", "阿联酋"):
+        if name in ("阿拉伯联合酋长国", "阿联酋", "UAE", "United Arab Emirates"):
             return "阿联酋"
         if name in ("US", "USA", "United States"):
             return "美国"
         if name in ("TW", "Taiwan"):
             return "台湾"
-        if "香港" in name:
+        if "香港" in name or name in ("HK", "Hong Kong"):
             return "香港"
-        if "澳门" in name:
+        if "澳门" in name or name in ("MO", "Macao", "Macau"):
             return "澳门"
         if "巴基斯坦" in name:
             return "巴基斯坦"
@@ -1934,41 +1943,32 @@ def extract_country(cf_location: str | None, colo: str | None) -> str:
 
     parts = [p.strip() for p in cf_location.split("·") if p.strip()] if cf_location else []
 
-    # 1. 三段式或以上结构优先取末段（通常为国家/地区名，如 '北美洲 · 洛杉矶 · 美国'）
-    if len(parts) >= 3:
-        return _normalize_name(parts[-1])
+    # 1. 优先从右向左逐段探测已知国家/地区（兼容 "北美洲 · 美国 · 洛杉矶" 与 "California · Los Angeles · 美国"）
+    for p in reversed(parts):
+        n = _normalize_name(p)
+        if n in COUNTRY_FLAGS or n in COUNTRY_TO_CODE:
+            return n
 
-    # 2. 两段式结构（如 '欧洲 · 德国' 或 '北美洲 · 洛杉矶'）
-    if len(parts) == 2:
-        loc = _normalize_name(parts[1])
-        if loc in COUNTRY_FLAGS:
-            return loc
-        if loc in CITY_TO_COUNTRY:
-            return CITY_TO_COUNTRY[loc]
+    # 2. 若无直接国家匹配，探测是否为已知城市名并反查所属国家
+    for p in reversed(parts):
+        if p in CITY_TO_COUNTRY:
+            return CITY_TO_COUNTRY[p]
 
-    # 3. 单段式直接匹配国家或城市（如 '日本' 或 '东京'）
-    if len(parts) == 1:
-        loc = _normalize_name(parts[0])
-        if loc in COUNTRY_FLAGS:
-            return loc
-        if loc in CITY_TO_COUNTRY:
-            return CITY_TO_COUNTRY[loc]
-
-    # 4. cf_location 文本中包含已知城市名
+    # 3. cf_location 文本全词匹配已知城市名
     if cf_location:
         for city, c in CITY_TO_COUNTRY.items():
             if city in cf_location:
                 return c
 
-    # 5. 回退到 colo 机房代码映射
+    # 4. 回退到 Cloudflare colo 机房三字代码映射
     if colo in COLO_TO_COUNTRY:
         return COLO_TO_COUNTRY[colo]
 
-    # 6. 两段式/单段式兜底（若未匹配到已知表，直接规范化作为地区名）
-    if len(parts) >= 2:
-        return _normalize_name(parts[1])
-    if len(parts) == 1:
-        return _normalize_name(parts[0])
+    # 5. 非大洲名称的两段式/单段式兜底
+    for p in reversed(parts):
+        n = _normalize_name(p)
+        if n and n not in ("北美洲", "欧洲", "亚洲", "大洋洲", "南美洲", "非洲"):
+            return n
 
     return "其他地区"
 
