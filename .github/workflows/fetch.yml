@@ -14,6 +14,10 @@ on:
         description: "SSTP 出口检测端点 URL (需自行部署 CF-Workers-CheckSocks5，仅对 proxies_verify 生效，留空则不执行外部检测)"
         required: false
         default: ""
+      check_proxyip_url:
+        description: "Check ProxyIP 外部穿透鉴真端点 URL (支持 Check ProxyIP 或自建 Worker，留空则读取仓库变量 CHECK_PROXYIP_URL)"
+        required: false
+        default: ""
       edt_mirrors:
         description: "EDT 镜像加速源列表 (支持逗号/空格分隔多个加速域名/前缀，留空则自动竞速内置镜像)"
         required: false
@@ -72,6 +76,7 @@ jobs:
           EDT_HTTP_URLS: ${{ vars.EDT_HTTP_URLS }}
           EDT_SOCKS5_URLS: ${{ vars.EDT_SOCKS5_URLS }}
           PROXIFLY_HTTPS_URLS: ${{ vars.PROXIFLY_HTTPS_URLS }}
+          CHECK_PROXYIP_URL: ${{ inputs.check_proxyip_url || vars.CHECK_PROXYIP_URL || secrets.CHECK_PROXYIP_URL || '' }}
           DEFER_NOTIFY: "1"
         run: python tg_fetch.py
 
@@ -81,6 +86,9 @@ jobs:
         run: python proxies_verify.py --concurrency 300 --max-fails 3 --no-notify
 
       - name: 🔍 ProxyIP 穿透存活质检
+        env:
+          CHECK_PROXYIP_URL: ${{ inputs.check_proxyip_url || vars.CHECK_PROXYIP_URL || secrets.CHECK_PROXYIP_URL || '' }}
+          CHECK_CONCURRENCY: ${{ vars.CHECK_CONCURRENCY || '32' }}
         run: python proxyip_verify.py --concurrency 250 --max-fails 3 --no-notify
 
       - name: 🛡️ 优选 IP 两阶段主动校验（TLS + 301）
