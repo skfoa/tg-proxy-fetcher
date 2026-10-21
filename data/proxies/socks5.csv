@@ -177,6 +177,7 @@ socks5://84.42.102.18:1080,socks5,84.42.102.18,1080,3153,0,alive,DME,RU,84.42.10
 socks5://203.99.54.238:1080,socks5,203.99.54.238,1080,3211,0,alive,ISB,PK,203.99.54.238,AS23674 Nayatel (Pvt) Ltd,Nayatel (Pvt) Ltd,isp,2026-10-20 12:55:22,EDT-Pages
 socks5://vpn:vpn@101.126.33.223:1080,socks5,101.126.33.223,1080,3388,0,alive,FRA,CN,101.126.33.223,AS137718 GHSX,GHSX,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://45.74.31.47:11539,socks5,45.74.31.47,11539,5804,0,alive,BOM,IN,64.227.140.218,AS27845 Empresa de Recursos Tecnologicos S.A E.S.P,Empresa de Recursos Tecnologicos S.A E.S.P,isp,2026-10-20 12:55:22,EDT-Pages
+socks5://dpalieus1006:Aa1234567@192.46.200.166:5836,socks5,192.46.200.166,5836,0,0,alive,BOS,US,192.46.200.166,AS6079 RCN,RCN,isp,2026-10-21 14:05:00,@user
 socks5://49.13.22.249:10807,socks5,49.13.22.249,10807,1365,1,timeout,ATL,US,151.240.101.87,"AS174 Cogent Communications, LLC (Private Customer)",Private Customer,isp,2026-10-14 12:57:52,EDT-Pages
 socks5://5.75.133.113:10807,socks5,5.75.133.113,10807,1988,1,timeout,MCT,AE,95.181.235.77,"AS174 Cogent Communications, LLC (Private Customer)",Private Customer,isp,2026-10-12 21:49:55,EDT-Pages
 socks5://212.237.125.216:6969,socks5,212.237.125.216,6969,0,1,timeout,,IQ,212.237.125.216,AS206206 Kurdistan Net Company for Computer and Internet Ltd.,Kurdistan Net Company for Computer and Internet Ltd.,isp,2026-10-20 12:55:22,EDT-Pages

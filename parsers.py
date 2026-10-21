@@ -30,13 +30,13 @@ log = logging.getLogger("parsers")
 
 # 通用代理匹配正则表达式
 ANNOUNCE_PROXY_RE = re.compile(
-    r"\[发现开放\s*(?P<proto>HTTP|SOCKS5|HTTPS|TURN|SSTP)\s*(?:代理|服务)?\]\s*(?:(?:https?|socks5|turn|sstp)://)?(?P<ip>\d{1,3}(?:\.\d{1,3}){3}):(?P<port>\d{1,5})"
+    r"\[发现开放\s*(?P<proto>HTTP|SOCKS5|HTTPS|TURNS?|SSTP)\s*(?:代理|服务)?\]\s*(?:(?:https?|socks5|turns?|sstp)://)?(?P<ip>\d{1,3}(?:\.\d{1,3}){3}):(?P<port>\d{1,5})"
 )
 TG_SOCKS_RE = re.compile(
     r"(?:tg://socks|https?://(?:t\.me|telegram\.me)/socks)\?(?P<query>[^\s#]+)"
 )
 PROXY_URL_RE = re.compile(
-    r"(?P<url>(?P<proto>socks5|http|https|turn|sstp)://(?:[^\s#@]+@)?(?P<host>(?:\d{1,3}\.){3}\d{1,3}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}):(?P<port>\d{1,5}))",
+    r"(?P<url>(?P<proto>socks5|http|https|turns?|sstp)://(?:[^\s#@]+@)?(?P<host>(?:\d{1,3}\.){3}\d{1,3}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}):(?P<port>\d{1,5}))",
     re.IGNORECASE,
 )
 
@@ -402,7 +402,12 @@ def parse_cf_csv_content(
                 field_map["exit_ip"] = col
                 continue
 
-            # 2. 忽略其余出站属性列与隧道/网关标记列，防止污染后续指标提取
+            # 2. 捕获出站地理位置 (如 出站IP位置, 出口IP位置, 兼容部分表头中将国家列误标为出站IP位置的变体)
+            if any(k in c_clean for k in ("出站ip位置", "出口ip位置", "出站位置", "出口位置", "出站国家", "出口国家")):
+                field_map["exit_loc"] = col
+                continue
+
+            # 3. 忽略其余出站属性列与隧道/网关标记列，防止污染后续指标提取
             if any(k in c_clean for k in ("出站", "出口", "egress", "tunnel", "warp", "gateway", "rbi")):
                 continue
 
@@ -442,8 +447,9 @@ def parse_cf_csv_content(
                     speed_unit_is_mb = True
 
             # 9. 机房/数据中心代码匹配
-            elif any(k in c_clean for k in ("数据中心", "机房", "colo", "dc")):
+            elif any(k in c_clean for k in ("数据中心", "机房", "colo", "dc", "地区码", "城市码", "机场码")):
                 field_map["colo"] = col
+
 
             # 10. 地理位置多维精细识别 (优先区分中文地理层级与英文/标准地理字段)
             elif any(k in c_clean for k in ("地区(中文)", "大洲(中文)", "地区中文", "大洲中文", "洲(中文)", "continentcn", "regioncn")):
@@ -505,11 +511,12 @@ def parse_cf_csv_content(
 
             colo = row.get(field_map.get("colo", ""), "").strip()
 
-            # 智能拼接地理信息：优先中文完整层级 (大洲/地区 · 国家 · 城市)，若无中文则回退到英文/通用
+            # 智能拼接地理信息：优先中文完整层级 (大洲/地区 · 国家 · 城市)，若无国家则使用 exit_loc 兜底
             loc_parts = []
-            has_cn_loc = any(field_map.get(k) for k in ("region_cn", "country_cn", "city_cn"))
+            has_cn_loc = any(field_map.get(k) for k in ("region_cn", "country_cn", "exit_loc", "city_cn"))
             if has_cn_loc:
-                for key in ("region_cn", "country_cn", "city_cn"):
+                country_key = "country_cn" if field_map.get("country_cn") else "exit_loc"
+                for key in ("region_cn", country_key, "city_cn"):
                     val = row.get(field_map.get(key, ""), "").strip()
                     if val and val.upper() not in ("-", "N/A", "NULL", "NONE") and val not in loc_parts:
                         loc_parts.append(val)
@@ -669,12 +676,13 @@ def parse_otc_scan_content(
                 is_otc_7col = True
 
         if is_otc_7col:
-            # 模式 A：精准定长 7 字段解析，杜绝字段错位与误吞
-            c_country = parts[1].strip() if len(parts) > 1 else ""
-            c_asn = parts[2].strip() if len(parts) > 2 else ""
-            c_isp = parts[3].strip() if len(parts) > 3 else ""
-            c_colo_loc = parts[4].strip() if len(parts) > 4 else ""
-            c_exit = parts[5].strip() if len(parts) > 5 else ""
+            # 模式 A：精准定长 7 字段解析，杜绝字段错位与误吞 (兼容 IP:Port 与 IP,Port 独立分列变体)
+            sub_parts = parts[2:] if (":" not in first_token and len(parts) > 1 and parts[1].strip().isdigit()) else parts[1:]
+            c_country = sub_parts[0].strip() if len(sub_parts) > 0 else ""
+            c_asn = sub_parts[1].strip() if len(sub_parts) > 1 else ""
+            c_isp = sub_parts[2].strip() if len(sub_parts) > 2 else ""
+            c_colo_loc = sub_parts[3].strip() if len(sub_parts) > 3 else ""
+            c_exit = sub_parts[4].strip() if len(sub_parts) > 4 else ""
 
             # 1. 提取 ASN (格式如 AS139659)
             if c_asn:
@@ -696,6 +704,9 @@ def parse_otc_scan_content(
                     colo = c_colo_loc.upper()
                 else:
                     loc = c_colo_loc.strip("()")
+
+            if not loc and c_country:
+                loc = c_country
 
             # 4. 提取真实出口 IP
             if is_valid_ip(c_exit):
@@ -813,11 +824,11 @@ def parse_otc_scan_content(
 
 
 RE_ATTACHMENT_PROXY_1 = re.compile(
-    r"^(?P<url>(?P<proto>socks5|http|https|turn|sstp)://(?:[^\s#@]+@[^@\s#]+@|[^\s#@]+@)?(?P<host>(?:\d{1,3}\.){3}\d{1,3}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}):(?P<port>\d{1,5}))",
+    r"^(?P<url>(?P<proto>socks5|http|https|turns?|sstp)://(?:[^\s#@]+@[^@\s#]+@|[^\s#@]+@)?(?P<host>(?:\d{1,3}\.){3}\d{1,3}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}):(?P<port>\d{1,5}))",
     re.IGNORECASE,
 )
 RE_ATTACHMENT_PROXY_2 = re.compile(
-    r"(?P<url>(?P<proto>socks5|http|https|turn|sstp)://(?:[^\s#@]+@)?(?P<host>(?:\d{1,3}\.){3}\d{1,3}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}):(?P<port>\d{1,5}))",
+    r"(?P<url>(?P<proto>socks5|http|https|turns?|sstp)://(?:[^\s#@]+@)?(?P<host>(?:\d{1,3}\.){3}\d{1,3}|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}):(?P<port>\d{1,5}))",
     re.IGNORECASE,
 )
 RE_ATTACHMENT_PROXY_RAW = re.compile(

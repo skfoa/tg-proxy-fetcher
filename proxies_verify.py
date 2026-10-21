@@ -815,10 +815,11 @@ async def probe_turn(
     port: int,
     connect_timeout: float = TIMEOUT,
     read_timeout: float = HTTP_TIMEOUT,
+    use_tls: bool = False,
 ) -> tuple[bool, int, str, str, str, str]:
     """
-    TURN 协议鉴真：
-    通过 TCP 发送标准 STUN Binding Request (RFC 5389)，
+    TURN/TURNS 协议鉴真：
+    通过 TCP（或 TLS 握手，对于 TURNS）发送标准 STUN/TURN Allocate 请求 (RFC 5766)，
     校验 20 字节响应头部 Magic Cookie (0x2112A442) 以及 Transaction ID 匹配。
     返回 (is_alive, delay_ms, status, colo, country, egress_ip)
     """
@@ -830,8 +831,13 @@ async def probe_turn(
     t0 = time.monotonic()
     writer = None
     try:
+        ssl_ctx = None
+        if use_tls:
+            ssl_ctx = ssl.create_default_context()
+            ssl_ctx.check_hostname = False
+            ssl_ctx.verify_mode = ssl.CERT_NONE
         reader, writer = await asyncio.wait_for(
-            asyncio.open_connection(connect_host, port),
+            asyncio.open_connection(connect_host, port, ssl=ssl_ctx),
             timeout=connect_timeout,
         )
 
@@ -1114,9 +1120,9 @@ async def probe_single(
                     colo = ""
                     country = ""
                     egress_ip = ""
-    elif proto == "turn":
+    elif proto in ("turn", "turns"):
         is_alive, delay_ms, status, colo, country, egress_ip = await probe_turn(
-            host, port, timeout, http_timeout
+            host, port, timeout, http_timeout, use_tls=(proto == "turns")
         )
     elif proto == "sstp":
         if cf_check_endpoint:
@@ -1511,7 +1517,7 @@ def save_proxies_data(
     按 (协议顺序, fail_count 升序, delay_ms 升序) 排序，确保在 CSV 与 TXT 中各协议严格分块独立，绝不交错混杂。
     覆写 proxies.txt 与 proxies.csv，并按协议独立拆分保存至 proxies/ 子目录（包含 .txt, .csv, .json 纯净单协议版）。
     """
-    PROTO_ORDER = ["socks5", "http", "https", "turn", "sstp"]
+    PROTO_ORDER = ["socks5", "http", "https", "turn", "turns", "sstp"]
 
     def _sort_key(r):
         proto = (r.get("proto") or "").strip().lower()

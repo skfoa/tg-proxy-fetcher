@@ -61,9 +61,7 @@ from providers import (
     atomic_writer,
     atomic_write_text,
     atomic_write_json,
-    CHECK_PROXYIP_URL,
     probe_check_proxyip_api,
-    format_check_proxyip_url,
 )
 
 # 确保本地 .env 加载

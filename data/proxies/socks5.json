@@ -2670,6 +2670,21 @@
     "source": "EDT-Pages"
   },
   {
+    "proxy": "socks5://dpalieus1006:Aa1234567@192.46.200.166:5836",
+    "protocol": "socks5",
+    "ip": "192.46.200.166",
+    "port": 5836,
+    "country": "US",
+    "country_name": "美国",
+    "country_cn": "美国",
+    "country_emoji": "🇺🇸",
+    "asn": "6079",
+    "asOrganization": "RCN",
+    "isp": "RCN",
+    "net_type": "isp",
+    "source": "@user"
+  },
+  {
     "proxy": "socks5://49.13.22.249:10807",
     "protocol": "socks5",
     "ip": "49.13.22.249",

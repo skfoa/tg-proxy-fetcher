@@ -87,6 +87,7 @@ from parsers import (
     parse_otc_scan_content,
     parse_proxy_attachment_content,
     is_valid_host,
+    is_valid_ip,
 )
 
 # 确保本地 .env 加载
@@ -1209,9 +1210,16 @@ def fetch_zip_proxyips(
             continue
 
         meta = item.get("meta") if isinstance(item.get("meta"), dict) else {}
+        client_ip = str(meta.get("clientIp") or meta.get("client_ip") or "").strip()
+        exit_ip = client_ip if is_valid_ip(client_ip) else ""
+
         raw_asn = str(meta.get("asn") or item.get("asn") or "").strip()
         raw_isp = str(meta.get("asOrganization") or meta.get("isp") or item.get("asOrganization") or item.get("isp") or "").strip()
         asn_code = _extract_asn_code(raw_asn, raw_isp)
+
+        # Cloudflare speed meta 原生不返回 asOrganization，若本地权威对照表已收录该 ASN 则自动补全标准 ISP
+        if not raw_isp and asn_code and asn_code in ASN_TO_PROVIDER:
+            raw_isp = ASN_TO_PROVIDER[asn_code]
 
         # 核心策略：严格只收录非机房，常规 datacenter 机房节点直接过滤剔除
         net_type = classify_asn(asn_code, raw_isp)
@@ -1225,8 +1233,13 @@ def fetch_zip_proxyips(
         else:
             colo = str(colo_obj or "").strip().upper()
 
+        # 规范地理层级顺序：大洲 · 国家 · 城市/地区
         loc_parts = []
-        for part in (meta.get("continent_cn"), meta.get("city") or meta.get("region"), meta.get("country_cn") or meta.get("country")):
+        for part in (
+            meta.get("continent_cn"),
+            meta.get("country_cn") or meta.get("country"),
+            meta.get("city") or meta.get("region"),
+        ):
             p_str = str(part or "").strip()
             if p_str and p_str != "-" and p_str not in loc_parts:
                 loc_parts.append(p_str)
@@ -1250,6 +1263,8 @@ def fetch_zip_proxyips(
                 "cf_location": cf_location,
                 "isp": raw_isp,
                 "asn": formatted_asn,
+                "raw_asn": asn_code,
+                "exit_ip": exit_ip,
                 "first_seen": now_bjt,
                 "channel": "@cmliussss_all",
                 "fail_count": 0,
@@ -1272,7 +1287,7 @@ def fetch_zip_proxyips(
                         }
                     unrecorded_asns_map[asn_code]["count"] += 1
             elif isinstance(scraped_proxyips[key], dict):
-                for mk in ("colo", "cf_location", "isp", "asn", "net_type"):
+                for mk in ("colo", "cf_location", "isp", "asn", "net_type", "exit_ip", "raw_asn"):
                     if proxyip_item.get(mk) and not scraped_proxyips[key].get(mk):
                         scraped_proxyips[key][mk] = proxyip_item[mk]
 
@@ -1676,7 +1691,7 @@ def merge_and_save(
         if k not in cleaned_proxyips:
             cleaned_proxyips[k] = v
         else:
-            for mk in ("colo", "cf_location", "isp", "asn", "net_type"):
+            for mk in ("colo", "cf_location", "isp", "asn", "net_type", "exit_ip", "raw_asn"):
                 if v.get(mk) and not cleaned_proxyips[k].get(mk):
                     cleaned_proxyips[k][mk] = v[mk]
 
@@ -1684,7 +1699,7 @@ def merge_and_save(
         if k not in cleaned_scan_ips:
             cleaned_scan_ips[k] = v
         else:
-            for mk in ("colo", "cf_location", "isp", "asn", "net_type"):
+            for mk in ("colo", "cf_location", "isp", "asn", "net_type", "exit_ip", "raw_asn"):
                 if v.get(mk) and not cleaned_scan_ips[k].get(mk):
                     cleaned_scan_ips[k][mk] = v[mk]
 
@@ -1953,6 +1968,7 @@ async def run_telethon():
 
     tombstone = load_tombstone()
     log.info("已加载墓地黑名单: %d 个冷却中死节点（7天内淘汰）", len(tombstone))
+    ip_cache = load_ip_cache()
 
     client = TelegramClient(
         StringSession(TG_SESSION_STR), int(TG_API_ID), TG_API_HASH
