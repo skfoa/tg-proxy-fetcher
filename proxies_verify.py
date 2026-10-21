@@ -1068,7 +1068,7 @@ async def probe_single(
                                 "resolved_ip": exit_ip,
                             },
                         }
-                    log.info("🚫 拦截到数据中心/机房 HTTPS 节点 [%s:%s] (ASN: %s, ISP: %s)，已移出并记入机房永久黑名单", host, port, clean_asn, clean_isp)
+                    log.debug("🚫 拦截到数据中心/机房 HTTPS 节点 [%s:%s] (ASN: %s, ISP: %s)，已移出并记入机房永久黑名单", host, port, clean_asn, clean_isp)
                 else:
                     # 原生住宅/家宽/教育/专线：准入通过！
                     is_alive = True
@@ -1736,6 +1736,11 @@ async def async_main(args):
 
     tasks = [_worker(r) for r in rows]
     results = await asyncio.gather(*tasks)
+
+    # 汇总机房拦截数据（避免逐条输出刷屏）
+    dc_rejected_https = sum(1 for r in results if r.get("status") == "datacenter_rejected")
+    if dc_rejected_https > 0:
+        log.info("🚫 【HTTPS 机房拦截】累计拦截并剔除数据中心/机房 HTTPS 节点 %d 个，已全部移出并记入机房永久黑名单", dc_rejected_https)
 
     # 沉淀本轮质检提取出的 IP 网络画像 (包含新检测出的机房黑名单与原生家宽指纹) 至持久化 ip_cache (彻底杜绝重复测速)
     cache_updates = [r.get("_cache_update") for r in results if r.get("_cache_update")]
