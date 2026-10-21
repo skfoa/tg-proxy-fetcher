@@ -2506,7 +2506,17 @@
     "DataRoom": "AS19624",
     "Cloud Fabric, Inc.": "AS8126",
     "RCN": "AS6079",
-    "Aviation RE LLC": "AS6079"
+    "Aviation RE LLC": "AS6079",
+    "National Infrastructures for Research and Technology S.A.": "AS5408",
+    "Sun Network Company Limited": "AS328543",
+    "MEGARED TELECOMUNICACIONES S.A.S": "AS267880",
+    "University of North Carolina at Chapel Hill": "AS36850",
+    "CROCKER COMMUNICATIONS, INCORPORATED": "AS7849",
+    "JSC Er-telecom Holding Orenburg Branch": "AS42683",
+    "Tanzania Education And Research Network": "AS37182",
+    "JSC ER-Telecom Holding Irkutsk branch": "AS51645",
+    "Lumina Broadband UAB": "AS215294",
+    "Ayao Takata": "AS38074"
   },
   "asn_to_isp": {
     "AS174": "Cogent Communications, LLC",
@@ -4909,7 +4919,17 @@
     "AS402139": "Peekabo Networks",
     "AS402628": "IDC Cube LLC",
     "AS8126": "Cloud Fabric, Inc.",
-    "AS6079": "RCN"
+    "AS6079": "RCN",
+    "AS5408": "National Infrastructures for Research and Technology S.A.",
+    "AS328543": "Sun Network Company Limited",
+    "AS267880": "MEGARED TELECOMUNICACIONES S.A.S",
+    "AS36850": "University of North Carolina at Chapel Hill",
+    "AS7849": "CROCKER COMMUNICATIONS, INCORPORATED",
+    "AS42683": "JSC Er-telecom Holding Orenburg Branch",
+    "AS37182": "Tanzania Education And Research Network",
+    "AS51645": "JSC ER-Telecom Holding Irkutsk branch",
+    "AS215294": "Lumina Broadband UAB",
+    "AS38074": "Ayao Takata"
   },
   "asn_to_net_type": {
     "AS1311": "banking",
@@ -8345,6 +8365,17 @@
     "AS50049": "datacenter",
     "AS216311": "datacenter",
     "AS402139": "datacenter",
-    "AS8126": "datacenter"
+    "AS8126": "datacenter",
+    "AS0": "datacenter",
+    "AS5408": "education",
+    "AS328543": "datacenter",
+    "AS267880": "isp",
+    "AS36850": "education",
+    "AS7849": "business",
+    "AS42683": "isp",
+    "AS37182": "education",
+    "AS51645": "isp",
+    "AS215294": "isp",
+    "AS38074": "datacenter"
   }
 }
