@@ -2746,8 +2746,12 @@ def save_scan_ips_by_asn(asn_groups: dict, output_dir: str, min_nodes: int = 5) 
         if not isp_name:
             isp_name = next((r.get("isp") for r in group if r.get("isp")), "")
 
-        # 严格过滤地址字符串与无意义泛化占位符（如 Private Customer、3rd Floor 等），避免生成脏文件名
-        if isp_name and (_ADDR_RE.search(isp_name) or re.search(r'(?i)^(?:private\s*customer|shared\s*assignment|customer\s*ip|nat\s*pool|undefined)$', isp_name.strip())):
+        # 严格过滤地址字符串、过短字符与无意义泛化占位符（如 Private Customer、3rd Floor、SA、Beafort 等），避免生成脏文件名
+        if isp_name and (
+            len(isp_name.strip()) <= 2
+            or _ADDR_RE.search(isp_name)
+            or re.search(r'(?i)^(?:private\s*customer|shared\s*assignment|customer\s*ip|nat\s*pool|undefined|sa|beafort|ht|dc|vps|cloud|ip|llc|ltd|na|null|none|unknown)$', isp_name.strip())
+        ):
             isp_name = ""
 
         # 严谨过滤文件名非法字符（特别是 Windows / Linux 路径分隔符 / 与 \，以及冒号等）

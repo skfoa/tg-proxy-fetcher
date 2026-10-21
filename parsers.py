@@ -22,6 +22,7 @@ from providers import (
     ASN_TO_PROVIDER,
     SORTED_CLOUD_PROVIDER_KEYS,
     format_asn_isp,
+    load_ip_cache,
     normalize_timestamp,
     resolve_ip_asn,
 )
@@ -203,12 +204,32 @@ def resolve_and_clean_asn(ip: str, raw_asn: str = "", raw_isp: str = "") -> tupl
             elif not raw_isp and raw_asn not in ("-", "UNKNOWN", "AS_UNKNOWN", "AS0", "0"):
                 raw_isp = raw_asn
 
+    # 优先查验本地 IP 缓存：若当前 IP 已有确凿真实的 BGP ASN，且当前标记为空/未知/或误标为 Cloudflare (AS13335)，坚决以 IP 真实 ASN 为准
+    if ip and ip not in ("AS_UNKNOWN", "unknown", "127.0.0.1"):
+        try:
+            cache = load_ip_cache()
+            if ip in cache and cache[ip].get("asn"):
+                cached_asn = cache[ip]["asn"]
+                if cached_asn and cached_asn.upper() not in ("AS0", "AS_UNKNOWN", "UNKNOWN"):
+                    if not asn_clean or asn_clean in ("AS0", "AS_UNKNOWN", "UNKNOWN") or (asn_clean == "AS13335" and cached_asn != "AS13335"):
+                        asn_clean = cached_asn
+                        cached_isp = cache[ip].get("isp") or ASN_TO_PROVIDER.get(cached_asn, "")
+                        if cached_isp:
+                            raw_isp = cached_isp
+        except Exception:
+            pass
+
     if not asn_clean or asn_clean in ("AS0", "AS_UNKNOWN", "UNKNOWN"):
         found_asn, found_isp = resolve_ip_asn(ip, raw_isp)
         if found_asn and found_asn.upper() not in ("AS0", "AS_UNKNOWN", "UNKNOWN"):
             asn_clean = found_asn
             if not raw_isp and found_isp:
                 raw_isp = found_isp
+
+    if asn_clean and asn_clean in ASN_TO_PROVIDER:
+        std_isp = ASN_TO_PROVIDER[asn_clean]
+        if not raw_isp or len(raw_isp.strip()) <= 2 or re.search(r'(?i)^(?:sa|beafort|ht|dc|unknown|none|null|n/a)$', raw_isp.strip()):
+            raw_isp = std_isp
 
     return asn_clean or "", raw_isp
 
@@ -558,17 +579,17 @@ def parse_cf_csv_content(
 
             raw_asn = row.get(field_map.get("asn", ""), "").replace("`", "").strip()
             if not raw_asn or raw_asn in ("-", "0", "AS0", "AS_UNKNOWN", "UNKNOWN"):
-                raw_asn = raw_exit_asn or fn_asn
+                raw_asn = fn_asn
             elif raw_asn.isdigit():
                 num = int(raw_asn)
-                raw_asn = f"AS{num}" if num > 0 else (raw_exit_asn or fn_asn)
+                raw_asn = f"AS{num}" if num > 0 else fn_asn
 
             raw_isp = row.get(field_map.get("isp", ""), "").replace("`", "").strip()
             if not raw_isp or raw_isp in ("-", "UNKNOWN", "AS_UNKNOWN"):
-                raw_isp = raw_exit_isp or fn_isp
+                raw_isp = fn_isp
 
             asn_val, raw_isp = resolve_and_clean_asn(raw_ip, raw_asn, raw_isp)
-            # 若入口 ASN 缺失但行内自带合法 exit_asn，使用 exit_asn 兜底补全
+            # 仅当入口 ASN 完全缺失且本地 IP 缓存未收录时，才允许使用 exit_asn 兜底
             if (not asn_val or asn_val in ("AS0", "AS_UNKNOWN", "UNKNOWN")) and raw_exit_asn:
                 asn_val, raw_isp = resolve_and_clean_asn(raw_ip, raw_exit_asn, raw_exit_isp or raw_isp)
 

@@ -1454,8 +1454,22 @@ def save_and_notify(
         local_ip_cache = load_ip_cache()
         asn_groups = defaultdict(list)
         for row in final_scan_ips.values():
-            # 若入口 ASN 缺失或为非法占位符 (AS0/AS_UNKNOWN)，优先尝试回退实测出口 exit_asn 或本地 IP 缓存
+            cur_ip = row.get("ip") or ""
             c_asn = clean_asn(row.get("asn"), row.get("isp"))
+
+            # 1. 优先查本地 IP 缓存获取入口 IP 的真实 BGP 归属 (避免目标反代被误标为 Cloudflare 或继承出站 ASN)
+            if cur_ip in local_ip_cache:
+                cached = local_ip_cache[cur_ip]
+                cached_code = clean_asn(cached.get("asn"), cached.get("isp"))
+                if cached_code and cached_code.upper() not in ("AS0", "AS_UNKNOWN", "UNKNOWN", "AS"):
+                    if not c_asn or c_asn.upper() in ("AS0", "AS_UNKNOWN", "UNKNOWN", "AS") or (c_asn == "AS13335" and cached_code != "AS13335"):
+                        cached_isp = cached.get("isp") or ASN_TO_PROVIDER.get(cached_code, "")
+                        row["raw_asn"] = cached_code
+                        row["asn"] = format_asn_isp(cached_code, cached_isp)
+                        row["isp"] = cached_isp
+                        c_asn = cached_code
+
+            # 2. 仅在未命中本地缓存且自身 ASN 缺失时，才以实测出口 exit_asn 兜底
             if not c_asn or c_asn.upper() in ("AS0", "AS_UNKNOWN", "UNKNOWN", "AS"):
                 ex_code = clean_asn(row.get("exit_asn"), row.get("exit_isp"))
                 if ex_code and ex_code.upper() not in ("AS0", "AS_UNKNOWN", "UNKNOWN", "AS"):
@@ -1465,18 +1479,12 @@ def save_and_notify(
                     if not row.get("isp") and ex_isp:
                         row["isp"] = ex_isp
                     c_asn = ex_code
-                else:
-                    cur_ip = row.get("ip") or ""
-                    if cur_ip in local_ip_cache:
-                        cached = local_ip_cache[cur_ip]
-                        cached_code = clean_asn(cached.get("asn"), cached.get("isp"))
-                        if cached_code and cached_code.upper() not in ("AS0", "AS_UNKNOWN", "UNKNOWN", "AS"):
-                            cached_isp = cached.get("isp") or ASN_TO_PROVIDER.get(cached_code, "")
-                            row["raw_asn"] = cached_code
-                            row["asn"] = format_asn_isp(cached_code, cached_isp)
-                            if not row.get("isp") and cached_isp:
-                                row["isp"] = cached_isp
-                            c_asn = cached_code
+
+            # 3. 规范化 ISP 机构标准名称，杜绝残缺缩写（如 SA、Beafort）
+            if c_asn in ASN_TO_PROVIDER:
+                std_isp = ASN_TO_PROVIDER[c_asn]
+                if not row.get("isp") or len(str(row.get("isp")).strip()) <= 2 or re.search(r'(?i)^(?:sa|beafort|ht|dc|unknown|none|null|n/a)$', str(row.get("isp")).strip()):
+                    row["isp"] = std_isp
 
             row["asn"] = format_asn_isp(c_asn, row.get("isp"))
             asn_groups[c_asn].append(row)

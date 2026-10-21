@@ -38,6 +38,8 @@ from providers import (
     format_asn_isp,
     send_tg_message,
     normalize_timestamp,
+    load_ip_cache,
+    ASN_TO_PROVIDER,
     get_keyed_lock,
     TG_BOT_TOKEN,
     TG_CHAT_ID,
@@ -792,9 +794,27 @@ async def async_main(args):
     # ================= 2. 校验扫描优选 IP (scan_ips) =================
     def _save_scan_track(survivors):
         asn_groups = defaultdict(list)
+        local_ip_cache = load_ip_cache()
         for row in survivors:
+            cur_ip = row.get("ip") or ""
             asn_clean = clean_asn(row.get("asn", ""), row.get("isp", ""))
-            row["asn"] = format_asn_isp(row.get("asn", ""), row.get("isp", ""))
+            if cur_ip in local_ip_cache:
+                cached = local_ip_cache[cur_ip]
+                cached_code = clean_asn(cached.get("asn"), cached.get("isp"))
+                if cached_code and cached_code.upper() not in ("AS0", "AS_UNKNOWN", "UNKNOWN", "AS"):
+                    if not asn_clean or (asn_clean == "AS13335" and cached_code != "AS13335"):
+                        cached_isp = cached.get("isp") or ASN_TO_PROVIDER.get(cached_code, "")
+                        row["raw_asn"] = cached_code
+                        row["asn"] = format_asn_isp(cached_code, cached_isp)
+                        row["isp"] = cached_isp
+                        asn_clean = cached_code
+
+            if asn_clean in ASN_TO_PROVIDER:
+                std_isp = ASN_TO_PROVIDER[asn_clean]
+                if not row.get("isp") or len(str(row.get("isp")).strip()) <= 2 or re.search(r'(?i)^(?:sa|beafort|ht|dc|unknown|none|null|n/a)$', str(row.get("isp")).strip()):
+                    row["isp"] = std_isp
+
+            row["asn"] = format_asn_isp(asn_clean, row.get("isp", ""))
             asn_groups[asn_clean].append(row)
 
         all_sorted_scan = []
