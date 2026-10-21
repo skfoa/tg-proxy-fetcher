@@ -109,6 +109,9 @@ except Exception:
 
 
 RE_HTTP_STATUS = re.compile(rb"^HTTP/\d\.\d\s+(\d{3})\b")
+RE_HTTP_502 = re.compile(rb"^HTTP/\d\.\d\s+502\b")
+RE_CL_ZERO = re.compile(rb"(?im)^content-length:\s*0\b")
+RE_THIRD_PARTY_SERVER = re.compile(rb"(?im)^server:\s*(nginx|apache|caddy|openresty|envoy|iis|tengine|lighttpd)")
 
 # 确定性硬伤致命状态（端口明确拒绝关闭、空响应断连、脏数据等），当场判死淘汰进墓地
 # 注：tls_error (保护第三方自建反代)、status_502 (源站抖动)、connect_timeout (跨国丢包) 等严格排除在外，充分享受 3 次缓冲容错！
@@ -178,14 +181,23 @@ async def probe_ip(
         if not resp_bytes:
             return False, latency_ms, "empty_response"
 
-        header_part, _ = split_header_body(resp_bytes)
+        header_part, body_part = split_header_body(resp_bytes)
         status_match = RE_HTTP_STATUS.match(header_part)
         status_code = status_match.group(1).decode("latin1") if status_match else ""
 
         is_301 = bool(RE_HTTP_301.match(header_part))
         is_cf = bool(RE_SERVER_CF.search(header_part))
 
-        if is_301 and is_cf:
+        # 精准识别 Cloudflare 官方对 crypto.cloudflare.com:443 透传的特征空包 502
+        # 前提：已严格通过 TLS CA 官方证书鉴真，且排除带有 HTML 错误页或第三方 Server 头的真实故障 502
+        is_cf_crypto_502 = (
+            bool(RE_HTTP_502.match(header_part))
+            and bool(RE_CL_ZERO.search(header_part))
+            and not bool(RE_THIRD_PARTY_SERVER.search(header_part))
+            and len(body_part.strip()) == 0
+        )
+
+        if (is_301 and is_cf) or is_cf_crypto_502:
             return True, latency_ms, "ok"
         elif not is_301:
             return False, latency_ms, f"status_{status_code}" if status_code else "invalid_http_status"

@@ -1,4 +1,4 @@
-﻿ip,port,tls,delay_ms,speed_kbs,colo,cf_location,asn,isp,first_seen,channel,fail_count,exit_ip,exit_asn,exit_isp,exit_location
+ip,port,tls,delay_ms,speed_kbs,colo,cf_location,asn,isp,first_seen,channel,fail_count,exit_ip,exit_asn,exit_isp,exit_location
 207.174.40.168,443,true,149,,EWR,北美洲 · 美国 · 纽瓦克,AS1002 Bytefilter LLC,Bytefilter LLC,2026-10-18 21:48:30,@danfeng_chat,0,207.174.40.168,,,
 207.174.40.231,443,true,163,,EWR,Quebec · Montréal · 加拿大,AS1002 Bytefilter LLC,Bytefilter LLC,2026-09-16 08:26:32,@danfeng2,0,104.28.246.48,AS13335 Cloudflare,"Cloudflare, Inc.",Quebec · Montréal · 加拿大
 165.140.202.187,443,true,233,,MCI,Missouri · Kansas City · 美国,AS1002 Bytefilter LLC,Bytefilter LLC,2026-07-24 21:51:47,@danfeng2,0,165.140.202.187,AS1002 Bytefilter LLC,Bytefilter LLC,Missouri · Kansas City · 美国
@@ -32544,6 +32544,7 @@
 179.253.226.141,8443,true,244,,LAX,美国-洛杉矶,AS906 DMIT,DMIT,2026-10-16 18:36:36,@otcfxq,2,,,,
 179.255.123.130,443,true,266,,LAX,美国-洛杉矶,AS906 DMIT,DMIT,2026-10-16 18:36:36,@otcfxq,2,,,,
 131.143.181.111,8443,true,269,,LAX,美国-洛杉矶,AS906 DMIT,DMIT,2026-10-16 18:36:36,@otcfxq,2,,,,
+69.63.216.24,8443,true,312,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-10-16 18:36:36,@otcfxq,0,69.63.216.24,AS906,DMIT Cloud Services,"United States, Los Angeles"
 179.255.126.254,8443,true,211,0,LAX,California · Los Angeles · 美国,AS906 DMIT,DMIT,2026-10-12 21:49:55,@cmliussss_all,0,2605:52c0:2:32a8:be24:11ff:febd:9571,AS906 DMIT,DMIT Cloud Services,California · Los Angeles · 美国
 179.255.99.30,443,true,217,,LAX,California · Los Angeles · 美国,AS906 DMIT,DMIT,2026-10-02 00:17:40,@danfeng_chat,0,2605:52c0:2:58f9:be24:11ff:fe87:8d15,AS906 DMIT,DMIT Cloud Services,California · Los Angeles · 美国
 179.253.254.80,8443,true,246,,LAX,California · Los Angeles · 美国,AS906 DMIT,DMIT,2026-10-02 00:17:36,@danfeng_chat,0,179.253.254.80,AS906 DMIT,Private Customer,California · Los Angeles · 美国
