@@ -1317,6 +1317,18 @@ def resolve_ip_asn(ip: str = "", isp_hint: str = "", allow_online: bool = False)
                 asn_code, std_name = KNOWN_CLOUD_PROVIDERS[k]
                 return asn_code, std_name
 
+    # 2.5 检查本地持久化 IP 缓存 (data/ip_cache.json)
+    if ip and ip not in ("AS_UNKNOWN", "unknown", "127.0.0.1"):
+        try:
+            cache = load_ip_cache()
+            if ip in cache and cache[ip].get("asn"):
+                c_asn = cache[ip]["asn"]
+                c_isp = cache[ip].get("isp") or ASN_TO_PROVIDER.get(c_asn, clean_isp)
+                if c_asn and c_asn.upper() not in ("AS0", "AS_UNKNOWN", "UNKNOWN"):
+                    return c_asn, c_isp
+        except Exception:
+            pass
+
     # 3. 仅在显式允许时在线反查（解耦数据解析与网络 I/O，杜绝 Parser 阻塞与限流故障）
     if allow_online and ip and ip not in ("AS_UNKNOWN", "unknown"):
         found_asn, found_isp = resolve_asn_online(ip, isp_hint)
@@ -1470,7 +1482,9 @@ def clean_asn(raw_asn: str, isp: str = "") -> str:
     raw_asn = (raw_asn or "").strip()
     m = re.search(r"(AS\d+)", raw_asn, re.IGNORECASE)
     if m:
-        return m.group(1).upper()
+        code = m.group(1).upper()
+        if code != "AS0":
+            return code
     r_low = (raw_asn + " " + (isp or "")).lower()
     for k in SORTED_CLOUD_PROVIDER_KEYS:
         if len(k) <= 3:
@@ -2494,6 +2508,7 @@ def _extract_asn_code(asn_str: str | None, isp_str: str | None = "") -> str | No
     - 支持前缀格式：AS4760、as4760、AS 4760、as 4760
     - 支持纯数字编号：4760、" 4760 "
     - 优先检查 asn_str，随后检查 isp_str
+    - 严格遵循 RFC 7607 排除非路由保留编号 AS0
     """
     for s in (asn_str, isp_str):
         if not s:
@@ -2502,11 +2517,17 @@ def _extract_asn_code(asn_str: str | None, isp_str: str | None = "") -> str | No
 
         m = _ASN_WITH_PREFIX_RE.search(s)
         if m:
-            return f"AS{m.group(1)}"
+            num = m.group(1).lstrip("0") or "0"
+            if num == "0":
+                continue
+            return f"AS{num}"
 
         m = _PURE_NUMBER_RE.match(s)
         if m:
-            return f"AS{m.group(1)}"
+            num = m.group(1).lstrip("0") or "0"
+            if num == "0":
+                continue
+            return f"AS{num}"
 
     return None
 
@@ -2519,12 +2540,12 @@ def is_asn_recorded(asn_str: str | None, isp_str: str | None = "") -> bool:
     """
     判断目标节点是否免于触发『未收录 ASN 补库告警』：
     - 返回 True：该 AS 编号已被权威对照表收录（含人工裁决表、ASN 基础数据库、权威云厂商），
-                 或节点本身无有效 AS 编号（无需作为新 ASN 告警）。
+                 或节点本身无有效 AS 编号（含 AS0 占位符，无需作为新 ASN 告警）。
     - 返回 False：提取到了有效 AS 编号，但该编号尚未被内置库收录（提示补充）。
     注：无有效 ASN 编号时返回 True，是为避免将缺少 ASN 元数据的正常节点误报为待补充的新自治系统。
     """
     code = _extract_asn_code(asn_str, isp_str)
-    if not code:
+    if not code or code == "AS0":
         return True
     return (
         code in MANUAL_OVERRIDE_NET_TYPES
@@ -2710,6 +2731,12 @@ def save_scan_ips_by_asn(asn_groups: dict, output_dir: str, min_nodes: int = 5) 
         if not valid_rows:
             continue
 
+        # 严格过滤非法 AS 编号与未知占位符，绝不生成 AS0_xxx.txt 或 AS_UNKNOWN.txt
+        safe_asn_check = str(asn_name).strip().upper()
+        if safe_asn_check in ("AS0", "AS_UNKNOWN", "UNKNOWN", "AS", "") or safe_asn_check.startswith("AS0_"):
+            other_rows.extend(valid_rows)
+            continue
+
         # 小于 min_nodes 门槛的长尾 ASN，统一收纳进长尾聚合集合
         if len(valid_rows) < min_nodes:
             other_rows.extend(valid_rows)
@@ -2726,6 +2753,10 @@ def save_scan_ips_by_asn(asn_groups: dict, output_dir: str, min_nodes: int = 5) 
         # 严谨过滤文件名非法字符（特别是 Windows / Linux 路径分隔符 / 与 \，以及冒号等）
         safe_asn = re.sub(r'[\\/:*?"<>|\s]', "_", str(asn_name).strip()).strip(" ._") or "AS_UNKNOWN"
         safe_asn = re.sub(r"_+", "_", safe_asn)
+        if safe_asn.upper() in ("AS0", "AS_UNKNOWN", "UNKNOWN", "AS") or safe_asn.upper().startswith("AS0_"):
+            other_rows.extend(valid_rows)
+            continue
+
         clean_isp = re.sub(r"[^a-zA-Z0-9]", "", isp_name) if isp_name else ""
         if clean_isp and clean_isp.lower() != safe_asn.lower():
             fname = f"{safe_asn}_{clean_isp}.txt"

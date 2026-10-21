@@ -739,7 +739,7 @@ def auto_enrich_and_save_asns(unrecorded_items: list[dict], proxy: str = "") -> 
                 raw_asn = str(item.get("asn") or "").strip()
                 raw_isp = str(item.get("isp") or item.get("org") or "").strip()
                 code = _extract_asn_code(raw_asn, raw_isp)
-                if not code or not re.match(r"^AS\d+$", code):
+                if not code or not re.match(r"^AS\d+$", code) or code == "AS0":
                     continue
 
                 # 云厂商 SSOT 保护：若命中内置权威已知云厂商，坚决维持权威定义，直接跳过并拒绝外部污染
@@ -1451,11 +1451,35 @@ def save_and_notify(
     if final_scan_ips:
         os.makedirs(OUTPUT_SCAN_DIR, exist_ok=True)
 
+        local_ip_cache = load_ip_cache()
         asn_groups = defaultdict(list)
         for row in final_scan_ips.values():
-            asn_clean = clean_asn(row.get("asn"), row.get("isp"))
-            row["asn"] = format_asn_isp(row.get("asn"), row.get("isp"))
-            asn_groups[asn_clean].append(row)
+            # 若入口 ASN 缺失或为非法占位符 (AS0/AS_UNKNOWN)，优先尝试回退实测出口 exit_asn 或本地 IP 缓存
+            c_asn = clean_asn(row.get("asn"), row.get("isp"))
+            if not c_asn or c_asn.upper() in ("AS0", "AS_UNKNOWN", "UNKNOWN", "AS"):
+                ex_code = clean_asn(row.get("exit_asn"), row.get("exit_isp"))
+                if ex_code and ex_code.upper() not in ("AS0", "AS_UNKNOWN", "UNKNOWN", "AS"):
+                    ex_isp = row.get("exit_isp") or ASN_TO_PROVIDER.get(ex_code, "")
+                    row["raw_asn"] = ex_code
+                    row["asn"] = format_asn_isp(ex_code, ex_isp)
+                    if not row.get("isp") and ex_isp:
+                        row["isp"] = ex_isp
+                    c_asn = ex_code
+                else:
+                    cur_ip = row.get("ip") or ""
+                    if cur_ip in local_ip_cache:
+                        cached = local_ip_cache[cur_ip]
+                        cached_code = clean_asn(cached.get("asn"), cached.get("isp"))
+                        if cached_code and cached_code.upper() not in ("AS0", "AS_UNKNOWN", "UNKNOWN", "AS"):
+                            cached_isp = cached.get("isp") or ASN_TO_PROVIDER.get(cached_code, "")
+                            row["raw_asn"] = cached_code
+                            row["asn"] = format_asn_isp(cached_code, cached_isp)
+                            if not row.get("isp") and cached_isp:
+                                row["isp"] = cached_isp
+                            c_asn = cached_code
+
+            row["asn"] = format_asn_isp(c_asn, row.get("isp"))
+            asn_groups[c_asn].append(row)
 
         asn_groups_total = len(asn_groups)
 
@@ -2096,7 +2120,7 @@ async def run_telethon():
                                                 exit_net_type = exit_cached.get("net_type") or classify_asn(exit_cached.get("asn", ""), exit_cached.get("isp", ""))
 
                                             # 若缺少有效 ASN 且配置了在线探针端点，执行在线探针补全
-                                            if (not raw_asn or raw_asn == "AS_UNKNOWN") and CHECK_PROXYIP_URL:
+                                            if (not raw_asn or raw_asn in ("AS0", "0", "AS_UNKNOWN", "UNKNOWN")) and CHECK_PROXYIP_URL:
                                                 probe_res = probe_check_proxyip_api(cf_item['ip'], int(cf_item['port']))
                                                 if probe_res.get("success"):
                                                     if not exit_ip and probe_res.get("exit_ip"):
@@ -2106,6 +2130,15 @@ async def run_telethon():
                                                         cf_item["colo"] = probe_res["colo"]
                                                     if probe_res.get("net_type"):
                                                         exit_net_type = probe_res["net_type"]
+                                                    if probe_res.get("exit_asn"):
+                                                        cf_item["exit_asn"] = probe_res["exit_asn"]
+                                                        if not cf_item.get("raw_asn") or cf_item["raw_asn"] in ("AS0", "0", "AS_UNKNOWN", "UNKNOWN"):
+                                                            cf_item["raw_asn"] = probe_res["exit_asn"]
+                                                            cf_item["asn"] = format_asn_isp(probe_res["exit_asn"], probe_res.get("exit_isp", ""))
+                                                    if probe_res.get("exit_isp"):
+                                                        cf_item["exit_isp"] = probe_res["exit_isp"]
+                                                        if not cf_item.get("isp"):
+                                                            cf_item["isp"] = probe_res["exit_isp"]
 
                                             # 判断入口网络类型
                                             ingress_net_type = cf_item.get("net_type") or classify_asn(cf_item.get("asn", ""), cf_item.get("isp", ""))

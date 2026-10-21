@@ -176,9 +176,9 @@ def parse_speed_to_kbs(
 def resolve_and_clean_asn(ip: str, raw_asn: str = "", raw_isp: str = "") -> tuple[str, str]:
     """
     统一解析与补全 (asn, isp)：
-    1. 从 raw_asn 中正则提取标准 AS\d+ 编号；
+    1. 从 raw_asn 中正则提取标准 AS\d+ 编号（严格遵循 RFC 7607 排除非路由保留编号 AS0）；
     2. 兼容 ASN/ISP 列反转（如 raw_asn 全为组织名称）；
-    3. 若缺少有效 ASN，查持久化库或在线反查 (resolve_ip_asn) 补全；
+    3. 若缺少有效 ASN，查持久化库、本地 IP 缓存 (ip_cache) 或在线反查补全；
     4. 返回 (asn_code, isp_name)。
     """
     raw_asn = (raw_asn or "").strip()
@@ -188,25 +188,29 @@ def resolve_and_clean_asn(ip: str, raw_asn: str = "", raw_isp: str = "") -> tupl
     if raw_asn:
         m_asn = RE_AS_CODE.search(raw_asn)
         if m_asn:
-            asn_clean = m_asn.group(1).upper()
+            code_str = m_asn.group(1).upper()
+            if code_str != "AS0":
+                asn_clean = code_str
             if not raw_isp:
                 rem_isp = raw_asn[m_asn.end():].strip().strip("-").strip()
                 if rem_isp:
                     raw_isp = rem_isp
         else:
             if raw_asn.isdigit():
-                asn_clean = f"AS{raw_asn}"
-            elif not raw_isp and raw_asn != "-":
+                num = int(raw_asn)
+                if num > 0:
+                    asn_clean = f"AS{num}"
+            elif not raw_isp and raw_asn not in ("-", "UNKNOWN", "AS_UNKNOWN", "AS0", "0"):
                 raw_isp = raw_asn
 
-    if not asn_clean or asn_clean == "AS_UNKNOWN":
+    if not asn_clean or asn_clean in ("AS0", "AS_UNKNOWN", "UNKNOWN"):
         found_asn, found_isp = resolve_ip_asn(ip, raw_isp)
-        if found_asn:
+        if found_asn and found_asn.upper() not in ("AS0", "AS_UNKNOWN", "UNKNOWN"):
             asn_clean = found_asn
             if not raw_isp and found_isp:
                 raw_isp = found_isp
 
-    return asn_clean or raw_asn, raw_isp
+    return asn_clean or "", raw_isp
 
 
 def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
@@ -407,6 +411,14 @@ def parse_cf_csv_content(
                 field_map["exit_loc"] = col
                 continue
 
+            # 2.5 捕获出站 ASN 与出站 ISP (如 出站ASN, 出口ASN, 出站组织, 出口运营商)
+            if any(k in c_clean for k in ("出站as", "出口as", "egressas", "exitas")):
+                field_map["exit_asn"] = col
+                continue
+            if any(k in c_clean for k in ("出站运营商", "出口运营商", "出站组织", "出口组织", "egressisp", "exitisp", "egressorg", "exitorg", "出站isp", "出口isp")):
+                field_map["exit_isp"] = col
+                continue
+
             # 3. 忽略其余出站属性列与隧道/网关标记列，防止污染后续指标提取
             if any(k in c_clean for k in ("出站", "出口", "egress", "tunnel", "warp", "gateway", "rbi")):
                 continue
@@ -541,17 +553,24 @@ def parse_cf_csv_content(
                         ch_clean = f"@{ch_clean}"
                     row_channel = ch_clean
 
+            raw_exit_asn = row.get(field_map.get("exit_asn", ""), "").strip()
+            raw_exit_isp = row.get(field_map.get("exit_isp", ""), "").strip()
+
             raw_asn = row.get(field_map.get("asn", ""), "").replace("`", "").strip()
-            if not raw_asn or raw_asn == "-":
-                raw_asn = fn_asn
+            if not raw_asn or raw_asn in ("-", "0", "AS0", "AS_UNKNOWN", "UNKNOWN"):
+                raw_asn = raw_exit_asn or fn_asn
             elif raw_asn.isdigit():
-                raw_asn = f"AS{raw_asn}"
+                num = int(raw_asn)
+                raw_asn = f"AS{num}" if num > 0 else (raw_exit_asn or fn_asn)
 
             raw_isp = row.get(field_map.get("isp", ""), "").replace("`", "").strip()
-            if not raw_isp or raw_isp == "-":
-                raw_isp = fn_isp
+            if not raw_isp or raw_isp in ("-", "UNKNOWN", "AS_UNKNOWN"):
+                raw_isp = raw_exit_isp or fn_isp
 
             asn_val, raw_isp = resolve_and_clean_asn(raw_ip, raw_asn, raw_isp)
+            # 若入口 ASN 缺失但行内自带合法 exit_asn，使用 exit_asn 兜底补全
+            if (not asn_val or asn_val in ("AS0", "AS_UNKNOWN", "UNKNOWN")) and raw_exit_asn:
+                asn_val, raw_isp = resolve_and_clean_asn(raw_ip, raw_exit_asn, raw_exit_isp or raw_isp)
 
             raw_time = row.get(field_map.get("time", ""), "").strip()
             first_seen = normalize_timestamp(raw_time, fn_time)
@@ -571,6 +590,8 @@ def parse_cf_csv_content(
                 "channel": row_channel,
                 "fail_count": 0,
                 "exit_ip": exit_ip,
+                "exit_asn": raw_exit_asn,
+                "exit_isp": raw_exit_isp,
             })
     except Exception as e:
         log.warning("解析 CSV 优选/ProxyIP 数据异常: %s", e)
@@ -787,10 +808,11 @@ def parse_otc_scan_content(
         # 1. 优先使用行内真实提取出的合法 ASN；
         # 2. 行内无 ASN 时，若文件名明确指定了目标 ASN（如 OTC_SCAN_YX_AS210644.txt），采用文件名 ASN 兜底；
         # 3. 否则交由 resolve_and_clean_asn 根据 IP 权威反查。
-        if not asn and fn_asn:
-            asn = fn_asn
+        if not asn or asn in ("AS0", "AS_UNKNOWN", "UNKNOWN"):
+            if fn_asn:
+                asn = fn_asn
 
-        if not isp and asn and asn != "AS_UNKNOWN" and asn in ASN_TO_PROVIDER:
+        if not isp and asn and asn not in ("AS0", "AS_UNKNOWN") and asn in ASN_TO_PROVIDER:
             isp = ASN_TO_PROVIDER[asn]
 
         if not colo and line_remark:
@@ -819,6 +841,8 @@ def parse_otc_scan_content(
             "channel": default_channel,
             "fail_count": 0,
             "exit_ip": exit_ip,
+            "exit_asn": clean_asn_code,
+            "exit_isp": isp,
         })
     return results
 
