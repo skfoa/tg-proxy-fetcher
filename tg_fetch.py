@@ -1457,12 +1457,12 @@ def save_and_notify(
             cur_ip = row.get("ip") or ""
             c_asn = clean_asn(row.get("asn"), row.get("isp"))
 
-            # 1. 优先查本地 IP 缓存获取入口 IP 的真实 BGP 归属 (避免目标反代被误标为 Cloudflare 或继承出站 ASN)
+            # 1. 优先查本地 IP 缓存获取入口 IP 的真实 BGP 归属 (避免目标反代被误标为 Cloudflare、中转运营商或继承出站 ASN)
             if cur_ip in local_ip_cache:
                 cached = local_ip_cache[cur_ip]
                 cached_code = clean_asn(cached.get("asn"), cached.get("isp"))
                 if cached_code and cached_code.upper() not in ("AS0", "AS_UNKNOWN", "UNKNOWN", "AS"):
-                    if not c_asn or c_asn.upper() in ("AS0", "AS_UNKNOWN", "UNKNOWN", "AS") or (c_asn == "AS13335" and cached_code != "AS13335"):
+                    if not c_asn or c_asn.upper() in ("AS0", "AS_UNKNOWN", "UNKNOWN", "AS") or (cached_code != c_asn):
                         cached_isp = cached.get("isp") or ASN_TO_PROVIDER.get(cached_code, "")
                         row["raw_asn"] = cached_code
                         row["asn"] = format_asn_isp(cached_code, cached_isp)

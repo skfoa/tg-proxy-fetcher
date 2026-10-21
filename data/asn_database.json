@@ -2532,7 +2532,16 @@
     "PIXOOF TEKNOLOJI": "AS209847",
     "ServerKing B.V.": "AS52000",
     "JT TELECOM INTERNATIONAL": "AS7607",
-    "Akenai Products LTD": "AS197974"
+    "Akenai Products LTD": "AS197974",
+    "Kurun Cloud Inc": "AS8796",
+    "KURUN CLOUD INC": "AS8796",
+    "AEZA GROUP LLC": "AS210644",
+    "Aeza Group": "AS210644",
+    "HOST4NERD LLC": "AS401362",
+    "Host4Nerd": "AS401362",
+    "ByteVirt LLC": "AS212336",
+    "SKINARK LTD": "AS209363",
+    "Skinark": "AS209363"
   },
   "asn_to_isp": {
     "AS174": "Cogent Communications, LLC",
@@ -4953,7 +4962,9 @@
     "AS39351": "Ali Monfared",
     "AS52000": "ServerKing B.V.",
     "AS7607": "JT TELECOM INTERNATIONAL",
-    "AS197974": "Akenai Products LTD"
+    "AS197974": "Akenai Products LTD",
+    "AS401362": "HOST4NERD LLC",
+    "AS209363": "SKINARK LTD"
   },
   "asn_to_net_type": {
     "AS1311": "banking",
@@ -8405,6 +8416,8 @@
     "AS209847": "datacenter",
     "AS213755": "datacenter",
     "AS7607": "datacenter",
-    "AS197974": "datacenter"
+    "AS197974": "datacenter",
+    "AS401362": "datacenter",
+    "AS209363": "datacenter"
   }
 }
