@@ -185,7 +185,7 @@ def _sync_check_proxyip_endpoint(
 CSV_FIELDS = [
     "ip", "port", "tls", "delay_ms", "speed_kbs",
     "colo", "cf_location", "asn", "isp",
-    "first_seen", "channel", "fail_count", "net_type",
+    "first_seen", "channel", "fail_count", "net_type", "exit_ip",
 ]
 
 # 反代穿透上下文：跳过非官方证书校验（安全审计说明：有意设计，反代节点由第三方部署且证书各异，需直接与节点建立 TLS 隧道嗅探 CDN /cdn-cgi/trace 边缘机房特征）
@@ -353,7 +353,9 @@ def save_proxyip(
 
     for row in rows:
         row["asn"] = format_asn_isp(row.get("asn", ""), row.get("isp", ""))
-        row["net_type"] = classify_asn(row.get("asn", ""), row.get("isp", ""))
+        if not row.get("net_type"):
+            row["net_type"] = classify_asn(row.get("asn", ""), row.get("isp", ""))
+        row.setdefault("exit_ip", "")
 
     with atomic_writer(csv_path, encoding="utf-8-sig", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
@@ -431,6 +433,8 @@ async def verify_proxyips(
                     check_executor, _sync_check_proxyip_endpoint, check_endpoint, ip, port, timeout
                 )
                 if alive:
+                    if exit_ip:
+                        row["exit_ip"] = exit_ip
                     if exit_asn:
                         row["asn"] = format_asn_isp(exit_asn, exit_isp)
                         row["isp"] = exit_isp

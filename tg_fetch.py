@@ -338,7 +338,7 @@ CF_CSV_FIELDS = [
     "fail_count",
 ]
 SCAN_CSV_FIELDS = CF_CSV_FIELDS + ["exit_ip", "exit_asn", "exit_isp", "exit_location"]
-PROXYIP_CSV_FIELDS = CF_CSV_FIELDS + ["net_type"]
+PROXYIP_CSV_FIELDS = CF_CSV_FIELDS + ["net_type", "exit_ip"]
 
 logging.basicConfig(
     level=logging.INFO,
@@ -1530,7 +1530,9 @@ def save_and_notify(
             for row in sorted_proxyips:
                 row.setdefault("fail_count", 0)
                 row["asn"] = format_asn_isp(row.get("asn", ""), row.get("isp", ""))
-                row["net_type"] = classify_asn(row.get("asn", ""), row.get("isp", ""))
+                if not row.get("net_type"):
+                    row["net_type"] = classify_asn(row.get("asn", ""), row.get("isp", ""))
+                row.setdefault("exit_ip", "")
                 writer.writerow(row)
         log.info("已保存反代 ProxyIP 表格: %s (%d 条全量累积记录)", OUTPUT_PROXYIP_FILE, len(sorted_proxyips))
 

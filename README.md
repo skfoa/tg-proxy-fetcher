@@ -260,7 +260,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `exit_location` | 字符串 | 最终出站落地的地理位置 | `美国 · 旧金山` |
 
 #### ③ 反代 ProxyIP 穿透与网络属性数据表（`data/proxyip.csv`）
-*共 13 个字段，除基础网络字段外，包含 `net_type`（两级分层网络识别）核心资产属性：*
+*共 14 个字段，除基础网络字段外，包含 `net_type`（两级分层网络识别）核心资产属性与 `exit_ip`（真实出站落地 IP）：*
 
 | 字段 | 类型 | 说明 | 示例 |
 | :--- | :--- | :--- | :--- |
@@ -277,6 +277,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `channel` | 字符串 | 来源频道或附件源 | `@danfeng_chat` |
 | `fail_count` | 整数 | 连续探测失败次数（连续失败 ≥ 3 次永久物理删除） | `0` |
 | `net_type` | 字符串 | **【核心属性】** 网络类型归属（详见下方 6 类取值说明） | `isp` |
+| `exit_ip` | 字符串 | **【真实出站落地】** 穿透测试测出的出站落地真实 IP（未测通或未走外部探针则为空） | `192.241.216.172` |
 
 > 📌 **`net_type` 网络分类取值与对应导出品**：
 > - `isp`：运营商原生民用宽带（ASN 粗筛候选） ➔ 对应导出 `data/proxyip/【ISP_运营商原生宽带】.txt`
