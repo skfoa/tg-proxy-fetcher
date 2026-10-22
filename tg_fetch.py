@@ -69,6 +69,7 @@ from providers import (
     prune_tombstone,
     is_tombstoned,
     load_ip_cache,
+    prune_ip_cache,
     LEGACY_DEFAULT_FIRST_SEEN,
     AUTHORITATIVE_CLOUD_ASNS,
     load_asn_database,
@@ -2226,6 +2227,7 @@ def main():
 
     # 主动修剪磁盘上超过 7 天的过期墓碑条目并原子持久化 (函数内已记录日志)
     prune_tombstone()
+    prune_ip_cache()
 
     if TG_API_ID and TG_API_HASH and TG_SESSION_STR:
         import importlib.util

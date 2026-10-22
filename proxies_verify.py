@@ -64,6 +64,7 @@ from providers import (
     resolve_asn_batch_online_async,
     load_ip_cache,
     save_ip_cache,
+    prune_ip_cache,
     classify_asn,
     format_asn_isp,
     ASN_TO_PROVIDER,
@@ -1763,6 +1764,7 @@ async def async_main(args):
                 if res_ip and res_ip != h:
                     persistent_cache[res_ip] = entry
         save_ip_cache(persistent_cache)
+        prune_ip_cache(persistent_cache)
         log.info(
             "【持久化 IP 缓存】本轮检测新增/更新画像 %d 个 (永久拦截机房 +%d, 家宽/专线 +%d)，当前总缓存库 %d 条",
             len(cache_updates),

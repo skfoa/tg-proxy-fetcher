@@ -365,9 +365,12 @@ def atomic_write_text(path: str, text: str, encoding: str = "utf-8", newline: st
         f.write(text)
 
 
-def atomic_write_json(path: str, obj, *, indent: int = 2, newline: str | None = "\n") -> None:
-    """原子序列化并覆写 JSON 数据 (跨平台默认严格强制 LF 换行，彻底杜绝 CRLF 污染)"""
-    text = json.dumps(obj, ensure_ascii=False, indent=indent)
+def atomic_write_json(path: str, obj, *, indent: int | None = 2, newline: str | None = "\n") -> None:
+    """原子序列化并覆写 JSON 数据 (跨平台默认严格强制 LF 换行，彻底杜绝 CRLF 污染；indent=None 时采用紧凑格式)"""
+    if indent is None:
+        text = json.dumps(obj, ensure_ascii=False, separators=(",", ":"))
+    else:
+        text = json.dumps(obj, ensure_ascii=False, indent=indent)
     atomic_write_text(path, text, encoding="utf-8", newline=newline)
 
 
@@ -954,13 +957,99 @@ def load_ip_cache() -> dict[str, dict]:
     return {}
 
 
-def save_ip_cache(cache: dict[str, dict], filepath: str = ""):
-    """持久化保存 IP/域名 -> ASN/ISP/net_type 缓存字典至 data/ip_cache.json（原子写入）"""
+def save_ip_cache(cache: dict[str, dict], filepath: str = "", compact: bool = True):
+    """持久化保存 IP/域名 -> ASN/ISP/net_type 缓存字典至 data/ip_cache.json（原子写入，默认紧凑压缩）"""
     target_path = filepath or IP_CACHE_PATH
     try:
-        atomic_write_json(target_path, cache)
+        atomic_write_json(target_path, cache, indent=None if compact else 2)
     except Exception as e:
         log.warning("保存 %s 异常: %s", target_path, e)
+
+
+def prune_ip_cache(
+    cache: dict[str, dict] | None = None,
+    active_ips: set[str] | None = None,
+    max_orphans: int = 5000,
+    filepath: str = "",
+) -> int:
+    """
+    修剪持久化 IP 缓存 (data/ip_cache.json)，防止无界无限膨胀：
+    1. 动态提取当前库中所有活跃 IP（scan_ips 入口与出口、proxyip、proxies 中的在用节点）；
+    2. 无条件完整保留活跃 IP 的画像；
+    3. 对已从活跃库淘汰但曾标记为机房/黑名单的孤儿 IP，最多保留 max_orphans (默认 5000) 条高频防护样本，超额部分予以物理剔除；
+    4. 修剪后以紧凑 Compact JSON 原子覆写。
+    返回修剪淘汰的孤儿 IP 数量。
+    """
+    target_path = filepath or IP_CACHE_PATH
+    if cache is None:
+        cache = load_ip_cache()
+    if not cache:
+        return 0
+
+    if active_ips is None:
+        active_ips = set()
+        base_dir = os.path.dirname(os.path.abspath(target_path))
+        # 扫描优选库与反代库
+        for fname in ("scan_ips.csv", "proxyip.csv"):
+            fpath = os.path.join(base_dir, fname)
+            if os.path.isfile(fpath):
+                try:
+                    with open(fpath, "r", encoding="utf-8-sig", errors="ignore") as f:
+                        for row in csv.DictReader(f):
+                            ip = (row.get("ip") or "").strip()
+                            if ip:
+                                active_ips.add(ip)
+                            exit_ip = (row.get("exit_ip") or "").strip()
+                            if exit_ip:
+                                active_ips.add(exit_ip)
+                except Exception as e:
+                    log.debug("读取 %s 收集活跃 IP 异常: %s", fpath, e)
+
+        # 扫描原始代理池
+        proxies_path = os.path.join(base_dir, "proxies.txt")
+        if os.path.isfile(proxies_path):
+            try:
+                with open(proxies_path, "r", encoding="utf-8", errors="ignore") as f:
+                    for line in f:
+                        m = re.findall(r"(?:[0-9]{1,3}\.){3}[0-9]{1,3}", line)
+                        for ip in m:
+                            active_ips.add(ip)
+            except Exception as e:
+                log.debug("读取 %s 收集活跃 IP 异常: %s", proxies_path, e)
+
+    pruned_cache = {}
+    orphan_dc = {}
+    pruned_count = 0
+
+    for ip_key, entry in cache.items():
+        if not isinstance(entry, dict):
+            continue
+        if ip_key in active_ips:
+            pruned_cache[ip_key] = entry
+        elif entry.get("net_type") in ("datacenter", "hosting"):
+            orphan_dc[ip_key] = entry
+        else:
+            pruned_count += 1
+
+    # 对机房黑名单孤儿 IP，限制最大保留数量
+    if len(orphan_dc) > max_orphans:
+        pruned_count += (len(orphan_dc) - max_orphans)
+        for k in list(orphan_dc.keys())[:max_orphans]:
+            pruned_cache[k] = orphan_dc[k]
+    else:
+        pruned_cache.update(orphan_dc)
+
+    save_ip_cache(pruned_cache, filepath=target_path, compact=True)
+    if pruned_count > 0:
+        log.info(
+            "已修剪 IP 缓存 %s: 剔除 %d 条淘汰孤儿记录，当前保留 %d 条 (活跃: %d, 机房黑名单: %d)",
+            target_path,
+            pruned_count,
+            len(pruned_cache),
+            len(pruned_cache) - min(len(orphan_dc), max_orphans),
+            min(len(orphan_dc), max_orphans),
+        )
+    return pruned_count
 
 
 def is_valid_public_ip(ip_str: str) -> bool:
