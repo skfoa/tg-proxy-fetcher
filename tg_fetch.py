@@ -1123,7 +1123,7 @@ def fetch_zip_proxyips(
     timeout: float = 30.0,
 ) -> tuple[int, list[dict]]:
     """
-    拉取外部 ProxyIP 聚合源 (如 cmliussss zip all.json)，
+    拉取外部 ProxyIP 在线归档聚合源 (如 all.json)，
     采用【多镜像并发竞速机制】(Concurrent Racing)：同时向所有候选镜像发起请求，最快返回合法数据的镜像胜出。
     【核心收录策略】：
       - 严格只收录非机房节点（ISP 宽带、高校教育网、政务网、商业企业专线、银行金融），

@@ -3083,7 +3083,7 @@ def is_tombstoned(
 
 
 # =====================================================================
-# Check ProxyIP 在线探针 API 适配模块 (https://check.proxyip.cmliussss.net/)
+# Check ProxyIP 在线探针 API 适配模块
 # =====================================================================
 def format_check_proxyip_url(base_url: str, ip: str, port: int) -> str:
     """智能格式化 Check ProxyIP 请求 URL，自适应各种形态的用户配置"""

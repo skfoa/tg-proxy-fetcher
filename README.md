@@ -35,13 +35,13 @@
 - **📁 智能 ASN 分组与命名**：
   - **DanFeng 测速**：CSV 内部无 ASN 列时自动从文件名（如 `AS45102_CNNICALIBABACNNETAP_*.csv`）解析归类。
   - **OTC 优选扫描**：单 ASN 文件以文件名目标 ASN 为准；混合扫描文件（如 `OTC_SCAN_YX_杂.txt`）自动逐行提取具体 ASN 与 ISP 拆分归类。
-- **🔬 报文特征级质检引擎升级（放行 CF 1034 边缘真节点 + 异构 CDN 伪节点立斩）**：质检引擎突破盲目依赖 200/301 状态码的传统局限，深入分析响应报文底层特征：
-  - **放行 Cloudflare 1034 (Edge IP restricted / 共享 Anycast IP) 边缘真节点**：报文状态码虽为 403，但包含权威 `Server: cloudflare`、`CF-RAY` 与 `error code: 1034`，证明其确属官方活跃边缘服务器，自动判定存活并通过 `CF-RAY` 准确提取三字机房代码（`colo`），杜绝假死误杀；
-  - **精准排他秒杀异构 CDN 伪节点 (`non_cf_cdn`)**：针对冒充 Cloudflare 的异构伪节点（检出 Fastly `421` 或包含 `fastly.com`、Akamai `Server: AkamaiGHost` 等指纹），直接判定为致命硬故障 `non_cf_cdn` 当场拉满淘汰，保证节点池绝对纯净。
-- **📊 通用代理质检全链路可观测性与协议分流策略**：`proxies_verify.py` 引入失败原因分布统计（`reasons_counter`，细分 `connect_timeout`、`tls_error`、`http_status_xxx`、`dc_rejected` 等）与协议明细汇总日志；实行精细化分协议淘汰策略（明文 HTTP 专属严格阈值 `--http-max-fails 1`，SOCKS5/HTTPS/TURN/SSTP 维持 `--max-fails 3` 缓冲容错），并支持 `--strict` 极致纯净模式。
-- **🌐 全量 TURN 穿透协议专属生态与 Check Socks5 深度兼容**：原生收录并维护 660+ 个实测存活的高可用 TURN 穿透协议节点（`turn://`），提供独立单协议 `.txt` / `.csv` / `.json` 端点；支持 RFC 5389 STUN Binding 与 Check Socks5 API 双模鉴真，并深度支持识别和标定稀缺的新加坡民用宽带（如 Viewqwest AS18106）等原生家宽 `isp` 节点。
-- **🗃️ `ip_cache` 活跃集修剪与紧凑序列化**：引入 `prune_ip_cache` 机制，在每次质检落盘时动态收集活跃 IP，无条件保护在用画像，同时将已淘汰孤儿机房黑名单严格限制在 `max_orphans=5000` 条以内，配合紧凑 Compact JSON 序列化，彻底根除缓存文件无界膨胀，兼顾高频防护与极速加载。
-- **🧪 演练诊断模式（Dry-run & Diag Output）**：`proxyip_verify.py` 与 `cf_verify.py` 原生支持 `--dry-run` 演练诊断与 `--diag-output` 输出详细故障分布 JSON，便于在不触碰生产数据与墓地库的前提下全景评估网络质量。
+- **🔬 报文特征级质检识别**：质检引擎深入分析响应报文底层特征，打破传统单一依赖 HTTP 状态码的局限：
+  - **兼容 Cloudflare 1034 边缘受限真节点**：对返回 403 但包含官方 `Server: cloudflare` 与 `CF-RAY` 特征的边缘节点自动放行并提取三字机房代码（`colo`），避免误杀；
+  - **识别并剔除异构 CDN 伪节点 (`non_cf_cdn`)**：准确识别并剔除混入的 Fastly、Akamai 等非 Cloudflare 伪造节点，保证优选节点池纯净度。
+- **📊 通用代理质检可观测性与分流策略**：`proxies_verify.py` 引入失败原因分布统计（细分 `connect_timeout`、`tls_error`、`http_status_xxx` 等）与协议明细汇总日志；实行精细化分协议淘汰机制（明文 HTTP 专属严格阈值 `--http-max-fails 1`，其他高可用协议维持缓冲容错），并支持 `--strict` 极致纯净模式。
+- **🌐 原生支持 TURN 穿透协议**：完整支持 `turn://` 协议节点的解析、存活质检与单协议数据导出（`.txt` / `.csv` / `.json`），兼容 RFC 5389 STUN Binding 校验与自定义外部检测端点，并支持自动区分机房与家庭宽带（`isp`）等网络画像。
+- **🗃️ `ip_cache` 活跃集修剪与紧凑序列化**：引入 `prune_ip_cache` 机制，在质检落盘时动态收集活跃在用 IP，有效画像全量保护，历史孤儿黑名单限制上限并紧凑存储，避免缓存文件无界膨胀。
+- **🧪 演练诊断模式（Dry-run & Diag Output）**：`proxyip_verify.py` 与 `cf_verify.py` 支持 `--dry-run` 诊断与 `--diag-output` 输出详细故障分布，便于在不触碰生产数据的前提下全景评估网络状况。
 - **⚡ 精细化分段锁调度（`ip:port` 锁粒度）**：内置基于 `zlib.crc32` 的 8192 桶位哈希分段锁（`get_keyed_lock`），并发互斥粒度细化至 `ip:port`，同 IP 异端口节点并发探测，彻底解除死节点多端口串行死锁排队（单个死 IP 挂载数十个端口排队超时从 50s+ 骤降至秒级）；异 IP 互不干扰，分段锁内存维持在常数级 $O(1)$。
 - **⚡ 全量 SSL 上下文单例复用**：质检引擎全面复用全局单例 SSL 证书上下文（`INSECURE_SSL_CTX` 与 `SSL_CTX`），杜绝每次高并发探测协程重复同步读取操作系统 CA 根证书（消除 ~26ms 阻塞开销），事件循环并发吞吐能力彻底释放。
 - **🛡️ 全链路原子安全写入（Windows 锁冲突免疫）**：封装统一的 `atomic_writer` 及 `atomic_write_*` 工具套件，规范执行「写盘 ➔ 显式关闭句柄 ➔ `os.replace` 原子替换」生命周期，彻底根治 Windows 平台 `PermissionError: [WinError 32]` 文件占用锁冲突；异常崩溃时自动清理 `.tmp` 脏文件。
@@ -103,9 +103,9 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 
 | 文件名 | 内容说明 | 生成条件 | GitHub Raw 永久直链（点击即可导入） |
 | :--- | :--- | :---: | :--- |
-| **`data/proxies.txt`** | 质检存活的多协议通用代理全量清单（当前收录 1,620+ 个节点，按协议分段注释归类，纯文本；每段以 `# {协议} 代理 - N 个` 开头，客户端订阅时请过滤 `#` 注释行，或直接使用下方单协议纯文本） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies.txt` |
+| **`data/proxies.txt`** | 质检存活的多协议通用代理全量清单（按协议分段注释归类，纯文本；每段以 `# {协议} 代理 - N 个` 开头，客户端订阅时请过滤 `#` 注释行，或直接使用下方单协议纯文本） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies.txt` |
 | **`data/proxies.csv`** | 代理质检数据总表（15 字段完整元数据，含出口国家、出口真实 IP、ASN、ISP、网络分类与来源渠道 `source`） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies.csv` |
-| **`data/proxies/*.txt`** | 按协议独立拆分的纯净单协议代理清单（涵盖 `socks5.txt`、`http.txt`、`https.txt`、`turn.txt`（660 个）、`sstp.txt`，纯文本无注释行） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies/{协议}.txt` |
+| **`data/proxies/*.txt`** | 按协议独立拆分的纯净单协议代理清单（涵盖 `socks5.txt`、`http.txt`、`https.txt`、`turn.txt`、`sstp.txt`，纯文本无注释行） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies/{协议}.txt` |
 | **`data/proxies/*.csv`** | 按协议独立拆分的纯净单协议结构化数据表（涵盖 `socks5.csv`、`http.csv`、`https.csv`、`turn.csv`、`sstp.csv`，15 字段含 `source`） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies/{协议}.csv` |
 | **`data/proxies/*.json`** | 按协议独立拆分的标准化 JSON 端点（涵盖 `socks5.json`、`http.json`、`https.json`、`turn.json`、`sstp.json`，结构化输出协议、国家、出口真实 IP、ASN、网络属性与来源 `source`，兼容 EDT-Toolkit / 油猴脚本及各类客户端导入） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies/{协议}.json` |
 | **`data/cf_ips.txt`** | 频道日常单条优选 IP（纯文本） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/cf_ips.txt` |
@@ -127,12 +127,11 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 
 1. **通用标准代理 URL**：
    - `socks5://...`、`http://...`、`https://...`（兼容免密与带账号密码认证）
-2. **TURN 穿透协议节点（原生支持与 Check Socks5 深度兼容）**：
+2. **TURN 穿透协议节点**：
    - `turn://114.34.87.173:3479#TW...` 或 `turn://user:pass@host:port`
-   - 自动识别 `turn://` 协议，智能剥离测速后缀与中文标签；
-   - 兼容免密与账号密码凭据认证；
-   - 深度集成 RFC 5389 STUN Binding 与 [Check Socks5 API](https://check.socks5.cmliussss.net/) 双模鉴真；
-   - 权威识别并收录新加坡 Viewqwest（AS18106）等高可用原生宽带 ISP 节点，精准打标 `net_type="isp"`。
+   - 自动识别 `turn://` 协议，智能剥离测速后缀与中文标签，兼容免密与账号密码认证；
+   - 支持基于 RFC 5389 STUN Binding 校验与扩展外部检测端点双重鉴真；
+   - 自动识别并打标数据中心（`datacenter`）与运营商原生宽带（`isp`）等网络画像。
 3. **SSTP 安全隧道协议节点（含 VPNGate 外部订阅）**：
    - `sstp://vpn:vpn@public-vpn-xxx.opengw.net:443`（自动识别与提取，支持通过 `SUB_URLS` 环境变量直接拉取外部订阅链接并自动去重合并）
 4. **Telegram 官方 SOCKS5 一键直连链接**：
@@ -151,16 +150,10 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
    - 自动提取行首有效节点与认证信息，过滤后续测速说明与反向 PTR 域名别名，统一去重合并至 `data/proxies.txt`。
 7. **Cloudflare 优选 IP 与反代池（需官方 API 模式）**：
    - 提取包含 IP、端口、TLS、网络延迟（纯数值 ms）、下载速度（纯数值 kB/s）、数据中心（Colo）、落地位置、ASN、运营商、测速时间等全量指标。
-8. **外部高价值代理镜像源（EDT-Pages 多镜像并发竞速与非机房严苛提取）**：
-   - 支持 HTTPS、HTTP、SOCKS5 外部开源镜像拉取。
-   - 🛡️ **严格过滤机房 (`datacenter`) 节点**：仅收录提取非机房资产（运营商原生宽带 ISP、企业商业专线、教育高校、政务公用网）。
-   - 🎯 **出口真实 IP 鉴真**：提取 `clientIp` 为实际落地出口 IP（`egress_ip`）。
-   - ⚡ **多镜像并发竞速（Concurrent Racing）**：多源同时发起网络请求，最快返回有效合法数据的镜像胜出率先采用，彻底消除慢镜像排队阻塞；自动拦截墓地冷却期黑名单。
-   - 🏷️ **全链路来源追踪**：显式打标来源字段为 `source="EDT-Pages"`。
-9. **Proxifly 外部公开 HTTPS 代理镜像源（`PROXIFLY_HTTPS_URLS`）**：
-   - 支持并发拉取 Proxifly 官方及多个 GitHub / CDN 加速镜像源，自动解构代理参数并入库。
-10. **反代 ProxyIP 外部 ZIP 归档源（`PROXYIP_ZIP_URLS`）**：
-    - 支持从外部在线归档端点（默认 `https://zip.cm.edu.kg.cmliussss.net/all.json`）提取全量反代 ProxyIP 节点。
+8. **外部订阅与开源代理源拓展**：
+   - 支持通过环境变量配置自定义公开订阅链接、镜像源或第三方在线归档端点（覆盖 HTTPS / HTTP / SOCKS5 / SSTP 等多协议）；
+   - **多源并发竞速**：支持配置多个镜像或备用地址并发拉取，最快有效返回者率先采用，防止单源超时阻塞；
+   - **质量与类型过滤**：支持基于网络属性筛选非机房资产，自动记录来源渠道并拦截已淘汰的墓地黑名单。
 
 ---
 
@@ -172,14 +165,14 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 * **协议分流淘汰阈值与延迟风控**：
   - **明文 HTTP 专属严格阈值（`--http-max-fails 1`）**：因公网明文 HTTP 代理极易短时间内失效，采取严格策略，探测失败立即剔除；
   - **高可用协议缓冲容错（`--max-fails 3`）**：SOCKS5、HTTPS、TURN、SSTP 等协议维持连续 3 次全网不可达方才淘汰的缓冲保护，避免网络抖动误杀；
-  - **延迟熔断与极致纯净**：支持 `--http-max-latency` 超时剔除与 `--strict` 极致纯净模式（全协议失败 1 次立斩）。
+  - **延迟熔断与极致纯净**：支持 `--http-max-latency` 超时剔除与 `--strict` 极致纯净模式（全协议失败 1 次即刻淘汰）。
 * **全链路失败可观测性**：探测过程由 `reasons_counter` 细分记录具体失败成因（`connect_timeout`、`tls_error`、`http_status_xxx`、`dc_rejected` 等），并在日志中输出详细的协议分布与成因汇总。
 * **协议专属分类与多格式导出（按协议分块归类，避免混杂）：**
   - `data/proxies.txt`：全量代理汇总纯文本，按协议分段归类输出（`# SOCKS5 代理`、`# TURN 协议`、`# SSTP 协议` 等），段内按实测延迟严选升序排列。
   - `data/proxies.csv`：结构化质检总表（15 字段完整凭据），严格按协议大类分块聚集排序（SOCKS5 块 ➔ TURN 块 ➔ SSTP 块），行与行之间无交错混插。
   - `data/proxies/`：专属单协议独立拆分子目录，提供单协议 `.txt`、`.csv` 与 `.json` 文件：
     - `data/proxies/socks5.txt` / `socks5.csv` / `socks5.json`：SOCKS5 代理节点列表、表格与 JSON 数据源（便于定向导入 Telegram / Proxifier / EDT-Toolkit 等）；
-    - `data/proxies/turn.txt` / `turn.csv` / `turn.json`：TURN 穿透协议节点列表、表格与 JSON（当前收录 660 个实测存活高可用节点）；
+    - `data/proxies/turn.txt` / `turn.csv` / `turn.json`：TURN 穿透协议节点列表、表格与 JSON 数据源；
     - `data/proxies/sstp.txt` / `sstp.csv` / `sstp.json`：SSTP 安全隧道协议节点列表、表格与 JSON（VPNGate 等）；
     - `data/proxies/http.txt` / `http.csv` / `http.json`：HTTP 代理节点列表、表格与 JSON；
     - `data/proxies/https.txt` / `https.csv` / `https.json`：HTTPS 代理节点列表、表格与 JSON。
@@ -379,7 +372,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 * **协议握手探测**：
   * **SOCKS5**：RFC 1928 握手协商（无密 `0x00` / 账密 `0x02` RFC 1929）➔ 发送 CONNECT 指令 ➔ 穿透请求 `/cdn-cgi/trace` 检验 200 与机房。
   * **HTTP / HTTPS**：CONNECT 隧道穿透 + 正向代理回退双路径校验；支持配置 `--http-max-latency` 对超高延迟节点实施熔断。
-  * **TURN / STUN**：构造 RFC 5389 STUN Binding Request 二进制包，校验 Magic Cookie (`0x2112A442`) 与 Transaction ID，兼容 Check Socks5 API 探针校验。
+  * **TURN / STUN**：构造 RFC 5389 STUN Binding Request 二进制包，校验 Magic Cookie (`0x2112A442`) 与 Transaction ID，支持扩展外部自建探针端点校验。
   * **SSTP**：MS-SSTP 标准双工隧道握手（TLS 握手 + `SSTP_DUPLEX_POST` 校验 `HTTP/1.1 200 OK` 确认服务就绪）；支持配置自建 Cloudflare Worker 进行第二阶段真实出口 IP 与 PPP 链路鉴真。
 * **分协议淘汰策略与延迟风控**：
   * **明文 HTTP 专属严格淘汰（`--http-max-fails 1`）**：公网明文 HTTP 极易失效与遭受封禁，默认失败 1 次立即清除，杜绝死节点长期积压占用资源；
@@ -392,14 +385,14 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 * **报文特征级穿透鉴真**：
   * 向反代节点发起 TLS 握手，发送 HTTP/1.1 GET `/cdn-cgi/trace` 探针请求。采用统一 Deadline 超时控制与循环读取（`read_full_response`），严格切分 Header 与 Body 区域，校验状态码与 Server 标头，提取有效 `colo` 机房代号。
   * **放行 Cloudflare 1034 边缘真节点**：报文虽为 403，但同时包含官方 `Server: cloudflare`、`CF-RAY` 与 `error code: 1034`，证明其确属官方受限的 Anycast 边缘真服务器，自动判定存活并通过 `CF-RAY` 准确提取三字机房代号；
-  * **精准排他秒杀异构 CDN 伪节点 (`non_cf_cdn`)**：检出 Fastly（`421` 或包含 `fastly.com`）、Akamai（`Server: AkamaiGHost`）等异构 CDN 指纹时，直接判定为致命错误 `non_cf_cdn` 当场拉满淘汰。
+  * **严格排查并过滤异构 CDN 伪节点 (`non_cf_cdn`)**：检出 Fastly（`421` 或包含 `fastly.com`）、Akamai（`Server: AkamaiGHost`）等异构 CDN 指纹时，判定为错误标记 `non_cf_cdn` 并自动淘汰。
 * **参数配置**：握手与连接超时设为 `4.0s`（HTTP 读取 `3.5s`），兼容高延迟跨洲网络；默认并发控制为 `250` 协程，配合哈希分段锁平滑调度。
 * **演练诊断支持**：支持 `--dry-run` 演练模式（仅探测与统计，不改动生产数据与墓地库）与 `--diag-output` 输出详细 JSON 故障日志。
 
 #### ③ 优选 IP 两阶段主动鉴真引擎（`cf_verify.py`）
 * **全量优选 IP 覆盖与报文特征排他**：
   * **阶段一（TLS 握手 + 证书鉴真）**：建立 TLS 握手并验证 `crypto.cloudflare.com` 官方证书有效性。
-  * **阶段二（同一连接 HTTP 301 重定向 + 报文特征校验）**：在同一连接发送 GET 请求，循环读取切分 Header 区域，校验状态行 `301` 与 `Server: cloudflare`。同样支持放行官方 1034 边缘真节点，并秒杀拦截 Fastly / Akamai 等 `non_cf_cdn` 异构伪节点。
+  * **阶段二（同一连接 HTTP 301 重定向 + 报文特征校验）**：在同一连接发送 GET 请求，循环读取切分 Header 区域，校验状态行 `301` 与 `Server: cloudflare`。同样支持放行官方 1034 边缘真节点，并自动拦截过滤 Fastly / Akamai 等 `non_cf_cdn` 异构伪节点。
   * **端口与格式校验**：入库加载前进行端口范围校验（`1 <= port <= 65535`），非法格式行自动累加失败计数并剔除。
 * **官方 Anycast 基线自检（`--probe-baseline`）**：内置 300 个 Cloudflare 官方 Anycast IP 作为基线池，可一键验证当前并发槽位与本地网络质量。
 * **联动剔除与演练模式**：达到淘汰阈值（默认 3 次）的失效节点，同步从 `scan_ips` 与 `cf_ips` 各产物中清理删除；支持 `--dry-run` 与 `--diag-output`。
@@ -465,17 +458,17 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `PROXY` | 抓取代理设置 | 留空 | 可选 | GitHub Actions 云端默认直连 Telegram 无需配置；自建私有 Runner 或特殊网络时可按需配置 |
 | `PROXY_CHANNELS` | 代理抓取目标频道/群组（逗号/空格分隔） | `@otcfxq, @danfeng_chat` | 可选 | 自定义抓取通用代理的频道/群组（若未配置自动回退至全局 `CHANNELS` 或默认值） |
 | `CF_IP_CHANNELS` | 优选 IP 抓取目标频道/群组（逗号/空格分隔） | `@otcfxq, @danfeng_chat` | 可选 | 自定义抓取 Cloudflare 优选 IP 与测速附件的频道/群组（若未配置自动回退至全局 `CHANNELS` 或默认值） |
-| `SUB_URLS` | 外部通用订阅源 URL 列表（逗号/换行分隔） | `sub.cmliussss.net/vpngate` (留空默认) | 可选 | 配置外部公开订阅链接（默认加载开源公共镜像 `https://sub.cmliussss.net/vpngate` 获取 VPNGate SSTP 节点）；如需**彻底禁用外部订阅**，设置为 `off`、`none` 或 `false` 即可；也可填入自有公开订阅链接 |
-| `EDT_MIRRORS` | EDT-Pages 外部代理镜像加速前缀列表（逗号/空格分隔） | 留空（自动竞速多组内置镜像源） | 可选 | 配置自定义 GitHub 加速镜像域名或前缀（如 `https://github.090227.xyz, https://github.cmliussss.net, https://ghfast.top`）。**系统采用多源并发竞速机制（Concurrent Racing）**：所有候选源同时起跑，最快有效返回者瞬间胜出采用，其余自动舍弃，彻底告别单源超时卡死；若需彻底禁用外部镜像拉取，设为 `off` 即可 |
+| `SUB_URLS` | 外部通用订阅源 URL 列表（逗号/换行分隔） | 内置公共订阅镜像（留空默认） | 可选 | 配置外部公开订阅链接（用于拓展 SSTP 等节点）；如需**彻底禁用外部订阅**，设置为 `off`、`none` 或 `false` 即可；亦可填入自定义订阅链接 |
+| `EDT_MIRRORS` | 外部代理源镜像加速前缀列表（逗号/空格分隔） | 留空（自动竞速多组内置镜像源） | 可选 | 配置自定义加速镜像域名或前缀。**系统采用多源并发竞速机制**：所有候选源并发请求，最快有效返回者率先采用，防止单源超时阻塞；若需彻底禁用外部镜像拉取，设为 `off` 即可 |
 | `EDT_URLS` | 自定义代理完整 JSON URL 列表（逗号/空格分隔） | 留空（由镜像自动推导） | 可选 | 直接传入多个完整的 proxy json 链接（支持同时混合 https/http/socks5，系统自动按文件名路由），进入并发竞速池 |
 | `EDT_BASE_URL` | 自建 Worker/CDN 代理基址（支持单个或多个，逗号分隔） | 留空（由镜像自动推导） | 可选 | 用于自建反代加速服务（如 `https://my-proxy.workers.dev/data`），系统自动拼接 `{base}/{proto}.json` 并参与竞速 |
 | `EDT_HTTPS_URLS` | 专属 HTTPS 代理完整 JSON 候选列表（逗号分隔） | 留空（由镜像自动推导） | 可选 | 高级自定义：直接指定抓取非机房 HTTPS 代理的完整 JSON 地址列表（支持多源并发竞速，协议级最高优先级） |
 | `EDT_HTTP_URLS` | 专属 HTTP 代理完整 JSON 候选列表（逗号分隔） | 留空（由镜像自动推导） | 可选 | 高级自定义：直接指定抓取非机房 HTTP 代理的完整 JSON 地址列表（支持多源并发竞速，协议级最高优先级） |
 | `EDT_SOCKS5_URLS` | 专属 SOCKS5 代理完整 JSON 候选列表（逗号分隔） | 留空（由镜像自动推导） | 可选 | 高级自定义：直接指定抓取非机房 SOCKS5 代理的完整 JSON 地址列表（支持多源并发竞速，协议级最高优先级） |
-| `PROXIFLY_HTTPS_URLS` | Proxifly 开源代理源 HTTPS 候选列表（逗号/空格分隔） | 留空（默认并发竞速官方及镜像源） | 可选 | 支持自定义传入 Proxifly 代理源 JSON 链接，并发多源竞速拉取 |
-| `PROXYIP_ZIP_URLS` | 反代 ProxyIP 外部在线归档 URL 列表（逗号/空格分隔） | `https://zip.cm.edu.kg.cmliussss.net/all.json` | 可选 | 从外部在线归档端点拉取全量反代 ProxyIP 节点并去重入库 |
-| `CF_CHECK_ENDPOINT` | SSTP 代理出口检测端点 URL | 留空（不执行） | 可选 | 用于存活 SSTP 节点的第二阶段真实出口 IP 与链路鉴真。<br>💡 **需自行部署**：本项目**默认不预设第三方公共端点**（避免占用他人私人项目额度）。推荐使用开源项目 [CF-Workers-CheckSocks5](https://github.com/cmliu/CF-Workers-CheckSocks5) 部署到个人 Cloudflare Workers 免费账号（每日 100,000 次免费请求额度），部署后将个人 Worker 域名填入此处。若留空则仅使用本地探测，完全不调用外部服务。 |
-| `CHECK_PROXYIP_URL` | Check ProxyIP 在线探针检测 API 端点 | 留空（不执行） | 可选 | 配置 [Check ProxyIP](https://check.proxyip.cmliussss.net/) 或后端检测端点（如 `https://api.090227.xyz/check?proxyip=` 或自建 Worker）。配置后系统自动对未知 ASN/ISP 或缺少出口信息的节点进行在线穿透鉴真，提取真实出口 IP 与网络归属；留空则仅依赖本地离线库与自带字段 |
+| `PROXIFLY_HTTPS_URLS` | 外部 HTTPS 代理源候选列表（逗号/空格分隔） | 留空（默认并发竞速内置源） | 可选 | 支持自定义传入外部代理源 JSON 链接，并发多源竞速拉取 |
+| `PROXYIP_ZIP_URLS` | 反代 ProxyIP 外部在线归档 URL 列表（逗号/空格分隔） | 内置归档端点（留空默认） | 可选 | 从外部在线归档端点拉取全量反代 ProxyIP 节点并去重入库；如不使用外部归档可留空或自定义指定自建端点 |
+| `CF_CHECK_ENDPOINT` | SSTP 代理出口检测端点 URL | 留空（不执行） | 可选 | 用于存活 SSTP 节点的第二阶段真实出口 IP 与链路鉴真。<br>💡 **建议自行部署**：本项目**默认不预设第三方公共端点**（避免依赖外部私人服务或产生不可控限流）。推荐使用开源项目 [CF-Workers-CheckSocks5](https://github.com/cmliu/CF-Workers-CheckSocks5) 部署到个人 Cloudflare Workers 免费账号，部署后将个人 Worker 域名填入此处。若留空则仅使用本地探测，完全不调用外部服务。 |
+| `CHECK_PROXYIP_URL` | 外部探针鉴真检测 API 端点 | 留空（不执行） | 可选 | 自定义外部鉴真端点（如自建 Cloudflare Worker 或后端检测 API）。配置后系统自动对缺少出口信息或未识别 ASN 的节点进行在线探测，提取真实出口 IP 与网络归属；默认留空，仅依赖本地解析与自带数据，不调用任何外部服务 |
 
 ### 3. 高级调优参数与本地调试对照（可选）
 
@@ -495,8 +488,8 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `--dry-run` | `proxyip_verify.py` / `cf_verify.py` | 关闭 | 关闭 | 演练诊断模式，仅探测统计原因，不覆写数据文件也不登记墓地，自动跳过通知 |
 | `--diag-output` | `proxyip_verify.py` / `cf_verify.py` | 留空 | 留空 | 诊断结果输出 JSON 路径，记录每个节点的探测原因明细 |
 | `--probe-baseline` | `cf_verify.py` | 关闭 | 关闭 | 探测 300 个官方 Cloudflare Anycast IP 作为并发与网络基线 |
-| `--cf-check-endpoint` | `proxies_verify.py` | 留空 | 留空 | SSTP 真实出口与 PPP 链路鉴真端点 URL (默认留空不执行外部检测，需自行部署 CF-Workers-CheckSocks5) |
-| `--check-endpoint` | `proxyip_verify.py` | 留空 | 留空 | Check ProxyIP 外部穿透鉴真端点 URL (默认读取环境变量 `CHECK_PROXYIP_URL`，留空使用本地直接探测) |
+| `--cf-check-endpoint` | `proxies_verify.py` | 留空 | 留空 | SSTP 真实出口与 PPP 链路鉴真端点 URL（默认留空不执行外部检测，可配置个人自建 Worker 端点） |
+| `--check-endpoint` | `proxyip_verify.py` | 留空 | 留空 | 反代外部穿透鉴真端点 URL（默认读取环境变量 `CHECK_PROXYIP_URL`，留空使用本地直接探测） |
 | `--check-concurrency` | `proxyip_verify.py` | `32` | `32` | Check ProxyIP 外部穿透鉴真并发线程数 (默认读取环境变量 `CHECK_CONCURRENCY`，并发多线程调度不盲等) |
 | `--no-notify` | 校验脚本 | 流水线静默 | 关闭 | 不单独推送各引擎卡片，由流水线终点聚合为四合一卡片 |
 | `DEFER_NOTIFY` | `tg_fetch.py` | `1` | `0` | 延迟 Telegram 推送标记，确保四合一卡片聚合完整 |
@@ -512,22 +505,22 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 ━━━━━━━━━━━━━━━━━━━━
 📅 时间：2026-10-23 18:00:00 (北京时间)
 📫 可用代理：1,622 个 (✅ 1,580 存活 · ⚠️ 42 缓冲 [+6 新进 · 12 恢复] · ⚡ 均延 480ms)
-   └ 协议分布: TURN 660, SSTP 473, HTTPS 255, SOCKS5 204, HTTP 30
+   └ 协议分布: TURN 320, SSTP 210, HTTPS 180, SOCKS5 150, HTTP 30
 🌐 单条优选：37 条 (✅ 31 存活 · ⚠️ 6 缓冲 [+1 新进 · 2 恢复])
 📁 扫描优选：30,096 条 (✅ 29,420 存活 · ⚠️ 676 缓冲 [+45 新进 · 58 恢复] · 440 个 ASN)
    └ 涵盖: Alibaba Cloud, Amazon AWS, Tencent Cloud, DMIT, Aeza, ByteVirt 等
 🔀 反代 ProxyIP：1,678 条 (✅ 1,612 存活 · ⚠️ 66 缓冲 [+14 新进 · 19 恢复])
    └ 出口画像: ISP/原生宽带 201 个 · 商业专线 15 个 · 教育政务 6 个
 💡 新收录 ASN (已自动归类入库)：
-   • AS18106 Viewqwest Pte Ltd (Singapore 家宽 ISP)
-   • AS213233 FastPath Network (12 条)
+   • AS13335 Cloudflare, Inc. (12 条)
+   • AS210644 Aeza Group LLC (8 条)
    └ 共 2 个已自动收录入库
 ━━━━━━━━━━━━━━━━━━━━
 🛡️ 主动鉴真淘汰：
-   • 质检规范：报文级穿透鉴真 (放行 CF 1034 · 秒杀异构伪节点 · 代理多协议穿透)
+   • 质检规范：报文级穿透鉴真 (放行 CF 1034 边缘节点 · 过滤异构 CDN 伪节点 · 代理多协议穿透)
    • 缓冲动态：⚠️ 新增缓冲 66 条 · ♻️ 取消缓冲 91 条 (恢复健康)
    • 淘汰死节点：21 条 [代理 3, 反代 8, 扫描优选 10] (连续失败 ≥ 3 次)
-📡 频道来源：@danfeng_chat, @otcfxq, Proxifly, EDT-Pages, Anti-CF
+📡 频道与数据源：@danfeng_chat, @otcfxq 等公开频道与外部订阅源
 ━━━━━━━━━━━━━━━━━━━━
 ⚡ 总耗时: 182.5s · 🔗 Action #42 · 📦 产物仓库
 ```
@@ -616,7 +609,7 @@ python proxies_verify.py --concurrency 100 --no-notify
 # 极速画像补全模式（跳过网络连通性探测，仅刷新 ASN/ISP/net_type）：
 python proxies_verify.py --enrich-only
 
-# ③ 反代 ProxyIP 应用层穿透质检（深入报文特征放行 CF 1034 边缘真节点并秒杀异构 CDN 伪节点）
+# ③ 反代 ProxyIP 应用层穿透质检（深入报文特征放行 CF 1034 边缘真节点并过滤异构 CDN 伪节点）
 python proxyip_verify.py --concurrency 150 --no-notify
 # 演练诊断模式（仅探测与统计，不覆写生产数据也不登记墓地）：
 python proxyip_verify.py --concurrency 150 --dry-run --diag-output diag_proxyip.json
@@ -637,10 +630,10 @@ python cf_verify.py --dry-run --diag-output diag_cf.json
 - **Telegram 公开频道**：
   - [@otcfxq](https://t.me/otcfxq)
   - [DanFeng 交流群 (@danfeng_chat)](https://t.me/danfeng_chat)
-- **开源代理镜像与实验项目**：
-  - [EDT-Pages/Proxy-List](https://github.com/EDT-Pages/Proxy-List)（提供高质量公开多协议非机房代理镜像）
-  - [Proxifly/free-proxy-list](https://github.com/proxifly/free-proxy-list)（提供公开多协议 HTTPS 代理镜像）
-  - [@cmliu](https://github.com/cmliu)（提供开源公共订阅镜像服务、[CF-Workers-CheckSocks5](https://github.com/cmliu/CF-Workers-CheckSocks5) 鉴真端点项目及 Check Socks5 / Check ProxyIP 在线 API 服务）
+- **开源代理与工具项目**：
+  - [EDT-Pages/Proxy-List](https://github.com/EDT-Pages/Proxy-List)（开源多协议代理数据源）
+  - [Proxifly/free-proxy-list](https://github.com/proxifly/free-proxy-list)（开源多协议代理镜像）
+  - [cmliu/CF-Workers-CheckSocks5](https://github.com/cmliu/CF-Workers-CheckSocks5)（开源 Cloudflare Workers 鉴真检测端点实现）
   - [VPN Gate 学术实验项目](https://www.vpngate.net/)（日本国立筑波大学研究生院全球分布式学术中继网络）
 
 ---
