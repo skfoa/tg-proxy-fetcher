@@ -711,8 +711,7 @@ def parse_otc_scan_content(
         is_otc_7col = False
         if len(parts) >= 6:
             last_token = parts[-1].strip()
-            # 末尾特征: 仅IPv6, 仅IPv4, 双栈, 纯IPv4 等
-            if "仅ipv" in last_token.lower() or "ipv" in last_token.lower() or "双栈" in last_token:
+            if "ipv" in last_token.lower() or "双栈" in last_token:
                 is_otc_7col = True
             elif len(parts) >= 7 and is_valid_ip(parts[5]):
                 is_otc_7col = True

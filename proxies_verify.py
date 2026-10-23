@@ -374,10 +374,7 @@ def is_datacenter_result(cf_res: dict) -> bool:
     isp_str = f"{asn_name} {company_name}".strip()
 
     nt = classify_asn(asn_code, isp_str)
-    if nt in ("datacenter", "hosting"):
-        return True
-
-    return False
+    return nt in ("datacenter", "hosting")
 
 
 # ---------- 协议探测实现 ----------

@@ -67,7 +67,7 @@ def parse_proxy_str(val: str) -> tuple | None:
         port = u.port
         if not port:
             return None
-        rdns = True if p_type == "socks5" else False
+        rdns = p_type == "socks5"
         username = u.username or None
         password = u.password or None
         if username or password:

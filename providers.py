@@ -340,7 +340,7 @@ def atomic_writer(
     is_binary = "b" in mode
     enc = None if is_binary else encoding
     nl = None if is_binary else newline
-    f = open(tmp, mode, encoding=enc, newline=nl)
+    f = open(tmp, mode, encoding=enc, newline=nl)  # noqa: SIM115  # 必须在 os.replace 前显式释放文件句柄以彻底规避 Windows WinError 32 锁冲突
     try:
         yield f
         f.close()
@@ -1224,7 +1224,7 @@ def resolve_asn_batch_online(
                     ip_to_targets.setdefault(resolved_ip, []).append(clean_t)
 
     # 待在线批量查询的去重 IP 列表
-    pending_ips = [ip for ip in ip_to_targets.keys() if ip not in results]
+    pending_ips = [ip for ip in ip_to_targets if ip not in results]
     if not pending_ips:
         if persist and cache_modified:
             save_ip_cache(cache)
@@ -1851,14 +1851,10 @@ async def read_full_response(
 
 async def safe_close_writer(writer: asyncio.StreamWriter, timeout: float = 0.5) -> None:
     """安全关闭 StreamWriter 并等待连接释放，带超时控制防 hang 与静默忽略 RST 异常"""
-    try:
+    with contextlib.suppress(Exception):
         writer.close()
-    except Exception:
-        pass
-    try:
+    with contextlib.suppress(Exception):
         await asyncio.wait_for(writer.wait_closed(), timeout=timeout)
-    except Exception:
-        pass
 
 
 def split_header_body(resp_bytes: bytes) -> tuple[bytes, bytes]:

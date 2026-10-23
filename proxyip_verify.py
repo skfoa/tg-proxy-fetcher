@@ -24,6 +24,7 @@ import argparse
 import asyncio
 from collections import defaultdict
 import concurrent.futures
+import contextlib
 import csv
 import json
 import logging
@@ -124,13 +125,8 @@ def shutdown_check_executor(wait: bool = False, cancel_futures: bool = True) -> 
     """关闭外部质检线程池，释放线程资源"""
     global _CHECK_EXECUTOR
     if _CHECK_EXECUTOR is not None:
-        try:
-            if sys.version_info >= (3, 9):
-                _CHECK_EXECUTOR.shutdown(wait=wait, cancel_futures=cancel_futures)
-            else:
-                _CHECK_EXECUTOR.shutdown(wait=wait)
-        except Exception:
-            pass
+        with contextlib.suppress(Exception):
+            _CHECK_EXECUTOR.shutdown(wait=wait, cancel_futures=cancel_futures)
         _CHECK_EXECUTOR = None
 
 
@@ -196,14 +192,10 @@ CSV_FIELDS = [
 SSL_CTX = ssl.create_default_context()
 SSL_CTX.check_hostname = False
 SSL_CTX.verify_mode = ssl.CERT_NONE
-try:
+with contextlib.suppress(Exception):
     SSL_CTX.minimum_version = ssl.TLSVersion.MINIMUM_SUPPORTED
-except Exception:
-    pass
-try:
+with contextlib.suppress(Exception):
     SSL_CTX.set_ciphers("DEFAULT:@SECLEVEL=0")
-except Exception:
-    pass
 
 
 # 确定性致命硬故障状态集：协议错配、非反代服务、SNI 域名拒绝或鉴真伪装

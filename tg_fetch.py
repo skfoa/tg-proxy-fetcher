@@ -185,7 +185,7 @@ def _parse_edt_mirrors() -> list[str]:
     mirrors = []
     for item in re.split(r"[,;\s]+", raw_val):
         item = item.strip().rstrip("/")
-        if item and (item.startswith("http://") or item.startswith("https://")):
+        if item and item.startswith(("http://", "https://")):
             mirrors.append(item)
     return mirrors
 
