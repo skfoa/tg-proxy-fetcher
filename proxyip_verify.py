@@ -57,6 +57,10 @@ from providers import (
     split_header_body,
     format_buffer_badge,
     RE_SERVER_CF,
+    RE_CF_RAY,
+    RE_CF_1034,
+    RE_NON_CF_FASTLY,
+    RE_NON_CF_AKAMAI,
     format_asn_isp,
     atomic_writer,
     atomic_write_text,
@@ -209,6 +213,7 @@ FATAL_FAIL_STATUSES = {
     "status_404",      # /cdn-cgi/trace 404（普通 Web 网站，未配置反代转发规则）
     "status_421",      # 421 Misdirected Request（SNI/Host 域名被反代明确拒绝）
     "status_400",      # 400 Bad Request（协议畸形或私有协议误录入）
+    "non_cf_cdn",      # 异构 CDN 伪节点 (Fastly/Akamai 等，报文特征明确排他)
     "tls_error",       # TLS 握手异常（纯明文 HTTP 端口或 SSL 协议不匹配）
     "empty_response",  # 建立连接后发送请求立即断开（死连接/假服务）
     "invalid_row",     # 数据行字段损坏或端口非法
@@ -285,7 +290,26 @@ async def probe_proxyip(
 
         if is_200 and is_cf and bool(colo):
             return True, latency_ms, colo, "ok"
-        elif not is_200:
+
+        # 报文级鉴真：识别 Cloudflare 官方 1034 边缘受限真节点 (403 + Server: cloudflare + CF-RAY + error code: 1034)
+        is_cf_1034 = (
+            status_code == "403"
+            and is_cf
+            and bool(RE_CF_RAY.search(header_part))
+            and bool(RE_CF_1034.search(body_part))
+        )
+        if is_cf_1034:
+            m_ray = RE_CF_RAY.search(header_part)
+            ray_colo = m_ray.group(1).split(b"-")[-1].decode().upper() if m_ray else "CF"
+            return True, latency_ms, ray_colo, "ok"
+
+        # 报文级排他：精准识别混入的异构 CDN 伪节点 (Fastly 421 SAN 拒绝 / Akamai 400 Bad Request)
+        is_fastly = bool(RE_NON_CF_FASTLY.search(body_part)) or (status_code == "421" and not is_cf)
+        is_akamai = bool(RE_NON_CF_AKAMAI.search(header_part))
+        if is_fastly or is_akamai:
+            return False, latency_ms, "", "non_cf_cdn"
+
+        if not is_200:
             return False, latency_ms, colo, f"status_{status_code}" if status_code else "invalid_http_status"
         elif not is_cf:
             return False, latency_ms, colo, "no_cf_header"

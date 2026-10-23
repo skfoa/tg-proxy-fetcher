@@ -50,6 +50,10 @@ from providers import (
     format_scan_ips_txt,
     RE_HTTP_301,
     RE_SERVER_CF,
+    RE_CF_RAY,
+    RE_CF_1034,
+    RE_NON_CF_FASTLY,
+    RE_NON_CF_AKAMAI,
     read_full_response,
     safe_close_writer,
     split_header_body,
@@ -121,6 +125,7 @@ FATAL_FAIL_STATUSES = {
     "conn_error",       # 对端端口关闭 (Connection Refused) / 主机不可达，TCP 直接被拒
     "empty_response",   # 建立连接后一发请求即断开 (假服务/死连接)
     "invalid_row",      # 格式损坏的脏数据行
+    "non_cf_cdn",       # 异构 CDN 伪节点 (Fastly/Akamai 等，报文特征明确排他)
 }
 
 # 官方 Cloudflare Anycast 诊断基线 IP 池 (共 300 个，覆盖并发 250 槽位)
@@ -199,9 +204,24 @@ async def probe_ip(
             and len(body_part.strip()) == 0
         )
 
-        if (is_301 and is_cf) or is_cf_crypto_502:
+        # 报文级鉴真：识别 Cloudflare 官方 1034 边缘受限真节点 (403 + Server: cloudflare + CF-RAY + error code: 1034)
+        is_cf_1034 = (
+            status_code == "403"
+            and is_cf
+            and bool(RE_CF_RAY.search(header_part))
+            and bool(RE_CF_1034.search(body_part))
+        )
+
+        if (is_301 and is_cf) or is_cf_crypto_502 or is_cf_1034:
             return True, latency_ms, "ok"
-        elif not is_301:
+
+        # 报文级排他：精准识别混入的异构 CDN 伪节点 (Fastly 421 SAN 拒绝 / Akamai 400 Bad Request)
+        is_fastly = bool(RE_NON_CF_FASTLY.search(body_part)) or (status_code == "421" and not is_cf)
+        is_akamai = bool(RE_NON_CF_AKAMAI.search(header_part))
+        if is_fastly or is_akamai:
+            return False, latency_ms, "non_cf_cdn"
+
+        if not is_301:
             return False, latency_ms, f"status_{status_code}" if status_code else "invalid_http_status"
         else:
             return False, latency_ms, "no_cf_header"

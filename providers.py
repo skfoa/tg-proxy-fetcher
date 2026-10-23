@@ -1800,6 +1800,11 @@ def format_diff(new_c: int, upd_c: int) -> str:
 
 RE_HTTP_301 = re.compile(rb"^HTTP/\d\.\d\s+301\b")
 RE_SERVER_CF = re.compile(rb"(?im)^server:\s*[^\r\n]*\bcloudflare\b")
+RE_CF_RAY = re.compile(rb"(?im)^cf-ray:\s*([a-f0-9]+-[a-z0-9]+)")
+RE_CF_1034 = re.compile(rb"(?i)error code:\s*1034\b")
+RE_NON_CF_FASTLY = re.compile(rb"(?i)fastly\.com")
+RE_NON_CF_AKAMAI = re.compile(rb"(?im)^server:\s*AkamaiGHost\b")
+
 
 
 async def read_full_response(
