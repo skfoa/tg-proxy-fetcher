@@ -23,6 +23,7 @@ import argparse
 import asyncio
 import atexit
 import base64
+from collections import defaultdict
 import concurrent.futures
 import csv
 import functools
@@ -1644,6 +1645,7 @@ async def async_main(args):
     min_delay = 99999
 
     proto_stats = {}
+    reasons_counter: dict[str, int] = defaultdict(int)
 
     h_to = getattr(args, "http_probe_timeout", HTTP_PROBE_TIMEOUT)
     h_lat = getattr(args, "http_max_latency", HTTP_MAX_LATENCY_MS)
@@ -1722,6 +1724,9 @@ async def async_main(args):
         else:
             fail_count += 1
 
+        st = res.get("status") or ("alive" if res.get("is_alive") else "fail")
+        reasons_counter[st] += 1
+
         if completed % 1000 == 0 or completed == total:
             pct = (completed / total) * 100
             min_str = f"{min_delay}ms" if min_delay < 99999 else "-"
@@ -1737,6 +1742,19 @@ async def async_main(args):
 
     tasks = [_worker(r) for r in rows]
     results = await asyncio.gather(*tasks)
+
+    sorted_reasons = sorted(reasons_counter.items(), key=lambda x: x[1], reverse=True)
+    reason_summary = ", ".join(f"{k}: {v}" for k, v in sorted_reasons)
+    proto_summary = ", ".join(
+        f"{p}: 存活 {d['alive']}/{d['total']} ({(d['alive']/d['total']*100) if d['total'] else 0:.1f}%)"
+        for p, d in sorted(proto_stats.items())
+    )
+    log.info(
+        "[通用代理 质检] 校验完成: 共 %d 条 | 存活通过 %d 条 (%.1f%%), 失败标记 %d 条",
+        total, pass_count, (pass_count / total * 100) if total else 0, fail_count,
+    )
+    log.info("[通用代理 质检] 探测原因汇总: %s", reason_summary)
+    log.info("[通用代理 质检] 协议分布明细: %s", proto_summary)
 
     # 汇总机房拦截数据（避免逐条输出刷屏）
     dc_rejected_https = sum(1 for r in results if r.get("status") == "datacenter_rejected")
