@@ -1097,6 +1097,7 @@ turn://8.136.113.183:3479,turn,8.136.113.183,3479,676,0,alive,-,CN,8.136.113.183
 turn://47.99.184.62:3479,turn,47.99.184.62,3479,700,0,alive,-,CN,47.99.184.62,"AS37963 Alibaba Cloud (Hangzhou Alibaba Advertising Co., Ltd.)","Hangzhou Alibaba Advertising Co., Ltd.",datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://110.42.215.193:3478,turn,110.42.215.193,3478,1260,0,alive,-,CN,110.42.215.193,AS45090 Tencent Cloud,Tencent Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://13.213.42.133:3478,turn,13.213.42.133,3478,1270,0,alive,SEA,SG,13.213.42.133,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",datacenter,2026-10-23 17:28:05,@user
+turn://51.79.138.120:3478,turn,51.79.138.120,3478,1285,0,alive,SEA,SG,51.79.138.120,AS16276 OVH,OVH SAS,datacenter,2026-10-23 17:28:05,@user
 turn://43.160.237.250:3478,turn,43.160.237.250,3478,1291,0,alive,SEA,SG,43.160.237.250,AS132203 Tencent Cloud (Shenzhen Tencent Computer Systems Company Limited),Shenzhen Tencent Computer Systems Company Limited,datacenter,2026-10-23 17:28:05,@user
 turn://139.59.234.68:3478,turn,139.59.234.68,3478,1295,0,alive,SEA,SG,139.59.234.68,AS14061 DigitalOcean,"DigitalOcean, LLC",datacenter,2026-10-23 17:28:05,@user
 turn://34.177.86.104:3478,turn,34.177.86.104,3478,1356,0,alive,SEA,SG,34.177.86.104,AS396982 Google Cloud (Google LLC),Google LLC,datacenter,2026-10-23 17:28:05,@user
@@ -1104,6 +1105,7 @@ turn://52.253.82.18:3478,turn,52.253.82.18,3478,1359,0,alive,SEA,SG,52.187.63.77
 turn://18.141.12.148:3478,turn,18.141.12.148,3478,1365,0,alive,SEA,SG,18.141.12.148,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",datacenter,2026-10-23 17:28:05,@user
 turn://146.190.111.240:3478,turn,146.190.111.240,3478,1368,0,alive,SEA,SG,146.190.111.240,AS14061 DigitalOcean,"DigitalOcean, LLC",datacenter,2026-10-23 17:28:05,@user
 turn://43.128.79.157:3478,turn,43.128.79.157,3478,1373,0,alive,SEA,SG,43.128.79.157,AS132203 Tencent Cloud (Shenzhen Tencent Computer Systems Company Limited),Shenzhen Tencent Computer Systems Company Limited,datacenter,2026-10-23 17:28:05,@user
+turn://43.230.99.117:3478,turn,43.230.99.117,3478,1375,0,alive,SEA,SG,43.230.99.117,AS18106 Viewqwest Pte Ltd,Viewqwest Pte Ltd,isp,2026-10-23 17:28:05,@user
 turn://20.195.58.22:3478,turn,20.195.58.22,3478,1377,0,alive,SEA,SG,20.195.58.22,AS8075 Microsoft Azure (Microsoft Corporation),Microsoft Corporation,datacenter,2026-10-23 17:28:05,@user
 turn://188.166.232.241:3478,turn,188.166.232.241,3478,1396,0,alive,SEA,SG,188.166.232.241,AS14061 DigitalOcean,"DigitalOcean, LLC",datacenter,2026-10-23 17:28:05,@user
 turn://34.143.164.85:3478,turn,34.143.164.85,3478,1401,0,alive,SEA,SG,34.143.164.85,AS396982 Google Cloud (Google LLC),Google LLC,datacenter,2026-10-23 17:28:05,@user

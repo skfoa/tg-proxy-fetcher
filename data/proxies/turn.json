@@ -9135,6 +9135,21 @@
     "source": "@user"
   },
   {
+    "proxy": "turn://51.79.138.120:3478",
+    "protocol": "turn",
+    "ip": "51.79.138.120",
+    "port": 3478,
+    "country": "SG",
+    "country_name": "新加坡",
+    "country_cn": "新加坡",
+    "country_emoji": "🇸🇬",
+    "asn": "16276",
+    "asOrganization": "OVH SAS",
+    "isp": "OVH SAS",
+    "net_type": "datacenter",
+    "source": "@user"
+  },
+  {
     "proxy": "turn://43.160.237.250:3478",
     "protocol": "turn",
     "ip": "43.160.237.250",
@@ -9237,6 +9252,21 @@
     "asOrganization": "Shenzhen Tencent Computer Systems Company Limited",
     "isp": "Shenzhen Tencent Computer Systems Company Limited",
     "net_type": "datacenter",
+    "source": "@user"
+  },
+  {
+    "proxy": "turn://43.230.99.117:3478",
+    "protocol": "turn",
+    "ip": "43.230.99.117",
+    "port": 3478,
+    "country": "SG",
+    "country_name": "新加坡",
+    "country_cn": "新加坡",
+    "country_emoji": "🇸🇬",
+    "asn": "18106",
+    "asOrganization": "Viewqwest Pte Ltd",
+    "isp": "Viewqwest Pte Ltd",
+    "net_type": "isp",
     "source": "@user"
   },
   {
