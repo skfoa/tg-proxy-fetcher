@@ -228,6 +228,11 @@ _CORE_BASELINE_NET_TYPES: dict[str, str] = {
     "AS3257": "isp",          # GTT Communications Inc. (Tier 1 国际骨干/ISP, ipinfo: ISP)
     "AS58682": "isp",         # Level3 Carrier Ltd. (Tier 1 国际骨干/ISP, ipinfo: ISP)
     "AS7738": "isp",          # V.tal (vtal.com, 巴西主流电信与国际海缆, ipinfo: ISP)
+    "AS8167": "isp",          # V.tal (ipinfo: ISP)
+    "AS134835": "isp",        # Starry Network (ipinfo: ISP)
+    "AS152179": "isp",        # (ipinfo: ISP)
+    "AS209604": "isp",        # 2E TELEKOMUNIKASYON (ipinfo: ISP)
+    "AS216475": "isp",        # NKtelecom INC (ipinfo: ISP)
 
     # 核心云厂商机房 (权威锁定为 datacenter)
     "AS152194": "datacenter", # CTG Server Limited (ipinfo: Hosting)
@@ -235,6 +240,8 @@ _CORE_BASELINE_NET_TYPES: dict[str, str] = {
     "AS906": "datacenter",    # DMIT Cloud Services (ipinfo: Hosting)
     "AS214195": "datacenter", # Tres Teknoloji A.S. (ipinfo: Hosting)
     "AS8796": "datacenter",   # FASTNET DATA INC (Kurun Cloud, ipinfo: Hosting)
+    "AS9891": "datacenter",   # CS LOXINFO (csloxinfo.com, ipinfo: Hosting)
+    "AS34665": "datacenter",  # Petersburg Internet Network (pindc.ru, ipinfo: Hosting)
     "AS26042": "datacenter",  # FiberState, LLC (ipinfo: Hosting)
     "AS199144": "datacenter", # HexCore cloud s.r.o. (ipinfo: Hosting)
     "AS57169": "datacenter",  # EDIS GmbH (ipinfo: Hosting)
@@ -247,12 +254,12 @@ _CORE_BASELINE_NET_TYPES: dict[str, str] = {
     "AS45102": "datacenter",  # Alibaba Cloud
     "AS132203": "datacenter", # Tencent Cloud
     "AS31898": "datacenter",  # Oracle Cloud
-    "AS54253": "datacenter",  # Oracle Corporation
-    "AS397540": "datacenter", # Windscribe Limited (VPN/代理机房)
+    "AS54253": "isp",         # Oracle Corporation (ipinfo: ISP)
+    "AS397540": "isp",        # Windscribe Limited (ipinfo: ISP)
     "AS207143": "datacenter", # hosttech GmbH (瑞士机房/主机托管)
     "AS216054": "datacenter", # Taymaz Gostaran Naghshe Almas Co. (Ltd) (算力IDC)
     "AS214822": "datacenter", # MT FINANCE LLC (算力/主机机房)
-    "AS206069": "datacenter", # Cornseed Limited (IDC/主机机房)
+    "AS206069": "isp",        # Cornseed Limited (ipinfo: ISP)
     "AS137535": "datacenter", # JT Telecom International / JTTI (jtti.cc, 云主机/机房)
     "AS205548": "datacenter", # Zouter Limited (zouter.io, 云主机/VPS)
     "AS202147": "datacenter", # VPSUS LTD (vpsus.com, 云主机/VPS)
@@ -263,16 +270,17 @@ _CORE_BASELINE_NET_TYPES: dict[str, str] = {
     "AS33842": "datacenter",  # Citytelecom LLC (CrossTelecom, crosstelecom.ru, 云主机机房)
     "AS151873": "datacenter", # TOTHOST SOLUTIONS AND TECHNOLOGIES COMPANY LIMITED (tothost.vn, 越南VPS/机房)
     "AS213035": "datacenter", # Serverion B.V. (serverion.com, 荷兰机房/主机托管, SoftShellWeb上游)
-    "AS44907": "datacenter",  # Telegram Messenger Inc.
+    "AS44907": "business",    # Telegram Messenger Inc. (ipinfo: Business)
     "AS45062": "datacenter",  # NetEase
     "AS137753": "datacenter", # JD Cloud
-    "AS131486": "datacenter", # JD.com
+    "AS131486": "business",   # JD.com (ipinfo: Business)
     "AS59019": "datacenter",  # Kingsoft Cloud
     "AS137280": "datacenter", # Kingsoft Cloud
     "AS135377": "datacenter", # UCloud
     "AS36007": "datacenter",  # Kamatera
     "AS25693": "datacenter",  # VirMach
     "AS142078": "education",  # CERNET FITI Nodes (清华大学/未来互联网试验设施教育网节点)
+    "AS3132": "education",    # Red Cientifica Peruana (rcp.pe, 秘鲁教育网, ipinfo: education)
 }
 
 # 权威已知云厂商与核心骨干网 SSOT 网络类型基准表
@@ -419,17 +427,13 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS206675": "datacenter", # PumpCloud JP / PAN-LIAN (pumpcloud.net, 云主机机房)
     "AS207847": "datacenter", # CloudBlast LLC (cloudblast.io, 云主机)
     "AS214478": "datacenter", # Sakura Clouds LLC (sakuraclouds.com, 云服务器)
-    "AS397540": "datacenter", # Windscribe (windscribe.com, VPN/代理机房)
     "AS207143": "datacenter", # hosttech GmbH (hosttech.ch, 瑞士机房/主机托管)
     "AS216054": "datacenter", # Taymaz Gostaran Naghshe Almas (viphost.cloud, 算力IDC)
     "AS214822": "datacenter", # MT FINANCE LLC (ruvds.com, 云主机机房)
-    "AS206069": "datacenter", # Cornseed Limited (cornseed.tech, IDC/主机机房)
+    "AS206069": "isp",        # Cornseed Limited (ipinfo: ISP)
     "AS200912": "datacenter", # Joel Krause (vpslayer.net, ipinfo核准为hosting)
-    "AS216475": "datacenter", # NKtelecom INC (nktele.com, ipinfo: hosting)
     "AS55799": "datacenter",  # IPTELECOM ASIA (iptelecom.asia, ipinfo: hosting)
     "AS135357": "datacenter", # HONG KONG KOWLOON TELECOMMUNICATIONS (as3491.net, ipinfo: hosting)
-    "AS402705": "datacenter", # Align Broadband (alignbb.com, ipinfo: inactive/hosting)
-    "AS209604": "datacenter", # 2E TELEKOMUNIKASYON LTD STI (2etelekom.com, ipinfo: hosting)
     "AS199669": "datacenter", # Okay-Telecom Ltd. / ATLEX.RU (atlex.ru, ipinfo: hosting)
     "AS33842": "datacenter",  # Citytelecom LLC (CrossTelecom, crosstelecom.ru, ipinfo: hosting)
     "AS62642": "datacenter",  # Bigleaf Networks, Inc. (bigleaf.net, ipinfo: hosting)
@@ -447,18 +451,17 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS59642": "datacenter",  # UAB Cherry Servers (balticservers.com, 立陶宛机房)
     "AS213840": "datacenter", # DDOS PROTECTION LTD (英国高防机房)
     "AS152324": "datacenter", # 3XNET Co., Ltd. (亚太云主机机房)
-    "AS200239": "datacenter", # Bogahost Bilisim (土耳其主机托管)
-    "AS210993": "datacenter", # Spacecore Solution Ltd (欧洲云主机机房)
     "AS135636": "datacenter", # PT. RACKH LINTAS ASIA (rackh.co.id, 印尼机房)
     "AS151873": "datacenter", # TOTHOST SOLUTIONS AND TECHNOLOGIES COMPANY LIMITED (tothost.vn, 越南VPS/机房)
     "AS213035": "datacenter", # Serverion B.V. (serverion.com, 荷兰机房/主机托管, SoftShellWeb上游)
     "AS26042": "datacenter",  # FiberState, LLC (ipinfo: Hosting)
-    "AS3132": "datacenter",   # Red Cientifica Peruana (rcp.pe, 秘鲁主机/机房, ipinfo: hosting)
     "AS152194": "datacenter", # CTG Server Limited (机房/云主机, ipinfo: Hosting)
     "AS20071": "datacenter",  # KUXUEYUN LLC (酷雪云, IDC机房, ipinfo: Hosting)
     "AS906": "datacenter",    # DMIT Cloud Services (IDC机房, ipinfo: Hosting)
     "AS214195": "datacenter", # Tres Teknoloji A.S. (IDC机房, ipinfo: Hosting)
     "AS8796": "datacenter",   # FASTNET DATA INC (Kurun Cloud, IDC机房, ipinfo: Hosting)
+    "AS9891": "datacenter",   # CS LOXINFO (csloxinfo.com, ipinfo: Hosting)
+    "AS34665": "datacenter",  # Petersburg Internet Network (pindc.ru, ipinfo: Hosting)
 
     # --- [L0 裁决 B: 知名正牌民用宽带 ISP，权威核准为 isp] ---
     "AS174": "isp",           # Cogent Communications, LLC (Tier 1 国际骨干/ISP, ipinfo: ISP)
@@ -466,19 +469,27 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS3257": "isp",          # GTT Communications Inc. (Tier 1 国际骨干/ISP, ipinfo: ISP)
     "AS58682": "isp",         # Level3 Carrier Ltd. (Tier 1 国际骨干/ISP, ipinfo: ISP)
     "AS7738": "isp",          # V.tal (vtal.com, 巴西主流电信与国际海缆, ipinfo: ISP)
+    "AS8167": "isp",          # V.tal (ipinfo: ISP)
+    "AS134835": "isp",        # Starry Network (ipinfo: ISP)
+    "AS152179": "isp",        # (ipinfo: ISP)
+    "AS209604": "isp",        # 2E TELEKOMUNIKASYON (ipinfo: ISP)
+    "AS216475": "isp",        # NKtelecom INC (ipinfo: ISP)
     "AS273961": "isp",        # LUDWIN GROUP COMPANY SRL (ipinfo: ISP)
     "AS273007": "isp",        # SPEEDNET, C.A (ipinfo: ISP)
     "AS274414": "isp",        # Osbaldo Tovar Campero (ipinfo: ISP)
     "AS1257": "isp",          # Tele2 Sverige AB (tele2.com, 欧洲顶级电信与家庭宽带)
     "AS18106": "isp",         # Viewqwest Pte Ltd (viewqwest.com, 新加坡知名光纤宽带 ISP)
-    "AS9891": "isp",          # CS LOXINFO (csloxinfo.com, 泰国主流电信运营商)
     "AS63150": "isp",         # BAGE CLOUD LLC (bage.dev, 双ISP广播, 权威ipinfo核准为ISP)
     "AS3226": "isp",          # OOO NI (mark.ru, Mark-ITT 俄罗斯老牌宽带运营商, 权威ipinfo核准为ISP)
     "AS4787": "isp",          # PT Cyberindo Aditama (cbn.id, 印尼知名民用光纤宽带 CBN)
     "AS135130": "isp",        # Anik Computer & Networking (aniknetwork.net, 孟加拉民用宽带ISP)
     "AS197275": "isp",        # Link Telecom NN Ltd. (lt-nn.net, 俄罗斯下诺夫哥罗德电信运营商)
     "AS16814": "isp",         # NSS S.A. (IPLAN Telecomunicaciones, iplan.com.ar, 阿根廷主流光纤运营商)
-    "AS34665": "isp",         # Petersburg Internet Network (pindc.ru, 圣彼得堡电信与宽带运营商)
+    "AS200239": "isp",        # Bogahost Bilisim (ipinfo: ISP)
+    "AS206069": "isp",        # Cornseed Limited (ipinfo: ISP)
+    "AS209604": "isp",        # 2E TELEKOMUNIKASYON (ipinfo: ISP)
+    "AS216475": "isp",        # NKtelecom INC (ipinfo: ISP)
+    "AS397540": "isp",        # Windscribe Limited (ipinfo: ISP)
     "AS35540": "isp",         # OVH SAS / OVH Telecom (ovhcloud.com, 法国电信与宽带接入网)
     "AS17621": "isp",         # China Unicom Shanghai network (中国联通上海网络)
     "AS25341": "isp",         # NPF ROI LLC (cstnet.ru, 俄罗斯宽带ISP)
@@ -530,19 +541,23 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS5458": "business", "AS6674": "business", "AS6773": "business", "AS7609": "business",
     "AS7630": "business", "AS7820": "business", "AS8373": "business", "AS8435": "business",
     "AS9016": "business", "AS9099": "business", "AS9118": "business", "AS9128": "business",
-    "AS9221": "business", "AS9487": "business", "AS9522": "business", "AS9630": "business",
-    "AS9772": "business", "AS9863": "business", "AS25883": "business", "AS207986": "business",
+    "AS9221": "business", "AS9522": "business", "AS9630": "business",
+    "AS9772": "business", "AS9863": "business", "AS207986": "business",
 
     # --- [L0 裁决 D: 核心学术科研教育网 (权威核准为 education)] ---
     "AS9488": "education",    # Seoul National University / SNU (首尔大学)
     "AS199578": "education",  # Verein zur Foerderung eines Deutschen Forschungsnetzes e.V. (DFN, 德国国家科研教育网)
     "AS142078": "education",  # CERNET FITI Nodes (清华大学/未来互联网试验设施教育网节点)
+    "AS3132": "education",    # Red Cientifica Peruana (rcp.pe, 秘鲁教育网, ipinfo: education)
 
     # --- [L0 裁决 E: 商业企业专线与骨干中继 (权威核准为 business)] ---
     "AS979": "business",      # NetLab Global (as979.net, 国际机房网络, ipinfo: business)
 
     # --- [L0 裁决 F: 国家政务与公共网络 (权威核准为 government)] ---
     "AS327724": "government",  # National Information Technology Authority Uganda (NITA-U, 乌干达国家信息技术管理局政务网)
+    "AS8435": "government",    # Bank of Korea (ipinfo: government)
+    "AS9487": "government",    # Bank of Korea (ipinfo: government)
+    "AS25883": "government",   # Central Bank of the Russian Federation (ipinfo: government)
 }
 
 
@@ -2758,9 +2773,14 @@ def save_proxyip_by_country(rows: list, output_dir: str) -> int:
         country = extract_country(r.get("cf_location"), r.get("colo"))
         groups.setdefault(country, []).append(r)
 
-        # 始终优先使用权威 classify_asn 定性，确保数据库或规则变更时自动同步纠正
-        nt = classify_asn(r.get("asn", ""), r.get("isp", ""))
-        r["net_type"] = nt
+        # 优先使用节点已认定的生效网络类型 (出口定性)，缺失时回退到权威研判
+        nt = r.get("net_type")
+        if not nt:
+            if r.get("exit_asn") or r.get("exit_isp"):
+                nt = classify_asn(r.get("exit_asn"), r.get("exit_isp"))
+            if not nt:
+                nt = classify_asn(r.get("asn", ""), r.get("isp", ""))
+            r["net_type"] = nt
         if nt in SPECIAL_NET_TYPE_FILES:
             type_groups.setdefault(nt, []).append(r)
 

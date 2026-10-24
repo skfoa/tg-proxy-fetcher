@@ -373,6 +373,58 @@ def get_system_proxy() -> str:
 # parse_otc_scan_content, parse_proxy_attachment_content) 已提取至 parsers.py 维护
 
 
+def classify_node_proxyip_or_scan(item: dict, ip_cache: dict) -> tuple[bool, str]:
+    """
+    终审判定节点归属 ProxyIP 还是扫描机房池（Scan IPs）：
+    【架构铁律：出口即正义，目标网站只认出口 IP】
+    1. 若自带/已探测真实出口 exit_ip:
+       - 优先从本地缓存或自治域推断 exit_net_type
+       - 若 exit_net_type != 'datacenter' (原生宽带/商业专线/教育/政务):
+         -> 绝对应划入 ProxyIP (无论入口是机房还是非机房)
+       - 若 exit_net_type == 'datacenter':
+         -> 坚决不划入 ProxyIP，留存在 scan_ips (即使入口是非机房，出站给目标网站展示的也是机房，毫无免风控价值)
+    2. 若未探测出口 (exit_ip 为空或未决):
+       - 按直连单跳反代假定，由入口 IP 属性兜底判定
+       - 若 ingress_net_type != 'datacenter' -> 归入 ProxyIP
+       - 否则 -> 归入 scan_ips (机房优选)
+    返回: (is_proxyip, effective_net_type)
+    """
+    ip = (item.get("ip") or "").strip()
+    exit_ip = (item.get("exit_ip") or "").strip()
+    exit_asn = (item.get("exit_asn") or "").strip()
+    exit_isp = (item.get("exit_isp") or "").strip()
+
+    # 1. 尝试判定出口网络类型
+    exit_nt = None
+    if exit_ip and exit_ip in ip_cache:
+        exit_nt = ip_cache[exit_ip].get("net_type")
+    if not exit_nt and (exit_asn or exit_isp):
+        exit_nt = classify_asn(exit_asn, exit_isp)
+
+    # 2. 尝试判定入口网络类型 (优先依据自治域权威研判，杜绝历史陈旧定性)
+    ing_nt = classify_asn(item.get("asn", ""), item.get("isp", ""))
+    if not ing_nt and ip and ip in ip_cache:
+        ing_nt = ip_cache[ip].get("net_type")
+    if not ing_nt:
+        ing_nt = item.get("net_type")
+
+    if not exit_nt and exit_ip and exit_ip == ip:
+        exit_nt = ing_nt
+
+    # 3. 终审分流：出口即正义
+    if exit_nt:
+        if exit_nt != "datacenter":
+            return True, exit_nt
+        else:
+            return False, "datacenter"
+
+    # 出口未探测时：按入口非机房兜底
+    if ing_nt and ing_nt != "datacenter":
+        return True, ing_nt
+
+    return False, "datacenter"
+
+
 def load_existing_proxies(
     filepath: str = OUTPUT_PROXY_FILE,
     csv_path: str = OUTPUT_PROXIES_CSV,
@@ -1608,6 +1660,7 @@ def merge_and_save(
     scraped_proxyips = scraped_proxyips or {}
 
     tombstone = load_tombstone()
+    ip_cache = load_ip_cache()
 
     # 1. 过滤掉命中墓地的节点 (双重防御，杜绝死节点进入待存集合)
     scraped_proxies = {k: v for k, v in scraped_proxies.items() if not is_tombstoned(k, tombstone)}
@@ -1700,14 +1753,18 @@ def merge_and_save(
             final_proxyips[k] = v
 
     # 3. 架构准则全局保底分流：
-    # - 凡是非机房节点 (net_type != 'datacenter') 绝对归入 final_proxyips (原生宽带/专线/教育/政务/金融)
-    # - 除此以外的所有节点 (net_type == 'datacenter'，即常规机房) 绝对归入 final_scan_ips (扫描优选机房池)
+    # - 核心准则：出口即正义。目标网站只认出口 IP。
+    #   1. 若自带/已探测真实出口 exit_ip:
+    #      - exit_net_type != 'datacenter' (原生宽带/商业专线/教育/政务) 绝对归入 final_proxyips (无论入口如何)
+    #      - exit_net_type == 'datacenter' 绝对归入 final_scan_ips (即使入口非机房，出口也是机房，绝无免风控价值)
+    #   2. 若未探测出口 (exit_ip 为空或未决):
+    #      - 按直连反代假定，由入口 IP 属性兜底
     cleaned_scan_ips = {}
     scan_to_proxy = {}
     for k, v in final_scan_ips.items():
-        nt = v.get("net_type") or classify_asn(v.get("asn", ""), v.get("isp", ""))
+        is_p, nt = classify_node_proxyip_or_scan(v, ip_cache)
         v["net_type"] = nt
-        if nt != "datacenter":
+        if is_p:
             scan_to_proxy[k] = v
         else:
             cleaned_scan_ips[k] = v
@@ -1715,9 +1772,9 @@ def merge_and_save(
     cleaned_proxyips = {}
     proxy_to_scan = {}
     for k, v in final_proxyips.items():
-        nt = v.get("net_type") or classify_asn(v.get("asn", ""), v.get("isp", ""))
+        is_p, nt = classify_node_proxyip_or_scan(v, ip_cache)
         v["net_type"] = nt
-        if nt == "datacenter":
+        if not is_p:
             proxy_to_scan[k] = v
         else:
             cleaned_proxyips[k] = v
@@ -2151,14 +2208,9 @@ async def run_telethon():
                                                         if not cf_item.get("isp"):
                                                             cf_item["isp"] = probe_res["exit_isp"]
 
-                                            # 判断入口网络类型
-                                            ingress_net_type = cf_item.get("net_type") or classify_asn(cf_item.get("asn", ""), cf_item.get("isp", ""))
-                                            cf_item["net_type"] = ingress_net_type
-
-                                            # 终极分流：
-                                            # - 出口非机房（家宽/专线等）或入口非机房 -> 坚决划入 proxyip
-                                            # - 只有纯机房优选 -> 归入 scan_ips (以入口 IP 的 ASN 归类分组)
-                                            is_proxyip = (exit_net_type and exit_net_type != "datacenter") or (ingress_net_type and ingress_net_type != "datacenter")
+                                            # 终极分流：出口即正义（目标网站只认真实出口 IP）
+                                            is_proxyip, effective_nt = classify_node_proxyip_or_scan(cf_item, ip_cache)
+                                            cf_item["net_type"] = effective_nt
 
                                             if is_proxyip:
                                                 if cf_key not in scraped_proxyips:
