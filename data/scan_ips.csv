@@ -423,12 +423,12 @@
 38.190.210.250,443,true,693,,HKG,亚洲 · 香港,AS133199 SonderCloud Limited,SonderCloud Limited,2026-10-18 21:50:10,@danfeng_chat,0,38.190.210.250,AS133199 SonderCloud Limited,SonderCloud Limited,Hong Kong · US
 202.61.84.253,443,true,530,,IAD,Hong Kong · HK,AS133201 ABCDE GROUP,ABCDE GROUP,2026-09-16 08:26:06,@danfeng2,0,202.61.84.253,,,
 43.228.126.45,443,true,554,,CDG,欧洲 · 法国 · 巴黎,AS133322 XIMBO Internet,XIMBO Internet,2026-10-18 21:50:18,@danfeng_chat,0,43.228.126.45,AS133322 XIMBO Internet,XIMBO Internet Limited,Singapore · HK
-23.141.204.18,59611,true,216,4675,DFW,East Los Angeles · US,AS13335 Cloudflare,"Cloudflare London, LLC",2026-09-06 16:44:44,@danfeng2,0,2a09:bac1:76a0:1a98::26a:4a,,,
+23.141.204.18,59611,true,216,4675,DFW,East Los Angeles · US,AS174 Cogent Communications, LLC,Cogent Communications,2026-09-06 16:44:44,@danfeng2,0,2a09:bac1:76a0:1a98::26a:4a,,,
 144.225.67.31,443,true,232,,VIE,欧洲 · 奥地利 · 维也纳,AS13335 Cloudflare,Cloudflare,2026-10-18 21:43:30,@danfeng_chat,0,163.245.58.248,AS40994 Hohl IT e.U.,Hohl IT e.U.,Vienna · CZ
-154.12.51.253,4000,true,252,41563,DFW,Los Angeles · US,AS13335 Cloudflare,"Cloudflare London, LLC",2026-09-06 16:44:44,@danfeng2,0,2a09:bac1:76c0:3d0::48c:61,,,
-154.21.206.112,443,true,308,,EWR,Los Angeles · US,AS13335 Cloudflare,"Cloudflare London, LLC",2026-09-16 08:20:44,@danfeng2,0,2a09:bac5:636b:281e::3ff:63,,,
-189.24.108.185,20189,true,358,7448,IAD,Frankfurt am Main · DE,AS13335 Cloudflare,"Cloudflare London, LLC",2026-09-06 16:44:44,@danfeng2,0,2a09:bac1:1e60:8::47:5ac,,,
-154.21.206.111,443,true,470,,EWR,Los Angeles · US,AS13335 Cloudflare,"Cloudflare London, LLC",2026-07-24 21:48:42,@danfeng2,0,2a09:bac5:636b:281e::3ff:63,,,
+154.12.51.253,4000,true,252,41563,DFW,Los Angeles · US,AS979 NetLab Global,NetLab Global,2026-09-06 16:44:44,@danfeng2,0,2a09:bac1:76c0:3d0::48c:61,,,
+154.21.206.112,443,true,308,,EWR,Los Angeles · US,AS174 Cogent Communications, LLC,Cogent Communications,2026-09-16 08:20:44,@danfeng2,0,2a09:bac5:636b:281e::3ff:63,,,
+189.24.108.185,20189,true,358,7448,IAD,Frankfurt am Main · DE,AS979 NetLab Global,NetLab Global,2026-09-06 16:44:44,@danfeng2,0,2a09:bac1:1e60:8::47:5ac,,,
+154.21.206.111,443,true,470,,EWR,Los Angeles · US,AS174 Cogent Communications, LLC,Cogent Communications,2026-07-24 21:48:42,@danfeng2,0,2a09:bac5:636b:281e::3ff:63,,,
 103.225.11.147,443,true,510,,HKG,亚洲 · 香港,AS133380 XIMBO Internet,XIMBO Internet,2026-10-18 21:42:10,@danfeng_chat,0,103.225.11.147,AS133380 XIMBO Internet (Layerstack Limited),Layerstack Limited,Tung Chung · HK
 103.253.43.172,443,true,578,,HKG,亚洲 · 香港,AS133398 BlueVPS,BlueVPS,2026-10-18 21:42:10,@danfeng_chat,0,2a10:1fc0::3929:b41f,AS133398 BlueVPS (Tele Asia Limited),Tele Asia Limited,Hong Kong · EE
 103.253.43.144,443,true,594,,HKG,亚洲 · 香港,AS133398 BlueVPS,BlueVPS,2026-10-18 21:42:10,@danfeng_chat,0,103.253.43.144,AS133398 BlueVPS (Tele Asia Limited),Tele Asia Limited,Tung Chung · HK
@@ -22437,12 +22437,12 @@
 91.92.66.167,8443,true,384,,IAD,Sofia · BG,AS34224 Neterra Ltd. (VPS.BG),VPS.BG,2026-07-27 18:59:22,@danfeng2,0,91.92.66.167,,,
 87.120.8.155,443,true,385,,IAD,Sofia · BG,AS34224 Neterra Ltd. (VPSBG),VPSBG,2026-10-18 21:52:40,@danfeng_chat,0,2a00:1728:f:b54f::1,,,
 91.92.66.167,443,true,402,,IAD,Sofia · BG,AS34224 Neterra Ltd. (VPS.BG),VPS.BG,2026-10-18 21:53:05,@danfeng_chat,0,91.92.66.167,,,
-194.76.146.25,443,true,260,,CDG,欧洲 · 法国 · 巴黎,AS34534 Beafort,Beafort,2026-10-18 21:47:38,@danfeng_chat,0,194.76.146.25,AS34534 Beafort (FBW NETWORKS SAS),FBW NETWORKS SAS,Paris · HK
-194.59.221.122,443,true,334,,CDG,欧洲 · 法国 · 巴黎,AS34534 Beafort,Beafort,2026-10-18 21:47:37,@danfeng_chat,0,194.59.221.122,AS34534 Beafort (FBW NETWORKS SAS),FBW NETWORKS SAS,Paris · HK
-194.124.250.43,443,true,336,,CDG,Île-de-France · Paris · 法国,AS34534 Beafort,Beafort,2026-09-16 08:25:13,@danfeng2,0,194.124.250.43,AS34534 Beafort (FBW NETWORKS SAS),FBW NETWORKS SAS,Paris · HK
-194.76.147.168,443,true,341,,CDG,欧洲 · 法国 · 巴黎,AS34534 Beafort,Beafort,2026-10-18 21:47:38,@danfeng_chat,0,194.76.147.168,AS34534 Beafort (FBW NETWORKS SAS),FBW NETWORKS SAS,Paris · HK
-194.124.251.104,443,true,368,,CDG,欧洲 · 法国 · 巴黎,AS34534 Beafort,Beafort,2026-10-18 21:47:32,@danfeng_chat,0,194.124.251.104,AS34534 Beafort (FBW NETWORKS SAS),FBW NETWORKS SAS,Paris · HK
-194.59.245.218,443,true,373,,CDG,欧洲 · 法国 · 巴黎,AS34534 Beafort,Beafort,2026-10-18 21:47:37,@danfeng_chat,0,194.59.245.218,AS34534 Beafort (FBW NETWORKS SAS),FBW NETWORKS SAS,Paris · HK
+194.76.146.25,443,true,260,,CDG,欧洲 · 法国 · 巴黎,AS34534 FBW Networks,FBW Networks,2026-10-18 21:47:38,@danfeng_chat,0,194.76.146.25,AS34534 Beafort (FBW NETWORKS SAS),FBW NETWORKS SAS,Paris · HK
+194.59.221.122,443,true,334,,CDG,欧洲 · 法国 · 巴黎,AS34534 FBW Networks,FBW Networks,2026-10-18 21:47:37,@danfeng_chat,0,194.59.221.122,AS34534 Beafort (FBW NETWORKS SAS),FBW NETWORKS SAS,Paris · HK
+194.124.250.43,443,true,336,,CDG,Île-de-France · Paris · 法国,AS34534 FBW Networks,FBW Networks,2026-09-16 08:25:13,@danfeng2,0,194.124.250.43,AS34534 Beafort (FBW NETWORKS SAS),FBW NETWORKS SAS,Paris · HK
+194.76.147.168,443,true,341,,CDG,欧洲 · 法国 · 巴黎,AS34534 FBW Networks,FBW Networks,2026-10-18 21:47:38,@danfeng_chat,0,194.76.147.168,AS34534 Beafort (FBW NETWORKS SAS),FBW NETWORKS SAS,Paris · HK
+194.124.251.104,443,true,368,,CDG,欧洲 · 法国 · 巴黎,AS34534 FBW Networks,FBW Networks,2026-10-18 21:47:32,@danfeng_chat,0,194.124.251.104,AS34534 Beafort (FBW NETWORKS SAS),FBW NETWORKS SAS,Paris · HK
+194.59.245.218,443,true,373,,CDG,欧洲 · 法国 · 巴黎,AS34534 FBW Networks,FBW Networks,2026-10-18 21:47:37,@danfeng_chat,0,194.59.245.218,AS34534 Beafort (FBW NETWORKS SAS),FBW NETWORKS SAS,Paris · HK
 162.254.86.123,443,true,609,,WAW,欧洲 · 波兰 · 华沙,AS34689 Hosteroid,Hosteroid,2026-10-18 21:45:25,@danfeng_chat,0,2a13:9401:0:1::b06b:1,AS34689 Hosteroid (Castlegem SRL),Castlegem SRL,Vilnius · RO
 38.180.230.137,443,true,317,,TLL,欧洲 · 爱沙尼亚 · 塔林,AS34702 Aktsiaselts WaveCom,Aktsiaselts WaveCom,2026-10-18 21:50:09,@danfeng_chat,0,38.180.230.137,AS34702 Aktsiaselts WaveCom,Aktsiaselts WaveCom,Tallinn · GB
 38.244.155.218,443,true,320,,TLL,欧洲 · 爱沙尼亚 · 塔林,AS34702 Aktsiaselts WaveCom,Aktsiaselts WaveCom,2026-10-18 21:50:11,@danfeng_chat,0,38.244.154.141,AS34702 Aktsiaselts WaveCom,Aktsiaselts WaveCom,Tallinn · GB

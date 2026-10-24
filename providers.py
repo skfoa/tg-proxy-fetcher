@@ -177,6 +177,7 @@ KNOWN_CLOUD_PROVIDERS = {
     "globaltelehost": ("AS62563", "GlobalTeleHost Corp."),
     "hexcore": ("AS199144", "HexCore cloud s.r.o."),
     "edis": ("AS57169", "EDIS GmbH"),
+    "fbwnetworks": ("AS34534", "FBW Networks"),
 
     # 运营商骨干与出海线路
     "hinet": ("AS3462", "Chunghwa Telecom HiNet"),

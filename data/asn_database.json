@@ -2606,7 +2606,10 @@
     "Lumen": "AS10753",
     "Wateen Telecom Limited": "AS38264",
     "National Information Technology Authority Uganda": "AS327724",
-    "NITA-U": "AS327724"
+    "NITA-U": "AS327724",
+    "FBW Networks": "AS34534",
+    "FBW Networks SAS": "AS34534",
+    "Beafort Limited": "AS34534"
   },
   "asn_to_isp": {
     "AS10001": "Mics Network Corporation",
@@ -4185,7 +4188,7 @@
     "AS34267": "PJSC Rostelecom, Bryansk branch",
     "AS34343": "Eweka Internet Services B.V.",
     "AS34352": "MSN Telecom LLC",
-    "AS34534": "Beafort",
+    "AS34534": "FBW Networks",
     "AS34590": "CJSC \"ER-Telecom Holding\" Izhevsk branch",
     "AS3462": "Chunghwa Telecom HiNet",
     "AS34665": "Petersburg Internet Network ltd.",
