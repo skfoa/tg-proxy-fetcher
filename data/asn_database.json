@@ -151,7 +151,6 @@
     "Amazon": "AS8987",
     "Amazon AWS": "AS16509",
     "Amir Hosein Maaref": "AS211056",
-    "Anarchy Lab S.r.l.": "AS200566",
     "Andrew Kristuli": "AS210464",
     "Andrey Voskresenskiy": "AS214504",
     "Andris Jakovlevs": "AS218731",
@@ -271,7 +270,6 @@
     "Bismillah IT Solution": "AS137953",
     "BitCommand LLC": "AS212552",
     "BitWeb LLC": "AS57271",
-    "Bitsflowcloud Ltd": "AS203090",
     "Black Mesa Corporation": "AS46997",
     "BlazingFast": "AS47674",
     "BlueVPS": "AS133398",
@@ -644,7 +642,6 @@
     "EternityCloud": "AS216150",
     "Etheron Hosting": "AS200223",
     "Etihad Etisalat, a joint stock company": "AS35819",
-    "Eugamehost Ltd": "AS203758",
     "Euro Crypt EOOD": "AS135392",
     "EuroByte LLC": "AS210079",
     "Euronodes": "AS199053",
@@ -1011,7 +1008,6 @@
     "IVER NORGE AS": "AS57829",
     "IXROOT LTD": "AS215286",
     "Ideal Communication Network": "AS134505",
-    "Ihor Hosting Ltd": "AS207569",
     "Ikoula Net SAS": "AS21409",
     "Iksir Internet Hizmetleri A.S.": "AS206991",
     "Ildar Gilmutdinov PE": "AS208427",
@@ -1178,7 +1174,6 @@
     "Kujtesa Net - Internet Services": "AS29170",
     "Kurdistan Net Company for Computer and Internet Ltd.": "AS206206",
     "Kurun Cloud": "AS8796",
-    "Kurun Cloud Inc": "AS8796",
     "Kutumova Olena": "AS51264",
     "Kviktel LLC": "AS34959",
     "Kyonix Networks Limited": "AS210457",
@@ -1272,7 +1267,6 @@
     "Lovitel LLC": "AS41275",
     "Lowhosting services of Davide Gennari": "AS212508",
     "Lugansk Telephone Company LLC": "AS29031",
-    "Lumadock Ltd": "AS203919",
     "Lumanex Srl": "AS212271",
     "Lumina Broadband UAB": "AS215294",
     "Lunarnaut": "AS51559",
@@ -1456,7 +1450,6 @@
     "Nearoute Limited": "AS401443",
     "Nearoute Limited.": "AS147293",
     "Neburst Networks": "AS8143",
-    "Nekobyte International Limited": "AS206134",
     "NeoFiber Communications inc.": "AS202036",
     "Nerushenko Vyacheslav Nikolaevich": "AS211860",
     "Nessus GmbH": "AS47692",
@@ -1497,7 +1490,6 @@
     "NhanHoa Software company": "AS131353",
     "Nice IT Customers Network": "AS49447",
     "Nine Communications Company Limited": "AS132167",
-    "Nls Astana Llp": "AS205516",
     "Node Host Limited": "AS198550",
     "Nodisto IT, LLC": "AS394727",
     "NolimitCloud s.r.o": "AS211693",
@@ -2582,7 +2574,8 @@
     "xTom Hong Kong": "AS9312",
     "xTom Japan": "AS3258",
     "xytor": "AS219501",
-    "zouter.io": "AS205548"
+    "zouter.io": "AS205548",
+    "Dream Cloud Limited": "AS209242"
   },
   "asn_to_isp": {
     "AS10001": "Mics Network Corporation",
@@ -5050,7 +5043,8 @@
     "AS9929": "China Unicom 9929",
     "AS9930": "TT DOTCOM SDN BHD",
     "AS9931": "492 Changmai-Lumpang Road Muang changmai",
-    "AS9981": "HYUNDAI COMMUNICATIONS & NETWORK"
+    "AS9981": "HYUNDAI COMMUNICATIONS & NETWORK",
+    "AS209242": "Dream Cloud Limited"
   },
   "asn_to_net_type": {
     "AS10001": "isp",
@@ -8543,6 +8537,7 @@
     "AS9929": "isp",
     "AS9930": "isp",
     "AS9931": "datacenter",
-    "AS9981": "isp"
+    "AS9981": "isp",
+    "AS209242": "datacenter"
   }
 }
