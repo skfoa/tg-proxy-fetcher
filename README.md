@@ -225,7 +225,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
     由于 Tier 1 / Tier 2 顶级电信运营商（如 HKT, SK Broadband, Comcast, Charter 等）名下的自治系统（ASN）属于综合广播，同一个自治系统内部通常既广播给普通居民家庭宽带，也广播给本地商户静态专线，甚至包含部分自建机房。因此，**在不调用商业付费 IP 库的前提下，本机制依据的是自治系统（ASN）广播属性筛选（排除已知托管机房），无法保证属于居民家庭光纤。**
   - **风控特性参考**：
     非机房 ASN 在部分网站的 IP 风险评分中通常被定性为 ISP 或 Business，相比机房 Hosting IP 较少被直接标记为代理，但在实际使用中效果仍取决于目标站点的风控策略与节点当前状态。
-* **结构化数据**：`data/proxyip.csv` 与 `data/proxies.csv` 均包含 `net_type` 字段（取值：`datacenter`、`isp`、`business`、`education`、`government`、`banking`），保留网络属性画像，基于内置 1,800+ 条网络分类字典快速定性。
+* **结构化数据**：`data/proxyip.csv` 与 `data/proxies.csv` 均包含 `net_type` 字段（取值严格对齐 ipinfo.io 业界权威五大标准：`datacenter`、`isp`、`business`、`education`、`government`），保留网络属性画像，基于内置 1,800+ 条网络分类字典快速定性。
 
 ### 5. 数据表通用字段说明
 * 采用 `UTF-8-SIG` 编码，Windows Excel 直接双击打开不乱码。
@@ -292,13 +292,12 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `net_type` | 字符串 | **【核心属性】** 网络类型归属（详见下方 6 类取值说明） | `isp` |
 | `exit_ip` | 字符串 | **【真实出站落地】** 穿透测试测出的出站落地真实 IP（未测通或未走外部探针则为空） | `192.241.216.172` |
 
-> 📌 **`net_type` 网络分类取值与对应导出品**：
+> 📌 **`net_type` 网络分类取值与对应导出品（严格对齐 ipinfo.io 业界权威分类标准）**：
 > - `isp`：运营商原生民用宽带（ASN 粗筛候选） ➔ 对应导出 `data/proxyip/【ISP_运营商原生宽带】.txt`
-> - `business`：商业专线与企业宽带 ➔ 对应导出 `data/proxyip/【BIZ_商业企业专线】.txt`
+> - `business`：商业专线、企业宽带与银行金融机构 ➔ 对应导出 `data/proxyip/【BIZ_商业企业专线】.txt`
 > - `education`：高校教育科研网 ➔ 对应导出 `data/proxyip/【EDU_高校教育科研】.txt`
-> - `government`：政务公用网与国家骨干 ➔ 对应导出 `data/proxyip/【GOV_政务公共网络】.txt`
-> - `banking`：银行金融与中央银行专网 ➔ 对应导出 `data/proxyip/【BANK_银行金融专网】.txt`
-> - `datacenter`：常规数据中心/托管机房 ➔ 归入各国家/地区常规列表
+> - `government`：政务公用网与国家机构 ➔ 对应导出 `data/proxyip/【GOV_政务公共网络】.txt`
+> - `datacenter`：常规数据中心/托管机房（hosting） ➔ 归入各国家/地区常规列表
 
 #### ③ 通用代理质检数据表（`data/proxies.csv`）
 *共 15 个字段，记录 SOCKS5/HTTP/HTTPS/TURN/SSTP 等通用代理应用层穿透结果、出口机房国家、出口真实 IP、自治系统 ASN、运营商 ISP 组织、原生家宽/数据中心属性、质检状态、首次收录生命周期与代理来源渠道：*

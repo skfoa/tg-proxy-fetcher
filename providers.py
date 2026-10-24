@@ -381,7 +381,7 @@ ASN_DATABASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "da
 ASN_DATABASE_REL_PATH = os.path.join("data", "asn_database.json")
 
 
-# L0: 人工确证网络类型裁决表 (Manual SSOT Overrides: 核心公有云/数据中心机房/知名宽带ISP/银行金融专网)
+# L0: 人工确证网络类型裁决表 (Manual SSOT Overrides: 核心公有云/数据中心机房/知名宽带ISP/商业专线与金融专网)
 MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     # --- [L0 裁决 A: 头部公有云、IDC 与 VPS 主机商，严格锁定为 datacenter] ---
     "AS16509": "datacenter",  # Amazon AWS / Amazon.com, Inc. (amazon.com)
@@ -525,13 +525,13 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS10753": "isp",          # Level 3 Parent, LLC / Lumen (lumen.com, Tier 1 国际电信与互联网服务商)
     "AS38264": "isp",          # Wateen Telecom Limited (wateen.com, 巴基斯坦全国光纤与民用宽带 ISP)
 
-    # --- [L0 裁决 C: 核心国际银行金融专网 (人工 SSOT 保护)] ---
-    "AS1311": "banking", "AS2600": "banking", "AS3187": "banking", "AS5091": "banking",
-    "AS5458": "banking", "AS6674": "banking", "AS6773": "banking", "AS7609": "banking",
-    "AS7630": "banking", "AS7820": "banking", "AS8373": "banking", "AS8435": "banking",
-    "AS9016": "banking", "AS9099": "banking", "AS9118": "banking", "AS9128": "banking",
-    "AS9221": "banking", "AS9487": "banking", "AS9522": "banking", "AS9630": "banking",
-    "AS9772": "banking", "AS9863": "banking", "AS25883": "banking", "AS207986": "banking",
+    # --- [L0 裁决 C: 核心国际银行金融专网 (对齐 ipinfo.io 业界权威标准，统一归入 business 商业专线)] ---
+    "AS1311": "business", "AS2600": "business", "AS3187": "business", "AS5091": "business",
+    "AS5458": "business", "AS6674": "business", "AS6773": "business", "AS7609": "business",
+    "AS7630": "business", "AS7820": "business", "AS8373": "business", "AS8435": "business",
+    "AS9016": "business", "AS9099": "business", "AS9118": "business", "AS9128": "business",
+    "AS9221": "business", "AS9487": "business", "AS9522": "business", "AS9630": "business",
+    "AS9772": "business", "AS9863": "business", "AS25883": "business", "AS207986": "business",
 
     # --- [L0 裁决 D: 核心学术科研教育网 (权威核准为 education)] ---
     "AS9488": "education",    # Seoul National University / SNU (首尔大学)
@@ -546,9 +546,9 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
 }
 
 
-VALID_NET_TYPES: frozenset[str] = frozenset({"isp", "datacenter", "business", "education", "government", "banking"})
+VALID_NET_TYPES: frozenset[str] = frozenset({"isp", "datacenter", "business", "education", "government"})
 
-# 外部查询接口网络类型枚举映射表 (对齐至内部受控六大标准网络类型)
+# 外部查询接口网络类型枚举映射表 (对齐至 ipinfo.io 业界权威五大标准网络类型)
 EXTERNAL_NET_TYPE_MAP: dict[str, str] = {
     # 住宅/民用宽带 (isp)
     "isp": "isp",
@@ -564,10 +564,12 @@ EXTERNAL_NET_TYPE_MAP: dict[str, str] = {
     "server": "datacenter",
     "cloud": "datacenter",
     "cdn": "datacenter",
-    # 商业专线 (business)
+    # 商业专线与金融机构 (business，对齐 ipinfo.io 标准：商业企业、银行金融均归入 business)
     "business": "business",
     "corporate": "business",
     "commercial": "business",
+    "banking": "business",
+    "finance": "business",
     # 教育学术 (education)
     "education": "education",
     "edu": "education",
@@ -575,9 +577,6 @@ EXTERNAL_NET_TYPE_MAP: dict[str, str] = {
     # 政府政务 (government)
     "government": "government",
     "gov": "government",
-    # 银行金融 (banking)
-    "banking": "banking",
-    "finance": "banking",
 }
 
 
@@ -2608,7 +2607,6 @@ SPECIAL_NET_TYPE_FILES = {
     "business": "【BIZ_商业企业专线】.txt",
     "education": "【EDU_高校教育科研】.txt",
     "government": "【GOV_政务公共网络】.txt",
-    "banking": "【BANK_银行金融专网】.txt",
 }
 
 # ----------------------------------------------------
@@ -2681,18 +2679,16 @@ def classify_asn(asn_str: str | None, isp_str: str | None = "") -> str:
       [Tier 3] 高置信度模式匹配 (Strict Pattern Fallback)：
                - 1. 学术科研网 (education)
                - 2. 政府政务网 (government)
-               - 3. 银行金融专网 (banking)
-               - 4. 机房/云厂商排除 (HOSTING_EXCLUSIONS -> datacenter)
-               - 5. 商业固定专线 (business)
-               - 6. 电信民用原生宽带 (isp)
+               - 3. 机房/云厂商排除 (HOSTING_EXCLUSIONS -> datacenter)
+               - 4. 商业企业专线与金融专网 (BANKING_PATTERNS / BIZ_PATTERNS -> business)
+               - 5. 电信民用原生宽带 (isp)
       [Tier 4] 安全降级兜底 (Default Fallback)：其余一律安全降级为 datacenter 机房
-    返回类型：
+    返回类型（严格对齐 ipinfo.io 业界权威五大标准网络类型）：
       - education: 高校与学术科研网
       - government: 政府政务与国家公共网
-      - banking: 银行金融与央行专网
       - isp: 电信民用原生宽带（非机房资产，信誉拟真度高）
-      - business: 商业固定专线与商务光纤
-      - datacenter: 常规云主机与数据中心机房（默认）
+      - business: 商业固定专线、企业专网与银行金融机构
+      - datacenter: 常规云主机与数据中心机房（hosting，默认）
     """
     asn_code = _extract_asn_code(asn_str, isp_str)
 
@@ -2731,12 +2727,8 @@ def classify_asn(asn_str: str | None, isp_str: str | None = "") -> str:
     if is_hosting:
         return "datacenter"
 
-    # 4. 识别银行与金融专网 (对中央银行、信用社与知名金融机构)
-    if any(p in text for p in BANKING_PATTERNS):
-        return "banking"
-
-    # 5. 识别商业专线
-    if any(p in text for p in BIZ_PATTERNS):
+    # 4. 识别商业专线与金融机构 (对齐 ipinfo.io 业界权威标准，商业企业与银行金融统一归入 business)
+    if any(p in text for p in BANKING_PATTERNS) or any(p in text for p in BIZ_PATTERNS):
         return "business"
 
     # 6. 识别电信运营商原生宽带 (仅高置信度强词根)
@@ -2793,7 +2785,7 @@ def save_proxyip_by_country(rows: list, output_dir: str) -> int:
         atomic_write_text(filepath, "".join(lines))
         active_files.add(fname)
 
-    # 2. 导出高价值特殊网络属性清单（运营商宽带、企业专线、高校教育、政务公用、银行金融）
+    # 2. 导出高价值特殊网络属性清单（运营商宽带、企业专线/金融、高校教育、政务公用）
     for nt, fname in SPECIAL_NET_TYPE_FILES.items():
         members = type_groups.get(nt, [])
         lines = [

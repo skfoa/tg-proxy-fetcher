@@ -1013,13 +1013,13 @@ async def probe_single(
         )
     elif proto == "https":
         # 核心分流准入控制：
-        # 1. 凡是已有老节点且已确认具备非机房属性 (isp, business, education, government, banking)，走本地轻量高并发 probe_https 极速探针，0 消耗 CF Worker 额度
+        # 1. 凡是已有老节点且已确认具备非机房属性 (isp, business, education, government)，走本地轻量高并发 probe_https 极速探针，0 消耗 CF Worker 额度
         # 2. 凡是新拉取 (source 为 proxifly 等)、未定性或未知属性的 HTTPS 节点，走 CF_CHECK_ENDPOINT 外部端点进行严格住宅/原生宽带准入质检
         # 3. 坚决剔除机房 (datacenter/hosting)，只要原生住宅与家宽 ISP (以及高校教育网/商业专线)
         is_known_non_dc = (
             row.get("source") != "proxifly"
             and bool(row.get("asn"))
-            and (row.get("net_type") or "").strip().lower() in ("isp", "business", "education", "government", "banking")
+            and (row.get("net_type") or "").strip().lower() in ("isp", "business", "education", "government")
         )
 
         if is_known_non_dc or not cf_check_endpoint:
@@ -1082,8 +1082,10 @@ async def probe_single(
                     egress_ip = exit_ip
 
                     asn_type = str(asn_obj.get("type") or "").strip().lower()
-                    if asn_type in ("isp", "business", "education", "government", "banking"):
+                    if asn_type in ("isp", "business", "education", "government"):
                         n_type = asn_type
+                    elif asn_type in ("banking", "finance"):
+                        n_type = "business"
                     else:
                         n_type = classify_asn(clean_asn, clean_isp)
                         if n_type in ("datacenter", "hosting"):
@@ -1591,7 +1593,6 @@ def send_proxies_notification(
             "business": "💼 商业专线",
             "education": "🎓 教育网",
             "government": "🏛️ 政府机构",
-            "banking": "🏦 金融网络",
         }
         for k, count in sorted(net_stats.items(), key=lambda x: -x[1]):
             lbl = type_labels.get(k, k.upper())
