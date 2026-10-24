@@ -176,7 +176,7 @@ socks5://user1:pass1@154.17.15.8:1080,socks5,154.17.15.8,1080,213,1,http_fail,LA
 socks5://212.103.116.73:1080,socks5,212.103.116.73,1080,673,1,timeout,DME,RU,212.103.116.73,AS57044 JSC ER-Telecom Holding Bryansk branch,JSC ER-Telecom Holding,isp,2026-10-20 12:55:22,EDT-Pages
 socks5://78.110.155.229:1080,socks5,78.110.155.229,1080,886,1,timeout,HEL,RU,78.110.155.229,AS43530 Limited Liability Company Irtelcom (ISP Irtelcom Ltd.),ISP Irtelcom Ltd.,isp,2026-10-20 12:55:22,EDT-Pages
 socks5://103.76.149.140:1080,socks5,103.76.149.140,1080,902,1,timeout,CGK,ID,103.76.149.140,AS135477 PT. Java Digital Nusantara,PT. Java Digital Nusantara,isp,2026-10-20 12:55:22,EDT-Pages
-socks5://45.74.31.47:13403,socks5,45.74.31.47,13403,903,1,timeout,CGK,ID,112.78.134.58,AS38060 Biznet Postpaid,Biznet Postpaid,isp,2026-10-21 15:52:42,EDT-Pages
+socks5://45.74.31.47:13403,socks5,45.74.31.47,13403,903,1,timeout,CGK,ID,112.78.134.58,AS38060 BIZNET,Biznet Postpaid,isp,2026-10-21 15:52:42,EDT-Pages
 socks5://182.184.30.96:1080,socks5,182.184.30.96,1080,962,1,timeout,KHI,PK,182.184.30.96,AS17557 USF DSLAM North,USF DSLAM North,isp,2026-10-20 12:55:22,EDT-Pages
 socks5://103.141.174.38:1080,socks5,103.141.174.38,1080,1051,1,timeout,DAC,BD,103.141.174.38,AS58689 Seabird Computer,Seabird Computer,isp,2026-10-20 12:55:22,EDT-Pages
 socks5://202.4.115.232:9090,socks5,202.4.115.232,9090,1101,1,timeout,DAC,BD,202.4.115.232,AS23956 Amber IT Limited,Amber IT Limited,isp,2026-10-20 12:55:22,EDT-Pages
@@ -188,7 +188,7 @@ socks5://203.189.135.140:1080,socks5,203.189.135.140,1080,1977,1,timeout,SIN,KH,
 socks5://118.70.151.55:1080,socks5,118.70.151.55,1080,2085,1,timeout,HKG,VN,118.70.151.55,AS18403 FPT Telecom Company (Dai IP dong ket noi xDSL),Dai IP dong ket noi xDSL,isp,2026-10-20 12:55:22,EDT-Pages
 socks5://182.163.96.66:1080,socks5,182.163.96.66,1080,2112,1,timeout,DAC,BD,182.163.96.66,AS9230 BOL - Gulshan HO Customer Block-19,BOL - Gulshan HO Customer Block-19,isp,2026-10-20 12:55:22,EDT-Pages
 socks5://80.72.180.122:1080,socks5,80.72.180.122,1080,2911,1,timeout,FRU,KG,80.72.180.122,AS12997 OJSC Kyrgyztelecom,OJSC Kyrgyztelecom,isp,2026-10-20 12:55:22,EDT-Pages
-socks5://45.74.31.47:13801,socks5,45.74.31.47,13801,2914,1,timeout,CGK,ID,112.78.134.58,AS38060 Biznet Postpaid,Biznet Postpaid,isp,2026-10-21 15:52:42,EDT-Pages
+socks5://45.74.31.47:13801,socks5,45.74.31.47,13801,2914,1,timeout,CGK,ID,112.78.134.58,AS38060 BIZNET,Biznet Postpaid,isp,2026-10-21 15:52:42,EDT-Pages
 socks5://58.144.196.192:39105,socks5,58.144.196.192,39105,0,1,timeout,,CN,211.158.45.237,"AS4837 China Unicom (CHONGQING CNC BROADBAND NETWORKS CO.,LTD)","CHONGQING CNC BROADBAND NETWORKS CO.,LTD",isp,2026-10-23 12:55:36,EDT-Pages
 socks5://112.5.33.179:999,socks5,112.5.33.179,999,0,1,timeout,,CN,112.5.33.179,AS9808 China Mobile,China Mobile Communications Corporation,isp,2026-10-23 12:55:36,EDT-Pages
 socks5://82.142.130.102:1080,socks5,82.142.130.102,1080,598,2,timeout,DME,RU,82.142.130.102,AS3216 PJSC Vimpelcom,PJSC Vimpelcom,isp,2026-10-21 15:52:42,EDT-Pages

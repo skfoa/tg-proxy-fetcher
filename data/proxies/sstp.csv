@@ -1,9 +1,9 @@
 ﻿url,proto,host,port,delay_ms,fail_count,status,colo,country,egress_ip,asn,isp,net_type,first_seen,source
-sstp://vpn:vpn@vpn164693092.opengw.net:1363,sstp,vpn164693092.opengw.net,1363,1246,0,alive,-,US,38.71.123.196,AS62560 Hosted America,Hosted America,datacenter,2026-10-16 12:36:06,vpngate
+sstp://vpn:vpn@vpn164693092.opengw.net:1363,sstp,vpn164693092.opengw.net,1363,1246,0,alive,-,US,38.71.123.196,AS62560 Hosted America,Hosted America,isp,2026-10-16 12:36:06,vpngate
 sstp://vpn:vpn@vpn907569351.opengw.net:1881,sstp,vpn907569351.opengw.net,1881,1555,0,alive,-,US,65.30.158.91,AS10796 Charter Communications Inc,Charter Communications Inc,isp,2026-10-01 00:00:00,vpngate
 sstp://vpn:vpn@vpn872609460.opengw.net:1502,sstp,vpn872609460.opengw.net,1502,1744,0,alive,-,US,64.233.229.158,AS12083 WideOpenWest Finance LLC,WideOpenWest Finance LLC,isp,2026-10-15 12:44:41,vpngate
-sstp://vpn:vpn@vpn988046136.opengw.net:1575,sstp,vpn988046136.opengw.net,1575,2118,0,alive,-,US,156.47.87.249,"AS14051 Consolidated Communications, Inc. (Fidium)",Fidium,datacenter,2026-10-20 12:55:22,vpngate
-sstp://vpn:vpn@vpn398736484.opengw.net:1723,sstp,vpn398736484.opengw.net,1723,2218,0,alive,-,IT,45.89.183.66,AS28716 Retelit Digital Services S.p.A.,Retelit Digital Services S.p.A.,datacenter,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn988046136.opengw.net:1575,sstp,vpn988046136.opengw.net,1575,2118,0,alive,-,US,156.47.87.249,AS14051 Fidium,Fidium,isp,2026-10-20 12:55:22,vpngate
+sstp://vpn:vpn@vpn398736484.opengw.net:1723,sstp,vpn398736484.opengw.net,1723,2218,0,alive,-,IT,45.89.183.66,AS28716 Retelit Digital Services S.p.A.,Retelit Digital Services S.p.A.,isp,2026-10-01 00:00:00,vpngate
 sstp://vpn:vpn@vpn313985146.opengw.net:5555,sstp,vpn313985146.opengw.net,5555,2324,0,alive,-,UA,31.43.129.131,AS48438 Corbina Telecom Llc.,Corbina Telecom Llc.,isp,2026-10-03 22:57:17,vpngate
 sstp://vpn:vpn@snmarron.opengw.net:992,sstp,snmarron.opengw.net,992,2504,0,alive,-,FR,45.152.19.83,AS16347 ADISTA SAS,ADISTA SAS,isp,2026-10-13 14:49:54,vpngate
 sstp://vpn:vpn@vpn168987812.opengw.net:1640,sstp,vpn168987812.opengw.net,1640,2696,0,alive,-,HU,145.236.49.90,AS5483 Magyar Telekom Plc.,Magyar Telekom Plc.,isp,2026-10-20 12:55:22,vpngate
@@ -105,7 +105,7 @@ sstp://vpn:vpn@vpn989314839.opengw.net:1729,sstp,vpn989314839.opengw.net,1729,37
 sstp://vpn:vpn@vpn271901051.opengw.net:995,sstp,vpn271901051.opengw.net,995,3737,0,alive,-,KR,112.172.66.114,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-01 00:00:00,vpngate
 sstp://vpn:vpn@vpn121310799.opengw.net:1519,sstp,vpn121310799.opengw.net,1519,3737,0,alive,-,JP,133.114.223.195,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-10-07 14:04:24,vpngate
 sstp://vpn:vpn@vpn244638209.opengw.net:1942,sstp,vpn244638209.opengw.net,1942,3740,0,alive,-,JP,180.147.49.54,AS17511 OPTAGE Inc.,OPTAGE Inc.,isp,2026-10-08 14:09:40,vpngate
-sstp://vpn:vpn@vpn836042621.opengw.net:1294,sstp,vpn836042621.opengw.net,1294,3741,0,alive,-,JP,211.128.17.88,"AS17529 STARCAT Co ., LTD. (STARCAT Co .,LTD.)","STARCAT Co .,LTD.",datacenter,2026-10-13 14:49:54,vpngate
+sstp://vpn:vpn@vpn836042621.opengw.net:1294,sstp,vpn836042621.opengw.net,1294,3741,0,alive,-,JP,211.128.17.88,"AS17529 STARCAT Co., LTD.","STARCAT Co., LTD.",isp,2026-10-13 14:49:54,vpngate
 sstp://vpn:vpn@vpn831566069.opengw.net:1588,sstp,vpn831566069.opengw.net,1588,3750,0,alive,-,KR,59.20.50.64,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-12 15:18:13,vpngate
 sstp://vpn:vpn@vpn788502559.opengw.net:1908,sstp,vpn788502559.opengw.net,1908,3755,0,alive,-,JP,220.254.220.117,AS18268 Naganoken Kyodou Densan Co.Ltd.,Naganoken Kyodou Densan Co.Ltd.,isp,2026-10-07 14:04:24,vpngate
 sstp://vpn:vpn@vpn353146232.opengw.net:1995,sstp,vpn353146232.opengw.net,1995,3757,0,alive,-,RU,212.164.214.213,AS12389 Primorye NET (PJSC Rostelecom),PJSC Rostelecom,isp,2026-10-01 00:00:00,vpngate
@@ -279,7 +279,7 @@ sstp://vpn:vpn@vpn999209650.opengw.net:1930,sstp,vpn999209650.opengw.net,1930,44
 sstp://vpn:vpn@vpn749475851.opengw.net:1921,sstp,vpn749475851.opengw.net,1921,4475,0,alive,-,KR,125.134.202.104,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-14 12:57:52,vpngate
 sstp://vpn:vpn@vpn970023981.opengw.net:1346,sstp,vpn970023981.opengw.net,1346,4478,0,alive,-,AU,61.69.7.98,AS2764 AAPT Limited,AAPT Limited,isp,2026-10-18 12:38:28,vpngate
 sstp://vpn:vpn@vpn918083457.opengw.net:1826,sstp,vpn918083457.opengw.net,1826,4481,0,alive,-,RU,2.63.23.253,AS12389 Primorye NET (PJSC Rostelecom),PJSC Rostelecom,isp,2026-10-03 22:57:17,vpngate
-sstp://vpn:vpn@vpn550981730.opengw.net:1674,sstp,vpn550981730.opengw.net,1674,4496,0,alive,-,JP,124.146.89.60,"AS7511 SYNAPSE Co.,Ltd.","SYNAPSE Co.,Ltd.",datacenter,2026-10-18 12:38:28,vpngate
+sstp://vpn:vpn@vpn550981730.opengw.net:1674,sstp,vpn550981730.opengw.net,1674,4496,0,alive,-,JP,124.146.89.60,"AS7511 SYNAPSE Co.,Ltd.","SYNAPSE Co.,Ltd.",isp,2026-10-18 12:38:28,vpngate
 sstp://vpn:vpn@vpn684766837.opengw.net:1857,sstp,vpn684766837.opengw.net,1857,4500,0,alive,-,RU,46.183.128.211,"AS8749 JSC Redcom-Internet (JSC ""Redcom-lnternet"")","JSC ""Redcom-lnternet""",isp,2026-10-04 17:03:41,vpngate
 sstp://vpn:vpn@vpn756959520.opengw.net:1883,sstp,vpn756959520.opengw.net,1883,4524,0,alive,-,KR,175.198.160.146,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-05 13:45:47,vpngate
 sstp://vpn:vpn@vpn774482453.opengw.net:995,sstp,vpn774482453.opengw.net,995,4540,0,alive,-,KR,183.99.25.80,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-03 16:48:27,vpngate

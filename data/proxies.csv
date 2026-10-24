@@ -176,7 +176,7 @@ socks5://user1:pass1@154.17.15.8:1080,socks5,154.17.15.8,1080,213,1,http_fail,LA
 socks5://212.103.116.73:1080,socks5,212.103.116.73,1080,673,1,timeout,DME,RU,212.103.116.73,AS57044 JSC ER-Telecom Holding Bryansk branch,JSC ER-Telecom Holding,isp,2026-10-20 12:55:22,EDT-Pages
 socks5://78.110.155.229:1080,socks5,78.110.155.229,1080,886,1,timeout,HEL,RU,78.110.155.229,AS43530 Limited Liability Company Irtelcom (ISP Irtelcom Ltd.),ISP Irtelcom Ltd.,isp,2026-10-20 12:55:22,EDT-Pages
 socks5://103.76.149.140:1080,socks5,103.76.149.140,1080,902,1,timeout,CGK,ID,103.76.149.140,AS135477 PT. Java Digital Nusantara,PT. Java Digital Nusantara,isp,2026-10-20 12:55:22,EDT-Pages
-socks5://45.74.31.47:13403,socks5,45.74.31.47,13403,903,1,timeout,CGK,ID,112.78.134.58,AS38060 Biznet Postpaid,Biznet Postpaid,isp,2026-10-21 15:52:42,EDT-Pages
+socks5://45.74.31.47:13403,socks5,45.74.31.47,13403,903,1,timeout,CGK,ID,112.78.134.58,AS38060 BIZNET,Biznet Postpaid,isp,2026-10-21 15:52:42,EDT-Pages
 socks5://182.184.30.96:1080,socks5,182.184.30.96,1080,962,1,timeout,KHI,PK,182.184.30.96,AS17557 USF DSLAM North,USF DSLAM North,isp,2026-10-20 12:55:22,EDT-Pages
 socks5://103.141.174.38:1080,socks5,103.141.174.38,1080,1051,1,timeout,DAC,BD,103.141.174.38,AS58689 Seabird Computer,Seabird Computer,isp,2026-10-20 12:55:22,EDT-Pages
 socks5://202.4.115.232:9090,socks5,202.4.115.232,9090,1101,1,timeout,DAC,BD,202.4.115.232,AS23956 Amber IT Limited,Amber IT Limited,isp,2026-10-20 12:55:22,EDT-Pages
@@ -188,7 +188,7 @@ socks5://203.189.135.140:1080,socks5,203.189.135.140,1080,1977,1,timeout,SIN,KH,
 socks5://118.70.151.55:1080,socks5,118.70.151.55,1080,2085,1,timeout,HKG,VN,118.70.151.55,AS18403 FPT Telecom Company (Dai IP dong ket noi xDSL),Dai IP dong ket noi xDSL,isp,2026-10-20 12:55:22,EDT-Pages
 socks5://182.163.96.66:1080,socks5,182.163.96.66,1080,2112,1,timeout,DAC,BD,182.163.96.66,AS9230 BOL - Gulshan HO Customer Block-19,BOL - Gulshan HO Customer Block-19,isp,2026-10-20 12:55:22,EDT-Pages
 socks5://80.72.180.122:1080,socks5,80.72.180.122,1080,2911,1,timeout,FRU,KG,80.72.180.122,AS12997 OJSC Kyrgyztelecom,OJSC Kyrgyztelecom,isp,2026-10-20 12:55:22,EDT-Pages
-socks5://45.74.31.47:13801,socks5,45.74.31.47,13801,2914,1,timeout,CGK,ID,112.78.134.58,AS38060 Biznet Postpaid,Biznet Postpaid,isp,2026-10-21 15:52:42,EDT-Pages
+socks5://45.74.31.47:13801,socks5,45.74.31.47,13801,2914,1,timeout,CGK,ID,112.78.134.58,AS38060 BIZNET,Biznet Postpaid,isp,2026-10-21 15:52:42,EDT-Pages
 socks5://58.144.196.192:39105,socks5,58.144.196.192,39105,0,1,timeout,,CN,211.158.45.237,"AS4837 China Unicom (CHONGQING CNC BROADBAND NETWORKS CO.,LTD)","CHONGQING CNC BROADBAND NETWORKS CO.,LTD",isp,2026-10-23 12:55:36,EDT-Pages
 socks5://112.5.33.179:999,socks5,112.5.33.179,999,0,1,timeout,,CN,112.5.33.179,AS9808 China Mobile,China Mobile Communications Corporation,isp,2026-10-23 12:55:36,EDT-Pages
 socks5://82.142.130.102:1080,socks5,82.142.130.102,1080,598,2,timeout,DME,RU,82.142.130.102,AS3216 PJSC Vimpelcom,PJSC Vimpelcom,isp,2026-10-21 15:52:42,EDT-Pages
@@ -464,7 +464,7 @@ https://182.156.203.41:443,https,182.156.203.41,443,2127,0,alive,MAA,IN,115.99.5
 https://141.105.83.68:443,https,141.105.83.68,443,2225,0,alive,BEY,LB,141.105.83.68,AS24634 CYBERIA-3G,CYBERIA-3G,isp,2026-10-15 10:08:09,EDT-Pages
 https://66.153.187.90:8090,https,66.153.187.90,8090,2278,0,alive,ATL,US,66.153.187.90,AS21565 Nations Title Agency Carolina s,Nations Title Agency Carolina s,isp,2026-10-09 00:00:00,EDT-Pages
 https://14.139.92.183:443,https,14.139.92.183,443,2905,0,alive,IAD,IN,14.139.92.182,AS55824 National Knowledge Network,National Knowledge Network,education,2026-10-22 12:56:40,proxifly
-https://154.72.198.149:443,https,154.72.198.149,443,3111,0,alive,MBA,UG,154.72.197.186,AS327724 NITA-U,NITA-U,government,2026-10-09 00:00:00,EDT-Pages
+https://154.72.198.149:443,https,154.72.198.149,443,3111,0,alive,MBA,UG,154.72.197.186,AS327724 National Information Technology Authority Uganda (NITA-U),NITA-U,government,2026-10-09 00:00:00,EDT-Pages
 https://134.59.1.187:443,https,134.59.1.187,443,3650,0,alive,CDG,FR,134.59.1.71,AS2200 Universite Cote d Azur,Universite Cote d Azur,education,2026-10-19 12:45:55,EDT-Pages
 https://113.23.216.128:9088,https,113.23.216.128,9088,4364,0,alive,HKG,MY,113.23.216.128,AS38182 Webserver Dedicated Hosting,Webserver Dedicated Hosting,isp,2026-10-12 15:18:13,EDT-Pages
 https://79.188.239.44:8443,https,79.188.239.44,8443,4424,0,alive,WAW,PL,79.188.239.41,AS5617 static IP,static IP,isp,2026-10-19 12:45:55,EDT-Pages
@@ -1112,7 +1112,7 @@ turn://34.143.164.85:3478,turn,34.143.164.85,3478,1401,0,alive,SEA,SG,34.143.164
 turn://13.251.156.219:3478,turn,13.251.156.219,3478,1414,0,alive,SEA,SG,13.251.156.219,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",datacenter,2026-10-23 17:28:05,@user
 turn://137.184.249.176:3478,turn,137.184.249.176,3478,1415,0,alive,SEA,SG,137.184.249.176,AS14061 DigitalOcean,"DigitalOcean, LLC",datacenter,2026-10-23 17:28:05,@user
 turn://47.237.172.9:3478,turn,47.237.172.9,3478,1430,0,alive,SEA,SG,47.237.172.9,AS45102 Alibaba Cloud (US),"Alibaba (US) Technology Co., Ltd.",datacenter,2026-10-23 17:28:05,@user
-turn://103.167.151.70:3478,turn,103.167.151.70,3478,1431,0,alive,SEA,SG,103.167.151.70,AS135598 SIBERFY (PRIVATE) LIMITED,SIBERFY (PRIVATE) LIMITED,datacenter,2026-10-23 17:28:05,@user
+turn://103.167.151.70:3478,turn,103.167.151.70,3478,1431,0,alive,SEA,SG,103.167.151.70,AS135598 SIBERFY LIMITED,SIBERFY (PRIVATE) LIMITED,datacenter,2026-10-23 17:28:05,@user
 turn://217.216.38.70:3478,turn,217.216.38.70,3478,1432,0,alive,SEA,SG,217.216.38.70,AS141995 Contabo,Contabo Asia Private Limited,datacenter,2026-10-23 17:28:05,@user
 turn://54.169.67.101:3478,turn,54.169.67.101,3478,1440,0,alive,SEA,SG,54.169.67.101,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",datacenter,2026-10-23 17:28:05,@user
 turn://124.156.195.244:3478,turn,124.156.195.244,3478,1459,0,alive,SEA,SG,124.156.195.244,AS132203 Tencent Cloud (Shenzhen Tencent Computer Systems Company Limited),Shenzhen Tencent Computer Systems Company Limited,datacenter,2026-10-23 17:28:05,@user
@@ -1148,11 +1148,11 @@ turn://157.90.155.9:3478,turn,157.90.155.9,3478,186,2,timeout,-,DE,157.90.155.9,
 turn://52.76.5.46:3478,turn,52.76.5.46,3478,442,2,timeout,-,SG,52.76.5.46,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://157.90.247.53:3478,turn,157.90.247.53,3478,564,2,timeout,-,DE,157.90.247.53,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://210.189.253.230:3478,turn,210.189.253.230,3478,627,2,timeout,-,JP,210.189.253.230,AS4694 IDC Frontier Inc.,IDC Frontier Inc.,datacenter,2026-10-01 00:00:00,@danfeng_chat
-sstp://vpn:vpn@vpn164693092.opengw.net:1363,sstp,vpn164693092.opengw.net,1363,1246,0,alive,-,US,38.71.123.196,AS62560 Hosted America,Hosted America,datacenter,2026-10-16 12:36:06,vpngate
+sstp://vpn:vpn@vpn164693092.opengw.net:1363,sstp,vpn164693092.opengw.net,1363,1246,0,alive,-,US,38.71.123.196,AS62560 Hosted America,Hosted America,isp,2026-10-16 12:36:06,vpngate
 sstp://vpn:vpn@vpn907569351.opengw.net:1881,sstp,vpn907569351.opengw.net,1881,1555,0,alive,-,US,65.30.158.91,AS10796 Charter Communications Inc,Charter Communications Inc,isp,2026-10-01 00:00:00,vpngate
 sstp://vpn:vpn@vpn872609460.opengw.net:1502,sstp,vpn872609460.opengw.net,1502,1744,0,alive,-,US,64.233.229.158,AS12083 WideOpenWest Finance LLC,WideOpenWest Finance LLC,isp,2026-10-15 12:44:41,vpngate
-sstp://vpn:vpn@vpn988046136.opengw.net:1575,sstp,vpn988046136.opengw.net,1575,2118,0,alive,-,US,156.47.87.249,"AS14051 Consolidated Communications, Inc. (Fidium)",Fidium,datacenter,2026-10-20 12:55:22,vpngate
-sstp://vpn:vpn@vpn398736484.opengw.net:1723,sstp,vpn398736484.opengw.net,1723,2218,0,alive,-,IT,45.89.183.66,AS28716 Retelit Digital Services S.p.A.,Retelit Digital Services S.p.A.,datacenter,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn988046136.opengw.net:1575,sstp,vpn988046136.opengw.net,1575,2118,0,alive,-,US,156.47.87.249,AS14051 Fidium,Fidium,isp,2026-10-20 12:55:22,vpngate
+sstp://vpn:vpn@vpn398736484.opengw.net:1723,sstp,vpn398736484.opengw.net,1723,2218,0,alive,-,IT,45.89.183.66,AS28716 Retelit Digital Services S.p.A.,Retelit Digital Services S.p.A.,isp,2026-10-01 00:00:00,vpngate
 sstp://vpn:vpn@vpn313985146.opengw.net:5555,sstp,vpn313985146.opengw.net,5555,2324,0,alive,-,UA,31.43.129.131,AS48438 Corbina Telecom Llc.,Corbina Telecom Llc.,isp,2026-10-03 22:57:17,vpngate
 sstp://vpn:vpn@snmarron.opengw.net:992,sstp,snmarron.opengw.net,992,2504,0,alive,-,FR,45.152.19.83,AS16347 ADISTA SAS,ADISTA SAS,isp,2026-10-13 14:49:54,vpngate
 sstp://vpn:vpn@vpn168987812.opengw.net:1640,sstp,vpn168987812.opengw.net,1640,2696,0,alive,-,HU,145.236.49.90,AS5483 Magyar Telekom Plc.,Magyar Telekom Plc.,isp,2026-10-20 12:55:22,vpngate
@@ -1254,7 +1254,7 @@ sstp://vpn:vpn@vpn989314839.opengw.net:1729,sstp,vpn989314839.opengw.net,1729,37
 sstp://vpn:vpn@vpn271901051.opengw.net:995,sstp,vpn271901051.opengw.net,995,3737,0,alive,-,KR,112.172.66.114,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-01 00:00:00,vpngate
 sstp://vpn:vpn@vpn121310799.opengw.net:1519,sstp,vpn121310799.opengw.net,1519,3737,0,alive,-,JP,133.114.223.195,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-10-07 14:04:24,vpngate
 sstp://vpn:vpn@vpn244638209.opengw.net:1942,sstp,vpn244638209.opengw.net,1942,3740,0,alive,-,JP,180.147.49.54,AS17511 OPTAGE Inc.,OPTAGE Inc.,isp,2026-10-08 14:09:40,vpngate
-sstp://vpn:vpn@vpn836042621.opengw.net:1294,sstp,vpn836042621.opengw.net,1294,3741,0,alive,-,JP,211.128.17.88,"AS17529 STARCAT Co ., LTD. (STARCAT Co .,LTD.)","STARCAT Co .,LTD.",datacenter,2026-10-13 14:49:54,vpngate
+sstp://vpn:vpn@vpn836042621.opengw.net:1294,sstp,vpn836042621.opengw.net,1294,3741,0,alive,-,JP,211.128.17.88,"AS17529 STARCAT Co., LTD.","STARCAT Co., LTD.",isp,2026-10-13 14:49:54,vpngate
 sstp://vpn:vpn@vpn831566069.opengw.net:1588,sstp,vpn831566069.opengw.net,1588,3750,0,alive,-,KR,59.20.50.64,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-12 15:18:13,vpngate
 sstp://vpn:vpn@vpn788502559.opengw.net:1908,sstp,vpn788502559.opengw.net,1908,3755,0,alive,-,JP,220.254.220.117,AS18268 Naganoken Kyodou Densan Co.Ltd.,Naganoken Kyodou Densan Co.Ltd.,isp,2026-10-07 14:04:24,vpngate
 sstp://vpn:vpn@vpn353146232.opengw.net:1995,sstp,vpn353146232.opengw.net,1995,3757,0,alive,-,RU,212.164.214.213,AS12389 Primorye NET (PJSC Rostelecom),PJSC Rostelecom,isp,2026-10-01 00:00:00,vpngate
@@ -1428,7 +1428,7 @@ sstp://vpn:vpn@vpn999209650.opengw.net:1930,sstp,vpn999209650.opengw.net,1930,44
 sstp://vpn:vpn@vpn749475851.opengw.net:1921,sstp,vpn749475851.opengw.net,1921,4475,0,alive,-,KR,125.134.202.104,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-14 12:57:52,vpngate
 sstp://vpn:vpn@vpn970023981.opengw.net:1346,sstp,vpn970023981.opengw.net,1346,4478,0,alive,-,AU,61.69.7.98,AS2764 AAPT Limited,AAPT Limited,isp,2026-10-18 12:38:28,vpngate
 sstp://vpn:vpn@vpn918083457.opengw.net:1826,sstp,vpn918083457.opengw.net,1826,4481,0,alive,-,RU,2.63.23.253,AS12389 Primorye NET (PJSC Rostelecom),PJSC Rostelecom,isp,2026-10-03 22:57:17,vpngate
-sstp://vpn:vpn@vpn550981730.opengw.net:1674,sstp,vpn550981730.opengw.net,1674,4496,0,alive,-,JP,124.146.89.60,"AS7511 SYNAPSE Co.,Ltd.","SYNAPSE Co.,Ltd.",datacenter,2026-10-18 12:38:28,vpngate
+sstp://vpn:vpn@vpn550981730.opengw.net:1674,sstp,vpn550981730.opengw.net,1674,4496,0,alive,-,JP,124.146.89.60,"AS7511 SYNAPSE Co.,Ltd.","SYNAPSE Co.,Ltd.",isp,2026-10-18 12:38:28,vpngate
 sstp://vpn:vpn@vpn684766837.opengw.net:1857,sstp,vpn684766837.opengw.net,1857,4500,0,alive,-,RU,46.183.128.211,"AS8749 JSC Redcom-Internet (JSC ""Redcom-lnternet"")","JSC ""Redcom-lnternet""",isp,2026-10-04 17:03:41,vpngate
 sstp://vpn:vpn@vpn756959520.opengw.net:1883,sstp,vpn756959520.opengw.net,1883,4524,0,alive,-,KR,175.198.160.146,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-05 13:45:47,vpngate
 sstp://vpn:vpn@vpn774482453.opengw.net:995,sstp,vpn774482453.opengw.net,995,4540,0,alive,-,KR,183.99.25.80,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-03 16:48:27,vpngate

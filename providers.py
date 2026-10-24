@@ -500,6 +500,29 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS27699": "isp",         # TELEFÔNICA BRASIL S.A / Vivo (巴西第一大电信与民用光纤宽带)
     "AS7004": "isp",          # TELEFÓNICA CHILE S.A. / Movistar (智利第一大民用光纤宽带)
     "AS131429": "isp",        # MobiFone (越南主流移动通信与手机蜂窝宽带)
+    "AS14051": "isp",          # Fidium / Consolidated Communications (fidiumfiber.com, 美国民用光纤宽带)
+    "AS28716": "isp",          # Retelit Digital Services S.p.A. (retelit.it, 意大利电信与光纤宽带)
+    "AS17529": "isp",          # STARCAT Co., LTD. (starcat.co.jp, 日本名古屋有线电视与民用宽带 ISP)
+    "AS7511": "isp",           # SYNAPSE Co.,Ltd. (synapse.jp, 日本鹿儿岛民用宽带 ISP)
+    "AS62560": "isp",          # Hosted America (hostedamerica.com, 美国民用光纤宽带 ISP)
+    "AS38060": "isp",          # BIZNET / PT. Supra Primatama Nusantara (biznetnetworks.com, 印尼民用光纤宽带)
+    "AS8427": "isp",           # Joint Stock Company TransTeleCom / TTK (ttk.ru, 俄罗斯骨干电信与宽带运营商)
+    "AS21271": "isp",          # Society of Mali's Telecommunications / SOTELMA (sotelma.ml, 马里国家电信与宽带运营商)
+    "AS139282": "isp",         # Novus Network (novusnetwork, 宽带接入 ISP)
+    "AS11404": "isp",          # Wave Broadband / Astound (astound.com, 美国民用有线与光纤宽带)
+    "AS265606": "isp",         # DIGY NETWORKS (digynetworks.com.br, 巴西民用光纤宽带)
+    "AS154462": "isp",         # Yournet Communications (yournet.in, 印度民用宽带 ISP)
+    "AS152045": "isp",         # PT. PETABYTE NETWORK INDONESIA (petabyte.net.id, 印尼光纤宽带 ISP)
+    "AS12252": "isp",          # America Movil Peru S.A.C. / Claro Peru (claro.com.pe, 秘鲁电信与民用宽带)
+    "AS16010": "isp",          # Magticom Ltd. (magticom.ge, 格鲁吉亚第一大电信与民用光纤宽带)
+    "AS265605": "isp",         # VELOCOM SA DE CV (velocom.com.mx, 墨西哥电信与民用宽带)
+    "AS3302": "isp",           # Retelit Digital Services S.p.A. (retelit.it, 意大利全国光纤骨干与电信 ISP)
+    "AS15401": "isp",          # Orange Business Services SA (orange.com, 法国电信 Orange 骨干网络)
+    "AS394311": "isp",         # Digicel Turks and Caicos Ltd (digicelgroup.com, 加勒比海特克斯和凯科斯群岛电信宽带)
+    "AS17975": "isp",          # APT Datamatrix Limited (aptdatamatrix.com, 香港亚太卫星与电信网络)
+    "AS203101": "isp",         # Navarino Single Member S.A. (navarino.gr, 希腊海事卫星与电信网络服务商)
+    "AS10753": "isp",          # Level 3 Parent, LLC / Lumen (lumen.com, Tier 1 国际电信与互联网服务商)
+    "AS38264": "isp",          # Wateen Telecom Limited (wateen.com, 巴基斯坦全国光纤与民用宽带 ISP)
 
     # --- [L0 裁决 C: 核心国际银行金融专网 (人工 SSOT 保护)] ---
     "AS1311": "banking", "AS2600": "banking", "AS3187": "banking", "AS5091": "banking",
@@ -516,6 +539,9 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
 
     # --- [L0 裁决 E: 商业企业专线与骨干中继 (权威核准为 business)] ---
     "AS979": "business",      # NetLab Global (as979.net, 国际机房网络, ipinfo: business)
+
+    # --- [L0 裁决 F: 国家政务与公共网络 (权威核准为 government)] ---
+    "AS327724": "government",  # National Information Technology Authority Uganda (NITA-U, 乌干达国家信息技术管理局政务网)
 }
 
 

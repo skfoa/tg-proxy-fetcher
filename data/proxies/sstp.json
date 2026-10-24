@@ -11,7 +11,7 @@
     "asn": "62560",
     "asOrganization": "Hosted America",
     "isp": "Hosted America",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "vpngate"
   },
   {
@@ -56,7 +56,7 @@
     "asn": "14051",
     "asOrganization": "Fidium",
     "isp": "Fidium",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "vpngate"
   },
   {
@@ -71,7 +71,7 @@
     "asn": "28716",
     "asOrganization": "Retelit Digital Services S.p.A.",
     "isp": "Retelit Digital Services S.p.A.",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "vpngate"
   },
   {
@@ -1599,9 +1599,9 @@
     "country_cn": "日本",
     "country_emoji": "🇯🇵",
     "asn": "17529",
-    "asOrganization": "STARCAT Co .,LTD.",
-    "isp": "STARCAT Co .,LTD.",
-    "net_type": "datacenter",
+    "asOrganization": "STARCAT Co., LTD.",
+    "isp": "STARCAT Co., LTD.",
+    "net_type": "isp",
     "source": "vpngate"
   },
   {
@@ -4211,7 +4211,7 @@
     "asn": "7511",
     "asOrganization": "SYNAPSE Co.,Ltd.",
     "isp": "SYNAPSE Co.,Ltd.",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "vpngate"
   },
   {
