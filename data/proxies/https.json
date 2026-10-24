@@ -945,21 +945,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "https://138.66.65.52:443",
-    "protocol": "https",
-    "ip": "138.66.65.52",
-    "port": 443,
-    "country": "IT",
-    "country_name": "意大利",
-    "country_cn": "意大利",
-    "country_emoji": "🇮🇹",
-    "asn": "20981",
-    "asOrganization": "Innovapuglia SPA",
-    "isp": "Innovapuglia SPA",
-    "net_type": "datacenter",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "https://162.191.226.246:9443",
     "protocol": "https",
     "ip": "162.191.226.246",
@@ -1260,21 +1245,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "https://138.66.66.136:443",
-    "protocol": "https",
-    "ip": "138.66.66.136",
-    "port": 443,
-    "country": "IT",
-    "country_name": "意大利",
-    "country_cn": "意大利",
-    "country_emoji": "🇮🇹",
-    "asn": "20981",
-    "asOrganization": "Innovapuglia SPA",
-    "isp": "Innovapuglia SPA",
-    "net_type": "datacenter",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "https://72.28.165.185:8090",
     "protocol": "https",
     "ip": "72.28.165.185",
@@ -1527,21 +1497,6 @@
     "asOrganization": "Gemini Internet Sp. z o.o.",
     "isp": "Gemini Internet Sp. z o.o.",
     "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "https://138.66.66.229:443",
-    "protocol": "https",
-    "ip": "138.66.66.229",
-    "port": 443,
-    "country": "IT",
-    "country_name": "意大利",
-    "country_cn": "意大利",
-    "country_emoji": "🇮🇹",
-    "asn": "20981",
-    "asOrganization": "Innovapuglia SPA",
-    "isp": "Innovapuglia SPA",
-    "net_type": "datacenter",
     "source": "EDT-Pages"
   },
   {
@@ -2337,21 +2292,6 @@
     "asOrganization": "Orange",
     "isp": "Orange",
     "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "https://138.66.66.225:443",
-    "protocol": "https",
-    "ip": "138.66.66.225",
-    "port": 443,
-    "country": "IT",
-    "country_name": "意大利",
-    "country_cn": "意大利",
-    "country_emoji": "🇮🇹",
-    "asn": "20981",
-    "asOrganization": "Innovapuglia SPA",
-    "isp": "Innovapuglia SPA",
-    "net_type": "datacenter",
     "source": "EDT-Pages"
   },
   {

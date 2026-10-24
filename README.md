@@ -40,7 +40,7 @@
   - **识别并剔除异构 CDN 伪节点 (`non_cf_cdn`)**：准确识别并剔除混入的 Fastly、Akamai 等非 Cloudflare 伪造节点，保证优选节点池纯净度。
 - **📊 通用代理质检可观测性与分流策略**：`proxies_verify.py` 引入失败原因分布统计（细分 `connect_timeout`、`tls_error`、`http_status_xxx` 等）与协议明细汇总日志；实行精细化分协议淘汰机制（明文 HTTP 专属严格阈值 `--http-max-fails 1`，其他高可用协议维持缓冲容错），并支持 `--strict` 极致纯净模式。
 - **🌐 原生支持 TURN 穿透协议**：完整支持 `turn://` 协议节点的解析、存活质检与单协议数据导出（`.txt` / `.csv` / `.json`），兼容 RFC 5389 STUN Binding 校验与自定义外部检测端点，并支持自动区分机房与家庭宽带（`isp`）等网络画像。
-- **🗃️ `ip_cache` 活跃集修剪与紧凑序列化**：引入 `prune_ip_cache` 机制，在质检落盘时动态收集活跃在用 IP，有效画像全量保护，历史孤儿黑名单限制上限并紧凑存储，避免缓存文件无界膨胀。
+- **🗃️ `ip_cache` 与墓碑黑名单双重前置离线防御**：引入 `prune_ip_cache` 机制动态保护在用活跃 IP 并将孤儿黑名单上限控制在 5,000 条；配合 `tombstone.json` 墓碑冷却库，对质检确权为机房（`datacenter`/`hosting`）的死节点与分流淘汰节点实行永久拦截与 7 天冷却隔离，彻底阻断机房节点被爬虫重复引入或回流。
 - **🧪 演练诊断模式（Dry-run & Diag Output）**：`proxyip_verify.py` 与 `cf_verify.py` 支持 `--dry-run` 诊断与 `--diag-output` 输出详细故障分布，便于在不触碰生产数据的前提下全景评估网络状况。
 - **⚡ 精细化分段锁调度（`ip:port` 锁粒度）**：内置基于 `zlib.crc32` 的 8192 桶位哈希分段锁（`get_keyed_lock`），并发互斥粒度细化至 `ip:port`，同 IP 异端口节点并发探测，彻底解除死节点多端口串行死锁排队（单个死 IP 挂载数十个端口排队超时从 50s+ 骤降至秒级）；异 IP 互不干扰，分段锁内存维持在常数级 $O(1)$。
 - **⚡ 全量 SSL 上下文单例复用**：质检引擎全面复用全局单例 SSL 证书上下文（`INSECURE_SSL_CTX` 与 `SSL_CTX`），杜绝每次高并发探测协程重复同步读取操作系统 CA 根证书（消除 ~26ms 阻塞开销），事件循环并发吞吐能力彻底释放。
@@ -118,8 +118,8 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | **`data/proxyip/【...】.txt`** | 稀缺网络属性独立反代列表（原生宽带/商业/教育/政务，ASN 粗筛） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip/【ISP_运营商原生宽带】.txt` 等 |
 | **`data/proxyip.csv`** | 反代 ProxyIP 详细数据表（14 字段，含 `net_type` 网络分类与 `exit_ip` 真实出口落地 IP） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip.csv` |
 | **`data/asn_database.json`** | 内置离线 ASN 知识库（收录 1,000+ 条双向索引映射与 1,800+ 条网络分类基准；遇到新 ASN 时自动在线查询增量同步） | 运行时增量维护（由 CI 自动提交） | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/asn_database.json` |
-| **`data/tombstone.json`** | 死节点记忆库（7 天隔离冷却与生命周期闭环防回流） | 全模式支持（质检引擎运行触发） | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/tombstone.json` |
-| **`data/ip_cache.json`** | 持久化 IP 画像与机房黑名单库（动态活跃集修剪，防无界膨胀） | 运行时增量维护（由 CI 自动提交） | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/ip_cache.json` |
+| **`data/tombstone.json`** | 死节点与机房拦截记忆库（7 天隔离冷却与生命周期闭环防回流，登记连续失败死节点及确权机房拦截黑名单） | 全模式支持（质检引擎运行触发） | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/tombstone.json` |
+| **`data/ip_cache.json`** | 持久化 IP 画像与机房黑名单库（严格对齐 ipinfo.io 五大标准，规范化纯净 ASN 字典，动态活跃集修剪，前置离线拦截） | 运行时增量维护（由 CI 自动提交） | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/ip_cache.json` |
 
 ---
 
@@ -205,12 +205,15 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 * **质检分层排序与分国专属列表**：`data/proxyip.txt` 按缓冲状态与存活状态清晰分段，段内按实测延迟升序排列；各国家/地区专属分类由 `data/proxyip/*.txt` 独立提供。
 * **分国家/地区独立单文件**：
   - `data/proxyip/*.txt`：在 `data/proxyip/` 目录下按国家/地区拆分为独立文件（如 `data/proxyip/美国.txt`、`data/proxyip/日本.txt`、`data/proxyip/香港.txt` 等），内容为纯净的 `IP:端口` 格式，方便直接复制或作为分地区订阅。
-* **特殊网络类型提取（基于 ASN 静态属性的离线粗筛机制）**：
-  在抓取的反代节点中，绝大多数属于常规云服务器或机房托管 IP。系统通过 **ASN 分类规则与关键词清洗**，从混合池中筛选出潜在的运营商网络、商业专线及教育科研资产，在 `data/proxyip/` 目录下单独导出（文件名前缀加 `【...】`，排序置顶）：
-  - **`【ISP_运营商原生宽带】.txt`**：电信运营商原生宽带与精品线路网络（收录 中国电信 CN2、中国联通 9929/CUG、中国移动 CMIN2，以及 Comcast, Spectrum, Cox, HKT, HKBN, KT, SK Broadband, Vodafone, Orange 等常见电信服务商）。
-  - **`【BIZ_商业企业专线】.txt`**：企业商业专线与商务宽带（收录 AT&T Enterprises, PCCW Business 等）。
-  - **`【EDU_高校教育科研】.txt`**：高校与学术科研网（收录 CERNET, University 等科研学术网络）。
-  - **`【GOV_政务公共网络】.txt`**：政务公用网与国家通信骨干。
+* **纯净反代准入与机房自动分流（机房 0 容忍）**：
+  在抓取的反代节点中，部分节点属于云服务器或机房托管 IP。系统全面实施**「出口即正义」深度纠偏与机房自动分流**策略：
+  - **机房节点自动迁移**：若反代节点经 ASN 权威库或 `ip_cache` 画像确权为数据中心机房（`datacenter`/`hosting`），系统自动将其从 `proxyip.csv` 中剔除并无损分流迁移至 `data/scan_ips.csv` 扫段优选库；
+  - **墓碑黑名单锁定回流**：剔除的机房代理节点主键（`IP:端口`）同步全量登记至 `data/tombstone.json` 墓碑冷却黑名单库，从源头彻底杜绝爬虫重复抓取回流；
+  - **专属稀缺网络独立导出**：经过分流清洗后，`data/proxyip.csv` 仅保留 100% 纯净的运营商原生宽带、商业专线、教育与政务网络资产，并在 `data/proxyip/` 目录下单独导出（文件名前缀加 `【...】`，排序置顶）：
+    - **`【ISP_运营商原生宽带】.txt`**：电信运营商原生宽带与精品线路网络（收录 中国电信 CN2、中国联通 9929/CUG、中国移动 CMIN2，以及 Comcast, Spectrum, Cox, HKT, HKBN, KT, SK Broadband, Vodafone, Orange 等常见电信服务商）。
+    - **`【BIZ_商业企业专线】.txt`**：企业商业专线与商务宽带（收录 AT&T Enterprises, PCCW Business 等）。
+    - **`【EDU_高校教育科研】.txt`**：高校与学术科研网（收录 CERNET, University 等科研学术网络）。
+    - **`【GOV_政务公共网络】.txt`**：政务公用网与国家通信骨干。
   所有特殊分类清单同样采用 **纯净 `IP:端口`（按延迟升序排列，无多余注释）**，方便直接使用。
 * **技术实现与边界说明（两级分层分类体系）**：
   - **执行逻辑**：
