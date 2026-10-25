@@ -2181,12 +2181,6 @@ async def run_telethon():
                                             exit_ip = cf_item.get("exit_ip") or ""
                                             raw_asn = cf_item.get("raw_asn") or ""
 
-                                            # 若节点自带 exit_ip，从本地缓存或自治域分类识别出口网络类型
-                                            exit_net_type = ""
-                                            if exit_ip:
-                                                exit_cached = ip_cache.get(exit_ip) or {}
-                                                exit_net_type = exit_cached.get("net_type") or classify_asn(exit_cached.get("asn", ""), exit_cached.get("isp", ""))
-
                                             # 若缺少有效 ASN 且配置了在线探针端点，执行在线探针补全
                                             if (not raw_asn or raw_asn in ("AS0", "0", "AS_UNKNOWN", "UNKNOWN")) and CHECK_PROXYIP_URL:
                                                 probe_res = probe_check_proxyip_api(cf_item['ip'], int(cf_item['port']))
@@ -2196,8 +2190,8 @@ async def run_telethon():
                                                         cf_item["exit_ip"] = exit_ip
                                                     if not cf_item.get("colo") and probe_res.get("colo"):
                                                         cf_item["colo"] = probe_res["colo"]
-                                                    if probe_res.get("net_type"):
-                                                        exit_net_type = probe_res["net_type"]
+                                                    if probe_res.get("net_type") and not cf_item.get("net_type"):
+                                                        cf_item["net_type"] = probe_res["net_type"]
                                                     if probe_res.get("exit_asn"):
                                                         cf_item["exit_asn"] = probe_res["exit_asn"]
                                                         if not cf_item.get("raw_asn") or cf_item["raw_asn"] in ("AS0", "0", "AS_UNKNOWN", "UNKNOWN"):

@@ -430,7 +430,6 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS207143": "datacenter", # hosttech GmbH (hosttech.ch, 瑞士机房/主机托管)
     "AS216054": "datacenter", # Taymaz Gostaran Naghshe Almas (viphost.cloud, 算力IDC)
     "AS214822": "datacenter", # MT FINANCE LLC (ruvds.com, 云主机机房)
-    "AS206069": "isp",        # Cornseed Limited (ipinfo: ISP)
     "AS200912": "datacenter", # Joel Krause (vpslayer.net, ipinfo核准为hosting)
     "AS55799": "datacenter",  # IPTELECOM ASIA (iptelecom.asia, ipinfo: hosting)
     "AS135357": "datacenter", # HONG KONG KOWLOON TELECOMMUNICATIONS (as3491.net, ipinfo: hosting)
@@ -487,8 +486,6 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS16814": "isp",         # NSS S.A. (IPLAN Telecomunicaciones, iplan.com.ar, 阿根廷主流光纤运营商)
     "AS200239": "isp",        # Bogahost Bilisim (ipinfo: ISP)
     "AS206069": "isp",        # Cornseed Limited (ipinfo: ISP)
-    "AS209604": "isp",        # 2E TELEKOMUNIKASYON (ipinfo: ISP)
-    "AS216475": "isp",        # NKtelecom INC (ipinfo: ISP)
     "AS397540": "isp",        # Windscribe Limited (ipinfo: ISP)
     "AS35540": "isp",         # OVH SAS / OVH Telecom (ovhcloud.com, 法国电信与宽带接入网)
     "AS17621": "isp",         # China Unicom Shanghai network (中国联通上海网络)
@@ -539,7 +536,7 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     # --- [L0 裁决 C: 核心国际银行金融专网 (对齐 ipinfo.io 业界权威标准，统一归入 business 商业专线)] ---
     "AS1311": "business", "AS2600": "business", "AS3187": "business", "AS5091": "business",
     "AS5458": "business", "AS6674": "business", "AS6773": "business", "AS7609": "business",
-    "AS7630": "business", "AS7820": "business", "AS8373": "business", "AS8435": "business",
+    "AS7630": "business", "AS7820": "business", "AS8373": "business",
     "AS9016": "business", "AS9099": "business", "AS9118": "business", "AS9128": "business",
     "AS9221": "business", "AS9522": "business", "AS9630": "business",
     "AS9772": "business", "AS9863": "business", "AS207986": "business",
