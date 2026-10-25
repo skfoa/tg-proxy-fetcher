@@ -240,6 +240,21 @@
     "source": "EDT-Pages"
   },
   {
+    "proxy": "socks5://666:666@58.209.83.25:1080",
+    "protocol": "socks5",
+    "ip": "58.209.83.25",
+    "port": 1080,
+    "country": "CN",
+    "country_name": "中国",
+    "country_cn": "中国",
+    "country_emoji": "🇨🇳",
+    "asn": "4134",
+    "asOrganization": "China Telecom",
+    "isp": "China Telecom",
+    "net_type": "isp",
+    "source": "@user"
+  },
+  {
     "proxy": "socks5://72.194.42.131:4145",
     "protocol": "socks5",
     "ip": "72.194.42.131",
@@ -298,6 +313,21 @@
     "isp": "Cox Communications Inc.",
     "net_type": "isp",
     "source": "EDT-Pages"
+  },
+  {
+    "proxy": "socks5://666:666@106.227.75.21:1080",
+    "protocol": "socks5",
+    "ip": "106.227.75.21",
+    "port": 1080,
+    "country": "CN",
+    "country_name": "中国",
+    "country_cn": "中国",
+    "country_emoji": "🇨🇳",
+    "asn": "149837",
+    "asOrganization": "China Telecom",
+    "isp": "China Telecom",
+    "net_type": "isp",
+    "source": "@user"
   },
   {
     "proxy": "socks5://98.178.72.21:10919",
@@ -1665,6 +1695,21 @@
     "source": "@danfeng_chat"
   },
   {
+    "proxy": "socks5://test123:test123@104.168.249.36:1080",
+    "protocol": "socks5",
+    "ip": "104.168.249.36",
+    "port": 1080,
+    "country": "US",
+    "country_name": "美国",
+    "country_cn": "美国",
+    "country_emoji": "🇺🇸",
+    "asn": "54290",
+    "asOrganization": "Hostwinds LLC.",
+    "isp": "Hostwinds LLC.",
+    "net_type": "datacenter",
+    "source": "@user"
+  },
+  {
     "proxy": "socks5://123:123@101.36.126.84:1080",
     "protocol": "socks5",
     "ip": "101.36.126.84",
@@ -1980,6 +2025,21 @@
     "source": "@danfeng_chat"
   },
   {
+    "proxy": "socks5://abc123:abc123@103.238.72.56:1080",
+    "protocol": "socks5",
+    "ip": "103.238.72.56",
+    "port": 1080,
+    "country": "VN",
+    "country_name": "越南",
+    "country_cn": "越南",
+    "country_emoji": "🇻🇳",
+    "asn": "24088",
+    "asOrganization": "Hanoi Telecom Joint Stock Company - HCMC Branch",
+    "isp": "Hanoi Telecom Joint Stock Company - HCMC Branch",
+    "net_type": "isp",
+    "source": "@user"
+  },
+  {
     "proxy": "socks5://test:test@103.79.183.34:1080",
     "protocol": "socks5",
     "ip": "103.79.183.34",
@@ -2023,6 +2083,21 @@
     "isp": "Bismillah IT Solution",
     "net_type": "isp",
     "source": "@danfeng_chat"
+  },
+  {
+    "proxy": "socks5://1:1@103.130.196.61:1080",
+    "protocol": "socks5",
+    "ip": "103.130.196.61",
+    "port": 1080,
+    "country": "BD",
+    "country_name": "BD",
+    "country_cn": "BD",
+    "country_emoji": "🇧🇩",
+    "asn": "138043",
+    "asOrganization": "T Network",
+    "isp": "T Network",
+    "net_type": "datacenter",
+    "source": "@user"
   },
   {
     "proxy": "socks5://140.207.114.166:10080",
@@ -2145,6 +2220,21 @@
     "source": "@danfeng_chat"
   },
   {
+    "proxy": "socks5://1:1@103.130.196.110:1080",
+    "protocol": "socks5",
+    "ip": "103.130.196.110",
+    "port": 1080,
+    "country": "BD",
+    "country_name": "BD",
+    "country_cn": "BD",
+    "country_emoji": "🇧🇩",
+    "asn": "138043",
+    "asOrganization": "T Network",
+    "isp": "T Network",
+    "net_type": "datacenter",
+    "source": "@user"
+  },
+  {
     "proxy": "socks5://113.249.111.67:1080",
     "protocol": "socks5",
     "ip": "113.249.111.67",
@@ -2158,6 +2248,36 @@
     "isp": "CHINANET Chongqing Province Network",
     "net_type": "isp",
     "source": "EDT-Pages"
+  },
+  {
+    "proxy": "socks5://8888:8888@47.236.168.243:1080",
+    "protocol": "socks5",
+    "ip": "47.236.168.243",
+    "port": 1080,
+    "country": "SG",
+    "country_name": "新加坡",
+    "country_cn": "新加坡",
+    "country_emoji": "🇸🇬",
+    "asn": "45102",
+    "asOrganization": "Alibaba Cloud",
+    "isp": "Alibaba Cloud",
+    "net_type": "datacenter",
+    "source": "@user"
+  },
+  {
+    "proxy": "socks5://ss:ss@103.91.229.62:1080",
+    "protocol": "socks5",
+    "ip": "103.91.229.62",
+    "port": 1080,
+    "country": "BD",
+    "country_name": "BD",
+    "country_cn": "BD",
+    "country_emoji": "🇧🇩",
+    "asn": "136531",
+    "asOrganization": "NetExpress Online",
+    "isp": "NetExpress Online",
+    "net_type": "datacenter",
+    "source": "@user"
   },
   {
     "proxy": "socks5://72.214.108.67:4145",
@@ -2233,6 +2353,21 @@
     "isp": "China Telecom",
     "net_type": "isp",
     "source": "@danfeng_chat"
+  },
+  {
+    "proxy": "socks5://1:1@103.55.146.75:1080",
+    "protocol": "socks5",
+    "ip": "103.55.146.75",
+    "port": 1080,
+    "country": "BD",
+    "country_name": "BD",
+    "country_cn": "BD",
+    "country_emoji": "🇧🇩",
+    "asn": "134146",
+    "asOrganization": "SAMONLINE",
+    "isp": "SAMONLINE",
+    "net_type": "datacenter",
+    "source": "@user"
   },
   {
     "proxy": "socks5://111:111@106.55.143.100:1080",
@@ -2413,6 +2548,21 @@
     "isp": "Amber IT Limited",
     "net_type": "isp",
     "source": "EDT-Pages"
+  },
+  {
+    "proxy": "socks5://test:test@103.9.133.22:1080",
+    "protocol": "socks5",
+    "ip": "103.9.133.22",
+    "port": 1080,
+    "country": "BD",
+    "country_name": "BD",
+    "country_cn": "BD",
+    "country_emoji": "🇧🇩",
+    "asn": "9832",
+    "asOrganization": "ISN, Internet Service Provider",
+    "isp": "ISN, Internet Service Provider",
+    "net_type": "isp",
+    "source": "@user"
   },
   {
     "proxy": "socks5://103.76.149.140:1080",

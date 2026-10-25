@@ -2653,7 +2653,10 @@
         "BNW TECHNOLOGY LTD": "AS34442",
         "BDPEER": "AS134983",
         "ORION Blazej Hess Connected by T-Mobile Polska S.A.": "AS196776",
-        "TWOOIT-GMBH": "AS48823"
+        "TWOOIT-GMBH": "AS48823",
+        "T Network": "AS138043",
+        "SAMONLINE": "AS134146",
+        "NetExpress Online": "AS136531"
     },
     "asn_to_isp": {
         "AS10001": "Mics Network Corporation",
@@ -5187,7 +5190,10 @@
         "AS134983": "BDPEER",
         "AS209024": "MTS PJSC",
         "AS196776": "ORION Blazej Hess Connected by T-Mobile Polska S.A.",
-        "AS48823": "TWOOIT-GMBH"
+        "AS48823": "TWOOIT-GMBH",
+        "AS138043": "T Network",
+        "AS134146": "SAMONLINE",
+        "AS136531": "NetExpress Online"
     },
     "asn_to_net_type": {
         "AS10001": "isp",
@@ -8728,6 +8734,9 @@
         "AS134983": "datacenter",
         "AS209024": "isp",
         "AS196776": "datacenter",
-        "AS48823": "datacenter"
+        "AS48823": "datacenter",
+        "AS138043": "datacenter",
+        "AS134146": "datacenter",
+        "AS136531": "datacenter"
     }
 }

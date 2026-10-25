@@ -15,10 +15,12 @@ socks5://216.105.128.144:4145,socks5,216.105.128.144,4145,348,0,alive,ATL,US,216
 socks5://66.42.224.229:41679,socks5,66.42.224.229,41679,408,0,alive,CVG,US,66.42.224.229,AS6181 CINCINNATI BELL,CINCINNATI BELL,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://216.68.128.121:4145,socks5,216.68.128.121,4145,422,0,alive,CVG,US,216.68.128.121,AS6181 CINCINNATI BELL,CINCINNATI BELL,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://208.102.51.6:58208,socks5,208.102.51.6,58208,452,0,alive,CVG,US,208.102.51.6,AS6181 CINCINNATI BELL,CINCINNATI BELL,isp,2026-10-09 22:46:01,EDT-Pages
+socks5://666:666@58.209.83.25:1080,socks5,58.209.83.25,1080,452,0,alive,LAX,CN,58.209.83.25,AS4134 China Telecom,China Telecom,isp,2026-10-25T10:09:42Z,@user
 socks5://72.194.42.131:4145,socks5,72.194.42.131,4145,466,0,alive,ATL,US,72.194.42.131,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://72.194.42.156:4145,socks5,72.194.42.156,4145,469,0,alive,ATL,US,72.194.42.156,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://98.190.239.3:4145,socks5,98.190.239.3,4145,475,0,alive,ATL,US,98.190.239.3,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://98.182.147.97:4145,socks5,98.182.147.97,4145,479,0,alive,ATL,US,98.182.147.97,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-09 22:46:01,EDT-Pages
+socks5://666:666@106.227.75.21:1080,socks5,106.227.75.21,1080,485,0,alive,LAX,CN,106.227.75.21,AS149837 China Telecom,China Telecom,isp,2026-10-25T10:09:42Z,@user
 socks5://98.178.72.21:10919,socks5,98.178.72.21,10919,489,0,alive,ATL,US,98.178.72.21,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://184.181.217.210:4145,socks5,184.181.217.210,4145,491,0,alive,ATL,US,184.181.217.210,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://174.64.199.82:4145,socks5,174.64.199.82,4145,495,0,alive,ATL,US,174.64.199.82,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-09 22:46:01,EDT-Pages
@@ -110,6 +112,7 @@ socks5://8888:8888@8.210.212.0:6666,socks5,8.210.212.0,6666,933,0,alive,HKG,HK,8
 socks5://123:123@101.36.121.221:1080,socks5,101.36.121.221,1080,934,0,alive,HKG,HK,101.36.121.221,AS135377 UCloud,UCloud,datacenter,2026-10-09 14:13:10,@danfeng_chat
 socks5://6666:6666@8.210.222.7:6666,socks5,8.210.222.7,6666,934,0,alive,HKG,HK,8.210.222.7,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://123:123@165.154.20.162:1080,socks5,165.154.20.162,1080,934,0,alive,HKG,HK,165.154.20.162,AS135377 UCloud,UCloud,datacenter,2026-10-09 14:13:10,@danfeng_chat
+socks5://test123:test123@104.168.249.36:1080,socks5,104.168.249.36,1080,937,0,alive,SEA,US,104.168.215.83,AS54290 HostPapa,Hostwinds LLC.,datacenter,2026-10-25T10:15:36Z,@user
 socks5://123:123@101.36.126.84:1080,socks5,101.36.126.84,1080,941,0,alive,HKG,HK,101.36.126.84,AS135377 UCloud,UCloud,datacenter,2026-10-09 14:13:10,@danfeng_chat
 socks5://6666:6666@8.210.224.195:6666,socks5,8.210.224.195,6666,941,0,alive,HKG,HK,8.210.224.195,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://888:888@47.243.25.202:1080,socks5,47.243.25.202,1080,944,0,alive,HKG,HK,47.243.25.202,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
@@ -131,9 +134,11 @@ socks5://123:123@152.32.186.245:1080,socks5,152.32.186.245,1080,1191,0,alive,HKG
 socks5://123:123@165.154.22.211:1080,socks5,165.154.22.211,1080,1229,0,alive,HKG,HK,165.154.22.211,AS135377 UCloud,UCloud,datacenter,2026-10-06 14:25:18,@danfeng_chat
 socks5://46.146.220.180:1080,socks5,46.146.220.180,1080,1234,0,alive,HEL,RU,46.146.220.180,AS12768 JSC ER-Telecom Perm,JSC ER-Telecom Perm,isp,2026-10-20 12:55:22,EDT-Pages
 socks5://root:123456@101.91.233.238:1080,socks5,101.91.233.238,1080,1258,0,alive,LAX,CN,101.91.233.238,AS4811 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
+socks5://abc123:abc123@103.238.72.56:1080,socks5,103.238.72.56,1080,1265,0,alive,HAN,VN,103.238.72.56,AS24088 Hanoi Telecom Joint Stock Company - HCMC Branch,Hanoi Telecom Joint Stock Company - HCMC Branch,isp,2026-10-25T10:09:42Z,@user
 socks5://test:test@103.79.183.34:1080,socks5,103.79.183.34,1080,1273,0,alive,DAC,BD,103.79.183.34,AS136009 SpeedNet,SpeedNet,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://ss:ss@103.85.238.43:1080,socks5,103.85.238.43,1080,1288,0,alive,DAC,BD,103.14.72.168,AS137967 DigiCon Telecommunication Ltd,DigiCon Telecommunication Ltd,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://1:1@103.243.244.133:1080,socks5,103.243.244.133,1080,1294,0,alive,DAC,BD,103.243.244.133,AS137953 Bismillah IT Solution,Bismillah IT Solution,isp,2026-10-01 00:00:00,@danfeng_chat
+socks5://1:1@103.130.196.61:1080,socks5,103.130.196.61,1080,1297,0,alive,CGP,BD,103.130.196.110,AS138043 T Network,T Network,datacenter,2026-10-25T10:15:36Z,@user
 socks5://140.207.114.166:10080,socks5,140.207.114.166,10080,1298,0,alive,HKG,CN,140.207.114.166,AS17621 China Unicom Shanghai network,China Unicom Shanghai network,isp,2026-10-21 15:52:42,EDT-Pages
 socks5://test:test@103.135.252.30:1080,socks5,103.135.252.30,1080,1298,0,alive,DAC,BD,103.135.252.30,AS132298 Antaranga Dot Com Ltd,Antaranga Dot Com Ltd,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://root:123456@59.36.137.51:1080,socks5,59.36.137.51,1080,1313,0,alive,LAX,CN,59.36.137.51,AS4134 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
@@ -142,12 +147,16 @@ socks5://ss:ss@103.14.72.168:1080,socks5,103.14.72.168,1080,1321,0,alive,DAC,BD,
 socks5://199.66.183.226:4145,socks5,199.66.183.226,4145,1354,0,alive,ATL,US,199.66.183.226,AS20081 NET2ATLANTA.COM LLC,NET2ATLANTA.COM LLC,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://root:123456@61.171.95.65:1080,socks5,61.171.95.65,1080,1372,0,alive,LAX,CN,61.171.95.65,AS4811 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://root:123456@59.36.80.120:1080,socks5,59.36.80.120,1080,1401,0,alive,LAX,CN,59.36.80.120,AS4134 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
+socks5://1:1@103.130.196.110:1080,socks5,103.130.196.110,1080,1406,0,alive,DAC,BD,103.130.196.110,AS138043 T Network,T Network,datacenter,2026-10-25T10:15:36Z,@user
 socks5://113.249.111.67:1080,socks5,113.249.111.67,1080,1428,0,alive,LAX,CN,113.249.111.67,AS134420 CHINANET Chongqing Province Network,CHINANET Chongqing Province Network,isp,2026-10-16 12:36:06,EDT-Pages
+socks5://8888:8888@47.236.168.243:1080,socks5,47.236.168.243,1080,1514,0,alive,SIN,SG,47.236.168.243,"AS45102 Alibaba (US) Technology Co., Ltd.",Alibaba Cloud,datacenter,2026-10-25T10:15:36Z,@user
+socks5://ss:ss@103.91.229.62:1080,socks5,103.91.229.62,1080,1515,0,alive,DAC,BD,103.91.228.158,AS136531 NetExpress Online,NetExpress Online,datacenter,2026-10-25T10:15:36Z,@user
 socks5://72.214.108.67:4145,socks5,72.214.108.67,4145,1519,0,alive,ATL,US,72.214.108.67,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://72.207.109.5:4145,socks5,72.207.109.5,4145,1544,0,alive,ATL,US,72.207.109.5,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://98.191.0.37:4145,socks5,98.191.0.37,4145,1553,0,alive,ATL,US,98.191.0.37,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://171.25.158.95:1080,socks5,171.25.158.95,1080,1592,0,alive,ARN,SE,171.25.158.95,AS35100 Vaxjo NET C2IP,Vaxjo NET C2IP,isp,2026-10-25 14:07:00,EDT-Pages
 socks5://6666:6666@59.36.140.209:1080,socks5,59.36.140.209,1080,1734,0,alive,LAX,CN,59.36.140.209,AS4134 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
+socks5://1:1@103.55.146.75:1080,socks5,103.55.146.75,1080,1858,0,alive,DAC,BD,103.55.146.75,AS134146 SAM ONLINE,SAMONLINE,datacenter,2026-10-25T10:15:36Z,@user
 socks5://111:111@106.55.143.100:1080,socks5,106.55.143.100,1080,1905,0,alive,LAX,CN,106.55.143.100,AS45090 Tencent Cloud,Tencent Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://root:123456@101.89.160.59:1080,socks5,101.89.160.59,1080,2056,0,alive,LAX,CN,101.89.160.59,AS4811 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://root:123456@61.171.54.239:1080,socks5,61.171.54.239,1080,2059,0,alive,LAX,CN,61.171.54.239,AS4811 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
@@ -160,6 +169,7 @@ socks5://109.124.73.231:1080,socks5,109.124.73.231,1080,2628,0,alive,HEL,RU,109.
 socks5://root:123456@101.89.159.229:1080,socks5,101.89.159.229,1080,2688,0,alive,LAX,CN,101.89.159.229,AS4811 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://130.255.95.177:4080,socks5,130.255.95.177,4080,2914,0,alive,FRA,IQ,130.255.95.177,AS197882 Tarin General Trading and Setting Up Internet Device LTD,Tarin General Trading and Setting Up Internet Device LTD,isp,2026-10-20 12:55:22,EDT-Pages
 socks5://202.4.115.232:9090,socks5,202.4.115.232,9090,3054,0,alive,DAC,BD,202.4.115.232,AS23956 Amber IT Limited,Amber IT Limited,isp,2026-10-20 12:55:22,EDT-Pages
+socks5://test:test@103.9.133.22:1080,socks5,103.9.133.22,1080,3219,0,alive,DAC,BD,203.188.246.114,"AS9832 ISN, Internet Service Provider","ISN, Internet Service Provider",isp,2026-10-25T10:09:42Z,@user
 socks5://103.76.149.140:1080,socks5,103.76.149.140,1080,3276,0,alive,CGK,ID,103.76.149.140,AS135477 PT. Java Digital Nusantara,PT. Java Digital Nusantara,isp,2026-10-20 12:55:22,EDT-Pages
 socks5://119.73.109.210:1080,socks5,119.73.109.210,1080,3399,0,alive,KHI,PK,119.73.109.210,AS135407 LINKdotNET Telecom Limited,LINKdotNET Telecom Limited,isp,2026-10-20 12:55:22,EDT-Pages
 socks5://root:123456@61.171.51.87:1080,socks5,61.171.51.87,1080,5089,0,alive,LAX,CN,61.171.51.87,AS4811 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
