@@ -2657,7 +2657,8 @@
         "T Network": "AS138043",
         "SAMONLINE": "AS134146",
         "NetExpress Online": "AS136531",
-        "Triple T Broadband Public Company Limited": "AS138524"
+        "Triple T Broadband Public Company Limited": "AS138524",
+        "Limited Liability Company Izet Telecom Ural": "AS41925"
     },
     "asn_to_isp": {
         "AS10001": "Mics Network Corporation",
@@ -5196,7 +5197,8 @@
         "AS134146": "SAMONLINE",
         "AS136531": "NetExpress Online",
         "AS17857": "SK Broadband Co Ltd",
-        "AS138524": "Triple T Broadband Public Company Limited"
+        "AS138524": "Triple T Broadband Public Company Limited",
+        "AS41925": "Limited Liability Company Izet Telecom Ural"
     },
     "asn_to_net_type": {
         "AS10001": "isp",
