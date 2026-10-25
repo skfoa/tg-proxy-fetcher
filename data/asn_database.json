@@ -2656,7 +2656,8 @@
         "TWOOIT-GMBH": "AS48823",
         "T Network": "AS138043",
         "SAMONLINE": "AS134146",
-        "NetExpress Online": "AS136531"
+        "NetExpress Online": "AS136531",
+        "Triple T Broadband Public Company Limited": "AS138524"
     },
     "asn_to_isp": {
         "AS10001": "Mics Network Corporation",
@@ -5193,7 +5194,9 @@
         "AS48823": "TWOOIT-GMBH",
         "AS138043": "T Network",
         "AS134146": "SAMONLINE",
-        "AS136531": "NetExpress Online"
+        "AS136531": "NetExpress Online",
+        "AS17857": "SK Broadband Co Ltd",
+        "AS138524": "Triple T Broadband Public Company Limited"
     },
     "asn_to_net_type": {
         "AS10001": "isp",
@@ -8737,6 +8740,7 @@
         "AS48823": "datacenter",
         "AS138043": "datacenter",
         "AS134146": "datacenter",
-        "AS136531": "datacenter"
+        "AS136531": "datacenter",
+        "AS17857": "isp"
     }
 }

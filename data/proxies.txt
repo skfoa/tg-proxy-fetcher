@@ -1489,9 +1489,20 @@ turn://188.245.155.147:3478
 turn://180.102.135.166:3479
 turn://5.75.231.152:3478
 
-# SSTP 协议 - 441 个
+# SSTP 协议 - 453 个
+sstp://vpn:vpn@vpn370986181.opengw.net:1528
+sstp://vpn:vpn@vpn122916437.opengw.net:1558
+sstp://vpn:vpn@vpn574906134.opengw.net:1463
+sstp://vpn:vpn@vpn882557723.opengw.net:995
+sstp://vpn:vpn@vpn686381138.opengw.net:1308
+sstp://vpn:vpn@vpn351452945.opengw.net:1571
+sstp://vpn:vpn@vpn850655044.opengw.net:1842
+sstp://vpn:vpn@vpn363831111.opengw.net:995
+sstp://vpn:vpn@vpn151676033.opengw.net:1913
+sstp://vpn:vpn@vpn960273320.opengw.net:1571
 sstp://vpn:vpn@vpn164693092.opengw.net:1363
 sstp://vpn:vpn@vpn504272840.opengw.net:1543
+sstp://vpn:vpn@vpn678436306.opengw.net:1348
 sstp://vpn:vpn@vpn988046136.opengw.net:1575
 sstp://vpn:vpn@vpn426489163.opengw.net:1968
 sstp://vpn:vpn@vpn398736484.opengw.net:1723
@@ -1765,6 +1776,7 @@ sstp://vpn:vpn@vpn778475680.opengw.net:1225
 sstp://vpn:vpn@vpn521065574.opengw.net:995
 sstp://vpn:vpn@vpn991001621.opengw.net:1764
 sstp://vpn:vpn@vpn313400325.opengw.net:1454
+sstp://vpn:vpn@vpn519288713.opengw.net:995
 sstp://vpn:vpn@vpn215791012.opengw.net:1274
 sstp://vpn:vpn@vpn962043623.opengw.net:1431
 sstp://vpn:vpn@vpn817119416.opengw.net:1882
