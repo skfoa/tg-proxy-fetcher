@@ -1052,6 +1052,8 @@ turn://101.34.155.36:3478,turn,101.34.155.36,3478,502,0,alive,-,CN,101.34.155.36
 turn://103.125.217.26:3479,turn,103.125.217.26,3479,503,0,alive,-,SG,103.125.217.26,AS36007 Kamatera,Kamatera,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://52.16.253.175:3478,turn,52.16.253.175,3478,504,0,alive,-,IE,52.16.253.175,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://8.130.55.156:3478,turn,8.130.55.156,3478,508,0,alive,-,CN,8.130.55.156,AS37963 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
+turn://115.68.222.194:3478,turn,115.68.222.194,3478,514,0,alive,-,KR,115.68.222.194,AS38700 SMILESERV,SMILESERV,datacenter,2026-10-25 16:22:16,@user
+turn://115.68.219.31:3478,turn,115.68.219.31,3478,515,0,alive,-,KR,115.68.219.31,AS38700 SMILESERV,SMILESERV,datacenter,2026-10-25 16:22:16,@user
 turn://94.103.99.221:3478,turn,94.103.99.221,3478,516,0,alive,-,CH,94.103.99.221,AS49457 Openbusiness S.A.,Openbusiness S.A.,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://110.184.206.131:3478,turn,110.184.206.131,3478,516,0,alive,-,CN,110.184.206.131,AS4134 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
 turn://91.209.191.125:3478,turn,91.209.191.125,3478,520,0,alive,-,FR,91.209.191.125,AS47127 Telemaque SAS,Telemaque SAS,business,2026-10-01 00:00:00,@danfeng_chat
@@ -1076,6 +1078,7 @@ turn://101.126.29.194:3478,turn,101.126.29.194,3478,545,0,alive,-,CN,101.126.29.
 turn://185.252.235.116:3478,turn,185.252.235.116,3478,546,0,alive,-,FR,185.252.235.116,AS51167 Contabo,Contabo,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://91.99.142.143:3478,turn,91.99.142.143,3478,546,0,alive,-,DE,91.99.142.143,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://95.217.200.110:3478,turn,95.217.200.110,3478,546,0,alive,-,FI,95.217.200.110,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
+turn://115.68.219.31:3479,turn,115.68.219.31,3479,546,0,alive,-,KR,115.68.219.31,AS38700 SMILESERV,SMILESERV,datacenter,2026-10-25 16:22:16,@user
 turn://49.13.229.75:3478,turn,49.13.229.75,3478,548,0,alive,-,DE,49.13.229.75,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://188.245.49.92:3478,turn,188.245.49.92,3478,548,0,alive,-,DE,188.245.49.92,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://136.243.156.26:3478,turn,136.243.156.26,3478,548,0,alive,-,DE,136.243.156.26,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat

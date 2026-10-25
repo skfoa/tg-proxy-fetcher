@@ -8340,6 +8340,36 @@
     "source": "@danfeng_chat"
   },
   {
+    "proxy": "turn://115.68.222.194:3478",
+    "protocol": "turn",
+    "ip": "115.68.222.194",
+    "port": 3478,
+    "country": "KR",
+    "country_name": "韩国",
+    "country_cn": "韩国",
+    "country_emoji": "🇰🇷",
+    "asn": "38700",
+    "asOrganization": "SMILESERV",
+    "isp": "SMILESERV",
+    "net_type": "datacenter",
+    "source": "@user"
+  },
+  {
+    "proxy": "turn://115.68.219.31:3478",
+    "protocol": "turn",
+    "ip": "115.68.219.31",
+    "port": 3478,
+    "country": "KR",
+    "country_name": "韩国",
+    "country_cn": "韩国",
+    "country_emoji": "🇰🇷",
+    "asn": "38700",
+    "asOrganization": "SMILESERV",
+    "isp": "SMILESERV",
+    "net_type": "datacenter",
+    "source": "@user"
+  },
+  {
     "proxy": "turn://94.103.99.221:3478",
     "protocol": "turn",
     "ip": "94.103.99.221",
@@ -8698,6 +8728,21 @@
     "isp": "Hetzner",
     "net_type": "datacenter",
     "source": "@danfeng_chat"
+  },
+  {
+    "proxy": "turn://115.68.219.31:3479",
+    "protocol": "turn",
+    "ip": "115.68.219.31",
+    "port": 3479,
+    "country": "KR",
+    "country_name": "韩国",
+    "country_cn": "韩国",
+    "country_emoji": "🇰🇷",
+    "asn": "38700",
+    "asOrganization": "SMILESERV",
+    "isp": "SMILESERV",
+    "net_type": "datacenter",
+    "source": "@user"
   },
   {
     "proxy": "turn://49.13.229.75:3478",
