@@ -610,7 +610,7 @@ async def async_main(args):
             )
             endpoint = ""
     else:
-        log.info("未配置外部检测端点 (CHECK_PROXYIP_URL 留空)，采用本地直接探测（无外部依赖）")
+        log.info("采用本地原生 TLS 穿透质检（零外部依赖，并发: %d）", args.concurrency)
 
     try:
         rows = await verify_proxyips(
