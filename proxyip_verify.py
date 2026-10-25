@@ -102,9 +102,11 @@ HTTP_TIMEOUT = 3.5   # HTTP /cdn-cgi/trace 读取统一 deadline 超时
 CONCURRENCY = 250    # 异步探测协程池并发上限（平滑并发，兼顾速度与对端防刷限流）
 MAX_FAILS = 3        # 连续失败物理淘汰阈值（第 1~2 次缓冲容错，连续 3 次全网不可达永久淘汰）
 
-# 架构准则：ProxyIP 常规存活质检默认强制走本地原生 TLS 穿透探测（零外部依赖、250+ 高并发且无对端风控限流）。
-# 外部 Check ProxyIP 端点仅供 tg_fetch.py 对未知新节点出口信息补全，或在显式传入 --check-endpoint 时作为演练探针。
-CHECK_ENDPOINT = ""
+# 混合分流架构准则（对标 proxies_verify 的成熟模型）：
+# 1. 默认读取环境变量 CHECK_PROXYIP_URL；
+# 2. 已知画像且非机房的老节点走本地极速原生探测（零外部消耗、250 高并发）；
+# 3. 仅对缺少 exit_ip、未定性或 ASN 未知的新节点，通过专用线程池非阻塞调用外部端点补全画像。
+CHECK_ENDPOINT = os.getenv("CHECK_PROXYIP_URL", "").strip()
 CHECK_CONCURRENCY = safe_int(os.getenv("CHECK_CONCURRENCY"), 32)
 _CHECK_EXECUTOR: concurrent.futures.ThreadPoolExecutor | None = None
 
@@ -414,6 +416,8 @@ async def verify_proxyips(
     pass_count = 0
     fail_count_total = 0
     completed = 0
+    local_checked_cnt = 0
+    worker_checked_cnt = 0
     reasons_counter: dict[str, int] = defaultdict(int)
 
     # 全局显式初始化 _old_fc，确保异常提前返回或空跑时不遗留未定义状态
@@ -425,7 +429,7 @@ async def verify_proxyips(
     random.shuffle(indices)
 
     async def _check(idx: int):
-        nonlocal pass_count, fail_count_total, completed
+        nonlocal pass_count, fail_count_total, completed, local_checked_cnt, worker_checked_cnt
         row = rows[idx]
         fc = _get_fc(row)
         row["_old_fc"] = fc
@@ -442,8 +446,20 @@ async def verify_proxyips(
 
         lock_key = f"{ip}:{port}"
         async with sem, get_keyed_lock(lock_key):
-            if check_endpoint and check_executor:
-                # 外部端点多线程并发穿透鉴真模式（同 socks5 检测机制，高并发多线程不盲等）
+            # 混合分流准入控制（对标 proxies_verify 的成熟模型）：
+            # 1. 凡是老节点且已确认具备有效出口画像与非机房属性，走本地轻量高并发 probe_proxyip 极速探针，0 消耗 Worker 额度；
+            # 2. 凡是新拉取、缺少 exit_ip、未定性或 ASN 未知的节点，走 check_endpoint 外部端点进行严格穿透鉴真并补齐画像；
+            raw_asn = (row.get("asn") or "").strip().upper()
+            has_complete_profile = (
+                bool(row.get("exit_ip"))
+                and bool(raw_asn)
+                and raw_asn not in ("AS0", "0", "UNKNOWN", "AS_UNKNOWN")
+                and (row.get("net_type") or "").strip().lower() in ("isp", "business", "education", "government")
+            )
+
+            if not has_complete_profile and check_endpoint and check_executor:
+                worker_checked_cnt += 1
+                # 外部端点多线程并发穿透鉴真模式（高并发多线程不盲等，精准补齐出口画像）
                 loop = asyncio.get_running_loop()
                 alive, latency, colo, reason, exit_ip, exit_asn, exit_isp = await loop.run_in_executor(
                     check_executor, _sync_check_proxyip_endpoint, check_endpoint, ip, port, timeout
@@ -456,6 +472,7 @@ async def verify_proxyips(
                         row["isp"] = exit_isp
                         row["net_type"] = classify_asn(exit_asn, exit_isp)
             else:
+                local_checked_cnt += 1
                 # 本地直接 TLS 穿透 + /cdn-cgi/trace 鉴真
                 alive, latency, colo, reason = await probe_proxyip(
                     ip, port, connect_timeout=timeout, http_timeout=http_timeout
@@ -490,8 +507,13 @@ async def verify_proxyips(
     sorted_reasons = sorted(reasons_counter.items(), key=lambda x: x[1], reverse=True)
     reason_summary = ", ".join(f"{k}: {v}" for k, v in sorted_reasons)
     log.info(
-        "[ProxyIP 质检] 校验完成: 共 %d 条 | 存活通过 %d 条 (%.1f%%), 失败标记 %d 条",
-        total, pass_count, (pass_count / total * 100) if total else 0, fail_count_total,
+        "[ProxyIP 质检] 校验完成: 共 %d 条 | 存活通过 %d 条 (%.1f%%), 失败标记 %d 条 (本地原生探测: %d 条, 外部 Worker 鉴真: %d 条)",
+        total,
+        pass_count,
+        (pass_count / total * 100) if total else 0,
+        fail_count_total,
+        local_checked_cnt,
+        worker_checked_cnt,
     )
     log.info("[ProxyIP 质检] 探测原因汇总: %s", reason_summary)
     return rows
@@ -599,7 +621,7 @@ async def async_main(args):
         if is_endpoint_ok:
             check_executor = get_check_executor(max_workers=check_concurrency)
             log.info(
-                "🚀 启用 Check ProxyIP 外部穿透鉴真端点 (并发多线程): %s (专用并发线程: %d)",
+                "🚀 启用 Check ProxyIP 外部穿透鉴真端点 (混合分流模式: 已知画像走本地, 未知新节点走端点): %s (专用并发线程: %d)",
                 endpoint,
                 check_concurrency,
             )
@@ -610,7 +632,7 @@ async def async_main(args):
             )
             endpoint = ""
     else:
-        log.info("采用本地原生 TLS 穿透质检（零外部依赖，并发: %d）", args.concurrency)
+        log.info("未配置外部检测端点，采用本地原生 TLS 穿透质检（零外部依赖，并发: %d）", args.concurrency)
 
     try:
         rows = await verify_proxyips(
@@ -760,7 +782,7 @@ def main():
     parser.add_argument("--max-fails", type=int, default=MAX_FAILS, help=f"连续失败淘汰阈值 (默认 {MAX_FAILS})")
     parser.add_argument("--timeout", type=float, default=TIMEOUT, help=f"单节点连接与 TLS 握手超时秒数 (默认 {TIMEOUT})")
     parser.add_argument("--http-timeout", type=float, default=HTTP_TIMEOUT, help=f"单节点 HTTP 校验超时秒数 (默认 {HTTP_TIMEOUT})")
-    parser.add_argument("--check-endpoint", type=str, default="", help="Check ProxyIP 外部检测端点 URL (留空默认使用本地原生直接探测)")
+    parser.add_argument("--check-endpoint", type=str, default=CHECK_ENDPOINT, help="Check ProxyIP 外部检测端点 URL (默认读取环境变量 CHECK_PROXYIP_URL，留空使用本地直接探测)")
     parser.add_argument("--check-concurrency", type=int, default=CHECK_CONCURRENCY, help=f"外部检测端点并发线程数 (默认 {CHECK_CONCURRENCY})")
     parser.add_argument("--no-notify", action="store_true", help="静默模式，不单独发送 Telegram 质检通知（供流水线协同使用）")
     parser.add_argument("--dry-run", action="store_true", help="演练诊断模式，仅探测统计原因，不覆写数据文件也不登记墓地")
