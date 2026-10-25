@@ -2790,6 +2790,21 @@
     "source": "EDT-Pages"
   },
   {
+    "proxy": "https://118.130.28.228:443",
+    "protocol": "https",
+    "ip": "118.130.28.228",
+    "port": 443,
+    "country": "KR",
+    "country_name": "韩国",
+    "country_cn": "韩国",
+    "country_emoji": "🇰🇷",
+    "asn": "3786",
+    "asOrganization": "LG DACOM Corporation",
+    "isp": "LG DACOM Corporation",
+    "net_type": "isp",
+    "source": "@user"
+  },
+  {
     "proxy": "https://159.66.238.44:443",
     "protocol": "https",
     "ip": "159.66.238.44",
@@ -3045,6 +3060,36 @@
     "source": "EDT-Pages"
   },
   {
+    "proxy": "https://2.12.242.106:443",
+    "protocol": "https",
+    "ip": "2.12.242.106",
+    "port": 443,
+    "country": "FR",
+    "country_name": "法国",
+    "country_cn": "法国",
+    "country_emoji": "🇫🇷",
+    "asn": "3215",
+    "asOrganization": "Orange",
+    "isp": "Orange",
+    "net_type": "isp",
+    "source": "@user"
+  },
+  {
+    "proxy": "https://41.77.155.137:443",
+    "protocol": "https",
+    "ip": "41.77.155.137",
+    "port": 443,
+    "country": "ZA",
+    "country_name": "南非",
+    "country_cn": "南非",
+    "country_emoji": "🇿🇦",
+    "asn": "32653",
+    "asOrganization": "eNetworks (Pty) Ltd",
+    "isp": "eNetworks (Pty) Ltd",
+    "net_type": "isp",
+    "source": "@user"
+  },
+  {
     "proxy": "https://203.236.17.77:8104",
     "protocol": "https",
     "ip": "203.236.17.77",
@@ -3073,6 +3118,21 @@
     "isp": "Super Godzilla Communications GK",
     "net_type": "isp",
     "source": "proxifly"
+  },
+  {
+    "proxy": "https://41.77.152.91:443",
+    "protocol": "https",
+    "ip": "41.77.152.91",
+    "port": 443,
+    "country": "ZA",
+    "country_name": "南非",
+    "country_cn": "南非",
+    "country_emoji": "🇿🇦",
+    "asn": "32653",
+    "asOrganization": "eNetworks (Pty) Ltd",
+    "isp": "eNetworks (Pty) Ltd",
+    "net_type": "isp",
+    "source": "@user"
   },
   {
     "proxy": "https://107.91.88.78:8443",
@@ -3165,6 +3225,21 @@
     "source": "EDT-Pages"
   },
   {
+    "proxy": "https://41.77.155.141:443",
+    "protocol": "https",
+    "ip": "41.77.155.141",
+    "port": 443,
+    "country": "ZA",
+    "country_name": "南非",
+    "country_cn": "南非",
+    "country_emoji": "🇿🇦",
+    "asn": "32653",
+    "asOrganization": "eNetworks (Pty) Ltd",
+    "isp": "eNetworks (Pty) Ltd",
+    "net_type": "isp",
+    "source": "@user"
+  },
+  {
     "proxy": "https://41.205.129.179:443",
     "protocol": "https",
     "ip": "41.205.129.179",
@@ -3193,6 +3268,21 @@
     "isp": "eNetworks cc",
     "net_type": "isp",
     "source": "EDT-Pages"
+  },
+  {
+    "proxy": "https://41.77.155.154:443",
+    "protocol": "https",
+    "ip": "41.77.155.154",
+    "port": 443,
+    "country": "ZA",
+    "country_name": "南非",
+    "country_cn": "南非",
+    "country_emoji": "🇿🇦",
+    "asn": "32653",
+    "asOrganization": "eNetworks (Pty) Ltd",
+    "isp": "eNetworks (Pty) Ltd",
+    "net_type": "isp",
+    "source": "@user"
   },
   {
     "proxy": "https://103.153.135.118:443",
@@ -3300,6 +3390,21 @@
     "source": "EDT-Pages"
   },
   {
+    "proxy": "https://41.77.152.84:443",
+    "protocol": "https",
+    "ip": "41.77.152.84",
+    "port": 443,
+    "country": "ZA",
+    "country_name": "南非",
+    "country_cn": "南非",
+    "country_emoji": "🇿🇦",
+    "asn": "32653",
+    "asOrganization": "eNetworks (Pty) Ltd",
+    "isp": "eNetworks (Pty) Ltd",
+    "net_type": "isp",
+    "source": "@user"
+  },
+  {
     "proxy": "https://83.212.229.157:443",
     "protocol": "https",
     "ip": "83.212.229.157",
@@ -3328,6 +3433,21 @@
     "isp": "Durban Institute of Technology",
     "net_type": "education",
     "source": "EDT-Pages"
+  },
+  {
+    "proxy": "https://118.127.59.126:12443",
+    "protocol": "https",
+    "ip": "118.127.59.126",
+    "port": 12443,
+    "country": "AU",
+    "country_name": "澳大利亚",
+    "country_cn": "澳大利亚",
+    "country_emoji": "🇦🇺",
+    "asn": "45671",
+    "asOrganization": "Servers Australia Pty. Ltd",
+    "isp": "Servers Australia Pty. Ltd",
+    "net_type": "isp",
+    "source": "@user"
   },
   {
     "proxy": "https://83.212.225.31:443",
@@ -3450,6 +3570,21 @@
     "source": "proxifly"
   },
   {
+    "proxy": "https://90.160.15.197:443",
+    "protocol": "https",
+    "ip": "90.160.15.197",
+    "port": 443,
+    "country": "ES",
+    "country_name": "西班牙",
+    "country_cn": "西班牙",
+    "country_emoji": "🇪🇸",
+    "asn": "12430",
+    "asOrganization": "Vodafone Espana S.A.U.",
+    "isp": "Vodafone Espana S.A.U.",
+    "net_type": "isp",
+    "source": "@user"
+  },
+  {
     "proxy": "https://80.15.99.54:8090",
     "protocol": "https",
     "ip": "80.15.99.54",
@@ -3495,6 +3630,21 @@
     "source": "EDT-Pages"
   },
   {
+    "proxy": "https://194.254.206.88:443",
+    "protocol": "https",
+    "ip": "194.254.206.88",
+    "port": 443,
+    "country": "FR",
+    "country_name": "法国",
+    "country_cn": "法国",
+    "country_emoji": "🇫🇷",
+    "asn": "2200",
+    "asOrganization": "Renater",
+    "isp": "Renater",
+    "net_type": "education",
+    "source": "@user"
+  },
+  {
     "proxy": "https://122.165.229.173:443",
     "protocol": "https",
     "ip": "122.165.229.173",
@@ -3523,6 +3673,21 @@
     "isp": "CIA TRIAD SECURITY LLC",
     "net_type": "education",
     "source": "EDT-Pages"
+  },
+  {
+    "proxy": "https://41.77.155.147:443",
+    "protocol": "https",
+    "ip": "41.77.155.147",
+    "port": 443,
+    "country": "ZA",
+    "country_name": "南非",
+    "country_cn": "南非",
+    "country_emoji": "🇿🇦",
+    "asn": "32653",
+    "asOrganization": "eNetworks (Pty) Ltd",
+    "isp": "eNetworks (Pty) Ltd",
+    "net_type": "isp",
+    "source": "@user"
   },
   {
     "proxy": "https://64.119.193.154:443",
@@ -3628,6 +3793,21 @@
     "isp": "Orange Polska Spolka Akcyjna",
     "net_type": "isp",
     "source": "EDT-Pages"
+  },
+  {
+    "proxy": "https://213.98.90.68:8080",
+    "protocol": "https",
+    "ip": "213.98.90.68",
+    "port": 8080,
+    "country": "ES",
+    "country_name": "西班牙",
+    "country_cn": "西班牙",
+    "country_emoji": "🇪🇸",
+    "asn": "3352",
+    "asOrganization": "Telefonica de Espana SAU",
+    "isp": "Telefonica de Espana SAU",
+    "net_type": "isp",
+    "source": "@user"
   },
   {
     "proxy": "https://74.103.66.18:443",
