@@ -180,6 +180,21 @@
     "source": "EDT-Pages"
   },
   {
+    "proxy": "https://124.156.179.148:8443",
+    "protocol": "https",
+    "ip": "124.156.179.148",
+    "port": 8443,
+    "country": "HK",
+    "country_name": "中国香港",
+    "country_cn": "中国香港",
+    "country_emoji": "🇭🇰",
+    "asn": "132203",
+    "asOrganization": "Tencent Cloud",
+    "isp": "Tencent Cloud",
+    "net_type": "datacenter",
+    "source": "@user"
+  },
+  {
     "proxy": "https://181.215.52.16:9443",
     "protocol": "https",
     "ip": "181.215.52.16",
@@ -225,6 +240,21 @@
     "source": "EDT-Pages"
   },
   {
+    "proxy": "https://118.25.131.160:10003",
+    "protocol": "https",
+    "ip": "118.25.131.160",
+    "port": 10003,
+    "country": "SG",
+    "country_name": "新加坡",
+    "country_cn": "新加坡",
+    "country_emoji": "🇸🇬",
+    "asn": "21859",
+    "asOrganization": "Zenlayer",
+    "isp": "Zenlayer",
+    "net_type": "datacenter",
+    "source": "@user"
+  },
+  {
     "proxy": "https://108.60.228.210:443",
     "protocol": "https",
     "ip": "108.60.228.210",
@@ -253,6 +283,36 @@
     "isp": "Frontier Communications of America, Inc.",
     "net_type": "isp",
     "source": "EDT-Pages"
+  },
+  {
+    "proxy": "https://118.25.131.160:10061",
+    "protocol": "https",
+    "ip": "118.25.131.160",
+    "port": 10061,
+    "country": "SG",
+    "country_name": "新加坡",
+    "country_cn": "新加坡",
+    "country_emoji": "🇸🇬",
+    "asn": "21859",
+    "asOrganization": "Zenlayer",
+    "isp": "Zenlayer",
+    "net_type": "datacenter",
+    "source": "@user"
+  },
+  {
+    "proxy": "https://118.25.131.160:10027",
+    "protocol": "https",
+    "ip": "118.25.131.160",
+    "port": 10027,
+    "country": "SG",
+    "country_name": "新加坡",
+    "country_cn": "新加坡",
+    "country_emoji": "🇸🇬",
+    "asn": "21859",
+    "asOrganization": "Zenlayer",
+    "isp": "Zenlayer",
+    "net_type": "datacenter",
+    "source": "@user"
   },
   {
     "proxy": "https://208.72.4.50:443",
@@ -315,6 +375,21 @@
     "source": "EDT-Pages"
   },
   {
+    "proxy": "https://118.25.131.160:10050",
+    "protocol": "https",
+    "ip": "118.25.131.160",
+    "port": 10050,
+    "country": "SG",
+    "country_name": "新加坡",
+    "country_cn": "新加坡",
+    "country_emoji": "🇸🇬",
+    "asn": "21859",
+    "asOrganization": "Zenlayer",
+    "isp": "Zenlayer",
+    "net_type": "datacenter",
+    "source": "@user"
+  },
+  {
     "proxy": "https://45.56.228.8:443",
     "protocol": "https",
     "ip": "45.56.228.8",
@@ -328,6 +403,21 @@
     "isp": "Navarino Single Member S.A.",
     "net_type": "isp",
     "source": "EDT-Pages"
+  },
+  {
+    "proxy": "https://118.25.131.160:10015",
+    "protocol": "https",
+    "ip": "118.25.131.160",
+    "port": 10015,
+    "country": "SG",
+    "country_name": "新加坡",
+    "country_cn": "新加坡",
+    "country_emoji": "🇸🇬",
+    "asn": "21859",
+    "asOrganization": "Zenlayer",
+    "isp": "Zenlayer",
+    "net_type": "datacenter",
+    "source": "@user"
   },
   {
     "proxy": "https://64.98.50.100:443",
@@ -568,6 +658,21 @@
     "isp": "Invitech ICT Services Kft.",
     "net_type": "isp",
     "source": "EDT-Pages"
+  },
+  {
+    "proxy": "https://118.25.131.160:10028",
+    "protocol": "https",
+    "ip": "118.25.131.160",
+    "port": 10028,
+    "country": "SG",
+    "country_name": "新加坡",
+    "country_cn": "新加坡",
+    "country_emoji": "🇸🇬",
+    "asn": "21859",
+    "asOrganization": "Zenlayer",
+    "isp": "Zenlayer",
+    "net_type": "datacenter",
+    "source": "@user"
   },
   {
     "proxy": "https://162.244.227.36:443",
