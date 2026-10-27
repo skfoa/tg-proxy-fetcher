@@ -1237,6 +1237,7 @@ turn://34.177.86.104:3478,turn,34.177.86.104,3478,484,0,alive,-,SG,34.177.86.104
 turn://103.167.151.70:3478,turn,103.167.151.70,3478,484,0,alive,-,SG,103.167.151.70,AS135598 Siberfy,SIBERFY (PRIVATE) LIMITED,datacenter,2026-10-23 17:28:05,@user
 turn://int.demo.zhudian.store:3479,turn,int.demo.zhudian.store,3479,484,0,alive,-,CN,101.132.248.113,AS37963 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-14 12:57:52,@otcfxq
 turn://101.132.242.147:3479,turn,101.132.242.147,3479,484,0,alive,-,CN,101.132.242.147,AS37963 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-14 12:57:52,@otcfxq
+turn://85.155.188.123:3478,turn,85.155.188.123,3478,484,0,alive,-,AU,85.155.188.123,"AS63473 HostHatch, LLC","HostHatch, LLC",datacenter,2026-10-27 15:57:55,@user
 turn://91.107.240.72:3478,turn,91.107.240.72,3478,485,0,alive,-,DE,91.107.240.72,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://46.224.3.2:3478,turn,46.224.3.2,3478,485,0,alive,-,DE,46.224.3.2,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://142.132.192.5:3478,turn,142.132.192.5,3478,485,0,alive,-,DE,142.132.192.5,AS24940 Hetzner,Hetzner,datacenter,2026-10-25 17:48:11,@user
@@ -1403,6 +1404,7 @@ turn://39.98.86.59:3478,turn,39.98.86.59,3478,583,0,alive,-,CN,39.98.86.59,AS379
 turn://36.49.31.79:3478,turn,36.49.31.79,3478,585,0,alive,-,CN,36.49.31.79,AS4134 China Telecom,China Telecom,isp,2026-10-25 17:48:11,@user
 turn://115.190.244.160:3478,turn,115.190.244.160,3478,587,0,alive,-,CN,115.190.244.160,AS137718 GHSX,GHSX,datacenter,2026-10-25 17:48:11,@user
 turn://116.178.71.162:3478,turn,116.178.71.162,3478,589,0,alive,-,CN,116.178.71.162,AS4837 China Unicom,China Unicom,isp,2026-10-25 17:48:11,@user
+turn://170.205.37.61:3478,turn,170.205.37.61,3478,593,0,alive,-,US,170.205.37.61,"AS63473 HostHatch, LLC","HostHatch, LLC",datacenter,2026-10-27 15:57:55,@user
 turn://39.105.109.161:3478,turn,39.105.109.161,3478,617,0,alive,-,CN,39.105.109.161,AS37963 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://156.226.111.181:3478,turn,156.226.111.181,3478,659,0,alive,-,HK,156.226.111.181,AS135097 LUOGELANG (FRANCE) LIMITED,LUOGELANG (FRANCE) LIMITED,datacenter,2026-10-25 17:48:11,@user
 turn://42.101.91.67:3478,turn,42.101.91.67,3478,671,0,alive,-,CN,42.101.91.67,AS137698 China Telecom,China Telecom,isp,2026-10-25 17:48:11,@user
