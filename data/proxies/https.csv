@@ -1,267 +1,275 @@
 ﻿url,proto,host,port,delay_ms,fail_count,status,colo,country,egress_ip,asn,isp,net_type,first_seen,source
-https://208.66.248.70:443,https,208.66.248.70,443,92,0,alive,YVR,CA,208.66.248.70,AS14642 Morewave Communication Inc.,Morewave Communication Inc.,isp,2026-10-15 10:08:09,EDT-Pages
-https://130.253.2.250:443,https,130.253.2.250,443,101,0,alive,DEN,US,130.253.2.246,AS14041 University of Denver,University of Denver,education,2026-10-15 10:08:09,EDT-Pages
-https://47.149.9.211:443,https,47.149.9.211,443,137,0,alive,LAX,US,47.149.9.211,"AS5650 Frontier Communications of America, Inc.","Frontier Communications of America, Inc.",isp,2026-10-15 10:08:09,EDT-Pages
-https://216.218.159.87:443,https,216.218.159.87,443,143,0,alive,SJC,US,216.218.159.66,AS6939 Hurricane Electric LLC,Hurricane Electric LLC,isp,2026-10-15 10:08:09,EDT-Pages
-https://12.202.180.118:443,https,12.202.180.118,443,172,0,alive,ORD,US,12.202.180.130,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",isp,2026-10-09 00:00:00,EDT-Pages
-https://12.221.146.147:9443,https,12.221.146.147,9443,173,0,alive,DFW,US,12.221.146.155,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",isp,2026-10-09 00:00:00,EDT-Pages
-https://12.202.180.10:9443,https,12.202.180.10,9443,190,0,alive,ORD,US,12.202.180.112,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",isp,2026-10-09 00:00:00,EDT-Pages
-https://181.215.52.122:9443,https,181.215.52.122,9443,196,0,alive,YYZ,CA,181.215.52.131,AS397540 Windscribe Limited (Private Customer),Private Customer,isp,2026-10-25 14:07:00,EDT-Pages
-https://181.215.52.25:9443,https,181.215.52.25,9443,201,0,alive,YYZ,CA,181.215.52.29,AS397540 Windscribe Limited (Private Customer),Private Customer,isp,2026-10-25 14:07:00,EDT-Pages
-https://181.215.52.40:9443,https,181.215.52.40,9443,202,0,alive,YYZ,CA,181.215.52.45,AS397540 Windscribe Limited (Private Customer),Private Customer,isp,2026-10-25 14:07:00,EDT-Pages
-https://181.215.52.16:9443,https,181.215.52.16,9443,203,0,alive,YYZ,CA,181.215.52.19,AS397540 Windscribe Limited (Private Customer),Private Customer,isp,2026-10-25 14:07:00,EDT-Pages
-https://181.215.52.101:9443,https,181.215.52.101,9443,203,0,alive,YYZ,CA,181.215.52.110,AS397540 Windscribe Limited (Private Customer),Private Customer,isp,2026-10-25 14:07:00,EDT-Pages
-https://149.57.28.9:443,https,149.57.28.9,443,204,0,alive,YYZ,CA,149.57.28.250,AS397540 Windscribe Limited,Windscribe,isp,2026-10-25 14:07:00,EDT-Pages
-https://129.97.50.72:443,https,129.97.50.72,443,217,0,alive,YYZ,CA,129.97.50.72,AS12093 University of Waterloo,University of Waterloo,education,2026-10-15 10:08:09,EDT-Pages
-https://96.5.129.85:443,https,96.5.129.85,443,222,0,alive,SEA,US,96.5.129.121,AS11686 Zayo Bandwidth,Zayo Bandwidth,isp,2026-10-09 00:00:00,EDT-Pages
-https://64.98.50.100:443,https,64.98.50.100,443,245,0,alive,DEN,US,64.98.50.100,AS32133 Ting Fiber Inc.,Ting Fiber Inc.,isp,2026-10-09 00:00:00,EDT-Pages
-https://173.13.157.60:443,https,173.13.157.60,443,251,0,alive,SJC,US,2603:3024:152d:4800:250:56ff:fe94:2574,"AS7922 Comcast Cable Communications, LLC","Comcast Cable Communications, LLC",isp,2026-10-15 10:08:09,EDT-Pages
-https://138.108.28.48:443,https,138.108.28.48,443,262,0,alive,ORD,US,138.108.24.20,AS396290 Nielsen Consumer LLC,Nielsen Consumer LLC,business,2026-10-15 10:08:09,EDT-Pages
-https://154.202.118.108:443,https,154.202.118.108,443,305,0,alive,IAD,US,66.92.227.30,AS3257 GTT Communications,GTT Communications,isp,2026-10-23 12:55:36,EDT-Pages
-https://192.126.96.110:443,https,192.126.96.110,443,306,0,alive,IAD,US,192.126.96.110,AS46988 Maryland Institute College of Art,Maryland Institute College of Art,education,2026-10-15 10:08:09,EDT-Pages
-https://209.191.136.62:443,https,209.191.136.62,443,310,0,alive,ORD,US,209.191.136.30,AS26307 Horace Mann Service Corporation,Horace Mann Service Corporation,business,2026-10-21 15:52:42,EDT-Pages
-https://74.103.66.18:443,https,74.103.66.18,443,312,0,alive,PHL,US,74.103.66.2,AS701 Verizon Business,Verizon Business,isp,2026-10-21 15:52:42,EDT-Pages
-https://103.135.244.2:9443,https,103.135.244.2,9443,313,0,alive,NRT,JP,103.135.244.25,AS138652 Super Godzilla Communications GK,Super Godzilla Communications GK,isp,2026-10-09 00:00:00,EDT-Pages
-https://24.225.10.211:443,https,24.225.10.211,443,332,0,alive,DEN,US,24.225.10.210,"AS14155 RURAL TELEPHONE SERVICE COMPANY, INC.","RURAL TELEPHONE SERVICE COMPANY, INC.",isp,2026-10-09 00:00:00,EDT-Pages
-https://190.113.112.147:4443,https,190.113.112.147,4443,352,0,alive,SJO,CR,190.113.112.147,AS52263 Telecarrier,Telecarrier,isp,2026-10-15 10:08:09,EDT-Pages
-https://24.121.152.67:443,https,24.121.152.67,443,359,0,alive,SAN,US,24.121.152.67,AS19108 Optimum,Optimum,isp,2026-10-09 00:00:00,EDT-Pages
-https://58.120.141.74:443,https,58.120.141.74,443,373,0,alive,ICN,KR,58.120.141.78,AS9318 SK Broadband,SK Broadband,isp,2026-10-09 00:00:00,EDT-Pages
-https://159.66.238.44:443,https,159.66.238.44,443,392,0,alive,IAH,US,159.66.238.224,AS30175 Epicor Software Corporation,Epicor Software Corporation,business,2026-10-25 14:07:00,EDT-Pages
-https://108.60.228.210:443,https,108.60.228.210,443,401,0,alive,MIA,BS,108.60.228.210,"AS8014 The Bahamas Telecommunications Company, Ltd.","The Bahamas Telecommunications Company, Ltd.",isp,2026-10-15 10:08:09,EDT-Pages
-https://133.9.6.9:443,https,133.9.6.9,443,416,0,alive,NRT,JP,133.9.6.10,AS17956 Japan Network Information Center,Japan Network Information Center,education,2026-10-15 10:08:09,EDT-Pages
-https://66.64.100.66:443,https,66.64.100.66,443,423,0,alive,MCI,US,66.64.100.66,AS18712 Everfast Fiber Networks LLC,Everfast Fiber Networks LLC,isp,2026-10-09 00:00:00,EDT-Pages
-https://190.211.102.2:443,https,190.211.102.2,443,436,0,alive,SJO,CR,190.211.102.2,AS262145 Cooperativa de Electrificación Rural de San Carlos R.L. Coopelesca R.L.,Cooperativa de Electrificación Rural de San Carlos R.L. Coopelesca R.L.,isp,2026-10-15 10:08:09,EDT-Pages
-https://210.207.52.13:443,https,210.207.52.13,443,441,0,alive,ICN,KR,210.207.52.2,AS3786 LG DACOM Corporation,LG DACOM Corporation,isp,2026-10-15 10:08:09,EDT-Pages
-https://204.110.58.174:443,https,204.110.58.174,443,441,0,alive,MIA,TC,204.110.58.174,AS394311 Digicel Turks and Caicos Ltd (TCT Ltd.),TCT Ltd.,isp,2026-10-25 14:07:00,EDT-Pages
-https://221.126.247.53:22,https,221.126.247.53,22,442,0,alive,HKG,HK,221.126.247.53,AS9304 HGC Global Communications Limited,HGC Global Communications Limited,isp,2026-10-15 10:08:09,EDT-Pages
-https://162.244.227.36:443,https,162.244.227.36,443,447,0,alive,ORD,US,162.244.227.36,"AS1423 Rainbow Communications, L.L.C.","Rainbow Communications, L.L.C.",isp,2026-10-09 00:00:00,EDT-Pages
-https://193.49.168.100:443,https,193.49.168.100,443,455,0,alive,CDG,FR,193.49.168.100,AS2200 Renater,Renater,education,2026-10-15 10:08:09,EDT-Pages
-https://65.255.63.50:443,https,65.255.63.50,443,458,0,alive,MIA,TC,208.169.72.50,AS22933 Vodafone Americas,Vodafone Americas,isp,2026-10-15 10:08:09,EDT-Pages
-https://12.202.180.118:9443,https,12.202.180.118,9443,462,0,alive,SEA,US,12.202.180.124,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",isp,2026-10-26 12:52:01,proxifly
-https://45.131.254.246:443,https,45.131.254.246,443,472,0,alive,ZRH,CH,2001:1680:101:93::246,AS9044 BSE Software GmbH,BSE Software GmbH,isp,2026-10-15 10:08:09,EDT-Pages
-https://190.113.112.147:443,https,190.113.112.147,443,476,0,alive,SJO,CR,190.113.112.147,AS52263 Telecarrier,Telecarrier,isp,2026-10-15 10:08:09,EDT-Pages
-https://193.203.16.6:443,https,193.203.16.6,443,479,0,alive,HAM,DE,193.203.16.6,AS50629 Cassens Strassenbau GmbH,Cassens Strassenbau GmbH,isp,2026-10-15 10:08:09,EDT-Pages
-https://81.172.178.145:8443,https,81.172.178.145,8443,485,0,alive,AMS,NL,2001:4c3c:ae1d:ec00:fab4:6aff:fe25:9605,AS15435 DELTA Fiber Nederland B.V.,DELTA Fiber Nederland B.V.,isp,2026-10-15 10:08:09,EDT-Pages
-https://62.210.147.2:443,https,62.210.147.2,443,486,0,alive,CDG,FR,209.131.65.213,AS214143 SysLevel SAS,SysLevel SAS,isp,2026-10-09 00:00:00,EDT-Pages
-https://193.226.205.54:443,https,193.226.205.54,443,486,0,alive,BUD,HU,193.226.205.54,AS12301 Invitech ICT Services Kft.,Invitech ICT Services Kft.,isp,2026-10-15 10:08:09,EDT-Pages
-https://198.40.90.50:443,https,198.40.90.50,443,491,0,alive,DUS,DE,198.40.90.50,AS3320 Deutsche Telekom AG,Deutsche Telekom AG,isp,2026-10-15 10:08:09,EDT-Pages
-https://66.153.187.90:8090,https,66.153.187.90,8090,493,0,alive,ATL,US,66.153.187.90,AS21565 Nations Title Agency Carolina s,Nations Title Agency Carolina s,isp,2026-10-09 00:00:00,EDT-Pages
-https://217.96.36.36:443,https,217.96.36.36,443,494,0,alive,WAW,PL,217.96.36.36,AS5617 Orange Swiatlowod,Orange Swiatlowod,isp,2026-10-15 10:08:09,EDT-Pages
-https://62.210.70.194:443,https,62.210.70.194,443,494,0,alive,CDG,FR,209.131.65.213,AS214143 SysLevel SAS,SysLevel SAS,isp,2026-10-09 00:00:00,EDT-Pages
-https://123.108.164.103:443,https,123.108.164.103,443,498,0,alive,ICN,KR,123.108.164.103,"AS7562 kt HCN Co.,Ltd.","kt HCN Co.,Ltd.",isp,2026-10-21 15:52:42,EDT-Pages
-https://95.153.32.2:9443,https,95.153.32.2,9443,498,0,alive,TLL,EE,95.153.32.12,AS1257 Tele2 Sverige AB,Tele2 Sverige AB,isp,2026-10-09 00:00:00,EDT-Pages
-https://193.87.1.71:443,https,193.87.1.71,443,500,0,alive,BTS,SK,2001:4118:900:d814::47:0,AS2607 Zdruzenie pouzivatelov Slovenskej akademickej datovej siete SANET,Zdruzenie pouzivatelov Slovenskej akademickej datovej siete SANET,education,2026-10-15 10:08:09,EDT-Pages
-https://185.68.28.79:443,https,185.68.28.79,443,503,0,alive,PRG,CZ,185.68.28.76,AS201648 Plzensky kraj,Plzensky kraj,government,2026-10-15 10:08:09,EDT-Pages
-https://123.108.164.102:443,https,123.108.164.102,443,505,0,alive,ICN,KR,123.108.164.102,"AS7562 kt HCN Co.,Ltd.","kt HCN Co.,Ltd.",isp,2026-10-21 15:52:42,EDT-Pages
-https://134.1.7.9:443,https,134.1.7.9,443,506,0,alive,HAM,DE,134.1.7.9,AS680 Awinet,Awinet,education,2026-10-09 00:00:00,EDT-Pages
-https://153.5.68.160:443,https,153.5.68.160,443,514,0,alive,LJU,SI,2001:1470:ff94:d:153:5:68:160,AS2107 ARNES,ARNES,education,2026-10-15 10:08:09,EDT-Pages
-https://90.160.15.197:443,https,90.160.15.197,443,517,0,alive,MAD,ES,77.230.129.82,AS12430 Vodafone Espana S.A.U.,Vodafone Espana S.A.U.,isp,2026-10-25 16:44:06,@user
-https://195.200.166.126:443,https,195.200.166.126,443,517,0,alive,MRS,FR,149.232.174.15,AS30781 Free Pro SAS,Free Pro SAS,isp,2026-10-15 10:08:09,EDT-Pages
-https://195.182.74.92:42443,https,195.182.74.92,42443,520,0,alive,VNO,LT,195.182.74.91,AS6769 Kertinis valstybes telekomunikaciju centras,Kertinis valstybes telekomunikaciju centras,isp,2026-10-15 10:08:09,EDT-Pages
-https://46.229.114.132:40000,https,46.229.114.132,40000,523,0,alive,PRG,CZ,46.229.114.132,AS56450 Alberon Letohrad s.r.o,Alberon Letohrad s.r.o,isp,2026-10-15 10:08:09,EDT-Pages
-https://62.210.27.111:443,https,62.210.27.111,443,527,0,alive,CDG,FR,209.131.65.213,AS214143 SysLevel SAS,SysLevel SAS,isp,2026-10-09 00:00:00,EDT-Pages
-https://217.237.171.227:443,https,217.237.171.227,443,527,0,alive,FRA,DE,217.89.78.118,AS3320 Deutsche Telekom AG,Deutsche Telekom AG,isp,2026-10-15 10:08:09,EDT-Pages
-https://183.179.162.50:443,https,183.179.162.50,443,530,0,alive,HKG,HK,183.179.8.238,AS9269 Hong Kong Broadband Network Ltd.,Hong Kong Broadband Network Ltd.,isp,2026-10-15 10:08:09,EDT-Pages
-https://82.64.46.151:8013,https,82.64.46.151,8013,532,0,alive,CDG,FR,82.64.46.151,AS12322 Free SAS,Free SAS,isp,2026-10-15 10:08:09,EDT-Pages
-https://195.146.134.204:443,https,195.146.134.204,443,534,0,alive,PRG,SK,195.146.134.200,"AS6855 Slovak Telekom, a.s.","Slovak Telekom, a.s.",isp,2026-10-15 10:08:09,EDT-Pages
-https://217.13.162.5:443,https,217.13.162.5,443,535,0,alive,FRA,DE,217.13.162.5,AS12460 mandala IT GmbH,mandala IT GmbH,isp,2026-10-15 10:08:09,EDT-Pages
-https://138.118.81.189:443,https,138.118.81.189,443,541,0,alive,SJO,CR,138.118.81.189,AS52263 TELECABLE RESIDENCIAL,TELECABLE RESIDENCIAL,isp,2026-10-15 10:08:09,EDT-Pages
-https://185.225.28.50:443,https,185.225.28.50,443,549,0,alive,SOF,MK,185.225.28.59,AS205119 TELEKS DOOEL Skopje,TELEKS DOOEL Skopje,isp,2026-10-09 00:00:00,EDT-Pages
-https://200.52.72.14:443,https,200.52.72.14,443,549,0,alive,QRO,MX,200.52.72.14,"AS14178 Megacable Comunicaciones de Mexico, S.A. de C.V.","Megacable Comunicaciones de Mexico, S.A. de C.V.",isp,2026-10-15 10:08:09,EDT-Pages
-https://84.72.72.153:443,https,84.72.72.153,443,551,0,alive,ZRH,CH,84.72.72.153,AS6730 Sunrise GmbH,Sunrise GmbH,isp,2026-10-15 10:08:09,EDT-Pages
-https://103.87.68.50:9443,https,103.87.68.50,9443,552,0,alive,CGK,ID,103.87.68.58,AS150249 PT Atharva Telematika Persada,PT Atharva Telematika Persada,isp,2026-10-25 14:07:00,EDT-Pages
-https://195.231.110.164:443,https,195.231.110.164,443,553,0,alive,MXP,IT,2a00:6d43:10e:4300:5054:ff:fe6e:85a8,AS202613 Aruba S.p.A. Broadband Pool BNG,Aruba S.p.A. Broadband Pool BNG,isp,2026-10-25 14:07:00,EDT-Pages
-https://81.180.222.73:443,https,81.180.222.73,443,554,0,alive,OTP,RO,81.180.222.73,AS2614 Universitatea Tehnica Gheorghe Asachi din Iasi,Universitatea Tehnica Gheorghe Asachi din Iasi,education,2026-10-15 10:08:09,EDT-Pages
-https://190.112.224.179:443,https,190.112.224.179,443,556,0,alive,MIA,CW,190.112.224.132,AS52233 Columbus Communications Curacao NV,Columbus Communications Curacao NV,isp,2026-10-15 10:08:09,EDT-Pages
-https://103.87.68.146:9443,https,103.87.68.146,9443,561,0,alive,CGK,ID,103.87.68.156,AS150249 PT Atharva Telematika Persada,PT Atharva Telematika Persada,isp,2026-10-25 14:07:00,EDT-Pages
-https://66.249.146.210:443,https,66.249.146.210,443,566,0,alive,MIA,AG,66.249.146.210,AS396304 Digicel,Digicel,isp,2026-10-09 00:00:00,EDT-Pages
-https://162.191.226.246:9443,https,162.191.226.246,9443,567,0,alive,ORD,US,162.191.226.246,"AS21928 T-Mobile USA, Inc.","T-Mobile USA, Inc.",isp,2026-10-09 00:00:00,EDT-Pages
-https://189.204.255.4:8443,https,189.204.255.4,8443,572,0,alive,QRO,MX,187.141.99.82,AS8151 UNINET,UNINET,isp,2026-10-15 10:08:09,EDT-Pages
-https://203.31.65.32:443,https,203.31.65.32,443,576,0,alive,MEL,AU,203.31.65.32,AS133120 Hosted Network Pty Ltd,Hosted Network Pty Ltd,isp,2026-10-26 12:52:01,EDT-Pages
-https://66.249.156.130:443,https,66.249.156.130,443,583,0,alive,MIA,LC,66.249.156.130,AS33582 Digicel St.Lucia Ltd,Digicel St.Lucia Ltd,isp,2026-10-15 10:08:09,EDT-Pages
-https://103.40.138.14:443,https,103.40.138.14,443,595,0,alive,BKK,TH,223.27.243.104,AS38794,"United Information Highway Co.,Ltd.",isp,2026-10-21 15:52:42,EDT-Pages
-https://173.225.245.67:443,https,173.225.245.67,443,599,0,alive,EWR,JM,173.225.245.67,AS40786 Digicel Jamaica,Digicel Jamaica,isp,2026-10-15 10:08:09,EDT-Pages
-https://83.212.74.234:443,https,83.212.74.234,443,602,0,alive,ATH,GR,2001:648:2ffe:501:cc00:11ff:fe0e:69cc,AS5408 National Infrastructures for Research and Technology S.A.,National Infrastructures for Research and Technology S.A.,education,2026-10-21 15:52:42,EDT-Pages
-https://193.49.168.97:443,https,193.49.168.97,443,603,0,alive,CDG,FR,193.49.168.97,AS2200 Renater,Renater,education,2026-10-15 10:08:09,EDT-Pages
-https://83.212.77.6:443,https,83.212.77.6,443,603,0,alive,ATH,GR,2001:648:2ffe:501:cc00:13ff:fe66:d464,AS5408 National Infrastructures for Research and Technology S.A.,National Infrastructures for Research and Technology S.A.,education,2026-10-21 15:52:42,EDT-Pages
-https://133.9.6.10:443,https,133.9.6.10,443,605,0,alive,NRT,JP,133.9.6.10,AS17956 Japan Network Information Center,Japan Network Information Center,education,2026-10-15 10:08:09,EDT-Pages
-https://194.15.211.132:10000,https,194.15.211.132,10000,606,0,alive,FRA,DE,194.15.211.132,AS15779 Reply S.p.A.,Reply S.p.A.,business,2026-10-15 10:08:09,EDT-Pages
-https://134.0.63.185:443,https,134.0.63.185,443,612,0,alive,MXP,AL,134.0.63.189,AS5576 INSTAT,INSTAT,government,2026-10-15 10:08:09,EDT-Pages
-https://206.253.147.105:8090,https,206.253.147.105,8090,615,0,alive,IAD,US,206.253.147.105,"AS14615 PBT Communications, Inc.","PBT Communications, Inc.",isp,2026-10-09 00:00:00,EDT-Pages
-https://147.157.130.1:443,https,147.157.130.1,443,620,0,alive,NRT,JP,147.157.130.1,AS2907 Tsukuba College of Technology,Tsukuba College of Technology,education,2026-10-09 00:00:00,EDT-Pages
-https://2.12.242.106:443,https,2.12.242.106,443,622,0,alive,CDG,FR,2.12.242.106,AS3215 Orange,Orange,isp,2026-10-25 16:44:06,@user
-https://193.136.192.57:443,https,193.136.192.57,443,632,0,alive,LIS,PT,2001:690:a00:4001::57,"AS1930 Fundacao para a Ciencia e a Tecnologia, I.P.","Fundacao para a Ciencia e a Tecnologia, I.P.",education,2026-10-21 15:52:42,EDT-Pages
-https://95.153.31.66:443,https,95.153.31.66,443,636,0,alive,TLL,EE,95.153.31.74,AS1257 Tele2 Sverige AB,Tele2 Sverige AB,isp,2026-10-09 00:00:00,EDT-Pages
-https://113.23.216.128:9088,https,113.23.216.128,9088,640,0,alive,HKG,MY,113.23.216.128,AS38182 Webserver Dedicated Hosting,Webserver Dedicated Hosting,isp,2026-10-12 15:18:13,EDT-Pages
-https://208.169.72.50:443,https,208.169.72.50,443,644,0,alive,MIA,TC,208.169.72.50,AS22933 Vodafone Americas,Vodafone Americas,isp,2026-10-15 10:08:09,EDT-Pages
-https://91.227.97.113:443,https,91.227.97.113,443,645,0,alive,PRG,CZ,91.227.97.113,AS198103 CCS Ceska spolecnost pro platebni karty s.r.o.,CCS Ceska spolecnost pro platebni karty s.r.o.,business,2026-10-15 10:08:09,EDT-Pages
-https://175.134.18.237:443,https,175.134.18.237,443,647,0,alive,NRT,JP,240f:111:54d:1:2eb1:f658:607d:e97b,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-15 10:08:09,EDT-Pages
-https://210.19.96.163:443,https,210.19.96.163,443,648,0,alive,KUL,MY,210.19.96.163,AS9930 TT DOTCOM SDN BHD,TT DOTCOM SDN BHD,isp,2026-10-15 10:08:09,EDT-Pages
-https://195.80.165.154:443,https,195.80.165.154,443,650,0,alive,BTS,SK,212.55.225.242,AS31679 Slovanet a.s.,Slovanet a.s.,isp,2026-10-15 10:08:09,EDT-Pages
-https://200.75.11.94:443,https,200.75.11.94,443,652,0,alive,SCL,CL,200.75.11.90,AS14259 Gtd Internet S.A.,Gtd Internet S.A.,isp,2026-10-09 00:00:00,EDT-Pages
-https://213.207.130.34:443,https,213.207.130.34,443,653,0,alive,MRS,CY,213.207.130.46,AS15805 Epic Ltd,Epic Ltd,isp,2026-10-09 00:00:00,EDT-Pages
-https://64.119.193.154:443,https,64.119.193.154,443,654,0,alive,MIA,BB,64.119.193.154,AS35900 Sunbeach Communications Inc.,Sunbeach Communications Inc.,isp,2026-10-15 10:08:09,EDT-Pages
-https://211.72.236.159:443,https,211.72.236.159,443,657,0,alive,TPE,TW,211.23.161.79,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,isp,2026-10-15 10:08:09,EDT-Pages
-https://193.25.2.239:443,https,193.25.2.239,443,658,0,alive,BUD,PL,193.25.2.239,AS59686 Gemini Internet Sp. z o.o.,Gemini Internet Sp. z o.o.,isp,2026-10-15 10:08:09,EDT-Pages
-https://212.243.240.120:443,https,212.243.240.120,443,661,0,alive,ZRH,CH,212.243.240.120,AS3303 Bluewin,Bluewin,isp,2026-10-15 10:08:09,EDT-Pages
-https://194.249.231.22:443,https,194.249.231.22,443,663,0,alive,LJU,SI,2001:1470:ff80:e3:215:5dff:fe9a:f400,AS2107 ARNES,ARNES,education,2026-10-15 10:08:09,EDT-Pages
-https://178.115.238.253:443,https,178.115.238.253,443,666,0,alive,VIE,AT,178.115.238.253,AS25255 Hutchison Drei Austria GmbH,Hutchison Drei Austria GmbH,isp,2026-10-15 10:08:09,EDT-Pages
-https://50.76.211.251:8090,https,50.76.211.251,8090,671,0,alive,MEM,US,50.76.211.250,"AS7922 Comcast Cable Communications, LLC","Comcast Cable Communications, LLC",isp,2026-10-09 00:00:00,EDT-Pages
-https://83.103.36.213:443,https,83.103.36.213,443,678,0,alive,FCO,IT,83.103.36.211,AS12874 Fastweb SpA,Fastweb SpA,isp,2026-10-15 10:08:09,EDT-Pages
-https://87.251.79.113:443,https,87.251.79.113,443,681,0,alive,FRA,US,152.53.150.12,AS27284 Fourplex Telecom LLC,Fourplex Telecom LLC,isp,2026-10-16 12:36:06,EDT-Pages
-https://195.182.74.91:42443,https,195.182.74.91,42443,686,0,alive,VNO,LT,195.182.74.91,AS6769 Kertinis valstybes telekomunikaciju centras,Kertinis valstybes telekomunikaciju centras,isp,2026-10-15 10:08:09,EDT-Pages
-https://114.33.6.158:443,https,114.33.6.158,443,686,0,alive,KHH,TW,114.33.6.158,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,isp,2026-10-09 00:00:00,EDT-Pages
-https://213.96.140.33:443,https,213.96.140.33,443,686,0,alive,MAD,ES,213.96.140.33,AS3352 Telefonica De Espana SAU NCC 2000013794,Telefonica De Espana SAU NCC 2000013794,isp,2026-10-15 10:08:09,EDT-Pages
-https://213.241.124.228:443,https,213.241.124.228,443,696,0,alive,WAW,PL,213.241.124.228,AS12741 Netia SA,Netia SA,isp,2026-10-15 10:08:09,EDT-Pages
-https://118.127.59.126:12443,https,118.127.59.126,12443,699,0,alive,MEL,AU,118.127.59.114,AS45671 Servers Australia Pty. Ltd,Servers Australia Pty. Ltd,isp,2026-10-25 16:44:06,@user
-https://14.225.19.28:8443,https,14.225.19.28,8443,703,0,alive,HKG,VN,14.225.19.28,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group,isp,2026-10-09 00:00:00,EDT-Pages
-https://193.87.1.47:443,https,193.87.1.47,443,705,0,alive,BTS,SK,2001:4118:900:d812::2f:0,AS2607 Zdruzenie pouzivatelov Slovenskej akademickej datovej siete SANET,Zdruzenie pouzivatelov Slovenskej akademickej datovej siete SANET,education,2026-10-15 10:08:09,EDT-Pages
-https://113.23.216.129:9088,https,113.23.216.129,9088,707,0,alive,HKG,MY,113.23.216.128,AS38182 Webserver Dedicated Hosting,Webserver Dedicated Hosting,isp,2026-10-12 15:18:13,EDT-Pages
-https://23.161.192.97:9443,https,23.161.192.97,9443,711,0,alive,SEA,US,23.161.192.103,AS19575 ISPNET Communications LLC,ISPNET Communications LLC,isp,2026-10-25 14:07:00,proxifly
-https://184.188.139.2:8090,https,184.188.139.2,8090,715,0,alive,IAD,US,184.188.139.2,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-09 00:00:00,EDT-Pages
-https://183.111.240.139:443,https,183.111.240.139,443,720,0,alive,ICN,KR,211.38.95.10,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-19 12:45:55,EDT-Pages
-https://89.188.125.42:443,https,89.188.125.42,443,730,0,alive,FRA,RU,89.188.125.42,AS29076 Citytelecom LLC (Filanco),Citytelecom LLC (Filanco),isp,2026-10-15 10:08:09,EDT-Pages
-https://94.102.226.59:443,https,94.102.226.59,443,742,0,alive,BEG,ME,94.102.226.59,AS47881 One Crna Gora DOO,One Crna Gora DOO,isp,2026-10-15 10:08:09,EDT-Pages
-https://46.199.75.105:443,https,46.199.75.105,443,746,0,alive,LCA,CY,46.199.75.109,AS6866 Cyprus Telecommunications Authority,Cyprus Telecommunications Authority,isp,2026-10-09 00:00:00,EDT-Pages
-https://212.200.119.174:443,https,212.200.119.174,443,749,0,alive,BEG,RS,77.46.160.61,AS8400 TELEKOM SRBIJA a.d.,TELEKOM SRBIJA a.d.,isp,2026-10-15 10:08:09,EDT-Pages
-https://77.81.71.62:443,https,77.81.71.62,443,762,0,alive,OTP,RO,77.81.71.62,AS56654 Infinity Telecom SRL,Infinity Telecom SRL,isp,2026-10-15 10:08:09,EDT-Pages
-https://194.254.206.88:443,https,194.254.206.88,443,765,0,alive,CDG,FR,194.254.206.89,AS2200 Renater,Renater,education,2026-10-25 16:44:06,@user
-https://200.23.153.161:443,https,200.23.153.161,443,766,0,alive,FOR,BR,201.71.218.253,AS271145 PIAUI LINK S/A,PIAUI LINK S/A,government,2026-10-15 10:08:09,EDT-Pages
-https://88.197.53.165:443,https,88.197.53.165,443,769,0,alive,ATH,GR,88.197.53.165,AS8643 NATIONAL AND KAPODISTRIAN UNIVERSITY OF ATHENS,NATIONAL AND KAPODISTRIAN UNIVERSITY OF ATHENS,education,2026-10-15 10:08:09,EDT-Pages
-https://203.236.17.77:8104,https,203.236.17.77,8104,778,0,alive,ICN,KR,203.236.17.77,AS9644 SK Telecom,SK Telecom,isp,2026-10-19 12:45:55,EDT-Pages
-https://82.65.162.76:443,https,82.65.162.76,443,787,0,alive,CDG,FR,82.65.162.76,AS12322 Free SAS,Free SAS,isp,2026-10-09 00:00:00,EDT-Pages
-https://84.237.50.68:444,https,84.237.50.68,444,790,0,alive,DME,RU,84.237.50.68,AS3335 NSU,NSU,education,2026-10-15 10:08:09,EDT-Pages
-https://194.243.172.243:443,https,194.243.172.243,443,794,0,alive,MXP,IT,194.243.172.243,AS3269 Telecom Italia S.p.A.,Telecom Italia S.p.A.,isp,2026-10-15 10:08:09,EDT-Pages
-https://190.213.55.167:443,https,190.213.55.167,443,795,0,alive,POS,TT,190.213.55.167,AS27665 Columbus Communications Trinidad Limited.,Columbus Communications Trinidad Limited.,isp,2026-10-09 00:00:00,EDT-Pages
-https://5.158.70.34:443,https,5.158.70.34,443,797,0,alive,MXP,IT,5.158.70.34,AS199181 Orakom S.r.l.,Orakom S.r.l.,isp,2026-10-15 10:08:09,EDT-Pages
-https://79.188.239.44:8443,https,79.188.239.44,8443,799,0,alive,WAW,PL,79.188.239.41,AS5617 static IP,static IP,isp,2026-10-19 12:45:55,EDT-Pages
-https://91.146.45.78:443,https,91.146.45.78,443,806,0,alive,FRA,RU,91.146.45.78,AS3226 OOO NI,OOO NI,isp,2026-10-15 10:08:09,EDT-Pages
-https://88.135.143.159:443,https,88.135.143.159,443,807,0,alive,RIX,LV,88.135.143.159,AS24589 Telenet SIA,Telenet SIA,isp,2026-10-09 00:00:00,EDT-Pages
-https://179.96.182.182:443,https,179.96.182.182,443,812,0,alive,GIG,BR,187.92.203.235,AS10429 TELEFÔNICA BRASIL S.A,TELEFÔNICA BRASIL S.A,isp,2026-10-09 00:00:00,EDT-Pages
-https://83.212.225.30:443,https,83.212.225.30,443,817,0,alive,ATH,GR,2001:648:2ffe:11:a800:ff:fe48:2020,AS5408 National Infrastructures for Research and Technology S.A.,National Infrastructures for Research and Technology S.A.,education,2026-10-21 15:52:42,EDT-Pages
-https://82.66.235.221:443,https,82.66.235.221,443,820,0,alive,CDG,FR,2a01:e0a:1018:8c90:be24:11ff:fe98:e8b1,AS12322 Free SAS,Free SAS,isp,2026-10-09 00:00:00,EDT-Pages
-https://2.228.224.4:443,https,2.228.224.4,443,822,0,alive,MXP,IT,87.27.184.158,AS12874 Fastweb SpA,Fastweb SpA,isp,2026-10-15 10:08:09,EDT-Pages
-https://130.180.211.56:443,https,130.180.211.56,443,828,0,alive,CDG,FR,185.210.108.69,AS24904 K-sys SA,K-sys SA,isp,2026-10-09 00:00:00,EDT-Pages
-https://41.77.155.137:443,https,41.77.155.137,443,836,0,alive,CPT,ZA,41.77.155.137,AS32653 eNetworks Ltd,eNetworks (Pty) Ltd,isp,2026-10-25 16:44:06,@user
-https://98.101.229.212:8090,https,98.101.229.212,8090,839,0,alive,ATL,US,98.101.229.210,AS11426 Charter Communications Inc,Charter Communications Inc,isp,2026-10-09 00:00:00,EDT-Pages
-https://79.188.239.42:8443,https,79.188.239.42,8443,839,0,alive,WAW,PL,79.188.239.41,AS5617 static IP,static IP,isp,2026-10-19 12:45:55,EDT-Pages
-https://80.124.109.22:8090,https,80.124.109.22,8090,842,0,alive,CDG,FR,80.124.109.22,AS15557 Societe Francaise Du Radiotelephone - SFR SA,Societe Francaise Du Radiotelephone - SFR SA,isp,2026-10-09 00:00:00,EDT-Pages
-https://41.77.155.164:443,https,41.77.155.164,443,850,0,alive,JNB,ZA,41.77.155.164,AS32653 eNetworks cc,eNetworks cc,isp,2026-10-15 10:08:09,EDT-Pages
-https://149.12.210.39:443,https,149.12.210.39,443,856,0,alive,FRA,FR,149.12.210.39,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",isp,2026-10-15 10:08:09,EDT-Pages
-https://181.126.49.38:443,https,181.126.49.38,443,858,0,alive,GRU,PY,181.126.49.38,AS23201 Telecel S.A.,Telecel S.A.,isp,2026-10-09 00:00:00,EDT-Pages
-https://201.217.148.180:443,https,201.217.148.180,443,860,0,alive,EZE,UY,201.217.148.180,AS6057 Administracion Nacional de Telecomunicaciones,Administracion Nacional de Telecomunicaciones,isp,2026-10-15 10:08:09,EDT-Pages
-https://41.77.155.147:443,https,41.77.155.147,443,860,0,alive,CPT,ZA,41.77.155.147,AS32653 eNetworks Ltd,eNetworks (Pty) Ltd,isp,2026-10-25 16:44:06,@user
-https://41.77.155.141:443,https,41.77.155.141,443,867,0,alive,CPT,ZA,41.77.155.141,AS32653 eNetworks Ltd,eNetworks (Pty) Ltd,isp,2026-10-25 16:44:06,@user
-https://176.94.74.21:443,https,176.94.74.21,443,871,0,alive,FRA,DE,176.94.74.21,AS3209 Vodafone GmbH,Vodafone GmbH,isp,2026-10-09 00:00:00,EDT-Pages
-https://129.205.246.123:443,https,129.205.246.123,443,878,0,alive,GBE,BW,129.205.246.123,AS37678 BOTSWANA FIBRE NETWORKS Proprietary Limited,BOTSWANA FIBRE NETWORKS Proprietary Limited,isp,2026-10-15 10:08:09,EDT-Pages
-https://141.105.83.68:443,https,141.105.83.68,443,879,0,alive,BEY,LB,141.105.83.68,AS24634 CYBERIA-3G,CYBERIA-3G,isp,2026-10-15 10:08:09,EDT-Pages
-https://103.86.117.202:443,https,103.86.117.202,443,881,0,alive,CGK,ID,103.86.116.118,AS150552 PT Link Data Sumber Barokah,PT Link Data Sumber Barokah,isp,2026-10-09 00:00:00,EDT-Pages
-https://168.167.220.27:443,https,168.167.220.27,443,885,0,alive,JNB,BW,168.167.220.27,AS14988 Botswana Telecommunications Corporation,Botswana Telecommunications Corporation,isp,2026-10-15 10:08:09,EDT-Pages
-https://185.96.121.243:9443,https,185.96.121.243,9443,888,0,alive,WAW,PL,185.96.121.243,AS198317 Gabriel Sulka trading as Firma Handlowo - Uslugowa KOMPEX Gabriel Sulka,Gabriel Sulka trading as Firma Handlowo - Uslugowa KOMPEX Gabriel Sulka,isp,2026-10-15 10:08:09,EDT-Pages
-https://62.90.77.30:443,https,62.90.77.30,443,894,0,alive,TLV,IL,62.90.77.18,AS1680 Cellcom Fixed Line Communication L.P,Cellcom Fixed Line Communication L.P,isp,2026-10-09 00:00:00,EDT-Pages
-https://217.210.129.243:443,https,217.210.129.243,443,897,0,alive,CPH,SE,217.210.129.243,AS3301 Telia Company AB,Telia Company AB,isp,2026-10-09 00:00:00,EDT-Pages
-https://182.156.203.41:443,https,182.156.203.41,443,897,0,alive,MAA,IN,115.99.52.59,AS17488 HATHWAY CABLE AND DATACOM LIMITED,HATHWAY CABLE AND DATACOM LIMITED,isp,2026-10-15 10:08:09,EDT-Pages
-https://103.86.116.118:443,https,103.86.116.118,443,900,0,alive,CGK,ID,103.86.116.118,AS150552 PT Link Data Sumber Barokah,PT Link Data Sumber Barokah,isp,2026-10-09 00:00:00,EDT-Pages
-https://93.63.43.131:443,https,93.63.43.131,443,905,0,alive,FCO,IT,93.63.84.182,AS12874 Fastweb SpA,Fastweb SpA,isp,2026-10-15 10:08:09,EDT-Pages
-https://107.91.88.70:8443,https,107.91.88.70,8443,920,0,alive,SJC,US,107.91.88.70,"AS20057 AT&T Enterprises, LLC","AT&T Enterprises, LLC",isp,2026-10-09 00:00:00,EDT-Pages
-https://110.173.188.221:443,https,110.173.188.221,443,928,0,alive,BOM,IN,110.173.188.221,AS17426 PRIMENET GLOBAL LTD.,PRIMENET GLOBAL LTD.,isp,2026-10-09 00:00:00,EDT-Pages
-https://82.96.128.175:8090,https,82.96.128.175,8090,929,0,alive,CDG,FR,82.96.128.175,AS199636 Free Pro SAS,Free Pro SAS,isp,2026-10-09 00:00:00,EDT-Pages
-https://217.92.132.233:443,https,217.92.132.233,443,932,0,alive,TXL,DE,2003:a:4:e500:215:5dff:fe83:c00b,AS3320 Deutsche Telekom AG,Deutsche Telekom AG,isp,2026-10-09 00:00:00,EDT-Pages
-https://37.207.230.114:9443,https,37.207.230.114,9443,939,0,alive,MXP,IT,37.207.230.114,AS3269 Telecom Italia S.p.A.,Telecom Italia S.p.A.,isp,2026-10-15 10:08:09,EDT-Pages
-https://87.251.79.232:443,https,87.251.79.232,443,950,0,alive,DFW,US,204.8.96.183,AS36375 University of Michigan,University of Michigan,education,2026-10-12 21:49:55,EDT-Pages
-https://213.207.132.2:9443,https,213.207.132.2,9443,954,0,alive,MRS,CY,213.207.132.13,AS15805 Epic Ltd,Epic Ltd,isp,2026-10-09 00:00:00,EDT-Pages
-https://162.191.87.112:8443,https,162.191.87.112,8443,954,0,alive,ORD,US,162.191.87.112,"AS21928 T-Mobile USA, Inc.","T-Mobile USA, Inc.",isp,2026-10-09 00:00:00,EDT-Pages
-https://168.205.255.238:443,https,168.205.255.238,443,962,0,alive,GRU,BR,189.50.88.38,AS28327 Rei das Tecnologias LTDA ME,Rei das Tecnologias LTDA ME,isp,2026-10-15 10:08:09,EDT-Pages
-https://196.43.240.49:9443,https,196.43.240.49,9443,963,0,alive,LAD,CG,196.43.240.61,AS37548 ARPCE,ARPCE,business,2026-10-25 14:07:00,EDT-Pages
-https://162.191.235.197:8443,https,162.191.235.197,8443,971,0,alive,ORD,US,162.191.235.197,"AS21928 T-Mobile USA, Inc.","T-Mobile USA, Inc.",isp,2026-10-09 00:00:00,EDT-Pages
-https://31.186.220.204:443,https,31.186.220.204,443,975,0,alive,WAW,PL,31.186.220.204,AS9141 P4 Sp. z o.o.,P4 Sp. z o.o.,isp,2026-10-09 00:00:00,EDT-Pages
-https://208.169.72.58:443,https,208.169.72.58,443,977,0,alive,MIA,TC,208.169.72.58,AS22933 Vodafone Americas,Vodafone Americas,isp,2026-10-15 10:08:09,EDT-Pages
-https://14.225.71.128:8443,https,14.225.71.128,8443,983,0,alive,HKG,VN,14.225.71.128,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group,isp,2026-10-09 00:00:00,EDT-Pages
-https://41.191.232.21:443,https,41.191.232.21,443,987,0,alive,HRE,ZW,41.191.232.21,AS37123 Telco Applications servers and hosted facilities,Telco Applications servers and hosted facilities,isp,2026-10-15 10:08:09,EDT-Pages
-https://154.72.198.149:443,https,154.72.198.149,443,992,0,alive,MBA,UG,154.72.197.186,AS327724 National Information Technology Authority Uganda,National Information Technology Authority Uganda,government,2026-10-09 00:00:00,EDT-Pages
-https://162.172.63.120:8443,https,162.172.63.120,8443,1001,0,alive,SEA,US,162.172.63.120,"AS21928 T-Mobile USA, Inc.","T-Mobile USA, Inc.",isp,2026-10-23 12:55:36,proxifly
-https://164.160.240.37:443,https,164.160.240.37,443,1005,0,alive,LOS,GH,164.160.240.2,AS328439 GHANA INSTITUTE OF MANAGEMENT AND PUBLIC ADMINISTRATION - GIMPA,GHANA INSTITUTE OF MANAGEMENT AND PUBLIC ADMINISTRATION - GIMPA,education,2026-10-15 10:08:09,EDT-Pages
-https://190.128.253.82:8444,https,190.128.253.82,8444,1006,0,alive,ASU,PY,190.128.253.82,AS23201 Telecel S.A.,Telecel S.A.,isp,2026-10-15 10:08:09,EDT-Pages
-https://41.77.152.91:443,https,41.77.152.91,443,1010,0,alive,CPT,ZA,41.77.152.91,AS32653 eNetworks Ltd,eNetworks (Pty) Ltd,isp,2026-10-25 16:44:06,@user
-https://14.225.71.128:443,https,14.225.71.128,443,1018,0,alive,HKG,VN,14.225.71.128,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group,isp,2026-10-09 00:00:00,EDT-Pages
-https://202.162.232.76:443,https,202.162.232.76,443,1020,0,alive,BOM,IN,202.162.232.48,AS4755 Netcore Solutions Pvt Ltd,Netcore Solutions Pvt Ltd,isp,2026-10-21 15:52:42,EDT-Pages
-https://109.190.196.5:8090,https,109.190.196.5,8090,1025,0,alive,CDG,FR,109.190.196.5,AS35540 OVH SAS,OVH SAS,isp,2026-10-23 12:55:36,EDT-Pages
-https://156.38.64.51:443,https,156.38.64.51,443,1026,0,alive,CPT,TG,156.38.64.51,AS36924 GVA Togo,GVA Togo,isp,2026-10-15 10:08:09,EDT-Pages
-https://118.130.28.228:443,https,118.130.28.228,443,1037,0,alive,ICN,KR,118.130.28.229,AS3786 LG DACOM Corporation,LG DACOM Corporation,isp,2026-10-25 16:44:06,@user
-https://193.77.81.97:443,https,193.77.81.97,443,1040,0,alive,MXP,SI,193.77.81.97,"AS5603 Telekom Slovenije, d.d.","Telekom Slovenije, d.d.",isp,2026-10-15 10:08:09,EDT-Pages
-https://91.221.229.86:443,https,91.221.229.86,443,1044,0,alive,SOF,AM,91.221.229.86,AS197497 OFFICE OF THE PRIME-MINISTER OF THE REPUBLIC OF ARMENIA STATE BODY,OFFICE OF THE PRIME-MINISTER OF THE REPUBLIC OF ARMENIA STATE BODY,government,2026-10-15 10:08:09,EDT-Pages
-https://80.86.231.109:443,https,80.86.231.109,443,1050,0,alive,EVN,AM,80.86.231.62,AS21104 Netsys JVC is internet services provider in Armeina,Netsys JVC is internet services provider in Armeina,isp,2026-10-15 10:08:09,EDT-Pages
-https://168.167.220.28:443,https,168.167.220.28,443,1051,0,alive,JNB,BW,168.167.220.28,AS14988 Botswana Telecommunications Corporation,Botswana Telecommunications Corporation,isp,2026-10-15 10:08:09,EDT-Pages
-https://198.54.223.176:443,https,198.54.223.176,443,1051,0,alive,CPT,ZA,198.54.223.176,AS2018 Peninsula Technikon,Peninsula Technikon,education,2026-10-15 10:08:09,EDT-Pages
-https://188.77.69.184:443,https,188.77.69.184,443,1052,0,alive,MAD,ES,188.77.69.184,AS12479 Jazztel triple play services,Jazztel triple play services,isp,2026-10-09 00:00:00,EDT-Pages
-https://196.21.187.115:443,https,196.21.187.115,443,1058,0,alive,JNB,ZA,196.21.186.253,AS2018 Tertiary Education and Research Network of South Africa,Tertiary Education and Research Network of South Africa,education,2026-10-15 10:08:09,EDT-Pages
-https://31.32.19.111:8081,https,31.32.19.111,8081,1059,0,alive,CDG,FR,31.32.19.111,AS5410 Bouygues Telecom SA,Bouygues Telecom SA,isp,2026-10-09 00:00:00,EDT-Pages
-https://107.91.88.78:8443,https,107.91.88.78,8443,1065,0,alive,SJC,US,107.91.88.78,"AS20057 AT&T Enterprises, LLC","AT&T Enterprises, LLC",isp,2026-10-09 00:00:00,EDT-Pages
-https://41.77.152.84:443,https,41.77.152.84,443,1078,0,alive,CPT,ZA,41.77.152.84,AS32653 eNetworks Ltd,eNetworks (Pty) Ltd,isp,2026-10-25 16:44:06,@user
-https://103.153.135.118:443,https,103.153.135.118,443,1079,0,alive,CGK,ID,103.153.135.118,AS140464 PT Widara Media Informasi,PT Widara Media Informasi,isp,2026-10-09 00:00:00,EDT-Pages
-https://83.206.1.225:8090,https,83.206.1.225,8090,1092,0,alive,MRS,FR,83.206.1.225,AS3215 Orange,Orange,isp,2026-10-09 00:00:00,EDT-Pages
-https://162.191.139.40:8443,https,162.191.139.40,8443,1105,0,alive,ORD,US,162.191.139.40,"AS21928 T-Mobile USA, Inc.","T-Mobile USA, Inc.",isp,2026-10-09 00:00:00,EDT-Pages
-https://217.181.201.254:8090,https,217.181.201.254,8090,1108,0,alive,CDG,FR,217.181.201.254,AS8399 SEWAN SAS,SEWAN SAS,isp,2026-10-09 00:00:00,EDT-Pages
-https://80.24.34.107:8090,https,80.24.34.107,8090,1125,0,alive,MAD,ES,80.24.34.107,AS3352 Red de servicios IP,Red de servicios IP,isp,2026-10-09 00:00:00,EDT-Pages
-https://95.229.15.89:443,https,95.229.15.89,443,1134,0,alive,MXP,IT,95.229.15.89,AS3269 Telecom Italia S.p.A.,Telecom Italia S.p.A.,isp,2026-10-09 00:00:00,EDT-Pages
-https://41.205.129.179:443,https,41.205.129.179,443,1143,0,alive,WDH,NA,41.205.129.179,AS36996 Telecom Namibia,Telecom Namibia,isp,2026-10-15 10:08:09,EDT-Pages
-https://200.133.218.122:443,https,200.133.218.122,443,1147,0,alive,GRU,BR,200.133.218.126,AS1916 Rede Nacional de Ensino e Pesquisa,Rede Nacional de Ensino e Pesquisa,education,2026-10-15 10:08:09,EDT-Pages
-https://170.210.44.231:443,https,170.210.44.231,443,1150,0,alive,SCL,AR,170.210.44.235,AS4270 Red de Interconexion Universitaria,Red de Interconexion Universitaria,education,2026-10-09 00:00:00,EDT-Pages
-https://45.220.173.35:443,https,45.220.173.35,443,1153,0,alive,JNB,ZA,45.220.173.35,AS32653 eNetworks cc,eNetworks cc,isp,2026-10-15 10:08:09,EDT-Pages
-https://83.172.143.53:4443,https,83.172.143.53,4443,1156,0,alive,CDG,FR,83.172.143.53,AS25540 INIT SYS SAS,INIT SYS SAS,isp,2026-10-09 00:00:00,EDT-Pages
-https://45.220.173.40:443,https,45.220.173.40,443,1164,0,alive,JNB,ZA,45.220.173.40,AS32653 eNetworks cc,eNetworks cc,isp,2026-10-15 10:08:09,EDT-Pages
-https://93.71.245.84:8090,https,93.71.245.84,8090,1193,0,alive,FCO,IT,93.71.245.84,AS30722 IP pool assigned to VF DSL customers,IP pool assigned to VF DSL customers,isp,2026-10-09 00:00:00,EDT-Pages
-https://209.148.53.153:8090,https,209.148.53.153,8090,1210,0,alive,EWR,US,209.148.53.153,AS46887 CORPORATE SUITES 825 LLC,CORPORATE SUITES 825 LLC,isp,2026-10-15 10:08:09,EDT-Pages
-https://179.27.167.72:443,https,179.27.167.72,443,1229,0,alive,EZE,UY,200.108.214.68,AS20255 Sonda Uruguay,Sonda Uruguay,isp,2026-10-19 12:45:55,EDT-Pages
-https://41.77.155.154:443,https,41.77.155.154,443,1277,0,alive,CPT,ZA,41.77.155.154,AS32653 eNetworks Ltd,eNetworks (Pty) Ltd,isp,2026-10-25 16:44:06,@user
-https://200.108.214.80:443,https,200.108.214.80,443,1277,0,alive,EZE,UY,200.108.214.68,AS20255 Sonda Uruguay,Sonda Uruguay,isp,2026-10-19 12:45:55,EDT-Pages
-https://83.13.36.250:443,https,83.13.36.250,443,1293,0,alive,WAW,PL,83.13.36.250,AS5617 Orange Polska Spolka Akcyjna,Orange Polska Spolka Akcyjna,isp,2026-10-15 10:08:09,EDT-Pages
-https://196.21.109.82:443,https,196.21.109.82,443,1296,0,alive,JNB,ZA,45.220.167.49,AS32653 eNetworks cc,eNetworks cc,isp,2026-10-15 10:08:09,EDT-Pages
-https://116.254.118.180:443,https,116.254.118.180,443,1326,0,alive,CGK,ID,116.254.118.180,AS55666 PT Internet Mulia Untuk Negeri,PT Internet Mulia Untuk Negeri,isp,2026-10-15 10:08:09,EDT-Pages
-https://94.246.130.82:443,https,94.246.130.82,443,1373,0,alive,WAW,PL,94.246.130.82,AS33923 ART-COM Sp. z o.o.,ART-COM Sp. z o.o.,isp,2026-10-15 10:08:09,EDT-Pages
-https://152.230.28.131:8081,https,152.230.28.131,8081,1387,0,alive,SEA,CL,190.96.12.146,AS14259 Gtd Internet S.A.,Gtd Internet S.A.,isp,2026-10-20 12:55:22,proxifly
-https://43.251.18.20:443,https,43.251.18.20,443,1412,0,alive,SIN,MY,43.251.18.20,AS141201 MAMPU PDSA1,MAMPU PDSA1,isp,2026-10-15 10:08:09,EDT-Pages
-https://103.135.244.2:443,https,103.135.244.2,443,1420,0,alive,SEA,JP,103.135.244.18,AS138652 Super Godzilla Communications GK,Super Godzilla Communications GK,isp,2026-10-23 12:55:36,proxifly
-https://93.42.177.250:443,https,93.42.177.250,443,1464,0,alive,FCO,IT,93.42.177.250,AS12874 Infrastructure for Fastwebs main location,Infrastructure for Fastwebs main location,isp,2026-10-15 12:44:41,EDT-Pages
-https://110.38.225.213:443,https,110.38.225.213,443,1472,0,alive,KHI,PK,110.38.225.213,AS38264 Wateen Telecom Limited (National Wimax/IMS environment),National Wimax/IMS environment,isp,2026-10-25 14:07:00,EDT-Pages
-https://194.186.179.62:443,https,194.186.179.62,443,1485,0,alive,DME,RU,194.186.179.62,"AS3216 PJSC ""Vimpelcom"" (PJSC Vimpelcom)",PJSC Vimpelcom,isp,2026-10-09 00:00:00,EDT-Pages
-https://83.212.225.32:443,https,83.212.225.32,443,1515,0,alive,SEA,GR,2001:0648:2ffe:0011:a800:00ff:fe48:2020,AS5408 National Infrastructures for Research and Technology S.A.,National Infrastructures for Research and Technology S.A.,education,2026-10-20 12:55:22,proxifly
-https://94.246.130.82:5443,https,94.246.130.82,5443,1559,0,alive,WAW,PL,94.246.130.82,AS33923 ART-COM Sp. z o.o.,ART-COM Sp. z o.o.,isp,2026-10-15 10:08:09,EDT-Pages
-https://80.15.99.54:8090,https,80.15.99.54,8090,1566,0,alive,MRS,FR,80.15.99.54,AS3215 Orange,Orange,isp,2026-10-09 00:00:00,EDT-Pages
-https://196.21.60.44:443,https,196.21.60.44,443,1583,0,alive,DUR,ZA,196.21.61.122,AS2018 Durban Institute of Technology,Durban Institute of Technology,education,2026-10-15 10:08:09,EDT-Pages
-https://37.100.85.116:443,https,37.100.85.116,443,1597,0,alive,SEA,IT,37.100.85.116,AS1267 WIND TRE S.P.A.,WIND TRE S.P.A.,isp,2026-10-21 15:52:42,proxifly
-https://107.91.88.6:8443,https,107.91.88.6,8443,1645,0,alive,SJC,US,107.91.88.6,"AS20057 AT&T Enterprises, LLC","AT&T Enterprises, LLC",isp,2026-10-09 00:00:00,EDT-Pages
-https://103.142.225.37:443,https,103.142.225.37,443,1647,0,alive,DEL,IN,103.142.225.37,AS138231 Indian Institute Of Information Technology Allahabad,Indian Institute Of Information Technology Allahabad,education,2026-10-15 10:08:09,EDT-Pages
-https://196.21.61.67:443,https,196.21.61.67,443,1649,0,alive,DUR,ZA,196.21.61.107,AS2018 Durban Institute of Technology,Durban Institute of Technology,education,2026-10-15 10:08:09,EDT-Pages
-https://147.45.125.160:443,https,147.45.125.160,443,1689,0,alive,SAN,US,206.206.192.178,AS27284 Fourplex Telecom LLC,Fourplex Telecom LLC,isp,2026-10-25 14:07:00,EDT-Pages
-https://83.212.229.157:443,https,83.212.229.157,443,1824,0,alive,SEA,GR,2001:0648:2ffe:0013:a800:00ff:fe55:de91,AS5408 National Infrastructures for Research and Technology S.A.,National Infrastructures for Research and Technology S.A.,education,2026-10-20 12:55:22,proxifly
-https://203.193.169.112:443,https,203.193.169.112,443,1824,0,alive,BOM,IN,203.193.169.98,AS7633 Software Technology Parks of India,Software Technology Parks of India,government,2026-10-15 10:08:09,EDT-Pages
-https://83.212.225.31:443,https,83.212.225.31,443,1831,0,alive,SEA,GR,2001:0648:2ffe:0011:a800:00ff:fe0c:4f47,AS5408 National Infrastructures for Research and Technology S.A.,National Infrastructures for Research and Technology S.A.,education,2026-10-20 12:55:22,proxifly
-https://82.64.46.151:443,https,82.64.46.151,443,1869,0,alive,CDG,FR,82.64.46.151,AS12322 Free SAS,Free SAS,isp,2026-10-15 10:08:09,EDT-Pages
-https://83.212.80.126:443,https,83.212.80.126,443,1890,0,alive,SEA,GR,2001:0648:2ffe:0501:cc00:11ff:fefa:4468,AS5408 National Infrastructures for Research and Technology S.A.,National Infrastructures for Research and Technology S.A.,education,2026-10-20 12:55:22,proxifly
-https://122.165.229.173:443,https,122.165.229.173,443,2136,0,alive,SEA,IN,122.165.229.173,AS24560 Bharti Airtel Limited,Bharti Airtel Limited,isp,2026-10-25 14:07:00,proxifly
-https://118.184.157.67:4443,https,118.184.157.67,4443,2161,0,alive,LAX,CN,118.184.157.67,"AS23650 ChangZhou Bitcomm Software Technology Co., Limited","ChangZhou Bitcomm Software Technology Co., Limited",isp,2026-10-09 00:00:00,EDT-Pages
-https://82.64.46.151:8007,https,82.64.46.151,8007,2226,0,alive,CDG,FR,82.64.46.151,AS12322 Free SAS,Free SAS,isp,2026-10-15 10:08:09,EDT-Pages
-https://82.64.46.151:8017,https,82.64.46.151,8017,2235,0,alive,CDG,FR,82.64.46.151,AS12322 Free SAS,Free SAS,isp,2026-10-15 10:08:09,EDT-Pages
-https://82.64.46.151:8012,https,82.64.46.151,8012,2576,0,alive,CDG,FR,82.64.46.151,AS12322 Free SAS,Free SAS,isp,2026-10-15 10:08:09,EDT-Pages
-https://84.237.50.68:8444,https,84.237.50.68,8444,2740,0,alive,DME,RU,84.237.50.68,AS3335 NSU,NSU,education,2026-10-15 10:08:09,EDT-Pages
-https://134.59.1.187:443,https,134.59.1.187,443,3908,0,alive,CDG,FR,134.59.1.71,AS2200 Universite Cote d Azur,Universite Cote d Azur,education,2026-10-19 12:45:55,EDT-Pages
-https://46.170.93.122:443,https,46.170.93.122,443,5618,0,alive,WAW,PL,46.170.93.122,AS5617 Orange Polska Spolka Akcyjna,Orange Polska Spolka Akcyjna,isp,2026-10-15 10:08:09,EDT-Pages
-https://213.98.90.68:8080,https,213.98.90.68,8080,6015,0,alive,MAD,ES,213.98.90.68,AS3352 Telefonica de Espana SAU,Telefonica de Espana SAU,isp,2026-10-25 16:44:06,@user
-https://79.188.239.46:8443,https,79.188.239.46,8443,6269,0,alive,WAW,PL,79.188.239.41,AS5617 Orange Polska Spolka Akcyjna,Orange Polska Spolka Akcyjna,isp,2026-10-19 12:45:55,EDT-Pages
-https://79.188.239.47:8443,https,79.188.239.47,8443,6271,0,alive,WAW,PL,79.188.239.41,AS5617 static IP,static IP,isp,2026-10-21 15:52:42,EDT-Pages
-https://79.188.239.45:8443,https,79.188.239.45,8443,6274,0,alive,WAW,PL,79.188.239.41,AS5617 Orange Polska Spolka Akcyjna,Orange Polska Spolka Akcyjna,isp,2026-10-09 00:00:00,EDT-Pages
-https://79.188.239.40:8443,https,79.188.239.40,8443,6481,0,alive,WAW,PL,79.188.239.41,AS5617 Orange Polska Spolka Akcyjna,Orange Polska Spolka Akcyjna,isp,2026-10-15 10:08:09,EDT-Pages
-https://79.188.239.41:8443,https,79.188.239.41,8443,6555,0,alive,WAW,PL,79.188.239.41,AS5617 static IP,static IP,isp,2026-10-19 12:45:55,EDT-Pages
-https://79.188.239.43:8443,https,79.188.239.43,8443,9864,0,alive,WAW,PL,79.188.239.41,AS5617 Orange Polska Spolka Akcyjna,Orange Polska Spolka Akcyjna,isp,2026-10-19 12:45:55,EDT-Pages
-https://207.5.30.9:443,https,207.5.30.9,443,146,1,timeout,ATL,US,207.5.30.9,"AS22646 Hargray Communications Group, Inc.","Hargray Communications Group, Inc.",isp,2026-10-09 00:00:00,EDT-Pages
-https://50.184.176.222:8090,https,50.184.176.222,8090,538,1,timeout,JAX,US,50.184.176.222,"AS7922 Comcast Cable Communications, LLC","Comcast Cable Communications, LLC",isp,2026-10-09 00:00:00,EDT-Pages
-https://178.219.43.226:443,https,178.219.43.226,443,785,1,timeout,ARN,RU,178.219.43.226,AS51077 Modern Technologies Ltd.,Modern Technologies Ltd.,isp,2026-10-09 00:00:00,EDT-Pages
-https://14.99.141.239:443,https,14.99.141.239,443,801,1,timeout,BOM,IN,203.193.169.98,AS7633 Software Technology Parks of India,Software Technology Parks of India,government,2026-10-09 00:00:00,EDT-Pages
-https://201.54.216.54:443,https,201.54.216.54,443,1805,1,timeout,GIG,BR,201.54.216.54,AS28616 Emp. de Informatica e Informaçao do Mun. BH/SA,Emp. de Informatica e Informaçao do Mun. BH/SA,government,2026-10-15 10:08:09,EDT-Pages
-https://66.210.50.131:443,https,66.210.50.131,443,0,1,timeout,,US,66.210.50.131,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-26 12:52:01,EDT-Pages
-https://24.51.117.170:443,https,24.51.117.170,443,173,2,timeout,MIA,BS,24.51.117.170,"AS15146 Cable Bahamas, Ltd.","Cable Bahamas, Ltd.",isp,2026-10-15 10:08:09,EDT-Pages
-https://199.127.197.211:443,https,199.127.197.211,443,432,2,timeout,MIA,GD,199.127.197.211,AS395561 Digicel Grenada,Digicel Grenada,isp,2026-10-15 10:08:09,EDT-Pages
-https://80.97.226.98:443,https,80.97.226.98,443,607,2,timeout,FRA,RO,80.97.226.98,AS9050 Orange Romania SA,Orange Romania SA,isp,2026-10-15 10:08:09,EDT-Pages
-https://103.239.146.98:443,https,103.239.146.98,443,1083,2,timeout,BOM,IN,103.239.146.98,AS133269 Fiberpipe communications pvt. ltd.,Fiberpipe communications pvt. ltd.,isp,2026-10-15 10:08:09,EDT-Pages
-https://185.187.43.38:8090,https,185.187.43.38,8090,0,2,timeout,,IT,185.187.43.38,AS199324 DODONET S.R.L. - dodonet network,DODONET S.R.L. - dodonet network,isp,2026-10-25 14:07:00,EDT-Pages
+https://192.126.96.110:443,https,192.126.96.110,443,56,0,alive,IAD,US,192.126.96.110,AS46988 Maryland Institute College of Art,Maryland Institute College of Art,education,2026-10-15 10:08:09,EDT-Pages
+https://181.215.52.101:9443,https,181.215.52.101,9443,68,0,alive,YYZ,CA,181.215.52.112,AS397540 Windscribe Limited (Private Customer),Private Customer,isp,2026-10-25 14:07:00,EDT-Pages
+https://181.215.52.40:9443,https,181.215.52.40,9443,77,0,alive,YYZ,CA,181.215.52.43,AS397540 Windscribe Limited (Private Customer),Private Customer,isp,2026-10-25 14:07:00,EDT-Pages
+https://181.215.52.122:9443,https,181.215.52.122,9443,77,0,alive,YYZ,CA,181.215.52.126,AS397540 Windscribe Limited (Private Customer),Private Customer,isp,2026-10-25 14:07:00,EDT-Pages
+https://12.202.180.10:9443,https,12.202.180.10,9443,92,0,alive,ORD,US,12.202.180.117,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",isp,2026-10-09 00:00:00,EDT-Pages
+https://181.215.52.25:9443,https,181.215.52.25,9443,101,0,alive,YYZ,CA,181.215.52.29,AS397540 Windscribe Limited (Private Customer),Private Customer,isp,2026-10-25 14:07:00,EDT-Pages
+https://12.202.180.118:443,https,12.202.180.118,443,106,0,alive,ORD,US,12.202.180.13,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",isp,2026-10-09 00:00:00,EDT-Pages
+https://149.57.28.9:443,https,149.57.28.9,443,108,0,alive,YYZ,CA,149.57.28.248,AS397540 Windscribe Limited,Windscribe,isp,2026-10-25 14:07:00,EDT-Pages
+https://12.221.146.147:9443,https,12.221.146.147,9443,136,0,alive,DFW,US,12.221.146.165,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",isp,2026-10-09 00:00:00,EDT-Pages
+https://138.108.28.48:443,https,138.108.28.48,443,139,0,alive,ORD,US,138.108.24.20,AS396290 Nielsen Consumer LLC,Nielsen Consumer LLC,business,2026-10-15 10:08:09,EDT-Pages
+https://209.191.136.62:443,https,209.191.136.62,443,141,0,alive,ORD,US,209.191.136.30,AS26307 Horace Mann Service Corporation,Horace Mann Service Corporation,business,2026-10-21 15:52:42,EDT-Pages
+https://130.253.2.250:443,https,130.253.2.250,443,156,0,alive,DEN,US,130.253.2.246,AS14041 University of Denver,University of Denver,education,2026-10-15 10:08:09,EDT-Pages
+https://181.215.52.16:9443,https,181.215.52.16,9443,163,0,alive,YYZ,CA,181.215.52.18,AS397540 Windscribe Limited (Private Customer),Private Customer,isp,2026-10-25 14:07:00,EDT-Pages
+https://207.5.30.9:443,https,207.5.30.9,443,177,0,alive,ATL,US,207.5.30.9,"AS22646 Hargray Communications Group, Inc.","Hargray Communications Group, Inc.",isp,2026-10-09 00:00:00,EDT-Pages
+https://216.218.159.87:443,https,216.218.159.87,443,215,0,alive,SJC,US,216.218.159.66,AS6939 Hurricane Electric LLC,Hurricane Electric LLC,isp,2026-10-15 10:08:09,EDT-Pages
+https://108.60.228.210:443,https,108.60.228.210,443,222,0,alive,MIA,BS,108.60.228.210,"AS8014 The Bahamas Telecommunications Company, Ltd.","The Bahamas Telecommunications Company, Ltd.",isp,2026-10-15 10:08:09,EDT-Pages
+https://47.149.9.211:443,https,47.149.9.211,443,223,0,alive,LAX,US,47.149.9.211,"AS5650 Frontier Communications of America, Inc.","Frontier Communications of America, Inc.",isp,2026-10-15 10:08:09,EDT-Pages
+https://208.72.4.50:443,https,208.72.4.50,443,238,0,alive,ORD,US,208.72.4.1,AS6289 HONDA CANADA INC.,HONDA CANADA INC.,business,2026-10-27 13:10:20,EDT-Pages
+https://190.113.112.147:4443,https,190.113.112.147,4443,241,0,alive,SJO,CR,190.113.112.147,AS52263 Telecarrier,Telecarrier,isp,2026-10-15 10:08:09,EDT-Pages
+https://184.188.139.2:8090,https,184.188.139.2,8090,244,0,alive,IAD,US,184.188.139.2,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-09 00:00:00,EDT-Pages
+https://66.153.187.90:8090,https,66.153.187.90,8090,245,0,alive,ATL,US,66.153.187.90,AS21565 Nations Title Agency Carolina s,Nations Title Agency Carolina s,isp,2026-10-09 00:00:00,EDT-Pages
+https://45.56.228.8:443,https,45.56.228.8,443,274,0,alive,AMS,GB,45.56.228.8,AS203101 Navarino Single Member S.A.,Navarino Single Member S.A.,isp,2026-10-27 13:10:20,EDT-Pages
+https://64.98.50.100:443,https,64.98.50.100,443,289,0,alive,DEN,US,64.98.50.100,AS32133 Ting Fiber Inc.,Ting Fiber Inc.,isp,2026-10-09 00:00:00,EDT-Pages
+https://193.49.168.100:443,https,193.49.168.100,443,294,0,alive,CDG,FR,193.49.168.100,AS2200 Renater,Renater,education,2026-10-15 10:08:09,EDT-Pages
+https://104.36.250.48:443,https,104.36.250.48,443,296,0,alive,SJC,US,104.36.250.48,"AS30548 ARUBA NETWORKS, INC.","ARUBA NETWORKS, INC.",business,2026-10-27 13:10:20,EDT-Pages
+https://190.211.102.2:443,https,190.211.102.2,443,296,0,alive,SJO,CR,190.211.102.2,AS262145 Cooperativa de Electrificación Rural de San Carlos R.L. Coopelesca R.L.,Cooperativa de Electrificación Rural de San Carlos R.L. Coopelesca R.L.,isp,2026-10-15 10:08:09,EDT-Pages
+https://212.243.240.120:443,https,212.243.240.120,443,298,0,alive,ZRH,CH,212.243.240.120,AS3303 Bluewin,Bluewin,isp,2026-10-15 10:08:09,EDT-Pages
+https://129.97.50.72:443,https,129.97.50.72,443,299,0,alive,YYZ,CA,129.97.50.72,AS12093 University of Waterloo,University of Waterloo,education,2026-10-15 10:08:09,EDT-Pages
+https://204.110.58.174:443,https,204.110.58.174,443,300,0,alive,MIA,TC,204.110.58.174,AS394311 Digicel Turks and Caicos Ltd (TCT Ltd.),TCT Ltd.,isp,2026-10-25 14:07:00,EDT-Pages
+https://23.161.192.97:9443,https,23.161.192.97,9443,303,0,alive,IAD,US,23.161.192.102,AS19575 ISPNET Communications LLC,ISPNET Communications LLC,isp,2026-10-25 14:07:00,proxifly
+https://206.253.147.105:8090,https,206.253.147.105,8090,304,0,alive,IAD,US,206.253.147.105,"AS14615 PBT Communications, Inc.","PBT Communications, Inc.",isp,2026-10-09 00:00:00,EDT-Pages
+https://24.142.229.178:8090,https,24.142.229.178,8090,304,0,alive,ATL,US,24.142.229.178,AS11426 Charter Communications Inc,Charter Communications Inc,isp,2026-10-27 13:10:20,EDT-Pages
+https://81.172.178.145:8443,https,81.172.178.145,8443,305,0,alive,AMS,NL,81.172.178.145,AS15435 DELTA Fiber Nederland B.V.,DELTA Fiber Nederland B.V.,isp,2026-10-15 10:08:09,EDT-Pages
+https://45.131.254.246:443,https,45.131.254.246,443,316,0,alive,ZRH,CH,2001:1680:101:93::246,AS9044 BSE Software GmbH,BSE Software GmbH,isp,2026-10-15 10:08:09,EDT-Pages
+https://208.66.248.70:443,https,208.66.248.70,443,320,0,alive,YVR,CA,208.66.248.70,AS14642 Morewave Communication Inc.,Morewave Communication Inc.,isp,2026-10-15 10:08:09,EDT-Pages
+https://95.153.31.66:443,https,95.153.31.66,443,322,0,alive,TLL,EE,95.153.31.72,AS1257 Tele2 Sverige AB,Tele2 Sverige AB,isp,2026-10-09 00:00:00,EDT-Pages
+https://62.210.27.111:443,https,62.210.27.111,443,323,0,alive,CDG,FR,209.131.65.213,AS214143 SysLevel SAS,SysLevel SAS,isp,2026-10-09 00:00:00,EDT-Pages
+https://193.226.205.54:443,https,193.226.205.54,443,325,0,alive,BUD,HU,193.226.205.54,AS12301 Invitech ICT Services Kft.,Invitech ICT Services Kft.,isp,2026-10-15 10:08:09,EDT-Pages
+https://162.244.227.36:443,https,162.244.227.36,443,333,0,alive,ORD,US,162.244.227.36,"AS1423 Rainbow Communications, L.L.C.","Rainbow Communications, L.L.C.",isp,2026-10-09 00:00:00,EDT-Pages
+https://190.113.112.147:443,https,190.113.112.147,443,333,0,alive,SJO,CR,190.113.112.147,AS52263 Telecarrier,Telecarrier,isp,2026-10-15 10:08:09,EDT-Pages
+https://82.64.46.151:8013,https,82.64.46.151,8013,338,0,alive,CDG,FR,82.64.46.151,AS12322 Free SAS,Free SAS,isp,2026-10-15 10:08:09,EDT-Pages
+https://195.200.166.126:443,https,195.200.166.126,443,340,0,alive,MRS,FR,149.232.174.15,AS30781 Free Pro SAS,Free Pro SAS,isp,2026-10-15 10:08:09,EDT-Pages
+https://193.77.81.97:443,https,193.77.81.97,443,340,0,alive,MXP,SI,193.77.81.97,"AS5603 Telekom Slovenije, d.d.","Telekom Slovenije, d.d.",isp,2026-10-15 10:08:09,EDT-Pages
+https://193.203.16.6:443,https,193.203.16.6,443,341,0,alive,HAM,DE,193.203.16.6,AS50629 Cassens Strassenbau GmbH,Cassens Strassenbau GmbH,isp,2026-10-15 10:08:09,EDT-Pages
+https://193.87.1.71:443,https,193.87.1.71,443,341,0,alive,BTS,SK,2001:4118:900:d814::47:0,AS2607 Zdruzenie pouzivatelov Slovenskej akademickej datovej siete SANET,Zdruzenie pouzivatelov Slovenskej akademickej datovej siete SANET,education,2026-10-15 10:08:09,EDT-Pages
+https://82.64.46.151:8017,https,82.64.46.151,8017,342,0,alive,CDG,FR,82.64.46.151,AS12322 Free SAS,Free SAS,isp,2026-10-15 10:08:09,EDT-Pages
+https://134.1.7.9:443,https,134.1.7.9,443,342,0,alive,HAM,DE,134.1.7.9,AS680 Awinet,Awinet,education,2026-10-09 00:00:00,EDT-Pages
+https://217.13.162.5:443,https,217.13.162.5,443,343,0,alive,FRA,DE,217.13.162.5,AS12460 mandala IT GmbH,mandala IT GmbH,isp,2026-10-15 10:08:09,EDT-Pages
+https://82.64.46.151:443,https,82.64.46.151,443,353,0,alive,CDG,FR,82.64.46.151,AS12322 Free SAS,Free SAS,isp,2026-10-15 10:08:09,EDT-Pages
+https://84.72.72.153:443,https,84.72.72.153,443,353,0,alive,ZRH,CH,84.72.72.153,AS6730 Sunrise GmbH,Sunrise GmbH,isp,2026-10-15 10:08:09,EDT-Pages
+https://153.5.68.160:443,https,153.5.68.160,443,355,0,alive,LJU,SI,2001:1470:ff94:d:153:5:68:160,AS2107 ARNES,ARNES,education,2026-10-15 10:08:09,EDT-Pages
+https://65.255.63.50:443,https,65.255.63.50,443,355,0,alive,MIA,TC,208.169.72.50,AS22933 Vodafone Americas,Vodafone Americas,isp,2026-10-15 10:08:09,EDT-Pages
+https://12.202.180.118:9443,https,12.202.180.118,9443,359,0,alive,IAD,US,12.202.180.133,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",isp,2026-10-26 12:52:01,proxifly
+https://90.160.15.197:443,https,90.160.15.197,443,364,0,alive,MAD,ES,77.230.129.82,AS12430 Vodafone Espana S.A.U.,Vodafone Espana S.A.U.,isp,2026-10-25 16:44:06,@user
+https://198.40.90.50:443,https,198.40.90.50,443,364,0,alive,DUS,DE,198.40.90.50,AS3320 Deutsche Telekom AG,Deutsche Telekom AG,isp,2026-10-15 10:08:09,EDT-Pages
+https://208.169.72.50:443,https,208.169.72.50,443,373,0,alive,MIA,TC,208.169.72.50,AS22933 Vodafone Americas,Vodafone Americas,isp,2026-10-15 10:08:09,EDT-Pages
+https://217.96.36.36:443,https,217.96.36.36,443,375,0,alive,WAW,PL,217.96.36.36,AS5617 Orange Swiatlowod,Orange Swiatlowod,isp,2026-10-15 10:08:09,EDT-Pages
+https://66.249.156.130:443,https,66.249.156.130,443,376,0,alive,MIA,LC,66.249.156.130,AS33582 Digicel St.Lucia Ltd,Digicel St.Lucia Ltd,isp,2026-10-15 10:08:09,EDT-Pages
+https://149.12.210.39:443,https,149.12.210.39,443,382,0,alive,FRA,FR,149.12.210.39,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",isp,2026-10-15 10:08:09,EDT-Pages
+https://185.225.28.50:443,https,185.225.28.50,443,384,0,alive,SOF,MK,185.225.28.55,AS205119 TELEKS DOOEL Skopje,TELEKS DOOEL Skopje,isp,2026-10-09 00:00:00,EDT-Pages
+https://217.237.171.227:443,https,217.237.171.227,443,385,0,alive,FRA,DE,217.89.78.118,AS3320 Deutsche Telekom AG,Deutsche Telekom AG,isp,2026-10-15 10:08:09,EDT-Pages
+https://193.136.192.57:443,https,193.136.192.57,443,386,0,alive,LIS,PT,2001:690:a00:4001::57,"AS1930 Fundacao para a Ciencia e a Tecnologia, I.P.","Fundacao para a Ciencia e a Tecnologia, I.P.",education,2026-10-21 15:52:42,EDT-Pages
+https://195.146.134.204:443,https,195.146.134.204,443,387,0,alive,PRG,SK,195.146.134.200,"AS6855 Slovak Telekom, a.s.","Slovak Telekom, a.s.",isp,2026-10-15 10:08:09,EDT-Pages
+https://66.64.100.66:443,https,66.64.100.66,443,387,0,alive,MCI,US,66.64.100.66,AS18712 Everfast Fiber Networks LLC,Everfast Fiber Networks LLC,isp,2026-10-09 00:00:00,EDT-Pages
+https://190.112.224.179:443,https,190.112.224.179,443,393,0,alive,MIA,CW,190.112.224.132,AS52233 Columbus Communications Curacao NV,Columbus Communications Curacao NV,isp,2026-10-15 10:08:09,EDT-Pages
+https://193.49.168.97:443,https,193.49.168.97,443,396,0,alive,CDG,FR,193.49.168.97,AS2200 Renater,Renater,education,2026-10-15 10:08:09,EDT-Pages
+https://98.101.229.212:8090,https,98.101.229.212,8090,411,0,alive,ATL,US,98.101.229.210,AS11426 Charter Communications Inc,Charter Communications Inc,isp,2026-10-09 00:00:00,EDT-Pages
+https://24.225.10.211:443,https,24.225.10.211,443,413,0,alive,DEN,US,24.225.10.210,"AS14155 RURAL TELEPHONE SERVICE COMPANY, INC.","RURAL TELEPHONE SERVICE COMPANY, INC.",isp,2026-10-09 00:00:00,EDT-Pages
+https://138.118.81.189:443,https,138.118.81.189,443,414,0,alive,SJO,CR,138.118.81.189,AS52263 TELECABLE RESIDENCIAL,TELECABLE RESIDENCIAL,isp,2026-10-15 10:08:09,EDT-Pages
+https://81.180.222.73:443,https,81.180.222.73,443,415,0,alive,OTP,RO,81.180.222.73,AS2614 Universitatea Tehnica Gheorghe Asachi din Iasi,Universitatea Tehnica Gheorghe Asachi din Iasi,education,2026-10-15 10:08:09,EDT-Pages
+https://194.249.231.22:443,https,194.249.231.22,443,416,0,alive,LJU,SI,2001:1470:ff80:e3:215:5dff:fe9a:f400,AS2107 ARNES,ARNES,education,2026-10-15 10:08:09,EDT-Pages
+https://91.227.97.113:443,https,91.227.97.113,443,419,0,alive,PRG,CZ,91.227.97.113,AS198103 CCS Ceska spolecnost pro platebni karty s.r.o.,CCS Ceska spolecnost pro platebni karty s.r.o.,business,2026-10-15 10:08:09,EDT-Pages
+https://213.96.140.33:443,https,213.96.140.33,443,422,0,alive,MAD,ES,213.96.140.33,AS3352 Telefonica De Espana SAU NCC 2000013794,Telefonica De Espana SAU NCC 2000013794,isp,2026-10-15 10:08:09,EDT-Pages
+https://173.225.245.67:443,https,173.225.245.67,443,426,0,alive,EWR,JM,173.225.245.67,AS40786 Digicel Jamaica,Digicel Jamaica,isp,2026-10-15 10:08:09,EDT-Pages
+https://83.211.198.117:443,https,83.211.198.117,443,427,0,alive,FCO,IT,83.211.198.117,AS3302 Retelit Digital Services S.p.A.,Retelit Digital Services S.p.A.,isp,2026-10-27 13:10:20,EDT-Pages
+https://46.199.75.105:443,https,46.199.75.105,443,428,0,alive,LCA,CY,46.199.75.109,AS6866 Cyprus Telecommunications Authority,Cyprus Telecommunications Authority,isp,2026-10-09 00:00:00,EDT-Pages
+https://83.212.77.6:443,https,83.212.77.6,443,434,0,alive,ATH,GR,2001:648:2ffe:501:cc00:13ff:fe66:d464,AS5408 National Infrastructures for Research and Technology S.A.,National Infrastructures for Research and Technology S.A.,education,2026-10-21 15:52:42,EDT-Pages
+https://66.249.146.210:443,https,66.249.146.210,443,438,0,alive,MIA,AG,66.249.146.210,AS396304 Digicel,Digicel,isp,2026-10-09 00:00:00,EDT-Pages
+https://195.80.165.154:443,https,195.80.165.154,443,438,0,alive,BTS,SK,212.55.225.242,AS31679 Slovanet a.s.,Slovanet a.s.,isp,2026-10-15 10:08:09,EDT-Pages
+https://154.202.118.108:443,https,154.202.118.108,443,438,0,alive,IAD,US,66.92.227.30,AS3257 GTT Communications,GTT Communications,isp,2026-10-23 12:55:36,EDT-Pages
+https://162.191.226.246:9443,https,162.191.226.246,9443,441,0,alive,ORD,US,162.191.226.246,"AS21928 T-Mobile USA, Inc.","T-Mobile USA, Inc.",isp,2026-10-09 00:00:00,EDT-Pages
+https://83.103.36.213:443,https,83.103.36.213,443,446,0,alive,FCO,IT,83.103.36.211,AS12874 Fastweb SpA,Fastweb SpA,isp,2026-10-15 10:08:09,EDT-Pages
+https://134.0.63.185:443,https,134.0.63.185,443,446,0,alive,MXP,AL,134.0.63.189,AS5576 INSTAT,INSTAT,government,2026-10-15 10:08:09,EDT-Pages
+https://195.192.209.130:8443,https,195.192.209.130,8443,447,0,alive,FRA,AT,195.192.209.132,AS5404 conova communications GmbH,conova communications GmbH,isp,2026-10-27 13:10:20,EDT-Pages
+https://195.192.209.130:9443,https,195.192.209.130,9443,449,0,alive,FRA,AT,195.192.209.132,AS5404 conova communications GmbH,conova communications GmbH,isp,2026-10-27 13:10:20,EDT-Pages
+https://195.192.209.130:443,https,195.192.209.130,443,450,0,alive,FRA,AT,195.192.209.132,AS5404 conova communications GmbH,conova communications GmbH,isp,2026-10-27 13:10:20,EDT-Pages
+https://193.87.1.47:443,https,193.87.1.47,443,467,0,alive,BTS,SK,2001:4118:900:d812::2f:0,AS2607 Zdruzenie pouzivatelov Slovenskej akademickej datovej siete SANET,Zdruzenie pouzivatelov Slovenskej akademickej datovej siete SANET,education,2026-10-15 10:08:09,EDT-Pages
+https://82.65.162.76:443,https,82.65.162.76,443,470,0,alive,CDG,FR,82.65.162.76,AS12322 Free SAS,Free SAS,isp,2026-10-09 00:00:00,EDT-Pages
+https://200.75.11.94:443,https,200.75.11.94,443,475,0,alive,SCL,CL,200.75.11.90,AS14259 Gtd Internet S.A.,Gtd Internet S.A.,isp,2026-10-09 00:00:00,EDT-Pages
+https://213.241.124.228:443,https,213.241.124.228,443,476,0,alive,WAW,PL,213.241.124.228,AS12741 Netia SA,Netia SA,isp,2026-10-15 10:08:09,EDT-Pages
+https://24.121.152.67:443,https,24.121.152.67,443,478,0,alive,SAN,US,24.121.152.67,AS19108 Optimum,Optimum,isp,2026-10-09 00:00:00,EDT-Pages
+https://93.63.43.131:443,https,93.63.43.131,443,483,0,alive,FCO,IT,93.63.84.182,AS12874 Fastweb SpA,Fastweb SpA,isp,2026-10-15 10:08:09,EDT-Pages
+https://178.115.238.253:443,https,178.115.238.253,443,484,0,alive,VIE,AT,178.115.238.253,AS25255 Hutchison Drei Austria GmbH,Hutchison Drei Austria GmbH,isp,2026-10-15 10:08:09,EDT-Pages
+https://194.243.172.243:443,https,194.243.172.243,443,488,0,alive,MXP,IT,194.243.172.243,AS3269 Telecom Italia S.p.A.,Telecom Italia S.p.A.,isp,2026-10-15 10:08:09,EDT-Pages
+https://208.169.72.58:443,https,208.169.72.58,443,489,0,alive,MIA,TC,208.169.72.58,AS22933 Vodafone Americas,Vodafone Americas,isp,2026-10-15 10:08:09,EDT-Pages
+https://103.135.244.2:9443,https,103.135.244.2,9443,490,0,alive,NRT,JP,103.135.244.18,AS138652 Super Godzilla Communications GK,Super Godzilla Communications GK,isp,2026-10-09 00:00:00,EDT-Pages
+https://193.25.2.239:443,https,193.25.2.239,443,493,0,alive,BUD,PL,193.25.2.239,AS59686 Gemini Internet Sp. z o.o.,Gemini Internet Sp. z o.o.,isp,2026-10-15 10:08:09,EDT-Pages
+https://83.212.74.234:443,https,83.212.74.234,443,498,0,alive,ATH,GR,2001:648:2ffe:501:cc00:11ff:fe0e:69cc,AS5408 National Infrastructures for Research and Technology S.A.,National Infrastructures for Research and Technology S.A.,education,2026-10-21 15:52:42,EDT-Pages
+https://188.77.69.184:443,https,188.77.69.184,443,503,0,alive,MAD,ES,188.77.69.184,AS12479 Jazztel triple play services,Jazztel triple play services,isp,2026-10-09 00:00:00,EDT-Pages
+https://212.200.119.174:443,https,212.200.119.174,443,503,0,alive,BEG,RS,77.46.160.61,AS8400 TELEKOM SRBIJA a.d.,TELEKOM SRBIJA a.d.,isp,2026-10-15 10:08:09,EDT-Pages
+https://64.119.193.154:443,https,64.119.193.154,443,504,0,alive,MIA,BB,64.119.193.154,AS35900 Sunbeach Communications Inc.,Sunbeach Communications Inc.,isp,2026-10-15 10:08:09,EDT-Pages
+https://50.76.211.251:8090,https,50.76.211.251,8090,504,0,alive,MEM,US,50.76.211.250,"AS7922 Comcast Cable Communications, LLC","Comcast Cable Communications, LLC",isp,2026-10-09 00:00:00,EDT-Pages
+https://185.68.28.79:443,https,185.68.28.79,443,508,0,alive,PRG,CZ,185.68.28.76,AS201648 Plzensky kraj,Plzensky kraj,government,2026-10-15 10:08:09,EDT-Pages
+https://77.81.71.62:443,https,77.81.71.62,443,518,0,alive,OTP,RO,77.81.71.62,AS56654 Infinity Telecom SRL,Infinity Telecom SRL,isp,2026-10-15 10:08:09,EDT-Pages
+https://80.124.109.22:8090,https,80.124.109.22,8090,524,0,alive,CDG,FR,80.124.109.22,AS15557 Societe Francaise Du Radiotelephone - SFR SA,Societe Francaise Du Radiotelephone - SFR SA,isp,2026-10-09 00:00:00,EDT-Pages
+https://185.96.121.243:9443,https,185.96.121.243,9443,527,0,alive,WAW,PL,185.96.121.243,AS198317 Gabriel Sulka trading as Firma Handlowo - Uslugowa KOMPEX Gabriel Sulka,Gabriel Sulka trading as Firma Handlowo - Uslugowa KOMPEX Gabriel Sulka,isp,2026-10-15 10:08:09,EDT-Pages
+https://201.54.216.54:443,https,201.54.216.54,443,530,0,alive,GIG,BR,201.54.216.54,AS28616 Emp. de Informatica e Informaçao do Mun. BH/SA,Emp. de Informatica e Informaçao do Mun. BH/SA,government,2026-10-15 10:08:09,EDT-Pages
+https://82.66.235.221:443,https,82.66.235.221,443,531,0,alive,CDG,FR,2a01:e0a:1018:8c90:be24:11ff:fe98:e8b1,AS12322 Free SAS,Free SAS,isp,2026-10-09 00:00:00,EDT-Pages
+https://200.23.153.161:443,https,200.23.153.161,443,541,0,alive,FOR,BR,201.71.218.253,AS271145 PIAUI LINK S/A,PIAUI LINK S/A,government,2026-10-15 10:08:09,EDT-Pages
+https://89.188.125.42:443,https,89.188.125.42,443,544,0,alive,FRA,RU,89.188.125.42,AS29076 Citytelecom LLC (Filanco),Citytelecom LLC (Filanco),isp,2026-10-15 10:08:09,EDT-Pages
+https://209.148.53.153:8090,https,209.148.53.153,8090,549,0,alive,EWR,US,209.148.53.153,AS46887 CORPORATE SUITES 825 LLC,CORPORATE SUITES 825 LLC,isp,2026-10-15 10:08:09,EDT-Pages
+https://130.180.211.56:443,https,130.180.211.56,443,551,0,alive,CDG,FR,185.210.108.69,AS24904 K-sys SA,K-sys SA,isp,2026-10-09 00:00:00,EDT-Pages
+https://213.207.132.2:9443,https,213.207.132.2,9443,552,0,alive,MRS,CY,213.207.132.10,AS15805 Epic Ltd,Epic Ltd,isp,2026-10-09 00:00:00,EDT-Pages
+https://194.254.206.88:443,https,194.254.206.88,443,553,0,alive,CDG,FR,194.254.206.89,AS2200 Renater,Renater,education,2026-10-25 16:44:06,@user
+https://179.96.182.182:443,https,179.96.182.182,443,558,0,alive,GIG,BR,187.92.203.235,AS10429 TELEFÔNICA BRASIL S.A,TELEFÔNICA BRASIL S.A,isp,2026-10-09 00:00:00,EDT-Pages
+https://88.197.53.165:443,https,88.197.53.165,443,559,0,alive,ATH,GR,88.197.53.165,AS8643 NATIONAL AND KAPODISTRIAN UNIVERSITY OF ATHENS,NATIONAL AND KAPODISTRIAN UNIVERSITY OF ATHENS,education,2026-10-15 10:08:09,EDT-Pages
+https://62.210.147.2:443,https,62.210.147.2,443,564,0,alive,CDG,FR,209.131.65.213,AS214143 SysLevel SAS,SysLevel SAS,isp,2026-10-09 00:00:00,EDT-Pages
+https://200.52.72.14:443,https,200.52.72.14,443,564,0,alive,DFW,MX,200.52.72.14,"AS14178 Megacable Comunicaciones de Mexico, S.A. de C.V.","Megacable Comunicaciones de Mexico, S.A. de C.V.",isp,2026-10-15 10:08:09,EDT-Pages
+https://83.172.143.53:4443,https,83.172.143.53,4443,566,0,alive,CDG,FR,83.172.143.53,AS25540 INIT SYS SAS,INIT SYS SAS,isp,2026-10-09 00:00:00,EDT-Pages
+https://94.102.226.59:443,https,94.102.226.59,443,574,0,alive,BEG,ME,94.102.226.59,AS47881 One Crna Gora DOO,One Crna Gora DOO,isp,2026-10-15 10:08:09,EDT-Pages
+https://83.212.225.30:443,https,83.212.225.30,443,574,0,alive,ATH,GR,2001:648:2ffe:11:a800:ff:fe48:2020,AS5408 National Infrastructures for Research and Technology S.A.,National Infrastructures for Research and Technology S.A.,education,2026-10-21 15:52:42,EDT-Pages
+https://178.237.108.214:443,https,178.237.108.214,443,579,0,alive,LYS,FR,178.237.108.214,AS15401 Orange Business Services SA (La Fabrique Hosted services - Datacenter MA),La Fabrique Hosted services - Datacenter MA,isp,2026-10-27 13:10:20,EDT-Pages
+https://96.5.129.85:443,https,96.5.129.85,443,583,0,alive,SEA,US,96.5.129.121,AS11686 Zayo Bandwidth,Zayo Bandwidth,isp,2026-10-09 00:00:00,EDT-Pages
+https://62.210.70.194:443,https,62.210.70.194,443,587,0,alive,CDG,FR,209.131.65.213,AS214143 SysLevel SAS,SysLevel SAS,isp,2026-10-09 00:00:00,EDT-Pages
+https://190.213.55.167:443,https,190.213.55.167,443,592,0,alive,POS,TT,190.213.55.167,AS27665 Columbus Communications Trinidad Limited.,Columbus Communications Trinidad Limited.,isp,2026-10-09 00:00:00,EDT-Pages
+https://31.32.19.111:8081,https,31.32.19.111,8081,597,0,alive,CDG,FR,31.32.19.111,AS5410 Bouygues Telecom SA,Bouygues Telecom SA,isp,2026-10-09 00:00:00,EDT-Pages
+https://217.210.129.243:443,https,217.210.129.243,443,603,0,alive,CPH,SE,217.210.129.243,AS3301 Telia Company AB,Telia Company AB,isp,2026-10-09 00:00:00,EDT-Pages
+https://95.153.32.2:9443,https,95.153.32.2,9443,607,0,alive,TLL,EE,95.153.32.8,AS1257 Tele2 Sverige AB,Tele2 Sverige AB,isp,2026-10-09 00:00:00,EDT-Pages
+https://5.158.70.34:443,https,5.158.70.34,443,609,0,alive,AMS,IT,5.158.70.34,AS199181 Orakom S.r.l.,Orakom S.r.l.,isp,2026-10-15 10:08:09,EDT-Pages
+https://168.205.255.238:443,https,168.205.255.238,443,609,0,alive,GRU,BR,189.50.88.38,AS28327 Rei das Tecnologias LTDA ME,Rei das Tecnologias LTDA ME,isp,2026-10-15 10:08:09,EDT-Pages
+https://82.96.128.175:8090,https,82.96.128.175,8090,611,0,alive,CDG,FR,82.96.128.175,AS199636 Free Pro SAS,Free Pro SAS,isp,2026-10-09 00:00:00,EDT-Pages
+https://183.179.162.50:443,https,183.179.162.50,443,615,0,alive,HKG,HK,183.179.162.50,AS9269 Hong Kong Broadband Network Ltd.,Hong Kong Broadband Network Ltd.,isp,2026-10-15 10:08:09,EDT-Pages
+https://181.126.49.38:443,https,181.126.49.38,443,616,0,alive,ASU,PY,181.126.49.38,AS23201 Telecel S.A.,Telecel S.A.,isp,2026-10-09 00:00:00,EDT-Pages
+https://62.90.77.30:443,https,62.90.77.30,443,619,0,alive,TLV,IL,62.90.77.18,AS1680 Cellcom Fixed Line Communication L.P,Cellcom Fixed Line Communication L.P,isp,2026-10-09 00:00:00,EDT-Pages
+https://84.237.50.68:8444,https,84.237.50.68,8444,621,0,alive,DME,RU,84.237.50.68,AS3335 NSU,NSU,education,2026-10-15 10:08:09,EDT-Pages
+https://221.126.247.53:22,https,221.126.247.53,22,625,0,alive,HKG,HK,221.126.247.53,AS9304 HGC Global Communications Limited,HGC Global Communications Limited,isp,2026-10-15 10:08:09,EDT-Pages
+https://2.228.224.4:443,https,2.228.224.4,443,629,0,alive,FCO,IT,2.228.224.4,AS12874 Fastweb SpA,Fastweb SpA,isp,2026-10-15 10:08:09,EDT-Pages
+https://217.92.132.233:443,https,217.92.132.233,443,633,0,alive,TXL,DE,2003:a:4:e500:215:5dff:fe83:c00b,AS3320 Deutsche Telekom AG,Deutsche Telekom AG,isp,2026-10-09 00:00:00,EDT-Pages
+https://79.188.239.46:8443,https,79.188.239.46,8443,635,0,alive,WAW,PL,79.188.239.41,AS5617 Orange Polska Spolka Akcyjna,Orange Polska Spolka Akcyjna,isp,2026-10-19 12:45:55,EDT-Pages
+https://2.12.242.106:443,https,2.12.242.106,443,638,0,alive,CDG,FR,2.12.242.106,AS3215 Orange,Orange,isp,2026-10-25 16:44:06,@user
+https://176.94.74.21:443,https,176.94.74.21,443,641,0,alive,FRA,DE,176.94.74.21,AS3209 Vodafone GmbH,Vodafone GmbH,isp,2026-10-09 00:00:00,EDT-Pages
+https://213.207.130.34:443,https,213.207.130.34,443,641,0,alive,MRS,CY,213.207.130.43,AS15805 Epic Ltd,Epic Ltd,isp,2026-10-09 00:00:00,EDT-Pages
+https://82.64.46.151:8012,https,82.64.46.151,8012,643,0,alive,CDG,FR,82.64.46.151,AS12322 Free SAS,Free SAS,isp,2026-10-15 10:08:09,EDT-Pages
+https://200.133.218.122:443,https,200.133.218.122,443,651,0,alive,ARU,BR,177.190.73.2,AS1916 Rede Nacional de Ensino e Pesquisa,Rede Nacional de Ensino e Pesquisa,education,2026-10-15 10:08:09,EDT-Pages
+https://194.15.211.132:10000,https,194.15.211.132,10000,654,0,alive,FRA,DE,194.15.211.132,AS15779 Reply S.p.A.,Reply S.p.A.,business,2026-10-15 10:08:09,EDT-Pages
+https://41.77.155.147:443,https,41.77.155.147,443,655,0,alive,CPT,ZA,41.77.155.147,AS32653 eNetworks Ltd,eNetworks (Pty) Ltd,isp,2026-10-25 16:44:06,@user
+https://84.237.50.68:444,https,84.237.50.68,444,656,0,alive,DME,RU,84.237.50.68,AS3335 NSU,NSU,education,2026-10-15 10:08:09,EDT-Pages
+https://41.77.152.84:443,https,41.77.152.84,443,656,0,alive,CPT,ZA,41.77.152.84,AS32653 eNetworks Ltd,eNetworks (Pty) Ltd,isp,2026-10-25 16:44:06,@user
+https://201.217.148.180:443,https,201.217.148.180,443,661,0,alive,EZE,UY,201.217.148.180,AS6057 Administracion Nacional de Telecomunicaciones,Administracion Nacional de Telecomunicaciones,isp,2026-10-15 10:08:09,EDT-Pages
+https://195.182.74.92:42443,https,195.182.74.92,42443,662,0,alive,VNO,LT,195.182.74.91,AS6769 Kertinis valstybes telekomunikaciju centras,Kertinis valstybes telekomunikaciju centras,isp,2026-10-15 10:08:09,EDT-Pages
+https://178.219.43.226:443,https,178.219.43.226,443,667,0,alive,DME,RU,178.219.43.226,AS51077 Modern Technologies Ltd.,Modern Technologies Ltd.,isp,2026-10-09 00:00:00,EDT-Pages
+https://82.64.46.151:8007,https,82.64.46.151,8007,669,0,alive,CDG,FR,82.64.46.151,AS12322 Free SAS,Free SAS,isp,2026-10-15 10:08:09,EDT-Pages
+https://41.77.155.164:443,https,41.77.155.164,443,669,0,alive,JNB,ZA,41.77.155.164,AS32653 eNetworks cc,eNetworks cc,isp,2026-10-15 10:08:09,EDT-Pages
+https://83.13.36.250:443,https,83.13.36.250,443,671,0,alive,WAW,PL,83.13.36.250,AS5617 Orange Polska Spolka Akcyjna,Orange Polska Spolka Akcyjna,isp,2026-10-15 10:08:09,EDT-Pages
+https://189.204.255.4:8443,https,189.204.255.4,8443,677,0,alive,DFW,MX,187.141.99.82,AS8151 UNINET,UNINET,isp,2026-10-15 10:08:09,EDT-Pages
+https://203.31.65.32:443,https,203.31.65.32,443,677,0,alive,MEL,AU,203.31.65.32,AS133120 Hosted Network Pty Ltd,Hosted Network Pty Ltd,isp,2026-10-26 12:52:01,EDT-Pages
+https://80.86.231.109:443,https,80.86.231.109,443,679,0,alive,EVN,AM,80.86.231.62,AS21104 Netsys JVC is internet services provider in Armeina,Netsys JVC is internet services provider in Armeina,isp,2026-10-15 10:08:09,EDT-Pages
+https://41.77.155.137:443,https,41.77.155.137,443,680,0,alive,CPT,ZA,41.77.155.137,AS32653 eNetworks Ltd,eNetworks (Pty) Ltd,isp,2026-10-25 16:44:06,@user
+https://168.167.220.27:443,https,168.167.220.27,443,689,0,alive,JNB,BW,168.167.220.27,AS14988 Botswana Telecommunications Corporation,Botswana Telecommunications Corporation,isp,2026-10-15 10:08:09,EDT-Pages
+https://41.77.152.91:443,https,41.77.152.91,443,690,0,alive,CPT,ZA,41.77.152.91,AS32653 eNetworks Ltd,eNetworks (Pty) Ltd,isp,2026-10-25 16:44:06,@user
+https://95.229.15.89:443,https,95.229.15.89,443,692,0,alive,MXP,IT,95.229.15.89,AS3269 Telecom Italia S.p.A.,Telecom Italia S.p.A.,isp,2026-10-09 00:00:00,EDT-Pages
+https://41.77.155.154:443,https,41.77.155.154,443,695,0,alive,CPT,ZA,41.77.155.154,AS32653 eNetworks Ltd,eNetworks (Pty) Ltd,isp,2026-10-25 16:44:06,@user
+https://31.186.220.204:443,https,31.186.220.204,443,701,0,alive,WAW,PL,31.186.220.204,AS9141 P4 Sp. z o.o.,P4 Sp. z o.o.,isp,2026-10-09 00:00:00,EDT-Pages
+https://109.190.196.5:8090,https,109.190.196.5,8090,702,0,alive,CDG,FR,109.190.196.5,AS35540 OVH SAS,OVH SAS,isp,2026-10-23 12:55:36,EDT-Pages
+https://129.205.246.123:443,https,129.205.246.123,443,706,0,alive,GBE,BW,129.205.246.123,AS37678 BOTSWANA FIBRE NETWORKS Proprietary Limited,BOTSWANA FIBRE NETWORKS Proprietary Limited,isp,2026-10-15 10:08:09,EDT-Pages
+https://103.87.68.146:9443,https,103.87.68.146,9443,733,0,alive,CGK,ID,103.87.68.150,AS150249 PT Atharva Telematika Persada,PT Atharva Telematika Persada,isp,2026-10-25 14:07:00,EDT-Pages
+https://41.77.155.141:443,https,41.77.155.141,443,733,0,alive,CPT,ZA,41.77.155.141,AS32653 eNetworks Ltd,eNetworks (Pty) Ltd,isp,2026-10-25 16:44:06,@user
+https://123.108.164.102:443,https,123.108.164.102,443,738,0,alive,ICN,KR,123.108.164.102,"AS7562 kt HCN Co.,Ltd.","kt HCN Co.,Ltd.",isp,2026-10-21 15:52:42,EDT-Pages
+https://168.167.220.28:443,https,168.167.220.28,443,738,0,alive,JNB,BW,168.167.220.28,AS14988 Botswana Telecommunications Corporation,Botswana Telecommunications Corporation,isp,2026-10-15 10:08:09,EDT-Pages
+https://91.146.45.78:443,https,91.146.45.78,443,742,0,alive,FRA,RU,91.146.45.78,AS3226 OOO NI,OOO NI,isp,2026-10-15 10:08:09,EDT-Pages
+https://123.108.164.103:443,https,123.108.164.103,443,743,0,alive,ICN,KR,123.108.164.103,"AS7562 kt HCN Co.,Ltd.","kt HCN Co.,Ltd.",isp,2026-10-21 15:52:42,EDT-Pages
+https://162.191.235.197:8443,https,162.191.235.197,8443,744,0,alive,ORD,US,162.191.235.197,"AS21928 T-Mobile USA, Inc.","T-Mobile USA, Inc.",isp,2026-10-09 00:00:00,EDT-Pages
+https://87.251.79.232:443,https,87.251.79.232,443,747,0,alive,MXP,US,64.190.76.14,AS36375 University of Michigan,University of Michigan,education,2026-10-12 21:49:55,EDT-Pages
+https://211.72.236.159:443,https,211.72.236.159,443,765,0,alive,TPE,TW,211.23.161.79,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,isp,2026-10-15 10:08:09,EDT-Pages
+https://156.38.64.51:443,https,156.38.64.51,443,775,0,alive,LOS,TG,156.38.64.51,AS36924 GVA Togo,GVA Togo,isp,2026-10-15 10:08:09,EDT-Pages
+https://14.99.141.239:443,https,14.99.141.239,443,783,0,alive,BOM,IN,203.193.169.98,AS7633 Software Technology Parks of India,Software Technology Parks of India,government,2026-10-09 00:00:00,EDT-Pages
+https://103.87.68.50:9443,https,103.87.68.50,9443,786,0,alive,CGK,ID,103.87.68.59,AS150249 PT Atharva Telematika Persada,PT Atharva Telematika Persada,isp,2026-10-25 14:07:00,EDT-Pages
+https://41.191.232.21:443,https,41.191.232.21,443,790,0,alive,HRE,ZW,41.191.232.21,AS37123 Telco Applications servers and hosted facilities,Telco Applications servers and hosted facilities,isp,2026-10-15 10:08:09,EDT-Pages
+https://196.43.240.49:9443,https,196.43.240.49,9443,790,0,alive,LAD,CG,196.43.240.61,AS37548 ARPCE,ARPCE,business,2026-10-25 14:07:00,EDT-Pages
+https://162.172.63.120:8443,https,162.172.63.120,8443,792,0,alive,IAD,US,162.172.63.120,"AS21928 T-Mobile USA, Inc.","T-Mobile USA, Inc.",isp,2026-10-23 12:55:36,proxifly
+https://103.40.138.14:443,https,103.40.138.14,443,796,0,alive,BKK,TH,223.27.243.104,AS38794,"United Information Highway Co.,Ltd.",isp,2026-10-21 15:52:42,EDT-Pages
+https://79.72.36.217:443,https,79.72.36.217,443,798,0,alive,MCT,OM,158.179.3.228,AS54253 Oracle Corporation,oracle,isp,2026-10-27 13:10:20,EDT-Pages
+https://116.254.118.180:443,https,116.254.118.180,443,806,0,alive,CGK,ID,116.254.118.180,AS55666 PT Internet Mulia Untuk Negeri,PT Internet Mulia Untuk Negeri,isp,2026-10-15 10:08:09,EDT-Pages
+https://198.54.223.176:443,https,198.54.223.176,443,817,0,alive,CPT,ZA,198.54.223.176,AS2018 Peninsula Technikon,Peninsula Technikon,education,2026-10-15 10:08:09,EDT-Pages
+https://14.225.71.128:8443,https,14.225.71.128,8443,820,0,alive,HKG,VN,14.225.71.128,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group,isp,2026-10-09 00:00:00,EDT-Pages
+https://217.181.201.254:8090,https,217.181.201.254,8090,830,0,alive,CDG,FR,217.181.201.254,AS8399 SEWAN SAS,SEWAN SAS,isp,2026-10-09 00:00:00,EDT-Pages
+https://203.193.169.112:443,https,203.193.169.112,443,847,0,alive,BOM,IN,203.193.169.98,AS7633 Software Technology Parks of India,Software Technology Parks of India,government,2026-10-15 10:08:09,EDT-Pages
+https://93.71.245.84:8090,https,93.71.245.84,8090,850,0,alive,FCO,IT,93.71.245.84,AS30722 IP pool assigned to VF DSL customers,IP pool assigned to VF DSL customers,isp,2026-10-09 00:00:00,EDT-Pages
+https://79.188.239.40:8443,https,79.188.239.40,8443,854,0,alive,WAW,PL,79.188.239.41,AS5617 Orange Polska Spolka Akcyjna,Orange Polska Spolka Akcyjna,isp,2026-10-15 10:08:09,EDT-Pages
+https://58.120.141.74:443,https,58.120.141.74,443,856,0,alive,ICN,KR,58.120.141.78,AS9318 SK Broadband,SK Broadband,isp,2026-10-09 00:00:00,EDT-Pages
+https://118.127.59.126:12443,https,118.127.59.126,12443,858,0,alive,MEL,AU,118.127.59.114,AS45671 Servers Australia Pty. Ltd,Servers Australia Pty. Ltd,isp,2026-10-25 16:44:06,@user
+https://79.188.239.44:8443,https,79.188.239.44,8443,859,0,alive,WAW,PL,79.188.239.41,AS5617 static IP,static IP,isp,2026-10-19 12:45:55,EDT-Pages
+https://110.173.188.221:443,https,110.173.188.221,443,859,0,alive,BOM,IN,110.173.188.221,AS17426 PRIMENET GLOBAL LTD.,PRIMENET GLOBAL LTD.,isp,2026-10-09 00:00:00,EDT-Pages
+https://79.188.239.45:8443,https,79.188.239.45,8443,859,0,alive,WAW,PL,79.188.239.41,AS5617 Orange Polska Spolka Akcyjna,Orange Polska Spolka Akcyjna,isp,2026-10-09 00:00:00,EDT-Pages
+https://37.207.230.114:9443,https,37.207.230.114,9443,863,0,alive,MXP,IT,37.207.230.114,AS3269 Telecom Italia S.p.A.,Telecom Italia S.p.A.,isp,2026-10-15 10:08:09,EDT-Pages
+https://162.191.87.112:8443,https,162.191.87.112,8443,872,0,alive,ORD,US,162.191.87.112,"AS21928 T-Mobile USA, Inc.","T-Mobile USA, Inc.",isp,2026-10-09 00:00:00,EDT-Pages
+https://196.21.187.115:443,https,196.21.187.115,443,875,0,alive,JNB,ZA,196.21.186.253,AS2018 Tertiary Education and Research Network of South Africa,Tertiary Education and Research Network of South Africa,education,2026-10-15 10:08:09,EDT-Pages
+https://141.105.83.68:443,https,141.105.83.68,443,877,0,alive,BEY,LB,141.105.83.68,AS24634 CYBERIA-3G,CYBERIA-3G,isp,2026-10-15 10:08:09,EDT-Pages
+https://83.206.1.225:8090,https,83.206.1.225,8090,886,0,alive,MRS,FR,83.206.1.225,AS3215 Orange,Orange,isp,2026-10-09 00:00:00,EDT-Pages
+https://79.188.239.43:8443,https,79.188.239.43,8443,889,0,alive,WAW,PL,79.188.239.41,AS5617 Orange Polska Spolka Akcyjna,Orange Polska Spolka Akcyjna,isp,2026-10-19 12:45:55,EDT-Pages
+https://175.134.18.237:443,https,175.134.18.237,443,890,0,alive,NRT,JP,240f:111:54d:1:2eb1:f658:607d:e97b,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-15 10:08:09,EDT-Pages
+https://170.210.44.231:443,https,170.210.44.231,443,905,0,alive,SCL,AR,170.210.44.235,AS4270 Red de Interconexion Universitaria,Red de Interconexion Universitaria,education,2026-10-09 00:00:00,EDT-Pages
+https://41.205.129.179:443,https,41.205.129.179,443,906,0,alive,WDH,NA,41.205.129.179,AS36996 Telecom Namibia,Telecom Namibia,isp,2026-10-15 10:08:09,EDT-Pages
+https://210.19.96.163:443,https,210.19.96.163,443,908,0,alive,KUL,MY,210.19.96.163,AS9930 TT DOTCOM SDN BHD,TT DOTCOM SDN BHD,isp,2026-10-15 10:08:09,EDT-Pages
+https://210.207.52.13:443,https,210.207.52.13,443,914,0,alive,ICN,KR,210.207.52.2,AS3786 LG DACOM Corporation,LG DACOM Corporation,isp,2026-10-15 10:08:09,EDT-Pages
+https://179.27.167.72:443,https,179.27.167.72,443,917,0,alive,EZE,UY,200.108.214.68,AS20255 Sonda Uruguay,Sonda Uruguay,isp,2026-10-19 12:45:55,EDT-Pages
+https://88.135.143.159:443,https,88.135.143.159,443,924,0,alive,RIX,LV,88.135.143.159,AS24589 Telenet SIA,Telenet SIA,isp,2026-10-09 00:00:00,EDT-Pages
+https://45.220.173.40:443,https,45.220.173.40,443,924,0,alive,JNB,ZA,45.220.173.40,AS32653 eNetworks cc,eNetworks cc,isp,2026-10-15 10:08:09,EDT-Pages
+https://196.21.109.82:443,https,196.21.109.82,443,925,0,alive,JNB,ZA,45.220.167.49,AS32653 eNetworks cc,eNetworks cc,isp,2026-10-15 10:08:09,EDT-Pages
+https://45.220.173.35:443,https,45.220.173.35,443,927,0,alive,JNB,ZA,45.220.173.35,AS32653 eNetworks cc,eNetworks cc,isp,2026-10-15 10:08:09,EDT-Pages
+https://200.108.214.80:443,https,200.108.214.80,443,966,0,alive,EZE,UY,200.108.214.68,AS20255 Sonda Uruguay,Sonda Uruguay,isp,2026-10-19 12:45:55,EDT-Pages
+https://46.170.93.122:443,https,46.170.93.122,443,970,0,alive,WAW,PL,46.170.93.122,AS5617 Orange Polska Spolka Akcyjna,Orange Polska Spolka Akcyjna,isp,2026-10-15 10:08:09,EDT-Pages
+https://147.157.130.1:443,https,147.157.130.1,443,974,0,alive,NRT,JP,147.157.130.1,AS2907 Tsukuba College of Technology,Tsukuba College of Technology,education,2026-10-09 00:00:00,EDT-Pages
+https://93.42.177.250:443,https,93.42.177.250,443,979,0,alive,FCO,IT,93.42.177.250,AS12874 Infrastructure for Fastwebs main location,Infrastructure for Fastwebs main location,isp,2026-10-15 12:44:41,EDT-Pages
+https://221.120.177.43:443,https,221.120.177.43,443,988,0,alive,HKG,HK,221.120.177.43,AS17975 APT Datamatrix Limited,Apt Datamatrix Limited,isp,2026-10-27 13:10:20,EDT-Pages
+https://202.162.232.76:443,https,202.162.232.76,443,990,0,alive,BOM,IN,202.162.232.48,AS4755 Netcore Solutions Pvt Ltd,Netcore Solutions Pvt Ltd,isp,2026-10-21 15:52:42,EDT-Pages
+https://114.33.6.158:443,https,114.33.6.158,443,991,0,alive,TPE,TW,114.33.6.158,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,isp,2026-10-09 00:00:00,EDT-Pages
+https://14.225.19.28:8443,https,14.225.19.28,8443,1022,0,alive,HKG,VN,14.225.19.28,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group,isp,2026-10-09 00:00:00,EDT-Pages
+https://103.142.225.37:443,https,103.142.225.37,443,1029,0,alive,DEL,IN,103.142.225.37,AS138231 Indian Institute Of Information Technology Allahabad,Indian Institute Of Information Technology Allahabad,education,2026-10-15 10:08:09,EDT-Pages
+https://107.91.88.70:8443,https,107.91.88.70,8443,1036,0,alive,SJC,US,107.91.88.70,"AS20057 AT&T Enterprises, LLC","AT&T Enterprises, LLC",isp,2026-10-09 00:00:00,EDT-Pages
+https://183.111.240.139:443,https,183.111.240.139,443,1038,0,alive,ICN,KR,211.38.95.10,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-19 12:45:55,EDT-Pages
+https://80.15.99.54:8090,https,80.15.99.54,8090,1063,0,alive,MRS,FR,80.15.99.54,AS3215 Orange,Orange,isp,2026-10-09 00:00:00,EDT-Pages
+https://190.128.253.82:8444,https,190.128.253.82,8444,1072,0,alive,ASU,PY,190.128.253.82,AS23201 Telecel S.A.,Telecel S.A.,isp,2026-10-15 10:08:09,EDT-Pages
+https://164.160.240.37:443,https,164.160.240.37,443,1094,0,alive,LOS,GH,164.160.240.2,AS328439 GHANA INSTITUTE OF MANAGEMENT AND PUBLIC ADMINISTRATION - GIMPA,GHANA INSTITUTE OF MANAGEMENT AND PUBLIC ADMINISTRATION - GIMPA,education,2026-10-15 10:08:09,EDT-Pages
+https://110.38.225.213:443,https,110.38.225.213,443,1099,0,alive,KHI,PK,110.38.225.213,AS38264 Wateen Telecom Limited (National Wimax/IMS environment),National Wimax/IMS environment,isp,2026-10-25 14:07:00,EDT-Pages
+https://91.221.229.86:443,https,91.221.229.86,443,1114,0,alive,EVN,AM,91.221.229.86,AS197497 OFFICE OF THE PRIME-MINISTER OF THE REPUBLIC OF ARMENIA STATE BODY,OFFICE OF THE PRIME-MINISTER OF THE REPUBLIC OF ARMENIA STATE BODY,government,2026-10-15 10:08:09,EDT-Pages
+https://194.186.179.62:443,https,194.186.179.62,443,1119,0,alive,DME,RU,194.186.179.62,"AS3216 PJSC ""Vimpelcom"" (PJSC Vimpelcom)",PJSC Vimpelcom,isp,2026-10-09 00:00:00,EDT-Pages
+https://196.21.60.44:443,https,196.21.60.44,443,1123,0,alive,DUR,ZA,196.21.61.122,AS2018 Durban Institute of Technology,Durban Institute of Technology,education,2026-10-15 10:08:09,EDT-Pages
+https://152.230.28.131:8081,https,152.230.28.131,8081,1138,0,alive,IAD,CL,190.96.12.146,AS14259 Gtd Internet S.A.,Gtd Internet S.A.,isp,2026-10-20 12:55:22,proxifly
+https://83.212.225.32:443,https,83.212.225.32,443,1141,0,alive,IAD,GR,2001:0648:2ffe:0011:a800:00ff:fe48:2020,AS5408 National Infrastructures for Research and Technology S.A.,National Infrastructures for Research and Technology S.A.,education,2026-10-20 12:55:22,proxifly
+https://107.91.88.78:8443,https,107.91.88.78,8443,1146,0,alive,SJC,US,107.91.88.78,"AS20057 AT&T Enterprises, LLC","AT&T Enterprises, LLC",isp,2026-10-09 00:00:00,EDT-Pages
+https://203.236.17.77:8104,https,203.236.17.77,8104,1162,0,alive,ICN,KR,203.236.17.77,AS9644 SK Telecom,SK Telecom,isp,2026-10-19 12:45:55,EDT-Pages
+https://162.191.139.40:8443,https,162.191.139.40,8443,1193,0,alive,ORD,US,162.191.139.40,"AS21928 T-Mobile USA, Inc.","T-Mobile USA, Inc.",isp,2026-10-09 00:00:00,EDT-Pages
+https://103.86.116.118:443,https,103.86.116.118,443,1204,0,alive,CGK,ID,103.86.116.118,AS150552 PT Link Data Sumber Barokah,PT Link Data Sumber Barokah,isp,2026-10-09 00:00:00,EDT-Pages
+https://103.86.117.202:443,https,103.86.117.202,443,1204,0,alive,CGK,ID,103.86.116.118,AS150552 PT Link Data Sumber Barokah,PT Link Data Sumber Barokah,isp,2026-10-09 00:00:00,EDT-Pages
+https://37.100.85.116:443,https,37.100.85.116,443,1235,0,alive,IAD,IT,37.100.85.116,AS1267 WIND TRE S.P.A.,WIND TRE S.P.A.,isp,2026-10-21 15:52:42,proxifly
+https://83.212.225.31:443,https,83.212.225.31,443,1254,0,alive,IAD,GR,2001:0648:2ffe:0011:a800:00ff:fe0c:4f47,AS5408 National Infrastructures for Research and Technology S.A.,National Infrastructures for Research and Technology S.A.,education,2026-10-20 12:55:22,proxifly
+https://103.153.135.118:443,https,103.153.135.118,443,1272,0,alive,CGK,ID,103.153.135.118,AS140464 PT Widara Media Informasi,PT Widara Media Informasi,isp,2026-10-09 00:00:00,EDT-Pages
+https://182.156.203.41:443,https,182.156.203.41,443,1280,0,alive,MAA,IN,115.99.52.59,AS17488 HATHWAY CABLE AND DATACOM LIMITED,HATHWAY CABLE AND DATACOM LIMITED,isp,2026-10-15 10:08:09,EDT-Pages
+https://83.212.229.157:443,https,83.212.229.157,443,1298,0,alive,IAD,GR,2001:0648:2ffe:0013:a800:00ff:fe55:de91,AS5408 National Infrastructures for Research and Technology S.A.,National Infrastructures for Research and Technology S.A.,education,2026-10-20 12:55:22,proxifly
+https://83.212.80.126:443,https,83.212.80.126,443,1312,0,alive,IAD,GR,2001:0648:2ffe:0501:cc00:11ff:fefa:4468,AS5408 National Infrastructures for Research and Technology S.A.,National Infrastructures for Research and Technology S.A.,education,2026-10-20 12:55:22,proxifly
+https://94.246.130.82:443,https,94.246.130.82,443,1377,0,alive,WAW,PL,94.246.130.82,AS33923 ART-COM Sp. z o.o.,ART-COM Sp. z o.o.,isp,2026-10-15 10:08:09,EDT-Pages
+https://173.13.157.60:443,https,173.13.157.60,443,1389,0,alive,SJC,US,2603:3024:152d:4800:250:56ff:fe94:2574,"AS7922 Comcast Cable Communications, LLC","Comcast Cable Communications, LLC",isp,2026-10-15 10:08:09,EDT-Pages
+https://79.188.239.41:8443,https,79.188.239.41,8443,1391,0,alive,WAW,PL,79.188.239.41,AS5617 static IP,static IP,isp,2026-10-19 12:45:55,EDT-Pages
+https://118.130.28.228:443,https,118.130.28.228,443,1392,0,alive,ICN,KR,118.130.28.229,AS3786 LG DACOM Corporation,LG DACOM Corporation,isp,2026-10-25 16:44:06,@user
+https://195.182.74.91:42443,https,195.182.74.91,42443,1404,0,alive,VNO,LT,195.182.74.91,AS6769 Kertinis valstybes telekomunikaciju centras,Kertinis valstybes telekomunikaciju centras,isp,2026-10-15 10:08:09,EDT-Pages
+https://103.135.244.2:443,https,103.135.244.2,443,1406,0,alive,IAD,JP,103.135.244.18,AS138652 Super Godzilla Communications GK,Super Godzilla Communications GK,isp,2026-10-23 12:55:36,proxifly
+https://87.251.79.113:443,https,87.251.79.113,443,1409,0,alive,EWR,US,147.90.234.117,AS27284 Fourplex Telecom LLC,Fourplex Telecom LLC,isp,2026-10-16 12:36:06,EDT-Pages
+https://14.225.71.128:443,https,14.225.71.128,443,1480,0,alive,HKG,VN,14.225.71.128,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group,isp,2026-10-09 00:00:00,EDT-Pages
+https://107.91.88.6:8443,https,107.91.88.6,8443,1485,0,alive,SJC,US,107.91.88.6,"AS20057 AT&T Enterprises, LLC","AT&T Enterprises, LLC",isp,2026-10-09 00:00:00,EDT-Pages
+https://43.251.18.20:443,https,43.251.18.20,443,1493,0,alive,KUL,MY,43.251.18.20,AS141201 MAMPU PDSA1,MAMPU PDSA1,isp,2026-10-15 10:08:09,EDT-Pages
+https://94.246.130.82:5443,https,94.246.130.82,5443,1494,0,alive,WAW,PL,94.246.130.82,AS33923 ART-COM Sp. z o.o.,ART-COM Sp. z o.o.,isp,2026-10-15 10:08:09,EDT-Pages
+https://154.72.198.149:443,https,154.72.198.149,443,1498,0,alive,MBA,UG,154.72.197.186,AS327724 National Information Technology Authority Uganda,National Information Technology Authority Uganda,government,2026-10-09 00:00:00,EDT-Pages
+https://209.33.167.96:8443,https,209.33.167.96,8443,1502,0,alive,HKG,HK,209.33.167.96,AS63150 Bage Cloud,BAGE CLOUD LLC,isp,2026-10-27 13:10:20,EDT-Pages
+https://196.21.61.67:443,https,196.21.61.67,443,1625,0,alive,DUR,ZA,196.21.61.107,AS2018 Durban Institute of Technology,Durban Institute of Technology,education,2026-10-15 10:08:09,EDT-Pages
+https://113.23.216.128:9088,https,113.23.216.128,9088,1809,0,alive,SIN,MY,113.23.216.128,AS38182 Webserver Dedicated Hosting,Webserver Dedicated Hosting,isp,2026-10-12 15:18:13,EDT-Pages
+https://46.229.114.132:40000,https,46.229.114.132,40000,2067,0,alive,PRG,CZ,46.229.114.132,AS56450 Alberon Letohrad s.r.o,Alberon Letohrad s.r.o,isp,2026-10-15 10:08:09,EDT-Pages
+https://118.184.157.67:4443,https,118.184.157.67,4443,2216,0,alive,LAX,CN,118.184.157.67,"AS23650 ChangZhou Bitcomm Software Technology Co., Limited","ChangZhou Bitcomm Software Technology Co., Limited",isp,2026-10-09 00:00:00,EDT-Pages
+https://113.23.216.129:9088,https,113.23.216.129,9088,2348,0,alive,SIN,MY,113.23.216.128,AS38182 Webserver Dedicated Hosting,Webserver Dedicated Hosting,isp,2026-10-12 15:18:13,EDT-Pages
+https://147.45.125.160:443,https,147.45.125.160,443,2878,0,alive,FRA,US,143.20.185.77,AS27284 Fourplex Telecom LLC,Fourplex Telecom LLC,isp,2026-10-25 14:07:00,EDT-Pages
+https://134.59.1.187:443,https,134.59.1.187,443,3651,0,alive,CDG,FR,134.59.1.71,AS2200 Universite Cote d Azur,Universite Cote d Azur,education,2026-10-19 12:45:55,EDT-Pages
+https://159.66.238.44:443,https,159.66.238.44,443,5029,0,alive,DFW,US,159.66.238.224,AS30175 Epicor Software Corporation,Epicor Software Corporation,business,2026-10-25 14:07:00,EDT-Pages
+https://213.98.90.68:8080,https,213.98.90.68,8080,5588,0,alive,MAD,ES,213.98.90.68,AS3352 Telefonica de Espana SAU,Telefonica de Espana SAU,isp,2026-10-25 16:44:06,@user
+https://79.188.239.47:8443,https,79.188.239.47,8443,5865,0,alive,WAW,PL,79.188.239.41,AS5617 static IP,static IP,isp,2026-10-21 15:52:42,EDT-Pages
+https://74.103.66.18:443,https,74.103.66.18,443,312,1,timeout,PHL,US,74.103.66.2,AS701 Verizon Business,Verizon Business,isp,2026-10-21 15:52:42,EDT-Pages
+https://133.9.6.9:443,https,133.9.6.9,443,416,1,timeout,NRT,JP,133.9.6.10,AS17956 Japan Network Information Center,Japan Network Information Center,education,2026-10-15 10:08:09,EDT-Pages
+https://195.231.110.164:443,https,195.231.110.164,443,553,1,timeout,MXP,IT,2a00:6d43:10e:4300:5054:ff:fe6e:85a8,AS202613 Aruba S.p.A. Broadband Pool BNG,Aruba S.p.A. Broadband Pool BNG,isp,2026-10-25 14:07:00,EDT-Pages
+https://133.9.6.10:443,https,133.9.6.10,443,605,1,timeout,NRT,JP,133.9.6.10,AS17956 Japan Network Information Center,Japan Network Information Center,education,2026-10-15 10:08:09,EDT-Pages
+https://79.188.239.42:8443,https,79.188.239.42,8443,839,1,conn_reset,WAW,PL,79.188.239.41,AS5617 static IP,static IP,isp,2026-10-19 12:45:55,EDT-Pages
+https://80.24.34.107:8090,https,80.24.34.107,8090,1125,1,timeout,MAD,ES,80.24.34.107,AS3352 Red de servicios IP,Red de servicios IP,isp,2026-10-09 00:00:00,EDT-Pages
+https://195.231.110.164:8448,https,195.231.110.164,8448,0,1,timeout,,IT,2a00:6d43:10e:4300:5054:ff:fe6e:85a8,AS202613 Aruba S.p.A. Broadband Pool BNG,Aruba S.p.A. Broadband Pool BNG,isp,2026-10-27 13:10:20,EDT-Pages
+https://177.234.248.186:443,https,177.234.248.186,443,0,1,timeout,,EC,177.234.248.186,AS52468 Ufinet Panama S.A. (NEGOCIOS Y TELEFONIA NEDETEL S.A.),NEGOCIOS Y TELEFONIA NEDETEL S.A.,isp,2026-10-27 13:10:20,EDT-Pages
+https://50.184.176.222:8090,https,50.184.176.222,8090,538,2,timeout,JAX,US,50.184.176.222,"AS7922 Comcast Cable Communications, LLC","Comcast Cable Communications, LLC",isp,2026-10-09 00:00:00,EDT-Pages
+https://66.210.50.131:443,https,66.210.50.131,443,0,2,timeout,,US,66.210.50.131,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-26 12:52:01,EDT-Pages
