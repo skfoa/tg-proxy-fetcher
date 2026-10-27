@@ -313,7 +313,9 @@ import json
 import logging
 import os
 import re
+import shutil
 import socket
+import subprocess
 import time
 import urllib.parse
 import urllib.request
@@ -975,6 +977,68 @@ def resolve_asn_online(ip: str, isp_hint: str = "", persist: bool = False, db_pa
 async def resolve_asn_online_async(ip: str, isp_hint: str = "", persist: bool = False, db_path: str = "") -> tuple[str, str]:
     """resolve_asn_online 的异步无阻塞封装，在独立工作线程中执行同步网络 I/O，杜绝阻塞事件循环"""
     return await asyncio.to_thread(resolve_asn_online, ip, isp_hint, persist, db_path)
+
+
+def resolve_asn_name_online(asn: str, proxy: str = "", timeout: float = 6.0) -> str:
+    """
+    通过官方全球 BGP / RIR 数据库（RIPEstat / APNIC / ARIN）直接反查 ASN 编号的权威法定持有者名称。
+    用于在抓取阶段对全新发现的未收录 ASN 执行权威交叉校验，杜绝第三方抓取源错标脏数据污染数据库。
+    """
+    clean_code = (asn or "").strip().upper()
+    if not clean_code:
+        return ""
+    if not clean_code.startswith("AS"):
+        clean_code = f"AS{clean_code}"
+    if not re.match(r"^AS\d+$", clean_code) or clean_code == "AS0":
+        return ""
+
+    # 若命中已知权威云厂商，直接返回标准名称
+    if clean_code in AUTHORITATIVE_CLOUD_ASNS:
+        return AUTHORITATIVE_CLOUD_ASNS[clean_code]
+
+    # 通道 1: RIPEstat 全球 ASN 权威概览接口 (覆盖全球 APNIC/RIPE/ARIN/LACNIC/AFRINIC 全量自治系统)
+    try:
+        url = f"https://stat.ripe.net/data/as-overview/data.json?resource={clean_code}"
+        raw_json = ""
+        if shutil.which("curl"):
+            cmd = ["curl", "-sL", "-A", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"]
+            if proxy:
+                cmd.extend(["-x", proxy])
+            cmd.extend([url, "--max-time", str(int(timeout))])
+            try:
+                res = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="ignore", timeout=timeout + 3, check=False)
+                if res.returncode == 0 and res.stdout:
+                    raw_json = res.stdout
+            except Exception:
+                pass
+
+        if not raw_json:
+            handlers = []
+            if proxy and not proxy.startswith("socks"):
+                handlers.append(urllib.request.ProxyHandler({"http": proxy, "https": proxy}))
+            opener = urllib.request.build_opener(*handlers)
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
+            with opener.open(req, timeout=timeout) as resp:
+                raw_json = resp.read().decode("utf-8", errors="ignore")
+
+        if raw_json:
+            data = json.loads(raw_json)
+            holder = data.get("data", {}).get("holder") or ""
+            if holder:
+                if " - " in holder:
+                    name_part = holder.split(" - ", 1)[1].strip()
+                else:
+                    name_part = holder.strip()
+                name_clean = re.sub(r"\s*\((?:PRIVATE|LTD|LLC|INC|GMBH|CORP|SA|BV)\)\s*", " ", name_part, flags=re.IGNORECASE).strip()
+                name_clean = re.sub(r"^(AS\d+|[A-Z0-9\-]+-AS-[A-Z]+|[A-Z0-9\-]+-AS)\s*", "", name_clean, flags=re.IGNORECASE).strip()
+                _, clean_isp, _ = normalize_external_asn_info(clean_code, name_clean or name_part)
+                if clean_isp:
+                    return clean_isp
+                return name_clean or name_part
+    except Exception as e:
+        log.debug("RIPEstat 在线反查 ASN %s 失败 (已安全隔离): %s", clean_code, e)
+
+    return ""
 
 
 # ---------- IP/域名 级别持久化元数据缓存 (data/ip_cache.json) ----------

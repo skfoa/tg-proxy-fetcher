@@ -75,6 +75,7 @@ from providers import (
     load_asn_database,
     save_asn_database,
     resolve_asn_online,
+    resolve_asn_name_online,
     atomic_writer,
     atomic_write_text,
     atomic_write_json,
@@ -807,8 +808,19 @@ def auto_enrich_and_save_asns(unrecorded_items: list[dict], proxy: str = "") -> 
                 org = re.sub(r"^AS\d+\s*", "", raw_isp, flags=re.IGNORECASE).strip()
                 sample_ip = str(item.get("ip") or "").strip()
 
-                # 若组织名缺失且存在有效公网 IP，尝试轻量在线反查一次获取标准组织名 (隔离超时与异常)
-                if not org and sample_ip and is_valid_host(sample_ip):
+                # 权威交叉校验与反查纠偏：对全新收录的自治系统，主动反查官方 RIR/BGP 权威名称，杜绝第三方源错标污染
+                authoritative_name = ""
+                try:
+                    authoritative_name = resolve_asn_name_online(code, proxy=proxy, timeout=5.0)
+                except Exception as auth_err:
+                    log.debug("反查 ASN %s 权威机构名称异常 (已安全跳过): %s", code, auth_err)
+
+                if authoritative_name:
+                    if org and org.lower() != authoritative_name.lower():
+                        log.info("【ASN 权威防错标纠偏】ASN %s 外部标签 '%s' 与官方权威 '%s' 不符，自动以官方权威为准入库", code, org, authoritative_name)
+                    org = authoritative_name
+                elif not org and sample_ip and is_valid_host(sample_ip):
+                    # 若权威接口未返回且自身缺失组织名，尝试用公网 IP 进行反查
                     try:
                         resolved_code, resolved_isp = resolve_asn_online(sample_ip)
                         if resolved_code == code and resolved_isp:
