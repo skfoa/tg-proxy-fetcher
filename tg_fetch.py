@@ -128,8 +128,8 @@ def _parse_channels(env_name: str, default: list[str]) -> list[str]:
     return channels if channels else default
 
 
-PROXY_CHANNELS = _parse_channels("PROXY_CHANNELS", ["@otcfxq", "@danfeng_chat"])
-CF_IP_CHANNELS = _parse_channels("CF_IP_CHANNELS", ["@otcfxq", "@danfeng_chat"])
+PROXY_CHANNELS = _parse_channels("PROXY_CHANNELS", ["@otcjlq", "@danfeng_chat"])
+CF_IP_CHANNELS = _parse_channels("CF_IP_CHANNELS", ["@otcjlq", "@danfeng_chat"])
 
 DEFAULT_SUB_URLS = [
     "https://sub.cmliussss.net/vpngate",
@@ -1395,7 +1395,7 @@ def scrape_channel_web(channel: str, cutoff: datetime, proxy: str = "") -> tuple
                     log.debug("频道 %s 重试异常: %s", channel, e)
                     html_content = ""
             if not html_content or "tgme_widget_message_wrap" not in html_content:
-                log.warning("频道 %s 未获取到公开消息卡片（可能不支持 Web 预览或为群组/私密频道）", channel)
+                log.warning("频道/群组 %s 未获取到公开消息卡片（Telegram 群组不支持 Web 预览，需配置 TG_SESSION_STR 官方 API 模式抓取）", channel)
                 break
 
         chunks = re.split(r'<div class="tgme_widget_message_wrap[^"]*"', html_content)[1:]

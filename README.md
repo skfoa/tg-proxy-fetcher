@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
 
-每天自动从 Telegram 公开频道与交流群（[@otcfxq](https://t.me/otcfxq)、[@danfeng_chat](https://t.me/danfeng_chat)）抓取多协议代理节点、Cloudflare 优选 IP 以及反代 ProxyIP。系统具备**增量持久化**、**去重合并**与**多阶段主动质检淘汰机制**，自动导出通用代理列表、纯净 `IP:端口` 文本列表以及结构化测速数据表格，并通过 GitHub Actions 每天北京时间 08:15 定时自动执行质检流水线并推送到仓库。
+每天自动从 Telegram 公开频道与交流群（[@otcjlq](https://t.me/otcjlq)、[@danfeng_chat](https://t.me/danfeng_chat)）抓取多协议代理节点、Cloudflare 优选 IP 以及反代 ProxyIP。系统具备**增量持久化**、**去重合并**与**多阶段主动质检淘汰机制**，自动导出通用代理列表、纯净 `IP:端口` 文本列表以及结构化测速数据表格，并通过 GitHub Actions 每天北京时间 08:15 定时自动执行质检流水线并推送到仓库。
 
 ---
 
@@ -60,7 +60,7 @@
 
 ```text
                                      Telegram 公开频道
-                          ┌─── @otcfxq ────────┐
+                          ┌─── @otcjlq ────────┐
                           │   (代理 + 优选IP)  │
     tg_fetch.py ──────────┤                    ├────► 增量抓取 & 全局智能去重 ──┬──► data/proxies.txt / proxies.csv
     (免登录/官方API双模)   │                    │                               ├──► data/cf_ips.txt / cf_ips.csv
@@ -178,7 +178,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
     - `data/proxies/https.txt` / `https.csv` / `https.json`：HTTPS 代理节点列表、表格与 JSON。
 
 ### 2. `data/cf_ips.txt` / `data/cf_ips.csv`（频道日常单条优选 IP）
-* 仅收录频道日常消息正文中发布的单条优选 IP（如 `@danfeng_chat`、`@otcfxq` 的实时测速通报）。
+* 仅收录频道日常消息正文中发布的单条优选 IP（如 `@danfeng_chat`、`@otcjlq` 的实时测速通报）。
 * `data/cf_ips.txt` 为纯文本格式，每行一个 `IP:端口`。
 * `data/cf_ips.csv` 为 UTF-8-SIG 结构化表格，可直接用 Excel 查看。
 
@@ -250,7 +250,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `asn` | 字符串 | **【核心规范】** 『ASN 编号 + 服务商名称』一体化直观标签 | `AS400618 Prime Security Corp.` |
 | `isp` | 字符串 | 自治系统所属运营商 / 托管商组织名称 | `Prime Security Corp.` |
 | `first_seen` | 时间字符串 | 首次收录时间（以第一次抓取入库为准，永久不变） | `2026-09-13 18:00:33` |
-| `channel` | 字符串 | 来源频道 | `@danfeng_chat` / `@otcfxq` |
+| `channel` | 字符串 | 来源频道 | `@danfeng_chat` / `@otcjlq` |
 | `fail_count` | 整数 | 连续探测失败次数（默认 0，连续失败 ≥ 3 次自动淘汰剔除） | `0` |
 
 #### ② 扫描测速反代数据表（`data/scan_ips.csv`，出入口双维度）
@@ -321,7 +321,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `isp` | 字符串 | **【核心凭据】** 自治系统所属运营商 / 托管商组织名称（与 `proxyip.csv` 规范统一对齐） | `Cloudflare, Inc.`、`Eweka Internet Services B.V.` |
 | `net_type` | 字符串 | **【核心凭据】** 网络类型属性分类（`isp` 原生家宽 / `datacenter` 机房 / `business` 商业专线等） | `isp`、`datacenter` |
 | `first_seen` | 时间字符串 | 首次收录时间（以第一次抓取入库为准，永久不变，用于统计节点存活时长与长期可用性；注：针对 2026-10-01 前无此字段的历史旧节点，统一兼容赋予 2026-10-01 00:00:00 作为基准初值） | `2026-10-01 00:00:00` |
-| `source` | 字符串 | **【来源渠道】** 代理节点抓取/获取渠道（如 `EDT-Pages`、`@danfeng_chat`、`@otcfxq`、`vpngate` 等，精准标识来源） | `EDT-Pages`、`@danfeng_chat` |
+| `source` | 字符串 | **【来源渠道】** 代理节点抓取/获取渠道（如 `EDT-Pages`、`@danfeng_chat`、`@otcjlq`、`vpngate` 等，精准标识来源） | `EDT-Pages`、`@danfeng_chat` |
 
 ---
 
@@ -451,15 +451,15 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 
 > 💡 **自适应配置机制**：
 > - **Variables 默认全部留空即可正常自动运行**，仓库代码内置了开箱即用的默认值。
-> - **覆盖优先级（网页配置优先）**：若在 GitHub 网页的 Variables 标签页中配置了自定义变量，系统将优先采用您自定义配置的频道或参数；若留空或未配置，则自动无缝回退至代码内置默认值（如未配置时自动抓取 `@otcfxq` 与 `@danfeng_chat`），完全无需手动干预。
+> - **覆盖优先级（网页配置优先）**：若在 GitHub 网页的 Variables 标签页中配置了自定义变量，系统将优先采用您自定义配置的频道或参数；若留空或未配置，则自动无缝回退至代码内置默认值（如未配置时自动抓取 `@otcjlq` 与 `@danfeng_chat`），完全无需手动干预。
 
 | 变量名 | 用途 | 默认值 | 必要性 | 说明 |
 | :--- | :--- | :---: | :---: | :--- |
 | `FETCH_DAYS` | 单次增量回溯天数（扫描时间窗口） | `3` | 可选 | 增量模式下只读取最近 N 天频道消息，加快运行速度 |
 | `FETCH_MAX_PAGES` | Web 免登录模式最大抓取页数 | `35` | 可选 | 控制无凭据网页爬虫向前抓取历史消息的最大分页数（每页约 20 条消息） |
 | `PROXY` | 抓取代理设置 | 留空 | 可选 | GitHub Actions 云端默认直连 Telegram 无需配置；自建私有 Runner 或特殊网络时可按需配置 |
-| `PROXY_CHANNELS` | 代理抓取目标频道/群组（逗号/空格分隔） | `@otcfxq, @danfeng_chat` | 可选 | 自定义抓取通用代理的频道/群组（若未配置自动回退至全局 `CHANNELS` 或默认值） |
-| `CF_IP_CHANNELS` | 优选 IP 抓取目标频道/群组（逗号/空格分隔） | `@otcfxq, @danfeng_chat` | 可选 | 自定义抓取 Cloudflare 优选 IP 与测速附件的频道/群组（若未配置自动回退至全局 `CHANNELS` 或默认值） |
+| `PROXY_CHANNELS` | 代理抓取目标频道/群组（逗号/空格分隔） | `@otcjlq, @danfeng_chat` | 可选 | 自定义抓取通用代理的频道/群组（若未配置自动回退至全局 `CHANNELS` 或默认值） |
+| `CF_IP_CHANNELS` | 优选 IP 抓取目标频道/群组（逗号/空格分隔） | `@otcjlq, @danfeng_chat` | 可选 | 自定义抓取 Cloudflare 优选 IP 与测速附件的频道/群组（若未配置自动回退至全局 `CHANNELS` 或默认值） |
 | `SUB_URLS` | 外部通用订阅源 URL 列表（逗号/换行分隔） | 内置公共订阅镜像（留空默认） | 可选 | 配置外部公开订阅链接（用于拓展 SSTP 等节点）；如需**彻底禁用外部订阅**，设置为 `off`、`none` 或 `false` 即可；亦可填入自定义订阅链接 |
 | `EDT_MIRRORS` | 外部代理源镜像加速前缀列表（逗号/空格分隔） | 留空（自动竞速多组内置镜像源） | 可选 | 配置自定义加速镜像域名或前缀。**系统采用多源并发竞速机制**：所有候选源并发请求，最快有效返回者率先采用，防止单源超时阻塞；若需彻底禁用外部镜像拉取，设为 `off` 即可 |
 | `EDT_URLS` | 自定义代理完整 JSON URL 列表（逗号/空格分隔） | 留空（由镜像自动推导） | 可选 | 直接传入多个完整的 proxy json 链接（支持同时混合 https/http/socks5，系统自动按文件名路由），进入并发竞速池 |
@@ -522,7 +522,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
    • 质检规范：报文级穿透鉴真 (放行 CF 1034 边缘节点 · 过滤异构 CDN 伪节点 · 代理多协议穿透)
    • 缓冲动态：⚠️ 新增缓冲 66 条 · ♻️ 取消缓冲 91 条 (恢复健康)
    • 淘汰死节点：21 条 [代理 3, 反代 8, 扫描优选 10] (连续失败 ≥ 3 次)
-📡 频道与数据源：@danfeng_chat, @otcfxq 等公开频道与外部订阅源
+📡 频道与数据源：@danfeng_chat, @otcjlq 等公开频道与外部订阅源
 ━━━━━━━━━━━━━━━━━━━━
 ⚡ 总耗时: 182.5s · 🔗 Action #42 · 📦 产物仓库
 ```
@@ -629,8 +629,8 @@ python cf_verify.py --dry-run --diag-output diag_cf.json
 
 本项目节点与优选 IP 数据源及配套工具来自以下公开频道与开源项目，在此表示诚挚感谢：
 
-- **Telegram 公开频道**：
-  - [@otcfxq](https://t.me/otcfxq)
+- **Telegram 公开频道与交流群**：
+  - [OTC 交流群 (@otcjlq)](https://t.me/otcjlq)
   - [DanFeng 交流群 (@danfeng_chat)](https://t.me/danfeng_chat)
 - **开源代理与工具项目**：
   - [EDT-Pages/Proxy-List](https://github.com/EDT-Pages/Proxy-List)（开源多协议代理数据源）

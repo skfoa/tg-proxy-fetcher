@@ -622,7 +622,7 @@ def parse_cf_csv_content(
 
 def parse_otc_scan_content(
     text: str,
-    default_channel: str = "@otcfxq",
+    default_channel: str = "@otcjlq",
     filename: str = "",
     dt_str: str = ""
 ) -> list[dict]:
