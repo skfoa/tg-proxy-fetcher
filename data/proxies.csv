@@ -1234,7 +1234,7 @@ turn://bms.araypower.com:3478,turn,bms.araypower.com,3478,482,0,alive,-,CN,101.1
 turn://myuser:mypassword@52.66.165.251:3478,turn,52.66.165.251,3478,483,0,alive,-,IN,52.66.165.251,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://118.178.229.144:3478,turn,118.178.229.144,3478,483,0,alive,-,CN,118.178.229.144,AS37963 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-01 00:00:00,@danfeng_chat
 turn://34.177.86.104:3478,turn,34.177.86.104,3478,484,0,alive,-,SG,34.177.86.104,AS396982 Google Cloud,Google Cloud,datacenter,2026-10-23 17:28:05,@user
-turn://103.167.151.70:3478,turn,103.167.151.70,3478,484,0,alive,-,SG,103.167.151.70,AS135598 Prinode AB (PRIVATE),SIBERFY (PRIVATE) LIMITED,datacenter,2026-10-23 17:28:05,@user
+turn://103.167.151.70:3478,turn,103.167.151.70,3478,484,0,alive,-,SG,103.167.151.70,AS135598 Siberfy,SIBERFY (PRIVATE) LIMITED,datacenter,2026-10-23 17:28:05,@user
 turn://int.demo.zhudian.store:3479,turn,int.demo.zhudian.store,3479,484,0,alive,-,CN,101.132.248.113,AS37963 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-14 12:57:52,@otcfxq
 turn://101.132.242.147:3479,turn,101.132.242.147,3479,484,0,alive,-,CN,101.132.242.147,AS37963 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-14 12:57:52,@otcfxq
 turn://91.107.240.72:3478,turn,91.107.240.72,3478,485,0,alive,-,DE,91.107.240.72,AS24940 Hetzner,Hetzner,datacenter,2026-10-01 00:00:00,@danfeng_chat

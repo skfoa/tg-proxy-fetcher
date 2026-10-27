@@ -178,6 +178,7 @@ KNOWN_CLOUD_PROVIDERS = {
     "hexcore": ("AS199144", "HexCore cloud s.r.o."),
     "edis": ("AS57169", "EDIS GmbH"),
     "fbwnetworks": ("AS34534", "FBW Networks"),
+    "siberfy": ("AS135598", "Siberfy"),
 
     # 运营商骨干与出海线路
     "hinet": ("AS3462", "Chunghwa Telecom HiNet"),
@@ -247,6 +248,7 @@ _CORE_BASELINE_NET_TYPES: dict[str, str] = {
     "AS57169": "datacenter",  # EDIS GmbH (ipinfo: Hosting)
     "AS396986": "datacenter", # Bytedance Inc. (ipinfo: Hosting)
     "AS23724": "datacenter",  # IDC, China Telecommunications Corporation (ipinfo: Hosting)
+    "AS135598": "datacenter", # Siberfy (APNIC: SIBERFY-AS-AP, ipinfo: Hosting)
     "AS13335": "datacenter",  # Cloudflare
     "AS15169": "datacenter",  # Google
     "AS16509": "datacenter",  # Amazon AWS
