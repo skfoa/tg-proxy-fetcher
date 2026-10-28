@@ -1,39 +1,38 @@
 ﻿url,proto,host,port,delay_ms,fail_count,status,colo,country,egress_ip,asn,isp,net_type,first_seen,source
-http://47.85.161.37:3128,http,47.85.161.37,3128,10,0,alive,IAD,US,47.85.161.37,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
-http://189.51.168.165:999,http,189.51.168.165,999,194,0,alive,MIA,MX,189.51.168.164,AS270111 Comunicación por Fibra SA de CV,Comunicación por Fibra SA de CV,isp,2026-10-21 15:52:42,EDT-Pages
-http://1234:1234@3.71.195.250:2080,http,3.71.195.250,2080,196,0,alive,FRA,DE,2a05:d014:1f5c:7900:2d90:c4f4:2405:62f3,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://176.111.37.216:39811,http,176.111.37.216,39811,234,0,alive,ARN,SE,176.111.37.216,AS214743 Cogento Backbone Limited,Cogento Backbone Limited,isp,2026-10-25 14:07:00,EDT-Pages
-http://176.111.37.5:39811,http,176.111.37.5,39811,260,0,alive,ARN,SE,176.111.37.5,AS214743 Cogento Backbone Limited,Cogento Backbone Limited,isp,2026-10-25 14:07:00,EDT-Pages
-http://8.209.255.13:3128,http,8.209.255.13,3128,326,0,alive,NRT,JP,8.209.255.13,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
-http://8.213.151.128:3128,http,8.213.151.128,3128,373,0,alive,ICN,KR,8.213.151.128,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
-http://185.195.254.72:5432,http,185.195.254.72,5432,379,0,alive,IST,TR,185.195.254.72,AS206119 Veganet Teknolojileri ve Hizmetleri LTD STI,Veganet Teknolojileri ve Hizmetleri LTD STI,isp,2026-10-09 22:46:01,EDT-Pages
-http://47.243.92.199:3128,http,47.243.92.199,3128,418,0,alive,HKG,HK,47.243.92.199,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
-http://1234:1234@54.255.222.157:2080,http,54.255.222.157,2080,451,0,alive,SIN,SG,2406:da18:ad0:a400:d51a:79e2:51a6:d8a2,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://1234:1234@54.254.170.180:2080,http,54.254.170.180,2080,451,0,alive,SIN,SG,2406:da18:ad0:a400:d883:1396:f5be:256f,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://1234:1234@13.229.59.119:2080,http,13.229.59.119,2080,451,0,alive,SIN,SG,2406:da18:ad0:a400:40b8:e560:fae9:42c9,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://1234:1234@13.250.24.214:2080,http,13.250.24.214,2080,452,0,alive,SIN,SG,2406:da18:ad0:a400:a4a5:636c:281b:3d8d,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://1234:1234@13.250.114.105:2080,http,13.250.114.105,2080,452,0,alive,SIN,SG,2406:da18:ad0:a400:83e2:cc94:985b:6663,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://4.144.146.21:80,http,4.144.146.21,80,452,0,alive,SIN,SG,20.44.210.140,AS8075 Microsoft Azure,Microsoft Azure,datacenter,2026-10-19 12:45:55,@otcfxq
-http://1234:1234@52.221.233.141:2080,http,52.221.233.141,2080,453,0,alive,SIN,SG,2406:da18:ad0:a400:b45a:77ec:7057:8999,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://1234:1234@47.128.223.25:2080,http,47.128.223.25,2080,456,0,alive,SIN,SG,2406:da18:ad0:a400:3461:4714:de76:b355,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://1234:1234@54.254.197.64:2080,http,54.254.197.64,2080,457,0,alive,SIN,SG,2406:da18:ad0:a400:594e:ce56:8509:d9bb,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://1234:1234@52.74.46.126:2080,http,52.74.46.126,2080,458,0,alive,SIN,SG,2406:da18:46b:0:21f5:b7b5:a660:e41f,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://1234:1234@13.250.53.203:2080,http,13.250.53.203,2080,460,0,alive,SIN,SG,2406:da18:ad0:a400:a0cc:1672:8ddc:c9b1,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://1234:1234@47.128.216.221:2080,http,47.128.216.221,2080,462,0,alive,SIN,SG,2406:da18:ad0:a400:368e:b4fd:5bb3:9efb,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://1234:1234@47.128.148.63:2080,http,47.128.148.63,2080,462,0,alive,SIN,SG,2406:da18:ad0:a400:aa45:be61:ddb0:f4f,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://1234:1234@52.77.237.40:2080,http,52.77.237.40,2080,464,0,alive,SIN,SG,2406:da18:ad0:a400:f576:ae64:5a7b:3158,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://1234:1234@18.143.149.74:2080,http,18.143.149.74,2080,482,0,alive,SIN,SG,2406:da18:ad0:a400:3c4c:9aa8:6198:37f5,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://103.133.26.73:3128,http,103.133.26.73,3128,552,0,alive,CGK,ID,103.178.42.17,AS138130 PT PHATRIA INTI PERSADA,PT PHATRIA INTI PERSADA,isp,2026-10-12 15:18:13,EDT-Pages
-http://103.133.26.50:8080,http,103.133.26.50,8080,556,0,alive,SIN,ID,103.133.24.37,AS138130 PT PHATRIA INTI PERSADA,PT PHATRIA INTI PERSADA,isp,2026-10-12 15:18:13,EDT-Pages
-http://102.244.78.61:8087,http,102.244.78.61,8087,569,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-09 22:46:01,EDT-Pages
-http://102.244.78.61:8082,http,102.244.78.61,8082,575,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-21 15:52:42,@otcfxq
-http://102.244.78.61:8085,http,102.244.78.61,8085,596,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-09 22:46:01,EDT-Pages
-http://102.244.78.61:8083,http,102.244.78.61,8083,603,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-22 12:56:40,EDT-Pages
-http://102.244.78.61:8081,http,102.244.78.61,8081,616,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-21 15:52:42,EDT-Pages
-http://102.244.78.61:8089,http,102.244.78.61,8089,624,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-21 15:52:42,@otcfxq
-http://1234:1234@54.251.228.111:2080,http,54.251.228.111,2080,678,0,alive,SIN,SG,2406:da18:ad0:a400:cddf:e8bc:d41a:8ff3,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://122.246.3.12:17981,http,122.246.3.12,17981,891,0,alive,LAX,CN,122.246.3.12,AS136188 China Telecom,China Telecom,datacenter,2026-10-19 12:45:55,@otcfxq
-http://120.232.115.57:17981,http,120.232.115.57,17981,921,0,alive,LAX,CN,2409:8c54:2030:713::11,AS9808 China Mobile,China Mobile,isp,2026-10-21 15:52:42,@otcfxq
-http://120.232.115.170:17981,http,120.232.115.170,17981,927,0,alive,LAX,CN,2409:8c54:2030:71a::12,AS9808 China Mobile,China Mobile,isp,2026-10-21 15:52:42,@otcfxq
-http://47.91.65.23:3128,http,47.91.65.23,3128,1021,0,alive,FRA,DE,47.91.65.23,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
-http://27.185.218.213:17981,http,27.185.218.213,17981,1823,0,alive,LAX,CN,27.185.218.213,AS4134 China Telecom,China Telecom,isp,2026-10-21 15:52:42,EDT-Pages
+http://47.85.161.37:3128,http,47.85.161.37,3128,67,0,alive,IAD,US,47.85.161.37,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
+http://189.51.168.165:999,http,189.51.168.165,999,163,0,alive,MIA,MX,189.51.168.164,AS270111 Comunicación por Fibra SA de CV,Comunicación por Fibra SA de CV,isp,2026-10-21 15:52:42,EDT-Pages
+http://176.111.37.216:39811,http,176.111.37.216,39811,254,0,alive,ARN,SE,176.111.37.216,AS214743 Cogento Backbone Limited,Cogento Backbone Limited,isp,2026-10-25 14:07:00,EDT-Pages
+http://176.111.37.5:39811,http,176.111.37.5,39811,265,0,alive,ARN,SE,176.111.37.5,AS214743 Cogento Backbone Limited,Cogento Backbone Limited,isp,2026-10-25 14:07:00,EDT-Pages
+http://8.209.255.13:3128,http,8.209.255.13,3128,278,0,alive,NRT,JP,8.209.255.13,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
+http://47.243.92.199:3128,http,47.243.92.199,3128,378,0,alive,HKG,HK,47.243.92.199,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
+http://4.144.146.21:80,http,4.144.146.21,80,401,0,alive,SIN,SG,20.44.210.140,AS8075 Microsoft Azure,Microsoft Azure,datacenter,2026-10-19 12:45:55,@otcfxq
+http://1234:1234@13.229.59.119:2080,http,13.229.59.119,2080,403,0,alive,SIN,SG,2406:da18:ad0:a400:40b8:e560:fae9:42c9,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://1234:1234@47.128.148.63:2080,http,47.128.148.63,2080,404,0,alive,SIN,SG,2406:da18:ad0:a400:aa45:be61:ddb0:f4f,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://1234:1234@13.250.114.105:2080,http,13.250.114.105,2080,404,0,alive,SIN,SG,2406:da18:ad0:a400:83e2:cc94:985b:6663,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://1234:1234@13.250.53.203:2080,http,13.250.53.203,2080,404,0,alive,SIN,SG,2406:da18:ad0:a400:a0cc:1672:8ddc:c9b1,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://1234:1234@47.128.223.25:2080,http,47.128.223.25,2080,404,0,alive,SIN,SG,2406:da18:ad0:a400:3461:4714:de76:b355,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://1234:1234@54.254.197.64:2080,http,54.254.197.64,2080,405,0,alive,SIN,SG,2406:da18:ad0:a400:594e:ce56:8509:d9bb,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://1234:1234@47.128.216.221:2080,http,47.128.216.221,2080,405,0,alive,SIN,SG,2406:da18:ad0:a400:368e:b4fd:5bb3:9efb,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://1234:1234@13.250.24.214:2080,http,13.250.24.214,2080,405,0,alive,SIN,SG,2406:da18:ad0:a400:a4a5:636c:281b:3d8d,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://1234:1234@54.254.170.180:2080,http,54.254.170.180,2080,406,0,alive,SIN,SG,2406:da18:ad0:a400:d883:1396:f5be:256f,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://1234:1234@54.251.228.111:2080,http,54.251.228.111,2080,406,0,alive,SIN,SG,2406:da18:ad0:a400:cddf:e8bc:d41a:8ff3,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://1234:1234@52.74.46.126:2080,http,52.74.46.126,2080,407,0,alive,SIN,SG,2406:da18:46b:0:21f5:b7b5:a660:e41f,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://1234:1234@18.143.149.74:2080,http,18.143.149.74,2080,407,0,alive,SIN,SG,2406:da18:ad0:a400:3c4c:9aa8:6198:37f5,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://1234:1234@54.255.222.157:2080,http,54.255.222.157,2080,409,0,alive,SIN,SG,2406:da18:ad0:a400:d51a:79e2:51a6:d8a2,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://1234:1234@52.77.237.40:2080,http,52.77.237.40,2080,409,0,alive,SIN,SG,2406:da18:ad0:a400:f576:ae64:5a7b:3158,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://1234:1234@52.221.233.141:2080,http,52.221.233.141,2080,421,0,alive,SIN,SG,2406:da18:ad0:a400:b45a:77ec:7057:8999,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://185.195.254.72:5432,http,185.195.254.72,5432,434,0,alive,IST,TR,185.195.254.72,AS206119 Veganet Teknolojileri ve Hizmetleri LTD STI,Veganet Teknolojileri ve Hizmetleri LTD STI,isp,2026-10-09 22:46:01,EDT-Pages
+http://47.91.65.23:3128,http,47.91.65.23,3128,468,0,alive,FRA,DE,47.91.65.23,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
+http://103.133.26.50:8080,http,103.133.26.50,8080,506,0,alive,SIN,ID,103.133.24.37,AS138130 PT PHATRIA INTI PERSADA,PT PHATRIA INTI PERSADA,isp,2026-10-12 15:18:13,EDT-Pages
+http://8.213.151.128:3128,http,8.213.151.128,3128,605,0,alive,ICN,KR,8.213.151.128,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
+http://102.244.78.61:8089,http,102.244.78.61,8089,609,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-21 15:52:42,@otcfxq
+http://102.244.78.61:8081,http,102.244.78.61,8081,629,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-21 15:52:42,EDT-Pages
+http://102.244.78.61:8082,http,102.244.78.61,8082,635,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-21 15:52:42,@otcfxq
+http://102.244.78.61:8085,http,102.244.78.61,8085,635,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-09 22:46:01,EDT-Pages
+http://102.244.78.61:8087,http,102.244.78.61,8087,637,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-09 22:46:01,EDT-Pages
+http://103.133.26.73:3128,http,103.133.26.73,3128,837,0,alive,CGK,ID,103.178.42.17,AS138130 PT PHATRIA INTI PERSADA,PT PHATRIA INTI PERSADA,isp,2026-10-12 15:18:13,EDT-Pages
+http://120.232.115.57:17981,http,120.232.115.57,17981,851,0,alive,LAX,CN,2409:8c54:2030:713::11,AS9808 China Mobile,China Mobile,isp,2026-10-21 15:52:42,@otcfxq
+http://27.185.218.213:17981,http,27.185.218.213,17981,856,0,alive,SJC,CN,240e:940:e01b:5:40::c,AS4134 China Telecom,China Telecom,isp,2026-10-21 15:52:42,EDT-Pages
+http://102.244.78.61:8083,http,102.244.78.61,8083,911,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-22 12:56:40,EDT-Pages
+http://120.232.115.170:17981,http,120.232.115.170,17981,953,0,alive,SJC,CN,2409:8c54:2030:71a::12,AS9808 China Mobile,China Mobile,isp,2026-10-21 15:52:42,@otcfxq
+http://122.246.3.12:17981,http,122.246.3.12,17981,1637,0,alive,SJC,CN,122.246.3.12,AS136188 China Telecom,China Telecom,datacenter,2026-10-19 12:45:55,@otcfxq
