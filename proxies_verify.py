@@ -1013,16 +1013,13 @@ async def probe_single(
         )
     elif proto == "https":
         # 核心分流准入控制：
-        # 1. 凡是已有老节点且已确认具备非机房属性 (isp, business, education, government)，走本地轻量高并发 probe_https 极速探针，0 消耗 CF Worker 额度
-        # 2. 凡是新拉取 (source 为 proxifly 等)、未定性或未知属性的 HTTPS 节点，走 CF_CHECK_ENDPOINT 外部端点进行严格住宅/原生宽带准入质检
-        # 3. 坚决剔除机房 (datacenter/hosting)，只要原生住宅与家宽 ISP (以及高校教育网/商业专线)
-        is_known_non_dc = (
-            row.get("source") != "proxifly"
-            and bool(row.get("asn"))
-            and (row.get("net_type") or "").strip().lower() in ("isp", "business", "education", "government")
-        )
+        # 1. 频道与群组 / 内部来源 (@otcjlq, @otcfxq, @danfeng_chat, @user, EDT-Pages 等)：
+        #    执行“全收”策略，直接走本地 probe_https 进行报文级穿透测活。不论机房或家宽，只要连通即准入存活，严禁判死剔除。
+        # 2. 外部全网海量公用爬虫源 (source 为 proxifly 等)：
+        #    执行“严选”住宅准入策略，通过 CF_CHECK_ENDPOINT 端点深度校验真实出口，坚决剔除机房垃圾节点 (datacenter_rejected)。
+        is_trusted_or_local = (row.get("source") != "proxifly") or not cf_check_endpoint
 
-        if is_known_non_dc or not cf_check_endpoint:
+        if is_trusted_or_local:
             is_alive, delay_ms, status, colo, country, egress_ip = await probe_https(
                 host, port, user, pwd, max(timeout, 7.0), http_timeout
             )
@@ -1285,13 +1282,15 @@ def load_proxies_data(
                     if is_tombstoned(key, tombstone):
                         continue
 
-                    # 前置拦截已知机房 HTTPS 节点 (针对用户“只要住宅/原生家宽，坚决不要机房”核心诉求)
+                    # 仅针对外部全网批量抓取源 (如 proxifly) 前置拦截已知机房 HTTPS 节点；
+                    # 频道与群组来源 (@otcjlq, @otcfxq, @danfeng_chat, @user 等) 全收，绝不前置剔除机房
+                    source = r.get("source", "").strip()
                     host = parsed["host"]
                     proto = parsed["proto"]
                     cached_nt = (ip_cache.get(host, {}) or {}).get("net_type", "").lower()
                     row_nt = (r.get("net_type") or "").strip().lower()
 
-                    if proto == "https" and (cached_nt in ("datacenter", "hosting") or row_nt in ("datacenter", "hosting")):
+                    if source == "proxifly" and proto == "https" and (cached_nt in ("datacenter", "hosting") or row_nt in ("datacenter", "hosting")):
                         dc_filtered_count += 1
                         if host not in ip_cache:
                             ip_cache[host] = {
@@ -1337,9 +1336,6 @@ def load_proxies_data(
                             key = canonical_key(parsed["host"], parsed["port"])
                             if is_tombstoned(key, tombstone):
                                 continue
-                            if parsed["proto"] == "https" and (ip_cache.get(parsed["host"], {}) or {}).get("net_type") in ("datacenter", "hosting"):
-                                dc_filtered_count += 1
-                                continue
                             parsed["first_seen"] = now_str
                             url_map[line] = parsed
             log.info("从 %s 读取 %d 行，合并后待检节点共: %d 条", target_txt, txt_count, len(url_map))
@@ -1365,7 +1361,8 @@ def load_proxies_data(
                             key = canonical_key(parsed["host"], parsed["port"])
                             if is_tombstoned(key, tombstone):
                                 continue
-                            if parsed["proto"] == "https":
+                            source = r.get("source", "").strip()
+                            if source == "proxifly" and parsed["proto"] == "https":
                                 host = parsed["host"]
                                 cached_nt = (ip_cache.get(host, {}) or {}).get("net_type", "").lower()
                                 row_nt = (r.get("net_type") or "").strip().lower()
@@ -1399,9 +1396,6 @@ def load_proxies_data(
                                 continue
                             key = canonical_key(parsed["host"], parsed["port"])
                             if is_tombstoned(key, tombstone):
-                                continue
-                            if parsed["proto"] == "https" and (ip_cache.get(parsed["host"], {}) or {}).get("net_type") in ("datacenter", "hosting"):
-                                dc_filtered_count += 1
                                 continue
                             parsed["first_seen"] = now_str
                             url_map[line] = parsed
