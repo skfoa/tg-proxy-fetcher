@@ -536,6 +536,7 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS203101": "isp",         # Navarino Single Member S.A. (navarino.gr, 希腊海事卫星与电信网络服务商)
     "AS10753": "isp",          # Level 3 Parent, LLC / Lumen (lumen.com, Tier 1 国际电信与互联网服务商)
     "AS38264": "isp",          # Wateen Telecom Limited (wateen.com, 巴基斯坦全国光纤与民用宽带 ISP)
+    "AS20981": "isp",          # InnovaPuglia SpA (RUPAR Puglia 区域宽带专网运营商, ipinfo: isp)
 
     # --- [L0 裁决 C: 核心国际银行金融专网 (对齐 ipinfo.io 业界权威标准，统一归入 business 商业专线)] ---
     "AS1311": "business", "AS2600": "business", "AS3187": "business", "AS5091": "business",
@@ -558,7 +559,6 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
 
     # --- [L0 裁决 F: 国家政务与公共网络 (权威核准为 government)] ---
     "AS327724": "government",  # National Information Technology Authority Uganda (NITA-U, 乌干达国家信息技术管理局政务网)
-    "AS20981": "government",   # InnovaPuglia SpA (意大利普利亚大区公共政务专网 / RUPAR Puglia)
     "AS8435": "government",    # Bank of Korea (ipinfo: government)
     "AS9487": "government",    # Bank of Korea (ipinfo: government)
     "AS25883": "government",   # Central Bank of the Russian Federation (ipinfo: government)
@@ -2638,7 +2638,7 @@ EDU_PATTERNS = (
 GOV_PATTERNS = (
     "ministry of", "department of", "parliament", "municipality",
     "federal government", "state government", "public administration",
-    "innovapuglia", "regione ", "national information technology authority",
+    "regione ", "national information technology authority",
     "public authority", "government",
     "beltelecom",
 )
@@ -2650,7 +2650,7 @@ BIZ_PATTERNS = (
 
 ISP_RES_PATTERNS = (
     "residential", "consumer broadband", "ftth", "fiber to the home", "adsl customer", "cable internet",
-    "broadband",
+    "broadband", "innovapuglia",
     "cable tv", "cable television", "cable corporation", "wisp", "wireless multi service",
     "telecommunication", "telecommunications",
     "odido", "wisper", "inalan", "radiokomunikace", "radiografica", "informsvyaz", "bashinformsvyaz",
