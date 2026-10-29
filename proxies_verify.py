@@ -351,9 +351,30 @@ async def check_sstp_exit_cf_worker(
 def is_datacenter_result(cf_res: dict) -> bool:
     """
     研判 Worker 检测结果是否属于机房/数据中心/公有云。
-    坚决剔除机房，只要原生家庭宽带/住宅 ISP/教育网/专线。
+    坚决剔除机房，只要原生家庭宽带/住宅 ISP/教育网/商业专线/政务网络。
+
+    架构设计遵循 SSOT (本地权威单真理源优先) 原则：
+    1. 优先调用本地 classify_asn(asn_code, isp_str) 进行四级体系研判 (人工裁决 -> 权威库 -> 模式匹配)；
+    2. 若本地确证为原生宽带(isp)、专线机构(business)、学术科研(education)或政府政务(government)，
+       则本地权威结论高于一切，直接准入通过 (返回 False)，绝不被外部第三方接口的粗放标签误杀！
+    3. 若本地研判为 datacenter (或落入 Tier 4 安全降级)，再综合外部第三方探针返回的
+       is_datacenter、privacy.is_hosting 或 asn_type/company_type 进行阻断 (返回 True)。
     """
     exit_info = cf_res.get("exit") or {}
+    asn_obj = exit_info.get("asn") or {}
+    company_obj = exit_info.get("company") or {}
+
+    asn_code = str(asn_obj.get("asn") or "").strip()
+    asn_name = str(asn_obj.get("name") or asn_obj.get("org") or "").strip()
+    company_name = str(company_obj.get("name") or "").strip()
+    isp_str = f"{asn_name} {company_name}".strip()
+
+    # [SSOT 优先] 优先采信本地权威研判体系 (防止第三方 GeoIP API 将非民用政务专网/高校科研网误判为 hosting)
+    nt = classify_asn(asn_code, isp_str)
+    if nt in ("isp", "business", "education", "government"):
+        return False
+
+    # 若本地未定性或判定为 datacenter，综合外部第三方探针情报判定是否为机房
     if exit_info.get("is_datacenter") is True:
         return True
 
@@ -361,21 +382,11 @@ def is_datacenter_result(cf_res: dict) -> bool:
     if privacy.get("is_hosting") is True:
         return True
 
-    asn_obj = exit_info.get("asn") or {}
-    company_obj = exit_info.get("company") or {}
-
     asn_type = str(asn_obj.get("type") or "").strip().lower()
     company_type = str(company_obj.get("type") or "").strip().lower()
-
     if asn_type in ("hosting", "datacenter") or company_type in ("hosting", "datacenter"):
         return True
 
-    asn_code = str(asn_obj.get("asn") or "").strip()
-    asn_name = str(asn_obj.get("name") or asn_obj.get("org") or "").strip()
-    company_name = str(company_obj.get("name") or "").strip()
-    isp_str = f"{asn_name} {company_name}".strip()
-
-    nt = classify_asn(asn_code, isp_str)
     return nt in ("datacenter", "hosting")
 
 

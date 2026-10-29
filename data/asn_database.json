@@ -2665,7 +2665,8 @@
     "SUPERLOOP (AUSTRALIA) PTY LTD": "AS38195",
     "INHA UNIVERSITY": "AS9317",
     "China Unicom Guangdong province network": "AS17623",
-    "Flynet Ltd": "AS49711"
+    "Flynet Ltd": "AS49711",
+    "InnovaPuglia SpA": "AS20981"
   },
   "asn_to_isp": {
     "AS10001": "Mics Network Corporation",
@@ -5212,7 +5213,8 @@
     "AS38097": "SK Broadband Co Ltd",
     "AS9317": "INHA UNIVERSITY",
     "AS17623": "China Unicom Guangdong province network",
-    "AS49711": "Flynet Ltd"
+    "AS49711": "Flynet Ltd",
+    "AS20981": "InnovaPuglia SpA"
   },
   "asn_to_net_type": {
     "AS10001": "isp",
@@ -6488,7 +6490,7 @@
     "AS207604": "isp",
     "AS207656": "datacenter",
     "AS20766": "isp",
-    "AS207705": "datacenter",
+    "AS207705": "education",
     "AS20771": "isp",
     "AS207713": "datacenter",
     "AS207728": "datacenter",
@@ -6546,7 +6548,7 @@
     "AS209750": "datacenter",
     "AS209783": "datacenter",
     "AS209805": "datacenter",
-    "AS20981": "datacenter",
+    "AS20981": "government",
     "AS209829": "datacenter",
     "AS209847": "datacenter",
     "AS209854": "datacenter",
@@ -6728,7 +6730,7 @@
     "AS214790": "datacenter",
     "AS214798": "datacenter",
     "AS214803": "datacenter",
-    "AS214822": "datacenter",
+    "AS214822": "business",
     "AS214861": "datacenter",
     "AS214891": "datacenter",
     "AS214902": "datacenter",

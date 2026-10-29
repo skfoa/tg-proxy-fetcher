@@ -550,12 +550,15 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS199578": "education",  # Verein zur Foerderung eines Deutschen Forschungsnetzes e.V. (DFN, 德国国家科研教育网)
     "AS142078": "education",  # CERNET FITI Nodes (清华大学/未来互联网试验设施教育网节点)
     "AS3132": "education",    # Red Cientifica Peruana (rcp.pe, 秘鲁教育网, ipinfo: education)
+    "AS207705": "education",  # TW NCU (台湾国立中央大学)
 
     # --- [L0 裁决 E: 商业企业专线与骨干中继 (权威核准为 business)] ---
     "AS979": "business",      # NetLab Global (as979.net, 国际机房网络, ipinfo: business)
+    "AS214822": "business",   # MT FINANCE LLC (商业金融专线)
 
     # --- [L0 裁决 F: 国家政务与公共网络 (权威核准为 government)] ---
     "AS327724": "government",  # National Information Technology Authority Uganda (NITA-U, 乌干达国家信息技术管理局政务网)
+    "AS20981": "government",   # InnovaPuglia SpA (意大利普利亚大区公共政务专网 / RUPAR Puglia)
     "AS8435": "government",    # Bank of Korea (ipinfo: government)
     "AS9487": "government",    # Bank of Korea (ipinfo: government)
     "AS25883": "government",   # Central Bank of the Russian Federation (ipinfo: government)
@@ -2635,6 +2638,8 @@ EDU_PATTERNS = (
 GOV_PATTERNS = (
     "ministry of", "department of", "parliament", "municipality",
     "federal government", "state government", "public administration",
+    "innovapuglia", "regione ", "national information technology authority",
+    "public authority", "government",
     "beltelecom",
 )
 
