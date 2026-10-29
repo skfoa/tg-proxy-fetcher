@@ -2951,7 +2951,7 @@
     "asn": "48524",
     "asOrganization": "INTERRA telecommunications group, Ltd.",
     "isp": "INTERRA telecommunications group, Ltd.",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "vpngate"
   },
   {

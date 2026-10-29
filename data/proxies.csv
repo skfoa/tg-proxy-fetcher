@@ -1739,7 +1739,7 @@ sstp://vpn:vpn@vpn508965699.opengw.net:995,sstp,vpn508965699.opengw.net,995,3746
 sstp://vpn:vpn@vpn749475851.opengw.net:1921,sstp,vpn749475851.opengw.net,1921,3750,0,alive,-,KR,125.134.202.104,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-14 12:57:52,vpngate
 sstp://vpn:vpn@vpn258365250.opengw.net:1332,sstp,vpn258365250.opengw.net,1332,3750,0,alive,-,KR,115.91.247.102,AS3786 LG DACOM Corporation,LG DACOM Corporation,isp,2026-10-01 00:00:00,vpngate
 sstp://vpn:vpn@vpn599923276.opengw.net:1882,sstp,vpn599923276.opengw.net,1882,3751,0,alive,-,JP,27.138.239.165,"AS9824 JCOM Co., Ltd.","JCOM Co., Ltd.",isp,2026-10-14 12:57:52,vpngate
-sstp://vpn:vpn@vpn420948767.opengw.net:1470,sstp,vpn420948767.opengw.net,1470,3760,0,alive,-,RU,94.190.50.143,"AS48524 INTERRA telecommunications group, Ltd.","INTERRA telecommunications group, Ltd.",datacenter,2026-10-21 15:52:42,vpngate
+sstp://vpn:vpn@vpn420948767.opengw.net:1470,sstp,vpn420948767.opengw.net,1470,3760,0,alive,-,RU,94.190.50.143,"AS48524 INTERRA telecommunications group, Ltd.","INTERRA telecommunications group, Ltd.",isp,2026-10-21 15:52:42,vpngate
 sstp://vpn:vpn@vpn999209650.opengw.net:1930,sstp,vpn999209650.opengw.net,1930,3771,0,alive,-,KR,59.10.57.184,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-06 14:25:18,vpngate
 sstp://vpn:vpn@vpn941078596.opengw.net:995,sstp,vpn941078596.opengw.net,995,3780,0,alive,-,KR,110.9.169.153,AS9318 SK Broadband,SK Broadband Co Ltd,isp,2026-10-04 23:17:15,vpngate
 sstp://vpn:vpn@vpn486404568.opengw.net:1595,sstp,vpn486404568.opengw.net,1595,3784,0,alive,-,KR,175.205.253.138,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-16 12:36:06,vpngate

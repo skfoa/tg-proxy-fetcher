@@ -2660,7 +2660,8 @@
     "Triple T Broadband Public Company Limited": "AS138524",
     "Limited Liability Company Izet Telecom Ural": "AS41925",
     "Siberfy": "AS135598",
-    "SIBERFY (PRIVATE) LIMITED": "AS135598"
+    "SIBERFY (PRIVATE) LIMITED": "AS135598",
+    "INTERRA telecommunications group, Ltd.": "AS48524"
   },
   "asn_to_isp": {
     "AS10001": "Mics Network Corporation",
@@ -5201,7 +5202,8 @@
     "AS17857": "SK Broadband Co Ltd",
     "AS138524": "Triple T Broadband Public Company Limited",
     "AS41925": "Limited Liability Company Izet Telecom Ural",
-    "AS135598": "Siberfy"
+    "AS135598": "Siberfy",
+    "AS48524": "INTERRA telecommunications group, Ltd."
   },
   "asn_to_net_type": {
     "AS10001": "isp",
@@ -8747,6 +8749,7 @@
     "AS134146": "datacenter",
     "AS136531": "datacenter",
     "AS17857": "isp",
-    "AS135598": "datacenter"
+    "AS135598": "datacenter",
+    "AS48524": "isp"
   }
 }
