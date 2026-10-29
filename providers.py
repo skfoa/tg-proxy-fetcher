@@ -3258,6 +3258,7 @@ def probe_check_proxyip_api(
             exit_isp = exit_info.get("asOrganization") or exit_info.get("org") or data.get("exit_isp") or ""
             colo = data.get("colo") or probe.get("colo") or ""
             country = exit_info.get("country") or data.get("country") or ""
+            city = exit_info.get("city") or data.get("city") or ""
 
             if exit_asn and not str(exit_asn).upper().startswith("AS"):
                 exit_asn = f"AS{exit_asn}"
@@ -3271,6 +3272,7 @@ def probe_check_proxyip_api(
                 "exit_isp": str(exit_isp).strip(),
                 "colo": str(colo).strip().upper(),
                 "country": str(country).strip(),
+                "city": str(city).strip(),
                 "net_type": net_type,
             }
     except Exception as e:

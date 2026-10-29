@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import concurrent.futures
 import csv
 import json
 import logging
@@ -62,6 +63,13 @@ from providers import (
     save_scan_ips_by_asn as save_scan_dir,
     atomic_writer,
     atomic_write_text,
+    probe_check_proxyip_api,
+    classify_asn,
+)
+from proxyip_verify import (
+    load_proxyip_csv,
+    save_proxyip,
+    check_proxyip_endpoint_health,
 )
 
 # 确保本地 .env 加载
@@ -90,6 +98,13 @@ SCAN_DIR = os.path.join(DATA_DIR, "scan_ips")
 
 CF_CSV = os.path.join(DATA_DIR, "cf_ips.csv")
 CF_TXT = os.path.join(DATA_DIR, "cf_ips.txt")
+
+PROXYIP_CSV = os.path.join(DATA_DIR, "proxyip.csv")
+PROXYIP_TXT = os.path.join(DATA_DIR, "proxyip.txt")
+PROXYIP_DIR = os.path.join(DATA_DIR, "proxyip")
+
+CHECK_ENDPOINT = os.getenv("CHECK_PROXYIP_URL", "").strip()
+CHECK_CONCURRENCY = safe_int(os.getenv("CHECK_CONCURRENCY"), 32)
 
 PROBE_HOST = "crypto.cloudflare.com"
 TIMEOUT = 3.0
@@ -715,8 +730,157 @@ def _cf_sort_key(x):
     return (fc, d if d > 0 else 99999)
 
 
+# ---------- 扫描优选存活节点出口画像异步补全与 ProxyIP 晋升 ----------
+async def enrich_scan_ips_exits(
+    survivors: list,
+    check_endpoint: str = "",
+    check_concurrency: int = 32,
+    dry_run: bool = False,
+) -> int:
+    """
+    对本地已通过 TLS + 301 校验且存活 (fail_count == 0) 但 exit_ip 缺失的扫描优选 IP 执行外部穿透鉴真。
+    补全出口 IP、出口 ASN、出口 ISP、机房与地理位置，并将其中属于非机房（ISP/商业专线等）的高价值节点
+    自动晋升收录至 data/proxyip.csv。
+    """
+    endpoint = check_endpoint.strip() if check_endpoint else CHECK_ENDPOINT
+    if not endpoint:
+        log.info("[扫描优选] 未配置 CHECK_PROXYIP_URL，跳过存活缺失出口画像补全与 ProxyIP 晋升")
+        return 0
+
+    # 仅对待定存活 (fail_count == 0) 且缺失 exit_ip 的节点进行补全，避免对故障/离线节点盲等超时
+    candidates = [
+        r for r in survivors
+        if safe_int(r.get("fail_count"), 0) == 0 and not (r.get("exit_ip") or "").strip()
+    ]
+    if not candidates:
+        log.info("[扫描优选] 存活节点中无缺失 exit_ip 的候选，无需调用外部鉴真")
+        return 0
+
+    if not check_proxyip_endpoint_health(endpoint, timeout=5.0):
+        log.warning("[扫描优选] Check ProxyIP 外部端点健康探针失败，安全熔断跳过出口画像补全")
+        return 0
+
+    concurrency = safe_int(check_concurrency, 32) or 32
+    log.info(
+        "🚀 [扫描优选 外部鉴真] 发现 %d 个存活但缺失 exit_ip 的节点，启用外部 Worker 探针补全画像并评估 ProxyIP 晋升: %s (并发线程: %d)",
+        len(candidates),
+        endpoint,
+        concurrency,
+    )
+
+    loop = asyncio.get_running_loop()
+    executor = concurrent.futures.ThreadPoolExecutor(
+        max_workers=max(1, concurrency),
+        thread_name_prefix="cf_scan_enrich",
+    )
+    promoted_proxyips = []
+    enriched_count = 0
+    now_bjt = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
+
+    try:
+        sem = asyncio.Semaphore(concurrency)
+
+        async def _probe_candidate(row: dict):
+            nonlocal enriched_count
+            ip = (row.get("ip") or "").strip()
+            port = safe_int(row.get("port"), 0)
+            if not ip or port <= 0:
+                return
+
+            async with sem:
+                res = await loop.run_in_executor(
+                    executor,
+                    probe_check_proxyip_api,
+                    ip,
+                    port,
+                    endpoint,
+                    6.0,
+                )
+
+            if res.get("success") and res.get("exit_ip"):
+                enriched_count += 1
+                row["exit_ip"] = res["exit_ip"]
+                if res.get("exit_asn"):
+                    row["exit_asn"] = res["exit_asn"]
+                if res.get("exit_isp"):
+                    row["exit_isp"] = res["exit_isp"]
+                if res.get("colo") and not row.get("colo"):
+                    row["colo"] = res["colo"]
+
+                city = res.get("city") or ""
+                country = res.get("country") or ""
+                loc_parts = [p for p in (city, country) if p]
+                if loc_parts and not row.get("exit_location"):
+                    row["exit_location"] = " · ".join(loc_parts)
+
+                # 评估是否可晋升为 ProxyIP (非机房优质出口)
+                exit_nt = res.get("net_type") or classify_asn(res.get("exit_asn", ""), res.get("exit_isp", ""))
+                if exit_nt in ("isp", "business", "education", "government"):
+                    promoted_proxyips.append({
+                        "ip": ip,
+                        "port": str(port),
+                        "tls": str(row.get("tls") or "true").lower(),
+                        "delay_ms": safe_int(row.get("delay_ms"), 0),
+                        "speed_kbs": str(row.get("speed_kbs") or ""),
+                        "colo": res.get("colo") or row.get("colo", ""),
+                        "cf_location": row.get("cf_location", ""),
+                        "asn": format_asn_isp(res.get("exit_asn") or row.get("asn", ""), res.get("exit_isp") or row.get("isp", "")),
+                        "isp": res.get("exit_isp") or row.get("isp", ""),
+                        "first_seen": row.get("first_seen") or now_bjt,
+                        "channel": row.get("channel") or "@scan_ips_promoted",
+                        "fail_count": 0,
+                        "net_type": exit_nt,
+                        "exit_ip": res.get("exit_ip", ""),
+                    })
+
+        tasks = [_probe_candidate(r) for r in candidates]
+        await asyncio.gather(*tasks)
+    finally:
+        executor.shutdown(wait=False, cancel_futures=True)
+
+    log.info(
+        "[扫描优选 外部鉴真] 完成出口画像补全: 探测 %d 个候选 | 成功补全 %d 个节点画像",
+        len(candidates),
+        enriched_count,
+    )
+
+    # 若有新晋升的 ProxyIP，自动合并写入 data/proxyip.csv
+    if promoted_proxyips and not dry_run:
+        try:
+            existing_proxyips = load_proxyip_csv(PROXYIP_CSV)
+            existing_map = {
+                canonical_key(r.get("ip", ""), r.get("port", 0)): r
+                for r in existing_proxyips
+                if (r.get("ip") or "").strip() and safe_int(r.get("port"), 0) > 0
+            }
+            new_promoted_cnt = 0
+            for pr in promoted_proxyips:
+                k = canonical_key(pr["ip"], pr["port"])
+                if k not in existing_map:
+                    existing_proxyips.append(pr)
+                    existing_map[k] = pr
+                    new_promoted_cnt += 1
+                else:
+                    ex = existing_map[k]
+                    if not ex.get("exit_ip") and pr.get("exit_ip"):
+                        ex["exit_ip"] = pr["exit_ip"]
+                        ex["net_type"] = pr["net_type"]
+            if new_promoted_cnt > 0:
+                save_proxyip(existing_proxyips, PROXYIP_CSV, PROXYIP_TXT, PROXYIP_DIR)
+                log.info(
+                    "🎉 [扫描优选 外部鉴真] 成功晋升 %d 个非机房高价值 ProxyIP 至 %s (当前 ProxyIP 总数: %d)",
+                    new_promoted_cnt,
+                    PROXYIP_CSV,
+                    len(existing_proxyips),
+                )
+        except Exception as e:
+            log.warning("晋升合并 ProxyIP 失败: %s", e)
+
+    return enriched_count
+
+
 # ---------- 主流程 ----------
-async def _verify_and_persist(csv_path: str, tag: str, args, on_save) -> dict:
+async def _verify_and_persist(csv_path: str, tag: str, args, on_save, pre_save_hook=None) -> dict:
     rows = load_csv(csv_path)
     total = len(rows)
     res = {
@@ -780,6 +944,9 @@ async def _verify_and_persist(csv_path: str, tag: str, args, on_save) -> dict:
         return res
 
     # 严格保证保存先于登记墓地：若保存失败触发异常，避免墓地预先登记导致状态不一致
+    if pre_save_hook:
+        await pre_save_hook(survivors)
+
     if on_save:
         on_save(survivors)
 
@@ -847,7 +1014,22 @@ async def async_main(args):
         save_scan_txt(all_sorted_scan, SCAN_TXT)
         save_scan_dir(asn_groups, SCAN_DIR)
 
-    scan_res = await _verify_and_persist(SCAN_CSV, "扫描优选", args, _save_scan_track)
+    async def _scan_pre_save(survivors):
+        if not getattr(args, "no_enrich_exits", False):
+            await enrich_scan_ips_exits(
+                survivors,
+                check_endpoint=getattr(args, "check_endpoint", ""),
+                check_concurrency=getattr(args, "check_concurrency", 32),
+                dry_run=getattr(args, "dry_run", False),
+            )
+
+    scan_res = await _verify_and_persist(
+        SCAN_CSV,
+        "扫描优选",
+        args,
+        _save_scan_track,
+        pre_save_hook=_scan_pre_save,
+    )
 
     baseline_map = {}
     if getattr(args, "probe_baseline", False):
@@ -933,6 +1115,9 @@ def main():
     parser.add_argument("--dry-run", action="store_true", help="演练诊断模式，仅探测统计原因，不覆写数据文件也不登记墓地，自动跳过通知")
     parser.add_argument("--probe-baseline", action="store_true", help="探测 300 个官方 Cloudflare Anycast IP 作为并发与网络基线")
     parser.add_argument("--diag-output", type=str, default="", help="诊断结果输出 JSON 路径，记录每个节点的探测原因明细")
+    parser.add_argument("--check-endpoint", type=str, default="", help="Check ProxyIP 外部穿透鉴真端点 URL (默认读取 CHECK_PROXYIP_URL)")
+    parser.add_argument("--check-concurrency", type=int, default=32, help="外部鉴真端点专用并发线程数 (默认 32)")
+    parser.add_argument("--no-enrich-exits", action="store_true", help="禁用存活扫描优选 IP 出口画像外部鉴真与 ProxyIP 晋升")
     args = parser.parse_args()
 
     asyncio.run(async_main(args))

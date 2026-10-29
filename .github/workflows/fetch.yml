@@ -94,6 +94,7 @@ jobs:
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          CHECK_PROXYIP_URL: ${{ inputs.check_proxyip_url || vars.CHECK_PROXYIP_URL || secrets.CHECK_PROXYIP_URL || '' }}
         run: python cf_verify.py --concurrency 250 --max-fails 3 --timeout 3.0
 
       - name: 🚨 任务失败告警推送
