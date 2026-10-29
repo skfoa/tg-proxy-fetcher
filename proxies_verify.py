@@ -74,6 +74,8 @@ from providers import (
     resolve_domain_to_ip,
     atomic_write_text,
     atomic_write_json,
+    auto_enrich_and_save_asns,
+    is_asn_recorded,
 )
 
 # 确保本地 .env 加载
@@ -1053,6 +1055,8 @@ async def probe_single(
                     colo = ""
                     country = c_code
                     egress_ip = exit_ip
+                    if clean_asn and not is_asn_recorded(clean_asn):
+                        auto_enrich_and_save_asns([{"asn": clean_asn, "isp": clean_isp, "ip": exit_ip or host, "net_type": "datacenter"}])
                     if host:
                         row["_cache_update"] = {
                             "host": host,
@@ -1087,6 +1091,9 @@ async def probe_single(
                         n_type = classify_asn(clean_asn, clean_isp)
                         if n_type in ("datacenter", "hosting"):
                             n_type = "isp"
+
+                    if clean_asn and not is_asn_recorded(clean_asn):
+                        auto_enrich_and_save_asns([{"asn": clean_asn, "isp": clean_isp, "ip": exit_ip or host, "net_type": n_type}])
 
                     row["asn"] = format_asn_isp(clean_asn, clean_isp)
                     row["isp"] = clean_isp
@@ -1154,6 +1161,8 @@ async def probe_single(
                 if cf_asn:
                     row["asn"] = format_asn_isp(cf_asn, cf_isp)
                     row["isp"] = cf_isp
+                    if not is_asn_recorded(cf_asn):
+                        auto_enrich_and_save_asns([{"asn": cf_asn, "isp": cf_isp, "ip": egress_ip or host}])
                     row["net_type"] = classify_asn(cf_asn, cf_isp)
             else:
                 if cf_res.get("network_error"):
@@ -1439,6 +1448,14 @@ async def enrich_proxies_metadata(survivors: list[dict], max_concurrency: int = 
     if ip_to_resolve:
         log.info("正在为 %d 个唯一出口 IP/域名批量解析 ASN 与国家属性...", len(ip_to_resolve))
         ip_cache = await resolve_asn_batch_online_async(list(ip_to_resolve))
+        if ip_cache:
+            unrecorded_new_asns = []
+            for tip, (asn_c, isp_n) in ip_cache.items():
+                if asn_c and not is_asn_recorded(asn_c):
+                    unrecorded_new_asns.append({"asn": asn_c, "isp": isp_n, "ip": tip})
+            if unrecorded_new_asns:
+                log.info("【质检在线反查】发现 %d 个未收录 ASN，执行权威自动入库...", len(unrecorded_new_asns))
+                auto_enrich_and_save_asns(unrecorded_new_asns)
 
     persistent_cache = load_ip_cache()
     net_stats: dict[str, int] = {}
@@ -1455,8 +1472,7 @@ async def enrich_proxies_metadata(survivors: list[dict], max_concurrency: int = 
                     if asn_code:
                         r["asn"] = format_asn_isp(asn_code, isp_name)
                         r["isp"] = isp_name
-                        cached_nt = (persistent_cache.get(target_ip) or {}).get("net_type")
-                        r["net_type"] = cached_nt or classify_asn(asn_code, isp_name)
+                        r["net_type"] = classify_asn(asn_code, isp_name)
                 elif target_ip in persistent_cache:
                     c_item = persistent_cache[target_ip]
                     asn_code = c_item.get("asn", "")
@@ -1464,7 +1480,7 @@ async def enrich_proxies_metadata(survivors: list[dict], max_concurrency: int = 
                     if asn_code:
                         r["asn"] = format_asn_isp(asn_code, isp_name)
                         r["isp"] = isp_name
-                        r["net_type"] = c_item.get("net_type") or classify_asn(asn_code, isp_name)
+                        r["net_type"] = classify_asn(asn_code, isp_name)
 
             if not curr_country:
                 c_code = ""
@@ -1495,8 +1511,21 @@ async def enrich_proxies_metadata(survivors: list[dict], max_concurrency: int = 
         else:
             r["net_type"] = classify_asn("", "")
 
+        # 实时校准持久化 ip_cache 中的网络属性，避免历史旧值污染
+        if target_ip in persistent_cache:
+            persistent_cache[target_ip]["net_type"] = r["net_type"]
+            if r.get("asn"):
+                persistent_cache[target_ip]["asn"] = r["asn"]
+            if r.get("isp"):
+                persistent_cache[target_ip]["isp"] = r["isp"]
+
         nt = r.get("net_type", "datacenter")
         net_stats[nt] = net_stats.get(nt, 0) + 1
+
+    try:
+        save_ip_cache(persistent_cache, compact=True)
+    except Exception as e:
+        log.debug("保存同步后的 ip_cache 失败: %s", e)
 
     return net_stats
 

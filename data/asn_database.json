@@ -1967,7 +1967,7 @@
     "SIA Tet": "AS12578",
     "SIA VEESP": "AS43317",
     "SK Broadband": "AS9318",
-    "SK Broadband Co Ltd": "AS9318",
+    "SK Broadband Co Ltd": "AS38097",
     "SKINARK LTD": "AS209363",
     "SKN Subnet & Telecom": "AS402253",
     "SLA Network LLC": "AS402665",
@@ -2661,7 +2661,11 @@
     "Limited Liability Company Izet Telecom Ural": "AS41925",
     "Siberfy": "AS135598",
     "SIBERFY (PRIVATE) LIMITED": "AS135598",
-    "INTERRA telecommunications group, Ltd.": "AS48524"
+    "INTERRA telecommunications group, Ltd.": "AS48524",
+    "SUPERLOOP (AUSTRALIA) PTY LTD": "AS38195",
+    "INHA UNIVERSITY": "AS9317",
+    "China Unicom Guangdong province network": "AS17623",
+    "Flynet Ltd": "AS49711"
   },
   "asn_to_isp": {
     "AS10001": "Mics Network Corporation",
@@ -5203,7 +5207,12 @@
     "AS138524": "Triple T Broadband Public Company Limited",
     "AS41925": "Limited Liability Company Izet Telecom Ural",
     "AS135598": "Siberfy",
-    "AS48524": "INTERRA telecommunications group, Ltd."
+    "AS48524": "INTERRA telecommunications group, Ltd.",
+    "AS38195": "SUPERLOOP (AUSTRALIA) PTY LTD",
+    "AS38097": "SK Broadband Co Ltd",
+    "AS9317": "INHA UNIVERSITY",
+    "AS17623": "China Unicom Guangdong province network",
+    "AS49711": "Flynet Ltd"
   },
   "asn_to_net_type": {
     "AS10001": "isp",
@@ -7749,7 +7758,7 @@
     "AS402629": "business",
     "AS402665": "datacenter",
     "AS402681": "datacenter",
-    "AS402705": "datacenter",
+    "AS402705": "isp",
     "AS402737": "datacenter",
     "AS402799": "datacenter",
     "AS40509": "datacenter",
@@ -8750,6 +8759,11 @@
     "AS136531": "datacenter",
     "AS17857": "isp",
     "AS135598": "datacenter",
-    "AS48524": "isp"
+    "AS48524": "isp",
+    "AS38195": "isp",
+    "AS38097": "isp",
+    "AS9317": "education",
+    "AS17623": "isp",
+    "AS49711": "datacenter"
   }
 }

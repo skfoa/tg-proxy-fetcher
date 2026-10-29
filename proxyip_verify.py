@@ -67,6 +67,8 @@ from providers import (
     atomic_write_text,
     atomic_write_json,
     probe_check_proxyip_api,
+    is_asn_recorded,
+    auto_enrich_and_save_asns,
 )
 
 # 确保本地 .env 加载
@@ -370,9 +372,10 @@ def save_proxyip(
     rows.sort(key=_sort_key)
 
     for row in rows:
-        row["asn"] = format_asn_isp(row.get("asn", ""), row.get("isp", ""))
-        if not row.get("net_type"):
-            row["net_type"] = classify_asn(row.get("asn", ""), row.get("isp", ""))
+        exit_asn = row.get("exit_asn") or row.get("asn", "")
+        exit_isp = row.get("exit_isp") or row.get("isp", "")
+        row["asn"] = format_asn_isp(exit_asn or row.get("asn", ""), exit_isp or row.get("isp", ""))
+        row["net_type"] = classify_asn(exit_asn, exit_isp) or row.get("net_type", "datacenter")
         row.setdefault("exit_ip", "")
 
     with atomic_writer(csv_path, encoding="utf-8-sig", newline="") as f:
@@ -470,6 +473,8 @@ async def verify_proxyips(
                     if exit_asn:
                         row["asn"] = format_asn_isp(exit_asn, exit_isp)
                         row["isp"] = exit_isp
+                        if not is_asn_recorded(exit_asn):
+                            auto_enrich_and_save_asns([{"asn": exit_asn, "isp": exit_isp, "ip": exit_ip or ip}])
                         row["net_type"] = classify_asn(exit_asn, exit_isp)
             else:
                 local_checked_cnt += 1

@@ -97,6 +97,9 @@ jobs:
           CHECK_PROXYIP_URL: ${{ inputs.check_proxyip_url || vars.CHECK_PROXYIP_URL || secrets.CHECK_PROXYIP_URL || '' }}
         run: python cf_verify.py --concurrency 250 --max-fails 3 --timeout 3.0
 
+      - name: 🔄 全量数据自动化属性校准闭环
+        run: python providers.py --calibrate
+
       - name: 🚨 任务失败告警推送
         if: failure()
         continue-on-error: true

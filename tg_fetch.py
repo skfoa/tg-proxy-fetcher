@@ -43,7 +43,6 @@ START_TIME = time.time()
 TZ_BJT = timezone(timedelta(hours=8))
 
 # ================= 配置区域 =================
-import providers
 from providers import (
     load_dotenv,
     safe_int,
@@ -71,16 +70,12 @@ from providers import (
     load_ip_cache,
     prune_ip_cache,
     LEGACY_DEFAULT_FIRST_SEEN,
-    AUTHORITATIVE_CLOUD_ASNS,
-    load_asn_database,
-    save_asn_database,
-    resolve_asn_online,
-    resolve_asn_name_online,
     atomic_writer,
     atomic_write_text,
     atomic_write_json,
     CHECK_PROXYIP_URL,
     probe_check_proxyip_api,
+    auto_enrich_and_save_asns,
 )
 from parsers import (
     extract_proxies,
@@ -429,14 +424,21 @@ def classify_node_proxyip_or_scan(item: dict, ip_cache: dict) -> tuple[bool, str
 def load_existing_proxies(
     filepath: str = OUTPUT_PROXY_FILE,
     csv_path: str = OUTPUT_PROXIES_CSV,
+    proxies_dir: str = OUTPUT_PROXIES_DIR,
 ) -> dict:
-    """读取本地已保存的代理列表，保留历史累积有效节点及其首次收录时间与质检元数据"""
+    """
+    读取本地已保存的代理列表，保留历史累积有效节点及其首次收录时间与质检元数据。
+    全面对齐 proxies_verify 架构，360° 全量合并 proxies.csv、proxies.txt 及 proxies/ 子目录下各单协议文件。
+    """
     existing = {}
     csv_meta_by_url = {}
     csv_meta_by_key = {}
-    if os.path.isfile(csv_path):
+
+    def _ingest_csv(path: str):
+        if not os.path.isfile(path):
+            return
         try:
-            with open(csv_path, "r", encoding="utf-8-sig") as f:
+            with open(path, "r", encoding="utf-8-sig") as f:
                 reader = csv.DictReader(f)
                 for r in reader:
                     u = (r.get("url") or "").strip()
@@ -456,9 +458,9 @@ def load_existing_proxies(
                         "net_type": r.get("net_type", ""),
                         "source": (r.get("source") or "").strip(),
                     }
-                    csv_meta_by_url[u] = meta
+                    if u not in csv_meta_by_url:
+                        csv_meta_by_url[u] = meta
                     for _, key in extract_proxies(u):
-                        # 若同 key 在 CSV 中存在多行历史记录，优选健康度更高 (fail_count 更低) 或更新 (first_seen 更近) 的记录
                         if key not in csv_meta_by_key:
                             csv_meta_by_key[key] = meta
                         else:
@@ -468,12 +470,21 @@ def load_existing_proxies(
                             ):
                                 csv_meta_by_key[key] = meta
         except Exception as e:
-            log.warning("读取已有代理 CSV 失败: %s", e)
+            log.warning("读取已有代理 CSV %s 失败: %s", path, e)
 
-    # 1. 优先加载墓碑黑名单
+    # 1. 读取总表 proxies.csv
+    _ingest_csv(csv_path)
+
+    # 2. 扫描合并 data/proxies/ 子目录各单协议 CSV（如 sstp.csv, socks5.csv 等，防止遗漏）
+    if proxies_dir and os.path.isdir(proxies_dir):
+        for fname in sorted(os.listdir(proxies_dir)):
+            if fname.endswith(".csv"):
+                _ingest_csv(os.path.join(proxies_dir, fname))
+
+    # 3. 优先加载墓碑黑名单
     tombstone = load_tombstone()
 
-    # 2. 兜底回填：若 proxies.txt 缺失但 proxies.csv 存在，直接从 CSV 索引反解并严格过滤墓地
+    # 4. 兜底回填：若 proxies.txt 缺失但 CSV 索引存在，直接从 CSV 索引反解并严格过滤墓地
     if not os.path.exists(filepath):
         if csv_meta_by_key:
             for key, meta in csv_meta_by_key.items():
@@ -494,40 +505,52 @@ def load_existing_proxies(
                     }
             if not existing and csv_meta_by_url:
                 log.warning(
-                    "本地 %s 缺失，且 %s 中读取的 %d 条记录全部命中墓碑或未匹配到有效 host:port (可能含未识别格式/IPv6)",
-                    filepath, csv_path, len(csv_meta_by_url)
+                    "本地 %s 缺失，且 CSV 中读取的 %d 条记录全部命中墓碑或未匹配到有效 host:port",
+                    filepath, len(csv_meta_by_url)
                 )
             else:
-                log.info("本地 %s 缺失，已从 %s 兜底恢复有效代理节点: %d 个 (已执行墓碑过滤)", filepath, csv_path, len(existing))
+                log.info("本地 %s 缺失，已从 CSV 兜底恢复有效代理节点: %d 个 (已执行墓碑过滤)", filepath, len(existing))
         return existing
 
-    # 3. 正常读取 proxies.txt，优先按 canonical key (host:port) 关联 CSV 质检元数据
-    try:
-        with open(filepath, "r", encoding="utf-8") as f:
-            for line in f:
-                line_s = line.strip()
-                if not line_s or line_s.startswith("#"):
-                    continue
-                for url, key in extract_proxies(line_s):
-                    if not is_tombstoned(key, tombstone):
-                        meta = csv_meta_by_key.get(key) or csv_meta_by_url.get(url, {})
-                        existing[key] = {
-                            "url": url,
-                            "first_seen": meta.get("first_seen", LEGACY_DEFAULT_FIRST_SEEN),
-                            "fail_count": meta.get("fail_count", 0),
-                            "delay_ms": meta.get("delay_ms", 0),
-                            "status": meta.get("status", "pending"),
-                            "colo": meta.get("colo", ""),
-                            "country": meta.get("country", ""),
-                            "egress_ip": meta.get("egress_ip", ""),
-                            "asn": meta.get("asn", ""),
-                            "isp": meta.get("isp", ""),
-                            "net_type": meta.get("net_type", ""),
-                            "source": meta.get("source", ""),
-                        }
-        log.info("已加载本地已存代理节点: %d 个（历史有效节点全部保留）", len(existing))
-    except Exception as e:
-        log.warning("读取已有代理文件失败: %s", e)
+    # 5. 正常读取 proxies.txt，优先按 canonical key (host:port) 关联 CSV 质检元数据
+    def _ingest_txt(path: str):
+        if not os.path.isfile(path):
+            return
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                for line in f:
+                    line_s = line.strip()
+                    if not line_s or line_s.startswith("#"):
+                        continue
+                    for url, key in extract_proxies(line_s):
+                        if not is_tombstoned(key, tombstone) and key not in existing:
+                            meta = csv_meta_by_key.get(key) or csv_meta_by_url.get(url, {})
+                            existing[key] = {
+                                "url": url,
+                                "first_seen": meta.get("first_seen", LEGACY_DEFAULT_FIRST_SEEN),
+                                "fail_count": meta.get("fail_count", 0),
+                                "delay_ms": meta.get("delay_ms", 0),
+                                "status": meta.get("status", "pending"),
+                                "colo": meta.get("colo", ""),
+                                "country": meta.get("country", ""),
+                                "egress_ip": meta.get("egress_ip", ""),
+                                "asn": meta.get("asn", ""),
+                                "isp": meta.get("isp", ""),
+                                "net_type": meta.get("net_type", ""),
+                                "source": meta.get("source", ""),
+                            }
+        except Exception as e:
+            log.warning("读取已有代理文本 %s 失败: %s", path, e)
+
+    _ingest_txt(filepath)
+
+    # 6. 扫描合并 data/proxies/ 子目录各独立单协议 txt（如 sstp.txt 等）
+    if proxies_dir and os.path.isdir(proxies_dir):
+        for fname in sorted(os.listdir(proxies_dir)):
+            if fname.endswith(".txt"):
+                _ingest_txt(os.path.join(proxies_dir, fname))
+
+    log.info("已加载本地已存代理节点: %d 个（含 proxies/ 子目录协议文件，历史有效节点全部保留）", len(existing))
     return existing
 
 
@@ -770,113 +793,8 @@ def fetch_external_subscriptions(
     return total_added
 
 
-def auto_enrich_and_save_asns(unrecorded_items: list[dict], proxy: str = "") -> int:
-    """
-    针对自带 ASN / 组织机构属性的数据源（如 EDT-Pages、测速扫描附件等）：
-    在抓取阶段直接自动完成网络类型属性分类并持久化入库到 data/asn_database.json。
-    对于裸 IP（如 Telegram 频道提取的裸节点），保持在抓取阶段不作处理，交由质检阶段在线反查入库。
+# 注：auto_enrich_and_save_asns 已提升至 providers.py 全局权威单例导出
 
-    工程保障：
-    1. 【严格幂等性】：内存字典去重 + is_asn_recorded 检查 + JSON 对象键覆盖，多次调用与多轮定时任务绝不产生重复条目或频繁写盘。
-    2. 【全链路异常隔离】：单条记录解析异常、正则不匹配、在线反查超时、写盘异常均被完全隔离捕获，记录日志后安全跳过，绝不中断抓取主流程。
-    3. 【云厂商 SSOT 保护】：若传入的 ASN 属于内置权威已知云厂商（如 AWS、Cloudflare、阿里云、腾讯云等），强制维持权威标准名称与 datacenter 属性，绝对禁止外部数据篡改。
-    """
-    if not unrecorded_items:
-        return 0
-
-    try:
-        to_save_map: dict[str, dict] = {}
-        for item in unrecorded_items:
-            try:
-                if not isinstance(item, dict):
-                    continue
-                raw_asn = str(item.get("asn") or "").strip()
-                raw_isp = str(item.get("isp") or item.get("org") or "").strip()
-                code = _extract_asn_code(raw_asn, raw_isp)
-                if not code or not re.match(r"^AS\d+$", code) or code == "AS0":
-                    continue
-
-                # 云厂商 SSOT 保护：若命中内置权威已知云厂商，坚决维持权威定义，直接跳过并拒绝外部污染
-                if code in AUTHORITATIVE_CLOUD_ASNS:
-                    log.debug("ASN %s 命中权威已知云厂商 SSOT 锁定列表，维持权威名称 %s，忽略外部标签: %s", code, AUTHORITATIVE_CLOUD_ASNS[code], raw_isp)
-                    continue
-
-                # 幂等性快速短路：若本地权威库已收录，直接跳过
-                if is_asn_recorded(code):
-                    continue
-
-                org = re.sub(r"^AS\d+\s*", "", raw_isp, flags=re.IGNORECASE).strip()
-                sample_ip = str(item.get("ip") or "").strip()
-
-                # 权威交叉校验与反查纠偏：对全新收录的自治系统，主动反查官方 RIR/BGP 权威名称，杜绝第三方源错标污染
-                authoritative_name = ""
-                try:
-                    authoritative_name = resolve_asn_name_online(code, proxy=proxy, timeout=5.0)
-                except Exception as auth_err:
-                    log.debug("反查 ASN %s 权威机构名称异常 (已安全跳过): %s", code, auth_err)
-
-                if authoritative_name:
-                    if org and org.lower() != authoritative_name.lower():
-                        log.info("【ASN 权威防错标纠偏】ASN %s 外部标签 '%s' 与官方权威 '%s' 不符，自动以官方权威为准入库", code, org, authoritative_name)
-                    org = authoritative_name
-                elif not org and sample_ip and is_valid_host(sample_ip):
-                    # 若权威接口未返回且自身缺失组织名，尝试用公网 IP 进行反查
-                    try:
-                        resolved_code, resolved_isp = resolve_asn_online(sample_ip)
-                        if resolved_code == code and resolved_isp:
-                            org = resolved_isp
-                    except Exception as resolve_err:
-                        log.debug("尝试在线反查缺失组织名的 ASN %s 失败 (已安全跳过反查): %s", code, resolve_err)
-
-                net_type = item.get("net_type") or classify_asn(code, org)
-                if code not in to_save_map:
-                    to_save_map[code] = {
-                        "asn": code,
-                        "isp": org,
-                        "net_type": net_type,
-                    }
-                if org:
-                    item["org"] = org
-                    item["isp"] = org
-            except Exception as item_err:
-                log.debug("解析单条未收录 ASN 条目发生异常 (已隔离跳过): %s (%s)", item, item_err)
-                continue
-
-        if not to_save_map:
-            return 0
-
-        i2a, a2i, a2nt = load_asn_database()
-        added_count = 0
-        for code, info in to_save_map.items():
-            # 再次确认 SSOT 保护
-            if code in AUTHORITATIVE_CLOUD_ASNS:
-                continue
-            org = info["isp"]
-            n_type = info["net_type"]
-            if code not in a2nt:
-                a2nt[code] = n_type
-                added_count += 1
-            if org:
-                if code not in a2i:
-                    a2i[code] = org
-                if org not in i2a:
-                    i2a[org] = code
-
-        if added_count > 0:
-            save_asn_database(i2a, a2i, a2nt)
-            # 同步更新内存运行时 SSOT 字典与 Fast-path
-            ASN_TO_PROVIDER.update(a2i)
-            if hasattr(providers, "ASN_DATABASE_ASN_TO_NET_TYPE"):
-                providers.ASN_DATABASE_ASN_TO_NET_TYPE.update(a2nt)
-            if hasattr(providers, "ASN_EXACT_NET_TYPE"):
-                providers.ASN_EXACT_NET_TYPE.update(a2nt)
-
-            sample_str = ", ".join(f"{c}[{info['net_type']}]" for c, info in list(to_save_map.items())[:6])
-            log.info("【批量自动持久化新 ASN】从自带源提取 %d 个全新自治系统并原子写入数据库: %s", added_count, sample_str)
-        return added_count
-    except Exception:
-        log.exception("【自动收录新 ASN】执行异常（已安全隔离，抓取主流程继续正常执行）")
-        return 0
 
 
 def fetch_edt_proxies(
@@ -1478,6 +1396,9 @@ def save_and_notify(
 ):
     # 1. 保存通用代理总表（proxies.txt）并按协议独立拆分（原子写入）
     os.makedirs(DATA_DIR, exist_ok=True)
+    for p in final_proxies.values():
+        if isinstance(p, dict) and (p.get("asn") or p.get("isp")):
+            p["net_type"] = classify_asn(p.get("asn", ""), p.get("isp", "")) or p.get("net_type", "")
     formatted_proxies = format_proxies_txt(list(final_proxies.values()))
     atomic_write_text(OUTPUT_PROXY_FILE, formatted_proxies)
     log.info("已按协议分段保存通用代理总文件: %s (%d 个全量累积节点)", OUTPUT_PROXY_FILE, len(final_proxies))
@@ -1594,8 +1515,7 @@ def save_and_notify(
             for row in sorted_proxyips:
                 row.setdefault("fail_count", 0)
                 row["asn"] = format_asn_isp(row.get("asn", ""), row.get("isp", ""))
-                if not row.get("net_type"):
-                    row["net_type"] = classify_asn(row.get("asn", ""), row.get("isp", ""))
+                row["net_type"] = classify_asn(row.get("exit_asn") or row.get("asn", ""), row.get("exit_isp") or row.get("isp", "")) or row.get("net_type", "datacenter")
                 row.setdefault("exit_ip", "")
                 writer.writerow(row)
         log.info("已保存反代 ProxyIP 表格: %s (%d 条全量累积记录)", OUTPUT_PROXYIP_FILE, len(sorted_proxyips))
@@ -1850,49 +1770,46 @@ def merge_and_save(
     unrecorded_net_types = {}
 
     for k, v in scraped_scan_ips.items():
-        if k not in existing_scan_ips:
-            c = _extract_asn_code(v.get("asn"), v.get("isp"))
-            if c and not is_asn_recorded(c):
-                unrecorded_counts[c] += 1
-                if c not in unrecorded_orgs:
-                    org = v.get("isp") or v.get("asn") or ""
-                    org = re.sub(r"^AS\d+\s*", "", org, flags=re.IGNORECASE).strip()
-                    unrecorded_orgs[c] = org
-                if c not in unrecorded_ips:
-                    unrecorded_ips[c] = v.get("ip") or (k.split(":")[0] if ":" in k else "")
-                if c not in unrecorded_net_types:
-                    unrecorded_net_types[c] = v.get("net_type") or ""
+        c = _extract_asn_code(v.get("asn"), v.get("isp"))
+        if c and not is_asn_recorded(c):
+            unrecorded_counts[c] += 1
+            if c not in unrecorded_orgs:
+                org = v.get("isp") or v.get("asn") or ""
+                org = re.sub(r"^AS\d+\s*", "", org, flags=re.IGNORECASE).strip()
+                unrecorded_orgs[c] = org
+            if c not in unrecorded_ips:
+                unrecorded_ips[c] = v.get("ip") or (k.split(":")[0] if ":" in k else "")
+            if c not in unrecorded_net_types:
+                unrecorded_net_types[c] = v.get("net_type") or ""
 
     for k, v in scraped_cf_ips.items():
-        if k not in existing_cf_ips:
-            c = _extract_asn_code(v.get("asn"), v.get("isp"))
-            if c and not is_asn_recorded(c):
-                unrecorded_counts[c] += 1
-                if c not in unrecorded_orgs:
-                    org = v.get("isp") or v.get("asn") or ""
-                    org = re.sub(r"^AS\d+\s*", "", org, flags=re.IGNORECASE).strip()
-                    unrecorded_orgs[c] = org
-                if c not in unrecorded_ips:
-                    unrecorded_ips[c] = v.get("ip") or (k.split(":")[0] if ":" in k else "")
-                if c not in unrecorded_net_types:
-                    unrecorded_net_types[c] = v.get("net_type") or ""
+        c = _extract_asn_code(v.get("asn"), v.get("isp"))
+        if c and not is_asn_recorded(c):
+            unrecorded_counts[c] += 1
+            if c not in unrecorded_orgs:
+                org = v.get("isp") or v.get("asn") or ""
+                org = re.sub(r"^AS\d+\s*", "", org, flags=re.IGNORECASE).strip()
+                unrecorded_orgs[c] = org
+            if c not in unrecorded_ips:
+                unrecorded_ips[c] = v.get("ip") or (k.split(":")[0] if ":" in k else "")
+            if c not in unrecorded_net_types:
+                unrecorded_net_types[c] = v.get("net_type") or ""
 
     for k, v in scraped_proxyips.items():
-        if k not in existing_proxyips:
-            c = _extract_asn_code(v.get("asn"), v.get("isp"))
-            if c and not is_asn_recorded(c):
-                unrecorded_counts[c] += 1
-                if c not in unrecorded_orgs:
-                    org = v.get("isp") or v.get("asn") or ""
-                    org = re.sub(r"^AS\d+\s*", "", org, flags=re.IGNORECASE).strip()
-                    unrecorded_orgs[c] = org
-                if c not in unrecorded_ips:
-                    unrecorded_ips[c] = v.get("ip") or (k.split(":")[0] if ":" in k else "")
-                if c not in unrecorded_net_types:
-                    unrecorded_net_types[c] = v.get("net_type") or ""
+        c = _extract_asn_code(v.get("asn"), v.get("isp"))
+        if c and not is_asn_recorded(c):
+            unrecorded_counts[c] += 1
+            if c not in unrecorded_orgs:
+                org = v.get("isp") or v.get("asn") or ""
+                org = re.sub(r"^AS\d+\s*", "", org, flags=re.IGNORECASE).strip()
+                unrecorded_orgs[c] = org
+            if c not in unrecorded_ips:
+                unrecorded_ips[c] = v.get("ip") or (k.split(":")[0] if ":" in k else "")
+            if c not in unrecorded_net_types:
+                unrecorded_net_types[c] = v.get("net_type") or ""
 
     for k, v in scraped_proxies.items():
-        if k not in existing_proxies and isinstance(v, dict):
+        if isinstance(v, dict):
             c = _extract_asn_code(v.get("asn"), v.get("isp"))
             if c and not is_asn_recorded(c):
                 unrecorded_counts[c] += 1

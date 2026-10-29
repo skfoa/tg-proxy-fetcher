@@ -154,7 +154,7 @@ sstp://vpn:vpn@vpn742486003.opengw.net:1427,sstp,vpn742486003.opengw.net,1427,35
 sstp://vpn:vpn@vpn493435183.opengw.net:1808,sstp,vpn493435183.opengw.net,1808,3532,0,alive,-,KR,211.226.71.219,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-15 12:44:41,vpngate
 sstp://vpn:vpn@vpn456065584.opengw.net:1511,sstp,vpn456065584.opengw.net,1511,3532,0,alive,-,JP,114.180.104.207,"AS4713 NTT Communications Corporation (NTT DOCOMO BUSINESS,Inc.)","NTT DOCOMO BUSINESS,Inc.",isp,2026-10-14 12:57:52,vpngate
 sstp://vpn:vpn@vpn624984613.opengw.net:995,sstp,vpn624984613.opengw.net,995,3534,0,alive,-,KR,112.187.218.114,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-20 12:55:22,vpngate
-sstp://vpn:vpn@vpn759761201.opengw.net:1521,sstp,vpn759761201.opengw.net,1521,3538,0,alive,-,AU,125.253.56.120,AS38195 SUPERLOOP PTY LTD,SUPERLOOP (AUSTRALIA) PTY LTD,isp,2026-10-21 15:52:42,vpngate
+sstp://vpn:vpn@vpn759761201.opengw.net:1521,sstp,vpn759761201.opengw.net,1521,3538,0,alive,-,AU,125.253.56.120,AS38195 SUPERLOOP (AUSTRALIA) PTY LTD,SUPERLOOP (AUSTRALIA) PTY LTD,isp,2026-10-21 15:52:42,vpngate
 sstp://vpn:vpn@vpn169225991.opengw.net:995,sstp,vpn169225991.opengw.net,995,3542,0,alive,-,KR,125.240.231.54,AS17858 LG POWERCOMM,LG POWERCOMM,isp,2026-10-19 12:45:55,vpngate
 sstp://vpn:vpn@vpn799731089.opengw.net:995,sstp,vpn799731089.opengw.net,995,3548,0,alive,-,KR,121.152.84.15,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-08 14:09:40,vpngate
 sstp://vpn:vpn@vpn419698713.opengw.net:995,sstp,vpn419698713.opengw.net,995,3556,0,alive,-,KR,59.19.145.132,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-04 23:17:15,vpngate

@@ -2362,12 +2362,12 @@ def format_proxy_json_item(r_dict: dict) -> dict:
     isp_name = str(r_dict.get("isp") or "").strip()
     proto = str(r_dict.get("proto") or "socks5").strip().lower()
 
-    # net_type：优先继承已打标的合规 net_type；若缺失则基于 ASN/ISP 判定；若完全未查询则留空，绝不虚假打标为 datacenter
+    # net_type：优先依据自治系统权威研判 (SSOT) 实时核算，杜绝陈旧属性污染；无 ASN/ISP 时继承合规值，完全未查询则留空
     curr_nt = str(r_dict.get("net_type") or "").strip().lower()
-    if curr_nt in VALID_NET_TYPES:
+    if clean_asn_num or isp_name:
+        net_type_val = classify_asn(clean_asn_num, isp_name) or (curr_nt if curr_nt in VALID_NET_TYPES else "")
+    elif curr_nt in VALID_NET_TYPES:
         net_type_val = curr_nt
-    elif clean_asn_num or isp_name:
-        net_type_val = classify_asn(clean_asn_num, isp_name)
     else:
         net_type_val = ""
 
@@ -2437,7 +2437,12 @@ def save_proxies_by_protocol(rows: list, output_dir: str = "data/proxies") -> di
         row_dict.setdefault("egress_ip", row_dict.get("egress_ip", ""))
         row_dict.setdefault("asn", row_dict.get("asn", ""))
         row_dict.setdefault("isp", row_dict.get("isp", ""))
-        row_dict.setdefault("net_type", row_dict.get("net_type", ""))
+        asn_str = row_dict.get("asn", "")
+        isp_str = row_dict.get("isp", "")
+        if asn_str or isp_str:
+            row_dict["net_type"] = classify_asn(asn_str, isp_str) or row_dict.get("net_type", "")
+        else:
+            row_dict.setdefault("net_type", row_dict.get("net_type", ""))
         row_dict.setdefault("first_seen", row_dict.get("first_seen", "") or LEGACY_DEFAULT_FIRST_SEEN)
         row_dict.setdefault("source", str(row_dict.get("source") or "").strip())
 
@@ -2545,7 +2550,12 @@ def save_proxies_csv(rows: list, csv_path: str = "data/proxies.csv") -> int:
         row_dict.setdefault("egress_ip", row_dict.get("egress_ip", ""))
         row_dict.setdefault("asn", row_dict.get("asn", ""))
         row_dict.setdefault("isp", row_dict.get("isp", ""))
-        row_dict.setdefault("net_type", row_dict.get("net_type", ""))
+        asn_str = row_dict.get("asn", "")
+        isp_str = row_dict.get("isp", "")
+        if asn_str or isp_str:
+            row_dict["net_type"] = classify_asn(asn_str, isp_str) or row_dict.get("net_type", "")
+        else:
+            row_dict.setdefault("net_type", row_dict.get("net_type", ""))
         row_dict.setdefault("first_seen", row_dict.get("first_seen", "") or LEGACY_DEFAULT_FIRST_SEEN)
         row_dict.setdefault("source", str(row_dict.get("source") or "").strip())
 
@@ -2636,7 +2646,8 @@ BIZ_PATTERNS = (
 ISP_RES_PATTERNS = (
     "residential", "consumer broadband", "ftth", "fiber to the home", "adsl customer", "cable internet",
     "broadband",
-    "cable tv", "cable corporation", "wisp", "wireless multi service",
+    "cable tv", "cable television", "cable corporation", "wisp", "wireless multi service",
+    "telecommunication", "telecommunications",
     "odido", "wisper", "inalan", "radiokomunikace", "radiografica", "informsvyaz", "bashinformsvyaz",
     "superloop", "hyperoptic", "viewqwest", "wyyerd",
     "sony network", "chubu telecom", "internet initiative", "optage", "eo hikari",
@@ -2836,14 +2847,11 @@ def save_proxyip_by_country(rows: list, output_dir: str) -> int:
         country = extract_country(r.get("cf_location"), r.get("colo"))
         groups.setdefault(country, []).append(r)
 
-        # 优先使用节点已认定的生效网络类型 (出口定性)，缺失时回退到权威研判
-        nt = r.get("net_type")
-        if not nt:
-            if r.get("exit_asn") or r.get("exit_isp"):
-                nt = classify_asn(r.get("exit_asn"), r.get("exit_isp"))
-            if not nt:
-                nt = classify_asn(r.get("asn", ""), r.get("isp", ""))
-            r["net_type"] = nt
+        # 始终依据出口真实 ASN 与权威研判实时校准网络类型，确保分流分类 100% 准确
+        exit_asn = r.get("exit_asn") or r.get("asn", "")
+        exit_isp = r.get("exit_isp") or r.get("isp", "")
+        nt = classify_asn(exit_asn, exit_isp) or r.get("net_type", "datacenter")
+        r["net_type"] = nt
         if nt in SPECIAL_NET_TYPE_FILES:
             type_groups.setdefault(nt, []).append(r)
 
@@ -3002,6 +3010,265 @@ def save_scan_ips_by_asn(asn_groups: dict, output_dir: str, min_nodes: int = 5) 
 
 # 兼容别名
 save_scan_dir = save_scan_ips_by_asn
+
+
+def auto_enrich_and_save_asns(unrecorded_items: list[dict], proxy: str = "") -> int:
+    """
+    针对自带 ASN / 组织机构属性的数据源（如 EDT-Pages、测速扫描附件、质检在线反查等）：
+    在全链路各阶段自动完成网络类型属性分类并持久化入库到 data/asn_database.json。
+
+    工程保障：
+    1. 【严格幂等性】：内存字典去重 + is_asn_recorded 检查 + JSON 对象键覆盖，多次调用绝不产生重复条目或频繁写盘。
+    2. 【全链路异常隔离】：单条记录解析异常、正则不匹配、在线反查超时、写盘异常均被完全隔离捕获，绝不中断调用方主流程。
+    3. 【云厂商 SSOT 保护】：若传入的 ASN 属于内置权威已知云厂商，强制维持权威标准名称与 datacenter 属性，绝对禁止外部数据篡改。
+    4. 【LRU 缓存实时自愈】：写盘入库后同步更新运行时字典与 fast-path，并主动清空 classify_asn LRU 缓存，保证后续判定即时生效。
+    """
+    if not unrecorded_items:
+        return 0
+
+    try:
+        to_save_map: dict[str, dict] = {}
+        for item in unrecorded_items:
+            try:
+                if not isinstance(item, dict):
+                    continue
+                raw_asn = str(item.get("asn") or "").strip()
+                raw_isp = str(item.get("isp") or item.get("org") or "").strip()
+                code = _extract_asn_code(raw_asn, raw_isp)
+                if not code or not re.match(r"^AS\d+$", code) or code == "AS0":
+                    continue
+
+                # 云厂商 SSOT 保护：若命中内置权威已知云厂商，坚决维持权威定义，直接跳过并拒绝外部污染
+                if code in AUTHORITATIVE_CLOUD_ASNS:
+                    log.debug("ASN %s 命中权威已知云厂商 SSOT 锁定列表，维持权威名称 %s，忽略外部标签: %s", code, AUTHORITATIVE_CLOUD_ASNS[code], raw_isp)
+                    continue
+
+                # 幂等性快速短路：若本地权威库已收录且已有明确网络类型，直接跳过
+                if is_asn_recorded(code):
+                    continue
+
+                org = re.sub(r"^AS\d+\s*", "", raw_isp, flags=re.IGNORECASE).strip()
+                sample_ip = str(item.get("ip") or "").strip()
+
+                # 权威交叉校验与反查纠偏：对全新收录的自治系统，主动反查官方 RIR/BGP 权威名称，杜绝第三方源错标污染
+                authoritative_name = ""
+                try:
+                    authoritative_name = resolve_asn_name_online(code, proxy=proxy, timeout=5.0)
+                except Exception as auth_err:
+                    log.debug("反查 ASN %s 权威机构名称异常 (已安全跳过): %s", code, auth_err)
+
+                if authoritative_name:
+                    if org and org.lower() != authoritative_name.lower():
+                        log.info("【ASN 权威防错标纠偏】ASN %s 外部标签 '%s' 与官方权威 '%s' 不符，自动以官方权威为准入库", code, org, authoritative_name)
+                    org = authoritative_name
+                elif not org and sample_ip and is_valid_public_ip(sample_ip):
+                    # 若权威接口未返回且自身缺失组织名，尝试用公网 IP 进行反查
+                    try:
+                        resolved_code, resolved_isp = resolve_asn_online(sample_ip)
+                        if resolved_code == code and resolved_isp:
+                            org = resolved_isp
+                    except Exception as resolve_err:
+                        log.debug("尝试在线反查缺失组织名的 ASN %s 失败 (已安全跳过反查): %s", code, resolve_err)
+
+                net_type = item.get("net_type") or classify_asn(code, org)
+                if code not in to_save_map:
+                    to_save_map[code] = {
+                        "asn": code,
+                        "isp": org,
+                        "net_type": net_type,
+                    }
+                if org:
+                    item["org"] = org
+                    item["isp"] = org
+            except Exception as item_err:
+                log.debug("解析单条未收录 ASN 条目发生异常 (已隔离跳过): %s (%s)", item, item_err)
+                continue
+
+        if not to_save_map:
+            return 0
+
+        i2a, a2i, a2nt = load_asn_database()
+        added_count = 0
+        for code, info in to_save_map.items():
+            if code in AUTHORITATIVE_CLOUD_ASNS:
+                continue
+            org = info["isp"]
+            n_type = info["net_type"]
+            if code not in a2nt:
+                a2nt[code] = n_type
+                added_count += 1
+            if org:
+                if code not in a2i:
+                    a2i[code] = org
+                if org not in i2a:
+                    i2a[org] = code
+
+        if added_count > 0:
+            save_asn_database(i2a, a2i, a2nt)
+            # 同步更新内存运行时 SSOT 字典与 Fast-path
+            ASN_TO_PROVIDER.update(a2i)
+            ASN_DATABASE_ASN_TO_ISP.update(a2i)
+            ASN_DATABASE_ASN_TO_NET_TYPE.update(a2nt)
+            ASN_EXACT_NET_TYPE.update(a2nt)
+            classify_asn.cache_clear()
+
+            sample_str = ", ".join(f"{c}[{info['net_type']}]" for c, info in list(to_save_map.items())[:6])
+            log.info("【批量自动持久化新 ASN】提取并持久化 %d 个全新自治系统并原子写入数据库: %s", added_count, sample_str)
+        return added_count
+    except Exception:
+        log.exception("【自动收录新 ASN】执行异常（已安全隔离，主流程继续正常执行）")
+        return 0
+
+
+def calibrate_all_datasets(
+    proxies_dir: str = "data/proxies",
+    proxies_csv_path: str = "data/proxies.csv",
+    proxyip_csv_path: str = "data/proxyip.csv",
+    proxyip_dir: str = "data/proxyip",
+    ip_cache_path: str = "data/ip_cache.json",
+    proxies_only: bool = False,
+) -> dict[str, int]:
+    """
+    全量数据自动化属性校准闭环引擎：
+    以 data/asn_database.json 与 classify_asn 为权威唯一真实来源 (SSOT)，
+    自动对整个项目中所有持久化数据文件执行网络属性与元数据校准同步：
+    1. 【ip_cache.json】：校准所有持久化 IP 缓存中的 net_type 与标准 ISP 名称
+    2. 【data/proxies/ 与 data/proxies.csv】：重新核算 net_type 与 ASN 标准格式，重新生成 .csv、.txt、.json
+    3. 【data/proxyip.csv & data/proxyip/】：重新校准 ProxyIP 属性，并自动重构【ISP_运营商原生宽带】.txt 等全部分流文件
+    返回各校准项变更计数统计字典。
+    """
+    # 0. 兜底扫描并自动收录所有数据集中可能遗漏的新 ASN
+    unrec_candidates = []
+    seen_unrec = set()
+    for ds_path in (proxies_csv_path, proxyip_csv_path):
+        if os.path.isfile(ds_path):
+            try:
+                with open(ds_path, "r", encoding="utf-8-sig") as f:
+                    for row in csv.DictReader(f):
+                        asn_val = row.get("exit_asn") or row.get("asn", "")
+                        isp_val = row.get("exit_isp") or row.get("isp", "")
+                        c = _extract_asn_code(asn_val, isp_val)
+                        if c and not is_asn_recorded(c) and c not in seen_unrec:
+                            seen_unrec.add(c)
+                            unrec_candidates.append({
+                                "asn": c,
+                                "isp": isp_val,
+                                "ip": row.get("exit_ip") or row.get("host") or row.get("ip", ""),
+                            })
+            except Exception:
+                pass
+    if unrec_candidates:
+        enriched_count = auto_enrich_and_save_asns(unrec_candidates)
+        if enriched_count > 0:
+            log.info("【全量校准】自动捕获并沉淀入库 %d 个未收录 ASN", enriched_count)
+            classify_asn.cache_clear()
+
+    classify_asn.cache_clear()
+    stats = {
+        "asns_enriched": len(unrec_candidates),
+        "ip_cache_updated": 0,
+        "proxies_csv_updated": 0,
+        "proxies_sub_updated": 0,
+        "proxyip_csv_updated": 0,
+        "proxyip_files_written": 0,
+    }
+
+    # 1. 校准 data/ip_cache.json
+    if os.path.isfile(ip_cache_path):
+        try:
+            cache = load_ip_cache()
+            updated_cache = 0
+            for ip, info in cache.items():
+                if not isinstance(info, dict):
+                    continue
+                asn = info.get("asn", "")
+                isp = info.get("isp", "")
+                if asn or isp:
+                    correct_nt = classify_asn(asn, isp)
+                    if correct_nt and info.get("net_type") != correct_nt:
+                        info["net_type"] = correct_nt
+                        updated_cache += 1
+            if updated_cache > 0:
+                save_ip_cache(cache, filepath=ip_cache_path, compact=True)
+                stats["ip_cache_updated"] = updated_cache
+                log.info("【全量校准】已校准 ip_cache.json 中 %d 个节点的网络属性", updated_cache)
+        except Exception as e:
+            log.warning("校准 ip_cache.json 异常: %s", e)
+
+    # 2. 校准 data/proxies.csv 与 data/proxies/
+    if os.path.isfile(proxies_csv_path):
+        try:
+            rows = []
+            with open(proxies_csv_path, "r", encoding="utf-8-sig") as f:
+                reader = csv.DictReader(f)
+                rows = list(reader)
+
+            changed_proxies = 0
+            for r in rows:
+                code = _extract_asn_code(r.get("asn"), r.get("isp"))
+                isp_val = r.get("isp") or ""
+                if code:
+                    std_isp = ASN_TO_PROVIDER.get(code) or ASN_DATABASE_ASN_TO_ISP.get(code) or isp_val
+                    if std_isp and not isp_val:
+                        r["isp"] = std_isp
+                    r["asn"] = format_asn_isp(code, r.get("isp", ""))
+                correct_nt = classify_asn(r.get("asn", ""), r.get("isp", ""))
+                if correct_nt and r.get("net_type") != correct_nt:
+                    r["net_type"] = correct_nt
+                    changed_proxies += 1
+
+            if changed_proxies > 0 or not proxies_only:
+                save_proxies_csv(rows, csv_path=proxies_csv_path)
+                stats["proxies_csv_updated"] = changed_proxies
+                if proxies_dir and os.path.isdir(proxies_dir):
+                    sub_counts = save_proxies_by_protocol(rows, output_dir=proxies_dir)
+                    stats["proxies_sub_updated"] = sum(sub_counts.values())
+                    log.info("【全量校准】已校准并在 %s/ 重建 %d 个协议节点 (更新 %d 条网络类型)", proxies_dir, sum(sub_counts.values()), changed_proxies)
+        except Exception as e:
+            log.warning("校准 proxies 数据异常: %s", e)
+
+    if proxies_only:
+        return stats
+
+    # 3. 校准 data/proxyip.csv 与 data/proxyip/
+    if os.path.isfile(proxyip_csv_path):
+        try:
+            proxyip_rows = []
+            with open(proxyip_csv_path, "r", encoding="utf-8-sig") as f:
+                reader = csv.DictReader(f)
+                proxyip_rows = list(reader)
+
+            changed_proxyip = 0
+            for r in proxyip_rows:
+                exit_asn = r.get("exit_asn") or r.get("asn", "")
+                exit_isp = r.get("exit_isp") or r.get("isp", "")
+                code = _extract_asn_code(exit_asn, exit_isp)
+                if code:
+                    std_isp = ASN_TO_PROVIDER.get(code) or ASN_DATABASE_ASN_TO_ISP.get(code) or exit_isp
+                    if std_isp and not exit_isp:
+                        r["isp"] = std_isp
+                    r["asn"] = format_asn_isp(code, r.get("isp", ""))
+                correct_nt = classify_asn(exit_asn, exit_isp)
+                if correct_nt and r.get("net_type") != correct_nt:
+                    r["net_type"] = correct_nt
+                    changed_proxyip += 1
+
+            if changed_proxyip > 0:
+                with atomic_writer(proxyip_csv_path, encoding="utf-8-sig", newline="") as f:
+                    writer = csv.DictWriter(f, fieldnames=list(proxyip_rows[0].keys()) if proxyip_rows else [], extrasaction="ignore")
+                    writer.writeheader()
+                    for r in proxyip_rows:
+                        writer.writerow(r)
+                stats["proxyip_csv_updated"] = changed_proxyip
+
+            if proxyip_dir and proxyip_rows:
+                written_files = save_proxyip_by_country(proxyip_rows, output_dir=proxyip_dir)
+                stats["proxyip_files_written"] = written_files
+                log.info("【全量校准】已校准 proxyip.csv (更新 %d 条网络类型)，并在 %s/ 生成 %d 个分流文件", changed_proxyip, proxyip_dir, written_files)
+        except Exception as e:
+            log.warning("校准 proxyip 数据异常: %s", e)
+
+    return stats
 
 
 # =====================================================================
@@ -3281,7 +3548,14 @@ def probe_check_proxyip_api(
 
 if __name__ == "__main__":
     import sys
-    if "--validate" in sys.argv or len(sys.argv) == 1:
+    if "--calibrate" in sys.argv:
+        print("[*] 正在执行全量数据自动化属性校准...")
+        cal_stats = calibrate_all_datasets()
+        print("[+] 全量校准执行完毕:")
+        for k, v in cal_stats.items():
+            print(f"  - {k}: {v}")
+        sys.exit(0)
+    elif "--validate" in sys.argv or len(sys.argv) == 1:
         errs, warns = validate_asn_database()
         if warns:
             print(f"[*] 检测到 {len(warns)} 条合法多业务线 (1对N) 自治域映射")

@@ -63,8 +63,12 @@ from providers import (
     save_scan_ips_by_asn as save_scan_dir,
     atomic_writer,
     atomic_write_text,
+    atomic_write_json,
     probe_check_proxyip_api,
     classify_asn,
+    is_asn_recorded,
+    auto_enrich_and_save_asns,
+    calibrate_all_datasets,
 )
 from proxyip_verify import (
     load_proxyip_csv,
@@ -608,7 +612,9 @@ def send_verify_notification(
             p_avg = fetch_stats.get("proxyip_avg_delay_ms", 0)
             p_status = f"✅ {p_pass} 存活" + format_buffer_badge(p_marked, buf_new=p_new, buf_rec=p_rec, f1=p_f1, f2=p_f2)
             p_avg_str = f" · ⚡ 均延 {p_avg}ms" if p_avg > 0 else ""
-            proxyip_line = f"🔀 <b>反代 ProxyIP</b>：<code>{p_surv}</code> 条 ({p_status}{p_avg_str})\n"
+            p_promoted = safe_int(fetch_stats.get("proxyip_promoted", 0), 0)
+            p_prom_str = f" · 🌟 晋升 +{p_promoted}" if p_promoted > 0 else ""
+            proxyip_line = f"🔀 <b>反代 ProxyIP</b>：<code>{p_surv}</code> 条 ({p_status}{p_prom_str}{p_avg_str})\n"
         elif proxyips_count > 0:
             proxyip_line = f"🔀 <b>反代 ProxyIP</b>：<code>{proxyips_count}</code> 条 ({format_diff(new_proxyips, updated_proxyips)})\n"
 
@@ -814,7 +820,13 @@ async def enrich_scan_ips_exits(
                     row["exit_location"] = " · ".join(loc_parts)
 
                 # 评估是否可晋升为 ProxyIP (非机房优质出口)
-                exit_nt = res.get("net_type") or classify_asn(res.get("exit_asn", ""), res.get("exit_isp", ""))
+                exit_asn = str(res.get("exit_asn") or "").strip()
+                exit_isp = str(res.get("exit_isp") or "").strip()
+                exit_ip = str(res.get("exit_ip") or "").strip()
+                if exit_asn and not is_asn_recorded(exit_asn):
+                    auto_enrich_and_save_asns([{"asn": exit_asn, "isp": exit_isp, "ip": exit_ip or ip}])
+
+                exit_nt = res.get("net_type") or classify_asn(exit_asn, exit_isp)
                 if exit_nt in ("isp", "business", "education", "government"):
                     promoted_proxyips.append({
                         "ip": ip,
@@ -844,7 +856,7 @@ async def enrich_scan_ips_exits(
         enriched_count,
     )
 
-    # 若有新晋升的 ProxyIP，自动合并写入 data/proxyip.csv
+    # 若有新晋升或更新出口画像的 ProxyIP，自动合并写入 data/proxyip.csv
     if promoted_proxyips and not dry_run:
         try:
             existing_proxyips = load_proxyip_csv(PROXYIP_CSV)
@@ -854,6 +866,7 @@ async def enrich_scan_ips_exits(
                 if (r.get("ip") or "").strip() and safe_int(r.get("port"), 0) > 0
             }
             new_promoted_cnt = 0
+            updated_promoted_cnt = 0
             for pr in promoted_proxyips:
                 k = canonical_key(pr["ip"], pr["port"])
                 if k not in existing_map:
@@ -862,17 +875,40 @@ async def enrich_scan_ips_exits(
                     new_promoted_cnt += 1
                 else:
                     ex = existing_map[k]
+                    updated = False
                     if not ex.get("exit_ip") and pr.get("exit_ip"):
                         ex["exit_ip"] = pr["exit_ip"]
                         ex["net_type"] = pr["net_type"]
-            if new_promoted_cnt > 0:
+                        updated = True
+                    if pr.get("asn") and (not ex.get("asn") or ex.get("net_type") != pr.get("net_type")):
+                        ex["asn"] = pr["asn"]
+                        if pr.get("isp"):
+                            ex["isp"] = pr["isp"]
+                        ex["net_type"] = pr["net_type"]
+                        updated = True
+                    if updated:
+                        updated_promoted_cnt += 1
+            if (new_promoted_cnt + updated_promoted_cnt) > 0:
                 save_proxyip(existing_proxyips, PROXYIP_CSV, PROXYIP_TXT, PROXYIP_DIR)
                 log.info(
-                    "🎉 [扫描优选 外部鉴真] 成功晋升 %d 个非机房高价值 ProxyIP 至 %s (当前 ProxyIP 总数: %d)",
+                    "🎉 [扫描优选 外部鉴真] 成功晋升 %d 个新节点，更新 %d 个存量节点画像至 %s (当前 ProxyIP 总数: %d)",
                     new_promoted_cnt,
+                    updated_promoted_cnt,
                     PROXYIP_CSV,
                     len(existing_proxyips),
                 )
+                if new_promoted_cnt > 0:
+                    fetch_stats_file = os.path.join(DATA_DIR, ".fetch_stats.json")
+                    if os.path.isfile(fetch_stats_file):
+                        try:
+                            with open(fetch_stats_file, "r", encoding="utf-8") as fs_f:
+                                fs_data = json.load(fs_f)
+                            fs_data["proxyip_survivors"] = fs_data.get("proxyip_survivors", 0) + new_promoted_cnt
+                            fs_data["proxyip_pass"] = fs_data.get("proxyip_pass", 0) + new_promoted_cnt
+                            fs_data["proxyip_promoted"] = fs_data.get("proxyip_promoted", 0) + new_promoted_cnt
+                            atomic_write_json(fetch_stats_file, fs_data)
+                        except Exception:
+                            pass
         except Exception as e:
             log.warning("晋升合并 ProxyIP 失败: %s", e)
 
@@ -1080,6 +1116,14 @@ async def async_main(args):
         scan_res["buf_new"],
         scan_res["buf_rec"],
     )
+
+    # 全链路终态属性校准闭环：在全流程结束前对全量数据集执行最终一致性校准
+    if not getattr(args, "dry_run", False):
+        try:
+            cal_stats = calibrate_all_datasets()
+            log.info("【全流程属性校准闭环】已完成最终一致性校准: %s", cal_stats)
+        except Exception as e:
+            log.warning("全流程终态校准异常: %s", e)
 
     if not getattr(args, "no_notify", False) and not getattr(args, "dry_run", False):
         send_verify_notification(

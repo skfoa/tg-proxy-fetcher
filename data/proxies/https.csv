@@ -144,19 +144,19 @@ https://190.128.253.82:8444,https,190.128.253.82,8444,701,0,alive,ASU,PY,190.128
 https://194.243.172.243:443,https,194.243.172.243,443,708,0,alive,MXP,IT,194.243.172.243,AS3269 Telecom Italia S.p.A.,Telecom Italia S.p.A.,isp,2026-10-15 10:08:09,EDT-Pages
 https://84.237.50.68:8444,https,84.237.50.68,8444,714,0,alive,DME,RU,84.237.50.68,AS3335 NSU,NSU,education,2026-10-15 10:08:09,EDT-Pages
 https://2.228.224.4:443,https,2.228.224.4,443,718,0,alive,FCO,IT,2.228.224.4,AS12874 Fastweb SpA,Fastweb SpA,isp,2026-10-15 10:08:09,EDT-Pages
-https://41.77.155.137:443,https,41.77.155.137,443,718,0,alive,CPT,ZA,41.77.155.137,AS32653 eNetworks Ltd,eNetworks (Pty) Ltd,isp,2026-10-25 16:44:06,@user
-https://41.77.152.84:443,https,41.77.152.84,443,720,0,alive,CPT,ZA,41.77.152.84,AS32653 eNetworks Ltd,eNetworks (Pty) Ltd,isp,2026-10-25 16:44:06,@user
-https://41.77.155.147:443,https,41.77.155.147,443,720,0,alive,CPT,ZA,41.77.155.147,AS32653 eNetworks Ltd,eNetworks (Pty) Ltd,isp,2026-10-25 16:44:06,@user
+https://41.77.155.137:443,https,41.77.155.137,443,718,0,alive,CPT,ZA,41.77.155.137,AS32653 eNetworks (Pty) Ltd,eNetworks (Pty) Ltd,isp,2026-10-25 16:44:06,@user
+https://41.77.152.84:443,https,41.77.152.84,443,720,0,alive,CPT,ZA,41.77.152.84,AS32653 eNetworks (Pty) Ltd,eNetworks (Pty) Ltd,isp,2026-10-25 16:44:06,@user
+https://41.77.155.147:443,https,41.77.155.147,443,720,0,alive,CPT,ZA,41.77.155.147,AS32653 eNetworks (Pty) Ltd,eNetworks (Pty) Ltd,isp,2026-10-25 16:44:06,@user
 https://213.207.132.2:9443,https,213.207.132.2,9443,727,0,alive,MRS,CY,213.207.132.9,AS15805 Epic Ltd,Epic Ltd,isp,2026-10-09 00:00:00,EDT-Pages
 https://201.217.148.180:443,https,201.217.148.180,443,728,0,alive,EZE,UY,201.217.148.180,AS6057 Administracion Nacional de Telecomunicaciones,Administracion Nacional de Telecomunicaciones,isp,2026-10-15 10:08:09,EDT-Pages
 https://91.146.45.78:443,https,91.146.45.78,443,730,0,alive,FRA,RU,91.146.45.78,AS3226 OOO NI,OOO NI,isp,2026-10-15 10:08:09,EDT-Pages
 https://41.77.155.164:443,https,41.77.155.164,443,736,0,alive,JNB,ZA,41.77.155.164,AS32653 eNetworks cc,eNetworks cc,isp,2026-10-15 10:08:09,EDT-Pages
 https://118.127.59.126:12443,https,118.127.59.126,12443,736,0,alive,MEL,AU,118.127.59.114,AS45671 Servers Australia Pty. Ltd,Servers Australia Pty. Ltd,isp,2026-10-25 16:44:06,@user
 https://5.158.70.34:443,https,5.158.70.34,443,738,0,alive,AMS,IT,5.158.70.34,AS199181 Orakom S.r.l.,Orakom S.r.l.,isp,2026-10-15 10:08:09,EDT-Pages
-https://41.77.152.91:443,https,41.77.152.91,443,741,0,alive,CPT,ZA,41.77.152.91,AS32653 eNetworks Ltd,eNetworks (Pty) Ltd,isp,2026-10-25 16:44:06,@user
+https://41.77.152.91:443,https,41.77.152.91,443,741,0,alive,CPT,ZA,41.77.152.91,AS32653 eNetworks (Pty) Ltd,eNetworks (Pty) Ltd,isp,2026-10-25 16:44:06,@user
 https://217.210.129.243:443,https,217.210.129.243,443,746,0,alive,CPH,SE,217.210.129.243,AS3301 Telia Company AB,Telia Company AB,isp,2026-10-09 00:00:00,EDT-Pages
 https://176.94.74.21:443,https,176.94.74.21,443,751,0,alive,FRA,DE,176.94.74.21,AS3209 Vodafone GmbH,Vodafone GmbH,isp,2026-10-09 00:00:00,EDT-Pages
-https://41.77.155.141:443,https,41.77.155.141,443,755,0,alive,CPT,ZA,41.77.155.141,AS32653 eNetworks Ltd,eNetworks (Pty) Ltd,isp,2026-10-25 16:44:06,@user
+https://41.77.155.141:443,https,41.77.155.141,443,755,0,alive,CPT,ZA,41.77.155.141,AS32653 eNetworks (Pty) Ltd,eNetworks (Pty) Ltd,isp,2026-10-25 16:44:06,@user
 https://175.134.18.237:443,https,175.134.18.237,443,769,0,alive,NRT,JP,240f:111:54d:1:2eb1:f658:607d:e97b,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-15 10:08:09,EDT-Pages
 https://113.23.216.129:9088,https,113.23.216.129,9088,770,0,alive,SIN,MY,113.23.216.128,AS38182 Webserver Dedicated Hosting,Webserver Dedicated Hosting,isp,2026-10-12 15:18:13,EDT-Pages
 https://80.86.231.109:443,https,80.86.231.109,443,770,0,alive,EVN,AM,80.86.231.62,AS21104 Netsys JVC is internet services provider in Armeina,Netsys JVC is internet services provider in Armeina,isp,2026-10-15 10:08:09,EDT-Pages
@@ -186,7 +186,7 @@ https://221.120.177.43:443,https,221.120.177.43,443,883,0,alive,HKG,HK,221.120.1
 https://141.105.83.68:443,https,141.105.83.68,443,893,0,alive,BEY,LB,141.105.83.68,AS24634 CYBERIA-3G,CYBERIA-3G,isp,2026-10-15 10:08:09,EDT-Pages
 https://37.207.230.114:9443,https,37.207.230.114,9443,894,0,alive,MXP,IT,37.207.230.114,AS3269 Telecom Italia S.p.A.,Telecom Italia S.p.A.,isp,2026-10-15 10:08:09,EDT-Pages
 https://31.186.220.204:443,https,31.186.220.204,443,899,0,alive,WAW,PL,31.186.220.204,AS9141 P4 Sp. z o.o.,P4 Sp. z o.o.,isp,2026-10-09 00:00:00,EDT-Pages
-https://41.77.155.154:443,https,41.77.155.154,443,907,0,alive,CPT,ZA,41.77.155.154,AS32653 eNetworks Ltd,eNetworks (Pty) Ltd,isp,2026-10-25 16:44:06,@user
+https://41.77.155.154:443,https,41.77.155.154,443,907,0,alive,CPT,ZA,41.77.155.154,AS32653 eNetworks (Pty) Ltd,eNetworks (Pty) Ltd,isp,2026-10-25 16:44:06,@user
 https://79.72.36.217:443,https,79.72.36.217,443,916,0,alive,MCT,OM,158.179.3.228,AS54253 Oracle Corporation,oracle,isp,2026-10-27 13:10:20,EDT-Pages
 https://217.181.201.254:8090,https,217.181.201.254,8090,919,0,alive,CDG,FR,217.181.201.254,AS8399 SEWAN SAS,SEWAN SAS,isp,2026-10-09 00:00:00,EDT-Pages
 https://84.237.50.68:444,https,84.237.50.68,444,924,0,alive,DME,RU,84.237.50.68,AS3335 NSU,NSU,education,2026-10-15 10:08:09,EDT-Pages
