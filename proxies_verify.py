@@ -1802,17 +1802,47 @@ async def async_main(args):
         for upd in cache_updates:
             h = upd.get("host")
             entry = upd.get("entry")
-            if h and entry:
+            if not (h and entry):
+                continue
+            res_ip = entry.get("resolved_ip")
+            # 1. 出口 IP (res_ip) 永远记录该出口节点自身的真实网络画像
+            if res_ip and is_valid_public_ip(res_ip):
+                exit_entry = {
+                    "asn": entry.get("asn", ""),
+                    "isp": entry.get("isp", ""),
+                    "net_type": entry.get("net_type", ""),
+                    "country": entry.get("country", ""),
+                }
+                old_nt = (persistent_cache.get(res_ip) or {}).get("net_type")
+                new_nt = exit_entry.get("net_type")
+                if new_nt == "datacenter" and old_nt != "datacenter":
+                    added_dc += 1
+                elif new_nt != "datacenter" and old_nt != new_nt:
+                    added_isp += 1
+                persistent_cache[res_ip] = exit_entry
+
+            # 2. 入口 (h)：区分域名与 IP 字面量，严禁将出口 ASN 强行写盖入口 IP
+            if not is_valid_public_ip(h):
+                # h 为域名：合法 DoH/DNS 解析，记录 resolved_ip 映射
+                persistent_cache[h] = entry
+            elif not res_ip or h == res_ip:
+                # h 为 IP 且与出口相同 (单跳直连)：正常写入
                 old_nt = (persistent_cache.get(h) or {}).get("net_type")
                 new_nt = entry.get("net_type")
                 if new_nt == "datacenter" and old_nt != "datacenter":
                     added_dc += 1
                 elif new_nt != "datacenter" and old_nt != new_nt:
                     added_isp += 1
-                persistent_cache[h] = entry
-                res_ip = entry.get("resolved_ip")
-                if res_ip and res_ip != h:
-                    persistent_cache[res_ip] = entry
+                persistent_cache[h] = {
+                    "asn": entry.get("asn", ""),
+                    "isp": entry.get("isp", ""),
+                    "net_type": entry.get("net_type", ""),
+                    "country": entry.get("country", ""),
+                }
+            else:
+                # h 为 IP 且 h != res_ip (多跳/隧道代理)：
+                # 严禁将出口 ASN 赋给入口 IP！保持 h 自身物理画像不受污染
+                pass
         save_ip_cache(persistent_cache)
         prune_ip_cache(persistent_cache)
         log.info(
