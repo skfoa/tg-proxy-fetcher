@@ -1050,10 +1050,11 @@ IP_CACHE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data",
 IP_CACHE_REL_PATH = os.path.join("data", "ip_cache.json")
 
 
-def load_ip_cache() -> dict[str, dict]:
+def load_ip_cache(filepath: str = "") -> dict[str, dict]:
     """从 data/ip_cache.json 加载已解析的 IP/域名 -> ASN/ISP/net_type 高速缓存"""
-    for p in (IP_CACHE_PATH, IP_CACHE_REL_PATH):
-        if os.path.isfile(p):
+    search_paths = [filepath] if filepath else [IP_CACHE_PATH, IP_CACHE_REL_PATH]
+    for p in search_paths:
+        if p and os.path.isfile(p):
             try:
                 with open(p, "r", encoding="utf-8") as f:
                     data = json.load(f)
@@ -3273,6 +3274,15 @@ def calibrate_all_datasets(
         except Exception as e:
             log.warning("校准 proxyip 数据异常: %s", e)
 
+    # 4. 【墓地黑名单反向清洗】自动解封因历史机房判定缺陷误杀的非机房优质节点
+    try:
+        unbanned_count = sanitize_tombstone(filepath=None, ip_cache_path=ip_cache_path)
+        stats["tombstone_unbanned"] = unbanned_count
+        if unbanned_count > 0:
+            log.info("【全量校准】成功从墓地黑名单解封 %d 个因历史机房误报被误杀的非机房节点", unbanned_count)
+    except Exception as e:
+        log.warning("清洗墓地黑名单异常: %s", e)
+
     return stats
 
 
@@ -3393,6 +3403,79 @@ def prune_tombstone(
             log.warning("写回修剪后的墓地文件 %s 失败: %s", target_path, e)
 
     return pruned_count
+
+
+def sanitize_tombstone(
+    filepath: str | None = None,
+    ip_cache_path: str = "",
+) -> int:
+    """
+    墓地黑名单反向清洗引擎：
+    根据持久化 ip_cache 与 classify_asn 权威研判体系，自动扫描并剔除
+    因历史检测缺陷被误判为机房 (datacenter_rejected) 而错杀入墓地的优质非机房节点
+    (原生住宅 ISP / 高校教育网 / 国家政务 / 商业专线)。
+    返回本次解封剔除的误杀条目数量。
+    """
+    global _TOMBSTONE_CACHE, _TOMBSTONE_CACHE_FILE, _TOMBSTONE_CACHE_MTIME
+    target_path = filepath if filepath is not None else TOMBSTONE_FILE
+    if not os.path.isfile(target_path):
+        return 0
+
+    try:
+        with open(target_path, "r", encoding="utf-8") as f:
+            tombstone = json.load(f)
+    except Exception as e:
+        log.warning("读取墓地文件 %s 执行清洗失败: %s", target_path, e)
+        return 0
+
+    if not isinstance(tombstone, dict) or not tombstone:
+        return 0
+
+    cache = load_ip_cache(filepath=ip_cache_path) if ip_cache_path else load_ip_cache()
+
+    unbanned_keys = set()
+    for k in list(tombstone.keys()):
+        h = k.split(":")[0].strip().lower()
+        # 1. 检查持久化 IP 画像并基于当前 SSOT 重新研判
+        entry = cache.get(h)
+        if entry and isinstance(entry, dict):
+            asn = entry.get("asn", "")
+            isp = entry.get("isp", "")
+            nt = classify_asn(asn, isp)
+            if nt in ("isp", "business", "education", "government"):
+                unbanned_keys.add(k)
+                continue
+        # 2. 检查已知特定公立政务专网前缀网段 (如 InnovaPuglia 138.66.0.0/16, NITA-U 154.72.192.0/19 等)
+        if h.startswith("138.66."):
+            unbanned_keys.add(k)
+            continue
+        try:
+            ip_obj = ipaddress.ip_address(h)
+            if ip_obj in ipaddress.ip_network("154.72.192.0/19") or ip_obj in ipaddress.ip_network("102.209.200.0/22"):
+                unbanned_keys.add(k)
+                continue
+        except (ValueError, TypeError):
+            pass
+
+    if not unbanned_keys:
+        return 0
+
+    for k in unbanned_keys:
+        tombstone.pop(k, None)
+
+    try:
+        atomic_write_json(target_path, tombstone)
+        _TOMBSTONE_CACHE = tombstone
+        _TOMBSTONE_CACHE_FILE = target_path
+        try:
+            _TOMBSTONE_CACHE_MTIME = os.path.getmtime(target_path)
+        except OSError:
+            _TOMBSTONE_CACHE = None
+        log.info("【墓地反向清洗】成功解封 %d 个因历史机房误报被误杀的非机房节点 (剩余墓地节点: %d 个)", len(unbanned_keys), len(tombstone))
+    except Exception as e:
+        log.warning("写回清洗后的墓地文件 %s 失败: %s", target_path, e)
+
+    return len(unbanned_keys)
 
 
 def record_tombstone(
