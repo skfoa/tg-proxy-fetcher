@@ -2666,7 +2666,9 @@
     "INHA UNIVERSITY": "AS9317",
     "China Unicom Guangdong province network": "AS17623",
     "Flynet Ltd": "AS49711",
-    "InnovaPuglia SpA": "AS20981"
+    "InnovaPuglia SpA": "AS20981",
+    "Brain Telecommunication Ltd.": "AS17911",
+    "Yxom_Network Xing Qingyu": "AS215502"
   },
   "asn_to_isp": {
     "AS10001": "Mics Network Corporation",
@@ -5214,7 +5216,9 @@
     "AS9317": "INHA UNIVERSITY",
     "AS17623": "China Unicom Guangdong province network",
     "AS49711": "Flynet Ltd",
-    "AS20981": "InnovaPuglia SpA"
+    "AS20981": "InnovaPuglia SpA",
+    "AS17911": "Brain Telecommunication Ltd.",
+    "AS215502": "Yxom_Network Xing Qingyu"
   },
   "asn_to_net_type": {
     "AS10001": "isp",
@@ -8766,6 +8770,8 @@
     "AS38097": "isp",
     "AS9317": "education",
     "AS17623": "isp",
-    "AS49711": "datacenter"
+    "AS49711": "datacenter",
+    "AS17911": "isp",
+    "AS215502": "datacenter"
   }
 }
