@@ -2668,7 +2668,8 @@
     "Flynet Ltd": "AS49711",
     "InnovaPuglia SpA": "AS20981",
     "Brain Telecommunication Ltd.": "AS17911",
-    "Yxom_Network Xing Qingyu": "AS215502"
+    "Yxom_Network Xing Qingyu": "AS215502",
+    "Datalogistics UAB Delska Lithuania": "AS201201"
   },
   "asn_to_isp": {
     "AS10001": "Mics Network Corporation",
@@ -5218,7 +5219,8 @@
     "AS49711": "Flynet Ltd",
     "AS20981": "InnovaPuglia SpA",
     "AS17911": "Brain Telecommunication Ltd.",
-    "AS215502": "Yxom_Network Xing Qingyu"
+    "AS215502": "Yxom_Network Xing Qingyu",
+    "AS201201": "Datalogistics UAB Delska Lithuania"
   },
   "asn_to_net_type": {
     "AS10001": "isp",
@@ -8772,6 +8774,7 @@
     "AS17623": "isp",
     "AS49711": "datacenter",
     "AS17911": "isp",
-    "AS215502": "datacenter"
+    "AS215502": "datacenter",
+    "AS201201": "datacenter"
   }
 }
