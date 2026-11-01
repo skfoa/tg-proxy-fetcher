@@ -130,7 +130,7 @@ PROXY_CHANNELS = _parse_channels("PROXY_CHANNELS", ["@otcjlq", "@danfeng_chat"])
 CF_IP_CHANNELS = _parse_channels("CF_IP_CHANNELS", ["@otcjlq", "@danfeng_chat"])
 
 DEFAULT_SUB_URLS = [
-    "https://sub.cmliussss.net/vpngate",
+    "https://sub.cmliussss.net/vpngate?token=20260924233538",
 ]
 
 
