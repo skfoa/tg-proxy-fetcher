@@ -1,0 +1,46 @@
+[
+  {
+    "proxy": "94.207.46.38:443",
+    "ip": "94.207.46.38",
+    "port": 443,
+    "tls": true,
+    "clientIp": "94.207.46.38",
+    "clientIps": [
+      "94.207.46.38"
+    ],
+    "clientIpv4": "94.207.46.38",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "AE",
+    "country_name": "阿联酋",
+    "country_cn": "阿联酋",
+    "country_emoji": "🇦🇪",
+    "asn": "57187",
+    "asOrganization": "Emirates Integrated Telecommunications Company PJSC",
+    "isp": "Emirates Integrated Telecommunications Company PJSC",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
+  },
+  {
+    "proxy": "80.227.252.11:8443",
+    "ip": "80.227.252.11",
+    "port": 8443,
+    "tls": true,
+    "clientIp": "2a00:f2a:e1bf:ee10::1",
+    "clientIps": [
+      "2a00:f2a:e1bf:ee10::1"
+    ],
+    "clientIpv4": "",
+    "clientIpv6": "2a00:f2a:e1bf:ee10::1",
+    "dual_stack": false,
+    "country": "AE",
+    "country_name": "阿联酋",
+    "country_cn": "阿联酋",
+    "country_emoji": "🇦🇪",
+    "asn": "15802",
+    "asOrganization": "Emirates Integrated Telecommunications Company PJSC",
+    "isp": "Emirates Integrated Telecommunications Company PJSC",
+    "net_type": "isp",
+    "source": "@cmliussss_all"
+  }
+]

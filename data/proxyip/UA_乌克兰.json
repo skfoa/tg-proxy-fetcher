@@ -1,0 +1,24 @@
+[
+  {
+    "proxy": "130.0.234.142:443",
+    "ip": "130.0.234.142",
+    "port": 443,
+    "tls": true,
+    "clientIp": "130.0.234.142",
+    "clientIps": [
+      "130.0.234.142"
+    ],
+    "clientIpv4": "130.0.234.142",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "UA",
+    "country_name": "乌克兰",
+    "country_cn": "乌克兰",
+    "country_emoji": "🇺🇦",
+    "asn": "44894",
+    "asOrganization": "3NT Solutions",
+    "isp": "3NT Solutions",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
+  }
+]

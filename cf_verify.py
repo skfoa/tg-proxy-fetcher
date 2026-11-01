@@ -105,6 +105,7 @@ CF_TXT = os.path.join(DATA_DIR, "cf_ips.txt")
 
 PROXYIP_CSV = os.path.join(DATA_DIR, "proxyip.csv")
 PROXYIP_TXT = os.path.join(DATA_DIR, "proxyip.txt")
+PROXYIP_JSON = os.path.join(DATA_DIR, "proxyip.json")
 PROXYIP_DIR = os.path.join(DATA_DIR, "proxyip")
 
 CHECK_ENDPOINT = os.getenv("CHECK_PROXYIP_URL", "").strip()
@@ -806,6 +807,8 @@ async def enrich_scan_ips_exits(
             if res.get("success") and res.get("exit_ip"):
                 enriched_count += 1
                 row["exit_ip"] = res["exit_ip"]
+                if res.get("exit_ipv6"):
+                    row["exit_ipv6"] = res["exit_ipv6"]
                 if res.get("exit_asn"):
                     row["exit_asn"] = res["exit_asn"]
                 if res.get("exit_isp"):
@@ -843,6 +846,7 @@ async def enrich_scan_ips_exits(
                         "fail_count": 0,
                         "net_type": exit_nt,
                         "exit_ip": res.get("exit_ip", ""),
+                        "exit_ipv6": res.get("exit_ipv6", ""),
                     })
 
         tasks = [_probe_candidate(r) for r in candidates]
@@ -880,6 +884,9 @@ async def enrich_scan_ips_exits(
                         ex["exit_ip"] = pr["exit_ip"]
                         ex["net_type"] = pr["net_type"]
                         updated = True
+                    if not ex.get("exit_ipv6") and pr.get("exit_ipv6"):
+                        ex["exit_ipv6"] = pr["exit_ipv6"]
+                        updated = True
                     if pr.get("asn") and (not ex.get("asn") or ex.get("net_type") != pr.get("net_type")):
                         ex["asn"] = pr["asn"]
                         if pr.get("isp"):
@@ -889,7 +896,7 @@ async def enrich_scan_ips_exits(
                     if updated:
                         updated_promoted_cnt += 1
             if (new_promoted_cnt + updated_promoted_cnt) > 0:
-                save_proxyip(existing_proxyips, PROXYIP_CSV, PROXYIP_TXT, PROXYIP_DIR)
+                save_proxyip(existing_proxyips, PROXYIP_CSV, PROXYIP_TXT, PROXYIP_DIR, PROXYIP_JSON)
                 log.info(
                     "🎉 [扫描优选 外部鉴真] 成功晋升 %d 个新节点，更新 %d 个存量节点画像至 %s (当前 ProxyIP 总数: %d)",
                     new_promoted_cnt,

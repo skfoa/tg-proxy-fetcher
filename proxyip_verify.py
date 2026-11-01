@@ -47,6 +47,7 @@ from providers import (
     TG_CHAT_ID,
     format_proxyip_txt,
     save_proxyip_by_country,
+    save_proxyip_json,
     classify_asn,
     normalize_timestamp,
     record_tombstone,
@@ -69,6 +70,9 @@ from providers import (
     probe_check_proxyip_api,
     is_asn_recorded,
     auto_enrich_and_save_asns,
+    extract_ips,
+    is_valid_ipv4,
+    is_valid_ipv6,
 )
 
 # 确保本地 .env 加载
@@ -93,6 +97,7 @@ if sys.platform == "win32":
 DATA_DIR = "data"
 PROXYIP_CSV = os.path.join(DATA_DIR, "proxyip.csv")
 PROXYIP_TXT = os.path.join(DATA_DIR, "proxyip.txt")
+PROXYIP_JSON = os.path.join(DATA_DIR, "proxyip.json")
 PROXYIP_DIR = os.path.join(DATA_DIR, "proxyip")
 
 PROBE_HOST = "speed.cloudflare.com"
@@ -166,10 +171,10 @@ def _sync_check_proxyip_endpoint(
     ip: str,
     port: int,
     timeout: float = 7.0,
-) -> tuple[bool, int, str, str, str, str, str]:
+) -> tuple[bool, int, str, str, str, str, str, str]:
     """
     同步调用 Check ProxyIP 外部检测接口（在独立线程池中并发执行，不阻塞事件循环，杜绝盲等）。
-    返回 (is_alive, latency_ms, colo, reason, exit_ip, exit_asn, exit_isp)
+    返回 (is_alive, latency_ms, colo, reason, exit_ip, exit_ipv6, exit_asn, exit_isp)
     """
     t0 = time.monotonic()
     res = probe_check_proxyip_api(ip, port, endpoint=endpoint, timeout=timeout)
@@ -177,19 +182,20 @@ def _sync_check_proxyip_endpoint(
     if res.get("success"):
         colo = res.get("colo", "")
         exit_ip = res.get("exit_ip", "")
+        exit_ipv6 = res.get("exit_ipv6", "")
         exit_asn = res.get("exit_asn", "")
         exit_isp = res.get("exit_isp", "")
-        return True, latency_ms, colo, "ok", exit_ip, exit_asn, exit_isp
+        return True, latency_ms, colo, "ok", exit_ip, exit_ipv6, exit_asn, exit_isp
     else:
         reason = res.get("reason") or (f"status_{res.get('status')}" if res.get('status') else "probe_failed")
-        return False, 0, "", reason, "", "", ""
+        return False, 0, "", reason, "", "", "", ""
 
 
-# ProxyIP 纯净数据表字段定义
+# ProxyIP 纯净数据表字段定义 (15 字段，支持 IPv4 / IPv6 双出口及两级分层网络识别)
 CSV_FIELDS = [
     "ip", "port", "tls", "delay_ms", "speed_kbs",
     "colo", "cf_location", "asn", "isp",
-    "first_seen", "channel", "fail_count", "net_type", "exit_ip",
+    "first_seen", "channel", "fail_count", "net_type", "exit_ip", "exit_ipv6",
 ]
 
 # 反代穿透上下文：跳过非官方证书校验（安全审计说明：有意设计，反代节点由第三方部署且证书各异，需直接与节点建立 TLS 隧道嗅探 CDN /cdn-cgi/trace 边缘机房特征）
@@ -354,10 +360,11 @@ def save_proxyip(
     csv_path: str = PROXYIP_CSV,
     txt_path: str = PROXYIP_TXT,
     dir_path: str = PROXYIP_DIR,
+    json_path: str = PROXYIP_JSON,
 ):
     """
-    覆写保存 proxyip.csv 与 proxyip.txt。
-    同时将全量反代按国家/地区拆分至 data/proxyip/ 独立目录。
+    覆写保存 proxyip.csv, proxyip.txt 与 proxyip.json。
+    同时将全量反代按国家/地区拆分至 data/proxyip/ 独立目录 (.txt 与 .json)。
     自动按质量排序：存活节点优先（fail_count 升序），低延迟优先（delay_ms 升序）。
     """
     # 稳定双重排序：先按 first_seen 降序（最新优先），再按 (fail_count, delay_ms) 升序
@@ -376,7 +383,15 @@ def save_proxyip(
         exit_isp = row.get("exit_isp") or row.get("isp", "")
         row["asn"] = format_asn_isp(exit_asn or row.get("asn", ""), exit_isp or row.get("isp", ""))
         row["net_type"] = classify_asn(exit_asn, exit_isp) or row.get("net_type", "datacenter")
-        row.setdefault("exit_ip", "")
+        cand_exits = extract_ips([row.get("exit_ip"), row.get("exit_ipv6")])
+        v4_exits = [cip for cip in cand_exits if is_valid_ipv4(cip)]
+        v6_exits = [cip for cip in cand_exits if is_valid_ipv6(cip)]
+        if v4_exits or v6_exits:
+            row["exit_ip"] = v4_exits[0] if v4_exits else (v6_exits[0] if v6_exits else "")
+            row["exit_ipv6"] = v6_exits[0] if v6_exits else ""
+        else:
+            row.setdefault("exit_ip", "")
+            row.setdefault("exit_ipv6", "")
 
     with atomic_writer(csv_path, encoding="utf-8-sig", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
@@ -388,8 +403,11 @@ def save_proxyip(
     atomic_write_text(txt_path, format_proxyip_txt(rows), encoding="utf-8")
     log.info("已按质检状态分层保存 %s: %d 条记录", txt_path, len(rows))
 
+    if json_path:
+        save_proxyip_json(rows, json_path=json_path)
+
     split_cnt = save_proxyip_by_country(rows, dir_path)
-    log.info("已在 %s/ 目录下生成 %d 个独立国家/地区纯文本文件", dir_path, split_cnt)
+    log.info("已在 %s/ 目录下生成 %d 个独立国家/地区分流文件 (.txt/.json)", dir_path, split_cnt)
 
 
 # ---------- 批量质检调度器 ----------
@@ -454,7 +472,7 @@ async def verify_proxyips(
             # 2. 凡是新拉取、缺少 exit_ip、未定性或 ASN 未知的节点，走 check_endpoint 外部端点进行严格穿透鉴真并补齐画像；
             raw_asn = (row.get("asn") or "").strip().upper()
             has_complete_profile = (
-                bool(row.get("exit_ip"))
+                bool(row.get("exit_ip") or row.get("exit_ipv6"))
                 and bool(raw_asn)
                 and raw_asn not in ("AS0", "0", "UNKNOWN", "AS_UNKNOWN")
                 and (row.get("net_type") or "").strip().lower() in ("isp", "business", "education", "government")
@@ -464,17 +482,19 @@ async def verify_proxyips(
                 worker_checked_cnt += 1
                 # 外部端点多线程并发穿透鉴真模式（高并发多线程不盲等，精准补齐出口画像）
                 loop = asyncio.get_running_loop()
-                alive, latency, colo, reason, exit_ip, exit_asn, exit_isp = await loop.run_in_executor(
+                alive, latency, colo, reason, exit_ip, exit_ipv6, exit_asn, exit_isp = await loop.run_in_executor(
                     check_executor, _sync_check_proxyip_endpoint, check_endpoint, ip, port, timeout
                 )
                 if alive:
                     if exit_ip:
                         row["exit_ip"] = exit_ip
+                    if exit_ipv6:
+                        row["exit_ipv6"] = exit_ipv6
                     if exit_asn:
                         row["asn"] = format_asn_isp(exit_asn, exit_isp)
                         row["isp"] = exit_isp
                         if not is_asn_recorded(exit_asn):
-                            auto_enrich_and_save_asns([{"asn": exit_asn, "isp": exit_isp, "ip": exit_ip or ip}])
+                            auto_enrich_and_save_asns([{"asn": exit_asn, "isp": exit_isp, "ip": exit_ip or exit_ipv6 or ip}])
                         row["net_type"] = classify_asn(exit_asn, exit_isp)
             else:
                 local_checked_cnt += 1

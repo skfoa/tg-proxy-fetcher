@@ -56,6 +56,7 @@ from providers import (
     format_scan_ips_txt,
     format_proxies_txt,
     save_proxyip_by_country,
+    save_proxyip_json,
     save_proxies_by_protocol,
     save_proxies_csv,
     save_scan_ips_by_asn,
@@ -84,7 +85,9 @@ from parsers import (
     parse_otc_scan_content,
     parse_proxy_attachment_content,
     is_valid_host,
-    is_valid_ip,
+    is_valid_ipv4,
+    is_valid_ipv6,
+    extract_ips,
 )
 
 # 确保本地 .env 加载
@@ -313,6 +316,7 @@ OUTPUT_SCAN_DIR = os.path.join(DATA_DIR, "scan_ips")
 # 反代 ProxyIP 专属保存文件（独立反代池，供 edgetunnel / Workers 等使用）
 OUTPUT_PROXYIP_FILE = os.path.join(DATA_DIR, "proxyip.csv")
 OUTPUT_PROXYIP_TXT = os.path.join(DATA_DIR, "proxyip.txt")
+OUTPUT_PROXYIP_JSON = os.path.join(DATA_DIR, "proxyip.json")
 OUTPUT_PROXYIP_DIR = os.path.join(DATA_DIR, "proxyip")
 FETCH_STATS_FILE = os.path.join(DATA_DIR, ".fetch_stats.json")
 # ============================================
@@ -334,7 +338,7 @@ CF_CSV_FIELDS = [
     "fail_count",
 ]
 SCAN_CSV_FIELDS = CF_CSV_FIELDS + ["exit_ip", "exit_asn", "exit_isp", "exit_location"]
-PROXYIP_CSV_FIELDS = CF_CSV_FIELDS + ["net_type", "exit_ip"]
+PROXYIP_CSV_FIELDS = CF_CSV_FIELDS + ["net_type", "exit_ip", "exit_ipv6"]
 
 logging.basicConfig(
     level=logging.INFO,
@@ -387,13 +391,16 @@ def classify_node_proxyip_or_scan(item: dict, ip_cache: dict) -> tuple[bool, str
     """
     ip = (item.get("ip") or "").strip()
     exit_ip = (item.get("exit_ip") or "").strip()
+    exit_ipv6 = (item.get("exit_ipv6") or "").strip()
     exit_asn = (item.get("exit_asn") or "").strip()
     exit_isp = (item.get("exit_isp") or "").strip()
 
-    # 1. 尝试判定出口网络类型
+    # 1. 尝试判定出口网络类型（支持 IPv4 / IPv6 双出口交叉检索）
     exit_nt = None
     if exit_ip and exit_ip in ip_cache:
         exit_nt = ip_cache[exit_ip].get("net_type")
+    if not exit_nt and exit_ipv6 and exit_ipv6 in ip_cache:
+        exit_nt = ip_cache[exit_ipv6].get("net_type")
     if not exit_nt and (exit_asn or exit_isp):
         exit_nt = classify_asn(exit_asn, exit_isp)
 
@@ -1184,8 +1191,24 @@ def fetch_zip_proxyips(
             continue
 
         meta = item.get("meta") if isinstance(item.get("meta"), dict) else {}
-        client_ip = str(meta.get("clientIp") or meta.get("client_ip") or "").strip()
-        exit_ip = client_ip if is_valid_ip(client_ip) else ""
+        cand_ips = extract_ips([
+            meta.get("clientIps"),
+            meta.get("client_ips"),
+            meta.get("clientIpv4"),
+            meta.get("client_ipv4"),
+            meta.get("clientIp"),
+            meta.get("client_ip"),
+            meta.get("clientIpv6"),
+            meta.get("client_ipv6"),
+            item.get("clientIp"),
+            item.get("client_ip"),
+        ])
+        v4_candidates = [cip for cip in cand_ips if is_valid_ipv4(cip)]
+        v6_candidates = [cip for cip in cand_ips if is_valid_ipv6(cip)]
+        exit_v4 = v4_candidates[0] if v4_candidates else ""
+        exit_v6 = v6_candidates[0] if v6_candidates else ""
+        exit_ip = exit_v4 or exit_v6
+        exit_ipv6 = exit_v6
 
         raw_asn = str(meta.get("asn") or item.get("asn") or "").strip()
         raw_isp = str(meta.get("asOrganization") or meta.get("isp") or item.get("asOrganization") or item.get("isp") or "").strip()
@@ -1239,6 +1262,7 @@ def fetch_zip_proxyips(
                 "asn": formatted_asn,
                 "raw_asn": asn_code,
                 "exit_ip": exit_ip,
+                "exit_ipv6": exit_ipv6,
                 "first_seen": now_bjt,
                 "channel": "@cmliussss_all",
                 "fail_count": 0,
@@ -1261,7 +1285,7 @@ def fetch_zip_proxyips(
                         }
                     unrecorded_asns_map[asn_code]["count"] += 1
             elif isinstance(scraped_proxyips[key], dict):
-                for mk in ("colo", "cf_location", "isp", "asn", "net_type", "exit_ip", "raw_asn"):
+                for mk in ("colo", "cf_location", "isp", "asn", "net_type", "exit_ip", "exit_ipv6", "raw_asn"):
                     if proxyip_item.get(mk) and not scraped_proxyips[key].get(mk):
                         scraped_proxyips[key][mk] = proxyip_item[mk]
 
@@ -1507,15 +1531,25 @@ def save_and_notify(
                 row.setdefault("fail_count", 0)
                 row["asn"] = format_asn_isp(row.get("asn", ""), row.get("isp", ""))
                 row["net_type"] = classify_asn(row.get("exit_asn") or row.get("asn", ""), row.get("exit_isp") or row.get("isp", "")) or row.get("net_type", "datacenter")
-                row.setdefault("exit_ip", "")
+                cand_exits = extract_ips([row.get("exit_ip"), row.get("exit_ipv6")])
+                v4_exits = [cip for cip in cand_exits if is_valid_ipv4(cip)]
+                v6_exits = [cip for cip in cand_exits if is_valid_ipv6(cip)]
+                if v4_exits or v6_exits:
+                    row["exit_ip"] = v4_exits[0] if v4_exits else (v6_exits[0] if v6_exits else "")
+                    row["exit_ipv6"] = v6_exits[0] if v6_exits else ""
+                else:
+                    row.setdefault("exit_ip", "")
+                    row.setdefault("exit_ipv6", "")
                 writer.writerow(row)
         log.info("已保存反代 ProxyIP 表格: %s (%d 条全量累积记录)", OUTPUT_PROXYIP_FILE, len(sorted_proxyips))
 
         atomic_write_text(OUTPUT_PROXYIP_TXT, format_proxyip_txt(sorted_proxyips))
         log.info("已保存反代 ProxyIP 纯文本: %s (%d 行/条记录，按质检状态分层)", OUTPUT_PROXYIP_TXT, len(sorted_proxyips))
 
+        save_proxyip_json(sorted_proxyips, OUTPUT_PROXYIP_JSON)
+
         proxyip_split_cnt = save_proxyip_by_country(sorted_proxyips, OUTPUT_PROXYIP_DIR)
-        log.info("已在 %s/ 目录下生成 %d 个独立国家/地区纯文本文件", OUTPUT_PROXYIP_DIR, proxyip_split_cnt)
+        log.info("已在 %s/ 目录下生成 %d 个独立国家/地区分流文件 (.txt/.json)", OUTPUT_PROXYIP_DIR, proxyip_split_cnt)
 
         proxyip_total = len(sorted_proxyips)
 
@@ -1706,7 +1740,7 @@ def merge_and_save(
         if k not in cleaned_proxyips:
             cleaned_proxyips[k] = v
         else:
-            for mk in ("colo", "cf_location", "isp", "asn", "net_type", "exit_ip", "raw_asn"):
+            for mk in ("colo", "cf_location", "isp", "asn", "net_type", "exit_ip", "exit_ipv6", "raw_asn"):
                 if v.get(mk) and not cleaned_proxyips[k].get(mk):
                     cleaned_proxyips[k][mk] = v[mk]
 
@@ -1714,7 +1748,7 @@ def merge_and_save(
         if k not in cleaned_scan_ips:
             cleaned_scan_ips[k] = v
         else:
-            for mk in ("colo", "cf_location", "isp", "asn", "net_type", "exit_ip", "raw_asn"):
+            for mk in ("colo", "cf_location", "isp", "asn", "net_type", "exit_ip", "exit_ipv6", "raw_asn"):
                 if v.get(mk) and not cleaned_scan_ips[k].get(mk):
                     cleaned_scan_ips[k][mk] = v[mk]
 
@@ -2108,6 +2142,8 @@ async def run_telethon():
                                                     if not exit_ip and probe_res.get("exit_ip"):
                                                         exit_ip = probe_res["exit_ip"]
                                                         cf_item["exit_ip"] = exit_ip
+                                                    if not cf_item.get("exit_ipv6") and probe_res.get("exit_ipv6"):
+                                                        cf_item["exit_ipv6"] = probe_res["exit_ipv6"]
                                                     if not cf_item.get("colo") and probe_res.get("colo"):
                                                         cf_item["colo"] = probe_res["colo"]
                                                     if probe_res.get("net_type") and not cf_item.get("net_type"):

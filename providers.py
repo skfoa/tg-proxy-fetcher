@@ -1107,7 +1107,12 @@ def prune_ip_cache(
                                 active_ips.add(ip)
                             exit_ip = (row.get("exit_ip") or "").strip()
                             if exit_ip:
-                                active_ips.add(exit_ip)
+                                for ep in extract_ips(exit_ip):
+                                    active_ips.add(ep)
+                            exit_ipv6 = (row.get("exit_ipv6") or "").strip()
+                            if exit_ipv6:
+                                for ep in extract_ips(exit_ipv6):
+                                    active_ips.add(ep)
                 except Exception as e:
                     log.debug("读取 %s 收集活跃 IP 异常: %s", fpath, e)
 
@@ -1156,6 +1161,49 @@ def prune_ip_cache(
             min(len(orphan_dc), max_orphans),
         )
     return pruned_count
+
+
+def is_valid_ipv4(ip_str: str) -> bool:
+    """严格校验是否为有效 IPv4 地址"""
+    if not ip_str or not isinstance(ip_str, str):
+        return False
+    try:
+        return ipaddress.ip_address(ip_str.strip().strip("[]")).version == 4
+    except Exception:
+        return False
+
+
+def is_valid_ipv6(ip_str: str) -> bool:
+    """严格校验是否为有效 IPv6 地址"""
+    if not ip_str or not isinstance(ip_str, str):
+        return False
+    try:
+        return ipaddress.ip_address(ip_str.strip().strip("[]")).version == 6
+    except Exception:
+        return False
+
+
+def extract_ips(val) -> list[str]:
+    """从任意输入（单串、列表、逗号/分号/斜杠/空格分隔）中提取所有合法 IP 地址（IPv4 与 IPv6），保持顺序并去重"""
+    if not val:
+        return []
+    if isinstance(val, (list, tuple, set)):
+        raw_items = [str(x) for x in val]
+    else:
+        raw_items = re.split(r"[,;\s/|]+", str(val).strip())
+    res = []
+    seen = set()
+    for item in raw_items:
+        clean = item.strip().strip("[]'\"")
+        if clean:
+            try:
+                ipaddress.ip_address(clean)
+                if clean not in seen:
+                    seen.add(clean)
+                    res.append(clean)
+            except Exception:
+                pass
+    return res
 
 
 def is_valid_public_ip(ip_str: str) -> bool:
@@ -2373,11 +2421,40 @@ def format_proxy_json_item(r_dict: dict) -> dict:
     else:
         net_type_val = ""
 
+    raw_egress = str(r_dict.get("egress_ip") or r_dict.get("resolved_ip") or r_dict.get("exit_ip") or "").strip()
+    raw_exit_v6 = str(r_dict.get("exit_ipv6") or "").strip()
+    raw_host = str(r_dict.get("host") or "").strip()
+
+    cand_ips = []
+    for cand in (r_dict.get("clientIps"), r_dict.get("client_ips"), raw_egress, raw_exit_v6):
+        if cand:
+            cand_ips.extend(extract_ips(cand))
+
+    seen_ips = set()
+    unique_exit_ips = []
+    for ip_item in cand_ips:
+        if ip_item not in seen_ips:
+            seen_ips.add(ip_item)
+            unique_exit_ips.append(ip_item)
+
+    v4_ips = [cip for cip in unique_exit_ips if is_valid_ipv4(cip)]
+    v6_ips = [cip for cip in unique_exit_ips if is_valid_ipv6(cip)]
+    client_ipv4 = v4_ips[0] if v4_ips else ""
+    client_ipv6 = v6_ips[0] if v6_ips else ""
+    client_ip = client_ipv4 or client_ipv6 or raw_egress or raw_host
+    client_ips = unique_exit_ips if unique_exit_ips else ([client_ip] if client_ip else [])
+    dual_stack = bool(client_ipv4 and client_ipv6)
+
     return {
         "proxy": r_dict.get("url") or "",
         "protocol": proto,
         "ip": r_dict.get("host") or "",
         "port": safe_int(r_dict.get("port"), 0),
+        "clientIp": client_ip,
+        "clientIps": client_ips,
+        "clientIpv4": client_ipv4,
+        "clientIpv6": client_ipv6,
+        "dual_stack": dual_stack,
         "country": c_code,
         "country_name": c_name,
         "country_cn": c_name,
@@ -2832,12 +2909,130 @@ def classify_asn(asn_str: str | None, isp_str: str | None = "") -> str:
     return "datacenter"
 
 
+def format_proxyip_json_item(r_dict: dict) -> dict:
+    """
+    转换为适配第三方调用、反代配置与前端订阅的标准化 ProxyIP JSON 字典对象：
+    支持 proxy (ip:port), ip, port, tls, clientIp (出口真实 IP), country, country_name, country_cn, country_emoji, asn, asOrganization, isp, net_type, source 等全量凭据
+    """
+    raw_ip = str(r_dict.get("ip") or "").strip()
+    port = safe_int(r_dict.get("port"), 0)
+    proxy_str = f"{raw_ip}:{port}" if raw_ip and port else ""
+
+    raw_tls = r_dict.get("tls")
+    if isinstance(raw_tls, bool):
+        tls_val = raw_tls
+    elif isinstance(raw_tls, str):
+        tls_val = raw_tls.strip().lower() in ("true", "1", "yes")
+    else:
+        tls_val = True
+
+    raw_exit = str(r_dict.get("exit_ip") or "").strip()
+    raw_exit_v6 = str(r_dict.get("exit_ipv6") or "").strip()
+
+    cand_ips = []
+    for cand in (
+        r_dict.get("clientIps"),
+        r_dict.get("client_ips"),
+        r_dict.get("exit_ips"),
+        r_dict.get("clientIpv4"),
+        raw_exit,
+        r_dict.get("clientIpv6"),
+        raw_exit_v6,
+    ):
+        if cand:
+            cand_ips.extend(extract_ips(cand))
+
+    seen_ips = set()
+    unique_exit_ips = []
+    for ip_item in cand_ips:
+        if ip_item not in seen_ips:
+            seen_ips.add(ip_item)
+            unique_exit_ips.append(ip_item)
+
+    v4_ips = [cip for cip in unique_exit_ips if is_valid_ipv4(cip)]
+    v6_ips = [cip for cip in unique_exit_ips if is_valid_ipv6(cip)]
+    client_ipv4 = v4_ips[0] if v4_ips else ""
+    client_ipv6 = v6_ips[0] if v6_ips else ""
+    client_ip = client_ipv4 or client_ipv6 or raw_exit or raw_ip
+    client_ips = unique_exit_ips if unique_exit_ips else ([client_ip] if client_ip else [])
+    dual_stack = bool(client_ipv4 and client_ipv6)
+
+    raw_country = str(r_dict.get("country") or "").strip().upper()
+    if len(raw_country) == 2 and raw_country != "UN":
+        c_code = raw_country
+        c_name = COUNTRY_NAME_MAP.get(c_code, c_code)
+        c_emoji = country_code_to_emoji(c_code)
+    else:
+        country_name = extract_country(r_dict.get("cf_location"), r_dict.get("colo"))
+        code = get_country_code(country_name)
+        if code and len(code) == 2:
+            c_code = code.upper()
+            c_name = COUNTRY_NAME_MAP.get(c_code, country_name or c_code)
+            c_emoji = country_code_to_emoji(c_code)
+        else:
+            c_code = ""
+            c_name = country_name or ""
+            c_emoji = country_code_to_emoji(c_code) if c_code else ("🌐" if country_name else "")
+
+    raw_asn = str(r_dict.get("exit_asn") or r_dict.get("asn") or "").strip()
+    m_asn = re.search(r"AS(\d+)", raw_asn, re.IGNORECASE)
+    clean_asn_num = m_asn.group(1) if m_asn else raw_asn
+
+    isp_name = str(r_dict.get("exit_isp") or r_dict.get("isp") or "").strip()
+    if not isp_name and clean_asn_num:
+        isp_name = ASN_TO_PROVIDER.get(f"AS{clean_asn_num}", "")
+
+    curr_nt = str(r_dict.get("net_type") or "").strip().lower()
+    if clean_asn_num or isp_name:
+        net_type_val = classify_asn(clean_asn_num, isp_name) or (curr_nt if curr_nt in VALID_NET_TYPES else "")
+    elif curr_nt in VALID_NET_TYPES:
+        net_type_val = curr_nt
+    else:
+        net_type_val = ""
+
+    source_val = str(r_dict.get("channel") or r_dict.get("source") or "").strip()
+
+    return {
+        "proxy": proxy_str,
+        "ip": raw_ip,
+        "port": port,
+        "tls": tls_val,
+        "clientIp": client_ip,
+        "clientIps": client_ips,
+        "clientIpv4": client_ipv4,
+        "clientIpv6": client_ipv6,
+        "dual_stack": dual_stack,
+        "country": c_code,
+        "country_name": c_name,
+        "country_cn": c_name,
+        "country_emoji": c_emoji,
+        "asn": clean_asn_num,
+        "asOrganization": isp_name,
+        "isp": isp_name,
+        "net_type": net_type_val,
+        "source": source_val,
+    }
+
+
+def save_proxyip_json(rows: list, json_path: str = "data/proxyip.json") -> int:
+    """
+    保存全量反代 ProxyIP 标准化 JSON 文件（原子写入）。
+    """
+    json_list = [
+        format_proxyip_json_item(r)
+        for r in rows
+        if isinstance(r, dict) and (r.get("ip") or "").strip() and safe_int(r.get("port"), 0) > 0
+    ]
+    atomic_write_json(json_path, json_list)
+    log.info("已覆写保存 %s: %d 个全量 ProxyIP 节点 (标准 JSON 格式)", json_path, len(json_list))
+    return len(json_list)
+
+
 def save_proxyip_by_country(rows: list, output_dir: str) -> int:
     """
-    将 ProxyIP 列表按国家/地区拆分输出为独立的纯文本文件（如 美国.txt、日本.txt）。
-    同时自动提取高价值稀缺属性节点导出为独立专用清单（如 【ISP_运营商原生宽带】.txt 等）。
-    每个文件内容仅包含纯净的 IP:端口（保留传入时的原始质量排序，无任何注释头），
-    方便用户直接在编辑器中全选复制（Ctrl+A / Ctrl+C）或按国家/属性独立订阅。
+    将 ProxyIP 列表按国家/地区拆分输出为独立的纯文本与标准化 JSON 文件（如 美国.txt / 美国.json）。
+    同时自动提取高价值稀缺属性节点导出为独立专用清单（如 【ISP_运营商原生宽带】.txt / .json 等）。
+    纯文本内容仅包含纯净的 IP:端口，JSON 文件包含完整元数据（含 clientIp 出口 IP）。
     自动清理目录中已不存在的旧地区文件，返回生成的独立文件数量。
     """
     if not rows:
@@ -2861,45 +3056,52 @@ def save_proxyip_by_country(rows: list, output_dir: str) -> int:
 
     active_files = set()
 
-    # 1. 导出各国家/地区独立清单
+    # 1. 导出各国家/地区独立清单 (.txt 与 .json)
     for country, members in groups.items():
-        lines = [
-            f"{(r.get('ip') or '').strip()}:{r.get('port')}\n"
-            for r in members
-            if (r.get("ip") or "").strip() and r.get("port")
+        valid_members = [
+            r for r in members
+            if (r.get("ip") or "").strip() and safe_int(r.get("port"), 0) > 0
         ]
-        if not lines:
+        if not valid_members:
             continue
+        lines = [f"{(r.get('ip') or '').strip()}:{r.get('port')}\n" for r in valid_members]
         safe_country = re.sub(r'[\\/:*?"<>|]', "_", country).strip() or "其他地区"
         code = get_country_code(safe_country) or get_country_code(country)
-        if code:
-            fname = f"{code}_{safe_country}.txt"
-        else:
-            fname = f"{safe_country}.txt"
-        filepath = os.path.join(output_dir, fname)
-        atomic_write_text(filepath, "".join(lines))
-        active_files.add(fname)
+        base_name = f"{code}_{safe_country}" if code else safe_country
+        txt_fname = f"{base_name}.txt"
+        json_fname = f"{base_name}.json"
 
-    # 2. 导出高价值特殊网络属性清单（运营商宽带、企业专线/金融、高校教育、政务公用）
+        atomic_write_text(os.path.join(output_dir, txt_fname), "".join(lines))
+        active_files.add(txt_fname)
+
+        json_items = [format_proxyip_json_item(r) for r in valid_members]
+        atomic_write_json(os.path.join(output_dir, json_fname), json_items)
+        active_files.add(json_fname)
+
+    # 2. 导出高价值特殊网络属性清单（运营商宽带、企业专线/金融、高校教育、政务公用，.txt 与 .json）
     for nt, fname in SPECIAL_NET_TYPE_FILES.items():
         members = type_groups.get(nt, [])
-        lines = [
-            f"{(r.get('ip') or '').strip()}:{r.get('port')}\n"
-            for r in members
-            if (r.get("ip") or "").strip() and r.get("port")
+        valid_members = [
+            r for r in members
+            if (r.get("ip") or "").strip() and safe_int(r.get("port"), 0) > 0
         ]
-        if not lines:
+        if not valid_members:
             continue
-        filepath = os.path.join(output_dir, fname)
-        atomic_write_text(filepath, "".join(lines))
+        lines = [f"{(r.get('ip') or '').strip()}:{r.get('port')}\n" for r in valid_members]
+        atomic_write_text(os.path.join(output_dir, fname), "".join(lines))
         active_files.add(fname)
 
-    # 清理已不存在或旧命名格式的 .txt 文件（保留 .gitkeep 等非 txt 标记文件，以及 custom_ / manual_ 用户自定义文件）
+        json_fname = fname[:-4] + ".json"
+        json_items = [format_proxyip_json_item(r) for r in valid_members]
+        atomic_write_json(os.path.join(output_dir, json_fname), json_items)
+        active_files.add(json_fname)
+
+    # 清理已不存在或旧命名格式的 .txt 与 .json 文件（保留 .gitkeep 等非数据标记文件，以及 custom_ / manual_ 用户自定义文件）
     for old_f in os.listdir(output_dir):
         fpath = os.path.join(output_dir, old_f)
         if (
             os.path.isfile(fpath)
-            and old_f.endswith(".txt")
+            and (old_f.endswith(".txt") or old_f.endswith(".json"))
             and old_f not in active_files
             and not old_f.startswith("custom_")
             and not old_f.startswith("manual_")
@@ -3595,28 +3797,52 @@ def probe_check_proxyip_api(
                 return {"success": False, "reason": "invalid_json"}
 
             probe = data.get("probe_results", {})
-            exit_info = (
-                probe.get("ipv4", {}).get("exit")
-                or probe.get("ipv6", {}).get("exit")
-                or data.get("exit")
-                or {}
-            )
+            v4_obj = probe.get("ipv4", {}) if isinstance(probe.get("ipv4"), dict) else {}
+            v6_obj = probe.get("ipv6", {}) if isinstance(probe.get("ipv6"), dict) else {}
+            v4_exit = v4_obj.get("exit") if isinstance(v4_obj.get("exit"), dict) else {}
+            v6_exit = v6_obj.get("exit") if isinstance(v6_obj.get("exit"), dict) else {}
+            fallback_exit = data.get("exit") if isinstance(data.get("exit"), dict) else {}
 
-            exit_ip = exit_info.get("ip") or data.get("exit_ip") or ""
-            exit_asn = exit_info.get("asn") or data.get("exit_asn") or ""
-            exit_isp = exit_info.get("asOrganization") or exit_info.get("org") or data.get("exit_isp") or ""
-            colo = data.get("colo") or probe.get("colo") or ""
-            country = exit_info.get("country") or data.get("country") or ""
-            city = exit_info.get("city") or data.get("city") or ""
+            v4_ip = str(v4_exit.get("ip") or "").strip()
+            v6_ip = str(v6_exit.get("ip") or "").strip()
+            fb_ip = str(fallback_exit.get("ip") or data.get("exit_ip") or "").strip()
+
+            if not v4_ip and fb_ip and is_valid_ipv4(fb_ip):
+                v4_ip = fb_ip
+            if not v6_ip and fb_ip and is_valid_ipv6(fb_ip):
+                v6_ip = fb_ip
+
+            dual_stack = bool(data.get("dual_stack")) or bool(v4_ip and v6_ip)
+            supports_v4 = bool(data.get("supports_ipv4")) or bool(v4_ip)
+            supports_v6 = bool(data.get("supports_ipv6")) or bool(v6_ip)
+
+            primary_exit_ip = v4_ip or v6_ip or fb_ip
+            primary_info = v4_exit if v4_ip else (v6_exit if v6_ip else fallback_exit)
+
+            exit_asn = primary_info.get("asn") or data.get("exit_asn") or ""
+            exit_isp = primary_info.get("asOrganization") or primary_info.get("org") or data.get("exit_isp") or ""
+            colo = data.get("colo") or probe.get("colo") or primary_info.get("colo") or ""
+            country = primary_info.get("country") or data.get("country") or ""
+            city = primary_info.get("city") or data.get("city") or ""
 
             if exit_asn and not str(exit_asn).upper().startswith("AS"):
                 exit_asn = f"AS{exit_asn}"
 
             net_type = classify_asn(exit_asn, exit_isp) if exit_asn else ""
 
+            all_exit_ips = [ip for ip in (v4_ip, v6_ip) if ip]
+            if not all_exit_ips and primary_exit_ip:
+                all_exit_ips = [primary_exit_ip]
+
             return {
-                "success": bool(data.get("success", False)) or bool(exit_ip),
-                "exit_ip": str(exit_ip).strip(),
+                "success": bool(data.get("success", False)) or bool(primary_exit_ip),
+                "exit_ip": str(primary_exit_ip).strip(),
+                "exit_ipv4": str(v4_ip).strip(),
+                "exit_ipv6": str(v6_ip).strip(),
+                "exit_ips": all_exit_ips,
+                "dual_stack": dual_stack,
+                "supports_ipv4": supports_v4,
+                "supports_ipv6": supports_v6,
                 "exit_asn": str(exit_asn).strip().upper(),
                 "exit_isp": str(exit_isp).strip(),
                 "colo": str(colo).strip().upper(),

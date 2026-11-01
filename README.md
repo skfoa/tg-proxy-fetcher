@@ -114,9 +114,11 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | **`data/scan_ips/*.txt`** | 独立 ASN + 厂商纯文本列表（单文件） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/scan_ips/AS{ASN}_{ISP}.txt` |
 | **`data/scan_ips.csv`** | 扫描测速优选 IP（出入口双维度解耦数据表，16 字段含 `exit_ip`, `exit_asn`, `exit_isp`, `exit_location`） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/scan_ips.csv` |
 | **`data/proxyip.txt`** | 反代 ProxyIP 总清单（按存活/缓冲质检状态分层排序，纯文本） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip.txt` |
-| **`data/proxyip/*.txt`** | 独立国家/地区纯净反代列表（如 `美国.txt`、`日本.txt`） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip/{地区}.txt` |
-| **`data/proxyip/【...】.txt`** | 稀缺网络属性独立反代列表（原生宽带/商业/教育/政务，ASN 粗筛） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip/【ISP_运营商原生宽带】.txt` 等 |
-| **`data/proxyip.csv`** | 反代 ProxyIP 详细数据表（14 字段，含 `net_type` 网络分类与 `exit_ip` 真实出口落地 IP） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip.csv` |
+| **`data/proxyip.json`** | 反代 ProxyIP 全量标准化 JSON 端点（包含 `ip`, `port`, `tls`, `clientIp` 出口真实 IP, `clientIps` 真实出口列表, `clientIpv4`, `clientIpv6`, `dual_stack` 双栈标识, 国家, ASN, ISP 与网络属性） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip.json` |
+| **`data/proxyip/*.txt`** | 独立国家/地区纯净反代列表（纯文本 `IP:端口`，如 `US_美国.txt`、`JP_日本.txt`） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip/{地区}.txt` |
+| **`data/proxyip/*.json`** | 独立国家/地区标准化 JSON 反代数据（如 `US_美国.json`、`JP_日本.json`，含 `clientIp`/`clientIps` 双出口画像） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip/{地区}.json` |
+| **`data/proxyip/【...】.txt` / `.json`** | 稀缺网络属性独立反代列表与 JSON（原生宽带/商业/教育/政务，ASN 粗筛） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip/【ISP_运营商原生宽带】.json` 等 |
+| **`data/proxyip.csv`** | 反代 ProxyIP 详细数据表（15 字段，含 `net_type` 网络分类、`exit_ip` 真实出站落地 IP 与 `exit_ipv6` 出口 IPv6，原生支持双出口/双栈解耦） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip.csv` |
 | **`data/asn_database.json`** | 内置离线 ASN 知识库（收录 1,000+ 条双向索引映射与 1,800+ 条网络分类基准；遇到新 ASN 时自动在线查询增量同步） | 运行时增量维护（由 CI 自动提交） | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/asn_database.json` |
 | **`data/tombstone.json`** | 质检死节点冷却库（7 天隔离冷却与生命周期闭环防回流，仅登记连续失败达标的死节点，机房拒收节点不进墓地） | 全模式支持（质检引擎运行触发） | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/tombstone.json` |
 | **`data/ip_cache.json`** | 持久化 IP 物理画像知识库（严格对齐 ipinfo.io 五大标准，规范化纯净 ASN 字典，动态活跃集修剪） | 运行时增量维护（由 CI 自动提交） | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/ip_cache.json` |
@@ -276,7 +278,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `exit_location` | 字符串 | 最终出站落地的地理位置 | `美国 · 旧金山` |
 
 #### ③ 反代 ProxyIP 穿透与网络属性数据表（`data/proxyip.csv`）
-*共 14 个字段，除基础网络字段外，包含 `net_type`（两级分层网络识别）核心资产属性与 `exit_ip`（真实出站落地 IP）：*
+*共 15 个字段，除基础网络字段外，包含 `net_type`（两级分层网络识别）核心资产属性与 `exit_ip` / `exit_ipv6`（原生支持 IPv4 / IPv6 双出口及双栈解耦）：*
 
 | 字段 | 类型 | 说明 | 示例 |
 | :--- | :--- | :--- | :--- |
@@ -292,8 +294,9 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `first_seen` | 时间字符串 | 首次收录时间（以第一次抓取入库为准，永久不变） | `2026-09-19 18:00:00` |
 | `channel` | 字符串 | 来源频道或附件源 | `@danfeng_chat` |
 | `fail_count` | 整数 | 连续探测失败次数（连续失败 ≥ 3 次永久物理删除） | `0` |
-| `net_type` | 字符串 | **【核心属性】** 网络类型归属（详见下方 6 类取值说明） | `isp` |
-| `exit_ip` | 字符串 | **【真实出站落地】** 穿透测试测出的出站落地真实 IP（未测通或未走外部探针则为空） | `192.241.216.172` |
+| `net_type` | 字符串 | **【核心属性】** 网络类型归属（详见下方 5 类取值说明） | `isp` |
+| `exit_ip` | 字符串 | **【真实出站落地】** 穿透测试测出的出站落地真实 IP（双栈时为 IPv4 出口，仅 IPv6 时继承 IPv6 以向下兼容旧解析器，未测通则为空） | `192.241.216.172` |
+| `exit_ipv6` | 字符串 | **【IPv6 出口落地】** 穿透测试测出的 IPv6 出站落地真实 IP（无 IPv6 出口或未测通则为空） | `2602:f988:210:c4f::7f4` |
 
 > 📌 **`net_type` 网络分类取值与对应导出品（严格对齐 ipinfo.io 业界权威分类标准）**：
 > - `isp`：运营商原生民用宽带（ASN 粗筛候选） ➔ 对应导出 `data/proxyip/【ISP_运营商原生宽带】.txt`
@@ -302,7 +305,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 > - `government`：政务公用网与国家机构 ➔ 对应导出 `data/proxyip/【GOV_政务公共网络】.txt`
 > - `datacenter`：常规数据中心/托管机房（hosting） ➔ 归入各国家/地区常规列表
 
-#### ③ 通用代理质检数据表（`data/proxies.csv`）
+#### ④ 通用代理质检数据表（`data/proxies.csv`）
 *共 15 个字段，记录 SOCKS5/HTTP/HTTPS/TURN/SSTP 等通用代理应用层穿透结果、出口机房国家、出口真实 IP、自治系统 ASN、运营商 ISP 组织、原生家宽/数据中心属性、质检状态、首次收录生命周期与代理来源渠道：*
 
 | 字段 | 类型 | 说明 | 示例 |
@@ -322,6 +325,26 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `net_type` | 字符串 | **【核心凭据】** 网络类型属性分类（`isp` 原生家宽 / `datacenter` 机房 / `business` 商业专线等） | `isp`、`datacenter` |
 | `first_seen` | 时间字符串 | 首次收录时间（以第一次抓取入库为准，永久不变，用于统计节点存活时长与长期可用性；注：针对 2026-10-01 前无此字段的历史旧节点，统一兼容赋予 2026-10-01 00:00:00 作为基准初值） | `2026-10-01 00:00:00` |
 | `source` | 字符串 | **【来源渠道】** 代理节点抓取/获取渠道（如 `EDT-Pages`、`@danfeng_chat`、`@otcjlq`、`vpngate` 等，精准标识来源） | `EDT-Pages`、`@danfeng_chat` |
+
+#### ⑤ 标准化 JSON 接口与双出口（Dual-Stack Egress）设计规范（`data/proxyip.json` 与 `data/proxies/*.json`）
+为全面兼容第三方前端订阅、EDT-Toolkit、油猴脚本以及现代化双栈路由客户端，全站 JSON 端点统一采用标准化双出口画像格式：
+
+| 字段 | 类型 | 说明 | 示例 |
+| :--- | :--- | :--- | :--- |
+| `proxy` | 字符串 | 节点连接串（ProxyIP 为 `ip:port`，通用代理为完整 URL） | `104.16.132.229:443` 或 `socks5://...` |
+| `clientIp` | 字符串 | **【主要出口 IP】** 单一出口 IP 字符串（向下兼容旧版前端与解析器；双栈时优先填入 IPv4，无 IPv4 时填入 IPv6） | `192.241.216.172` |
+| `clientIps` | 字符串数组 | **【全量出口列表】** 穿透测试出的所有真实出口 IP 数组（去重有序排列，含 IPv4 与 IPv6） | `["192.241.216.172", "2602:f988:210:c4f::7f4"]` |
+| `clientIpv4` | 字符串 | **【IPv4 出口落地】** 穿透测试出的 IPv4 出站落地 IP（若无则为空串 `""`） | `192.241.216.172` |
+| `clientIpv6` | 字符串 | **【IPv6 出口落地】** 穿透测试出的 IPv6 出站落地 IP（若无则为空串 `""`） | `2602:f988:210:c4f::7f4` |
+| `dual_stack` | 布尔值 | **【双栈路由能力】** 是否同时具备 IPv4 与 IPv6 双出口能力（`true`/`false`） | `true` |
+| `country` | 字符串 | ISO 3166-1 alpha-2 两位大写国家代码 | `US`、`HK` |
+| `country_name` | 字符串 | 国家/地区中文名称 | `美国`、`中国香港` |
+| `country_emoji` | 字符串 | 国家/地区国旗 Emoji 标识符 | `🇺🇸`、`🇭🇰` |
+| `asn` | 字符串 / 整数 | 自治系统纯数字编号 | `9269` |
+| `asOrganization` | 字符串 | 自治系统组织 / 运营商全称 | `HKBN Hong Kong Broadband` |
+| `isp` | 字符串 | 运营商实体名称 | `HKBN Hong Kong Broadband` |
+| `net_type` | 字符串 | 网络类型归属（`isp`/`business`/`education`/`government`/`datacenter`） | `isp` |
+| `source` | 字符串 | 来源渠道或频道 | `@danfeng_chat` |
 
 ---
 

@@ -1,0 +1,24 @@
+[
+  {
+    "proxy": "212.2.227.187:443",
+    "ip": "212.2.227.187",
+    "port": 443,
+    "tls": true,
+    "clientIp": "212.2.227.187",
+    "clientIps": [
+      "212.2.227.187"
+    ],
+    "clientIpv4": "212.2.227.187",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "KG",
+    "country_name": "吉尔吉斯斯坦",
+    "country_cn": "吉尔吉斯斯坦",
+    "country_emoji": "🇰🇬",
+    "asn": "48271",
+    "asOrganization": "CJSC TELECOMMUNICATIONS COMPANY DUN",
+    "isp": "CJSC TELECOMMUNICATIONS COMPANY DUN",
+    "net_type": "isp",
+    "source": "@cmliussss_all"
+  }
+]

@@ -57,6 +57,46 @@ def is_valid_ip(val: str) -> bool:
         return False
 
 
+def is_valid_ipv4(val: str) -> bool:
+    """严格校验是否为有效 IPv4 地址"""
+    if not val:
+        return False
+    clean = str(val).strip().strip("[]")
+    try:
+        return ipaddress.ip_address(clean).version == 4
+    except Exception:
+        return False
+
+
+def is_valid_ipv6(val: str) -> bool:
+    """严格校验是否为有效 IPv6 地址"""
+    if not val:
+        return False
+    clean = str(val).strip().strip("[]")
+    try:
+        return ipaddress.ip_address(clean).version == 6
+    except Exception:
+        return False
+
+
+def extract_ips(val) -> list[str]:
+    """从任意输入（单串、列表、逗号/分号/斜杠/空格分隔）中提取所有合法 IP 地址（IPv4 与 IPv6），保持顺序并去重"""
+    if not val:
+        return []
+    if isinstance(val, (list, tuple, set)):
+        raw_items = [str(x) for x in val]
+    else:
+        raw_items = re.split(r"[,;\s/|]+", str(val).strip())
+    res = []
+    seen = set()
+    for item in raw_items:
+        clean = item.strip().strip("[]'\"")
+        if clean and is_valid_ip(clean) and clean not in seen:
+            seen.add(clean)
+            res.append(clean)
+    return res
+
+
 def is_valid_host(host: str) -> bool:
     """验证主机名是否为有效 IPv4 地址或域名 (RFC 1035 / RFC 1123)"""
     if not host or len(host) > 253:
@@ -402,6 +442,7 @@ def parse_cf_csv_content(
                     "channel": default_channel,
                     "fail_count": 0,
                     "exit_ip": "",
+                    "exit_ipv6": "",
                 })
             return results
 
@@ -416,7 +457,13 @@ def parse_cf_csv_content(
                 continue
             c_clean = col.strip().lower().replace(" ", "").replace("_", "")
 
-            # 1. 优先精准提取出口/出站 IP 字段 (严格排除 类型/位置/协议 等干扰属性列)
+            # 1. 优先精准提取出口/出站 IP 字段 (含 IPv4 / IPv6 细分与解耦列)
+            if any(k in c_clean for k in ("出站ipv6", "出口ipv6", "egressipv6", "exitipv6", "clientipv6", "出站v6", "出口v6")):
+                field_map["exit_ipv6"] = col
+                continue
+            if any(k in c_clean for k in ("出站ipv4", "出口ipv4", "egressipv4", "exitipv4", "clientipv4", "出站v4", "出口v4")):
+                field_map["exit_ipv4"] = col
+                continue
             if (
                 c_clean in ("出站ip", "出口ip", "egressip", "exitip", "clientip", "出站", "出口", "egress", "exit")
                 or (
@@ -560,9 +607,17 @@ def parse_cf_csv_content(
                         loc_parts.append(val)
             cf_location = " · ".join(loc_parts)
 
-            # 真实出口 IP 提取与校验
+            # 真实出口 IP 提取与校验（原生支持单/多出口与 IPv4/IPv6 双栈解耦）
             raw_exit_ip = row.get(field_map.get("exit_ip", ""), "").strip()
-            exit_ip = raw_exit_ip if is_valid_ip(raw_exit_ip) else ""
+            raw_exit_v4 = row.get(field_map.get("exit_ipv4", ""), "").strip()
+            raw_exit_v6 = row.get(field_map.get("exit_ipv6", ""), "").strip()
+            cand_exit_ips = extract_ips([raw_exit_ip, raw_exit_v4, raw_exit_v6])
+            v4_exits = [cip for cip in cand_exit_ips if is_valid_ipv4(cip)]
+            v6_exits = [cip for cip in cand_exit_ips if is_valid_ipv6(cip)]
+            exit_v4 = v4_exits[0] if v4_exits else ""
+            exit_v6 = v6_exits[0] if v6_exits else ""
+            exit_ip = exit_v4 or exit_v6
+            exit_ipv6 = exit_v6
 
             # 来源频道提取与格式清洗 (如 TG@danfeng_chat -> @danfeng_chat)
             raw_channel = row.get(field_map.get("channel", ""), "").strip()
@@ -611,6 +666,7 @@ def parse_cf_csv_content(
                 "channel": row_channel,
                 "fail_count": 0,
                 "exit_ip": exit_ip,
+                "exit_ipv6": exit_ipv6,
                 "exit_asn": raw_exit_asn,
                 "exit_isp": raw_exit_isp,
             })
@@ -861,6 +917,7 @@ def parse_otc_scan_content(
             "channel": default_channel,
             "fail_count": 0,
             "exit_ip": exit_ip,
+            "exit_ipv6": exit_ip if is_valid_ipv6(exit_ip) else "",
             "exit_asn": clean_asn_code,
             "exit_isp": isp,
         })

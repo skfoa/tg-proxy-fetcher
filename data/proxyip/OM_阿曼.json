@@ -1,0 +1,24 @@
+[
+  {
+    "proxy": "89.147.163.8:443",
+    "ip": "89.147.163.8",
+    "port": 443,
+    "tls": true,
+    "clientIp": "89.147.163.8",
+    "clientIps": [
+      "89.147.163.8"
+    ],
+    "clientIpv4": "89.147.163.8",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "OM",
+    "country_name": "阿曼",
+    "country_cn": "阿曼",
+    "country_emoji": "🇴🇲",
+    "asn": "204170",
+    "asOrganization": "Awaser Oman",
+    "isp": "Awaser Oman",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
+  }
+]

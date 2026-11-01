@@ -1,0 +1,24 @@
+[
+  {
+    "proxy": "89.236.217.103:2053",
+    "ip": "89.236.217.103",
+    "port": 2053,
+    "tls": true,
+    "clientIp": "89.236.217.103",
+    "clientIps": [
+      "89.236.217.103"
+    ],
+    "clientIpv4": "89.236.217.103",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "UZ",
+    "country_name": "乌兹别克斯坦",
+    "country_cn": "乌兹别克斯坦",
+    "country_emoji": "🇺🇿",
+    "asn": "39032",
+    "asOrganization": "East Telecom Networks",
+    "isp": "East Telecom Networks",
+    "net_type": "isp",
+    "source": "@cmliussss_all"
+  }
+]

@@ -1,0 +1,90 @@
+[
+  {
+    "proxy": "61.245.11.45:443",
+    "ip": "61.245.11.45",
+    "port": 443,
+    "tls": true,
+    "clientIp": "2602:fa63:800:46::2",
+    "clientIps": [
+      "2602:fa63:800:46::2"
+    ],
+    "clientIpv4": "",
+    "clientIpv6": "2602:fa63:800:46::2",
+    "dual_stack": false,
+    "country": "PH",
+    "country_name": "菲律宾",
+    "country_cn": "菲律宾",
+    "country_emoji": "🇵🇭",
+    "asn": "19970",
+    "asOrganization": "R&R Managed Telecom Services",
+    "isp": "R&R Managed Telecom Services",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
+  },
+  {
+    "proxy": "120.89.46.123:443",
+    "ip": "120.89.46.123",
+    "port": 443,
+    "tls": true,
+    "clientIp": "120.89.46.123",
+    "clientIps": [
+      "120.89.46.123"
+    ],
+    "clientIpv4": "120.89.46.123",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "PH",
+    "country_name": "菲律宾",
+    "country_cn": "菲律宾",
+    "country_emoji": "🇵🇭",
+    "asn": "9658",
+    "asOrganization": "Eastern Telecoms Phils., Inc.",
+    "isp": "Eastern Telecoms Phils., Inc.",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
+  },
+  {
+    "proxy": "61.245.10.8:443",
+    "ip": "61.245.10.8",
+    "port": 443,
+    "tls": true,
+    "clientIp": "2602:fa63:800:6b::6",
+    "clientIps": [
+      "2602:fa63:800:6b::6"
+    ],
+    "clientIpv4": "",
+    "clientIpv6": "2602:fa63:800:6b::6",
+    "dual_stack": false,
+    "country": "PH",
+    "country_name": "菲律宾",
+    "country_cn": "菲律宾",
+    "country_emoji": "🇵🇭",
+    "asn": "19970",
+    "asOrganization": "R&R Managed Telecom Services",
+    "isp": "R&R Managed Telecom Services",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
+  },
+  {
+    "proxy": "64.81.73.243:443",
+    "ip": "64.81.73.243",
+    "port": 443,
+    "tls": true,
+    "clientIp": "64.81.73.243",
+    "clientIps": [
+      "64.81.73.243"
+    ],
+    "clientIpv4": "64.81.73.243",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "PH",
+    "country_name": "菲律宾",
+    "country_cn": "菲律宾",
+    "country_emoji": "🇵🇭",
+    "asn": "50118",
+    "asOrganization": "Caribbean Telecom S.A",
+    "isp": "Caribbean Telecom S.A",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
+  }
+]
