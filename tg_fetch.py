@@ -983,8 +983,7 @@ def fetch_proxifly_https_proxies(
     """
     拉取外部 Proxifly 单协议 HTTPS 代理源 (proxies/protocols/https/data.json)。
     采用多镜像并发竞速机制 (Concurrent Racing)。
-    基于本地 tombstone (死节点) 与 ip_cache (已知机房 IP) 进行双重前置离线拦截，
-    直接剔除已知机房，仅将未知 IP 或已知家宽候选追加至待检列表，来源打标为 'proxifly'。
+    基于本地 tombstone (死节点) 进行前置离线拦截，不预设机房硬拦截以允许通过 Worker 真实穿透探测出口画像，来源打标为 'proxifly'。
     """
     if not urls:
         return 0
@@ -1040,7 +1039,6 @@ def fetch_proxifly_https_proxies(
 
     total_added = 0
     tomb_filtered = 0
-    dc_filtered = 0
 
     for item in data:
         if not isinstance(item, dict):
@@ -1056,13 +1054,7 @@ def fetch_proxifly_https_proxies(
             tomb_filtered += 1
             continue
 
-        # 门禁 2: 已知机房 IP 离线前置拦截 (彻底杜绝重复测速)
         cached = ip_cache.get(ip, {})
-        cached_nt = (cached.get("net_type") or "").strip().lower()
-        if cached_nt in ("datacenter", "hosting"):
-            dc_filtered += 1
-            continue
-
         geo = item.get("geolocation") or {}
         country = str(geo.get("country") or "").strip().upper() or cached.get("country", "")
 
@@ -1089,9 +1081,8 @@ def fetch_proxifly_https_proxies(
                     scraped_proxies[key][m_k] = meta_dict[m_k]
 
     log.info(
-        "Proxifly HTTPS 提取完成: 新增待检候选 %d 个 (前置剔除机房 %d 个, 墓碑淘汰 %d 个)",
+        "Proxifly HTTPS 提取完成: 新增待检候选 %d 个 (墓碑死节点过滤 %d 个)",
         total_added,
-        dc_filtered,
         tomb_filtered,
     )
     return total_added

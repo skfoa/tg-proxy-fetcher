@@ -3272,14 +3272,10 @@ def calibrate_all_datasets(
         except Exception as e:
             log.warning("校准 proxyip 数据异常: %s", e)
 
-    # 4. 【墓地黑名单反向清洗】自动解封因历史机房判定缺陷误杀的非机房优质节点
-    try:
-        unbanned_count = sanitize_tombstone(filepath=None, ip_cache_path=ip_cache_path)
-        stats["tombstone_unbanned"] = unbanned_count
-        if unbanned_count > 0:
-            log.info("【全量校准】成功从墓地黑名单解封 %d 个因历史机房误报被误杀的非机房节点", unbanned_count)
-    except Exception as e:
-        log.warning("清洗墓地黑名单异常: %s", e)
+    # 4. 墓地机制已彻底解耦：机房拒收节点不再入墓地，入出口画像已完全解耦。
+    # 墓地中记录的均为真实超时/不可达的物理死节点，不再执行基于非机房标签的自动解封，
+    # 确保死节点严格遵循 7 天隔离冷却期，彻底杜绝死节点诈尸回流。
+    stats["tombstone_unbanned"] = 0
 
     return stats
 

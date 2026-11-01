@@ -133,7 +133,6 @@ FATAL_FAIL_STATUSES = {
     "http_connect_no_colo",   # HTTPS 代理 CONNECT 隧道建立后无法读取有效 trace/colo 报文 (假 200 代理)
     "sstp_fail",              # SSTP 隧道请求返回非 200 (非 SSTP 服务)
     "unknown_proto",          # 未知协议
-    "datacenter_rejected",    # 检测出数据中心/机房节点，严禁入库并直接拉满淘汰阈值，阻止进入存活列表与缓冲期
 }
 
 CSV_FIELDS = PROXY_CSV_FIELDS
@@ -1059,7 +1058,7 @@ async def probe_single(
                 c_code = str(exit_info.get("country_code") or exit_info.get("country") or "").strip().upper()
 
                 if is_datacenter_result(cf_res):
-                    # 识别为机房/数据中心：拒收淘汰，沉淀至持久化 ip_cache 永久拦截！
+                    # 识别为机房/数据中心：拒收淘汰，不入存活列表 (不打入墓地，允许后续轮次动态重检)
                     is_alive = False
                     delay_ms = 0
                     status = "datacenter_rejected"
@@ -1079,7 +1078,7 @@ async def probe_single(
                                 "resolved_ip": exit_ip,
                             },
                         }
-                    log.debug("🚫 拦截到数据中心/机房 HTTPS 节点 [%s:%s] (ASN: %s, ISP: %s)，已移出并记入机房永久黑名单", host, port, clean_asn, clean_isp)
+                    log.debug("🚫 拦截到数据中心/机房 HTTPS 节点 [%s:%s] (ASN: %s, ISP: %s)，已移出并拒收准入", host, port, clean_asn, clean_isp)
                 else:
                     # 原生住宅/家宽/教育/专线：准入通过！
                     is_alive = True
@@ -1277,12 +1276,9 @@ def load_proxies_data(
     1. 优先读取 proxies.csv，保留既有 fail_count 与历史统计
     2. 合并 proxies.txt 中新增的节点
     3. 自动过滤墓地黑名单中的冷却期死节点
-    4. 前置离线过滤 ip_cache 中已知数据中心/机房 (datacenter/hosting) 的 HTTPS 代理，实现永久拦截
     """
     tombstone = load_tombstone()
-    ip_cache = load_ip_cache()
     url_map: dict[str, dict] = {}
-    dc_filtered_count = 0
 
     target_csv = csv_path
 
@@ -1302,25 +1298,6 @@ def load_proxies_data(
                     if is_tombstoned(key, tombstone):
                         continue
 
-                    # 仅针对外部全网批量抓取源 (如 proxifly) 前置拦截已知机房 HTTPS 节点；
-                    # 频道与群组来源 (@otcjlq, @otcfxq, @danfeng_chat, @user 等) 全收，绝不前置剔除机房
-                    source = r.get("source", "").strip()
-                    host = parsed["host"]
-                    proto = parsed["proto"]
-                    cached_nt = (ip_cache.get(host, {}) or {}).get("net_type", "").lower()
-                    row_nt = (r.get("net_type") or "").strip().lower()
-
-                    if source == "proxifly" and proto == "https" and (cached_nt in ("datacenter", "hosting") or row_nt in ("datacenter", "hosting")):
-                        dc_filtered_count += 1
-                        if host not in ip_cache:
-                            ip_cache[host] = {
-                                "asn": r.get("asn", ""),
-                                "isp": r.get("isp", ""),
-                                "net_type": "datacenter",
-                                "country": r.get("country", ""),
-                            }
-                        continue
-
                     parsed["fail_count"] = safe_int(r.get("fail_count"), 0)
                     parsed["delay_ms"] = safe_int(r.get("delay_ms"), 0)
                     parsed["status"] = r.get("status", "pending")
@@ -1333,7 +1310,7 @@ def load_proxies_data(
                     parsed["first_seen"] = r.get("first_seen", "").strip() or LEGACY_DEFAULT_FIRST_SEEN
                     parsed["source"] = r.get("source", "").strip()
                     url_map[url] = parsed
-            log.info("从 %s 加载已有记录 %d 条 (离线前置剔除机房 %d 个)", target_csv, len(url_map), dc_filtered_count)
+            log.info("从 %s 加载已有记录 %d 条", target_csv, len(url_map))
         except Exception as e:
             log.warning("读取 %s 失败: %s", target_csv, e)
 
@@ -1381,14 +1358,6 @@ def load_proxies_data(
                             key = canonical_key(parsed["host"], parsed["port"])
                             if is_tombstoned(key, tombstone):
                                 continue
-                            source = r.get("source", "").strip()
-                            if source == "proxifly" and parsed["proto"] == "https":
-                                host = parsed["host"]
-                                cached_nt = (ip_cache.get(host, {}) or {}).get("net_type", "").lower()
-                                row_nt = (r.get("net_type") or "").strip().lower()
-                                if cached_nt in ("datacenter", "hosting") or row_nt in ("datacenter", "hosting"):
-                                    dc_filtered_count += 1
-                                    continue
                             parsed["fail_count"] = safe_int(r.get("fail_count"), 0)
                             parsed["delay_ms"] = safe_int(r.get("delay_ms"), 0)
                             parsed["status"] = r.get("status", "pending")
@@ -1791,7 +1760,7 @@ async def async_main(args):
     # 汇总机房拦截数据（避免逐条输出刷屏）
     dc_rejected_https = sum(1 for r in results if r.get("status") == "datacenter_rejected")
     if dc_rejected_https > 0:
-        log.info("🚫 【HTTPS 机房拦截】累计拦截并剔除数据中心/机房 HTTPS 节点 %d 个，已全部移出并记入机房永久黑名单", dc_rejected_https)
+        log.info("🚫 【HTTPS 机房拦截】累计拦截并剔除数据中心/机房 HTTPS 节点 %d 个 (拒收准入存活列表)", dc_rejected_https)
 
     # 沉淀本轮质检提取出的 IP 网络画像 (包含新检测出的机房黑名单与原生家宽指纹) 至持久化 ip_cache (彻底杜绝重复测速)
     cache_updates = [r.get("_cache_update") for r in results if r.get("_cache_update")]
@@ -1855,6 +1824,8 @@ async def async_main(args):
 
     # 幸存者筛选（支持按协议分流淘汰阈值：HTTP 专属严格阈值，其余协议维持 max_fails 缓冲容错）
     def _is_survivor(r):
+        if r.get("status") == "datacenter_rejected":
+            return False
         proto = (r.get("proto") or "").lower()
         fc = safe_int(r.get("fail_count"), 0)
         eff_mf = h_mf if proto == "http" else args.max_fails
@@ -1885,8 +1856,8 @@ async def async_main(args):
     avg_delay = int(sum(alive_delays) / len(alive_delays)) if alive_delays else 0
 
     if eliminated > 0:
-        log.info("[通用代理 淘汰] 剔除 %d 条达到淘汰阈值的死节点 (HTTP专属: >= %d 次, 其余协议: >= %d 次)", eliminated, h_mf, args.max_fails)
-        dead_nodes = [r for r in results if not _is_survivor(r)]
+        dead_nodes = [r for r in results if not _is_survivor(r) and r.get("status") != "datacenter_rejected"]
+        log.info("[通用代理 淘汰] 剔除 %d 条达到淘汰阈值的死节点 (HTTP专属: >= %d 次, 其余协议: >= %d 次; 排除机房拒收节点 %d 条)", len(dead_nodes), h_mf, args.max_fails, dc_rejected_https)
         dead_keys = [
             canonical_key(r.get("host", ""), r.get("port", 0))
             for r in dead_nodes
