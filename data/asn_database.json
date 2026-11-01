@@ -2669,7 +2669,17 @@
     "InnovaPuglia SpA": "AS20981",
     "Brain Telecommunication Ltd.": "AS17911",
     "Yxom_Network Xing Qingyu": "AS215502",
-    "Datalogistics UAB Delska Lithuania": "AS201201"
+    "Datalogistics UAB Delska Lithuania": "AS201201",
+    "Orange Madagascar": "AS37037",
+    "Oman Telecommunications Company (S.A.O.G)": "AS28885",
+    "Clemson University": "AS12148",
+    "Telium Telecomunicacoes Ltda": "AS11432",
+    "UKRPACK Joint Ukrainan-German Enterprise \"INFOCOM\" LLC": "AS6846",
+    "K.G.B. TELECOMUNICACIONES S.A.S": "AS274059",
+    "Regional Digital Telecommunication Company LLC": "AS29072",
+    "TRS": "AS13444",
+    "Datalahti Oy": "AS199231",
+    "PLDT GLOBAL Corp. Internet-based Services AP": "AS23988"
   },
   "asn_to_isp": {
     "AS10001": "Mics Network Corporation",
@@ -5220,7 +5230,17 @@
     "AS20981": "InnovaPuglia SpA",
     "AS17911": "Brain Telecommunication Ltd.",
     "AS215502": "Yxom_Network Xing Qingyu",
-    "AS201201": "Datalogistics UAB Delska Lithuania"
+    "AS201201": "Datalogistics UAB Delska Lithuania",
+    "AS37037": "Orange Madagascar",
+    "AS28885": "Oman Telecommunications Company (S.A.O.G)",
+    "AS12148": "Clemson University",
+    "AS11432": "Telium Telecomunicacoes Ltda",
+    "AS6846": "UKRPACK Joint Ukrainan-German Enterprise \"INFOCOM\" LLC",
+    "AS274059": "K.G.B. TELECOMUNICACIONES S.A.S",
+    "AS29072": "Regional Digital Telecommunication Company LLC",
+    "AS13444": "TRS",
+    "AS199231": "Datalahti Oy",
+    "AS23988": "PLDT GLOBAL Corp. Internet-based Services AP"
   },
   "asn_to_net_type": {
     "AS10001": "isp",
@@ -8775,6 +8795,16 @@
     "AS49711": "datacenter",
     "AS17911": "isp",
     "AS215502": "datacenter",
-    "AS201201": "datacenter"
+    "AS201201": "datacenter",
+    "AS37037": "isp",
+    "AS28885": "isp",
+    "AS12148": "education",
+    "AS11432": "isp",
+    "AS6846": "business",
+    "AS274059": "isp",
+    "AS29072": "isp",
+    "AS13444": "datacenter",
+    "AS199231": "datacenter",
+    "AS23988": "datacenter"
   }
 }

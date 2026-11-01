@@ -1,34 +1,77 @@
 ﻿url,proto,host,port,delay_ms,fail_count,status,colo,country,egress_ip,asn,isp,net_type,first_seen,source
-http://47.85.161.37:3128,http,47.85.161.37,3128,92,0,alive,IAD,US,47.85.161.37,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
-http://189.51.168.165:999,http,189.51.168.165,999,177,0,alive,MIA,MX,189.51.168.164,AS270111 Comunicación por Fibra SA de CV,Comunicación por Fibra SA de CV,isp,2026-10-21 15:52:42,EDT-Pages
-http://8.209.255.13:3128,http,8.209.255.13,3128,249,0,alive,NRT,JP,8.209.255.13,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
-http://176.111.37.5:39811,http,176.111.37.5,39811,273,0,alive,ARN,SE,176.111.37.5,AS214743 Cogento Backbone Limited,Cogento Backbone Limited,isp,2026-10-25 14:07:00,EDT-Pages
-http://176.111.37.216:39811,http,176.111.37.216,39811,282,0,alive,ARN,SE,176.111.37.216,AS214743 Cogento Backbone Limited,Cogento Backbone Limited,isp,2026-10-25 14:07:00,EDT-Pages
-http://4.144.146.21:80,http,4.144.146.21,80,372,0,alive,SIN,SG,20.44.210.140,AS8075 Microsoft Azure,Microsoft Azure,datacenter,2026-10-19 12:45:55,@otcfxq
-http://1234:1234@54.254.197.64:2080,http,54.254.197.64,2080,372,0,alive,SIN,SG,2406:da18:ad0:a400:594e:ce56:8509:d9bb,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://1234:1234@13.250.24.214:2080,http,13.250.24.214,2080,373,0,alive,SIN,SG,2406:da18:ad0:a400:a4a5:636c:281b:3d8d,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://1234:1234@47.128.216.221:2080,http,47.128.216.221,2080,373,0,alive,SIN,SG,2406:da18:ad0:a400:368e:b4fd:5bb3:9efb,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://1234:1234@13.229.59.119:2080,http,13.229.59.119,2080,375,0,alive,SIN,SG,2406:da18:ad0:a400:40b8:e560:fae9:42c9,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://1234:1234@54.254.170.180:2080,http,54.254.170.180,2080,375,0,alive,SIN,SG,2406:da18:ad0:a400:d883:1396:f5be:256f,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://1234:1234@52.221.233.141:2080,http,52.221.233.141,2080,375,0,alive,SIN,SG,2406:da18:ad0:a400:b45a:77ec:7057:8999,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://1234:1234@47.128.223.25:2080,http,47.128.223.25,2080,376,0,alive,SIN,SG,2406:da18:ad0:a400:3461:4714:de76:b355,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://1234:1234@47.128.148.63:2080,http,47.128.148.63,2080,376,0,alive,SIN,SG,2406:da18:ad0:a400:aa45:be61:ddb0:f4f,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://1234:1234@54.251.228.111:2080,http,54.251.228.111,2080,377,0,alive,SIN,SG,2406:da18:ad0:a400:cddf:e8bc:d41a:8ff3,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://1234:1234@52.77.237.40:2080,http,52.77.237.40,2080,377,0,alive,SIN,SG,2406:da18:ad0:a400:f576:ae64:5a7b:3158,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://1234:1234@54.255.222.157:2080,http,54.255.222.157,2080,379,0,alive,SIN,SG,2406:da18:ad0:a400:d51a:79e2:51a6:d8a2,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://1234:1234@18.143.149.74:2080,http,18.143.149.74,2080,380,0,alive,SIN,SG,2406:da18:ad0:a400:3c4c:9aa8:6198:37f5,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://185.195.254.72:5432,http,185.195.254.72,5432,398,0,alive,IST,TR,185.195.254.72,AS206119 Veganet Teknolojileri ve Hizmetleri LTD STI,Veganet Teknolojileri ve Hizmetleri LTD STI,isp,2026-10-09 22:46:01,EDT-Pages
-http://8.213.151.128:3128,http,8.213.151.128,3128,409,0,alive,ICN,KR,8.213.151.128,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
-http://103.133.26.73:3128,http,103.133.26.73,3128,467,0,alive,CGK,ID,103.178.42.17,AS138130 PT PHATRIA INTI PERSADA,PT PHATRIA INTI PERSADA,isp,2026-10-12 15:18:13,EDT-Pages
-http://103.133.26.50:8080,http,103.133.26.50,8080,479,0,alive,SIN,ID,103.133.24.37,AS138130 PT PHATRIA INTI PERSADA,PT PHATRIA INTI PERSADA,isp,2026-10-12 15:18:13,EDT-Pages
-http://1234:1234@13.250.53.203:2080,http,13.250.53.203,2080,489,0,alive,SIN,SG,2406:da18:ad0:a400:a0cc:1672:8ddc:c9b1,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://1234:1234@13.250.114.105:2080,http,13.250.114.105,2080,496,0,alive,SIN,SG,2406:da18:ad0:a400:83e2:cc94:985b:6663,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
-http://102.244.78.61:8087,http,102.244.78.61,8087,636,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-09 22:46:01,EDT-Pages
-http://102.244.78.61:8089,http,102.244.78.61,8089,637,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-21 15:52:42,@otcfxq
-http://102.244.78.61:8081,http,102.244.78.61,8081,638,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-21 15:52:42,EDT-Pages
-http://102.244.78.61:8085,http,102.244.78.61,8085,641,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-09 22:46:01,EDT-Pages
-http://102.244.78.61:8082,http,102.244.78.61,8082,753,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-21 15:52:42,@otcfxq
-http://120.232.115.170:17981,http,120.232.115.170,17981,955,0,alive,LHR,CN,120.232.115.170,AS9808 China Mobile,China Mobile,isp,2026-10-21 15:52:42,@otcfxq
-http://27.185.218.213:17981,http,27.185.218.213,17981,957,0,alive,SJC,CN,27.185.218.213,AS4134 China Telecom,China Telecom,isp,2026-10-21 15:52:42,EDT-Pages
-http://111.206.4.163:18888,http,111.206.4.163,18888,1903,0,alive,HKG,CN,111.206.4.163,AS4808 China Unicom Beijing Province Network,China Unicom Beijing province network,isp,2026-10-30 15:25:20,EDT-Pages
-http://119.188.131.55:17981,http,119.188.131.55,17981,2085,0,alive,LAX,CN,119.188.131.55,AS4837 China Unicom,China Unicom,isp,2026-10-29 13:52:21,EDT-Pages
+http://47.85.161.37:3128,http,47.85.161.37,3128,110,0,alive,IAD,US,47.85.161.37,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
+http://130.127.204.197:8080,http,130.127.204.197,8080,149,0,alive,ATL,US,2620:103:a009:1b3:250:56ff:fea1:466a,AS12148 Clemson University,Clemson University,education,2026-11-01 14:11:17,EDT-Pages
+http://8.209.255.13:3128,http,8.209.255.13,3128,224,0,alive,NRT,JP,8.209.255.13,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
+http://180.53.81.127:8080,http,180.53.81.127,8080,255,0,alive,NRT,JP,180.53.81.127,AS4713 NTT Communications Corporation (Open Computer Network),Open Computer Network,isp,2026-11-01 14:11:17,EDT-Pages
+http://176.111.37.216:39811,http,176.111.37.216,39811,302,0,alive,ARN,SE,176.111.37.216,AS214743 Cogento Backbone Limited,Cogento Backbone Limited,isp,2026-10-25 14:07:00,EDT-Pages
+http://176.111.37.5:39811,http,176.111.37.5,39811,303,0,alive,ARN,SE,176.111.37.5,AS214743 Cogento Backbone Limited,Cogento Backbone Limited,isp,2026-10-25 14:07:00,EDT-Pages
+http://196.64.106.232:2367,http,196.64.106.232,2367,334,0,alive,LIS,MA,160.178.229.60,AS36903 ADSL_Maroc_telecom (MarocTelecomASDL),MarocTelecomASDL,isp,2026-11-01 14:11:17,EDT-Pages
+http://210.61.97.16:7071,http,210.61.97.16,7071,343,0,alive,TPE,TW,210.61.97.17,AS3462 Chunghwa Telecom HiNet (Chunghwa Telecom Data Communication Business Group),Chunghwa Telecom Data Communication Business Group,isp,2026-11-01 14:11:17,EDT-Pages
+http://1234:1234@47.128.223.25:2080,http,47.128.223.25,2080,356,0,alive,SIN,SG,2406:da18:ad0:a400:3461:4714:de76:b355,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://1234:1234@54.254.170.180:2080,http,54.254.170.180,2080,358,0,alive,SIN,SG,2406:da18:ad0:a400:d883:1396:f5be:256f,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://1234:1234@13.250.114.105:2080,http,13.250.114.105,2080,359,0,alive,SIN,SG,2406:da18:ad0:a400:83e2:cc94:985b:6663,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://1234:1234@47.128.216.221:2080,http,47.128.216.221,2080,362,0,alive,SIN,SG,2406:da18:ad0:a400:368e:b4fd:5bb3:9efb,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://1234:1234@13.250.24.214:2080,http,13.250.24.214,2080,362,0,alive,SIN,SG,2406:da18:ad0:a400:a4a5:636c:281b:3d8d,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://1234:1234@52.77.237.40:2080,http,52.77.237.40,2080,363,0,alive,SIN,SG,2406:da18:ad0:a400:f576:ae64:5a7b:3158,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://1234:1234@13.250.53.203:2080,http,13.250.53.203,2080,366,0,alive,SIN,SG,2406:da18:ad0:a400:a0cc:1672:8ddc:c9b1,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://1234:1234@18.143.149.74:2080,http,18.143.149.74,2080,366,0,alive,SIN,SG,2406:da18:ad0:a400:3c4c:9aa8:6198:37f5,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://1234:1234@54.251.228.111:2080,http,54.251.228.111,2080,367,0,alive,SIN,SG,2406:da18:ad0:a400:cddf:e8bc:d41a:8ff3,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://1234:1234@13.229.59.119:2080,http,13.229.59.119,2080,367,0,alive,SIN,SG,2406:da18:ad0:a400:40b8:e560:fae9:42c9,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://4.144.146.21:80,http,4.144.146.21,80,368,0,alive,SIN,SG,20.44.210.140,AS8075 Microsoft Azure,Microsoft Azure,datacenter,2026-10-19 12:45:55,@otcfxq
+http://1234:1234@54.255.222.157:2080,http,54.255.222.157,2080,371,0,alive,SIN,SG,2406:da18:ad0:a400:d51a:79e2:51a6:d8a2,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://1234:1234@54.254.197.64:2080,http,54.254.197.64,2080,373,0,alive,SIN,SG,2406:da18:ad0:a400:594e:ce56:8509:d9bb,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://1234:1234@47.128.148.63:2080,http,47.128.148.63,2080,383,0,alive,SIN,SG,2406:da18:ad0:a400:aa45:be61:ddb0:f4f,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://103.172.42.229:3333,http,103.172.42.229,3333,401,0,alive,CGK,ID,103.172.42.229,AS142393 PT Media Solusi Sukses,PT Media Solusi Sukses,isp,2026-11-01 14:11:17,EDT-Pages
+http://187.102.219.42:999,http,187.102.219.42,999,407,0,alive,EZE,AR,187.102.219.42,AS270004 CRETTON LISANDRO MAXIMILIANO MISIOTECH,CRETTON LISANDRO MAXIMILIANO (MISIOTECH),isp,2026-11-01 14:11:17,EDT-Pages
+http://41.33.245.139:1976,http,41.33.245.139,1976,426,0,alive,PMO,EG,41.33.245.139,AS8452 TE Data,TE Data,isp,2026-11-01 14:11:17,EDT-Pages
+http://213.131.85.26:1981,http,213.131.85.26,1981,426,0,alive,MRS,EG,213.131.85.26,AS24863 Link Egypt (Link.NET),Link Egypt,isp,2026-11-01 14:11:17,EDT-Pages
+http://41.196.16.230:1981,http,41.196.16.230,1981,435,0,alive,MRS,EG,41.196.16.230,AS24863 Link Egypt (Link.NET),Link Egypt,isp,2026-11-01 14:11:17,EDT-Pages
+http://41.196.16.230:1976,http,41.196.16.230,1976,439,0,alive,MRS,EG,41.196.16.230,AS24863 Link Egypt (Link.NET),Link Egypt,isp,2026-11-01 14:11:17,EDT-Pages
+http://103.133.26.73:3128,http,103.133.26.73,3128,442,0,alive,CGK,ID,103.178.42.17,AS138130 PT PHATRIA INTI PERSADA,PT PHATRIA INTI PERSADA,isp,2026-10-12 15:18:13,EDT-Pages
+http://103.188.169.93:8080,http,103.188.169.93,8080,457,0,alive,CGK,ID,103.188.169.93,AS58821 PT Trinity Telekomunikasi Indonesia,PT Trinity Telekomunikasi Indonesia,isp,2026-11-01 14:11:17,EDT-Pages
+http://41.128.77.76:1981,http,41.128.77.76,1981,463,0,alive,MRS,EG,41.128.77.76,AS24863 Link Egypt (Link.NET),Link Egypt (Link.NET),isp,2026-11-01 14:11:17,EDT-Pages
+http://217.52.247.89:1981,http,217.52.247.89,1981,465,0,alive,LHR,EG,217.52.247.89,AS36992 Nile Online,Nile Online,isp,2026-11-01 14:11:17,EDT-Pages
+http://185.195.254.72:5432,http,185.195.254.72,5432,466,0,alive,IST,TR,185.195.254.72,AS206119 Veganet Teknolojileri ve Hizmetleri LTD STI,Veganet Teknolojileri ve Hizmetleri LTD STI,isp,2026-10-09 22:46:01,EDT-Pages
+http://8.213.151.128:3128,http,8.213.151.128,3128,467,0,alive,ICN,KR,8.213.151.128,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
+http://41.33.126.136:1976,http,41.33.126.136,1976,491,0,alive,PMO,EG,41.33.126.136,AS8452 TE Data,TE Data,isp,2026-11-01 14:11:17,EDT-Pages
+http://41.33.126.136:1981,http,41.33.126.136,1981,493,0,alive,MXP,EG,41.33.126.136,AS8452 TE Data,TE Data,isp,2026-11-01 14:11:17,EDT-Pages
+http://103.133.26.11:8080,http,103.133.26.11,8080,548,0,alive,CGK,ID,202.65.236.76,AS45700 PT Global Telecom Utama,PT Global Telecom Utama,isp,2026-11-01 14:11:17,EDT-Pages
+http://46.209.217.108:8088,http,46.209.217.108,8088,610,0,alive,FRA,IR,46.209.217.106,AS42337 Respina Networks & Beyond PJSC,Respina Networks & Beyond PJSC,isp,2026-11-01 14:11:17,EDT-Pages
+http://102.244.78.61:8082,http,102.244.78.61,8082,618,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-21 15:52:42,@otcfxq
+http://217.52.247.89:1976,http,217.52.247.89,1976,630,0,alive,LHR,EG,217.52.247.89,AS36992 Nile Online,Nile Online,isp,2026-11-01 14:11:17,EDT-Pages
+http://102.244.78.61:8085,http,102.244.78.61,8085,645,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-09 22:46:01,EDT-Pages
+http://102.244.78.61:8081,http,102.244.78.61,8081,645,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-21 15:52:42,EDT-Pages
+http://102.244.78.61:8089,http,102.244.78.61,8089,646,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-21 15:52:42,@otcfxq
+http://102.244.78.61:8087,http,102.244.78.61,8087,648,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-09 22:46:01,EDT-Pages
+http://103.133.26.119:8080,http,103.133.26.119,8080,656,0,alive,CGK,ID,202.65.229.23,AS45700 PT Global Telecom Utama,PT Global Telecom Utama,isp,2026-11-01 14:11:17,EDT-Pages
+http://156.200.116.69:8080,http,156.200.116.69,8080,691,0,alive,MXP,EG,156.200.116.69,AS8452 TE Data,TE Data,isp,2026-11-01 14:11:17,EDT-Pages
+http://84.36.141.180:1981,http,84.36.141.180,1981,735,0,alive,LHR,EG,84.36.141.180,AS36992 EgyNet,EgyNet,isp,2026-11-01 14:11:17,EDT-Pages
+http://1234:1234@52.221.233.141:2080,http,52.221.233.141,2080,773,0,alive,SIN,SG,2406:da18:ad0:a400:b45a:77ec:7057:8999,AS16509 Amazon AWS,Amazon AWS,datacenter,2026-10-25 16:33:54,@user
+http://27.185.218.213:17981,http,27.185.218.213,17981,803,0,alive,SJC,CN,240e:940:e01b:5:40::c,AS4134 China Telecom,China Telecom,isp,2026-10-21 15:52:42,EDT-Pages
+http://154.236.179.229:1981,http,154.236.179.229,1981,813,0,alive,LHR,EG,84.36.62.114,AS36992 EgyNet,EgyNet,isp,2026-11-01 14:11:17,EDT-Pages
+http://119.188.131.55:17981,http,119.188.131.55,17981,819,0,alive,LAX,CN,119.188.131.55,AS4837 China Unicom,China Unicom,isp,2026-10-29 13:52:21,EDT-Pages
+http://36.213.79.159:1081,http,36.213.79.159,1081,922,0,alive,HKG,CN,36.213.79.159,AS9808 China Mobile,"China Mobile Communications Group Co., Ltd.",isp,2026-11-01 14:11:17,EDT-Pages
+http://187.102.219.34:999,http,187.102.219.34,999,962,0,alive,EZE,AR,187.102.217.54,AS270004 CRETTON LISANDRO MAXIMILIANO MISIOTECH,CRETTON LISANDRO MAXIMILIANO (MISIOTECH),isp,2026-11-01 14:11:17,EDT-Pages
+http://120.232.115.170:17981,http,120.232.115.170,17981,1002,0,alive,LHR,CN,120.232.115.170,AS9808 China Mobile,China Mobile,isp,2026-10-21 15:52:42,@otcfxq
+http://103.180.118.122:1080,http,103.180.118.122,1080,1135,0,alive,CGK,ID,49.0.26.43,AS149359 PT Persada Data Multimedia,PT Persada Data Multimedia,isp,2026-11-01 14:11:17,EDT-Pages
+http://177.234.217.92:999,http,177.234.217.92,999,1209,0,alive,GYE,EC,177.234.217.92,AS52468 Ufinet Panama S.A. (NEGOCIOS Y TELEFONIA NEDETEL S.A.),NEGOCIOS Y TELEFONIA NEDETEL S.A.,isp,2026-11-01 14:11:17,EDT-Pages
+http://103.211.82.92:8080,http,103.211.82.92,8080,1344,0,alive,CGK,ID,103.211.82.92,AS134660 PT.MEDIA LINTAS DATA (Badan Pengelola Keuangan Dan Aset Daerah Kota Batu),Badan Pengelola Keuangan Dan Aset Daerah Kota Batu,government,2026-11-01 14:11:17,EDT-Pages
+http://110.93.218.62:8080,http,110.93.218.62,8080,1365,0,alive,KHI,PK,110.93.218.62,AS38193 Transworld Associates (Pvt.) Ltd. (Transworld Associates Pvt. Ltd.),Transworld Associates Pvt. Ltd.,isp,2026-11-01 14:11:17,EDT-Pages
+http://189.51.168.164:999,http,189.51.168.164,999,1377,0,alive,MIA,MX,189.51.168.164,AS270111 Comunicación por Fibra SA de CV,Comunicación por Fibra SA de CV,isp,2026-11-01 14:11:17,EDT-Pages
+http://175.106.15.186:8080,http,175.106.15.186,8080,1429,0,alive,CGK,ID,175.106.15.186,AS46023 PT Quantum Tera Network,PT Quantum Tera Network,isp,2026-11-01 14:11:17,EDT-Pages
+http://103.156.75.243:3125,http,103.156.75.243,3125,1482,0,alive,CGK,ID,103.251.8.52,AS141082 PT Trika Media Teknologi,PT Trika Media Teknologi,isp,2026-11-01 14:11:17,EDT-Pages
+http://189.148.34.54:8080,http,189.148.34.54,8080,1506,0,alive,DFW,MX,189.148.34.54,AS8151 UNINET,Gestión de direccionamiento UniNet,isp,2026-11-01 14:11:17,EDT-Pages
+http://181.79.157.171:999,http,181.79.157.171,999,1520,0,alive,BOG,CO,181.79.157.171,"AS52468 Ufinet Panama S.A. (UFINET COLOMBIA, S. A.)","UFINET COLOMBIA, S. A.",isp,2026-11-01 14:11:17,EDT-Pages
+http://45.71.185.217:9991,http,45.71.185.217,9991,1574,0,alive,GYE,EC,45.71.185.216,AS52468 Ufinet Panama S.A. (NEGOCIOS Y TELEFONIA NEDETEL S.A.),NEGOCIOS Y TELEFONIA NEDETEL S.A.,isp,2026-11-01 14:11:17,EDT-Pages
+http://82.41.42.229:1080,http,82.41.42.229,1080,1629,0,alive,SIN,ID,125.166.94.245,AS7713 PT TELKOM INDONESIA,PT TELKOM INDONESIA,isp,2026-11-01 14:11:17,EDT-Pages
+http://170.78.208.32:999,http,170.78.208.32,999,1711,0,alive,QRO,MX,170.78.208.34,AS270158 REDPON SA DE CV,REDPON SA DE CV,isp,2026-11-01 14:11:17,EDT-Pages
+http://188.119.98.126:9999,http,188.119.98.126,9999,1741,0,alive,PRG,CZ,188.119.98.126,"AS42908 Nordic Telecom Regional s.r.o. (O2 Czech Republic, a.s.)","O2 Czech Republic, a.s.",isp,2026-11-01 14:11:17,EDT-Pages
+http://182.53.202.238:80,http,182.53.202.238,80,1857,0,alive,BKK,TH,182.53.202.238,AS23969 TOT Public Company Limited,TOT Public Company Limited,isp,2026-11-01 14:11:17,EDT-Pages
+http://212.200.223.89:8080,http,212.200.223.89,8080,2031,0,alive,BEG,RS,212.200.223.89,"AS8400 TELEKOM SRBIJA a.d. (TELEKOM SRBIJA, ADSL users)","TELEKOM SRBIJA, ADSL users",isp,2026-11-01 14:11:17,EDT-Pages
+http://38.226.242.61:8080,http,38.226.242.61,8080,2117,0,alive,CGK,ID,38.226.242.61,AS152032 PT Putra Garsel Interkoneksi,PT Putra Garsel Interkoneksi,isp,2026-11-01 14:11:17,EDT-Pages
+http://103.156.248.53:8080,http,103.156.248.53,8080,2122,0,alive,CGK,ID,103.156.248.53,AS58821 PT Trans Media Telekomunikasi,PT Trans Media Telekomunikasi,isp,2026-11-01 14:11:17,EDT-Pages
+http://160.19.146.82:2022,http,160.19.146.82,2022,2207,0,alive,CGK,ID,160.19.146.82,AS152775 PT Taska Sarana Nusantara,PT Taska Sarana Nusantara,isp,2026-11-01 14:11:17,EDT-Pages
+http://45.68.63.201:999,http,45.68.63.201,999,2237,0,alive,SAP,HN,45.68.63.150,AS64150 PIT HONDURAS S. DE R.L. DE C.V.,PIT HONDURAS S. DE R.L. DE C.V.,isp,2026-11-01 14:11:17,EDT-Pages
+http://103.193.144.251:8080,http,103.193.144.251,8080,2336,0,alive,CGK,ID,103.193.144.251,AS58821 PT Jaringan Kabel Nusantara,PT Jaringan Kabel Nusantara,isp,2026-11-01 14:11:17,EDT-Pages
+http://103.80.215.98:8080,http,103.80.215.98,8080,2407,0,alive,CGK,ID,103.80.215.98,AS153092 PT Redi Revolusi Digital Solusi,PT Redi Revolusi Digital Solusi,isp,2026-11-01 14:11:17,EDT-Pages
+http://23.138.88.96:999,http,23.138.88.96,999,2481,0,alive,SJU,PR,23.138.88.97,AS400354 ALPHANET CORP,ALPHANET CORP,isp,2026-11-01 14:11:17,EDT-Pages
