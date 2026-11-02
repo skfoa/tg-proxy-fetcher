@@ -2679,7 +2679,19 @@
     "Regional Digital Telecommunication Company LLC": "AS29072",
     "TRS": "AS13444",
     "Datalahti Oy": "AS199231",
-    "PLDT GLOBAL Corp. Internet-based Services AP": "AS23988"
+    "PLDT GLOBAL Corp. Internet-based Services AP": "AS23988",
+    "WISP TECNOGER, C.A.": "AS273093",
+    "ELS INTER TELECOMUNICACIONES, S.R.L.": "AS273982",
+    "Saudi Telecom Company JSC": "AS25019",
+    "JSC \"ER-Telecom Holding\"": "AS57026",
+    "GARCIA TELECOMUNICACOES LTDA": "AS265989",
+    "SPEED AIRLIVE BROADBAND SERVICES PVT LTD": "AS138283",
+    "ONE TELECOMUNICACIONES SAS": "AS273896",
+    "Miranda-Media Ltd": "AS201776",
+    "Rices Privately owned enterprise": "AS48693",
+    "Starry, Inc.": "AS395354",
+    "HCN Dongjak": "AS7562",
+    "Ulsan Jung-Ang Broadcasting Network": "AS45361"
   },
   "asn_to_isp": {
     "AS10001": "Mics Network Corporation",
@@ -5240,7 +5252,23 @@
     "AS29072": "Regional Digital Telecommunication Company LLC",
     "AS13444": "TRS",
     "AS199231": "Datalahti Oy",
-    "AS23988": "PLDT GLOBAL Corp. Internet-based Services AP"
+    "AS23988": "PLDT GLOBAL Corp. Internet-based Services AP",
+    "AS273093": "WISP TECNOGER, C.A.",
+    "AS273982": "ELS INTER TELECOMUNICACIONES, S.R.L.",
+    "AS25019": "Saudi Telecom Company JSC",
+    "AS57026": "JSC \"ER-Telecom Holding\"",
+    "AS265989": "GARCIA TELECOMUNICACOES LTDA",
+    "AS138283": "SPEED AIRLIVE BROADBAND SERVICES PVT LTD",
+    "AS269980": "K.G.B. TELECOMUNICACIONES S.A.S",
+    "AS273896": "ONE TELECOMUNICACIONES SAS",
+    "AS201776": "Miranda-Media Ltd",
+    "AS48693": "Rices Privately owned enterprise",
+    "AS34150": "JSC \"ER-Telecom Holding\"",
+    "AS60075": "GORODOK-NET Gorodok Ltd.",
+    "AS45374": "CCS",
+    "AS395354": "Starry, Inc.",
+    "AS7562": "HCN Dongjak",
+    "AS45361": "Ulsan Jung-Ang Broadcasting Network"
   },
   "asn_to_net_type": {
     "AS10001": "isp",
@@ -8805,6 +8833,20 @@
     "AS29072": "isp",
     "AS13444": "datacenter",
     "AS199231": "datacenter",
-    "AS23988": "isp"
+    "AS23988": "isp",
+    "AS273093": "isp",
+    "AS273982": "isp",
+    "AS25019": "isp",
+    "AS57026": "isp",
+    "AS265989": "isp",
+    "AS138283": "isp",
+    "AS269980": "isp",
+    "AS273896": "isp",
+    "AS201776": "isp",
+    "AS48693": "business",
+    "AS34150": "isp",
+    "AS60075": "datacenter",
+    "AS45374": "datacenter",
+    "AS395354": "datacenter"
   }
 }

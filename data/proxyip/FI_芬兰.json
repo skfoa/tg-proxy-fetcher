@@ -20,5 +20,27 @@
     "isp": "DNA Oyj",
     "net_type": "isp",
     "source": "@cmliussss_all"
+  },
+  {
+    "proxy": "62.78.157.86:443",
+    "ip": "62.78.157.86",
+    "port": 443,
+    "tls": true,
+    "clientIp": "2001:14ba:46f2:de00::191",
+    "clientIps": [
+      "2001:14ba:46f2:de00::191"
+    ],
+    "clientIpv4": "",
+    "clientIpv6": "2001:14ba:46f2:de00::191",
+    "dual_stack": false,
+    "country": "FI",
+    "country_name": "芬兰",
+    "country_cn": "芬兰",
+    "country_emoji": "🇫🇮",
+    "asn": "16086",
+    "asOrganization": "DNA Oyj",
+    "isp": "DNA Oyj",
+    "net_type": "isp",
+    "source": "@cmliussss_all"
   }
 ]

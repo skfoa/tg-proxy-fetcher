@@ -1,25 +1,25 @@
 [
   {
-    "proxy": "110.232.84.159:2053",
-    "ip": "110.232.84.159",
-    "port": 2053,
+    "proxy": "43.173.1.153:8443",
+    "ip": "43.173.1.153",
+    "port": 8443,
     "tls": true,
-    "clientIp": "110.232.84.159",
+    "clientIp": "2001:448a:2050:3a15:3647:d4ff:fed5:4a24",
     "clientIps": [
-      "110.232.84.159"
+      "2001:448a:2050:3a15:3647:d4ff:fed5:4a24"
     ],
-    "clientIpv4": "110.232.84.159",
-    "clientIpv6": "",
+    "clientIpv4": "",
+    "clientIpv6": "2001:448a:2050:3a15:3647:d4ff:fed5:4a24",
     "dual_stack": false,
     "country": "ID",
     "country_name": "印度尼西亚",
     "country_cn": "印度尼西亚",
     "country_emoji": "🇮🇩",
-    "asn": "23679",
-    "asOrganization": "PT. Media Antar Nusa",
-    "isp": "PT. Media Antar Nusa",
+    "asn": "7713",
+    "asOrganization": "PT Telekomunikasi Indonesia",
+    "isp": "PT Telekomunikasi Indonesia",
     "net_type": "isp",
-    "source": "@danfeng_chat"
+    "source": "@cmliussss_all"
   },
   {
     "proxy": "43.229.254.182:443",
@@ -44,16 +44,16 @@
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "43.229.254.71:443",
-    "ip": "43.229.254.71",
-    "port": 443,
+    "proxy": "110.232.84.159:2053",
+    "ip": "110.232.84.159",
+    "port": 2053,
     "tls": true,
-    "clientIp": "2401:2900:108::135",
+    "clientIp": "110.232.84.159",
     "clientIps": [
-      "2401:2900:108::135"
+      "110.232.84.159"
     ],
-    "clientIpv4": "",
-    "clientIpv6": "2401:2900:108::135",
+    "clientIpv4": "110.232.84.159",
+    "clientIpv6": "",
     "dual_stack": false,
     "country": "ID",
     "country_name": "印度尼西亚",
@@ -63,29 +63,7 @@
     "asOrganization": "PT. Media Antar Nusa",
     "isp": "PT. Media Antar Nusa",
     "net_type": "isp",
-    "source": "@cmliussss_all"
-  },
-  {
-    "proxy": "43.173.1.153:8443",
-    "ip": "43.173.1.153",
-    "port": 8443,
-    "tls": true,
-    "clientIp": "2001:448a:2050:3a15:3647:d4ff:fed5:4a24",
-    "clientIps": [
-      "2001:448a:2050:3a15:3647:d4ff:fed5:4a24"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2001:448a:2050:3a15:3647:d4ff:fed5:4a24",
-    "dual_stack": false,
-    "country": "ID",
-    "country_name": "印度尼西亚",
-    "country_cn": "印度尼西亚",
-    "country_emoji": "🇮🇩",
-    "asn": "7713",
-    "asOrganization": "PT Telekomunikasi Indonesia",
-    "isp": "PT Telekomunikasi Indonesia",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
+    "source": "@danfeng_chat"
   },
   {
     "proxy": "103.153.131.67:443",
@@ -108,5 +86,27 @@
     "isp": "Sekolah Tinggi Teknologi Kedirgantaraan Yogyakarta",
     "net_type": "education",
     "source": "@danfeng_chat"
+  },
+  {
+    "proxy": "43.229.254.71:443",
+    "ip": "43.229.254.71",
+    "port": 443,
+    "tls": true,
+    "clientIp": "2401:2900:108::135",
+    "clientIps": [
+      "2401:2900:108::135"
+    ],
+    "clientIpv4": "",
+    "clientIpv6": "2401:2900:108::135",
+    "dual_stack": false,
+    "country": "ID",
+    "country_name": "印度尼西亚",
+    "country_cn": "印度尼西亚",
+    "country_emoji": "🇮🇩",
+    "asn": "23679",
+    "asOrganization": "PT. Media Antar Nusa",
+    "isp": "PT. Media Antar Nusa",
+    "net_type": "isp",
+    "source": "@cmliussss_all"
   }
 ]

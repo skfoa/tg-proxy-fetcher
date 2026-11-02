@@ -22,24 +22,24 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "103.115.109.227:39738",
-    "ip": "103.115.109.227",
-    "port": 39738,
-    "tls": false,
-    "clientIp": "103.115.109.227",
+    "proxy": "61.216.113.194:443",
+    "ip": "61.216.113.194",
+    "port": 443,
+    "tls": true,
+    "clientIp": "2407:4b00:6c03:d6e:20c:29ff:fed8:1086",
     "clientIps": [
-      "103.115.109.227"
+      "2407:4b00:6c03:d6e:20c:29ff:fed8:1086"
     ],
-    "clientIpv4": "103.115.109.227",
-    "clientIpv6": "",
+    "clientIpv4": "",
+    "clientIpv6": "2407:4b00:6c03:d6e:20c:29ff:fed8:1086",
     "dual_stack": false,
     "country": "TW",
     "country_name": "中国台湾",
     "country_cn": "中国台湾",
     "country_emoji": "🇹🇼",
-    "asn": "152179",
-    "asOrganization": "Global Communication Network",
-    "isp": "Global Communication Network",
+    "asn": "24165",
+    "asOrganization": "UNION BROADBAND NETWORK",
+    "isp": "UNION BROADBAND NETWORK",
     "net_type": "isp",
     "source": "@danfeng_chat"
   },
@@ -66,16 +66,16 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "220.134.133.216:4443",
-    "ip": "220.134.133.216",
-    "port": 4443,
+    "proxy": "203.69.23.30:443",
+    "ip": "203.69.23.30",
+    "port": 443,
     "tls": true,
-    "clientIp": "2001:b011:b004:d0f1:215:5dff:fe01:6702",
+    "clientIp": "203.69.23.30",
     "clientIps": [
-      "2001:b011:b004:d0f1:215:5dff:fe01:6702"
+      "203.69.23.30"
     ],
-    "clientIpv4": "",
-    "clientIpv6": "2001:b011:b004:d0f1:215:5dff:fe01:6702",
+    "clientIpv4": "203.69.23.30",
+    "clientIpv6": "",
     "dual_stack": false,
     "country": "TW",
     "country_name": "中国台湾",
@@ -110,6 +110,28 @@
     "source": "@danfeng_chat"
   },
   {
+    "proxy": "103.115.109.227:39738",
+    "ip": "103.115.109.227",
+    "port": 39738,
+    "tls": false,
+    "clientIp": "103.115.109.227",
+    "clientIps": [
+      "103.115.109.227"
+    ],
+    "clientIpv4": "103.115.109.227",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "TW",
+    "country_name": "中国台湾",
+    "country_cn": "中国台湾",
+    "country_emoji": "🇹🇼",
+    "asn": "152179",
+    "asOrganization": "Global Communication Network",
+    "isp": "Global Communication Network",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
+  },
+  {
     "proxy": "140.115.53.51:443",
     "ip": "140.115.53.51",
     "port": 443,
@@ -130,28 +152,6 @@
     "isp": "TW NCU",
     "net_type": "education",
     "source": "@cmliussss_all"
-  },
-  {
-    "proxy": "61.216.113.194:443",
-    "ip": "61.216.113.194",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2407:4b00:6c03:d6e:20c:29ff:fed8:1086",
-    "clientIps": [
-      "2407:4b00:6c03:d6e:20c:29ff:fed8:1086"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2407:4b00:6c03:d6e:20c:29ff:fed8:1086",
-    "dual_stack": false,
-    "country": "TW",
-    "country_name": "中国台湾",
-    "country_cn": "中国台湾",
-    "country_emoji": "🇹🇼",
-    "asn": "24165",
-    "asOrganization": "UNION BROADBAND NETWORK",
-    "isp": "UNION BROADBAND NETWORK",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
   },
   {
     "proxy": "125.229.205.26:443",
@@ -176,16 +176,16 @@
     "source": "@danfeng2"
   },
   {
-    "proxy": "203.69.23.30:443",
-    "ip": "203.69.23.30",
-    "port": 443,
+    "proxy": "220.134.133.216:4443",
+    "ip": "220.134.133.216",
+    "port": 4443,
     "tls": true,
-    "clientIp": "203.69.23.30",
+    "clientIp": "2001:b011:b004:d0f1:215:5dff:fe01:6702",
     "clientIps": [
-      "203.69.23.30"
+      "2001:b011:b004:d0f1:215:5dff:fe01:6702"
     ],
-    "clientIpv4": "203.69.23.30",
-    "clientIpv6": "",
+    "clientIpv4": "",
+    "clientIpv6": "2001:b011:b004:d0f1:215:5dff:fe01:6702",
     "dual_stack": false,
     "country": "TW",
     "country_name": "中国台湾",
@@ -218,27 +218,5 @@
     "isp": "Chunghwa Telecom HiNet",
     "net_type": "isp",
     "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "114.34.210.159:443",
-    "ip": "114.34.210.159",
-    "port": 443,
-    "tls": true,
-    "clientIp": "114.34.210.159",
-    "clientIps": [
-      "114.34.210.159"
-    ],
-    "clientIpv4": "114.34.210.159",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "TW",
-    "country_name": "中国台湾",
-    "country_cn": "中国台湾",
-    "country_emoji": "🇹🇼",
-    "asn": "3462",
-    "asOrganization": "Chunghwa Telecom Data Communication Business Group",
-    "isp": "Chunghwa Telecom Data Communication Business Group",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
   }
 ]

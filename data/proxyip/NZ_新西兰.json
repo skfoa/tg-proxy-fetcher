@@ -22,28 +22,6 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "121.74.188.227:443",
-    "ip": "121.74.188.227",
-    "port": 443,
-    "tls": true,
-    "clientIp": "121.74.188.227",
-    "clientIps": [
-      "121.74.188.227"
-    ],
-    "clientIpv4": "121.74.188.227",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "NZ",
-    "country_name": "新西兰",
-    "country_cn": "新西兰",
-    "country_emoji": "🇳🇿",
-    "asn": "9500",
-    "asOrganization": "One New Zealand Group Limited",
-    "isp": "One New Zealand Group Limited",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "161.29.46.212:443",
     "ip": "161.29.46.212",
     "port": 443,
@@ -62,6 +40,28 @@
     "asn": "9790",
     "asOrganization": "Two Degrees Networks Limited",
     "isp": "Two Degrees Networks Limited",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
+  },
+  {
+    "proxy": "121.74.188.227:443",
+    "ip": "121.74.188.227",
+    "port": 443,
+    "tls": true,
+    "clientIp": "121.74.188.227",
+    "clientIps": [
+      "121.74.188.227"
+    ],
+    "clientIpv4": "121.74.188.227",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "NZ",
+    "country_name": "新西兰",
+    "country_cn": "新西兰",
+    "country_emoji": "🇳🇿",
+    "asn": "9500",
+    "asOrganization": "One New Zealand Group Limited",
+    "isp": "One New Zealand Group Limited",
     "net_type": "isp",
     "source": "@danfeng_chat"
   },
