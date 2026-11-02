@@ -203,9 +203,100 @@ for _asn, _isp in KNOWN_CLOUD_PROVIDERS.values():
         AUTHORITATIVE_CLOUD_ASNS[_asn] = _isp
 ASN_TO_PROVIDER = dict(AUTHORITATIVE_CLOUD_ASNS)
 
-# 核心基准骨干自治系统网络类型定义（权威锁定）
-_CORE_BASELINE_NET_TYPES: dict[str, str] = {
-    # 核心运营商骨干与主流 ISP (权威锁定为 isp)
+# =====================================================================
+# L0: 人工确证网络类型裁决表 (Manual SSOT Overrides: 核心公有云/数据中心机房/知名宽带ISP/商业专线与金融专网)
+# =====================================================================
+MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
+    # --- [L0 裁决 A: 头部公有云、IDC 与 VPS 主机商，严格锁定为 datacenter] ---
+    "AS16509": "datacenter",  # Amazon AWS / Amazon.com, Inc. (amazon.com)
+    "AS14618": "datacenter",  # Amazon.com / AWS (amazon.com)
+    "AS8075": "datacenter",   # Microsoft Corporation / Azure (microsoft.com)
+    "AS45102": "datacenter",  # Alibaba (US) Technology Co., Ltd. (alibabagroup.com)
+    "AS132203": "datacenter", # Tencent Building, Kejizhongyi Avenue (tencent.com)
+    "AS31898": "datacenter",  # Oracle Corporation (oracle.com)
+    "AS3214": "datacenter",   # xTom GmbH (xtom.com, 知名 VPS/主机商)
+    "AS3258": "datacenter",   # xTom Tokyo / VirMach (xtom.com)
+    "AS4785": "datacenter",   # xTom Osaka (xtom.com)
+    "AS6233": "datacenter",   # xTom San Jose (xtom.com)
+    "AS7720": "datacenter",   # Skywolf Cloud (skywolf.net)
+    "AS8888": "datacenter",   # xTom APAC (xtom.com)
+    "AS9312": "datacenter",   # xTom Hong Kong (xtom.com)
+    "AS22295": "datacenter",  # Advin Services LLC (advinservers.com, VPS 主机商)
+    "AS22781": "datacenter",  # Black Oak Computers Inc (算力服务器)
+    "AS34343": "datacenter",  # BIP Backbone ASN / Eweka (eweka.nl, ipinfo核准为hosting)
+    "AS39618": "datacenter",  # HostCram LLC (hostcram.com, 主机商)
+    "AS44382": "datacenter",  # FibaCloud (fibacloud.com, 云服务器机房)
+    "AS45090": "datacenter",  # 腾讯云 (Shenzhen Tencent Computer Systems Company Limited, tencent.com)
+    "AS49870": "datacenter",  # Alsycon B.V. (as49870.net, 云主机托管)
+    "AS55933": "datacenter",  # Cloudie Limited (worria.com, 云主机托管)
+    "AS56971": "datacenter",  # CGI GLOBAL LIMITED (hostvds.com, 香港云主机)
+    "AS61112": "datacenter",  # AkileCloud Network (akilecloud.com, 云服务器机房)
+    "AS62651": "datacenter",  # Strong Technology, LLC (strongtechnology.net, 算力服务器)
+    "AS134677": "datacenter", # Dromatics Systems Pte Ltd (drosys.com, 机房 IDC)
+    "AS136258": "datacenter", # BrainStorm Network, Inc (oneprovider.com, 机房)
+    "AS138915": "datacenter", # Kaopu Cloud HK Limited (kaopucloud.com, 云主机)
+    "AS146943": "datacenter", # Tier 4 Cloud Services (tier4.cloud, 数据中心)
+    "AS149440": "datacenter", # Evoxt Sdn. Bhd. (evoxt.com, VPS 主机商)
+    "AS198610": "datacenter", # Beget LLC (beget.com, 云主机托管)
+    "AS202448": "datacenter", # MVPS LTD (mvps.net, VPS 主机商)
+    "AS206216": "datacenter", # Advin Services LLC (advinservers.com, VPS 主机商)
+    "AS206675": "datacenter", # PumpCloud JP / PAN-LIAN (pumpcloud.net, 云主机机房)
+    "AS207847": "datacenter", # CloudBlast LLC (cloudblast.io, 云主机)
+    "AS214478": "datacenter", # Sakura Clouds LLC (sakuraclouds.com, 云服务器)
+    "AS207143": "datacenter", # hosttech GmbH (hosttech.ch, 瑞士机房/主机托管)
+    "AS216054": "datacenter", # Taymaz Gostaran Naghshe Almas (viphost.cloud, 算力IDC)
+    "AS200912": "datacenter", # Joel Krause (vpslayer.net, ipinfo核准为hosting)
+    "AS55799": "datacenter",  # IPTELECOM ASIA (iptelecom.asia, ipinfo: hosting)
+    "AS135357": "datacenter", # HONG KONG KOWLOON TELECOMMUNICATIONS (as3491.net, ipinfo: hosting)
+    "AS199669": "datacenter", # Okay-Telecom Ltd. / ATLEX.RU (atlex.ru, ipinfo: hosting)
+    "AS33842": "datacenter",  # Citytelecom LLC (CrossTelecom, crosstelecom.ru, ipinfo: hosting)
+    "AS62642": "datacenter",  # Bigleaf Networks, Inc. (bigleaf.net, ipinfo: hosting)
+    "AS137535": "datacenter", # JT Telecom International / JTTI (jtti.cc, 云主机/机房)
+    "AS205548": "datacenter", # Zouter Limited (zouter.io, 云主机/VPS)
+    "AS202147": "datacenter", # VPSUS LTD (vpsus.com, 云主机/VPS)
+    "AS397373": "datacenter", # H4Y Technologies LLC / HostDare (hostdare.com, 云主机/机房)
+    "AS54600": "datacenter",  # PEG TECH INC (misaka.io, 云主机/机房)
+    "AS201106": "datacenter", # Spartan Host Ltd (spartanhost.org, VPS/主机)
+    "AS38136": "datacenter",  # Akari Networks Limited (akarinetworks.com, 香港IDC)
+    "AS14315": "datacenter",  # 1GSERVERS, LLC (1gservers.com, Phoenix机房)
+    "AS202996": "datacenter", # Helkor (Ondrej Vrana, cbe-hosting.com, 捷克机房)
+    "AS214159": "datacenter", # UAB Cherry Servers (balticservers.com, 立陶宛机房)
+    "AS59642": "datacenter",  # UAB Cherry Servers (balticservers.com, 立陶宛机房)
+    "AS213840": "datacenter", # DDOS PROTECTION LTD (英国高防机房)
+    "AS152324": "datacenter", # 3XNET Co., Ltd. (亚太云主机机房)
+    "AS135636": "datacenter", # PT. RACKH LINTAS ASIA (rackh.co.id, 印尼机房)
+    "AS151873": "datacenter", # TOTHOST SOLUTIONS AND TECHNOLOGIES COMPANY LIMITED (tothost.vn, 越南VPS/机房)
+    "AS213035": "datacenter", # Serverion B.V. (serverion.com, 荷兰机房/主机托管, SoftShellWeb上游)
+    "AS26042": "datacenter",  # FiberState, LLC (ipinfo: Hosting)
+    "AS152194": "datacenter", # CTG Server Limited (机房/云主机, ipinfo: Hosting)
+    "AS20071": "datacenter",  # KUXUEYUN LLC (酷雪云, IDC机房, ipinfo: Hosting)
+    "AS906": "datacenter",    # DMIT Cloud Services (IDC机房, ipinfo: Hosting)
+    "AS214195": "datacenter", # Tres Teknoloji A.S. (IDC机房, ipinfo: Hosting)
+    "AS8796": "datacenter",   # FASTNET DATA INC (Kurun Cloud, IDC机房, ipinfo: Hosting)
+    "AS216475": "datacenter", # NKtelecom INC (ipinfo: Hosting)
+    "AS200239": "datacenter", # Bogahost Bilisim (ipinfo: Hosting)
+    "AS15401": "datacenter",  # Orange Business Services SA (orange.com, ipinfo: Hosting)
+    "AS10753": "datacenter",  # Level 3 Parent, LLC / Lumen (lumen.com, ipinfo: Hosting)
+    "AS7630": "datacenter",   # (ipinfo: Hosting)
+    "AS207705": "datacenter", # TW NCU (ipinfo: Hosting)
+    "AS214822": "datacenter", # MT FINANCE LLC (ipinfo: Hosting)
+    "AS199144": "datacenter", # HexCore cloud s.r.o. (ipinfo: Hosting)
+    "AS57169": "datacenter",  # EDIS GmbH (ipinfo: Hosting)
+    "AS396986": "datacenter", # Bytedance Inc. (ipinfo: Hosting)
+    "AS23724": "datacenter",  # IDC, China Telecommunications Corporation (ipinfo: Hosting)
+    "AS135598": "datacenter", # Siberfy (APNIC: SIBERFY-AS-AP, ipinfo: Hosting)
+    "AS13335": "datacenter",  # Cloudflare
+    "AS15169": "datacenter",  # Google
+    "AS54253": "datacenter",  # Oracle Corporation (ipinfo: Hosting)
+    "AS45062": "datacenter",  # NetEase
+    "AS137753": "datacenter", # JD Cloud
+    "AS59019": "datacenter",  # Kingsoft Cloud
+    "AS137280": "datacenter", # Kingsoft Cloud
+    "AS135377": "datacenter", # UCloud
+    "AS36007": "datacenter",  # Kamatera
+    "AS25693": "datacenter",  # VirMach
+
+    # --- [L0 裁决 B: 知名正牌民用宽带 ISP，权威核准为 isp] ---
     "AS4134": "isp",          # 中国电信 163
     "AS4811": "isp",          # 中国电信集团
     "AS4809": "isp",          # 中国电信 CN2
@@ -219,76 +310,108 @@ _CORE_BASELINE_NET_TYPES: dict[str, str] = {
     "AS4760": "isp",          # 香港电讯 HKT
     "AS4766": "isp",          # 韩国电信 KT
     "AS9318": "isp",          # 韩国 SK Broadband
-    "AS17621": "isp",         # 中国联通上海网络 (China Unicom Shanghai network)
-    "AS14813": "isp",         # Columbus Telecommunications (Barbados) Limited (Flow)
-    "AS29076": "isp",         # Citytelecom LLC (Filanco, citytelecom.ru, 俄罗斯宽带ISP)
-    "AS62711": "isp",         # Maxwell Telecom LLC (ipinfo: ISP)
-    "AS63150": "isp",         # BAGE CLOUD LLC (机房双ISP/原生住宅IP, ipinfo官方注册类型为ISP)
     "AS174": "isp",           # Cogent Communications, LLC (Tier 1 国际骨干/ISP, ipinfo: ISP)
     "AS1299": "isp",          # Arelion Sweden AB / Telia (Tier 1 国际骨干/ISP, ipinfo: ISP)
     "AS3257": "isp",          # GTT Communications Inc. (Tier 1 国际骨干/ISP, ipinfo: ISP)
     "AS58682": "isp",         # Level3 Carrier Ltd. (Tier 1 国际骨干/ISP, ipinfo: ISP)
     "AS7738": "isp",          # V.tal (vtal.com, 巴西主流电信与国际海缆, ipinfo: ISP)
     "AS8167": "isp",          # V.tal (ipinfo: ISP)
+    "AS9891": "isp",          # CS LOXINFO (csloxinfo.com, ipinfo: ISP)
+    "AS34665": "isp",         # Petersburg Internet Network (pindc.ru, ipinfo: ISP)
     "AS134835": "isp",        # Starry Network (ipinfo: ISP)
     "AS152179": "isp",        # (ipinfo: ISP)
     "AS209604": "isp",        # 2E TELEKOMUNIKASYON (ipinfo: ISP)
-    "AS216475": "isp",        # NKtelecom INC (ipinfo: ISP)
-
-    # 核心云厂商机房 (权威锁定为 datacenter)
-    "AS152194": "datacenter", # CTG Server Limited (ipinfo: Hosting)
-    "AS20071": "datacenter",  # KUXUEYUN LLC (ipinfo: Hosting)
-    "AS906": "datacenter",    # DMIT Cloud Services (ipinfo: Hosting)
-    "AS214195": "datacenter", # Tres Teknoloji A.S. (ipinfo: Hosting)
-    "AS8796": "datacenter",   # FASTNET DATA INC (Kurun Cloud, ipinfo: Hosting)
-    "AS9891": "datacenter",   # CS LOXINFO (csloxinfo.com, ipinfo: Hosting)
-    "AS34665": "datacenter",  # Petersburg Internet Network (pindc.ru, ipinfo: Hosting)
-    "AS26042": "datacenter",  # FiberState, LLC (ipinfo: Hosting)
-    "AS199144": "datacenter", # HexCore cloud s.r.o. (ipinfo: Hosting)
-    "AS57169": "datacenter",  # EDIS GmbH (ipinfo: Hosting)
-    "AS396986": "datacenter", # Bytedance Inc. (ipinfo: Hosting)
-    "AS23724": "datacenter",  # IDC, China Telecommunications Corporation (ipinfo: Hosting)
-    "AS135598": "datacenter", # Siberfy (APNIC: SIBERFY-AS-AP, ipinfo: Hosting)
-    "AS13335": "datacenter",  # Cloudflare
-    "AS15169": "datacenter",  # Google
-    "AS16509": "datacenter",  # Amazon AWS
-    "AS8075": "datacenter",   # Microsoft Azure
-    "AS45102": "datacenter",  # Alibaba Cloud
-    "AS132203": "datacenter", # Tencent Cloud
-    "AS31898": "datacenter",  # Oracle Cloud
-    "AS54253": "isp",         # Oracle Corporation (ipinfo: ISP)
-    "AS397540": "isp",        # Windscribe Limited (ipinfo: ISP)
-    "AS207143": "datacenter", # hosttech GmbH (瑞士机房/主机托管)
-    "AS216054": "datacenter", # Taymaz Gostaran Naghshe Almas Co. (Ltd) (算力IDC)
+    "AS400951": "isp",        # Akari Networks LLC (akarinetworks.com, ipinfo: ISP)
+    "AS273961": "isp",        # LUDWIN GROUP COMPANY SRL (ipinfo: ISP)
+    "AS273007": "isp",        # SPEEDNET, C.A (ipinfo: ISP)
+    "AS274414": "isp",        # Osbaldo Tovar Campero (ipinfo: ISP)
+    "AS1257": "isp",          # Tele2 Sverige AB (tele2.com, 欧洲顶级电信与家庭宽带)
+    "AS18106": "isp",         # Viewqwest Pte Ltd (viewqwest.com, 新加坡知名光纤宽带 ISP)
+    "AS63150": "isp",         # BAGE CLOUD LLC (bage.dev, 双ISP广播, 权威ipinfo核准为ISP)
+    "AS3226": "isp",          # OOO NI (mark.ru, Mark-ITT 俄罗斯老牌宽带运营商, 权威ipinfo核准为ISP)
+    "AS4787": "isp",          # PT Cyberindo Aditama (cbn.id, 印尼知名民用光纤宽带 CBN)
+    "AS135130": "isp",        # Anik Computer & Networking (aniknetwork.net, 孟加拉民用宽带ISP)
+    "AS197275": "isp",        # Link Telecom NN Ltd. (lt-nn.net, 俄罗斯下诺夫哥罗德电信运营商)
+    "AS16814": "isp",         # NSS S.A. (IPLAN Telecomunicaciones, iplan.com.ar, 阿根廷主流光纤运营商)
     "AS206069": "isp",        # Cornseed Limited (ipinfo: ISP)
-    "AS137535": "datacenter", # JT Telecom International / JTTI (jtti.cc, 云主机/机房)
-    "AS205548": "datacenter", # Zouter Limited (zouter.io, 云主机/VPS)
-    "AS202147": "datacenter", # VPSUS LTD (vpsus.com, 云主机/VPS)
-    "AS397373": "datacenter", # H4Y Technologies LLC / HostDare (hostdare.com, 云主机/机房)
-    "AS54600": "datacenter",  # PEG TECH INC (misaka.io, 云主机/机房)
-    "AS201106": "datacenter", # Spartan Host Ltd (spartanhost.org, VPS/主机)
-    "AS14315": "datacenter",  # 1GSERVERS, LLC (1gservers.com, Phoenix机房)
-    "AS33842": "datacenter",  # Citytelecom LLC (CrossTelecom, crosstelecom.ru, 云主机机房)
-    "AS151873": "datacenter", # TOTHOST SOLUTIONS AND TECHNOLOGIES COMPANY LIMITED (tothost.vn, 越南VPS/机房)
-    "AS213035": "datacenter", # Serverion B.V. (serverion.com, 荷兰机房/主机托管, SoftShellWeb上游)
-    "AS44907": "business",    # Telegram Messenger Inc. (ipinfo: Business)
-    "AS45062": "datacenter",  # NetEase
-    "AS137753": "datacenter", # JD Cloud
-    "AS131486": "business",   # JD.com (ipinfo: Business)
-    "AS59019": "datacenter",  # Kingsoft Cloud
-    "AS137280": "datacenter", # Kingsoft Cloud
-    "AS135377": "datacenter", # UCloud
-    "AS36007": "datacenter",  # Kamatera
-    "AS25693": "datacenter",  # VirMach
+    "AS397540": "isp",        # Windscribe Limited (ipinfo: ISP)
+    "AS35540": "isp",         # OVH SAS / OVH Telecom (ovhcloud.com, 法国电信与宽带接入网)
+    "AS17621": "isp",         # China Unicom Shanghai network (中国联通上海网络)
+    "AS25341": "isp",         # NPF ROI LLC (cstnet.ru, 俄罗斯宽带ISP)
+    "AS44347": "isp",         # Limited Company "SiNT" (俄罗斯地区ISP)
+    "AS24530": "isp",         # PT. Power Telecom Indonesia (Powertel, 印尼ISP)
+    "AS14813": "isp",         # Columbus Telecommunications (Barbados) Limited (巴巴多斯电信宽带)
+    "AS29076": "isp",         # Citytelecom LLC (Filanco, citytelecom.ru, 俄罗斯宽带ISP)
+    "AS272605": "isp",        # Grupo Ultra Fibra (巴西宽带ISP)
+    "AS36902": "isp",         # Intelvision Ltd (塞舌尔宽带ISP)
+    "AS24550": "isp",         # Websurfer Nepal Communication System (尼泊尔宽带ISP)
+    "AS14593": "isp",         # SpaceX Services / Starlink (星链低轨卫星民用宽带)
+    "AS134760": "isp",        # CHINANET Hebei (中国电信河北民用原生宽带)
+    "AS134420": "isp",        # CHINANET Chongqing (中国电信重庆民用原生宽带)
+    "AS137694": "isp",        # CHINANET Xinjiang (中国电信新疆民用原生宽带)
+    "AS137697": "isp",        # CHINANET Jiangsu (中国电信江苏民用原生宽带)
+    "AS4773": "isp",          # M1 LIMITED (新加坡主流电信与家庭光纤宽带)
+    "AS17547": "isp",         # M1 NET LTD (新加坡 M1 宽带网)
+    "AS8708": "isp",          # DIGI ROMANIA S.A. (罗马尼亚第一大民用光纤宽带)
+    "AS27699": "isp",         # TELEFÔNICA BRASIL S.A / Vivo (巴西第一大电信与民用光纤宽带)
+    "AS7004": "isp",          # TELEFÓNICA CHILE S.A. / Movistar (智利第一大民用光纤宽带)
+    "AS131429": "isp",        # MobiFone (越南主流移动通信与手机蜂窝宽带)
+    "AS14051": "isp",          # Fidium / Consolidated Communications (fidiumfiber.com, 美国民用光纤宽带)
+    "AS28716": "isp",          # Retelit Digital Services S.p.A. (retelit.it, 意大利电信与光纤宽带)
+    "AS17529": "isp",          # STARCAT Co., LTD. (starcat.co.jp, 日本名古屋有线电视与民用宽带 ISP)
+    "AS7511": "isp",           # SYNAPSE Co.,Ltd. (synapse.jp, 日本鹿儿岛民用宽带 ISP)
+    "AS62560": "isp",          # Hosted America (hostedamerica.com, 美国民用光纤宽带 ISP)
+    "AS62711": "isp",          # Maxwell Telecom LLC (ipinfo: ISP)
+    "AS38060": "isp",          # BIZNET / PT. Supra Primatama Nusantara (biznetnetworks.com, 印尼民用光纤宽带)
+    "AS8427": "isp",           # Joint Stock Company TransTeleCom / TTK (ttk.ru, 俄罗斯骨干电信与宽带运营商)
+    "AS21271": "isp",          # Society of Mali's Telecommunications / SOTELMA (sotelma.ml, 马里国家电信与宽带运营商)
+    "AS139282": "isp",         # Novus Network (novusnetwork, 宽带接入 ISP)
+    "AS11404": "isp",          # Wave Broadband / Astound (astound.com, 美国民用有线与光纤宽带)
+    "AS265606": "isp",         # DIGY NETWORKS (digynetworks.com.br, 巴西民用光纤宽带)
+    "AS154462": "isp",         # Yournet Communications (yournet.in, 印度民用宽带 ISP)
+    "AS152045": "isp",         # PT. PETABYTE NETWORK INDONESIA (petabyte.net.id, 印尼光纤宽带 ISP)
+    "AS12252": "isp",          # America Movil Peru S.A.C. / Claro Peru (claro.com.pe, 秘鲁电信与民用宽带)
+    "AS16010": "isp",          # Magticom Ltd. (magticom.ge, 格鲁吉亚第一大电信与民用光纤宽带)
+    "AS265605": "isp",         # VELOCOM SA DE CV (velocom.com.mx, 墨西哥电信与民用宽带)
+    "AS3302": "isp",           # Retelit Digital Services S.p.A. (retelit.it, 意大利全国光纤骨干与电信 ISP)
+    "AS394311": "isp",         # Digicel Turks and Caicos Ltd (digicelgroup.com, 加勒比海特克斯和凯科斯群岛电信宽带)
+    "AS17975": "isp",          # APT Datamatrix Limited (aptdatamatrix.com, 香港亚太卫星与电信网络)
+    "AS203101": "isp",         # Navarino Single Member S.A. (navarino.gr, 希腊海事卫星与电信网络服务商)
+    "AS38264": "isp",          # Wateen Telecom Limited (wateen.com, 巴基斯坦全国光纤与民用宽带 ISP)
+
+    # --- [L0 裁决 C: 核心国际银行金融专网 (对齐 ipinfo.io 业界权威标准，统一归入 business 商业专线)] ---
+    "AS1311": "business", "AS2600": "business", "AS3187": "business", "AS5091": "business",
+    "AS5458": "business", "AS6674": "business", "AS6773": "business", "AS7609": "business",
+    "AS7820": "business", "AS8373": "business",
+    "AS9016": "business", "AS9099": "business", "AS9118": "business", "AS9128": "business",
+    "AS9221": "business", "AS9522": "business", "AS9630": "business",
+    "AS9772": "business", "AS9863": "business", "AS207986": "business",
+    "AS8435": "business",     # Bank of Korea (ipinfo: business)
+    "AS25883": "business",    # Citigroup Inc. (ipinfo: business)
+
+    # --- [L0 裁决 D: 核心学术科研教育网 (权威核准为 education)] ---
+    "AS9488": "education",    # Seoul National University / SNU (首尔大学)
+    "AS199578": "education",  # Verein zur Foerderung eines Deutschen Forschungsnetzes e.V. (DFN, 德国国家科研教育网)
     "AS142078": "education",  # CERNET FITI Nodes (清华大学/未来互联网试验设施教育网节点)
     "AS3132": "education",    # Red Cientifica Peruana (rcp.pe, 秘鲁教育网, ipinfo: education)
+
+    # --- [L0 裁决 E: 商业企业专线与骨干中继 (权威核准为 business)] ---
+    "AS44907": "business",    # Telegram Messenger Inc. (ipinfo: Business)
+    "AS131486": "business",   # JD.com (ipinfo: Business)
+    "AS979": "business",      # NetLab Global (as979.net, 国际机房网络, ipinfo: business)
+    "AS20981": "business",    # InnovaPuglia SpA (RUPAR Puglia 区域宽带专网运营商, ipinfo: business)
+    "AS274029": "business",   # KAZAV LATAM E.I.R.L. / ASU TELECOM PERU (秘鲁商业网络, ipinfo: business)
+
+    # --- [L0 裁决 F: 国家政务与公共网络 (权威核准为 government)] ---
+    "AS327724": "government",  # National Information Technology Authority Uganda (NITA-U, 乌干达国家信息技术管理局政务网)
+    "AS9487": "government",    # Bank of Korea (ipinfo: government)
 }
 
 # 权威已知云厂商与核心骨干网 SSOT 网络类型基准表
 AUTHORITATIVE_CLOUD_NET_TYPES: dict[str, str] = {}
 for _asn, _isp in AUTHORITATIVE_CLOUD_ASNS.items():
-    if _asn in _CORE_BASELINE_NET_TYPES:
-        AUTHORITATIVE_CLOUD_NET_TYPES[_asn] = _CORE_BASELINE_NET_TYPES[_asn]
+    if _asn in MANUAL_OVERRIDE_NET_TYPES:
+        AUTHORITATIVE_CLOUD_NET_TYPES[_asn] = MANUAL_OVERRIDE_NET_TYPES[_asn]
     else:
         text = f"{_asn} {_isp}".lower()
         if any(p in text for p in ("china telecom", "korea telecom", "chunghwa telecom", "unicom", "mobile", "broadband", "hinet")):
@@ -365,12 +488,6 @@ def atomic_writer(
         raise
 
 
-def atomic_write_bytes(path: str, data: bytes) -> None:
-    """原子覆写二进制字节数据"""
-    with atomic_writer(path, mode="wb") as f:
-        f.write(data)
-
-
 def atomic_write_text(path: str, text: str, encoding: str = "utf-8", newline: str | None = "\n") -> None:
     """原子覆写纯文本数据 (跨平台默认严格强制 LF 换行，彻底杜绝 CRLF 污染)"""
     with atomic_writer(path, mode="w", encoding=encoding, newline=newline) as f:
@@ -392,175 +509,8 @@ ASN_DATABASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "da
 ASN_DATABASE_REL_PATH = os.path.join("data", "asn_database.json")
 
 
-# L0: 人工确证网络类型裁决表 (Manual SSOT Overrides: 核心公有云/数据中心机房/知名宽带ISP/商业专线与金融专网)
-MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
-    # --- [L0 裁决 A: 头部公有云、IDC 与 VPS 主机商，严格锁定为 datacenter] ---
-    "AS16509": "datacenter",  # Amazon AWS / Amazon.com, Inc. (amazon.com)
-    "AS14618": "datacenter",  # Amazon.com / AWS (amazon.com)
-    "AS8075": "datacenter",   # Microsoft Corporation / Azure (microsoft.com)
-    "AS45102": "datacenter",  # Alibaba (US) Technology Co., Ltd. (alibabagroup.com)
-    "AS132203": "datacenter", # Tencent Building, Kejizhongyi Avenue (tencent.com)
-    "AS31898": "datacenter",  # Oracle Corporation (oracle.com)
-    "AS3214": "datacenter",   # xTom GmbH (xtom.com, 知名 VPS/主机商)
-    "AS3258": "datacenter",   # xTom Tokyo / VirMach (xtom.com)
-    "AS4785": "datacenter",   # xTom Osaka (xtom.com)
-    "AS6233": "datacenter",   # xTom San Jose (xtom.com)
-    "AS7720": "datacenter",   # Skywolf Cloud (skywolf.net)
-    "AS8888": "datacenter",   # xTom APAC (xtom.com)
-    "AS9312": "datacenter",   # xTom Hong Kong (xtom.com)
-    "AS22295": "datacenter",  # Advin Services LLC (advinservers.com, VPS 主机商)
-    "AS22781": "datacenter",  # Black Oak Computers Inc (算力服务器)
-    "AS34343": "datacenter",  # BIP Backbone ASN / Eweka (eweka.nl, ipinfo核准为hosting)
-    "AS39618": "datacenter",  # HostCram LLC (hostcram.com, 主机商)
-    "AS44382": "datacenter",  # FibaCloud (fibacloud.com, 云服务器机房)
-    "AS45090": "datacenter",  # 腾讯云 (Shenzhen Tencent Computer Systems Company Limited, tencent.com)
-    "AS49870": "datacenter",  # Alsycon B.V. (as49870.net, 云主机托管)
-    "AS55933": "datacenter",  # Cloudie Limited (worria.com, 云主机托管)
-    "AS56971": "datacenter",  # CGI GLOBAL LIMITED (hostvds.com, 香港云主机)
-    "AS61112": "datacenter",  # AkileCloud Network (akilecloud.com, 云服务器机房)
-    "AS62651": "datacenter",  # Strong Technology, LLC (strongtechnology.net, 算力服务器)
-    "AS134677": "datacenter", # Dromatics Systems Pte Ltd (drosys.com, 机房 IDC)
-    "AS136258": "datacenter", # BrainStorm Network, Inc (oneprovider.com, 机房)
-    "AS138915": "datacenter", # Kaopu Cloud HK Limited (kaopucloud.com, 云主机)
-    "AS146943": "datacenter", # Tier 4 Cloud Services (tier4.cloud, 数据中心)
-    "AS149440": "datacenter", # Evoxt Sdn. Bhd. (evoxt.com, VPS 主机商)
-    "AS198610": "datacenter", # Beget LLC (beget.com, 云主机托管)
-    "AS202448": "datacenter", # MVPS LTD (mvps.net, VPS 主机商)
-    "AS206216": "datacenter", # Advin Services LLC (advinservers.com, VPS 主机商)
-    "AS206675": "datacenter", # PumpCloud JP / PAN-LIAN (pumpcloud.net, 云主机机房)
-    "AS207847": "datacenter", # CloudBlast LLC (cloudblast.io, 云主机)
-    "AS214478": "datacenter", # Sakura Clouds LLC (sakuraclouds.com, 云服务器)
-    "AS207143": "datacenter", # hosttech GmbH (hosttech.ch, 瑞士机房/主机托管)
-    "AS216054": "datacenter", # Taymaz Gostaran Naghshe Almas (viphost.cloud, 算力IDC)
-    "AS200912": "datacenter", # Joel Krause (vpslayer.net, ipinfo核准为hosting)
-    "AS55799": "datacenter",  # IPTELECOM ASIA (iptelecom.asia, ipinfo: hosting)
-    "AS135357": "datacenter", # HONG KONG KOWLOON TELECOMMUNICATIONS (as3491.net, ipinfo: hosting)
-    "AS199669": "datacenter", # Okay-Telecom Ltd. / ATLEX.RU (atlex.ru, ipinfo: hosting)
-    "AS33842": "datacenter",  # Citytelecom LLC (CrossTelecom, crosstelecom.ru, ipinfo: hosting)
-    "AS62642": "datacenter",  # Bigleaf Networks, Inc. (bigleaf.net, ipinfo: hosting)
-    "AS137535": "datacenter", # JT Telecom International / JTTI (jtti.cc, 云主机/机房)
-    "AS205548": "datacenter", # Zouter Limited (zouter.io, 云主机/VPS)
-    "AS202147": "datacenter", # VPSUS LTD (vpsus.com, 云主机/VPS)
-    "AS397373": "datacenter", # H4Y Technologies LLC / HostDare (hostdare.com, 云主机/机房)
-    "AS54600": "datacenter",  # PEG TECH INC (misaka.io, 云主机/机房)
-    "AS201106": "datacenter", # Spartan Host Ltd (spartanhost.org, VPS/主机)
-    "AS400951": "datacenter", # Akari Networks LLC (akarinetworks.com, 机房IDC)
-    "AS38136": "datacenter",  # Akari Networks Limited (akarinetworks.com, 香港IDC)
-    "AS14315": "datacenter",  # 1GSERVERS, LLC (1gservers.com, Phoenix机房)
-    "AS202996": "datacenter", # Helkor (Ondrej Vrana, cbe-hosting.com, 捷克机房)
-    "AS214159": "datacenter", # UAB Cherry Servers (balticservers.com, 立陶宛机房)
-    "AS59642": "datacenter",  # UAB Cherry Servers (balticservers.com, 立陶宛机房)
-    "AS213840": "datacenter", # DDOS PROTECTION LTD (英国高防机房)
-    "AS152324": "datacenter", # 3XNET Co., Ltd. (亚太云主机机房)
-    "AS135636": "datacenter", # PT. RACKH LINTAS ASIA (rackh.co.id, 印尼机房)
-    "AS151873": "datacenter", # TOTHOST SOLUTIONS AND TECHNOLOGIES COMPANY LIMITED (tothost.vn, 越南VPS/机房)
-    "AS213035": "datacenter", # Serverion B.V. (serverion.com, 荷兰机房/主机托管, SoftShellWeb上游)
-    "AS26042": "datacenter",  # FiberState, LLC (ipinfo: Hosting)
-    "AS152194": "datacenter", # CTG Server Limited (机房/云主机, ipinfo: Hosting)
-    "AS20071": "datacenter",  # KUXUEYUN LLC (酷雪云, IDC机房, ipinfo: Hosting)
-    "AS906": "datacenter",    # DMIT Cloud Services (IDC机房, ipinfo: Hosting)
-    "AS214195": "datacenter", # Tres Teknoloji A.S. (IDC机房, ipinfo: Hosting)
-    "AS8796": "datacenter",   # FASTNET DATA INC (Kurun Cloud, IDC机房, ipinfo: Hosting)
-    "AS9891": "datacenter",   # CS LOXINFO (csloxinfo.com, ipinfo: Hosting)
-    "AS34665": "datacenter",  # Petersburg Internet Network (pindc.ru, ipinfo: Hosting)
+# L0 人工网络类型裁决表已在上方统一声明为 MANUAL_OVERRIDE_NET_TYPES，单真理源 (SSOT) 杜绝重复定义
 
-    # --- [L0 裁决 B: 知名正牌民用宽带 ISP，权威核准为 isp] ---
-    "AS174": "isp",           # Cogent Communications, LLC (Tier 1 国际骨干/ISP, ipinfo: ISP)
-    "AS1299": "isp",          # Arelion Sweden AB / Telia (Tier 1 国际骨干/ISP, ipinfo: ISP)
-    "AS3257": "isp",          # GTT Communications Inc. (Tier 1 国际骨干/ISP, ipinfo: ISP)
-    "AS58682": "isp",         # Level3 Carrier Ltd. (Tier 1 国际骨干/ISP, ipinfo: ISP)
-    "AS7738": "isp",          # V.tal (vtal.com, 巴西主流电信与国际海缆, ipinfo: ISP)
-    "AS8167": "isp",          # V.tal (ipinfo: ISP)
-    "AS134835": "isp",        # Starry Network (ipinfo: ISP)
-    "AS152179": "isp",        # (ipinfo: ISP)
-    "AS209604": "isp",        # 2E TELEKOMUNIKASYON (ipinfo: ISP)
-    "AS216475": "isp",        # NKtelecom INC (ipinfo: ISP)
-    "AS273961": "isp",        # LUDWIN GROUP COMPANY SRL (ipinfo: ISP)
-    "AS273007": "isp",        # SPEEDNET, C.A (ipinfo: ISP)
-    "AS274414": "isp",        # Osbaldo Tovar Campero (ipinfo: ISP)
-    "AS1257": "isp",          # Tele2 Sverige AB (tele2.com, 欧洲顶级电信与家庭宽带)
-    "AS18106": "isp",         # Viewqwest Pte Ltd (viewqwest.com, 新加坡知名光纤宽带 ISP)
-    "AS63150": "isp",         # BAGE CLOUD LLC (bage.dev, 双ISP广播, 权威ipinfo核准为ISP)
-    "AS3226": "isp",          # OOO NI (mark.ru, Mark-ITT 俄罗斯老牌宽带运营商, 权威ipinfo核准为ISP)
-    "AS4787": "isp",          # PT Cyberindo Aditama (cbn.id, 印尼知名民用光纤宽带 CBN)
-    "AS135130": "isp",        # Anik Computer & Networking (aniknetwork.net, 孟加拉民用宽带ISP)
-    "AS197275": "isp",        # Link Telecom NN Ltd. (lt-nn.net, 俄罗斯下诺夫哥罗德电信运营商)
-    "AS16814": "isp",         # NSS S.A. (IPLAN Telecomunicaciones, iplan.com.ar, 阿根廷主流光纤运营商)
-    "AS200239": "isp",        # Bogahost Bilisim (ipinfo: ISP)
-    "AS206069": "isp",        # Cornseed Limited (ipinfo: ISP)
-    "AS397540": "isp",        # Windscribe Limited (ipinfo: ISP)
-    "AS35540": "isp",         # OVH SAS / OVH Telecom (ovhcloud.com, 法国电信与宽带接入网)
-    "AS17621": "isp",         # China Unicom Shanghai network (中国联通上海网络)
-    "AS25341": "isp",         # NPF ROI LLC (cstnet.ru, 俄罗斯宽带ISP)
-    "AS44347": "isp",         # Limited Company "SiNT" (俄罗斯地区ISP)
-    "AS24530": "isp",         # PT. Power Telecom Indonesia (Powertel, 印尼ISP)
-    "AS274029": "isp",        # KAZAV LATAM E.I.R.L. / ASU TELECOM PERU (秘鲁宽带ISP)
-    "AS14813": "isp",         # Columbus Telecommunications (Barbados) Limited (巴巴多斯电信宽带)
-    "AS29076": "isp",         # Citytelecom LLC (Filanco, citytelecom.ru, 俄罗斯宽带ISP)
-    "AS272605": "isp",        # Grupo Ultra Fibra (巴西宽带ISP)
-    "AS36902": "isp",         # Intelvision Ltd (塞舌尔宽带ISP)
-    "AS24550": "isp",         # Websurfer Nepal Communication System (尼泊尔宽带ISP)
-    "AS14593": "isp",         # SpaceX Services / Starlink (星链低轨卫星民用宽带)
-    "AS134760": "isp",        # CHINANET Hebei (中国电信河北民用原生宽带)
-    "AS134420": "isp",        # CHINANET Chongqing (中国电信重庆民用原生宽带)
-    "AS137694": "isp",        # CHINANET Xinjiang (中国电信新疆民用原生宽带)
-    "AS137697": "isp",        # CHINANET Jiangsu (中国电信江苏民用原生宽带)
-    "AS4773": "isp",          # M1 LIMITED (新加坡主流电信与家庭光纤宽带)
-    "AS17547": "isp",         # M1 NET LTD (新加坡 M1 宽带网)
-    "AS8708": "isp",          # DIGI ROMANIA S.A. (罗马尼亚第一大民用光纤宽带)
-    "AS27699": "isp",         # TELEFÔNICA BRASIL S.A / Vivo (巴西第一大电信与民用光纤宽带)
-    "AS7004": "isp",          # TELEFÓNICA CHILE S.A. / Movistar (智利第一大民用光纤宽带)
-    "AS131429": "isp",        # MobiFone (越南主流移动通信与手机蜂窝宽带)
-    "AS14051": "isp",          # Fidium / Consolidated Communications (fidiumfiber.com, 美国民用光纤宽带)
-    "AS28716": "isp",          # Retelit Digital Services S.p.A. (retelit.it, 意大利电信与光纤宽带)
-    "AS17529": "isp",          # STARCAT Co., LTD. (starcat.co.jp, 日本名古屋有线电视与民用宽带 ISP)
-    "AS7511": "isp",           # SYNAPSE Co.,Ltd. (synapse.jp, 日本鹿儿岛民用宽带 ISP)
-    "AS62560": "isp",          # Hosted America (hostedamerica.com, 美国民用光纤宽带 ISP)
-    "AS38060": "isp",          # BIZNET / PT. Supra Primatama Nusantara (biznetnetworks.com, 印尼民用光纤宽带)
-    "AS8427": "isp",           # Joint Stock Company TransTeleCom / TTK (ttk.ru, 俄罗斯骨干电信与宽带运营商)
-    "AS21271": "isp",          # Society of Mali's Telecommunications / SOTELMA (sotelma.ml, 马里国家电信与宽带运营商)
-    "AS139282": "isp",         # Novus Network (novusnetwork, 宽带接入 ISP)
-    "AS11404": "isp",          # Wave Broadband / Astound (astound.com, 美国民用有线与光纤宽带)
-    "AS265606": "isp",         # DIGY NETWORKS (digynetworks.com.br, 巴西民用光纤宽带)
-    "AS154462": "isp",         # Yournet Communications (yournet.in, 印度民用宽带 ISP)
-    "AS152045": "isp",         # PT. PETABYTE NETWORK INDONESIA (petabyte.net.id, 印尼光纤宽带 ISP)
-    "AS12252": "isp",          # America Movil Peru S.A.C. / Claro Peru (claro.com.pe, 秘鲁电信与民用宽带)
-    "AS16010": "isp",          # Magticom Ltd. (magticom.ge, 格鲁吉亚第一大电信与民用光纤宽带)
-    "AS265605": "isp",         # VELOCOM SA DE CV (velocom.com.mx, 墨西哥电信与民用宽带)
-    "AS3302": "isp",           # Retelit Digital Services S.p.A. (retelit.it, 意大利全国光纤骨干与电信 ISP)
-    "AS15401": "isp",          # Orange Business Services SA (orange.com, 法国电信 Orange 骨干网络)
-    "AS394311": "isp",         # Digicel Turks and Caicos Ltd (digicelgroup.com, 加勒比海特克斯和凯科斯群岛电信宽带)
-    "AS17975": "isp",          # APT Datamatrix Limited (aptdatamatrix.com, 香港亚太卫星与电信网络)
-    "AS203101": "isp",         # Navarino Single Member S.A. (navarino.gr, 希腊海事卫星与电信网络服务商)
-    "AS10753": "isp",          # Level 3 Parent, LLC / Lumen (lumen.com, Tier 1 国际电信与互联网服务商)
-    "AS38264": "isp",          # Wateen Telecom Limited (wateen.com, 巴基斯坦全国光纤与民用宽带 ISP)
-    "AS20981": "isp",          # InnovaPuglia SpA (RUPAR Puglia 区域宽带专网运营商, ipinfo: isp)
-
-    # --- [L0 裁决 C: 核心国际银行金融专网 (对齐 ipinfo.io 业界权威标准，统一归入 business 商业专线)] ---
-    "AS1311": "business", "AS2600": "business", "AS3187": "business", "AS5091": "business",
-    "AS5458": "business", "AS6674": "business", "AS6773": "business", "AS7609": "business",
-    "AS7630": "business", "AS7820": "business", "AS8373": "business",
-    "AS9016": "business", "AS9099": "business", "AS9118": "business", "AS9128": "business",
-    "AS9221": "business", "AS9522": "business", "AS9630": "business",
-    "AS9772": "business", "AS9863": "business", "AS207986": "business",
-
-    # --- [L0 裁决 D: 核心学术科研教育网 (权威核准为 education)] ---
-    "AS9488": "education",    # Seoul National University / SNU (首尔大学)
-    "AS199578": "education",  # Verein zur Foerderung eines Deutschen Forschungsnetzes e.V. (DFN, 德国国家科研教育网)
-    "AS142078": "education",  # CERNET FITI Nodes (清华大学/未来互联网试验设施教育网节点)
-    "AS3132": "education",    # Red Cientifica Peruana (rcp.pe, 秘鲁教育网, ipinfo: education)
-    "AS207705": "education",  # TW NCU (台湾国立中央大学)
-
-    # --- [L0 裁决 E: 商业企业专线与骨干中继 (权威核准为 business)] ---
-    "AS979": "business",      # NetLab Global (as979.net, 国际机房网络, ipinfo: business)
-    "AS214822": "business",   # MT FINANCE LLC (商业金融专线)
-
-    # --- [L0 裁决 F: 国家政务与公共网络 (权威核准为 government)] ---
-    "AS327724": "government",  # National Information Technology Authority Uganda (NITA-U, 乌干达国家信息技术管理局政务网)
-    "AS8435": "government",    # Bank of Korea (ipinfo: government)
-    "AS9487": "government",    # Bank of Korea (ipinfo: government)
-    "AS25883": "government",   # Central Bank of the Russian Federation (ipinfo: government)
-}
 
 
 VALID_NET_TYPES: frozenset[str] = frozenset({"isp", "datacenter", "business", "education", "government"})
@@ -727,28 +677,40 @@ def save_asn_database(
     asn_to_net_type: dict[str, str] | None = None,
     db_path: str = "",
 ):
-    """持久化保存动态发现的 ASN/ISP/NetType 数据库（带格式鉴真、防冲突覆盖与 SSOT 保护）"""
+    """持久化保存动态发现的 ASN/ISP/NetType 数据库（严格 Append-Only 只增不改与 SSOT 保护）"""
     target_path = db_path or ASN_DATABASE_PATH
     try:
-        clean_i2a: dict[str, str] = {}
-        clean_a2i: dict[str, str] = {}
-        clean_a2nt: dict[str, str] = {}
+        # 0. 严格只增不改 (Append-Only): 优先加载磁盘文件基准，既有条目永久不可变
+        existing_data = {}
+        if os.path.exists(target_path):
+            try:
+                with open(target_path, "r", encoding="utf-8") as cur_f:
+                    existing_data = json.load(cur_f)
+            except Exception:
+                existing_data = {}
 
-        # 1. 规范化加载传入的反向映射字典
+        cur_i2a = existing_data.get("isp_to_asn", {})
+        cur_a2i = existing_data.get("asn_to_isp", {})
+        cur_a2nt = existing_data.get("asn_to_net_type", {})
+
+        clean_i2a: dict[str, str] = dict(cur_i2a)
+        clean_a2i: dict[str, str] = dict(cur_a2i)
+        clean_a2nt: dict[str, str] = dict(cur_a2nt)
+
+        # 1. 规范化增量加载传入的反向映射字典 (既有条目锁定，只准追加新 ASN)
         for k, v in asn_to_isp.items():
             asn_code = (k or "").strip().upper()
             isp_name = (v or "").strip()
             if re.match(r"^AS\d+$", asn_code) and isp_name:
-                clean_a2i[asn_code] = isp_name
+                if asn_code not in clean_a2i:
+                    clean_a2i[asn_code] = isp_name
 
         # 2. 权威 SSOT 锁定：内置权威已知云厂商始终锁定为 SSOT 权威名称，坚决禁止被覆盖
         for asn_code, auth_name in AUTHORITATIVE_CLOUD_ASNS.items():
-            if asn_code in clean_a2i and clean_a2i[asn_code] != auth_name:
-                log.debug("ASN %s 权威映射维持: %s (替换手工/历史配置: %s)", asn_code, auth_name, clean_a2i[asn_code])
             clean_a2i[asn_code] = auth_name
 
-        # 3. 规范化正向映射，并实施大小写不敏感去重与防冲突检查
-        seen_lower_i2a: dict[str, str] = {}
+        # 3. 规范化增量加载正向映射 (既有条目锁定，只准追加新服务商名称)
+        seen_lower_i2a: dict[str, str] = {k.lower(): k for k in clean_i2a}
         for k, v in isp_to_asn.items():
             isp_name = (k or "").strip()
             asn_code = (v or "").strip().upper()
@@ -757,44 +719,34 @@ def save_asn_database(
 
             lower_name = isp_name.lower()
             if lower_name in seen_lower_i2a:
-                existing_key = seen_lower_i2a[lower_name]
-                if clean_i2a.get(existing_key) == asn_code:
-                    continue
+                continue
 
             clean_i2a[isp_name] = asn_code
             seen_lower_i2a[lower_name] = isp_name
 
-            # 若反向字典已有该 ASN，检查是否与当前正向名称一致；若不一致仅记录，严禁篡改反向字典
-            if asn_code in clean_a2i:
-                if clean_a2i[asn_code] != isp_name:
-                    log.debug("多对一服务商映射: %s 正向指向 %s，反向标准名称维持 %s", isp_name, asn_code, clean_a2i[asn_code])
-            else:
-                # 仅当反向完全缺失时进行安全补录，首个记录者锁定，后续多值不覆写
+            if asn_code not in clean_a2i:
                 clean_a2i[asn_code] = isp_name
-                log.info("【自愈补齐反向索引】ASN %s 缺失反查名称，自动补录: %s", asn_code, isp_name)
 
-        # 4. 规范化 asn_to_net_type：若未显式传入则取运行时 ASN_DATABASE_ASN_TO_NET_TYPE，绝对杜绝误抹除
+        # 4. 规范化增量加载 asn_to_net_type (既有条目锁定，只准追加官方探针确证的新 ASN)
         target_a2nt = asn_to_net_type if asn_to_net_type is not None else ASN_DATABASE_ASN_TO_NET_TYPE
         for k, v in target_a2nt.items():
             asn_code = (k or "").strip().upper()
             net_type = (v or "").strip().lower()
             if re.match(r"^AS\d+$", asn_code) and net_type in VALID_NET_TYPES:
-                clean_a2nt[asn_code] = net_type
+                if asn_code not in clean_a2nt:
+                    clean_a2nt[asn_code] = net_type
 
-        # 权威云厂商与核心骨干网 SSOT 属性保护：锁定官方权威网络类型（云厂商/VPS 锁定 datacenter，运营商/宽带锁定 isp），杜绝被外部源篡改
+        # 权威云厂商与核心骨干网 SSOT 属性保护：锁定官方权威网络类型
         for auth_asn, auth_type in AUTHORITATIVE_CLOUD_NET_TYPES.items():
             if clean_a2nt.get(auth_asn) != auth_type:
                 clean_a2nt[auth_asn] = auth_type
 
-        # 人工裁决表保护：锁定 MANUAL_OVERRIDE_NET_TYPES，确保人工核准的机房与民用宽带不被覆盖
+        # 人工裁决表保护：锁定 MANUAL_OVERRIDE_NET_TYPES
         for man_asn, man_type in MANUAL_OVERRIDE_NET_TYPES.items():
             if clean_a2nt.get(man_asn) != man_type:
                 clean_a2nt[man_asn] = man_type
 
-        # 自愈补齐：若 clean_a2i 中的 ASN 尚未被 clean_a2nt 分类，自动利用 classify_asn 补齐网络类型，确保 100% 覆盖
-        for asn_code, isp_name in clean_a2i.items():
-            if asn_code not in clean_a2nt:
-                clean_a2nt[asn_code] = classify_asn(asn_code, isp_name)
+        # 彻底废除 classify_asn 正则猜测自愈补齐：未被探针/人工确证的 ASN 绝不自动填补落盘
 
         # 5. 保存前进行硬错误阻断校验
         val_errors, _ = validate_asn_database({
@@ -959,87 +911,11 @@ def resolve_asn_online(ip: str, isp_hint: str = "", persist: bool = False, db_pa
         if clean_asn not in ASN_TO_PROVIDER:
             ASN_TO_PROVIDER[clean_asn] = clean_isp
 
-        # 联动更新运行时网络类型 (net_type)
-        if clean_asn not in ASN_EXACT_NET_TYPE:
-            n_type = ext_net_type or classify_asn(clean_asn, clean_isp)
-            ASN_EXACT_NET_TYPE[clean_asn] = n_type
-            ASN_DATABASE_ASN_TO_NET_TYPE[clean_asn] = n_type
-
-        if persist:
-            save_asn_database(ASN_DATABASE_ISP_TO_ASN, ASN_DATABASE_ASN_TO_ISP, ASN_DATABASE_ASN_TO_NET_TYPE, db_path=db_path)
-            log.info("【自动完善数据库】已在线反查新 IP %s 并持久化入库: %s -> %s (net_type: %s)", ip, clean_asn, clean_isp, ASN_EXACT_NET_TYPE.get(clean_asn))
-        else:
-            log.debug("【内存缓存更新】在线反查新 IP %s: %s -> %s (net_type: %s)", ip, clean_asn, clean_isp, ASN_EXACT_NET_TYPE.get(clean_asn))
+        # 在线 IP 反查仅用于识别 IP 所属 ASN 与 ISP 名称，严禁将未探针定性的猜测 net_type 写入持久化映射
+        log.debug("【内存缓存更新】在线反查新 IP %s: %s -> %s", ip, clean_asn, clean_isp)
         return clean_asn, clean_isp
 
     return "", ""
-
-
-async def resolve_asn_online_async(ip: str, isp_hint: str = "", persist: bool = False, db_path: str = "") -> tuple[str, str]:
-    """resolve_asn_online 的异步无阻塞封装，在独立工作线程中执行同步网络 I/O，杜绝阻塞事件循环"""
-    return await asyncio.to_thread(resolve_asn_online, ip, isp_hint, persist, db_path)
-
-
-def resolve_asn_name_online(asn: str, proxy: str = "", timeout: float = 6.0) -> str:
-    """
-    通过官方全球 BGP / RIR 数据库（RIPEstat / APNIC / ARIN）直接反查 ASN 编号的权威法定持有者名称。
-    用于在抓取阶段对全新发现的未收录 ASN 执行权威交叉校验，杜绝第三方抓取源错标脏数据污染数据库。
-    """
-    clean_code = (asn or "").strip().upper()
-    if not clean_code:
-        return ""
-    if not clean_code.startswith("AS"):
-        clean_code = f"AS{clean_code}"
-    if not re.match(r"^AS\d+$", clean_code) or clean_code == "AS0":
-        return ""
-
-    # 若命中已知权威云厂商，直接返回标准名称
-    if clean_code in AUTHORITATIVE_CLOUD_ASNS:
-        return AUTHORITATIVE_CLOUD_ASNS[clean_code]
-
-    # 通道 1: RIPEstat 全球 ASN 权威概览接口 (覆盖全球 APNIC/RIPE/ARIN/LACNIC/AFRINIC 全量自治系统)
-    try:
-        url = f"https://stat.ripe.net/data/as-overview/data.json?resource={clean_code}"
-        raw_json = ""
-        if shutil.which("curl"):
-            cmd = ["curl", "-sL", "-A", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"]
-            if proxy:
-                cmd.extend(["-x", proxy])
-            cmd.extend([url, "--max-time", str(int(timeout))])
-            try:
-                res = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="ignore", timeout=timeout + 3, check=False)
-                if res.returncode == 0 and res.stdout:
-                    raw_json = res.stdout
-            except Exception:
-                pass
-
-        if not raw_json:
-            handlers = []
-            if proxy and not proxy.startswith("socks"):
-                handlers.append(urllib.request.ProxyHandler({"http": proxy, "https": proxy}))
-            opener = urllib.request.build_opener(*handlers)
-            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
-            with opener.open(req, timeout=timeout) as resp:
-                raw_json = resp.read().decode("utf-8", errors="ignore")
-
-        if raw_json:
-            data = json.loads(raw_json)
-            holder = data.get("data", {}).get("holder") or ""
-            if holder:
-                if " - " in holder:
-                    name_part = holder.split(" - ", 1)[1].strip()
-                else:
-                    name_part = holder.strip()
-                name_clean = re.sub(r"\s*\((?:PRIVATE|LTD|LLC|INC|GMBH|CORP|SA|BV)\)\s*", " ", name_part, flags=re.IGNORECASE).strip()
-                name_clean = re.sub(r"^(AS\d+|[A-Z0-9\-]+-AS-[A-Z]+|[A-Z0-9\-]+-AS)\s*", "", name_clean, flags=re.IGNORECASE).strip()
-                _, clean_isp, _ = normalize_external_asn_info(clean_code, name_clean or name_part)
-                if clean_isp:
-                    return clean_isp
-                return name_clean or name_part
-    except Exception as e:
-        log.debug("RIPEstat 在线反查 ASN %s 失败 (已安全隔离): %s", clean_code, e)
-
-    return ""
 
 
 # ---------- IP/域名 级别持久化元数据缓存 (data/ip_cache.json) ----------
@@ -1446,14 +1322,8 @@ def resolve_asn_batch_online(
                                 if clean_asn not in ASN_TO_PROVIDER:
                                     ASN_TO_PROVIDER[clean_asn] = clean_isp
 
-                                # 动态研判与同步 net_type
-                                if clean_asn not in ASN_EXACT_NET_TYPE:
-                                    n_type = ext_net_type or classify_asn(clean_asn, clean_isp)
-                                    ASN_EXACT_NET_TYPE[clean_asn] = n_type
-                                    ASN_DATABASE_ASN_TO_NET_TYPE[clean_asn] = n_type
-                                    asn_db_modified = True
-                                else:
-                                    n_type = ASN_EXACT_NET_TYPE[clean_asn]
+                                # 动态研判 net_type (仅用于当前 IP 缓存条目画像，不写入持久化 ASN 数据库)
+                                n_type = ASN_EXACT_NET_TYPE.get(clean_asn) or ext_net_type or classify_asn(clean_asn, clean_isp)
 
                                 cache_entry = {
                                     "asn": clean_asn,
@@ -2467,17 +2337,6 @@ def format_proxy_json_item(r_dict: dict) -> dict:
     }
 
 
-def save_proxies_json(rows: list, json_path: str = "data/proxies.json") -> int:
-    """
-    保存全量通用代理标准化 JSON 文件（原子写入），
-    按协议分组与延迟排序，直接适配 EDT-Toolkit / 油猴脚本及第三方 API 调用。
-    """
-    json_list = [format_proxy_json_item(r) for r in rows if isinstance(r, dict) and r.get("url")]
-    atomic_write_json(json_path, json_list)
-    log.info("已覆写保存 %s: %d 个全量代理节点 (标准 JSON 格式)", json_path, len(json_list))
-    return len(json_list)
-
-
 def save_proxies_by_protocol(rows: list, output_dir: str = "data/proxies") -> dict[str, int]:
     """
     按协议独立拆分保存至 output_dir 目录：
@@ -2673,105 +2532,6 @@ def save_proxies_csv(rows: list, csv_path: str = "data/proxies.csv") -> int:
     return len(formatted_rows)
 
 
-# ============================================================
-# 网络属性（ISP宽带 / 商业专线 / 高校教育 / 政务公共）识别引擎 (方案 A)
-# ============================================================
-
-HOSTING_EXCLUSIONS = (
-    "host", "server", "cloud", "vps", "datacenter", "data center",
-    "colo", "compute", "dedicated", "voxility",
-    "ovh", "hetzner", "digitalocean", "linode", "vultr", "choopa",
-    "akamai", "fastly", "cloudflare", "amazon", "alibaba", "tencent",
-    "leaseweb", "cogent", "level 3", "lumen", "telia company ab",
-    "gtt", "hurricane electric", "he.net", "global connectivity",
-    "brainoza", "timeweb", "green floid", "cgi global", "mitelis",
-    "globaltelehost", "bytefilter", "globaltech", "perfecto mobile",
-    "u1 digital", "serv.host", "it7 networks", "aeza", "netcup",
-    "layeronline", "m247", "datacamp", "clouvider", "contabo",
-    "sakura internet", "conoha", "kamatera", "racknerd", "buyvm",
-    "frantech", "vmiss", "dmit", "akile", "bytevirt", "bandwagon",
-    "xtom", "synlinq", "tzulo", "drosys", "dromatics", "nktele",
-    "moedove", "fiberxpress", "skyquantum", "gsl networks", "idc cube", "idc",
-    "oracle", "windscribe", "hosttech", "taymaz",
-    "mt finance", "mtfinance", "cornseed", "jtti", "zouter",
-    "hostdare", "misaka", "spartanhost", "h4y", "peg tech", "vpsus",
-    "1gservers", "cherry servers", "rackh", "spacecore", "ddos protection",
-    "tothost", "serverion", "softshell", "softshellweb", "fiberstate",
-)
-
-_HOSTING_SHORT_RE = {
-    h: re.compile(rf"\b{re.escape(h)}\b", re.IGNORECASE)
-    for h in HOSTING_EXCLUSIONS if len(h) <= 4
-}
-
-EDU_PATTERNS = (
-    "university", "college", "school", "education", "cernet",
-    "academician research", "academic", "institute of technology",
-    "polytechnic", "edunet", "research network", "research", "renater", "dfn", "surfnet",
-    "tw ncu", "national central university", "universidad", "universidade", "universite",
-)
-
-GOV_PATTERNS = (
-    "ministry of", "department of", "parliament", "municipality",
-    "federal government", "state government", "public administration",
-    "regione ", "national information technology authority",
-    "public authority", "government",
-    "beltelecom",
-)
-
-BIZ_PATTERNS = (
-    "pccw business", "data communication business", "at&t enterprises",
-    "business internet", "corporate line", "corporate network", "enterprise network",
-)
-
-ISP_RES_PATTERNS = (
-    "residential", "consumer broadband", "ftth", "fiber to the home", "adsl customer", "cable internet",
-    "broadband", "innovapuglia",
-    "cable tv", "cable television", "cable corporation", "wisp", "wireless multi service",
-    "telecommunication", "telecommunications",
-    "odido", "wisper", "inalan", "radiokomunikace", "radiografica", "informsvyaz", "bashinformsvyaz",
-    "superloop", "hyperoptic", "viewqwest", "wyyerd",
-    "sony network", "chubu telecom", "internet initiative", "optage", "eo hikari",
-    "biglobe", "so-net", "docomo", "softbank", "kddi", "chunghwa", "hinet",
-    "comcast", "charter", "spectrum", "cox", "hkt", "hkbn", "korea telecom",
-    "sk broadband", "singtel", "deutsche telekom", "vodafone", "orange",
-    "shaw", "british telecom", "kazakhtelecom", "transtelecom", "vnpt", "viettel",
-    "bell canada", "rogers", "frontier", "windstream", "centurylink", "swisscom",
-    "proximus", "kpn", "telenor", "telia", "virgin media", "o2", "turkcell",
-    "turk telekom", "china telecom", "china unicom", "china mobile", "wave broadband",
-    # 补充完整全称别名兼容
-    "charter communications", "cox communications", "hkt limited", "hong kong broadband network",
-    "singapore telecommunications", "shaw communications", "british telecommunications",
-    "vietnam posts and telecommunications", "softbank corp", "rogers communications",
-    "frontier communications", "lumen technologies", "telia sonera", "o2 czech",
-    "pldt", "pldt global", "infocom",
-    # 扩展日韩与东南亚民用住宅宽带、有线电视 (CATV) 与志愿者网络
-    "softether", "jcom", "j:com", "asahi net", "tokai communications", "qtnet",
-    "its communications", "itscom", "freebit", "infoweb", "er-telecom", "dom.ru",
-    "hellovision", "triple t broadband", "fiber network",
-    # 补充东欧/俄罗斯/东南亚/中东/拉美/大洋洲头部主流电信运营商关键词
-    "rostelecom", "megafon", "mobile telesystems", "mts pjsc", "mts jllc",
-    "yettel", "algar telecom", "cs loxinfo", "sai gon postel", "one new zealand",
-    "emirates integrated telecommunications",
-    # 扩展拉美、西葡语区高精度民用宽带词根与国家级/大区主力电信运营商
-    "telecomunicações", "telecomunicacoes", "telecomunicaciones", "comunicacoes",
-    "multicable", "telecable", "tv cable",
-    "broadband services", "broadband network", "broadband internet",
-    "subscribers", "cable isp", "gpon", "adsl_", "fiberlink", "fibernet",
-    "etecsa", "empresa de telecomunicaciones de cuba",
-    "maroc telecom", "pakistan telecomm",
-    "comunicaciones celulares", "tigo",
-    "megacable", "mega cable", "asianet", "cat telecom",
-    "dalsvyaz", "severen-telecom", "vntt", "vietnam technology and telecommunication",
-    "digi spain", "ebox telecom", "ebox",
-)
-
-BANKING_PATTERNS = (
-    "central bank", "reserve bank", "federal reserve", "monetary authority",
-    "commercial bank", "investment bank", "credit union", "banco", "banque",
-    "banking", "financial group", "finance", "jpmorgan", "goldman sachs",
-    "citigroup", "hsbc", "barclays", "bnp paribas", "deutsche bank",
-)
 
 SPECIAL_NET_TYPE_FILES = {
     "isp": "【ISP_运营商原生宽带】.txt",
@@ -2836,28 +2596,22 @@ def is_asn_recorded(asn_str: str | None, isp_str: str | None = "") -> bool:
     return (
         code in MANUAL_OVERRIDE_NET_TYPES
         or code in ASN_EXACT_NET_TYPE
-        or code in ASN_TO_PROVIDER
-        or code in ASN_DATABASE_ASN_TO_ISP
+        or code in ASN_DATABASE_ASN_TO_NET_TYPE
+        or code in AUTHORITATIVE_CLOUD_ASNS
     )
 
 
 @functools.lru_cache(maxsize=4096)
 def classify_asn(asn_str: str | None, isp_str: str | None = "") -> str:
     """
-    根据 BGP 广播的 ASN 编号、机构名称与 ISP 归属进行多维度网络类型属性分类 (四级架构 Tier 1~4)：
+    根据 BGP 广播的 ASN 编号进行网络类型属性分类 (三级权威架构 Tier 1~3)：
       [Tier 1] 人工裁决表 (Manual SSOT Overrides)：针对已确证的核心专网与特例的人工高优先级裁决
-      [Tier 2] 权威持久化 ASN 库 (Authoritative Local DB)：来自 3200+ 条经深度校准的权威 ASN 库与权威云厂商基准
-      [Tier 3] 高置信度模式匹配 (Strict Pattern Fallback)：
-               - 1. 学术科研网 (education)
-               - 2. 政府政务网 (government)
-               - 3. 机房/云厂商排除 (HOSTING_EXCLUSIONS -> datacenter)
-               - 4. 商业企业专线与金融专网 (BANKING_PATTERNS / BIZ_PATTERNS -> business)
-               - 5. 电信民用原生宽带 (isp)
-      [Tier 4] 安全降级兜底 (Default Fallback)：其余一律安全降级为 datacenter 机房
+      [Tier 2] 权威持久化 ASN 库 (Authoritative Local DB)：来自 4200+ 条权威 ASN 库与权威云厂商基准
+      [Tier 3] 默认安全降级兜底 (Default Fallback)：其余全新未确证 ASN 一律安全降级为 datacenter 机房
     返回类型（严格对齐 ipinfo.io 业界权威五大标准网络类型）：
       - education: 高校与学术科研网
       - government: 政府政务与国家公共网
-      - isp: 电信民用原生宽带（非机房资产，信誉拟真度高）
+      - isp: 电信民用原生宽带
       - business: 商业固定专线、企业专网与银行金融机构
       - datacenter: 常规云主机与数据中心机房（hosting，默认）
     """
@@ -2871,42 +2625,7 @@ def classify_asn(asn_str: str | None, isp_str: str | None = "") -> str:
     if asn_code and asn_code in ASN_EXACT_NET_TYPE:
         return ASN_EXACT_NET_TYPE[asn_code]
 
-    # [Tier 3] 高置信度模式匹配 (Pattern Fallback)
-    text = f"{asn_str or ''} {isp_str or ''}".lower().strip()
-    if not text:
-        return "datacenter"
-
-    # 1. 优先识别教育科研网
-    if any(p in text for p in EDU_PATTERNS):
-        return "education"
-
-    # 2. 识别政务公用网
-    if any(p in text for p in GOV_PATTERNS):
-        return "government"
-
-    # 3. 排除机房/主机商（对短词如 host/vps/colo 使用独立预编译单词边界匹配，杜绝 ghost/colorado 等误杀）
-    is_hosting = False
-    for h in HOSTING_EXCLUSIONS:
-        if len(h) <= 4:
-            if _HOSTING_SHORT_RE[h].search(text):
-                is_hosting = True
-                break
-        elif h in text:
-            is_hosting = True
-            break
-
-    if is_hosting:
-        return "datacenter"
-
-    # 4. 识别商业专线与金融机构 (对齐 ipinfo.io 业界权威标准，商业企业与银行金融统一归入 business)
-    if any(p in text for p in BANKING_PATTERNS) or any(p in text for p in BIZ_PATTERNS):
-        return "business"
-
-    # 6. 识别电信运营商原生宽带 (仅高置信度强词根)
-    if any(p in text for p in ISP_RES_PATTERNS):
-        return "isp"
-
-    # [Tier 4] 安全降级兜底 (Default Fallback)
+    # [Tier 3] 默认安全降级兜底 (Default Fallback)
     return "datacenter"
 
 
@@ -3222,30 +2941,61 @@ save_scan_dir = save_scan_ips_by_asn
 def get_top_quality_proxies(
     csv_path: str = "data/proxies.csv",
     limit: int = 8,
-    max_delay: int = 300,
+    max_delay: int = 350,
 ) -> list[str]:
     """
-    从本地已质检的 proxies.csv 中快速提取延迟最低、0 失败率、状态存活的优质代理列表，
-    自动将 socks5:// 协议前缀转换为 socks5h:// 以确保代理端远程解析 DNS。
+    从本地已质检的 proxies.csv 中智能提取跨区、低延时、0 失败率的优质代理列表：
+    分段轮换防封架构：
+    1. 严格排除国内 CN 节点（境内节点访问境外 IPinfo 易被阻断或握手重置）
+    2. 按国家/地区分桶（如 US, SG, DE, JP, HK, GB, FR 等），优先从每个国家各取 1 个最低延时节点
+    3. 组建跨大洲、跨机房多元化代理候选链，彻底避免单一机房/区域连坐触发 Cloudflare 验证码
+    4. 自动将 socks5:// 协议前缀转换为 socks5h:// 以确保代理端远程解析 DNS
     """
     if not os.path.isfile(csv_path):
         return []
-    candidates = []
     try:
+        by_country: dict[str, list[tuple[int, str, str]]] = {}
         with open(csv_path, "r", encoding="utf-8-sig") as f:
             reader = csv.DictReader(f)
             for r in reader:
                 if r.get("status") == "alive" and safe_int(r.get("fail_count"), 99) == 0:
                     proto = (r.get("proto") or "").lower()
                     if proto in ("socks5", "http"):
+                        country = str(r.get("country") or "").strip().upper()
+                        if not country or country == "CN":
+                            continue
                         dms = safe_int(r.get("delay_ms"), 99999)
                         if 0 < dms <= max_delay:
                             url = r.get("url") or ""
                             if url:
-                                candidates.append((dms, proto, url))
-        candidates.sort(key=lambda x: x[0])
+                                by_country.setdefault(country, []).append((dms, proto, url))
+
+        # 各国家桶内部按延时升序排序
+        for c in by_country:
+            by_country[c].sort(key=lambda x: x[0])
+
+        # 按各国家桶的最优延迟排序国家优先顺序
+        sorted_countries = sorted(by_country.keys(), key=lambda c: by_country[c][0][0])
+
+        # 轮换分桶抽样：优先每个国家抽取 1 条
+        selected = []
+        for c in sorted_countries:
+            if len(selected) >= limit:
+                break
+            selected.append(by_country[c][0])
+
+        # 若国家数量不足 limit，从各桶的次优节点继续补齐
+        if len(selected) < limit:
+            for c in sorted_countries:
+                for cand in by_country[c][1:]:
+                    if len(selected) >= limit:
+                        break
+                    selected.append(cand)
+                if len(selected) >= limit:
+                    break
+
         result = []
-        for _, proto, raw_url in candidates[:limit]:
+        for _, proto, raw_url in selected:
             if proto == "socks5" and raw_url.startswith("socks5://"):
                 clean_url = "socks5h://" + raw_url[len("socks5://"):]
             else:
@@ -3371,7 +3121,7 @@ def probe_asn_from_ipinfo(
         try:
             if curl_bin:
                 cmd = [
-                    curl_bin, "-sL", "-k",
+                    curl_bin, "-sL",
                     "-A", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
                     "--max-time", str(int(timeout)),
                 ]
@@ -3413,16 +3163,20 @@ def probe_asn_from_ipinfo(
     return "", ""
 
 
+_PROBE_FAILED_ASNS: set[str] = set()
+
+
 def auto_enrich_and_save_asns(unrecorded_items: list[dict], proxy: str = "") -> int:
     """
     针对自带 ASN / 组织机构属性的数据源（如 EDT-Pages、测速扫描附件、质检在线反查等）：
     在全链路各阶段自动完成网络类型属性分类并持久化入库到 data/asn_database.json。
 
     工程保障：
-    1. 【严格幂等性】：内存字典去重 + is_asn_recorded 检查 + JSON 对象键覆盖，多次调用绝不产生重复条目或频繁写盘。
-    2. 【全链路异常隔离】：单条记录解析异常、正则不匹配、在线反查超时、写盘异常均被完全隔离捕获，绝不中断调用方主流程。
-    3. 【云厂商 SSOT 保护】：若传入的 ASN 属于内置权威已知云厂商，强制维持权威标准名称与 datacenter 属性，绝对禁止外部数据篡改。
-    4. 【LRU 缓存实时自愈】：写盘入库后同步更新运行时字典与 fast-path，并主动清空 classify_asn LRU 缓存，保证后续判定即时生效。
+    1. 【严格只增不改 (Append-Only)】：仅当 IPinfo 官方探针精准命中权威分类时才新增入库，既有条目绝不覆写。
+    2. 【防猜测写盘】：探针未响应或遭遇拦截时绝不落盘，不拿正则盲猜污染数据库。
+    3. 【运行时防重试风暴】：同进程生命周期内失败的 ASN 记录进 _PROBE_FAILED_ASNS，避免重复发起探测。
+    4. 【云厂商 SSOT 保护】：若传入的 ASN 属于内置权威已知云厂商，强制维持权威标准名称与 datacenter 属性。
+    5. 【LRU 缓存实时自愈】：写盘入库后同步更新运行时字典与 fast-path，并主动清空 classify_asn LRU 缓存。
     """
     if not unrecorded_items:
         return 0
@@ -3442,6 +3196,10 @@ def auto_enrich_and_save_asns(unrecorded_items: list[dict], proxy: str = "") -> 
                 if not code or not re.match(r"^AS\d+$", code) or code == "AS0":
                     continue
 
+                # 运行期防重复探测拦截
+                if code in _PROBE_FAILED_ASNS:
+                    continue
+
                 # 云厂商 SSOT 保护：若命中内置权威已知云厂商，坚决维持权威定义，直接跳过并拒绝外部污染
                 if code in AUTHORITATIVE_CLOUD_ASNS:
                     log.debug("ASN %s 命中权威已知云厂商 SSOT 锁定列表，维持权威名称 %s，忽略外部标签: %s", code, AUTHORITATIVE_CLOUD_ASNS[code], raw_isp)
@@ -3452,7 +3210,6 @@ def auto_enrich_and_save_asns(unrecorded_items: list[dict], proxy: str = "") -> 
                     continue
 
                 org = re.sub(r"^AS\d+\s*", "", raw_isp, flags=re.IGNORECASE).strip()
-                sample_ip = str(item.get("ip") or "").strip()
 
                 # 通道 0 (最高权威优先): 通过代理池探针直连 IPinfo 取得 100% 精准官方网络类型与机构名
                 official_type = ""
@@ -3460,46 +3217,27 @@ def auto_enrich_and_save_asns(unrecorded_items: list[dict], proxy: str = "") -> 
                 try:
                     official_type, official_name = probe_asn_from_ipinfo(code, proxy_candidates=top_proxies, timeout=4.0)
                 except Exception as probe_err:
-                    log.debug("IPinfo 探针探测 ASN %s 异常 (已安全降级): %s", code, probe_err)
+                    log.debug("IPinfo 探针探测 ASN %s 异常 (已安全跳过): %s", code, probe_err)
 
                 if official_type and official_type in EXTERNAL_NET_TYPE_MAP:
                     net_type = EXTERNAL_NET_TYPE_MAP[official_type]
                     if official_name:
                         org = official_name
                     log.info("【ASN 精准注入】ASN %s 成功通过 IPinfo 官方探针精准打标: %s -> %s", code, org, net_type)
+                    if code not in to_save_map:
+                        to_save_map[code] = {
+                            "asn": code,
+                            "isp": org,
+                            "net_type": net_type,
+                        }
+                    if org:
+                        item["org"] = org
+                        item["isp"] = org
+                    item["net_type"] = net_type
                 else:
-                    # 容灾降级通道: 原有的 RIPEstat 查名 + classify_asn 本地启发式推断
-                    authoritative_name = ""
-                    try:
-                        authoritative_name = resolve_asn_name_online(code, proxy=proxy, timeout=5.0)
-                    except Exception as auth_err:
-                        log.debug("反查 ASN %s 权威机构名称异常 (已安全跳过): %s", code, auth_err)
-
-                    if authoritative_name:
-                        if org and org.lower() != authoritative_name.lower():
-                            log.info("【ASN 权威防错标纠偏】ASN %s 外部标签 '%s' 与官方权威 '%s' 不符，自动以官方权威为准入库", code, org, authoritative_name)
-                        org = authoritative_name
-                    elif not org and sample_ip and is_valid_public_ip(sample_ip):
-                        # 若权威接口未返回且自身缺失组织名，尝试用公网 IP 进行反查
-                        try:
-                            resolved_code, resolved_isp = resolve_asn_online(sample_ip)
-                            if resolved_code == code and resolved_isp:
-                                org = resolved_isp
-                        except Exception as resolve_err:
-                            log.debug("尝试在线反查缺失组织名的 ASN %s 失败 (已安全跳过反查): %s", code, resolve_err)
-
-                    net_type = item.get("net_type") or classify_asn(code, org)
-                    log.info("【ASN 降级归类】ASN %s 探针未响应，走加固安全守门员归类: %s -> %s", code, org, net_type)
-
-                if code not in to_save_map:
-                    to_save_map[code] = {
-                        "asn": code,
-                        "isp": org,
-                        "net_type": net_type,
-                    }
-                if org:
-                    item["org"] = org
-                    item["isp"] = org
+                    # 探针未响应/拦截/失败：坚决不拿正则猜测充数入库，记录防重试集合并安全跳过
+                    _PROBE_FAILED_ASNS.add(code)
+                    log.debug("ASN %s 探针未获取到官方有效网络类型，跳过持久化写入（避免猜测污染数据库）", code)
             except Exception as item_err:
                 log.debug("解析单条未收录 ASN 条目发生异常 (已隔离跳过): %s (%s)", item, item_err)
                 continue
@@ -3813,79 +3551,6 @@ def prune_tombstone(
             log.warning("写回修剪后的墓地文件 %s 失败: %s", target_path, e)
 
     return pruned_count
-
-
-def sanitize_tombstone(
-    filepath: str | None = None,
-    ip_cache_path: str = "",
-) -> int:
-    """
-    墓地黑名单反向清洗引擎：
-    根据持久化 ip_cache 与 classify_asn 权威研判体系，自动扫描并剔除
-    因历史检测缺陷被误判为机房 (datacenter_rejected) 而错杀入墓地的优质非机房节点
-    (原生住宅 ISP / 高校教育网 / 国家政务 / 商业专线)。
-    返回本次解封剔除的误杀条目数量。
-    """
-    global _TOMBSTONE_CACHE, _TOMBSTONE_CACHE_FILE, _TOMBSTONE_CACHE_MTIME
-    target_path = filepath if filepath is not None else TOMBSTONE_FILE
-    if not os.path.isfile(target_path):
-        return 0
-
-    try:
-        with open(target_path, "r", encoding="utf-8") as f:
-            tombstone = json.load(f)
-    except Exception as e:
-        log.warning("读取墓地文件 %s 执行清洗失败: %s", target_path, e)
-        return 0
-
-    if not isinstance(tombstone, dict) or not tombstone:
-        return 0
-
-    cache = load_ip_cache(filepath=ip_cache_path) if ip_cache_path else load_ip_cache()
-
-    unbanned_keys = set()
-    for k in list(tombstone.keys()):
-        h = k.split(":")[0].strip().lower()
-        # 1. 检查持久化 IP 画像并基于当前 SSOT 重新研判
-        entry = cache.get(h)
-        if entry and isinstance(entry, dict):
-            asn = entry.get("asn", "")
-            isp = entry.get("isp", "")
-            nt = classify_asn(asn, isp)
-            if nt in ("isp", "business", "education", "government"):
-                unbanned_keys.add(k)
-                continue
-        # 2. 检查已知特定公立政务专网前缀网段 (如 InnovaPuglia 138.66.0.0/16, NITA-U 154.72.192.0/19 等)
-        if h.startswith("138.66."):
-            unbanned_keys.add(k)
-            continue
-        try:
-            ip_obj = ipaddress.ip_address(h)
-            if ip_obj in ipaddress.ip_network("154.72.192.0/19") or ip_obj in ipaddress.ip_network("102.209.200.0/22"):
-                unbanned_keys.add(k)
-                continue
-        except (ValueError, TypeError):
-            pass
-
-    if not unbanned_keys:
-        return 0
-
-    for k in unbanned_keys:
-        tombstone.pop(k, None)
-
-    try:
-        atomic_write_json(target_path, tombstone)
-        _TOMBSTONE_CACHE = tombstone
-        _TOMBSTONE_CACHE_FILE = target_path
-        try:
-            _TOMBSTONE_CACHE_MTIME = os.path.getmtime(target_path)
-        except OSError:
-            _TOMBSTONE_CACHE = None
-        log.info("【墓地反向清洗】成功解封 %d 个因历史机房误报被误杀的非机房节点 (剩余墓地节点: %d 个)", len(unbanned_keys), len(tombstone))
-    except Exception as e:
-        log.warning("写回清洗后的墓地文件 %s 失败: %s", target_path, e)
-
-    return len(unbanned_keys)
 
 
 def record_tombstone(
