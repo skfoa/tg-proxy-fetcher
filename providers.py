@@ -2679,7 +2679,7 @@ def save_proxies_csv(rows: list, csv_path: str = "data/proxies.csv") -> int:
 
 HOSTING_EXCLUSIONS = (
     "host", "server", "cloud", "vps", "datacenter", "data center",
-    "colo", "nodes", "compute", "dedicated", "transit", "voxility",
+    "colo", "compute", "dedicated", "voxility",
     "ovh", "hetzner", "digitalocean", "linode", "vultr", "choopa",
     "akamai", "fastly", "cloudflare", "amazon", "alibaba", "tencent",
     "leaseweb", "cogent", "level 3", "lumen", "telia company ab",
@@ -2721,7 +2721,7 @@ GOV_PATTERNS = (
 
 BIZ_PATTERNS = (
     "pccw business", "data communication business", "at&t enterprises",
-    "enterprise", "corporate", "commercial", "business internet",
+    "business internet", "corporate line", "corporate network", "enterprise network",
 )
 
 ISP_RES_PATTERNS = (
@@ -2744,6 +2744,7 @@ ISP_RES_PATTERNS = (
     "singapore telecommunications", "shaw communications", "british telecommunications",
     "vietnam posts and telecommunications", "softbank corp", "rogers communications",
     "frontier communications", "lumen technologies", "telia sonera", "o2 czech",
+    "pldt", "pldt global", "infocom",
     # 扩展日韩与东南亚民用住宅宽带、有线电视 (CATV) 与志愿者网络
     "softether", "jcom", "j:com", "asahi net", "tokai communications", "qtnet",
     "its communications", "itscom", "freebit", "infoweb", "er-telecom", "dom.ru",
@@ -3218,6 +3219,200 @@ def save_scan_ips_by_asn(asn_groups: dict, output_dir: str, min_nodes: int = 5) 
 save_scan_dir = save_scan_ips_by_asn
 
 
+def get_top_quality_proxies(
+    csv_path: str = "data/proxies.csv",
+    limit: int = 8,
+    max_delay: int = 300,
+) -> list[str]:
+    """
+    从本地已质检的 proxies.csv 中快速提取延迟最低、0 失败率、状态存活的优质代理列表，
+    自动将 socks5:// 协议前缀转换为 socks5h:// 以确保代理端远程解析 DNS。
+    """
+    if not os.path.isfile(csv_path):
+        return []
+    candidates = []
+    try:
+        with open(csv_path, "r", encoding="utf-8-sig") as f:
+            reader = csv.DictReader(f)
+            for r in reader:
+                if r.get("status") == "alive" and safe_int(r.get("fail_count"), 99) == 0:
+                    proto = (r.get("proto") or "").lower()
+                    if proto in ("socks5", "http"):
+                        dms = safe_int(r.get("delay_ms"), 99999)
+                        if 0 < dms <= max_delay:
+                            url = r.get("url") or ""
+                            if url:
+                                candidates.append((dms, proto, url))
+        candidates.sort(key=lambda x: x[0])
+        result = []
+        for _, proto, raw_url in candidates[:limit]:
+            if proto == "socks5" and raw_url.startswith("socks5://"):
+                clean_url = "socks5h://" + raw_url[len("socks5://"):]
+            else:
+                clean_url = raw_url
+            result.append(clean_url)
+        return result
+    except Exception as e:
+        log.debug("读取优质代理列表异常 (已安全隔离): %s", e)
+        return []
+
+
+def extract_ipinfo_page_meta(html: str) -> tuple[str, str]:
+    """
+    从 IPinfo SSR 页面提取官方网络分类 (raw_type) 与官方组织机构名 (as_name)。
+    四通道稳态校验架构：
+    1. 优先解析 schema.org JSON-LD DataFeed (SEO 结构化数据，最标准)
+    2. 权威 Title / OpenGraph Meta 标签提取组织机构名 (SEO 规范，无 DOM 漂移风险)
+    3. HTML Summary 表格提取网络类型（行级作用域隔离 + 受控枚举白名单，彻底杜绝 .*? 越界误伤）
+    4. Next.js RSC / PropertyValue 键值对提取（兼容正反序与引号反斜杠转义）
+    返回 (raw_type, as_name)，如 ("isp", "Gorodok Ltd.")。
+    """
+    if not html:
+        return "", ""
+
+    net_type = ""
+    as_name = ""
+
+    # 通道 1: schema.org JSON-LD 结构化数据 (SEO 官方内嵌，首选)
+    for script_match in re.findall(r'<script[^>]*type=[\'"]application/ld\+json[\'"][^>]*>(.*?)</script>', html, re.DOTALL):
+        try:
+            data = json.loads(script_match.strip())
+            if isinstance(data, dict) and data.get("@type") == "DataFeed":
+                for prop in data.get("variableMeasured", []):
+                    if not isinstance(prop, dict):
+                        continue
+                    p_name = str(prop.get("name") or "").strip().lower()
+                    p_val = str(prop.get("value") or "").strip()
+                    if p_name in ("type", "asn type") and p_val:
+                        net_type = p_val.lower()
+                    elif p_name in ("as name", "name", "as_name") and p_val:
+                        as_name = p_val
+                if net_type:
+                    break
+        except Exception:
+            pass
+
+    # 通道 2: HTML 标题与 Meta 标签提取组织名 (SEO 官方内嵌，最稳定标准)
+    if not as_name:
+        title_m = re.search(r'<title>\s*AS\d+\s+(.*?)\s+(?:AS details|AS Details)\s*\|\s*IPinfo\s*</title>', html, re.IGNORECASE)
+        if title_m:
+            as_name = title_m.group(1).strip()
+        else:
+            og_m = re.search(r'<meta\s+(?:property|name)=[\'"](?:og:title|twitter:title)[\'"]\s+content=[\'"]AS\d+\s+(.*?)\s+(?:AS details|AS Details)[\'"]', html, re.IGNORECASE)
+            if og_m:
+                as_name = og_m.group(1).strip()
+
+    # 通道 3: HTML 表格 Summary 解析（行级作用域隔离 + 受控枚举白名单，彻底杜绝 .*? 越界污染）
+    if not net_type:
+        tr_m = re.search(r'<tr[^>]*>(?:(?!</tr>).)*?ASN\s+type(?:(?!</tr>).)*?</tr>', html, re.DOTALL | re.IGNORECASE)
+        if tr_m:
+            tr_content = tr_m.group(0)
+            type_m = re.search(r'\b(isp|hosting|business|education|government)\b', tr_content, re.IGNORECASE)
+            if type_m:
+                net_type = type_m.group(1).lower()
+
+    # 通道 4: 正则匹配 PropertyValue 结构（兼容反斜杠转义与双向键值顺序）
+    if not net_type:
+        prop_m = re.search(r'\\?["\']name\\?["\']\s*:\s*\\?["\']Type\\?["\']\s*,\s*\\?["\']value\\?["\']\s*:\s*\\?["\']([a-zA-Z]+)\\?["\']', html, re.IGNORECASE)
+        if not prop_m:
+            prop_m = re.search(r'\\?["\']value\\?["\']\s*:\s*\\?["\']([a-zA-Z]+)\\?["\']\s*,\s*\\?["\']name\\?["\']\s*:\s*\\?["\']Type\\?["\']', html, re.IGNORECASE)
+        if prop_m:
+            candidate = prop_m.group(1).lower()
+            if candidate in ("isp", "hosting", "business", "education", "government"):
+                net_type = candidate
+
+    return net_type, as_name
+
+
+def probe_asn_from_ipinfo(
+    asn: str,
+    proxy_candidates: list[str] | None = None,
+    timeout: float = 4.0,
+    max_tries: int = 2,
+) -> tuple[str, str]:
+    """
+    通过本地代理池轮换出口对 IPinfo.io 发起微探针，精准提取官方 ASN 权威类型与机构名称。
+    用于在 GitHub Actions 运行收录全新 ASN 时消除启发式正则推测误差，实现 100% 官方标准注入。
+    返回: (official_type, official_name)，如 ("isp", "Starry, Inc.")；失败时返回 ("", "")。
+    """
+    clean_code = (asn or "").strip().upper()
+    if not clean_code:
+        return "", ""
+    if not clean_code.startswith("AS"):
+        clean_code = f"AS{clean_code}"
+    if not re.match(r"^AS\d+$", clean_code) or clean_code == "AS0":
+        return "", ""
+
+    # 快速旁路 1: 权威已知云厂商直接返回 datacenter 与标准名 (0ms 免网络请求)
+    if clean_code in AUTHORITATIVE_CLOUD_ASNS:
+        return "datacenter", AUTHORITATIVE_CLOUD_ASNS[clean_code]
+
+    # 快速旁路 2: 人工特例表与已收录权威数据库直接复用 (0ms 免请求，节约探针开销)
+    if clean_code in MANUAL_OVERRIDE_NET_TYPES:
+        cached_name = ASN_DATABASE_ASN_TO_ISP.get(clean_code) or ""
+        return MANUAL_OVERRIDE_NET_TYPES[clean_code], cached_name
+
+    if clean_code in ASN_EXACT_NET_TYPE:
+        cached_name = ASN_DATABASE_ASN_TO_ISP.get(clean_code) or ""
+        return ASN_EXACT_NET_TYPE[clean_code], cached_name
+
+    url = f"https://ipinfo.io/{clean_code}"
+
+    # 组织候选代理列表：优先使用传入的代理池，兜底加入直连
+    cand_proxies = list(proxy_candidates) if proxy_candidates is not None else get_top_quality_proxies()
+    trials = cand_proxies[:max_tries] if cand_proxies else [""]
+    if "" not in trials:
+        trials.append("")
+
+    curl_bin = "curl.exe" if shutil.which("curl.exe") else ("curl" if shutil.which("curl") else "")
+
+    for p in trials:
+        html = ""
+        try:
+            if curl_bin:
+                cmd = [
+                    curl_bin, "-sL", "-k",
+                    "-A", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                    "--max-time", str(int(timeout)),
+                ]
+                if p:
+                    cmd.extend(["-x", p])
+                cmd.append(url)
+                res = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="ignore", timeout=timeout + 2, check=False)
+                if res.returncode == 0 and res.stdout:
+                    html = res.stdout
+            elif not p or not p.startswith("socks"):
+                handlers = []
+                if p:
+                    handlers.append(urllib.request.ProxyHandler({"http": p, "https": p}))
+                opener = urllib.request.build_opener(*handlers)
+                req = urllib.request.Request(
+                    url,
+                    headers={
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                    }
+                )
+                with opener.open(req, timeout=timeout) as resp:
+                    html = resp.read().decode("utf-8", errors="ignore")
+        except Exception as e:
+            log.debug("IPinfo 代理探针尝试 %s 访问 %s 异常: %s", p or "直连", clean_code, e)
+            continue
+
+        if html:
+            # 避坑：若遭遇 Cloudflare 拦截页面，安全跳过此代理
+            if "Just a moment" in html or "challenge-platform" in html:
+                log.debug("IPinfo 代理探针访问 %s 触发 Cloudflare 验证码 (跳过此代理 %s)", clean_code, p or "直连")
+                continue
+
+            raw_type, raw_name = extract_ipinfo_page_meta(html)
+            if raw_type:
+                log.info("【IPinfo 官方探针精准命中】%s -> Type: %s | Name: %s (出海通道: %s)", clean_code, raw_type, raw_name, p or "直连")
+                return raw_type, raw_name
+
+    return "", ""
+
+
 def auto_enrich_and_save_asns(unrecorded_items: list[dict], proxy: str = "") -> int:
     """
     针对自带 ASN / 组织机构属性的数据源（如 EDT-Pages、测速扫描附件、质检在线反查等）：
@@ -3234,6 +3429,9 @@ def auto_enrich_and_save_asns(unrecorded_items: list[dict], proxy: str = "") -> 
 
     try:
         to_save_map: dict[str, dict] = {}
+        # 预先拉取一次候选优质代理列表（复用，避免在循环中重复读取 CSV 文件）
+        top_proxies = get_top_quality_proxies()
+
         for item in unrecorded_items:
             try:
                 if not isinstance(item, dict):
@@ -3256,27 +3454,43 @@ def auto_enrich_and_save_asns(unrecorded_items: list[dict], proxy: str = "") -> 
                 org = re.sub(r"^AS\d+\s*", "", raw_isp, flags=re.IGNORECASE).strip()
                 sample_ip = str(item.get("ip") or "").strip()
 
-                # 权威交叉校验与反查纠偏：对全新收录的自治系统，主动反查官方 RIR/BGP 权威名称，杜绝第三方源错标污染
-                authoritative_name = ""
+                # 通道 0 (最高权威优先): 通过代理池探针直连 IPinfo 取得 100% 精准官方网络类型与机构名
+                official_type = ""
+                official_name = ""
                 try:
-                    authoritative_name = resolve_asn_name_online(code, proxy=proxy, timeout=5.0)
-                except Exception as auth_err:
-                    log.debug("反查 ASN %s 权威机构名称异常 (已安全跳过): %s", code, auth_err)
+                    official_type, official_name = probe_asn_from_ipinfo(code, proxy_candidates=top_proxies, timeout=4.0)
+                except Exception as probe_err:
+                    log.debug("IPinfo 探针探测 ASN %s 异常 (已安全降级): %s", code, probe_err)
 
-                if authoritative_name:
-                    if org and org.lower() != authoritative_name.lower():
-                        log.info("【ASN 权威防错标纠偏】ASN %s 外部标签 '%s' 与官方权威 '%s' 不符，自动以官方权威为准入库", code, org, authoritative_name)
-                    org = authoritative_name
-                elif not org and sample_ip and is_valid_public_ip(sample_ip):
-                    # 若权威接口未返回且自身缺失组织名，尝试用公网 IP 进行反查
+                if official_type and official_type in EXTERNAL_NET_TYPE_MAP:
+                    net_type = EXTERNAL_NET_TYPE_MAP[official_type]
+                    if official_name:
+                        org = official_name
+                    log.info("【ASN 精准注入】ASN %s 成功通过 IPinfo 官方探针精准打标: %s -> %s", code, org, net_type)
+                else:
+                    # 容灾降级通道: 原有的 RIPEstat 查名 + classify_asn 本地启发式推断
+                    authoritative_name = ""
                     try:
-                        resolved_code, resolved_isp = resolve_asn_online(sample_ip)
-                        if resolved_code == code and resolved_isp:
-                            org = resolved_isp
-                    except Exception as resolve_err:
-                        log.debug("尝试在线反查缺失组织名的 ASN %s 失败 (已安全跳过反查): %s", code, resolve_err)
+                        authoritative_name = resolve_asn_name_online(code, proxy=proxy, timeout=5.0)
+                    except Exception as auth_err:
+                        log.debug("反查 ASN %s 权威机构名称异常 (已安全跳过): %s", code, auth_err)
 
-                net_type = item.get("net_type") or classify_asn(code, org)
+                    if authoritative_name:
+                        if org and org.lower() != authoritative_name.lower():
+                            log.info("【ASN 权威防错标纠偏】ASN %s 外部标签 '%s' 与官方权威 '%s' 不符，自动以官方权威为准入库", code, org, authoritative_name)
+                        org = authoritative_name
+                    elif not org and sample_ip and is_valid_public_ip(sample_ip):
+                        # 若权威接口未返回且自身缺失组织名，尝试用公网 IP 进行反查
+                        try:
+                            resolved_code, resolved_isp = resolve_asn_online(sample_ip)
+                            if resolved_code == code and resolved_isp:
+                                org = resolved_isp
+                        except Exception as resolve_err:
+                            log.debug("尝试在线反查缺失组织名的 ASN %s 失败 (已安全跳过反查): %s", code, resolve_err)
+
+                    net_type = item.get("net_type") or classify_asn(code, org)
+                    log.info("【ASN 降级归类】ASN %s 探针未响应，走加固安全守门员归类: %s -> %s", code, org, net_type)
+
                 if code not in to_save_map:
                     to_save_map[code] = {
                         "asn": code,

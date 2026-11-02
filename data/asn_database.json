@@ -8843,10 +8843,10 @@
     "AS269980": "isp",
     "AS273896": "isp",
     "AS201776": "isp",
-    "AS48693": "business",
+    "AS48693": "datacenter",
     "AS34150": "isp",
-    "AS60075": "datacenter",
-    "AS45374": "datacenter",
-    "AS395354": "datacenter"
+    "AS60075": "isp",
+    "AS45374": "isp",
+    "AS395354": "isp"
   }
 }

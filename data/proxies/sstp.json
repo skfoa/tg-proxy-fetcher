@@ -3010,7 +3010,7 @@
     "asn": "45374",
     "asOrganization": "CCS",
     "isp": "CCS",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "vpngate"
   },
   {
@@ -5628,7 +5628,7 @@
     "asn": "60075",
     "asOrganization": "Gorodok Ltd.",
     "isp": "Gorodok Ltd.",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "vpngate"
   },
   {
@@ -6970,7 +6970,7 @@
     "asn": "395354",
     "asOrganization": "Starry, Inc.",
     "isp": "Starry, Inc.",
-    "net_type": "datacenter",
+    "net_type": "isp",
     "source": "vpngate"
   },
   {

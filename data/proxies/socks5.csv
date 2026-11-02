@@ -336,7 +336,7 @@ socks5://45.74.31.46:16337,socks5,45.74.31.46,16337,0,1,timeout,,ML,217.64.102.7
 socks5://103.143.11.246:9005,socks5,103.143.11.246,9005,0,1,timeout,,US,185.220.101.11,AS60729 Network for Tor-Exit traffic. (Artikel10 e.V.),Artikel10 e.V.,education,2026-11-02 14:11:43,EDT-Pages
 socks5://167.99.3.26:8818,socks5,167.99.3.26,8818,0,1,conn_reset,,US,102.129.170.131,AS7029 Neurotel Communications,Neurotel Communications,isp,2026-11-02 14:11:43,EDT-Pages
 socks5://178.78.7.228:1080,socks5,178.78.7.228,1080,0,1,timeout,,RU,178.78.7.228,"AS34150 JSC ""ER-Telecom Holding"" (JSC ER-Telecom Holding Krasnodar branch)",JSC ER-Telecom Holding Krasnodar branch,isp,2026-11-02 14:11:43,EDT-Pages
-socks5://185.243.99.64:1080,socks5,185.243.99.64,1080,0,1,timeout,,UA,185.243.99.63,AS48693 Rices Privately owned enterprise,Rices Privately owned enterprise,business,2026-11-02 14:11:43,EDT-Pages
+socks5://185.243.99.64:1080,socks5,185.243.99.64,1080,0,1,timeout,,UA,185.243.99.63,AS48693 Rices Privately owned enterprise,Rices Privately owned enterprise,datacenter,2026-11-02 14:11:43,EDT-Pages
 socks5://42.115.72.145:1064,socks5,42.115.72.145,1064,0,1,timeout,,VN,116.104.152.58,AS7552 Viettel Group,Viettel Group,isp,2026-11-02 14:11:43,EDT-Pages
 socks5://45.74.31.46:16462,socks5,45.74.31.46,16462,0,1,timeout,,ID,112.78.134.58,AS38060 BIZNET,Biznet Postpaid,isp,2026-11-02 14:11:43,EDT-Pages
 socks5://45.74.31.47:48087,socks5,45.74.31.47,48087,0,1,timeout,,MG,154.120.133.86,AS37037 Orange Madagascar,Orange Madagascar,isp,2026-11-02 14:11:43,EDT-Pages
