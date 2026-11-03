@@ -72,6 +72,10 @@ from providers import (
     SCAN_CSV_FIELDS,
     auto_enrich_and_save_asns,
     calibrate_all_datasets,
+    extract_ips,
+    is_valid_ipv4,
+    is_valid_ipv6,
+    resolve_node_exit_and_net_type,
 )
 from proxyip_verify import (
     load_proxyip_csv,
@@ -364,6 +368,17 @@ def load_csv(path: str) -> list:
             r["isp"] = raw_isp
             r["colo"] = str(r.get("colo") or "").replace("`", "").strip()
             r["cf_location"] = str(r.get("cf_location") or "").replace("`", "").strip()
+            if "exit_ip" in r:
+                cand_exits = extract_ips([r.get("exit_ip"), r.get("exit_ipv6")])
+                v4_exits = [cip for cip in cand_exits if is_valid_ipv4(cip)]
+                v6_exits = [cip for cip in cand_exits if is_valid_ipv6(cip)]
+                r["exit_ip"] = v4_exits[0] if v4_exits else (v6_exits[0] if v6_exits else "")
+                raw_exit_asn = str(r.get("exit_asn") or "").replace("`", "").strip()
+                raw_exit_isp = str(r.get("exit_isp") or "").replace("`", "").strip()
+                if raw_exit_asn.upper() in ("AS_UNKNOWN", "UNKNOWN", "AS0", "-"):
+                    raw_exit_asn = ""
+                r["exit_asn"] = format_asn_isp(raw_exit_asn, raw_exit_isp) if raw_exit_asn else ""
+                r["exit_isp"] = raw_exit_isp
             rows.append(r)
     return rows
 
@@ -739,7 +754,7 @@ def _cf_sort_key(x):
 async def enrich_scan_ips_exits(
     survivors: list,
     check_endpoint: str = "",
-    check_concurrency: int = 32,
+    check_concurrency: int = CHECK_CONCURRENCY,
     dry_run: bool = False,
 ) -> int:
     """
@@ -765,7 +780,7 @@ async def enrich_scan_ips_exits(
         log.warning("[扫描优选] Check ProxyIP 外部端点健康探针失败，安全熔断跳过出口画像补全")
         return 0
 
-    concurrency = safe_int(check_concurrency, 32) or 32
+    concurrency = safe_int(check_concurrency, CHECK_CONCURRENCY) or 32
     log.info(
         "🚀 [扫描优选 外部鉴真] 发现 %d 个存活但缺失 exit_ip 的节点，启用外部 Worker 探针补全画像并评估 ProxyIP 晋升: %s (并发线程: %d)",
         len(candidates),
@@ -800,7 +815,7 @@ async def enrich_scan_ips_exits(
                     ip,
                     port,
                     endpoint,
-                    4.5,
+                    6.0,
                 )
 
             if res.get("success") and res.get("exit_ip"):
@@ -1088,6 +1103,11 @@ async def async_main(args):
                     row["isp"] = std_isp
 
             row["asn"] = format_asn_isp(asn_clean, row.get("isp", ""))
+            _, _, exit_code, exit_isp = resolve_node_exit_and_net_type(row, local_ip_cache)
+            if exit_code:
+                row["exit_asn"] = format_asn_isp(exit_code, exit_isp)
+                if exit_isp and not row.get("exit_isp"):
+                    row["exit_isp"] = exit_isp
             asn_groups[asn_clean].append(row)
 
         all_sorted_scan = []
@@ -1104,8 +1124,8 @@ async def async_main(args):
         if not getattr(args, "no_enrich_exits", False):
             await enrich_scan_ips_exits(
                 survivors,
-                check_endpoint=getattr(args, "check_endpoint", ""),
-                check_concurrency=getattr(args, "check_concurrency", 32),
+                check_endpoint=getattr(args, "check_endpoint", CHECK_ENDPOINT),
+                check_concurrency=getattr(args, "check_concurrency", CHECK_CONCURRENCY),
                 dry_run=getattr(args, "dry_run", False),
             )
 
@@ -1209,8 +1229,8 @@ def main():
     parser.add_argument("--dry-run", action="store_true", help="演练诊断模式，仅探测统计原因，不覆写数据文件也不登记墓地，自动跳过通知")
     parser.add_argument("--probe-baseline", action="store_true", help="探测 300 个官方 Cloudflare Anycast IP 作为并发与网络基线")
     parser.add_argument("--diag-output", type=str, default="", help="诊断结果输出 JSON 路径，记录每个节点的探测原因明细")
-    parser.add_argument("--check-endpoint", type=str, default="", help="Check ProxyIP 外部穿透鉴真端点 URL (默认读取 CHECK_PROXYIP_URL)")
-    parser.add_argument("--check-concurrency", type=int, default=32, help="外部鉴真端点专用并发线程数 (默认 32)")
+    parser.add_argument("--check-endpoint", type=str, default=CHECK_ENDPOINT, help="Check ProxyIP 外部穿透鉴真端点 URL (默认读取 CHECK_PROXYIP_URL)")
+    parser.add_argument("--check-concurrency", type=int, default=CHECK_CONCURRENCY, help=f"外部鉴真端点专用并发线程数 (默认 {CHECK_CONCURRENCY})")
     parser.add_argument("--no-enrich-exits", action="store_true", help="禁用存活扫描优选 IP 出口画像外部鉴真与 ProxyIP 晋升")
     args = parser.parse_args()
 
