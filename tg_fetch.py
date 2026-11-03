@@ -64,6 +64,10 @@ from providers import (
     classify_asn,
     is_asn_recorded,
     _extract_asn_code,
+    CF_BASE_CSV_FIELDS,
+    SCAN_CSV_FIELDS,
+    PROXYIP_CSV_FIELDS,
+    resolve_node_exit_and_net_type,
     normalize_timestamp,
     load_tombstone,
     prune_tombstone,
@@ -323,22 +327,7 @@ FETCH_STATS_FILE = os.path.join(DATA_DIR, ".fetch_stats.json")
 
 
 
-CF_CSV_FIELDS = [
-    "ip",
-    "port",
-    "tls",
-    "delay_ms",
-    "speed_kbs",
-    "colo",
-    "cf_location",
-    "asn",
-    "isp",
-    "first_seen",
-    "channel",
-    "fail_count",
-]
-SCAN_CSV_FIELDS = CF_CSV_FIELDS + ["exit_ip", "exit_asn", "exit_isp", "exit_location"]
-PROXYIP_CSV_FIELDS = CF_CSV_FIELDS + ["net_type", "exit_ip", "exit_ipv6"]
+CF_CSV_FIELDS = CF_BASE_CSV_FIELDS
 
 logging.basicConfig(
     level=logging.INFO,
@@ -376,56 +365,15 @@ def get_system_proxy() -> str:
 def classify_node_proxyip_or_scan(item: dict, ip_cache: dict) -> tuple[bool, str]:
     """
     终审判定节点归属 ProxyIP 还是扫描机房池（Scan IPs）：
-    【架构铁律：出口即正义，目标网站只认出口 IP】
-    1. 若自带/已探测真实出口 exit_ip:
-       - 优先从本地缓存或自治域推断 exit_net_type
-       - 若 exit_net_type != 'datacenter' (原生宽带/商业专线/教育/政务):
-         -> 绝对应划入 ProxyIP (无论入口是机房还是非机房)
-       - 若 exit_net_type == 'datacenter':
-         -> 坚决不划入 ProxyIP，留存在 scan_ips (即使入口是非机房，出站给目标网站展示的也是机房，毫无免风控价值)
-    2. 若未探测出口 (exit_ip 为空或未决):
-       - 按直连单跳反代假定，由入口 IP 属性兜底判定
-       - 若 ingress_net_type != 'datacenter' -> 归入 ProxyIP
-       - 否则 -> 归入 scan_ips (机房优选)
+    委托 providers.resolve_node_exit_and_net_type 单一真相源（出口即正义 + 三级权威 ASN 库实时核算优先于缓存旧标签），
+    并在解析出明确出口 ASN 时原地回填 exit_asn / exit_isp，确保跨池流转与 17 列落盘零信息丢失。
     返回: (is_proxyip, effective_net_type)
     """
-    ip = (item.get("ip") or "").strip()
-    exit_ip = (item.get("exit_ip") or "").strip()
-    exit_ipv6 = (item.get("exit_ipv6") or "").strip()
-    exit_asn = (item.get("exit_asn") or "").strip()
-    exit_isp = (item.get("exit_isp") or "").strip()
-
-    # 1. 尝试判定出口网络类型（支持 IPv4 / IPv6 双出口交叉检索）
-    exit_nt = None
-    if exit_ip and exit_ip in ip_cache:
-        exit_nt = ip_cache[exit_ip].get("net_type")
-    if not exit_nt and exit_ipv6 and exit_ipv6 in ip_cache:
-        exit_nt = ip_cache[exit_ipv6].get("net_type")
-    if not exit_nt and (exit_asn or exit_isp):
-        exit_nt = classify_asn(exit_asn, exit_isp)
-
-    # 2. 尝试判定入口网络类型 (优先依据自治域权威研判，杜绝历史陈旧定性)
-    ing_nt = classify_asn(item.get("asn", ""), item.get("isp", ""))
-    if not ing_nt and ip and ip in ip_cache:
-        ing_nt = ip_cache[ip].get("net_type")
-    if not ing_nt:
-        ing_nt = item.get("net_type")
-
-    if not exit_nt and exit_ip and exit_ip == ip:
-        exit_nt = ing_nt
-
-    # 3. 终审分流：出口即正义
-    if exit_nt:
-        if exit_nt != "datacenter":
-            return True, exit_nt
-        else:
-            return False, "datacenter"
-
-    # 出口未探测时：按入口非机房兜底
-    if ing_nt and ing_nt != "datacenter":
-        return True, ing_nt
-
-    return False, "datacenter"
+    is_p, eff_nt, exit_code, exit_isp = resolve_node_exit_and_net_type(item, ip_cache)
+    if exit_code and not _extract_asn_code(item.get("exit_asn"), item.get("exit_isp")):
+        item["exit_asn"] = format_asn_isp(exit_code, exit_isp)
+        item["exit_isp"] = exit_isp
+    return is_p, eff_nt
 
 
 def load_existing_proxies(
@@ -584,6 +532,13 @@ def load_existing_cf_ips(filepath: str = OUTPUT_CF_FILE, label: str = "优选 IP
                         row["isp"] = raw_isp
                         row["colo"] = row.get("colo", "").replace("`", "").strip()
                         row["cf_location"] = row.get("cf_location", "").replace("`", "").strip()
+                        if "exit_ip" in row or "exit_ipv6" in row:
+                            cand_exits = extract_ips([row.get("exit_ip"), row.get("exit_ipv6")])
+                            v4_exits = [cip for cip in cand_exits if is_valid_ipv4(cip)]
+                            v6_exits = [cip for cip in cand_exits if is_valid_ipv6(cip)]
+                            row["exit_ip"] = v4_exits[0] if v4_exits else (v6_exits[0] if v6_exits else "")
+                            if "exit_ipv6" in row:
+                                row["exit_ipv6"] = v6_exits[0] if v6_exits else ""
                         existing[key] = row
         log.info("已加载本地已存%s记录: %d 条（历史有效记录全部保留）", label, len(existing))
     except Exception as e:
@@ -888,6 +843,17 @@ def fetch_edt_proxies(
     dc_filtered = 0
     unrecorded_asns_map: dict[str, dict] = {}
 
+    def _is_cached_datacenter(ip_addr: str) -> bool:
+        if not ip_cache or ip_addr not in ip_cache:
+            return False
+        c_info = ip_cache.get(ip_addr)
+        if not isinstance(c_info, dict):
+            return False
+        c_asn = _extract_asn_code(c_info.get("asn"), c_info.get("isp"))
+        if c_asn:
+            return classify_asn(c_asn, c_info.get("isp", "")) == "datacenter"
+        return c_info.get("net_type") in ("datacenter", "hosting")
+
     # 预先收集候选节点中未收录的 ASN 并执行批量在线探针定性入库，避免新 ASN 因默认安全降级为 datacenter 而被提前误滤
     pre_enrich_map: dict[str, dict] = {}
     for item in data:
@@ -897,7 +863,7 @@ def fetch_edt_proxies(
         port = safe_int(item.get("port"), 0)
         if not ip or not (1 <= port <= 65535):
             continue
-        if ip_cache and ip_cache.get(ip, {}).get("net_type") in ("datacenter", "hosting"):
+        if _is_cached_datacenter(ip):
             continue
         if is_tombstoned(f"{ip}:{port}", tombstone):
             continue
@@ -932,8 +898,8 @@ def fetch_edt_proxies(
             dc_filtered += 1
             continue
 
-        # 前置门禁：查本地持久化 ip_cache，拦截已知数据中心机房 IP
-        if ip_cache and ip_cache.get(ip, {}).get("net_type") in ("datacenter", "hosting"):
+        # 前置门禁：查本地持久化 ip_cache（优先按权威 ASN 实时定性），拦截已知数据中心机房 IP
+        if not asn_code and _is_cached_datacenter(ip):
             dc_filtered += 1
             continue
 
@@ -1089,6 +1055,7 @@ def fetch_proxifly_https_proxies(
             continue
 
         cached = ip_cache.get(ip, {})
+        c_asn = _extract_asn_code(cached.get("asn"), cached.get("isp"))
         geo = item.get("geolocation") or {}
         country = str(geo.get("country") or "").strip().upper() or cached.get("country", "")
 
@@ -1101,7 +1068,7 @@ def fetch_proxifly_https_proxies(
             "egress_ip": cached.get("resolved_ip", "") or ip,
             "asn": cached.get("asn", ""),
             "isp": cached.get("isp", ""),
-            "net_type": cached.get("net_type", ""),
+            "net_type": classify_asn(c_asn, cached.get("isp", "")) if c_asn else cached.get("net_type", ""),
             "source": "proxifly",
             "status": "pending",
         }
@@ -1320,6 +1287,8 @@ def fetch_zip_proxyips(
                 "raw_asn": asn_code,
                 "exit_ip": exit_ip,
                 "exit_ipv6": exit_ipv6,
+                "exit_asn": formatted_asn if (exit_ip or exit_ipv6) else "",
+                "exit_isp": raw_isp if (exit_ip or exit_ipv6) else "",
                 "first_seen": now_bjt,
                 "channel": "@cmliussss_all",
                 "fail_count": 0,
@@ -1343,7 +1312,7 @@ def fetch_zip_proxyips(
                         }
                     unrecorded_asns_map[asn_code]["count"] += 1
             elif isinstance(scraped_proxyips[key], dict):
-                for mk in ("colo", "cf_location", "isp", "asn", "net_type", "exit_ip", "exit_ipv6", "raw_asn"):
+                for mk in ("colo", "cf_location", "isp", "asn", "net_type", "exit_ip", "exit_ipv6", "exit_asn", "exit_isp", "raw_asn"):
                     if proxyip_item.get(mk) and not scraped_proxyips[key].get(mk):
                         scraped_proxyips[key][mk] = proxyip_item[mk]
 
@@ -1470,8 +1439,10 @@ def save_and_notify(
     # 1. 保存通用代理总表（proxies.txt）并按协议独立拆分（原子写入）
     os.makedirs(DATA_DIR, exist_ok=True)
     for p in final_proxies.values():
-        if isinstance(p, dict) and (p.get("asn") or p.get("isp")):
-            p["net_type"] = classify_asn(p.get("asn", ""), p.get("isp", "")) or p.get("net_type", "")
+        if isinstance(p, dict):
+            p_code = _extract_asn_code(p.get("asn"), p.get("isp"))
+            if p_code:
+                p["net_type"] = classify_asn(p_code, p.get("isp", "")) or p.get("net_type", "")
     formatted_proxies = format_proxies_txt(list(final_proxies.values()))
     atomic_write_text(OUTPUT_PROXY_FILE, formatted_proxies)
     log.info("已按协议分段保存通用代理总文件: %s (%d 个全量累积节点)", OUTPUT_PROXY_FILE, len(final_proxies))
@@ -1507,10 +1478,10 @@ def save_and_notify(
     scan_ips_total = 0
     asn_groups_total = 0
     asn_groups = {}
+    local_ip_cache = load_ip_cache() if (final_scan_ips or final_proxyips) else {}
     if final_scan_ips:
         os.makedirs(OUTPUT_SCAN_DIR, exist_ok=True)
 
-        local_ip_cache = load_ip_cache()
         asn_groups = defaultdict(list)
         for row in final_scan_ips.values():
             cur_ip = row.get("ip") or ""
@@ -1587,17 +1558,33 @@ def save_and_notify(
             writer.writeheader()
             for row in sorted_proxyips:
                 row.setdefault("fail_count", 0)
-                row["asn"] = format_asn_isp(row.get("asn", ""), row.get("isp", ""))
-                row["net_type"] = classify_asn(row.get("exit_asn") or row.get("asn", ""), row.get("exit_isp") or row.get("isp", "")) or row.get("net_type", "datacenter")
                 cand_exits = extract_ips([row.get("exit_ip"), row.get("exit_ipv6")])
                 v4_exits = [cip for cip in cand_exits if is_valid_ipv4(cip)]
                 v6_exits = [cip for cip in cand_exits if is_valid_ipv6(cip)]
-                if v4_exits or v6_exits:
-                    row["exit_ip"] = v4_exits[0] if v4_exits else (v6_exits[0] if v6_exits else "")
-                    row["exit_ipv6"] = v6_exits[0] if v6_exits else ""
+                row["exit_ip"] = v4_exits[0] if v4_exits else (v6_exits[0] if v6_exits else "")
+                row["exit_ipv6"] = v6_exits[0] if v6_exits else ""
+
+                _, resolved_nt, exit_code, exit_isp = resolve_node_exit_and_net_type(row, local_ip_cache)
+                ing_code = _extract_asn_code(row.get("asn"), row.get("isp"))
+                ing_isp = str(row.get("isp") or "").strip()
+
+                if ing_code:
+                    row["asn"] = format_asn_isp(ing_code, ing_isp)
+                    row["isp"] = ing_isp
+                elif exit_code:
+                    row["asn"] = format_asn_isp(exit_code, exit_isp)
+                    row["isp"] = exit_isp
                 else:
-                    row.setdefault("exit_ip", "")
-                    row.setdefault("exit_ipv6", "")
+                    row["asn"] = format_asn_isp(row.get("asn", ""), ing_isp)
+
+                if exit_code:
+                    row["exit_asn"] = format_asn_isp(exit_code, exit_isp)
+                    row["exit_isp"] = exit_isp
+                else:
+                    row["exit_asn"] = ""
+                    row["exit_isp"] = ""
+
+                row["net_type"] = resolved_nt
                 writer.writerow(row)
         log.info("已保存反代 ProxyIP 表格: %s (%d 条全量累积记录)", OUTPUT_PROXYIP_FILE, len(sorted_proxyips))
 
@@ -1848,22 +1835,30 @@ def merge_and_save(
     final_scan_ips = dict(existing_scan_ips)
     for k, v in scraped_scan_ips.items():
         if k in final_scan_ips:
-            # 关键修复：保留已有扫描 IP 失败计数
-            v["fail_count"] = final_scan_ips[k].get("fail_count", 0)
+            # 关键修复：保留已有扫描 IP 失败计数与已补全的非空出口画像字段，不被无出口附件的空串抹除
+            ex_scan = final_scan_ips[k]
+            v["fail_count"] = ex_scan.get("fail_count", 0)
             if not v.get("first_seen"):
-                v["first_seen"] = final_scan_ips[k].get("first_seen") or final_scan_ips[k].get("tested_at", "")
-            final_scan_ips[k].update(v)
+                v["first_seen"] = ex_scan.get("first_seen") or ex_scan.get("tested_at", "")
+            for keep_k in ("exit_ip", "exit_ipv6", "exit_asn", "exit_isp", "exit_location", "colo", "cf_location"):
+                if not v.get(keep_k) and ex_scan.get(keep_k):
+                    v[keep_k] = ex_scan[keep_k]
+            ex_scan.update(v)
         else:
             final_scan_ips[k] = v
 
     final_proxyips = dict(existing_proxyips)
     for k, v in scraped_proxyips.items():
         if k in final_proxyips:
-            # 关键修复：保留已有 ProxyIP 失败计数与质检状态
-            v["fail_count"] = final_proxyips[k].get("fail_count", 0)
+            # 关键修复：保留已有 ProxyIP 失败计数与已补全的非空出口画像字段
+            ex_proxy = final_proxyips[k]
+            v["fail_count"] = ex_proxy.get("fail_count", 0)
             if not v.get("first_seen"):
-                v["first_seen"] = final_proxyips[k].get("first_seen") or final_proxyips[k].get("tested_at", "")
-            final_proxyips[k].update(v)
+                v["first_seen"] = ex_proxy.get("first_seen") or ex_proxy.get("tested_at", "")
+            for keep_k in ("exit_ip", "exit_ipv6", "exit_asn", "exit_isp", "colo", "cf_location"):
+                if not v.get(keep_k) and ex_proxy.get(keep_k):
+                    v[keep_k] = ex_proxy[keep_k]
+            ex_proxy.update(v)
         else:
             final_proxyips[k] = v
 
@@ -1895,10 +1890,12 @@ def merge_and_save(
             cleaned_proxyips[k] = v
 
     for k, v in scan_to_proxy.items():
+        if not v.get("cf_location") and v.get("exit_location"):
+            v["cf_location"] = v["exit_location"]
         if k not in cleaned_proxyips:
             cleaned_proxyips[k] = v
         else:
-            for mk in ("colo", "cf_location", "isp", "asn", "net_type", "exit_ip", "exit_ipv6", "raw_asn"):
+            for mk in ("colo", "cf_location", "isp", "asn", "net_type", "exit_ip", "exit_ipv6", "exit_asn", "exit_isp", "raw_asn"):
                 if v.get(mk) and not cleaned_proxyips[k].get(mk):
                     cleaned_proxyips[k][mk] = v[mk]
 
@@ -1906,7 +1903,7 @@ def merge_and_save(
         if k not in cleaned_scan_ips:
             cleaned_scan_ips[k] = v
         else:
-            for mk in ("colo", "cf_location", "isp", "asn", "net_type", "exit_ip", "exit_ipv6", "raw_asn"):
+            for mk in ("colo", "cf_location", "isp", "asn", "net_type", "exit_ip", "exit_ipv6", "exit_asn", "exit_isp", "raw_asn"):
                 if v.get(mk) and not cleaned_scan_ips[k].get(mk):
                     cleaned_scan_ips[k][mk] = v[mk]
 
@@ -2206,13 +2203,16 @@ async def run_telethon():
                                                         cf_item["exit_ipv6"] = probe_res["exit_ipv6"]
                                                     if not cf_item.get("colo") and probe_res.get("colo"):
                                                         cf_item["colo"] = probe_res["colo"]
+                                                    loc_parts = [p for p in (probe_res.get("city", ""), probe_res.get("country", "")) if p]
+                                                    if loc_parts and not cf_item.get("cf_location"):
+                                                        cf_item["cf_location"] = " · ".join(loc_parts)
                                                     if probe_res.get("net_type") and not cf_item.get("net_type"):
                                                         cf_item["net_type"] = probe_res["net_type"]
                                                     if probe_res.get("exit_asn"):
-                                                        cf_item["exit_asn"] = probe_res["exit_asn"]
+                                                        cf_item["exit_asn"] = format_asn_isp(probe_res["exit_asn"], probe_res.get("exit_isp", ""))
                                                         if not cf_item.get("raw_asn") or cf_item["raw_asn"] in ("AS0", "0", "AS_UNKNOWN", "UNKNOWN"):
                                                             cf_item["raw_asn"] = probe_res["exit_asn"]
-                                                            cf_item["asn"] = format_asn_isp(probe_res["exit_asn"], probe_res.get("exit_isp", ""))
+                                                            cf_item["asn"] = cf_item["exit_asn"]
                                                     if probe_res.get("exit_isp"):
                                                         cf_item["exit_isp"] = probe_res["exit_isp"]
                                                         if not cf_item.get("isp"):

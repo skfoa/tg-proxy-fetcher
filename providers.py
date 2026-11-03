@@ -2282,10 +2282,11 @@ def format_proxy_json_item(r_dict: dict) -> dict:
     isp_name = str(r_dict.get("isp") or "").strip()
     proto = str(r_dict.get("proto") or "socks5").strip().lower()
 
-    # net_type：优先依据自治系统权威研判 (SSOT) 实时核算，杜绝陈旧属性污染；无 ASN/ISP 时继承合规值，完全未查询则留空
+    # net_type：优先依据自治系统权威研判 (SSOT) 实时核算，杜绝陈旧属性污染；无有效 ASN 时继承合规值，完全未查询则留空
     curr_nt = str(r_dict.get("net_type") or "").strip().lower()
-    if clean_asn_num or isp_name:
-        net_type_val = classify_asn(clean_asn_num, isp_name) or (curr_nt if curr_nt in VALID_NET_TYPES else "")
+    eff_asn_code = _extract_asn_code(clean_asn_num, isp_name)
+    if eff_asn_code:
+        net_type_val = classify_asn(eff_asn_code, isp_name)
     elif curr_nt in VALID_NET_TYPES:
         net_type_val = curr_nt
     else:
@@ -2631,6 +2632,127 @@ def classify_asn(asn_str: str | None, isp_str: str | None = "") -> str:
 classify_asn.cache_clear = _extract_asn_code.cache_clear  # type: ignore[attr-defined]
 
 
+# 全局共享优选 / 扫描优选 / 反代 ProxyIP 标准 CSV 字段定义 (SSOT)
+CF_BASE_CSV_FIELDS = [
+    "ip",
+    "port",
+    "tls",
+    "delay_ms",
+    "speed_kbs",
+    "colo",
+    "cf_location",
+    "asn",
+    "isp",
+    "first_seen",
+    "channel",
+    "fail_count",
+]
+SCAN_CSV_FIELDS = CF_BASE_CSV_FIELDS + ["exit_ip", "exit_asn", "exit_isp", "exit_location"]
+PROXYIP_CSV_FIELDS = CF_BASE_CSV_FIELDS + ["net_type", "exit_ip", "exit_ipv6", "exit_asn", "exit_isp"]
+
+
+def resolve_node_exit_and_net_type(
+    item: dict,
+    ip_cache: dict | None = None,
+) -> tuple[bool, str, str, str]:
+    """
+    全链路统一的节点出口画像与网络属性裁决函数 (SSOT)：
+    严格遵循【出口即正义 + 自治系统三级权威库实时核算优先于缓存旧标签】准则：
+    1. 校验并提取合法出口 IP (自动剔除 '0' 等非法占位串)。
+    2. 解析真实出口自治域 (exit_code, exit_isp)：
+       - 优先取显式有效 exit_asn / exit_isp；
+       - 其次查 ip_cache 中出口 IP 关联的 ASN 并经 classify_asn 实时核算（绝不盲信缓存中的陈旧 net_type 字符串）；
+       - 若单跳直连 (exit_ip == ip)，复用入口有效 ASN；
+       - 兼容旧版 15 列 proxyip.csv（无 exit_asn 列）平滑迁移：若原记录无 exit_asn 键且原 asn 为非机房，将其迁移为出口 ASN。
+    3. 裁决网络类型与归属池：
+       - 若已具备真实出口 IP：严格按出口网络类型裁决（无有效出口 ASN 时辅以缓存无 ASN 标签或安全降级为 datacenter）；
+       - 若尚未探测出口 IP：按入口有效 ASN / 缓存 / 合法存量标签兜底。
+    返回: (is_proxyip, effective_net_type, resolved_exit_code, resolved_exit_isp)
+    """
+    ip = str(item.get("ip") or "").strip()
+    cand_exits = extract_ips([item.get("exit_ip"), item.get("exit_ipv6")])
+    v4_exits = [cip for cip in cand_exits if is_valid_ipv4(cip)]
+    v6_exits = [cip for cip in cand_exits if is_valid_ipv6(cip)]
+    exit_v4 = v4_exits[0] if v4_exits else ""
+    exit_v6 = v6_exits[0] if v6_exits else ""
+    primary_exit = exit_v4 or exit_v6
+
+    raw_exit_asn = str(item.get("exit_asn") or "").strip()
+    raw_exit_isp = str(item.get("exit_isp") or "").strip()
+    exit_code = _extract_asn_code(raw_exit_asn, raw_exit_isp)
+
+    raw_ing_asn = str(item.get("asn") or "").strip()
+    raw_ing_isp = str(item.get("isp") or "").strip()
+    ing_code = _extract_asn_code(raw_ing_asn, raw_ing_isp)
+
+    cache_exit_nt = ""
+    if primary_exit and not exit_code and ip_cache:
+        for ep in (exit_v4, exit_v6):
+            if ep and ep in ip_cache and isinstance(ip_cache[ep], dict):
+                ent = ip_cache[ep]
+                c_code = _extract_asn_code(ent.get("asn"), ent.get("isp"))
+                if c_code:
+                    exit_code = c_code
+                    if not raw_exit_isp:
+                        raw_exit_isp = str(ent.get("isp") or "").strip()
+                    break
+                ent_nt = str(ent.get("net_type") or "").strip().lower()
+                if not cache_exit_nt and ent_nt in VALID_NET_TYPES:
+                    cache_exit_nt = ent_nt
+
+    if primary_exit and not exit_code:
+        if primary_exit == ip and ing_code:
+            exit_code = ing_code
+            if not raw_exit_isp:
+                raw_exit_isp = raw_ing_isp
+        elif "exit_asn" not in item and ing_code:
+            # 兼容旧版 15 列 proxyip.csv 平滑升级：旧表中 asn 列存的即为非机房出口 ASN
+            if classify_asn(ing_code, raw_ing_isp) != "datacenter":
+                exit_code = ing_code
+                if not raw_exit_isp:
+                    raw_exit_isp = raw_ing_isp
+
+    if exit_code and not raw_exit_isp:
+        raw_exit_isp = ASN_TO_PROVIDER.get(exit_code) or ASN_DATABASE_ASN_TO_ISP.get(exit_code) or ""
+
+    # 1. 已具备真实出口 IP 或明确出口 ASN：严格按出口裁决
+    if exit_code:
+        exit_nt = classify_asn(exit_code, raw_exit_isp)
+        return (exit_nt != "datacenter"), exit_nt, exit_code, raw_exit_isp
+
+    if primary_exit:
+        if cache_exit_nt:
+            return (cache_exit_nt != "datacenter"), cache_exit_nt, "", raw_exit_isp
+        return False, "datacenter", "", raw_exit_isp
+
+    # 2. 尚未探测出口 IP：按入口有效 ASN -> 缓存 -> 存量合法标签兜底
+    cache_ing_nt = ""
+    if not ing_code and ip and ip_cache and ip in ip_cache and isinstance(ip_cache[ip], dict):
+        ent = ip_cache[ip]
+        c_code = _extract_asn_code(ent.get("asn"), ent.get("isp"))
+        if c_code:
+            ing_code = c_code
+            if not raw_ing_isp:
+                raw_ing_isp = str(ent.get("isp") or "").strip()
+        else:
+            ent_nt = str(ent.get("net_type") or "").strip().lower()
+            if ent_nt in VALID_NET_TYPES:
+                cache_ing_nt = ent_nt
+
+    if ing_code:
+        ing_nt = classify_asn(ing_code, raw_ing_isp)
+        return (ing_nt != "datacenter"), ing_nt, "", ""
+
+    if cache_ing_nt:
+        return (cache_ing_nt != "datacenter"), cache_ing_nt, "", ""
+
+    curr_nt = str(item.get("net_type") or "").strip().lower()
+    if curr_nt in VALID_NET_TYPES:
+        return (curr_nt != "datacenter"), curr_nt, "", ""
+
+    return False, "datacenter", "", ""
+
+
 def format_proxyip_json_item(r_dict: dict) -> dict:
     """
     转换为适配第三方调用、反代配置与前端订阅的标准化 ProxyIP JSON 字典对象：
@@ -2675,7 +2797,7 @@ def format_proxyip_json_item(r_dict: dict) -> dict:
     v6_ips = [cip for cip in unique_exit_ips if is_valid_ipv6(cip)]
     client_ipv4 = v4_ips[0] if v4_ips else ""
     client_ipv6 = v6_ips[0] if v6_ips else ""
-    client_ip = client_ipv4 or client_ipv6 or raw_exit or raw_ip
+    client_ip = client_ipv4 or client_ipv6 or raw_ip
     client_ips = unique_exit_ips if unique_exit_ips else ([client_ip] if client_ip else [])
     dual_stack = bool(client_ipv4 and client_ipv6)
 
@@ -2696,21 +2818,21 @@ def format_proxyip_json_item(r_dict: dict) -> dict:
             c_name = country_name or ""
             c_emoji = country_code_to_emoji(c_code) if c_code else ("🌐" if country_name else "")
 
-    raw_asn = str(r_dict.get("exit_asn") or r_dict.get("asn") or "").strip()
-    m_asn = re.search(r"AS(\d+)", raw_asn, re.IGNORECASE)
-    clean_asn_num = m_asn.group(1) if m_asn else raw_asn
+    _, resolved_nt, exit_code, exit_isp = resolve_node_exit_and_net_type(r_dict)
+    eff_code = exit_code or _extract_asn_code(r_dict.get("asn"), r_dict.get("isp")) or ""
+    clean_asn_num = eff_code[2:] if eff_code.upper().startswith("AS") else eff_code
 
-    isp_name = str(r_dict.get("exit_isp") or r_dict.get("isp") or "").strip()
-    if not isp_name and clean_asn_num:
-        isp_name = ASN_TO_PROVIDER.get(f"AS{clean_asn_num}", "")
+    isp_name = exit_isp or str(r_dict.get("exit_isp") or r_dict.get("isp") or "").strip()
+    if not isp_name and eff_code:
+        isp_name = ASN_TO_PROVIDER.get(eff_code) or ASN_DATABASE_ASN_TO_ISP.get(eff_code) or ""
 
     curr_nt = str(r_dict.get("net_type") or "").strip().lower()
-    if clean_asn_num or isp_name:
-        net_type_val = classify_asn(clean_asn_num, isp_name) or (curr_nt if curr_nt in VALID_NET_TYPES else "")
+    if eff_code:
+        net_type_val = classify_asn(eff_code, isp_name)
     elif curr_nt in VALID_NET_TYPES:
         net_type_val = curr_nt
     else:
-        net_type_val = ""
+        net_type_val = resolved_nt if resolved_nt in VALID_NET_TYPES else ""
 
     source_val = str(r_dict.get("channel") or r_dict.get("source") or "").strip()
 
@@ -2768,10 +2890,8 @@ def save_proxyip_by_country(rows: list, output_dir: str) -> int:
         country = extract_country(r.get("cf_location"), r.get("colo"))
         groups.setdefault(country, []).append(r)
 
-        # 始终依据出口真实 ASN 与权威研判实时校准网络类型，确保分流分类 100% 准确
-        exit_asn = r.get("exit_asn") or r.get("asn", "")
-        exit_isp = r.get("exit_isp") or r.get("isp", "")
-        nt = classify_asn(exit_asn, exit_isp) or r.get("net_type", "datacenter")
+        # 始终依据出口真实 ASN 与权威研判实时校准网络类型，确保分流分类一致
+        _, nt, _, _ = resolve_node_exit_and_net_type(r)
         r["net_type"] = nt
         if nt in SPECIAL_NET_TYPE_FILES:
             type_groups.setdefault(nt, []).append(r)
@@ -3280,6 +3400,139 @@ def auto_enrich_and_save_asns(unrecorded_items: list[dict], proxy: str = "") -> 
         return 0
 
 
+def merge_demoted_into_scan_ips(
+    demoted_rows: list[dict],
+    scan_csv_path: str = "data/scan_ips.csv",
+    scan_txt_path: str = "data/scan_ips.txt",
+    scan_dir_path: str = "data/scan_ips",
+) -> int:
+    """
+    将经校准或外部鉴真确认为机房 (net_type == 'datacenter') 的节点从 ProxyIP 池安全移入 scan_ips 优选池，
+    同步更新 scan_ips.csv、scan_ips.txt 与 scan_ips/ ASN 分组目录（幂等合并，严格过滤墓地死节点）。
+    返回本次新并入或补全的记录条数。
+    """
+    if not demoted_rows:
+        return 0
+
+    tombstone = load_tombstone()
+    scan_map: dict[str, dict] = {}
+    if scan_csv_path and os.path.isfile(scan_csv_path):
+        try:
+            with open(scan_csv_path, "r", encoding="utf-8-sig") as f:
+                for r in csv.DictReader(f):
+                    ip = str(r.get("ip") or "").strip()
+                    port = safe_int(r.get("port"), 0)
+                    if not ip or port <= 0 or port > 65535:
+                        continue
+                    k = canonical_key(ip, port)
+                    if not is_tombstoned(k, tombstone):
+                        r["ip"] = ip
+                        r["port"] = str(port)
+                        r["fail_count"] = safe_int(r.get("fail_count"), 0)
+                        scan_map[k] = r
+        except Exception as e:
+            log.warning("读取 %s 以合并降级机房节点失败: %s", scan_csv_path, e)
+
+    merged_cnt = 0
+    for dr in demoted_rows:
+        ip = str(dr.get("ip") or "").strip()
+        port = safe_int(dr.get("port"), 0)
+        if not ip or port <= 0 or port > 65535:
+            continue
+        k = canonical_key(ip, port)
+        if is_tombstoned(k, tombstone):
+            continue
+
+        cand_exits = extract_ips([dr.get("exit_ip"), dr.get("exit_ipv6")])
+        v4_exits = [cip for cip in cand_exits if is_valid_ipv4(cip)]
+        v6_exits = [cip for cip in cand_exits if is_valid_ipv6(cip)]
+        eff_exit_ip = v4_exits[0] if v4_exits else (v6_exits[0] if v6_exits else "")
+
+        ex_code = _extract_asn_code(dr.get("exit_asn"), dr.get("exit_isp"))
+        ex_isp = str(dr.get("exit_isp") or "").strip()
+        ing_code = _extract_asn_code(dr.get("asn"), dr.get("isp"))
+        ing_isp = str(dr.get("isp") or "").strip()
+
+        if not ex_code and eff_exit_ip and eff_exit_ip == ip and ing_code:
+            ex_code = ing_code
+            ex_isp = ex_isp or ing_isp
+        if ex_code and not ex_isp:
+            ex_isp = ASN_TO_PROVIDER.get(ex_code) or ASN_DATABASE_ASN_TO_ISP.get(ex_code) or ""
+
+        eff_exit_asn = format_asn_isp(ex_code, ex_isp) if ex_code else ""
+        eff_ing_asn = format_asn_isp(ing_code or ex_code or "", ing_isp or ex_isp)
+
+        if k not in scan_map:
+            scan_map[k] = {
+                "ip": ip,
+                "port": str(port),
+                "tls": str(dr.get("tls") or "true").lower(),
+                "delay_ms": safe_int(dr.get("delay_ms"), 0),
+                "speed_kbs": str(dr.get("speed_kbs") or ""),
+                "colo": str(dr.get("colo") or ""),
+                "cf_location": str(dr.get("cf_location") or ""),
+                "asn": eff_ing_asn,
+                "isp": ing_isp or ex_isp,
+                "first_seen": normalize_timestamp(str(dr.get("first_seen") or "")),
+                "channel": str(dr.get("channel") or ""),
+                "fail_count": safe_int(dr.get("fail_count"), 0),
+                "exit_ip": eff_exit_ip,
+                "exit_asn": eff_exit_asn,
+                "exit_isp": ex_isp,
+                "exit_location": str(dr.get("exit_location") or dr.get("cf_location") or ""),
+            }
+            merged_cnt += 1
+        else:
+            ex_row = scan_map[k]
+            updated = False
+            for mk, mv in (
+                ("colo", dr.get("colo")),
+                ("cf_location", dr.get("cf_location")),
+                ("asn", eff_ing_asn),
+                ("isp", ing_isp or ex_isp),
+                ("exit_ip", eff_exit_ip),
+                ("exit_asn", eff_exit_asn),
+                ("exit_isp", ex_isp),
+            ):
+                if mv and not str(ex_row.get(mk) or "").strip():
+                    ex_row[mk] = mv
+                    updated = True
+            if updated:
+                merged_cnt += 1
+
+    if merged_cnt > 0 and scan_csv_path:
+        asn_groups: dict[str, list] = {}
+        for r in scan_map.values():
+            c_asn = _extract_asn_code(r.get("asn"), r.get("isp")) or _extract_asn_code(r.get("exit_asn"), r.get("exit_isp")) or "AS_UNKNOWN"
+            asn_groups.setdefault(c_asn, []).append(r)
+
+        sorted_scan_rows: list[dict] = []
+        for asn_name in sorted(asn_groups.keys()):
+            grp = sorted(asn_groups[asn_name], key=lambda x: str(x.get("first_seen") or ""), reverse=True)
+            grp = sorted(
+                grp,
+                key=lambda x: (
+                    safe_int(x.get("fail_count"), 0),
+                    safe_int(x.get("delay_ms"), 0) if safe_int(x.get("delay_ms"), 0) > 0 else 99999,
+                ),
+            )
+            sorted_scan_rows.extend(grp)
+
+        with atomic_writer(scan_csv_path, encoding="utf-8-sig", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=SCAN_CSV_FIELDS, extrasaction="ignore")
+            writer.writeheader()
+            for r in sorted_scan_rows:
+                writer.writerow(r)
+
+        if scan_txt_path:
+            atomic_write_text(scan_txt_path, format_scan_ips_txt(sorted_scan_rows))
+        if scan_dir_path:
+            save_scan_ips_by_asn(asn_groups, scan_dir_path)
+        log.info("【机房归池闭环】已将 %d 条机房属性节点从 ProxyIP 池安全移入 %s", merged_cnt, scan_csv_path)
+
+    return merged_cnt
+
+
 def calibrate_all_datasets(
     proxies_dir: str = "data/proxies",
     proxies_csv_path: str = "data/proxies.csv",
@@ -3287,6 +3540,11 @@ def calibrate_all_datasets(
     proxyip_dir: str = "data/proxyip",
     ip_cache_path: str = "data/ip_cache.json",
     proxies_only: bool = False,
+    proxyip_txt_path: str = "data/proxyip.txt",
+    proxyip_json_path: str = "data/proxyip.json",
+    scan_csv_path: str = "data/scan_ips.csv",
+    scan_txt_path: str = "data/scan_ips.txt",
+    scan_dir_path: str = "data/scan_ips",
 ) -> dict[str, int]:
     """
     全量数据自动化属性校准闭环引擎：
@@ -3294,7 +3552,7 @@ def calibrate_all_datasets(
     自动对整个项目中所有持久化数据文件执行网络属性与元数据校准同步：
     1. 【ip_cache.json】：校准所有持久化 IP 缓存中的 net_type 与标准 ISP 名称
     2. 【data/proxies/ 与 data/proxies.csv】：重新核算 net_type 与 ASN 标准格式，重新生成 .csv、.txt、.json
-    3. 【data/proxyip.csv & data/proxyip/】：重新校准 ProxyIP 属性，并自动重构【ISP_运营商原生宽带】.txt 等全部分流文件
+    3. 【data/proxyip.csv & data/proxyip/】：按统一出口口径校准 ProxyIP 属性，自动将校准为 datacenter 的节点移入 scan_ips.csv，并同步重建 proxyip.txt、proxyip.json 与全部分流文件
     返回各校准项变更计数统计字典。
     """
     # 0. 兜底扫描并自动收录所有数据集中可能遗漏的新 ASN
@@ -3305,16 +3563,18 @@ def calibrate_all_datasets(
             try:
                 with open(ds_path, "r", encoding="utf-8-sig") as f:
                     for row in csv.DictReader(f):
-                        asn_val = row.get("exit_asn") or row.get("asn", "")
-                        isp_val = row.get("exit_isp") or row.get("isp", "")
-                        c = _extract_asn_code(asn_val, isp_val)
-                        if c and not is_asn_recorded(c) and c not in seen_unrec:
-                            seen_unrec.add(c)
-                            unrec_candidates.append({
-                                "asn": c,
-                                "isp": isp_val,
-                                "ip": row.get("exit_ip") or row.get("host") or row.get("ip", ""),
-                            })
+                        for asn_val, isp_val, ip_val in (
+                            (row.get("exit_asn", ""), row.get("exit_isp", ""), row.get("exit_ip") or row.get("ip", "")),
+                            (row.get("asn", ""), row.get("isp", ""), row.get("host") or row.get("ip", "")),
+                        ):
+                            c = _extract_asn_code(asn_val, isp_val)
+                            if c and not is_asn_recorded(c) and c not in seen_unrec:
+                                seen_unrec.add(c)
+                                unrec_candidates.append({
+                                    "asn": c,
+                                    "isp": isp_val,
+                                    "ip": ip_val,
+                                })
             except Exception:
                 pass
     if unrec_candidates:
@@ -3330,20 +3590,22 @@ def calibrate_all_datasets(
         "proxies_csv_updated": 0,
         "proxies_sub_updated": 0,
         "proxyip_csv_updated": 0,
+        "proxyip_demoted_to_scan": 0,
         "proxyip_files_written": 0,
     }
 
     # 1. 校准 data/ip_cache.json
+    cache: dict[str, dict] = {}
     if os.path.isfile(ip_cache_path):
         try:
-            cache = load_ip_cache()
+            cache = load_ip_cache(filepath=ip_cache_path)
             updated_cache = 0
             for ip, info in cache.items():
                 if not isinstance(info, dict):
                     continue
                 asn = info.get("asn", "")
                 isp = info.get("isp", "")
-                if asn or isp:
+                if _extract_asn_code(asn, isp):
                     correct_nt = classify_asn(asn, isp)
                     if correct_nt and info.get("net_type") != correct_nt:
                         info["net_type"] = correct_nt
@@ -3372,10 +3634,10 @@ def calibrate_all_datasets(
                     if std_isp and not isp_val:
                         r["isp"] = std_isp
                     r["asn"] = format_asn_isp(code, r.get("isp", ""))
-                correct_nt = classify_asn(r.get("asn", ""), r.get("isp", ""))
-                if correct_nt and r.get("net_type") != correct_nt:
-                    r["net_type"] = correct_nt
-                    changed_proxies += 1
+                    correct_nt = classify_asn(code, r.get("isp", ""))
+                    if correct_nt and r.get("net_type") != correct_nt:
+                        r["net_type"] = correct_nt
+                        changed_proxies += 1
 
             if changed_proxies > 0 or not proxies_only:
                 save_proxies_csv(rows, csv_path=proxies_csv_path)
@@ -3390,41 +3652,87 @@ def calibrate_all_datasets(
     if proxies_only:
         return stats
 
-    # 3. 校准 data/proxyip.csv 与 data/proxyip/
+    # 3. 校准 data/proxyip.csv 与 data/proxyip/ (统一出口口径 + 机房节点自动归入 scan_ips)
     if os.path.isfile(proxyip_csv_path):
         try:
             proxyip_rows = []
+            orig_fields: list[str] = []
             with open(proxyip_csv_path, "r", encoding="utf-8-sig") as f:
                 reader = csv.DictReader(f)
+                orig_fields = list(reader.fieldnames or [])
                 proxyip_rows = list(reader)
 
+            schema_upgraded = orig_fields != PROXYIP_CSV_FIELDS
             changed_proxyip = 0
+            clean_proxyip_rows: list[dict] = []
+            dc_demoted_rows: list[dict] = []
+
             for r in proxyip_rows:
-                exit_asn = r.get("exit_asn") or r.get("asn", "")
-                exit_isp = r.get("exit_isp") or r.get("isp", "")
-                code = _extract_asn_code(exit_asn, exit_isp)
-                if code:
-                    std_isp = ASN_TO_PROVIDER.get(code) or ASN_DATABASE_ASN_TO_ISP.get(code) or exit_isp
-                    if std_isp and not exit_isp:
-                        r["isp"] = std_isp
-                    r["asn"] = format_asn_isp(code, r.get("isp", ""))
-                correct_nt = classify_asn(exit_asn, exit_isp)
+                cand_exits = extract_ips([r.get("exit_ip"), r.get("exit_ipv6")])
+                v4_exits = [cip for cip in cand_exits if is_valid_ipv4(cip)]
+                v6_exits = [cip for cip in cand_exits if is_valid_ipv6(cip)]
+                new_exit_ip = v4_exits[0] if v4_exits else (v6_exits[0] if v6_exits else "")
+                new_exit_v6 = v6_exits[0] if v6_exits else ""
+                if (r.get("exit_ip") or "") != new_exit_ip or (r.get("exit_ipv6") or "") != new_exit_v6:
+                    r["exit_ip"] = new_exit_ip
+                    r["exit_ipv6"] = new_exit_v6
+                    changed_proxyip += 1
+
+                is_p, correct_nt, exit_code, exit_isp = resolve_node_exit_and_net_type(r, cache)
+                ing_code = _extract_asn_code(r.get("asn"), r.get("isp"))
+                ing_isp = str(r.get("isp") or "").strip()
+
+                if ing_code:
+                    std_ing_isp = ASN_TO_PROVIDER.get(ing_code) or ASN_DATABASE_ASN_TO_ISP.get(ing_code) or ing_isp
+                    if std_ing_isp and not ing_isp:
+                        r["isp"] = std_ing_isp
+                    r["asn"] = format_asn_isp(ing_code, r.get("isp", ""))
+                elif exit_code:
+                    r["isp"] = exit_isp
+                    r["asn"] = format_asn_isp(exit_code, exit_isp)
+
+                if exit_code:
+                    r["exit_isp"] = exit_isp
+                    r["exit_asn"] = format_asn_isp(exit_code, exit_isp)
+                else:
+                    r["exit_asn"] = ""
+                    r["exit_isp"] = ""
+
                 if correct_nt and r.get("net_type") != correct_nt:
                     r["net_type"] = correct_nt
                     changed_proxyip += 1
 
-            if changed_proxyip > 0:
-                with atomic_writer(proxyip_csv_path, encoding="utf-8-sig", newline="") as f:
-                    writer = csv.DictWriter(f, fieldnames=list(proxyip_rows[0].keys()) if proxyip_rows else [], extrasaction="ignore")
-                    writer.writeheader()
-                    for r in proxyip_rows:
-                        writer.writerow(r)
-                stats["proxyip_csv_updated"] = changed_proxyip
+                if not is_p or r.get("net_type") == "datacenter":
+                    dc_demoted_rows.append(r)
+                else:
+                    clean_proxyip_rows.append(r)
 
-            if proxyip_dir and proxyip_rows:
-                written_files = save_proxyip_by_country(proxyip_rows, output_dir=proxyip_dir)
+            if dc_demoted_rows:
+                demoted_cnt = merge_demoted_into_scan_ips(
+                    dc_demoted_rows,
+                    scan_csv_path=scan_csv_path,
+                    scan_txt_path=scan_txt_path,
+                    scan_dir_path=scan_dir_path,
+                )
+                stats["proxyip_demoted_to_scan"] = len(dc_demoted_rows)
+                log.info("【全量校准】检测到 %d 条 ProxyIP 节点经校准属于机房属性 (并入 scan_ips: %d 条)", len(dc_demoted_rows), demoted_cnt)
+
+            if changed_proxyip > 0 or dc_demoted_rows or schema_upgraded:
+                with atomic_writer(proxyip_csv_path, encoding="utf-8-sig", newline="") as f:
+                    writer = csv.DictWriter(f, fieldnames=PROXYIP_CSV_FIELDS, extrasaction="ignore")
+                    writer.writeheader()
+                    for r in clean_proxyip_rows:
+                        writer.writerow(r)
+                if proxyip_txt_path:
+                    atomic_write_text(proxyip_txt_path, format_proxyip_txt(clean_proxyip_rows))
+                if proxyip_json_path:
+                    save_proxyip_json(clean_proxyip_rows, json_path=proxyip_json_path)
+                stats["proxyip_csv_updated"] = changed_proxyip + len(dc_demoted_rows)
+
+            if proxyip_dir and clean_proxyip_rows:
+                written_files = save_proxyip_by_country(clean_proxyip_rows, output_dir=proxyip_dir)
                 stats["proxyip_files_written"] = written_files
-                log.info("【全量校准】已校准 proxyip.csv (更新 %d 条网络类型)，并在 %s/ 生成 %d 个分流文件", changed_proxyip, proxyip_dir, written_files)
+                log.info("【全量校准】已校准 proxyip.csv (保留非机房 %d 条, 移出机房 %d 条, 属性更新 %d 条)，并在 %s/ 生成 %d 个分流文件", len(clean_proxyip_rows), len(dc_demoted_rows), changed_proxyip, proxyip_dir, written_files)
         except Exception as e:
             log.warning("校准 proxyip 数据异常: %s", e)
 
@@ -3615,26 +3923,43 @@ def is_tombstoned(
 # =====================================================================
 # Check ProxyIP 在线探针 API 适配模块
 # =====================================================================
-def format_check_proxyip_url(base_url: str, ip: str, port: int) -> str:
-    """智能格式化 Check ProxyIP 请求 URL，自适应各种形态的用户配置"""
+def format_check_proxyip_url(
+    base_url: str,
+    ip: str,
+    port: int,
+    timeout_ms: int | None = None,
+) -> str:
+    """智能格式化 Check ProxyIP 请求 URL，自适应 IPv6 方括号包裹与 timeoutMs 参数透传"""
     if not base_url:
         return ""
-    target = f"{ip}:{port}"
+    clean_ip = str(ip or "").strip()
+    if not clean_ip:
+        return ""
+    host_part = f"[{clean_ip}]" if (":" in clean_ip and not clean_ip.startswith("[")) else clean_ip
+    raw_target = f"{host_part}:{port}"
+    encoded_target = urllib.parse.quote(raw_target, safe="")
+
     u = base_url.strip()
     if "{target}" in u:
-        return u.replace("{target}", target)
-    if "{ip}" in u and "{port}" in u:
-        return u.replace("{ip}", ip).replace("{port}", str(port))
-    if u.endswith("="):
-        return f"{u}{target}"
-    if "?" in u:
+        res_url = u.replace("{target}", encoded_target)
+    elif "{ip}" in u and "{port}" in u:
+        res_url = u.replace("{ip}", urllib.parse.quote(host_part, safe="")).replace("{port}", str(port))
+    elif u.endswith("="):
+        res_url = f"{u}{encoded_target}"
+    elif "?" in u:
         sep = "&" if not u.endswith("&") and not u.endswith("?") else ""
-        return f"{u}{sep}proxyip={target}"
+        res_url = f"{u}{sep}proxyip={encoded_target}"
+    else:
+        u = u.rstrip("/")
+        if u.endswith("/check"):
+            res_url = f"{u}?proxyip={encoded_target}"
+        else:
+            res_url = f"{u}/check?proxyip={encoded_target}"
 
-    u = u.rstrip("/")
-    if u.endswith("/check"):
-        return f"{u}?proxyip={target}"
-    return f"{u}/check?proxyip={target}"
+    if timeout_ms and timeout_ms > 0 and "timeoutMs=" not in res_url:
+        sep = "&" if "?" in res_url else "?"
+        res_url = f"{res_url}{sep}timeoutMs={int(timeout_ms)}"
+    return res_url
 
 
 def probe_check_proxyip_api(
@@ -3644,16 +3969,20 @@ def probe_check_proxyip_api(
     timeout: float = 6.0,
 ) -> dict:
     """
-    通过 Check ProxyIP API 在线探测节点的出口真实 IP、出口 ASN、机房与地理位置。
+    通过 Check ProxyIP API 在线探测节点的出口真实 IP、出口 ASN、机房、真实握手延迟与地理位置。
     若 endpoint 留空则使用全局 CHECK_PROXYIP_URL。若未配置任何端点，直接返回 {"success": False}。
+    返回字段中的 network_error=True 表示 Worker 自身请求异常/限流/WAF 拦截，以便上游无损降级回退本地探测。
     """
     ep = endpoint or CHECK_PROXYIP_URL
     if not ep:
-        return {"success": False, "reason": "no_endpoint"}
+        return {"success": False, "reason": "no_endpoint", "network_error": True}
 
-    target_url = format_check_proxyip_url(ep, ip, port)
+    worker_timeout_ms = int(min(max(float(timeout) * 1000.0, 4000.0), 8000.0))
+    http_outer_timeout = max(float(timeout) + 8.0, 12.0)
+
+    target_url = format_check_proxyip_url(ep, ip, port, timeout_ms=worker_timeout_ms)
     if not target_url:
-        return {"success": False, "reason": "invalid_url"}
+        return {"success": False, "reason": "invalid_url", "network_error": False}
 
     try:
         req = urllib.request.Request(
@@ -3663,30 +3992,40 @@ def probe_check_proxyip_api(
                 "Accept": "application/json",
             },
         )
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
+        with urllib.request.urlopen(req, timeout=http_outer_timeout) as resp:
             if resp.status != 200:
-                return {"success": False, "status": resp.status}
+                return {
+                    "success": False,
+                    "status": resp.status,
+                    "reason": f"worker_http_{resp.status}",
+                    "network_error": True,
+                }
             content_type = (resp.headers.get("Content-Type") or "").lower()
             raw_body = resp.read()
             if "application/json" not in content_type and not raw_body.strip().startswith(b"{"):
-                return {"success": False, "reason": "waf_challenge_or_html_response"}
+                return {
+                    "success": False,
+                    "reason": "waf_challenge_or_html_response",
+                    "network_error": True,
+                }
             try:
                 data = json.loads(raw_body.decode("utf-8", errors="ignore"))
             except Exception:
-                return {"success": False, "reason": "invalid_json"}
+                return {"success": False, "reason": "invalid_json", "network_error": True}
             if not isinstance(data, dict):
-                return {"success": False, "reason": "invalid_json"}
+                return {"success": False, "reason": "invalid_json", "network_error": True}
 
-            probe = data.get("probe_results", {})
+            has_probe_results = isinstance(data.get("probe_results"), dict)
+            probe = data.get("probe_results") if has_probe_results else {}
             v4_obj = probe.get("ipv4", {}) if isinstance(probe.get("ipv4"), dict) else {}
             v6_obj = probe.get("ipv6", {}) if isinstance(probe.get("ipv6"), dict) else {}
             v4_exit = v4_obj.get("exit") if isinstance(v4_obj.get("exit"), dict) else {}
             v6_exit = v6_obj.get("exit") if isinstance(v6_obj.get("exit"), dict) else {}
             fallback_exit = data.get("exit") if isinstance(data.get("exit"), dict) else {}
 
-            v4_ip = str(v4_exit.get("ip") or "").strip()
-            v6_ip = str(v6_exit.get("ip") or "").strip()
-            fb_ip = str(fallback_exit.get("ip") or data.get("exit_ip") or "").strip()
+            v4_ip = str(v4_exit.get("ip") or v4_exit.get("ipAddress") or "").strip()
+            v6_ip = str(v6_exit.get("ip") or v6_exit.get("ipAddress") or "").strip()
+            fb_ip = str(fallback_exit.get("ip") or fallback_exit.get("ipAddress") or data.get("exit_ip") or "").strip()
 
             if not v4_ip and fb_ip and is_valid_ipv4(fb_ip):
                 v4_ip = fb_ip
@@ -3699,24 +4038,55 @@ def probe_check_proxyip_api(
 
             primary_exit_ip = v4_ip or v6_ip or fb_ip
             primary_info = v4_exit if v4_ip else (v6_exit if v6_ip else fallback_exit)
+            primary_probe = v4_obj if v4_ip else (v6_obj if v6_ip else {})
+
+            is_ok = bool(data.get("success", False)) or bool(primary_exit_ip)
+            if not is_ok:
+                err_detail = str(v4_obj.get("error") or v6_obj.get("error") or data.get("error") or "").strip()
+                return {
+                    "success": False,
+                    "reason": "worker_probe_failed",
+                    "detail": err_detail,
+                    "network_error": False,
+                }
 
             exit_asn = primary_info.get("asn") or data.get("exit_asn") or ""
             exit_isp = primary_info.get("asOrganization") or primary_info.get("org") or data.get("exit_isp") or ""
-            colo = data.get("colo") or probe.get("colo") or primary_info.get("colo") or ""
+            # CF-Workers-CheckProxyIP 顶层 data.colo 为 Worker 自身边缘节点 (req.cf.colo)，必须优先取穿透出口 primary_info.colo
+            if has_probe_results:
+                colo = primary_info.get("colo") or probe.get("colo") or ""
+            else:
+                colo = primary_info.get("colo") or data.get("colo") or ""
             country = primary_info.get("country") or data.get("country") or ""
             city = primary_info.get("city") or data.get("city") or ""
 
-            if exit_asn and not str(exit_asn).upper().startswith("AS"):
-                exit_asn = f"AS{exit_asn}"
+            c_ms = primary_probe.get("connect_ms")
+            t_ms = primary_probe.get("tls_ms")
+            resp_ms = data.get("responseTime")
+            if isinstance(c_ms, (int, float)) and c_ms >= 0 and isinstance(t_ms, (int, float)) and t_ms >= 0:
+                probe_delay_ms = max(1, int(round(c_ms + t_ms)))
+            elif isinstance(c_ms, (int, float)) and c_ms > 0:
+                probe_delay_ms = max(1, int(round(c_ms)))
+            elif isinstance(resp_ms, (int, float)) and resp_ms > 0:
+                probe_delay_ms = max(1, int(round(resp_ms)))
+            else:
+                probe_delay_ms = 0
 
-            net_type = classify_asn(exit_asn, exit_isp) if exit_asn else ""
+            asn_code = _extract_asn_code(str(exit_asn), str(exit_isp))
+            exit_asn_norm = asn_code or ""
+            net_type = classify_asn(exit_asn_norm, exit_isp) if exit_asn_norm else ""
 
-            all_exit_ips = [ip for ip in (v4_ip, v6_ip) if ip]
+            all_exit_ips = [x for x in (v4_ip, v6_ip) if x]
             if not all_exit_ips and primary_exit_ip:
                 all_exit_ips = [primary_exit_ip]
 
             return {
-                "success": bool(data.get("success", False)) or bool(primary_exit_ip),
+                "success": True,
+                "network_error": False,
+                "delay_ms": probe_delay_ms,
+                "connect_ms": c_ms,
+                "tls_ms": t_ms,
+                "response_time": resp_ms,
                 "exit_ip": str(primary_exit_ip).strip(),
                 "exit_ipv4": str(v4_ip).strip(),
                 "exit_ipv6": str(v6_ip).strip(),
@@ -3724,15 +4094,26 @@ def probe_check_proxyip_api(
                 "dual_stack": dual_stack,
                 "supports_ipv4": supports_v4,
                 "supports_ipv6": supports_v6,
-                "exit_asn": str(exit_asn).strip().upper(),
+                "exit_asn": exit_asn_norm,
                 "exit_isp": str(exit_isp).strip(),
                 "colo": str(colo).strip().upper(),
                 "country": str(country).strip(),
                 "city": str(city).strip(),
                 "net_type": net_type,
             }
+    except urllib.error.HTTPError as he:
+        return {
+            "success": False,
+            "status": he.code,
+            "reason": f"worker_http_{he.code}",
+            "network_error": True,
+        }
     except Exception as e:
-        return {"success": False, "reason": f"request_error_{type(e).__name__}"}
+        return {
+            "success": False,
+            "reason": f"request_error_{type(e).__name__}",
+            "network_error": True,
+        }
 
 
 if __name__ == "__main__":

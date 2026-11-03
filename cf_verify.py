@@ -67,6 +67,9 @@ from providers import (
     probe_check_proxyip_api,
     classify_asn,
     is_asn_recorded,
+    _extract_asn_code,
+    CF_BASE_CSV_FIELDS,
+    SCAN_CSV_FIELDS,
     auto_enrich_and_save_asns,
     calibrate_all_datasets,
 )
@@ -115,12 +118,7 @@ PROBE_HOST = "crypto.cloudflare.com"
 TIMEOUT = 3.0
 HTTP_TIMEOUT = 2.0
 MAX_FAILS = 3
-CSV_FIELDS = [
-    "ip", "port", "tls", "delay_ms", "speed_kbs",
-    "colo", "cf_location", "asn", "isp",
-    "first_seen", "channel", "fail_count",
-]
-SCAN_CSV_FIELDS = CSV_FIELDS + ["exit_ip", "exit_asn", "exit_isp", "exit_location"]
+CSV_FIELDS = CF_BASE_CSV_FIELDS
 
 # 复用全局 SSL 证书上下文，避免重复加载系统 CA 证书
 SSL_CTX = ssl.create_default_context()
@@ -802,7 +800,7 @@ async def enrich_scan_ips_exits(
                     ip,
                     port,
                     endpoint,
-                    6.0,
+                    4.5,
                 )
 
             if res.get("success") and res.get("exit_ip"):
@@ -811,17 +809,21 @@ async def enrich_scan_ips_exits(
                 if res.get("exit_ipv6"):
                     row["exit_ipv6"] = res["exit_ipv6"]
                 if res.get("exit_asn"):
-                    row["exit_asn"] = res["exit_asn"]
+                    row["exit_asn"] = format_asn_isp(res["exit_asn"], res.get("exit_isp", ""))
                 if res.get("exit_isp"):
                     row["exit_isp"] = res["exit_isp"]
                 if res.get("colo") and not row.get("colo"):
                     row["colo"] = res["colo"]
+                if safe_int(row.get("delay_ms"), 0) <= 0 and safe_int(res.get("delay_ms"), 0) > 0:
+                    row["delay_ms"] = safe_int(res.get("delay_ms"), 0)
 
                 city = res.get("city") or ""
                 country = res.get("country") or ""
                 loc_parts = [p for p in (city, country) if p]
                 if loc_parts and not row.get("exit_location"):
                     row["exit_location"] = " · ".join(loc_parts)
+                if loc_parts and not row.get("cf_location"):
+                    row["cf_location"] = " · ".join(loc_parts)
 
                 probed_records.append((row, res))
 
@@ -832,7 +834,7 @@ async def enrich_scan_ips_exits(
         if probed_records:
             unrec_map: dict[str, dict] = {}
             for row, res in probed_records:
-                e_asn = str(res.get("exit_asn") or "").strip()
+                e_asn = _extract_asn_code(res.get("exit_asn"), res.get("exit_isp")) or ""
                 e_isp = str(res.get("exit_isp") or "").strip()
                 e_ip = str(res.get("exit_ip") or row.get("ip") or "").strip()
                 if e_asn and not is_asn_recorded(e_asn) and e_asn not in unrec_map:
@@ -843,10 +845,14 @@ async def enrich_scan_ips_exits(
             for row, res in probed_records:
                 ip = (row.get("ip") or "").strip()
                 port = safe_int(row.get("port"), 0)
-                exit_asn = str(res.get("exit_asn") or "").strip()
+                exit_asn = _extract_asn_code(res.get("exit_asn"), res.get("exit_isp")) or ""
                 exit_isp = str(res.get("exit_isp") or "").strip()
                 exit_nt = classify_asn(exit_asn, exit_isp) if exit_asn else (res.get("net_type") or "datacenter")
                 if exit_nt in ("isp", "business", "education", "government"):
+                    ing_code = _extract_asn_code(row.get("asn"), row.get("isp"))
+                    ing_isp = str(row.get("isp") or "").strip()
+                    eff_ing_asn = format_asn_isp(ing_code or exit_asn, ing_isp or exit_isp)
+                    eff_exit_asn = format_asn_isp(exit_asn, exit_isp) if exit_asn else ""
                     promoted_proxyips.append({
                         "ip": ip,
                         "port": str(port),
@@ -854,15 +860,17 @@ async def enrich_scan_ips_exits(
                         "delay_ms": safe_int(row.get("delay_ms"), 0),
                         "speed_kbs": str(row.get("speed_kbs") or ""),
                         "colo": res.get("colo") or row.get("colo", ""),
-                        "cf_location": row.get("cf_location", ""),
-                        "asn": format_asn_isp(res.get("exit_asn") or row.get("asn", ""), res.get("exit_isp") or row.get("isp", "")),
-                        "isp": res.get("exit_isp") or row.get("isp", ""),
+                        "cf_location": row.get("cf_location") or row.get("exit_location", ""),
+                        "asn": eff_ing_asn,
+                        "isp": ing_isp or exit_isp,
                         "first_seen": row.get("first_seen") or now_bjt,
                         "channel": row.get("channel") or "@scan_ips_promoted",
                         "fail_count": 0,
                         "net_type": exit_nt,
                         "exit_ip": res.get("exit_ip", ""),
                         "exit_ipv6": res.get("exit_ipv6", ""),
+                        "exit_asn": eff_exit_asn,
+                        "exit_isp": exit_isp,
                     })
     finally:
         executor.shutdown(wait=False, cancel_futures=True)
@@ -873,7 +881,7 @@ async def enrich_scan_ips_exits(
         enriched_count,
     )
 
-    # 若有新晋升或更新出口画像的 ProxyIP，自动合并写入 data/proxyip.csv
+    # 若有新晋升或更新出口画像的 ProxyIP，自动合并写入 data/proxyip.csv，并从当前 scan_ips 存活池中移出
     if promoted_proxyips and not dry_run:
         try:
             existing_proxyips = load_proxyip_csv(PROXYIP_CSV)
@@ -884,8 +892,10 @@ async def enrich_scan_ips_exits(
             }
             new_promoted_cnt = 0
             updated_promoted_cnt = 0
+            promoted_keys: set[str] = set()
             for pr in promoted_proxyips:
                 k = canonical_key(pr["ip"], pr["port"])
+                promoted_keys.add(k)
                 if k not in existing_map:
                     existing_proxyips.append(pr)
                     existing_map[k] = pr
@@ -900,11 +910,19 @@ async def enrich_scan_ips_exits(
                     if not ex.get("exit_ipv6") and pr.get("exit_ipv6"):
                         ex["exit_ipv6"] = pr["exit_ipv6"]
                         updated = True
-                    if pr.get("asn") and (not ex.get("asn") or ex.get("net_type") != pr.get("net_type")):
-                        ex["asn"] = pr["asn"]
-                        if pr.get("isp"):
-                            ex["isp"] = pr["isp"]
+                    if not ex.get("cf_location") and pr.get("cf_location"):
+                        ex["cf_location"] = pr["cf_location"]
+                        updated = True
+                    if pr.get("exit_asn") and (not ex.get("exit_asn") or ex.get("net_type") != pr.get("net_type")):
+                        ex["exit_asn"] = pr["exit_asn"]
+                        if pr.get("exit_isp"):
+                            ex["exit_isp"] = pr["exit_isp"]
                         ex["net_type"] = pr["net_type"]
+                        updated = True
+                    if pr.get("asn") and not ex.get("asn"):
+                        ex["asn"] = pr["asn"]
+                        if pr.get("isp") and not ex.get("isp"):
+                            ex["isp"] = pr["isp"]
                         updated = True
                     if updated:
                         updated_promoted_cnt += 1
@@ -929,6 +947,11 @@ async def enrich_scan_ips_exits(
                             atomic_write_json(fetch_stats_file, fs_data)
                         except Exception:
                             pass
+            if promoted_keys:
+                survivors[:] = [
+                    r for r in survivors
+                    if canonical_key(r.get("ip", ""), r.get("port", 0)) not in promoted_keys
+                ]
         except Exception as e:
             log.warning("晋升合并 ProxyIP 失败: %s", e)
 
@@ -1002,6 +1025,13 @@ async def _verify_and_persist(csv_path: str, tag: str, args, on_save, pre_save_h
     # 严格保证保存先于登记墓地：若保存失败触发异常，避免墓地预先登记导致状态不一致
     if pre_save_hook:
         await pre_save_hook(survivors)
+        res["survivors"] = len(survivors)
+        res["pass"] = sum(1 for r in survivors if safe_int(r.get("fail_count"), 0) == 0)
+        res["buf_rec"] = sum(
+            1 for r in survivors
+            if safe_int(r.get("fail_count"), 0) == 0
+            and safe_int(r.get("_old_fc"), 0) > 0
+        )
 
     if on_save:
         on_save(survivors)

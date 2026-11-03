@@ -45,10 +45,15 @@ from providers import (
     get_keyed_lock,
     TG_BOT_TOKEN,
     TG_CHAT_ID,
+    PROXYIP_CSV_FIELDS,
     format_proxyip_txt,
     save_proxyip_by_country,
     save_proxyip_json,
     classify_asn,
+    _extract_asn_code,
+    resolve_node_exit_and_net_type,
+    merge_demoted_into_scan_ips,
+    load_ip_cache,
     normalize_timestamp,
     record_tombstone,
     load_tombstone,
@@ -99,6 +104,9 @@ PROXYIP_CSV = os.path.join(DATA_DIR, "proxyip.csv")
 PROXYIP_TXT = os.path.join(DATA_DIR, "proxyip.txt")
 PROXYIP_JSON = os.path.join(DATA_DIR, "proxyip.json")
 PROXYIP_DIR = os.path.join(DATA_DIR, "proxyip")
+SCAN_CSV = os.path.join(DATA_DIR, "scan_ips.csv")
+SCAN_TXT = os.path.join(DATA_DIR, "scan_ips.txt")
+SCAN_DIR = os.path.join(DATA_DIR, "scan_ips")
 
 PROBE_HOST = "speed.cloudflare.com"
 PROBE_PATH = "/cdn-cgi/trace"
@@ -143,14 +151,18 @@ def check_proxyip_endpoint_health(endpoint: str, timeout: float = 6.0) -> bool:
     """
     质检开始前，对 Check ProxyIP 外部检测端点进行全局健康探针校验。
     确认端点在线可用、域名正确且未欠费或被封禁。
-    若探测失败，则安全熔断并全局降级为本地直接探测，避免单节点频繁失败或卡顿。
+    优先请求轻量级 /check 接口（约 120 字节 JSON 响应），避免拉取整页 HTML。
     """
     if not endpoint:
         return False
-    clean_ep = endpoint.rstrip("/")
-    probe_urls = [clean_ep] if clean_ep.endswith("/check") else [clean_ep, f"{clean_ep}/check"]
+    clean_ep = endpoint.strip().rstrip("/")
+    if "?" in clean_ep or clean_ep.endswith("/check"):
+        probe_urls = [clean_ep]
+    else:
+        probe_urls = [f"{clean_ep}/check", clean_ep]
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)",
+        "Accept": "application/json",
     }
     for target in probe_urls:
         try:
@@ -171,32 +183,51 @@ def _sync_check_proxyip_endpoint(
     ip: str,
     port: int,
     timeout: float = 7.0,
-) -> tuple[bool, int, str, str, str, str, str, str]:
+) -> tuple[bool, int, str, str, bool, dict]:
     """
-    同步调用 Check ProxyIP 外部检测接口（在独立线程池中并发执行，不阻塞事件循环，杜绝盲等）。
-    返回 (is_alive, latency_ms, colo, reason, exit_ip, exit_ipv6, exit_asn, exit_isp)
+    同步调用 Check ProxyIP 外部检测接口（在独立线程池中并发执行，不阻塞事件循环）。
+    返回 (is_alive, latency_ms, colo, reason, network_error, profile_dict)
     """
     t0 = time.monotonic()
     res = probe_check_proxyip_api(ip, port, endpoint=endpoint, timeout=timeout)
-    latency_ms = max(1, int((time.monotonic() - t0) * 1000))
+    outer_ms = max(1, int((time.monotonic() - t0) * 1000))
     if res.get("success"):
+        worker_delay = safe_int(res.get("delay_ms"), 0)
+        latency_ms = worker_delay if worker_delay > 0 else outer_ms
         colo = res.get("colo", "")
-        exit_ip = res.get("exit_ip", "")
-        exit_ipv6 = res.get("exit_ipv6", "")
-        exit_asn = res.get("exit_asn", "")
-        exit_isp = res.get("exit_isp", "")
-        return True, latency_ms, colo, "ok", exit_ip, exit_ipv6, exit_asn, exit_isp
+        profile = {
+            "exit_ip": res.get("exit_ip", ""),
+            "exit_ipv6": res.get("exit_ipv6", ""),
+            "exit_asn": res.get("exit_asn", ""),
+            "exit_isp": res.get("exit_isp", ""),
+            "country": res.get("country", ""),
+            "city": res.get("city", ""),
+        }
+        return True, latency_ms, colo, "ok", False, profile
     else:
-        reason = res.get("reason") or (f"status_{res.get('status')}" if res.get('status') else "probe_failed")
-        return False, 0, "", reason, "", "", "", ""
+        reason = res.get("reason") or (f"status_{res.get('status')}" if res.get("status") else "probe_failed")
+        is_net_err = bool(res.get("network_error", False))
+        return False, 0, "", reason, is_net_err, {}
 
 
-# ProxyIP 纯净数据表字段定义 (15 字段，支持 IPv4 / IPv6 双出口及两级分层网络识别)
-CSV_FIELDS = [
-    "ip", "port", "tls", "delay_ms", "speed_kbs",
-    "colo", "cf_location", "asn", "isp",
-    "first_seen", "channel", "fail_count", "net_type", "exit_ip", "exit_ipv6",
-]
+def _has_complete_profile(row: dict, ip_cache: dict | None = None) -> bool:
+    """
+    判断节点是否已具备完整可信的真实出口画像（决定是否免调外部 Worker，直接走本地高并发探针）：
+    1. 具备合法的 IPv4 或 IPv6 出口地址（过滤 '0' 等无效残留）；
+    2. 具备已收录于权威库的真实出口 ASN（由 exit_asn、单跳 asn 或旧版 15 列迁移提供）。
+    """
+    cand_exits = extract_ips([row.get("exit_ip"), row.get("exit_ipv6")])
+    has_valid_exit = any(is_valid_ipv4(cip) or is_valid_ipv6(cip) for cip in cand_exits)
+    if not has_valid_exit:
+        return False
+    _, _, exit_code, _ = resolve_node_exit_and_net_type(row, ip_cache)
+    if not exit_code:
+        return False
+    return is_asn_recorded(exit_code)
+
+
+# ProxyIP 纯净数据表字段定义 (17 字段：解耦入口 asn/isp 与真实出口 exit_asn/exit_isp)
+CSV_FIELDS = PROXYIP_CSV_FIELDS
 
 # 反代穿透上下文：跳过非官方证书校验（安全审计说明：有意设计，反代节点由第三方部署且证书各异，需直接与节点建立 TLS 隧道嗅探 CDN /cdn-cgi/trace 边缘机房特征）
 SSL_CTX = ssl.create_default_context()
@@ -328,13 +359,14 @@ async def probe_proxyip(
 
 # ---------- 数据加载与保存 ----------
 def load_proxyip_csv(path: str) -> list:
-    """读取 proxyip.csv，自动处理 utf-8-sig BOM、自动过滤墓地黑名单及非法端口"""
+    """读取 proxyip.csv，自动处理 utf-8-sig BOM、过滤墓地黑名单及非法端口，并平滑兼容旧版 15 列格式"""
     if not os.path.exists(path):
         return []
     tombstone = load_tombstone()
     rows = []
     with open(path, "r", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
+        has_exit_asn_col = "exit_asn" in (reader.fieldnames or [])
         for r in reader:
             ip = str(r.get("ip") or "").strip()
             port = safe_int(r.get("port"), 0)
@@ -347,6 +379,19 @@ def load_proxyip_csv(path: str) -> list:
             r["port"] = str(port)
             r["fail_count"] = safe_int(r.get("fail_count"), 0)
             r["first_seen"] = normalize_timestamp(str(r.get("first_seen") or r.get("tested_at") or ""))
+
+            cand_exits = extract_ips([r.get("exit_ip"), r.get("exit_ipv6")])
+            v4_exits = [cip for cip in cand_exits if is_valid_ipv4(cip)]
+            v6_exits = [cip for cip in cand_exits if is_valid_ipv6(cip)]
+            r["exit_ip"] = v4_exits[0] if v4_exits else (v6_exits[0] if v6_exits else "")
+            r["exit_ipv6"] = v6_exits[0] if v6_exits else ""
+
+            if not has_exit_asn_col and (r["exit_ip"] or r["exit_ipv6"]):
+                ing_code = _extract_asn_code(r.get("asn"), r.get("isp"))
+                ing_isp = str(r.get("isp") or "").strip()
+                if ing_code and (r["exit_ip"] == ip or classify_asn(ing_code, ing_isp) != "datacenter"):
+                    r["exit_asn"] = format_asn_isp(ing_code, ing_isp)
+                    r["exit_isp"] = ing_isp
             rows.append(r)
     return rows
 
@@ -363,7 +408,7 @@ def save_proxyip(
     json_path: str = PROXYIP_JSON,
 ):
     """
-    覆写保存 proxyip.csv, proxyip.txt 与 proxyip.json。
+    覆写保存 proxyip.csv (17 列), proxyip.txt 与 proxyip.json。
     同时将全量反代按国家/地区拆分至 data/proxyip/ 独立目录 (.txt 与 .json)。
     自动按质量排序：存活节点优先（fail_count 升序），低延迟优先（delay_ms 升序）。
     """
@@ -379,35 +424,51 @@ def save_proxyip(
     rows.sort(key=_sort_key)
 
     for row in rows:
-        exit_asn = row.get("exit_asn") or row.get("asn", "")
-        exit_isp = row.get("exit_isp") or row.get("isp", "")
-        row["asn"] = format_asn_isp(exit_asn or row.get("asn", ""), exit_isp or row.get("isp", ""))
-        row["net_type"] = classify_asn(exit_asn, exit_isp) or row.get("net_type", "datacenter")
         cand_exits = extract_ips([row.get("exit_ip"), row.get("exit_ipv6")])
         v4_exits = [cip for cip in cand_exits if is_valid_ipv4(cip)]
         v6_exits = [cip for cip in cand_exits if is_valid_ipv6(cip)]
-        if v4_exits or v6_exits:
-            row["exit_ip"] = v4_exits[0] if v4_exits else (v6_exits[0] if v6_exits else "")
-            row["exit_ipv6"] = v6_exits[0] if v6_exits else ""
+        row["exit_ip"] = v4_exits[0] if v4_exits else (v6_exits[0] if v6_exits else "")
+        row["exit_ipv6"] = v6_exits[0] if v6_exits else ""
+
+        _, resolved_nt, exit_code, exit_isp = resolve_node_exit_and_net_type(row)
+        ing_code = _extract_asn_code(row.get("asn"), row.get("isp"))
+        ing_isp = str(row.get("isp") or "").strip()
+
+        if ing_code:
+            row["asn"] = format_asn_isp(ing_code, ing_isp)
+            row["isp"] = ing_isp
+        elif exit_code:
+            row["asn"] = format_asn_isp(exit_code, exit_isp)
+            row["isp"] = exit_isp
         else:
-            row.setdefault("exit_ip", "")
-            row.setdefault("exit_ipv6", "")
+            row["asn"] = format_asn_isp(row.get("asn", ""), ing_isp)
+
+        if exit_code:
+            row["exit_asn"] = format_asn_isp(exit_code, exit_isp)
+            row["exit_isp"] = exit_isp
+        else:
+            row["exit_asn"] = ""
+            row["exit_isp"] = ""
+
+        row["net_type"] = resolved_nt
 
     with atomic_writer(csv_path, encoding="utf-8-sig", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
         writer.writeheader()
         for row in rows:
             writer.writerow(row)
-    log.info("已覆写保存 %s: %d 条记录 (含 fail_count, net_type 列)", csv_path, len(rows))
+    log.info("已覆写保存 %s: %d 条记录 (17 列标准结构)", csv_path, len(rows))
 
-    atomic_write_text(txt_path, format_proxyip_txt(rows), encoding="utf-8")
-    log.info("已按质检状态分层保存 %s: %d 条记录", txt_path, len(rows))
+    if txt_path:
+        atomic_write_text(txt_path, format_proxyip_txt(rows), encoding="utf-8")
+        log.info("已按质检状态分层保存 %s: %d 条记录", txt_path, len(rows))
 
     if json_path:
         save_proxyip_json(rows, json_path=json_path)
 
-    split_cnt = save_proxyip_by_country(rows, dir_path)
-    log.info("已在 %s/ 目录下生成 %d 个独立国家/地区分流文件 (.txt/.json)", dir_path, split_cnt)
+    if dir_path:
+        split_cnt = save_proxyip_by_country(rows, dir_path)
+        log.info("已在 %s/ 目录下生成 %d 个独立国家/地区分流文件 (.txt/.json)", dir_path, split_cnt)
 
 
 # ---------- 批量质检调度器 ----------
@@ -419,19 +480,23 @@ async def verify_proxyips(
     max_fails: int = MAX_FAILS,
     check_endpoint: str = "",
     check_executor: concurrent.futures.ThreadPoolExecutor | None = None,
+    ip_cache: dict | None = None,
 ) -> list:
     """
     并发调度对所有 ProxyIP 进行穿透鉴真：
-    - 若配置了 check_endpoint，通过外部端点（Check ProxyIP）进行高并发多线程鉴真并提取真实出口与 ASN；
-    - 若未配置端点，则回退为本地原生 TLS 穿透 + /cdn-cgi/trace 校验；
-    打乱执行顺序以将同 IP 多端口请求自然散列，防止突发流量触发对端防护。
-    对致命硬故障（FATAL_FAIL_STATUSES）直接拉满 fail_count = max_fails 即刻淘汰入墓地。
-    原地更新 fail_count、delay_ms、colo。
+    - 已知完整出口画像的老节点直接走本地轻量高并发 TLS 穿透 + /cdn-cgi/trace 探针；
+    - 缺失出口画像或未收录 ASN 的节点走外部端点（Check ProxyIP）提取真实出口、真实延迟与出口 ASN；
+    - 若外部端点自身发生网络异常/限流/5xx (network_error=True)，单节点自动无损回退本地探针，杜绝误计失败。
     返回 rows。
     """
     total = len(rows)
     if total == 0:
         return rows
+
+    if ip_cache is None:
+        ip_cache = load_ip_cache()
+    if check_endpoint and check_executor is None:
+        check_executor = get_check_executor()
 
     sem = asyncio.Semaphore(concurrency)
     pass_count = 0
@@ -439,6 +504,7 @@ async def verify_proxyips(
     completed = 0
     local_checked_cnt = 0
     worker_checked_cnt = 0
+    worker_fallback_cnt = 0
     reasons_counter: dict[str, int] = defaultdict(int)
 
     # 全局显式初始化 _old_fc，确保异常提前返回或空跑时不遗留未定义状态
@@ -450,7 +516,7 @@ async def verify_proxyips(
     random.shuffle(indices)
 
     async def _check(idx: int):
-        nonlocal pass_count, fail_count_total, completed, local_checked_cnt, worker_checked_cnt
+        nonlocal pass_count, fail_count_total, completed, local_checked_cnt, worker_checked_cnt, worker_fallback_cnt
         row = rows[idx]
         fc = _get_fc(row)
         row["_old_fc"] = fc
@@ -467,32 +533,39 @@ async def verify_proxyips(
 
         lock_key = f"{ip}:{port}"
         async with sem, get_keyed_lock(lock_key):
-            # 混合分流准入控制（对标 proxies_verify 的成熟模型）：
-            # 1. 凡是老节点且已确认具备有效出口画像与非机房属性，走本地轻量高并发 probe_proxyip 极速探针，0 消耗 Worker 额度；
-            # 2. 凡是新拉取、缺少 exit_ip、未定性或 ASN 未知的节点，走 check_endpoint 外部端点进行严格穿透鉴真并补齐画像；
-            raw_asn = (row.get("asn") or "").strip().upper()
-            has_complete_profile = (
-                bool(row.get("exit_ip") or row.get("exit_ipv6"))
-                and bool(raw_asn)
-                and raw_asn not in ("AS0", "0", "UNKNOWN", "AS_UNKNOWN")
-                and (row.get("net_type") or "").strip().lower() in ("isp", "business", "education", "government")
-            )
+            has_complete_profile = _has_complete_profile(row, ip_cache)
 
             if not has_complete_profile and check_endpoint and check_executor:
                 worker_checked_cnt += 1
-                # 外部端点多线程并发穿透鉴真模式（高并发多线程不盲等，精准补齐出口画像）
                 loop = asyncio.get_running_loop()
-                alive, latency, colo, reason, exit_ip, exit_ipv6, exit_asn, exit_isp = await loop.run_in_executor(
+                alive, latency, colo, reason, is_net_err, profile = await loop.run_in_executor(
                     check_executor, _sync_check_proxyip_endpoint, check_endpoint, ip, port, timeout
                 )
-                if alive:
+                if is_net_err:
+                    # 外部 Worker 自身网络/限流异常，自动降级回退本地原生探针，防止误杀正常节点
+                    worker_fallback_cnt += 1
+                    local_checked_cnt += 1
+                    alive, latency, colo, reason = await probe_proxyip(
+                        ip, port, connect_timeout=timeout, http_timeout=http_timeout
+                    )
+                elif alive:
+                    exit_ip = profile.get("exit_ip", "")
+                    exit_ipv6 = profile.get("exit_ipv6", "")
+                    exit_asn = profile.get("exit_asn", "")
+                    exit_isp = profile.get("exit_isp", "")
                     if exit_ip:
                         row["exit_ip"] = exit_ip
                     if exit_ipv6:
                         row["exit_ipv6"] = exit_ipv6
+                    loc_parts = [p for p in (profile.get("city", ""), profile.get("country", "")) if p]
+                    if loc_parts and not str(row.get("cf_location") or "").strip():
+                        row["cf_location"] = " · ".join(loc_parts)
                     if exit_asn:
-                        row["asn"] = format_asn_isp(exit_asn, exit_isp)
-                        row["isp"] = exit_isp
+                        row["exit_asn"] = format_asn_isp(exit_asn, exit_isp)
+                        row["exit_isp"] = exit_isp
+                        if not _extract_asn_code(row.get("asn"), row.get("isp")):
+                            row["asn"] = row["exit_asn"]
+                            row["isp"] = exit_isp
                         row["net_type"] = classify_asn(exit_asn, exit_isp)
                         if not is_asn_recorded(exit_asn):
                             row["_pending_exit_asn"] = (exit_asn, exit_isp, exit_ip or exit_ipv6 or ip)
@@ -546,13 +619,14 @@ async def verify_proxyips(
     sorted_reasons = sorted(reasons_counter.items(), key=lambda x: x[1], reverse=True)
     reason_summary = ", ".join(f"{k}: {v}" for k, v in sorted_reasons)
     log.info(
-        "[ProxyIP 质检] 校验完成: 共 %d 条 | 存活通过 %d 条 (%.1f%%), 失败标记 %d 条 (本地原生探测: %d 条, 外部 Worker 鉴真: %d 条)",
+        "[ProxyIP 质检] 校验完成: 共 %d 条 | 存活通过 %d 条 (%.1f%%), 失败标记 %d 条 (本地探测: %d 条, 外部 Worker: %d 条, 异常回退本地: %d 条)",
         total,
         pass_count,
         (pass_count / total * 100) if total else 0,
         fail_count_total,
         local_checked_cnt,
         worker_checked_cnt,
+        worker_fallback_cnt,
     )
     log.info("[ProxyIP 质检] 探测原因汇总: %s", reason_summary)
     return rows
@@ -650,17 +724,27 @@ async def async_main(args):
     total = len(rows)
     log.info(">>> 开始执行 ProxyIP 穿透质检 (%s): 共 %d 条记录...", PROXYIP_CSV, total)
 
+    ip_cache = load_ip_cache()
     endpoint = getattr(args, "check_endpoint", "").strip() or CHECK_ENDPOINT
     check_concurrency = getattr(args, "check_concurrency", CHECK_CONCURRENCY)
     check_executor = None
 
-    if endpoint:
-        # 质检启动前对 Check ProxyIP 端点进行单次健康探针校验，若不可达则全局安全熔断降级
+    need_worker_cnt = sum(1 for r in rows if not _has_complete_profile(r, ip_cache))
+    if endpoint and need_worker_cnt == 0:
+        log.info(
+            "所有 %d 条存量节点均已具备完整出口画像，跳过外部端点健康探针，100%% 采用本地原生 TLS 穿透质检（0 消耗 Worker 额度）",
+            total,
+        )
+        endpoint = ""
+    elif endpoint:
+        # 仅在确有缺失画像的节点时，对 Check ProxyIP 端点执行单次健康探针校验
         is_endpoint_ok = await asyncio.to_thread(check_proxyip_endpoint_health, endpoint)
         if is_endpoint_ok:
             check_executor = get_check_executor(max_workers=check_concurrency)
             log.info(
-                "🚀 启用 Check ProxyIP 外部穿透鉴真端点 (混合分流模式: 已知画像走本地, 未知新节点走端点): %s (专用并发线程: %d)",
+                "🚀 启用 Check ProxyIP 外部穿透鉴真端点 (混合分流: 已知画像 %d 条走本地, 待补全 %d 条走端点): %s (专用并发线程: %d)",
+                total - need_worker_cnt,
+                need_worker_cnt,
                 endpoint,
                 check_concurrency,
             )
@@ -682,39 +766,57 @@ async def async_main(args):
             max_fails=args.max_fails,
             check_endpoint=endpoint,
             check_executor=check_executor,
+            ip_cache=ip_cache,
         )
     finally:
         if check_executor:
             shutdown_check_executor()
 
-    pass_count = sum(1 for r in rows if _get_fc(r) == 0)
-    fail_count = total - pass_count
+    # 物理淘汰连续失败达到阈值的死节点
+    survivors_all = [r for r in rows if _get_fc(r) < args.max_fails]
+    eliminated = total - len(survivors_all)
 
-    # 物理淘汰连续失败达到阈值的节点
-    survivors = [r for r in rows if _get_fc(r) < args.max_fails]
-    eliminated = total - len(survivors)
+    # 机房归池闭环：将经外部鉴真或权威库判定为 datacenter 的存活/缓冲节点移出至 scan_ips.csv
+    survivors: list[dict] = []
+    demoted_dc_rows: list[dict] = []
+    for r in survivors_all:
+        is_p, eff_nt, exit_code, exit_isp = resolve_node_exit_and_net_type(r, ip_cache)
+        r["net_type"] = eff_nt
+        if exit_code and not _extract_asn_code(r.get("exit_asn"), r.get("exit_isp")):
+            r["exit_asn"] = format_asn_isp(exit_code, exit_isp)
+            r["exit_isp"] = exit_isp
+        if not is_p or eff_nt == "datacenter":
+            demoted_dc_rows.append(r)
+        else:
+            survivors.append(r)
+
     survivors_len = len(survivors)
+    pass_count = sum(1 for r in survivors if _get_fc(r) == 0)
+    fail_count = (survivors_len - pass_count) + eliminated
     proxyip_f1 = sum(1 for r in survivors if _get_fc(r) == 1)
     proxyip_f2 = sum(1 for r in survivors if _get_fc(r) == 2)
     proxyip_buf_new = sum(
-        1 for r in rows
-        if _get_fc(r) > 0 and _get_fc(r) < args.max_fails and safe_int(r.get("_old_fc"), 0) == 0
+        1 for r in survivors
+        if _get_fc(r) > 0 and safe_int(r.get("_old_fc"), 0) == 0
     )
     proxyip_buf_rec = sum(
-        1 for r in rows
+        1 for r in survivors
         if _get_fc(r) == 0 and safe_int(r.get("_old_fc"), 0) > 0
     )
 
-    # 仅统计本次实测存活节点的网络延迟（排除缓冲期节点的旧延迟）
+    # 仅统计本次实测存活的非机房 ProxyIP 网络延迟（排除缓冲期节点的旧延迟）
     alive_delays = [
         int(r.get("delay_ms", 0))
-        for r in rows
+        for r in survivors
         if _get_fc(r) == 0 and safe_int(r.get("delay_ms"), 0) > 0
     ]
     avg_delay = int(sum(alive_delays) / len(alive_delays)) if alive_delays else 0
 
     elapsed = time.time() - t_start
-    log.info("ProxyIP 穿透质检流程执行完毕，总耗时 %.2f 秒 (✅ 存活: %d | 均延: %dms | ⚠️ 缓冲: %d [新增: %d, 取消恢复: %d])", elapsed, pass_count, avg_delay, (survivors_len - pass_count), proxyip_buf_new, proxyip_buf_rec)
+    log.info(
+        "ProxyIP 穿透质检流程执行完毕，总耗时 %.2f 秒 (✅ 存活: %d | 均延: %dms | ⚠️ 缓冲: %d [新增: %d, 取消恢复: %d] | 🏢 归入扫描池: %d)",
+        elapsed, pass_count, avg_delay, (survivors_len - pass_count), proxyip_buf_new, proxyip_buf_rec, len(demoted_dc_rows),
+    )
 
     # 导出逐节点诊断结果 (仅在指定参数时生成，无论是否 dry_run)
     if getattr(args, "diag_output", ""):
@@ -729,6 +831,7 @@ async def async_main(args):
                     "alive": _get_fc(r) == 0,
                     "latency": safe_int(r.get("delay_ms"), 0),
                     "colo": r.get("colo", ""),
+                    "net_type": r.get("net_type", ""),
                 }
                 for r in rows
                 if r.get("ip") and safe_int(r.get("port"), 0) > 0
@@ -753,6 +856,14 @@ async def async_main(args):
         txt_path=PROXYIP_TXT,
         dir_path=PROXYIP_DIR,
     )
+
+    if demoted_dc_rows:
+        merge_demoted_into_scan_ips(
+            demoted_dc_rows,
+            scan_csv_path=SCAN_CSV,
+            scan_txt_path=SCAN_TXT,
+            scan_dir_path=SCAN_DIR,
+        )
 
     if eliminated > 0:
         log.info("[ProxyIP 淘汰] 剔除 %d 条连续失败 >= %d 次的死节点", eliminated, args.max_fails)
