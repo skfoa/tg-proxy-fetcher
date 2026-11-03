@@ -295,25 +295,30 @@ def _sync_cf_check(endpoint: str, proxy_url: str, timeout: float = 18.0) -> dict
             body = resp.read().decode("utf-8", errors="ignore")
             data = json.loads(body)
             if isinstance(data, dict):
+                err_str = str(data.get("error") or "")
+                if not data.get("success") and err_str.startswith("Target /api/lookup"):
+                    data["network_error"] = True
                 return data
-            return {"success": False, "error": "invalid_worker_json"}
+            return {"success": False, "error": "invalid_worker_json", "network_error": True}
     except urllib.error.HTTPError as he:
-        # Worker 在抛出 400/500/524 时响应体可能附带结构化 JSON 错误说明
+        # Worker 在抛出 400/429/500/524 时属于端点自身或边缘异常，标记 network_error 避免归罪代理节点
         try:
             body = he.read().decode("utf-8", errors="ignore")
             data = json.loads(body)
             if isinstance(data, dict):
+                data["http_code"] = he.code
+                data["network_error"] = True
                 return data
         except Exception:
             pass
         log.debug("Cloudflare Worker 代理质检 HTTP 异常 [%s]: HTTP %s %s", proxy_url, he.code, he.reason)
-        return {"success": False, "error": f"HTTP {he.code}: {he.reason}", "http_code": he.code}
+        return {"success": False, "error": f"HTTP {he.code}: {he.reason}", "http_code": he.code, "network_error": True}
     except (urllib.error.URLError, TimeoutError, OSError) as ne:
         log.debug("Cloudflare Worker 代理网络超时/故障 [%s]: %s", proxy_url, ne)
         return {"success": False, "error": f"network_error: {ne}", "network_error": True}
     except Exception as e:
         log.debug("Cloudflare Worker 代理质检未决异常 [%s]: %s", proxy_url, e)
-        return {"success": False, "error": str(e)}
+        return {"success": False, "error": str(e), "network_error": True}
 
 
 async def check_proxy_exit_cf_worker(
@@ -884,8 +889,6 @@ async def probe_turn(
 async def probe_sstp(
     host: str,
     port: int,
-    user: str | None = None,
-    pwd: str | None = None,
     connect_timeout: float = SSTP_TIMEOUT,
     read_timeout: float = SSTP_READ_TIMEOUT,
 ) -> tuple[bool, int, str, str, str, str]:
@@ -1122,9 +1125,11 @@ async def probe_single(
                     country = ""
                     egress_ip = ""
                 else:
+                    err_msg = str(cf_res.get("error") or "https_worker_fail")
+                    log.debug("HTTPS 节点 [%s:%s] Worker 穿透探测失败: %s", host, port, err_msg)
                     is_alive = False
                     delay_ms = 0
-                    status = "connect_fail"
+                    status = "timeout" if "timed out" in err_msg.lower() else "https_worker_fail"
                     colo = ""
                     country = ""
                     egress_ip = ""
@@ -1213,7 +1218,7 @@ async def probe_single(
         else:
             # 未配置外部检测端点，执行本地轻量握手探测（无外部依赖）
             is_alive, delay_ms, status, colo, country, egress_ip = await probe_sstp(
-                host, port, user, pwd, sstp_timeout, max(http_timeout, SSTP_READ_TIMEOUT)
+                host, port, sstp_timeout, max(http_timeout, SSTP_READ_TIMEOUT)
             )
     else:
         is_alive, delay_ms, status, colo, country, egress_ip = False, 0, "unknown_proto", "", "", ""
@@ -1413,7 +1418,7 @@ def load_proxies_data(
     return list(url_map.values())
 
 
-async def enrich_proxies_metadata(survivors: list[dict], max_concurrency: int = 5) -> dict[str, int]:
+async def enrich_proxies_metadata(survivors: list[dict]) -> dict[str, int]:
     """
     为质检存活代理节点补全 ASN、ISP 及网络属性 (net_type：isp/datacenter/business 等)：
     1. 优先使用已有的有效 asn / isp / net_type（避免重复网络查询）
@@ -1574,11 +1579,6 @@ def save_proxies_data(
 
     # 写入 proxies.csv (完整元数据表，按协议分块严格隔离，不混杂；原子写入防截断)
     save_proxies_csv(survivors, csv_path=csv_path)
-
-
-# 向后兼容历史别名
-load_socks_data = load_proxies_data
-save_socks_data = save_proxies_data
 
 
 # ---------- Telegram 通知 ----------
@@ -2029,18 +2029,6 @@ async def async_main(args):
             stats["proxies_net_stats"] = net_stats
             stats["proxies_max_fails"] = args.max_fails
             stats["proxies_http_max_fails"] = h_mf
-            # 兼容历史 socks_* 字段
-            stats["socks_verified"] = True
-            stats["socks_total"] = total
-            stats["socks_pass"] = pass_count
-            stats["socks_eliminated"] = eliminated
-            stats["socks_survivors"] = survivors_len
-            stats["socks_elapsed"] = elapsed
-            stats["socks_max_fails"] = args.max_fails
-            stats["socks_fail_1"] = proxies_f1
-            stats["socks_fail_2"] = proxies_f2
-            stats["socks_buf_new"] = proxies_buf_new
-            stats["socks_buf_rec"] = proxies_buf_rec
             atomic_write_json(fetch_stats_file, stats)
             log.info("已将通用代理质检统计写入 %s (并入统一卡片)", fetch_stats_file)
         except Exception as e:
