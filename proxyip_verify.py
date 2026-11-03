@@ -493,9 +493,9 @@ async def verify_proxyips(
                     if exit_asn:
                         row["asn"] = format_asn_isp(exit_asn, exit_isp)
                         row["isp"] = exit_isp
-                        if not is_asn_recorded(exit_asn):
-                            auto_enrich_and_save_asns([{"asn": exit_asn, "isp": exit_isp, "ip": exit_ip or exit_ipv6 or ip}])
                         row["net_type"] = classify_asn(exit_asn, exit_isp)
+                        if not is_asn_recorded(exit_asn):
+                            row["_pending_exit_asn"] = (exit_asn, exit_isp, exit_ip or exit_ipv6 or ip)
             else:
                 local_checked_cnt += 1
                 # 本地直接 TLS 穿透 + /cdn-cgi/trace 鉴真
@@ -528,6 +528,20 @@ async def verify_proxyips(
 
     tasks = [_check(i) for i in indices]
     await asyncio.gather(*tasks)
+
+    # 二阶段批量定性入库：针对外部端点发现的未收录出口 ASN，在协程池收尾后统一单次入库并刷新 net_type
+    pending_asn_rows = [r for r in rows if r.get("_pending_exit_asn")]
+    if pending_asn_rows:
+        unrec_map: dict[str, dict] = {}
+        for r in pending_asn_rows:
+            e_asn, e_isp, e_ip = r.get("_pending_exit_asn")
+            if e_asn and not is_asn_recorded(e_asn) and e_asn not in unrec_map:
+                unrec_map[e_asn] = {"asn": e_asn, "isp": e_isp, "ip": e_ip}
+        if unrec_map:
+            auto_enrich_and_save_asns(list(unrec_map.values()))
+        for r in pending_asn_rows:
+            e_asn, e_isp, _ = r.pop("_pending_exit_asn")
+            r["net_type"] = classify_asn(e_asn, e_isp)
 
     sorted_reasons = sorted(reasons_counter.items(), key=lambda x: x[1], reverse=True)
     reason_summary = ", ".join(f"{k}: {v}" for k, v in sorted_reasons)

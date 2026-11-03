@@ -786,6 +786,7 @@ async def enrich_scan_ips_exits(
 
     try:
         sem = asyncio.Semaphore(concurrency)
+        probed_records: list[tuple[dict, dict]] = []
 
         async def _probe_candidate(row: dict):
             nonlocal enriched_count
@@ -822,14 +823,29 @@ async def enrich_scan_ips_exits(
                 if loc_parts and not row.get("exit_location"):
                     row["exit_location"] = " · ".join(loc_parts)
 
-                # 评估是否可晋升为 ProxyIP (非机房优质出口)
+                probed_records.append((row, res))
+
+        tasks = [_probe_candidate(r) for r in candidates]
+        await asyncio.gather(*tasks)
+
+        # 二阶段批量定性入库与晋升评估：避免协程内同步阻塞，同时防止 res["net_type"] 预填的 "datacenter" 兜底值短路最新定性结论
+        if probed_records:
+            unrec_map: dict[str, dict] = {}
+            for row, res in probed_records:
+                e_asn = str(res.get("exit_asn") or "").strip()
+                e_isp = str(res.get("exit_isp") or "").strip()
+                e_ip = str(res.get("exit_ip") or row.get("ip") or "").strip()
+                if e_asn and not is_asn_recorded(e_asn) and e_asn not in unrec_map:
+                    unrec_map[e_asn] = {"asn": e_asn, "isp": e_isp, "ip": e_ip}
+            if unrec_map:
+                auto_enrich_and_save_asns(list(unrec_map.values()))
+
+            for row, res in probed_records:
+                ip = (row.get("ip") or "").strip()
+                port = safe_int(row.get("port"), 0)
                 exit_asn = str(res.get("exit_asn") or "").strip()
                 exit_isp = str(res.get("exit_isp") or "").strip()
-                exit_ip = str(res.get("exit_ip") or "").strip()
-                if exit_asn and not is_asn_recorded(exit_asn):
-                    auto_enrich_and_save_asns([{"asn": exit_asn, "isp": exit_isp, "ip": exit_ip or ip}])
-
-                exit_nt = res.get("net_type") or classify_asn(exit_asn, exit_isp)
+                exit_nt = classify_asn(exit_asn, exit_isp) if exit_asn else (res.get("net_type") or "datacenter")
                 if exit_nt in ("isp", "business", "education", "government"):
                     promoted_proxyips.append({
                         "ip": ip,
@@ -848,9 +864,6 @@ async def enrich_scan_ips_exits(
                         "exit_ip": res.get("exit_ip", ""),
                         "exit_ipv6": res.get("exit_ipv6", ""),
                     })
-
-        tasks = [_probe_candidate(r) for r in candidates]
-        await asyncio.gather(*tasks)
     finally:
         executor.shutdown(wait=False, cancel_futures=True)
 

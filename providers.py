@@ -2601,7 +2601,6 @@ def is_asn_recorded(asn_str: str | None, isp_str: str | None = "") -> bool:
     )
 
 
-@functools.lru_cache(maxsize=4096)
 def classify_asn(asn_str: str | None, isp_str: str | None = "") -> str:
     """
     根据 BGP 广播的 ASN 编号进行网络类型属性分类 (三级权威架构 Tier 1~3)：
@@ -2627,6 +2626,9 @@ def classify_asn(asn_str: str | None, isp_str: str | None = "") -> str:
 
     # [Tier 3] 默认安全降级兜底 (Default Fallback)
     return "datacenter"
+
+
+classify_asn.cache_clear = _extract_asn_code.cache_clear  # type: ignore[attr-defined]
 
 
 def format_proxyip_json_item(r_dict: dict) -> dict:

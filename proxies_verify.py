@@ -67,6 +67,7 @@ from providers import (
     save_ip_cache,
     prune_ip_cache,
     classify_asn,
+    _extract_asn_code,
     format_asn_isp,
     ASN_TO_PROVIDER,
     ASN_DATABASE_ASN_TO_ISP,
@@ -252,13 +253,14 @@ def build_sstp_url(host: str, port: int, user: str | None = None, pwd: str | Non
 def check_cf_worker_health(endpoint: str, timeout: float = 6.0) -> bool:
     """
     质检开始前，对 Cloudflare Worker 外部检测端点进行全局健康探针校验。
-    探测 /locations 或 / 根路径，确认端点在线可用、域名正确且未欠费或被封禁。
+    优先探测零外部子请求开销的 /ip.json（回退至 /locations 与 / 根路径），
+    确认 Worker 端点在线可用、域名正确且未欠费或被封禁（注：验证 Worker 自身存活，不代表上游 iplocate.io 连通性）。
     若探测失败，则安全熔断并全局降级为本地轻量握手探测，避免单节点频繁失败或卡顿。
     """
     clean_ep = normalize_endpoint(endpoint)
     if not clean_ep:
         return False
-    probe_urls = [f"{clean_ep}/locations", f"{clean_ep}/"]
+    probe_urls = [f"{clean_ep}/ip.json", f"{clean_ep}/locations", f"{clean_ep}/"]
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
     }
@@ -353,11 +355,10 @@ def is_datacenter_result(cf_res: dict) -> bool:
     坚决剔除机房，只要原生家庭宽带/住宅 ISP/教育网/商业专线/政务网络。
 
     架构设计遵循 SSOT (本地权威单真理源优先) 原则：
-    1. 优先调用本地 classify_asn(asn_code, isp_str) 进行四级体系研判 (人工裁决 -> 权威库 -> 模式匹配)；
-    2. 若本地确证为原生宽带(isp)、专线机构(business)、学术科研(education)或政府政务(government)，
-       则本地权威结论高于一切，直接准入通过 (返回 False)，绝不被外部第三方接口的粗放标签误杀！
-    3. 若本地研判为 datacenter (或落入 Tier 4 安全降级)，再综合外部第三方探针返回的
-       is_datacenter、privacy.is_hosting 或 asn_type/company_type 进行阻断 (返回 True)。
+    1. 未收录的新 ASN 须先通过 auto_enrich_and_save_asns 批量调用 IPinfo 权威探针定性入库；
+    2. 统一调用本地 classify_asn(asn_code, isp_str) 进行三级权威体系裁决 (人工裁决 -> 权威库 -> 机房兜底)；
+    3. 若确证为原生宽带(isp)、专线机构(business)、学术科研(education)或政府政务(government)，
+       准入通过 (返回 False)；否则判定为 datacenter 并执行阻断 (返回 True)。
     """
     exit_info = cf_res.get("exit") or {}
     asn_obj = exit_info.get("asn") or {}
@@ -368,25 +369,8 @@ def is_datacenter_result(cf_res: dict) -> bool:
     company_name = str(company_obj.get("name") or "").strip()
     isp_str = f"{asn_name} {company_name}".strip()
 
-    # [SSOT 优先] 优先采信本地权威研判体系 (防止第三方 GeoIP API 将非民用政务专网/高校科研网误判为 hosting)
     nt = classify_asn(asn_code, isp_str)
-    if nt in ("isp", "business", "education", "government"):
-        return False
-
-    # 若本地未定性或判定为 datacenter，综合外部第三方探针情报判定是否为机房
-    if exit_info.get("is_datacenter") is True:
-        return True
-
-    privacy = exit_info.get("privacy") or {}
-    if privacy.get("is_hosting") is True:
-        return True
-
-    asn_type = str(asn_obj.get("type") or "").strip().lower()
-    company_type = str(company_obj.get("type") or "").strip().lower()
-    if asn_type in ("hosting", "datacenter") or company_type in ("hosting", "datacenter"):
-        return True
-
-    return nt in ("datacenter", "hosting")
+    return nt not in ("isp", "business", "education", "government")
 
 
 # ---------- 协议探测实现 ----------
@@ -699,6 +683,10 @@ async def probe_https(
             if max_latency_ms > 0 and lat > max_latency_ms:
                 return False, lat, "slow_timeout", "", "", ""
             return True, lat, "alive", colo, country, egress_ip
+        if RE_HTTP_407.search(first_line):
+            lat = max(1, int((time.monotonic() - t0) * 1000))
+            status = "auth_fail" if (user and pwd) else "auth_required_missing"
+            return False, lat, status, "", "", ""
     except asyncio.TimeoutError:
         if not connected:
             # 建立 TLS 连接超时，对端不可达，直接返回避免进入阶段 2 造成二次超时叠加
@@ -747,8 +735,13 @@ async def probe_https(
         writer.write(connect_req)
         await asyncio.wait_for(writer.drain(), timeout=connect_timeout)
 
-        # 校验代理端的 CONNECT 建立响应 (必须包含 HTTP 200 Connection Established)
-        resp = await asyncio.wait_for(reader.read(1024), timeout=connect_timeout)
+        # 校验代理端的 CONNECT 建立响应 (必须包含 HTTP 200 Connection Established，且完整排空至 \r\n\r\n 防止残留头部污染后续 start_tls)
+        resp = b""
+        while b"\r\n\r\n" not in resp and len(resp) < 4096:
+            chunk = await asyncio.wait_for(reader.read(1024), timeout=connect_timeout)
+            if not chunk:
+                break
+            resp += chunk
         resp_text = resp.decode("latin1", errors="ignore") if resp else ""
         first_line = resp_text.splitlines()[0] if resp_text else ""
 
@@ -842,13 +835,10 @@ async def probe_turn(
     t0 = time.monotonic()
     writer = None
     try:
-        ssl_ctx = None
-        if use_tls:
-            ssl_ctx = ssl.create_default_context()
-            ssl_ctx.check_hostname = False
-            ssl_ctx.verify_mode = ssl.CERT_NONE
+        ssl_ctx = INSECURE_SSL_CTX if use_tls else None
+        sni = (None if is_ip_literal(host) else host) if use_tls else None
         reader, writer = await asyncio.wait_for(
-            asyncio.open_connection(connect_host, port, ssl=ssl_ctx),
+            asyncio.open_connection(connect_host, port, ssl=ssl_ctx, server_hostname=sni),
             timeout=connect_timeout,
         )
 
@@ -1046,16 +1036,35 @@ async def probe_single(
                 asn_obj = exit_info.get("asn") or {}
                 cf_asn_raw = str(asn_obj.get("asn") or "").strip()
                 cf_isp_raw = str(asn_obj.get("name") or asn_obj.get("org") or "").strip()
-                clean_asn = cf_asn_raw
+                clean_asn = _extract_asn_code(cf_asn_raw, cf_isp_raw) or cf_asn_raw
                 clean_isp = cf_isp_raw
                 if clean_asn in ASN_TO_PROVIDER:
                     clean_isp = ASN_TO_PROVIDER[clean_asn]
+                elif not clean_isp and clean_asn in ASN_DATABASE_ASN_TO_ISP:
+                    clean_isp = ASN_DATABASE_ASN_TO_ISP[clean_asn]
 
                 exit_ip = str(exit_info.get("ip") or "").strip()
                 if not is_valid_public_ip(exit_ip):
                     exit_ip = host if is_valid_public_ip(host) else ""
 
                 c_code = str(exit_info.get("country_code") or exit_info.get("country") or "").strip().upper()
+                calc_delay = max(1, int((time.monotonic() - t_cf0) * 1000))
+                worker_delay_ms = safe_int(
+                    cf_res.get("responseTime") or cf_res.get("latency_ms") or cf_res.get("time") or calc_delay,
+                    calc_delay,
+                )
+
+                if clean_asn and not is_asn_recorded(clean_asn):
+                    # 二阶段批量解耦：记录待探测新 ASN，在 gather 结束后统一批量调用 IPinfo 权威探针并重裁决，杜绝高并发阻塞与文件写竞争
+                    row["_worker_exit"] = {
+                        "mode": "https_proxifly",
+                        "cf_res": cf_res,
+                        "clean_asn": clean_asn,
+                        "clean_isp": clean_isp,
+                        "exit_ip": exit_ip,
+                        "c_code": c_code,
+                        "delay_ms": worker_delay_ms,
+                    }
 
                 if is_datacenter_result(cf_res):
                     # 识别为机房/数据中心：拒收淘汰，不入存活列表 (不打入墓地，允许后续轮次动态重检)
@@ -1065,8 +1074,6 @@ async def probe_single(
                     colo = ""
                     country = c_code
                     egress_ip = exit_ip
-                    if clean_asn and not is_asn_recorded(clean_asn):
-                        auto_enrich_and_save_asns([{"asn": clean_asn, "isp": clean_isp, "ip": exit_ip or host, "net_type": "datacenter"}])
                     if host:
                         row["_cache_update"] = {
                             "host": host,
@@ -1078,32 +1085,18 @@ async def probe_single(
                                 "resolved_ip": exit_ip,
                             },
                         }
-                    log.debug("🚫 拦截到数据中心/机房 HTTPS 节点 [%s:%s] (ASN: %s, ISP: %s)，已移出并拒收准入", host, port, clean_asn, clean_isp)
+                    if not row.get("_worker_exit"):
+                        log.debug("🚫 拦截到数据中心/机房 HTTPS 节点 [%s:%s] (ASN: %s, ISP: %s)，已移出并拒收准入", host, port, clean_asn, clean_isp)
                 else:
                     # 原生住宅/家宽/教育/专线：准入通过！
                     is_alive = True
-                    calc_delay = max(1, int((time.monotonic() - t_cf0) * 1000))
-                    delay_ms = safe_int(
-                        cf_res.get("responseTime") or cf_res.get("latency_ms") or cf_res.get("time") or calc_delay,
-                        calc_delay,
-                    )
+                    delay_ms = worker_delay_ms
                     status = "alive"
-                    colo = str(cf_res.get("colo") or "-").strip().upper() or "-"
+                    # Worker 顶层 colo 为调用方到 Worker 的边缘节点而非代理真实出口机房，统一置为 "-"
+                    colo = "-"
                     country = c_code
                     egress_ip = exit_ip
-
-                    asn_type = str(asn_obj.get("type") or "").strip().lower()
-                    if asn_type in ("isp", "business", "education", "government"):
-                        n_type = asn_type
-                    elif asn_type in ("banking", "finance"):
-                        n_type = "business"
-                    else:
-                        n_type = classify_asn(clean_asn, clean_isp)
-                        if n_type in ("datacenter", "hosting"):
-                            n_type = "isp"
-
-                    if clean_asn and not is_asn_recorded(clean_asn):
-                        auto_enrich_and_save_asns([{"asn": clean_asn, "isp": clean_isp, "ip": exit_ip or host, "net_type": n_type}])
+                    n_type = classify_asn(clean_asn, clean_isp)
 
                     row["asn"] = format_asn_isp(clean_asn, clean_isp)
                     row["isp"] = clean_isp
@@ -1166,14 +1159,37 @@ async def probe_single(
                     country = c_code
                 # 若 Worker 已附带 ASN/ISP 归属，直接结构化丰富
                 asn_obj = exit_info.get("asn") or {}
-                cf_asn = str(asn_obj.get("asn") or "").strip()
-                cf_isp = str(asn_obj.get("name") or asn_obj.get("org") or "").strip()
+                cf_asn_raw = str(asn_obj.get("asn") or "").strip()
+                cf_isp_raw = str(asn_obj.get("name") or asn_obj.get("org") or "").strip()
+                cf_asn = _extract_asn_code(cf_asn_raw, cf_isp_raw) or cf_asn_raw
+                cf_isp = cf_isp_raw
+                if cf_asn in ASN_TO_PROVIDER:
+                    cf_isp = ASN_TO_PROVIDER[cf_asn]
+                elif not cf_isp and cf_asn in ASN_DATABASE_ASN_TO_ISP:
+                    cf_isp = ASN_DATABASE_ASN_TO_ISP[cf_asn]
                 if cf_asn:
                     row["asn"] = format_asn_isp(cf_asn, cf_isp)
                     row["isp"] = cf_isp
-                    if not is_asn_recorded(cf_asn):
-                        auto_enrich_and_save_asns([{"asn": cf_asn, "isp": cf_isp, "ip": egress_ip or host}])
                     row["net_type"] = classify_asn(cf_asn, cf_isp)
+                    if host:
+                        row["_cache_update"] = {
+                            "host": host,
+                            "entry": {
+                                "asn": cf_asn,
+                                "isp": cf_isp,
+                                "net_type": row["net_type"],
+                                "country": country,
+                                "resolved_ip": egress_ip,
+                            },
+                        }
+                    if not is_asn_recorded(cf_asn):
+                        row["_worker_exit"] = {
+                            "mode": "sstp",
+                            "clean_asn": cf_asn,
+                            "clean_isp": cf_isp,
+                            "exit_ip": egress_ip,
+                            "c_code": country,
+                        }
             else:
                 if cf_res.get("network_error"):
                     # Worker 侧网络抖动或请求 Worker 自身超时，不应归罪节点；保持原状态，不递增 fail_count
@@ -1428,14 +1444,26 @@ async def enrich_proxies_metadata(survivors: list[dict], max_concurrency: int = 
     if ip_to_resolve:
         log.info("正在为 %d 个唯一出口 IP/域名批量解析 ASN 与国家属性...", len(ip_to_resolve))
         ip_cache = await resolve_asn_batch_online_async(list(ip_to_resolve))
-        if ip_cache:
-            unrecorded_new_asns = []
-            for tip, (asn_c, isp_n) in ip_cache.items():
-                if asn_c and not is_asn_recorded(asn_c):
-                    unrecorded_new_asns.append({"asn": asn_c, "isp": isp_n, "ip": tip})
-            if unrecorded_new_asns:
-                log.info("【质检在线反查】发现 %d 个未收录 ASN，执行权威自动入库...", len(unrecorded_new_asns))
-                auto_enrich_and_save_asns(unrecorded_new_asns)
+
+    # 统一汇流 ip_cache、存活节点自身 asn 与持久化缓存中所有未收录 ASN，单次批量定性入库后再执行 classify_asn
+    unrecorded_map: dict[str, dict] = {}
+    for tip, (asn_c, isp_n) in ip_cache.items():
+        code = _extract_asn_code(asn_c, isp_n)
+        if code and not is_asn_recorded(code) and code not in unrecorded_map:
+            unrecorded_map[code] = {"asn": code, "isp": isp_n, "ip": tip}
+    for r in survivors:
+        tip = r.get("egress_ip", "").strip() or r.get("host", "").strip()
+        raw_a = r.get("asn", "").strip()
+        raw_i = r.get("isp", "").strip()
+        if not raw_a and tip and tip in persistent_cache:
+            raw_a = persistent_cache[tip].get("asn", "")
+            raw_i = persistent_cache[tip].get("isp", "")
+        code = _extract_asn_code(raw_a, raw_i)
+        if code and not is_asn_recorded(code) and code not in unrecorded_map:
+            unrecorded_map[code] = {"asn": code, "isp": raw_i, "ip": tip if is_valid_public_ip(tip) else ""}
+    if unrecorded_map:
+        log.info("【质检在线反查】发现 %d 个未收录 ASN，执行权威自动入库...", len(unrecorded_map))
+        auto_enrich_and_save_asns(list(unrecorded_map.values()))
 
     persistent_cache = load_ip_cache()
     net_stats: dict[str, int] = {}
@@ -1743,6 +1771,107 @@ async def async_main(args):
 
     tasks = [_worker(r) for r in rows]
     results = await asyncio.gather(*tasks)
+
+    # 二阶段批量补全与重裁决：针对 Worker 探测发现的未收录新 ASN，在协程池收尾后统一单次调用 IPinfo 权威探针并刷新准入状态
+    worker_pending_rows = [r for r in results if r.get("_worker_exit")]
+    if worker_pending_rows:
+        worker_unrecorded_map: dict[str, dict] = {}
+        for r in worker_pending_rows:
+            w_exit = r.get("_worker_exit") or {}
+            c_asn = w_exit.get("clean_asn", "")
+            c_isp = w_exit.get("clean_isp", "")
+            e_ip = w_exit.get("exit_ip", "") or r.get("host", "")
+            if c_asn and not is_asn_recorded(c_asn) and c_asn not in worker_unrecorded_map:
+                worker_unrecorded_map[c_asn] = {"asn": c_asn, "isp": c_isp, "ip": e_ip if is_valid_public_ip(e_ip) else ""}
+        if worker_unrecorded_map:
+            log.info("【Worker 出口鉴真】发现 %d 个未收录出口 ASN，执行批量权威探针入库与二次准入裁决...", len(worker_unrecorded_map))
+            auto_enrich_and_save_asns(list(worker_unrecorded_map.values()))
+
+        for r in worker_pending_rows:
+            w_exit = r.pop("_worker_exit", None) or {}
+            mode = w_exit.get("mode")
+            c_asn = w_exit.get("clean_asn", "")
+            c_isp = ASN_TO_PROVIDER.get(c_asn, "") or w_exit.get("clean_isp", "") or ASN_DATABASE_ASN_TO_ISP.get(c_asn, "")
+            e_ip = w_exit.get("exit_ip", "")
+            c_code = w_exit.get("c_code", "")
+            host = r.get("host", "")
+            port = r.get("port", 0)
+            if mode == "https_proxifly":
+                if is_datacenter_result(w_exit.get("cf_res") or {}):
+                    r["is_alive"] = False
+                    r["delay_ms"] = 0
+                    r["status"] = "datacenter_rejected"
+                    r["colo"] = ""
+                    r["fail_count"] = safe_int(r.get("_old_fc"), 0) + 1
+                    if host:
+                        r["_cache_update"] = {
+                            "host": host,
+                            "entry": {
+                                "asn": c_asn,
+                                "isp": c_isp,
+                                "net_type": "datacenter",
+                                "country": c_code,
+                                "resolved_ip": e_ip,
+                            },
+                        }
+                    log.debug("🚫 拦截到数据中心/机房 HTTPS 节点 [%s:%s] (ASN: %s, ISP: %s)，已移出并拒收准入", host, port, c_asn, c_isp)
+                else:
+                    n_type = classify_asn(c_asn, c_isp)
+                    r["is_alive"] = True
+                    r["delay_ms"] = safe_int(w_exit.get("delay_ms"), 1)
+                    r["status"] = "alive"
+                    r["colo"] = "-"
+                    r["fail_count"] = 0
+                    r["country"] = c_code or r.get("country", "")
+                    r["egress_ip"] = e_ip or r.get("egress_ip", "")
+                    r["asn"] = format_asn_isp(c_asn, c_isp)
+                    r["isp"] = c_isp
+                    r["net_type"] = n_type
+                    if host:
+                        r["_cache_update"] = {
+                            "host": host,
+                            "entry": {
+                                "asn": c_asn,
+                                "isp": c_isp,
+                                "net_type": n_type,
+                                "country": c_code,
+                                "resolved_ip": e_ip,
+                            },
+                        }
+            elif mode == "sstp" and c_asn:
+                n_type = classify_asn(c_asn, c_isp)
+                r["asn"] = format_asn_isp(c_asn, c_isp)
+                r["isp"] = c_isp
+                r["net_type"] = n_type
+                if host:
+                    r["_cache_update"] = {
+                        "host": host,
+                        "entry": {
+                            "asn": c_asn,
+                            "isp": c_isp,
+                            "net_type": n_type,
+                            "country": c_code,
+                            "resolved_ip": e_ip,
+                        },
+                    }
+
+        # 刷新二次准入裁决后的全局汇总统计
+        pass_count = 0
+        fail_count = 0
+        proto_stats.clear()
+        reasons_counter.clear()
+        for res in results:
+            p = res.get("proto", "unknown")
+            if p not in proto_stats:
+                proto_stats[p] = {"total": 0, "alive": 0}
+            proto_stats[p]["total"] += 1
+            if res.get("is_alive"):
+                pass_count += 1
+                proto_stats[p]["alive"] += 1
+            else:
+                fail_count += 1
+            st = res.get("status") or ("alive" if res.get("is_alive") else "fail")
+            reasons_counter[st] += 1
 
     sorted_reasons = sorted(reasons_counter.items(), key=lambda x: x[1], reverse=True)
     reason_summary = ", ".join(f"{k}: {v}" for k, v in sorted_reasons)
