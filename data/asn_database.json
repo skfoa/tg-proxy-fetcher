@@ -2691,7 +2691,12 @@
     "Rices Privately owned enterprise": "AS48693",
     "Starry, Inc.": "AS395354",
     "HCN Dongjak": "AS7562",
-    "Ulsan Jung-Ang Broadcasting Network": "AS45361"
+    "Ulsan Jung-Ang Broadcasting Network": "AS45361",
+    "VegasNAP, LLC": "AS53340",
+    "IELO Main Network": "AS29075",
+    "Enecom,Inc.": "AS18144",
+    "Charter Communications, Inc": "AS33363",
+    "CenturyLink Communications, LLC": "AS209"
   },
   "asn_to_isp": {
     "AS10001": "Mics Network Corporation",
@@ -5268,7 +5273,13 @@
     "AS45374": "CCS",
     "AS395354": "Starry, Inc.",
     "AS7562": "HCN Dongjak",
-    "AS45361": "Ulsan Jung-Ang Broadcasting Network"
+    "AS45361": "Ulsan Jung-Ang Broadcasting Network",
+    "AS53340": "VegasNAP, LLC",
+    "AS29075": "IELO Main Network",
+    "AS18144": "Enecom,Inc.",
+    "AS17506": "ARTERIA Networks Corporation",
+    "AS33363": "Charter Communications, Inc",
+    "AS209": "CenturyLink Communications, LLC"
   },
   "asn_to_net_type": {
     "AS10001": "isp",
@@ -8847,6 +8858,9 @@
     "AS34150": "isp",
     "AS60075": "isp",
     "AS45374": "isp",
-    "AS395354": "isp"
+    "AS395354": "isp",
+    "AS53340": "datacenter",
+    "AS29075": "isp",
+    "AS18144": "isp"
   }
 }

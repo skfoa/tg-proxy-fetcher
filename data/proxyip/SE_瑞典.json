@@ -1,27 +1,5 @@
 [
   {
-    "proxy": "185.154.110.106:8443",
-    "ip": "185.154.110.106",
-    "port": 8443,
-    "tls": true,
-    "clientIp": "2a03:d780:0:110::13",
-    "clientIps": [
-      "2a03:d780:0:110::13"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2a03:d780:0:110::13",
-    "dual_stack": false,
-    "country": "SE",
-    "country_name": "瑞典",
-    "country_cn": "瑞典",
-    "country_emoji": "🇸🇪",
-    "asn": "49770",
-    "asOrganization": "Internetport Sweden AB",
-    "isp": "Internetport Sweden AB",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
-  },
-  {
     "proxy": "155.4.244.232:443",
     "ip": "155.4.244.232",
     "port": 443,
@@ -44,47 +22,25 @@
     "source": "@danfeng2"
   },
   {
-    "proxy": "45.82.80.96:443",
-    "ip": "45.82.80.96",
+    "proxy": "158.174.210.98:443",
+    "ip": "158.174.210.98",
     "port": 443,
     "tls": true,
-    "clientIp": "2a03:d780:0:732::5103:4846",
+    "clientIp": "158.174.210.98",
     "clientIps": [
-      "2a03:d780:0:732::5103:4846"
+      "158.174.210.98"
     ],
-    "clientIpv4": "",
-    "clientIpv6": "2a03:d780:0:732::5103:4846",
-    "dual_stack": false,
-    "country": "SE",
-    "country_name": "瑞典",
-    "country_cn": "瑞典",
-    "country_emoji": "🇸🇪",
-    "asn": "49770",
-    "asOrganization": "Internetport Sweden AB",
-    "isp": "Internetport Sweden AB",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
-  },
-  {
-    "proxy": "195.133.13.90:443",
-    "ip": "195.133.13.90",
-    "port": 443,
-    "tls": true,
-    "clientIp": "195.133.13.90",
-    "clientIps": [
-      "195.133.13.90"
-    ],
-    "clientIpv4": "195.133.13.90",
+    "clientIpv4": "158.174.210.98",
     "clientIpv6": "",
     "dual_stack": false,
     "country": "SE",
     "country_name": "瑞典",
     "country_cn": "瑞典",
     "country_emoji": "🇸🇪",
-    "asn": "214822",
-    "asOrganization": "MT FINANCE LLC",
-    "isp": "MT FINANCE LLC",
-    "net_type": "business",
+    "asn": "8473",
+    "asOrganization": "Bahnhof AB",
+    "isp": "Bahnhof AB",
+    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
@@ -106,50 +62,6 @@
     "asn": "6939",
     "asOrganization": "Hurricane Electric LLC",
     "isp": "Hurricane Electric LLC",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "191.44.38.32:443",
-    "ip": "191.44.38.32",
-    "port": 443,
-    "tls": true,
-    "clientIp": "191.44.38.32",
-    "clientIps": [
-      "191.44.38.32"
-    ],
-    "clientIpv4": "191.44.38.32",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "SE",
-    "country_name": "瑞典",
-    "country_cn": "瑞典",
-    "country_emoji": "🇸🇪",
-    "asn": "214822",
-    "asOrganization": "MT FINANCE LLC",
-    "isp": "MT FINANCE LLC",
-    "net_type": "business",
-    "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "158.174.210.98:443",
-    "ip": "158.174.210.98",
-    "port": 443,
-    "tls": true,
-    "clientIp": "158.174.210.98",
-    "clientIps": [
-      "158.174.210.98"
-    ],
-    "clientIpv4": "158.174.210.98",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "SE",
-    "country_name": "瑞典",
-    "country_cn": "瑞典",
-    "country_emoji": "🇸🇪",
-    "asn": "8473",
-    "asOrganization": "Bahnhof AB",
-    "isp": "Bahnhof AB",
     "net_type": "isp",
     "source": "@danfeng_chat"
   },
@@ -195,6 +107,50 @@
     "asOrganization": "Maxima, LLC",
     "isp": "Maxima, LLC",
     "net_type": "isp",
+    "source": "@danfeng_chat"
+  },
+  {
+    "proxy": "195.133.13.90:443",
+    "ip": "195.133.13.90",
+    "port": 443,
+    "tls": true,
+    "clientIp": "195.133.13.90",
+    "clientIps": [
+      "195.133.13.90"
+    ],
+    "clientIpv4": "195.133.13.90",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "SE",
+    "country_name": "瑞典",
+    "country_cn": "瑞典",
+    "country_emoji": "🇸🇪",
+    "asn": "214822",
+    "asOrganization": "MT FINANCE LLC",
+    "isp": "MT FINANCE LLC",
+    "net_type": "datacenter",
+    "source": "@danfeng_chat"
+  },
+  {
+    "proxy": "191.44.38.32:443",
+    "ip": "191.44.38.32",
+    "port": 443,
+    "tls": true,
+    "clientIp": "191.44.38.32",
+    "clientIps": [
+      "191.44.38.32"
+    ],
+    "clientIpv4": "191.44.38.32",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "SE",
+    "country_name": "瑞典",
+    "country_cn": "瑞典",
+    "country_emoji": "🇸🇪",
+    "asn": "214822",
+    "asOrganization": "MT FINANCE LLC",
+    "isp": "MT FINANCE LLC",
+    "net_type": "datacenter",
     "source": "@danfeng_chat"
   }
 ]

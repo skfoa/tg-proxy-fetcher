@@ -1,27 +1,5 @@
 [
   {
-    "proxy": "125.20.69.45:443",
-    "ip": "125.20.69.45",
-    "port": 443,
-    "tls": true,
-    "clientIp": "125.20.69.42",
-    "clientIps": [
-      "125.20.69.42"
-    ],
-    "clientIpv4": "125.20.69.42",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "IN",
-    "country_name": "印度",
-    "country_cn": "印度",
-    "country_emoji": "🇮🇳",
-    "asn": "9498",
-    "asOrganization": "Bharti Airtel Ltd.",
-    "isp": "Bharti Airtel Ltd.",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "157.20.27.130:8443",
     "ip": "157.20.27.130",
     "port": 8443,
@@ -64,5 +42,49 @@
     "isp": "WebHorizon Internet Services",
     "net_type": "isp",
     "source": "@cmliussss_all"
+  },
+  {
+    "proxy": "143.110.188.241:443",
+    "ip": "143.110.188.241",
+    "port": 443,
+    "tls": true,
+    "clientIp": "157.20.27.201",
+    "clientIps": [
+      "157.20.27.201"
+    ],
+    "clientIpv4": "157.20.27.201",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "IN",
+    "country_name": "印度",
+    "country_cn": "印度",
+    "country_emoji": "🇮🇳",
+    "asn": "58678",
+    "asOrganization": "MANNDESHI GURU NET PRIVATE LIMITED",
+    "isp": "MANNDESHI GURU NET PRIVATE LIMITED",
+    "net_type": "isp",
+    "source": "@cmliussss_all"
+  },
+  {
+    "proxy": "125.20.69.45:443",
+    "ip": "125.20.69.45",
+    "port": 443,
+    "tls": true,
+    "clientIp": "125.20.69.42",
+    "clientIps": [
+      "125.20.69.42"
+    ],
+    "clientIpv4": "125.20.69.42",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "IN",
+    "country_name": "印度",
+    "country_cn": "印度",
+    "country_emoji": "🇮🇳",
+    "asn": "9498",
+    "asOrganization": "Bharti Airtel Ltd.",
+    "isp": "Bharti Airtel Ltd.",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
   }
 ]

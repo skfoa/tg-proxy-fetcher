@@ -22,6 +22,28 @@
     "source": "@danfeng_chat"
   },
   {
+    "proxy": "46.199.75.118:443",
+    "ip": "46.199.75.118",
+    "port": 443,
+    "tls": true,
+    "clientIp": "46.199.75.113",
+    "clientIps": [
+      "46.199.75.113"
+    ],
+    "clientIpv4": "46.199.75.113",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "CY",
+    "country_name": "塞浦路斯",
+    "country_cn": "塞浦路斯",
+    "country_emoji": "🇨🇾",
+    "asn": "6866",
+    "asOrganization": "Cyprus Telecommunications Authority",
+    "isp": "Cyprus Telecommunications Authority",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
+  },
+  {
     "proxy": "94.78.67.171:443",
     "ip": "94.78.67.171",
     "port": 443,
@@ -64,27 +86,5 @@
     "isp": "Cyprus Telecommunications Authority",
     "net_type": "isp",
     "source": "@cmliussss_all"
-  },
-  {
-    "proxy": "46.199.75.118:443",
-    "ip": "46.199.75.118",
-    "port": 443,
-    "tls": true,
-    "clientIp": "46.199.75.113",
-    "clientIps": [
-      "46.199.75.113"
-    ],
-    "clientIpv4": "46.199.75.113",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "CY",
-    "country_name": "塞浦路斯",
-    "country_cn": "塞浦路斯",
-    "country_emoji": "🇨🇾",
-    "asn": "6866",
-    "asOrganization": "Cyprus Telecommunications Authority",
-    "isp": "Cyprus Telecommunications Authority",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
   }
 ]

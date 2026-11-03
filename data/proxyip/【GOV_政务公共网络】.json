@@ -1,27 +1,5 @@
 [
   {
-    "proxy": "192.193.104.25:443",
-    "ip": "192.193.104.25",
-    "port": 443,
-    "tls": true,
-    "clientIp": "192.193.104.22",
-    "clientIps": [
-      "192.193.104.22"
-    ],
-    "clientIpv4": "192.193.104.22",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "25883",
-    "asOrganization": "Citibank N.A.",
-    "isp": "Citibank N.A.",
-    "net_type": "government",
-    "source": "@cmliussss_all"
-  },
-  {
     "proxy": "101.108.49.121:443",
     "ip": "101.108.49.121",
     "port": 443,

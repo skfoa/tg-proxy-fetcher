@@ -1,27 +1,5 @@
 [
   {
-    "proxy": "181.36.229.212:2096",
-    "ip": "181.36.229.212",
-    "port": 2096,
-    "tls": true,
-    "clientIp": "181.36.229.211",
-    "clientIps": [
-      "181.36.229.211"
-    ],
-    "clientIpv4": "181.36.229.211",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "DO",
-    "country_name": "多米尼加",
-    "country_cn": "多米尼加",
-    "country_emoji": "🇩🇴",
-    "asn": "28118",
-    "asOrganization": "ALTICE DOMINICANA S.A.",
-    "isp": "ALTICE DOMINICANA S.A.",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
-  },
-  {
     "proxy": "181.36.229.212:8443",
     "ip": "181.36.229.212",
     "port": 8443,
@@ -44,9 +22,9 @@
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "181.36.229.212:443",
+    "proxy": "181.36.229.212:2083",
     "ip": "181.36.229.212",
-    "port": 443,
+    "port": 2083,
     "tls": true,
     "clientIp": "181.36.229.211",
     "clientIps": [
@@ -88,9 +66,9 @@
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "181.36.229.212:2053",
+    "proxy": "181.36.229.212:2096",
     "ip": "181.36.229.212",
-    "port": 2053,
+    "port": 2096,
     "tls": true,
     "clientIp": "181.36.229.211",
     "clientIps": [
@@ -110,9 +88,31 @@
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "181.36.229.212:2083",
+    "proxy": "181.36.229.212:443",
     "ip": "181.36.229.212",
-    "port": 2083,
+    "port": 443,
+    "tls": true,
+    "clientIp": "181.36.229.211",
+    "clientIps": [
+      "181.36.229.211"
+    ],
+    "clientIpv4": "181.36.229.211",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "DO",
+    "country_name": "多米尼加",
+    "country_cn": "多米尼加",
+    "country_emoji": "🇩🇴",
+    "asn": "28118",
+    "asOrganization": "ALTICE DOMINICANA S.A.",
+    "isp": "ALTICE DOMINICANA S.A.",
+    "net_type": "isp",
+    "source": "@cmliussss_all"
+  },
+  {
+    "proxy": "181.36.229.212:2053",
+    "ip": "181.36.229.212",
+    "port": 2053,
     "tls": true,
     "clientIp": "181.36.229.211",
     "clientIps": [

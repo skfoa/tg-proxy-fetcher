@@ -22,24 +22,24 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "201.16.130.6:443",
-    "ip": "201.16.130.6",
-    "port": 443,
+    "proxy": "200.193.47.117:8443",
+    "ip": "200.193.47.117",
+    "port": 8443,
     "tls": true,
-    "clientIp": "200.170.137.148",
+    "clientIp": "200.193.47.117",
     "clientIps": [
-      "200.170.137.148"
+      "200.193.47.117"
     ],
-    "clientIpv4": "200.170.137.148",
+    "clientIpv4": "200.193.47.117",
     "clientIpv6": "",
     "dual_stack": false,
     "country": "BR",
     "country_name": "巴西",
     "country_cn": "巴西",
     "country_emoji": "🇧🇷",
-    "asn": "16735",
-    "asOrganization": "ALGAR TELECOM S/A",
-    "isp": "ALGAR TELECOM S/A",
+    "asn": "8167",
+    "asOrganization": "V tal",
+    "isp": "V tal",
     "net_type": "isp",
     "source": "@danfeng2"
   },
@@ -66,24 +66,24 @@
     "source": "@danfeng2"
   },
   {
-    "proxy": "200.193.47.117:8443",
-    "ip": "200.193.47.117",
-    "port": 8443,
+    "proxy": "201.16.130.6:443",
+    "ip": "201.16.130.6",
+    "port": 443,
     "tls": true,
-    "clientIp": "200.193.47.117",
+    "clientIp": "200.170.137.148",
     "clientIps": [
-      "200.193.47.117"
+      "200.170.137.148"
     ],
-    "clientIpv4": "200.193.47.117",
+    "clientIpv4": "200.170.137.148",
     "clientIpv6": "",
     "dual_stack": false,
     "country": "BR",
     "country_name": "巴西",
     "country_cn": "巴西",
     "country_emoji": "🇧🇷",
-    "asn": "8167",
-    "asOrganization": "V tal",
-    "isp": "V tal",
+    "asn": "16735",
+    "asOrganization": "ALGAR TELECOM S/A",
+    "isp": "ALGAR TELECOM S/A",
     "net_type": "isp",
     "source": "@danfeng2"
   },
