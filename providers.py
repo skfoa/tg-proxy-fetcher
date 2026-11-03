@@ -283,6 +283,7 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS199144": "datacenter", # HexCore cloud s.r.o. (ipinfo: Hosting)
     "AS57169": "datacenter",  # EDIS GmbH (ipinfo: Hosting)
     "AS396986": "datacenter", # Bytedance Inc. (ipinfo: Hosting)
+    "AS27284": "datacenter",  # Fourplex Telecom LLC (ipinfo: Hosting / 静态机房双ISP, 收敛为机房)
     "AS23724": "datacenter",  # IDC, China Telecommunications Corporation (ipinfo: Hosting)
     "AS135598": "datacenter", # Siberfy (APNIC: SIBERFY-AS-AP, ipinfo: Hosting)
     "AS13335": "datacenter",  # Cloudflare
@@ -2650,6 +2651,48 @@ CF_BASE_CSV_FIELDS = [
 SCAN_CSV_FIELDS = CF_BASE_CSV_FIELDS + ["exit_ip", "exit_asn", "exit_isp", "exit_location"]
 PROXYIP_CSV_FIELDS = CF_BASE_CSV_FIELDS + ["net_type", "exit_ip", "exit_ipv6", "exit_asn", "exit_isp"]
 
+_CF_NETWORKS = tuple(
+    ipaddress.ip_network(cidr)
+    for cidr in (
+        "173.245.48.0/20",
+        "103.21.244.0/22",
+        "103.22.200.0/22",
+        "103.31.4.0/22",
+        "141.101.64.0/18",
+        "108.162.192.0/18",
+        "190.93.240.0/20",
+        "188.114.96.0/20",
+        "197.234.240.0/22",
+        "198.41.128.0/17",
+        "162.158.0.0/15",
+        "104.16.0.0/13",
+        "104.24.0.0/14",
+        "104.28.0.0/14",
+        "172.64.0.0/13",
+        "131.0.72.0/22",
+        "2400:cb00::/32",
+        "2606:4700::/32",
+        "2803:f800::/32",
+        "2405:b500::/32",
+        "2405:8100::/32",
+        "2a06:98c0::/29",
+        "2c0f:f248::/32",
+        "2a09:bac0::/29",
+    )
+)
+
+
+@functools.lru_cache(maxsize=4096)
+def is_cloudflare_ip(ip_str: str) -> bool:
+    """判定 IP 是否属于 Cloudflare 官方 Anycast / WARP (2a09:bac0::/29, 104.28.0.0/14 等) 网段 (AS13335)"""
+    if not ip_str:
+        return False
+    try:
+        addr = ipaddress.ip_address(str(ip_str).strip().strip("[]"))
+        return any(addr in net for net in _CF_NETWORKS)
+    except Exception:
+        return False
+
 
 def resolve_node_exit_and_net_type(
     item: dict,
@@ -2661,6 +2704,7 @@ def resolve_node_exit_and_net_type(
     1. 校验并提取合法出口 IP (自动剔除 '0' 等非法占位串)。
     2. 解析真实出口自治域 (exit_code, exit_isp)：
        - 优先取显式有效 exit_asn / exit_isp；
+       - 若出口 IP 命中 Cloudflare 官方 Anycast / WARP 网段 (如 2a09:bac0::/29)，直接锁定为 AS13335 Cloudflare；
        - 其次查 ip_cache 中出口 IP 关联的 ASN 并经 classify_asn 实时核算（绝不盲信缓存中的陈旧 net_type 字符串）；
        - 若单跳直连 (exit_ip == ip)，复用入口有效 ASN；
        - 兼容旧版 15 列 proxyip.csv（无 exit_asn 列）平滑迁移：若原记录无 exit_asn 键且原 asn 为非机房，将其迁移为出口 ASN。
@@ -2685,6 +2729,12 @@ def resolve_node_exit_and_net_type(
     raw_ing_isp = str(item.get("isp") or "").strip()
     ing_code = _extract_asn_code(raw_ing_asn, raw_ing_isp)
 
+    if primary_exit and not exit_code:
+        if any(is_cloudflare_ip(ep) for ep in (exit_v4, exit_v6) if ep):
+            exit_code = "AS13335"
+            if not raw_exit_isp:
+                raw_exit_isp = ASN_TO_PROVIDER.get("AS13335", "Cloudflare")
+
     cache_exit_nt = ""
     if primary_exit and not exit_code and ip_cache:
         for ep in (exit_v4, exit_v6):
@@ -2705,8 +2755,8 @@ def resolve_node_exit_and_net_type(
             exit_code = ing_code
             if not raw_exit_isp:
                 raw_exit_isp = raw_ing_isp
-        elif "exit_asn" not in item and ing_code:
-            # 兼容旧版 15 列 proxyip.csv 平滑升级：旧表中 asn 列存的即为非机房出口 ASN
+        elif ("exit_asn" not in item or not str(item.get("exit_asn") or "").strip()) and ing_code:
+            # 兼容旧版 15 列 proxyip.csv 平滑升级与空 exit_asn 节点平滑继承：若原记录无有效 exit_asn 且原 asn 为非机房，将其作为出口 ASN
             if classify_asn(ing_code, raw_ing_isp) != "datacenter":
                 exit_code = ing_code
                 if not raw_exit_isp:
@@ -3668,6 +3718,13 @@ def calibrate_all_datasets(
             dc_demoted_rows: list[dict] = []
 
             for r in proxyip_rows:
+                raw_fs = str(r.get("first_seen") or "").strip()
+                raw_ch = str(r.get("channel") or "").strip()
+                if re.match(r"^\d{4}-\d{2}-\d{2}", raw_ch) and not re.match(r"^\d{4}-\d{2}-\d{2}", raw_fs):
+                    r["first_seen"] = normalize_timestamp(raw_ch)
+                    r["channel"] = ""
+                    changed_proxyip += 1
+
                 cand_exits = extract_ips([r.get("exit_ip"), r.get("exit_ipv6")])
                 v4_exits = [cip for cip in cand_exits if is_valid_ipv4(cip)]
                 v6_exits = [cip for cip in cand_exits if is_valid_ipv6(cip)]

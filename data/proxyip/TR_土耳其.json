@@ -82,8 +82,8 @@
     "country_cn": "土耳其",
     "country_emoji": "🇹🇷",
     "asn": "209604",
-    "asOrganization": "TALIDO Bilisim Teknolojileri Sanayi ve Ticaret Anonim Sirketi",
-    "isp": "TALIDO Bilisim Teknolojileri Sanayi ve Ticaret Anonim Sirketi",
+    "asOrganization": "2E TELEKOMUNIKASYON LTD STI",
+    "isp": "2E TELEKOMUNIKASYON LTD STI",
     "net_type": "isp",
     "source": "@cmliussss_all"
   },
@@ -214,8 +214,8 @@
     "country_cn": "土耳其",
     "country_emoji": "🇹🇷",
     "asn": "209604",
-    "asOrganization": "2E Telekomunikasyon LTD. STI.",
-    "isp": "2E Telekomunikasyon LTD. STI.",
+    "asOrganization": "2E TELEKOMUNIKASYON LTD STI",
+    "isp": "2E TELEKOMUNIKASYON LTD STI",
     "net_type": "isp",
     "source": "@cmliussss_all"
   },
@@ -459,50 +459,6 @@
     "asOrganization": "Tellcom Adana Fiber Dynamic",
     "isp": "Tellcom Adana Fiber Dynamic",
     "net_type": "isp",
-    "source": "@cmliussss_all"
-  },
-  {
-    "proxy": "131.222.130.62:443",
-    "ip": "131.222.130.62",
-    "port": 443,
-    "tls": true,
-    "clientIp": "131.222.130.62",
-    "clientIps": [
-      "131.222.130.62"
-    ],
-    "clientIpv4": "131.222.130.62",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "TR",
-    "country_name": "土耳其",
-    "country_cn": "土耳其",
-    "country_emoji": "🇹🇷",
-    "asn": "207279",
-    "asOrganization": "MARKAHOST TELEKOMUNIKASYON VE TICARET LIMITED SIRKETI",
-    "isp": "MARKAHOST TELEKOMUNIKASYON VE TICARET LIMITED SIRKETI",
-    "net_type": "datacenter",
-    "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "5.180.32.101:443",
-    "ip": "5.180.32.101",
-    "port": 443,
-    "tls": true,
-    "clientIp": "5.180.32.101",
-    "clientIps": [
-      "5.180.32.101"
-    ],
-    "clientIpv4": "5.180.32.101",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "TR",
-    "country_name": "土耳其",
-    "country_cn": "土耳其",
-    "country_emoji": "🇹🇷",
-    "asn": "200239",
-    "asOrganization": "Private Customer",
-    "isp": "Private Customer",
-    "net_type": "datacenter",
     "source": "@cmliussss_all"
   },
   {

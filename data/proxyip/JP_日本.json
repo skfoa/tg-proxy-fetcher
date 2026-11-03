@@ -566,8 +566,8 @@
     "country_cn": "日本",
     "country_emoji": "🇯🇵",
     "asn": "979",
-    "asOrganization": "NetLab Global",
-    "isp": "NetLab Global",
+    "asOrganization": "NetLab",
+    "isp": "NetLab",
     "net_type": "business",
     "source": "@cmliussss_all"
   },
@@ -1141,28 +1141,6 @@
     "asOrganization": "NetLab",
     "isp": "NetLab",
     "net_type": "business",
-    "source": "@danfeng2"
-  },
-  {
-    "proxy": "208.68.182.75:443",
-    "ip": "208.68.182.75",
-    "port": 443,
-    "tls": true,
-    "clientIp": "208.68.182.75",
-    "clientIps": [
-      "208.68.182.75"
-    ],
-    "clientIpv4": "208.68.182.75",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "215172",
-    "asOrganization": "JIANYUELAB LTD",
-    "isp": "JIANYUELAB LTD",
-    "net_type": "datacenter",
     "source": "@danfeng2"
   },
   {

@@ -370,9 +370,14 @@ def classify_node_proxyip_or_scan(item: dict, ip_cache: dict) -> tuple[bool, str
     返回: (is_proxyip, effective_net_type)
     """
     is_p, eff_nt, exit_code, exit_isp = resolve_node_exit_and_net_type(item, ip_cache)
-    if exit_code and not _extract_asn_code(item.get("exit_asn"), item.get("exit_isp")):
+    if exit_code:
         item["exit_asn"] = format_asn_isp(exit_code, exit_isp)
         item["exit_isp"] = exit_isp
+    else:
+        # 清洗非法占位字符串 (如 "AS_UNKNOWN", "-", "AS0")
+        if _extract_asn_code(item.get("exit_asn"), item.get("exit_isp")) == "":
+            item["exit_asn"] = ""
+            item["exit_isp"] = ""
     return is_p, eff_nt
 
 
@@ -539,6 +544,16 @@ def load_existing_cf_ips(filepath: str = OUTPUT_CF_FILE, label: str = "优选 IP
                             row["exit_ip"] = v4_exits[0] if v4_exits else (v6_exits[0] if v6_exits else "")
                             if "exit_ipv6" in row:
                                 row["exit_ipv6"] = v6_exits[0] if v6_exits else ""
+                        if "exit_asn" in row or "exit_isp" in row:
+                            raw_exit_asn = str(row.get("exit_asn") or "").replace("`", "").strip()
+                            raw_exit_isp = str(row.get("exit_isp") or "").replace("`", "").strip()
+                            exit_code = _extract_asn_code(raw_exit_asn, raw_exit_isp)
+                            if exit_code:
+                                row["exit_asn"] = format_asn_isp(exit_code, raw_exit_isp)
+                                row["exit_isp"] = raw_exit_isp
+                            else:
+                                row["exit_asn"] = ""
+                                row["exit_isp"] = ""
                         existing[key] = row
         log.info("已加载本地已存%s记录: %d 条（历史有效记录全部保留）", label, len(existing))
     except Exception as e:
@@ -1748,25 +1763,43 @@ def merge_and_save(
     total_enriched_count = pre_enriched_count + enriched_now
     if total_enriched_count > 0:
         log.info("【批量自动持久化新 ASN】全流程批量入库完成: 本次共新收录 %d 个全新自治系统到权威库！", total_enriched_count)
-        # 若新入库了 ASN，立即校准本次新抓取的 scraped_scan_ips 与 scraped_proxyips 分流归属，确保新增计数精准
-        for k in list(scraped_scan_ips.keys()):
-            v = scraped_scan_ips[k]
-            is_p, nt = classify_node_proxyip_or_scan(v, ip_cache)
-            v["net_type"] = nt
-            if is_p:
-                scraped_scan_ips.pop(k, None)
-                if k not in scraped_proxyips:
-                    scraped_proxyips[k] = v
-        for k in list(scraped_proxyips.keys()):
-            v = scraped_proxyips[k]
-            is_p, nt = classify_node_proxyip_or_scan(v, ip_cache)
-            v["net_type"] = nt
-            if not is_p:
-                scraped_proxyips.pop(k, None)
-                if k not in scraped_scan_ips:
-                    scraped_scan_ips[k] = v
     elif new_asn_records:
         log.debug("【批量自动持久化新 ASN】本次全源无新 ASN 需入库（全部已在库或已去重跳过）")
+
+    # 全量抓取与画像闭环：跨池出口画像继承与分流重校准（无论是否有新入库 ASN，均确保抓取数据与权威属性对齐）
+    for k in list(scraped_scan_ips.keys()):
+        v = scraped_scan_ips[k]
+        if k in existing_proxyips:
+            for mk in ("exit_ip", "exit_ipv6", "exit_asn", "exit_isp", "colo", "cf_location"):
+                if not v.get(mk) and existing_proxyips[k].get(mk):
+                    v[mk] = existing_proxyips[k][mk]
+        elif k in existing_scan_ips:
+            for mk in ("exit_ip", "exit_ipv6", "exit_asn", "exit_isp", "colo", "cf_location"):
+                if not v.get(mk) and existing_scan_ips[k].get(mk):
+                    v[mk] = existing_scan_ips[k][mk]
+        is_p, nt = classify_node_proxyip_or_scan(v, ip_cache)
+        v["net_type"] = nt
+        if is_p:
+            scraped_scan_ips.pop(k, None)
+            if k not in scraped_proxyips:
+                scraped_proxyips[k] = v
+
+    for k in list(scraped_proxyips.keys()):
+        v = scraped_proxyips[k]
+        if k in existing_proxyips:
+            for mk in ("exit_ip", "exit_ipv6", "exit_asn", "exit_isp", "colo", "cf_location"):
+                if not v.get(mk) and existing_proxyips[k].get(mk):
+                    v[mk] = existing_proxyips[k][mk]
+        elif k in existing_scan_ips:
+            for mk in ("exit_ip", "exit_ipv6", "exit_asn", "exit_isp", "colo", "cf_location"):
+                if not v.get(mk) and existing_scan_ips[k].get(mk):
+                    v[mk] = existing_scan_ips[k][mk]
+        is_p, nt = classify_node_proxyip_or_scan(v, ip_cache)
+        v["net_type"] = nt
+        if not is_p:
+            scraped_proxyips.pop(k, None)
+            if k not in scraped_scan_ips:
+                scraped_scan_ips[k] = v
 
     # 仅当本次实际入库了新 ASN，且节点计数 > 0，才在通知卡片中展示新收录清单；无新增或 0 条则 0 视觉噪音
     card_unrecorded = [
@@ -1780,11 +1813,11 @@ def merge_and_save(
     new_cf_cnt = sum(1 for k in scraped_cf_ips if k not in existing_cf_ips)
     updated_cf_cnt = sum(1 for k in scraped_cf_ips if k in existing_cf_ips)
 
-    new_scan_cnt = sum(1 for k in scraped_scan_ips if k not in existing_scan_ips)
-    updated_scan_cnt = sum(1 for k in scraped_scan_ips if k in existing_scan_ips)
+    new_scan_cnt = sum(1 for k in scraped_scan_ips if k not in existing_scan_ips and k not in existing_proxyips)
+    updated_scan_cnt = sum(1 for k in scraped_scan_ips if k in existing_scan_ips or k in existing_proxyips)
 
-    new_proxyip_cnt = sum(1 for k in scraped_proxyips if k not in existing_proxyips)
-    updated_proxyip_cnt = sum(1 for k in scraped_proxyips if k in existing_proxyips)
+    new_proxyip_cnt = sum(1 for k in scraped_proxyips if k not in existing_proxyips and k not in existing_scan_ips)
+    updated_proxyip_cnt = sum(1 for k in scraped_proxyips if k in existing_proxyips or k in existing_scan_ips)
 
     # 2. 合并：严格保护历史 fail_count 与元数据，防止被新抓取结果抹除为 0
     final_proxies = {}
@@ -1844,6 +1877,15 @@ def merge_and_save(
                 if not v.get(keep_k) and ex_scan.get(keep_k):
                     v[keep_k] = ex_scan[keep_k]
             ex_scan.update(v)
+        elif k in existing_proxyips:
+            ex_p = existing_proxyips[k]
+            v["fail_count"] = ex_p.get("fail_count", 0)
+            if not v.get("first_seen"):
+                v["first_seen"] = ex_p.get("first_seen") or ex_p.get("tested_at", "")
+            for keep_k in ("exit_ip", "exit_ipv6", "exit_asn", "exit_isp", "colo", "cf_location"):
+                if not v.get(keep_k) and ex_p.get(keep_k):
+                    v[keep_k] = ex_p[keep_k]
+            final_scan_ips[k] = v
         else:
             final_scan_ips[k] = v
 
@@ -1859,6 +1901,15 @@ def merge_and_save(
                 if not v.get(keep_k) and ex_proxy.get(keep_k):
                     v[keep_k] = ex_proxy[keep_k]
             ex_proxy.update(v)
+        elif k in existing_scan_ips:
+            ex_s = existing_scan_ips[k]
+            v["fail_count"] = ex_s.get("fail_count", 0)
+            if not v.get("first_seen"):
+                v["first_seen"] = ex_s.get("first_seen") or ex_s.get("tested_at", "")
+            for keep_k in ("exit_ip", "exit_ipv6", "exit_asn", "exit_isp", "exit_location", "colo", "cf_location"):
+                if not v.get(keep_k) and ex_s.get(keep_k):
+                    v[keep_k] = ex_s[keep_k]
+            final_proxyips[k] = v
         else:
             final_proxyips[k] = v
 
@@ -1898,6 +1949,7 @@ def merge_and_save(
             for mk in ("colo", "cf_location", "isp", "asn", "net_type", "exit_ip", "exit_ipv6", "exit_asn", "exit_isp", "raw_asn"):
                 if v.get(mk) and not cleaned_proxyips[k].get(mk):
                     cleaned_proxyips[k][mk] = v[mk]
+        cleaned_scan_ips.pop(k, None)
 
     for k, v in proxy_to_scan.items():
         if k not in cleaned_scan_ips:
@@ -1906,6 +1958,10 @@ def merge_and_save(
             for mk in ("colo", "cf_location", "isp", "asn", "net_type", "exit_ip", "exit_ipv6", "exit_asn", "exit_isp", "raw_asn"):
                 if v.get(mk) and not cleaned_scan_ips[k].get(mk):
                     cleaned_scan_ips[k][mk] = v[mk]
+        cleaned_proxyips.pop(k, None)
+
+    for k in list(cleaned_proxyips.keys()):
+        cleaned_scan_ips.pop(k, None)
 
     final_scan_ips = cleaned_scan_ips
     final_proxyips = cleaned_proxyips

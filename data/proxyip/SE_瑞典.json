@@ -108,49 +108,5 @@
     "isp": "Maxima, LLC",
     "net_type": "isp",
     "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "195.133.13.90:443",
-    "ip": "195.133.13.90",
-    "port": 443,
-    "tls": true,
-    "clientIp": "195.133.13.90",
-    "clientIps": [
-      "195.133.13.90"
-    ],
-    "clientIpv4": "195.133.13.90",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "SE",
-    "country_name": "瑞典",
-    "country_cn": "瑞典",
-    "country_emoji": "🇸🇪",
-    "asn": "214822",
-    "asOrganization": "MT FINANCE LLC",
-    "isp": "MT FINANCE LLC",
-    "net_type": "datacenter",
-    "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "191.44.38.32:443",
-    "ip": "191.44.38.32",
-    "port": 443,
-    "tls": true,
-    "clientIp": "191.44.38.32",
-    "clientIps": [
-      "191.44.38.32"
-    ],
-    "clientIpv4": "191.44.38.32",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "SE",
-    "country_name": "瑞典",
-    "country_cn": "瑞典",
-    "country_emoji": "🇸🇪",
-    "asn": "214822",
-    "asOrganization": "MT FINANCE LLC",
-    "isp": "MT FINANCE LLC",
-    "net_type": "datacenter",
-    "source": "@danfeng_chat"
   }
 ]

@@ -456,8 +456,8 @@
     "country_cn": "美国",
     "country_emoji": "🇺🇸",
     "asn": "214238",
-    "asOrganization": "IT Hostline Ltd",
-    "isp": "IT Hostline Ltd",
+    "asOrganization": "Host Telecom Ltd",
+    "isp": "Host Telecom Ltd",
     "net_type": "isp",
     "source": "@cmliussss_all"
   },
@@ -510,9 +510,9 @@
     "ip": "23.141.204.18",
     "port": 59611,
     "tls": true,
-    "clientIp": "0",
+    "clientIp": "23.141.204.18",
     "clientIps": [
-      "0"
+      "23.141.204.18"
     ],
     "clientIpv4": "",
     "clientIpv6": "",
@@ -525,7 +525,7 @@
     "asOrganization": "Cogent Communications, LLC",
     "isp": "Cogent Communications, LLC",
     "net_type": "isp",
-    "source": "2026-09-06 16:44:44"
+    "source": ""
   },
   {
     "proxy": "167.253.97.183:443",
@@ -2178,28 +2178,6 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "154.64.237.222:443",
-    "ip": "154.64.237.222",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2a09:bac1:76e0:3d0::26a:d5",
-    "clientIps": [
-      "2a09:bac1:76e0:3d0::26a:d5"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2a09:bac1:76e0:3d0::26a:d5",
-    "dual_stack": false,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "174",
-    "asOrganization": "Cogent Communications, LLC",
-    "isp": "Cogent Communications, LLC",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "64.81.29.82:443",
     "ip": "64.81.29.82",
     "port": 443,
@@ -2462,28 +2440,6 @@
     "isp": "Hurricane Electric LLC",
     "net_type": "isp",
     "source": "@cmliussss_all"
-  },
-  {
-    "proxy": "154.21.206.104:443",
-    "ip": "154.21.206.104",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2a09:bac5:636b:281e::3ff:63",
-    "clientIps": [
-      "2a09:bac5:636b:281e::3ff:63"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2a09:bac5:636b:281e::3ff:63",
-    "dual_stack": false,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "174",
-    "asOrganization": "Cogent Communications, LLC",
-    "isp": "Cogent Communications, LLC",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
   },
   {
     "proxy": "216.167.33.174:443",
@@ -5302,28 +5258,6 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "154.21.206.112:443",
-    "ip": "154.21.206.112",
-    "port": 443,
-    "tls": true,
-    "clientIp": "0",
-    "clientIps": [
-      "0"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "174",
-    "asOrganization": "Cogent Communications, LLC",
-    "isp": "Cogent Communications, LLC",
-    "net_type": "isp",
-    "source": "2026-09-16 08:20:44"
-  },
-  {
     "proxy": "128.121.31.213:587",
     "ip": "128.121.31.213",
     "port": 587,
@@ -6528,8 +6462,8 @@
     "country_cn": "西班牙",
     "country_emoji": "🇪🇸",
     "asn": "214238",
-    "asOrganization": "IT Hostline Ltd",
-    "isp": "IT Hostline Ltd",
+    "asOrganization": "Host Telecom Ltd",
+    "isp": "Host Telecom Ltd",
     "net_type": "isp",
     "source": "@cmliussss_all"
   },
@@ -6836,8 +6770,8 @@
     "country_cn": "荷兰",
     "country_emoji": "🇳🇱",
     "asn": "213753",
-    "asOrganization": "Des Capital B.V.",
-    "isp": "Des Capital B.V.",
+    "asOrganization": "InterEdge B.V.",
+    "isp": "InterEdge B.V.",
     "net_type": "isp",
     "source": "@cmliussss_all"
   },
@@ -8200,8 +8134,8 @@
     "country_cn": "爱沙尼亚",
     "country_emoji": "🇪🇪",
     "asn": "204785",
-    "asOrganization": "TakeHost OU",
-    "isp": "TakeHost OU",
+    "asOrganization": "'Ghita Telekom'",
+    "isp": "'Ghita Telekom'",
     "net_type": "isp",
     "source": "@cmliussss_all"
   },
@@ -9630,8 +9564,8 @@
     "country_cn": "白俄罗斯",
     "country_emoji": "🇧🇾",
     "asn": "6697",
-    "asOrganization": "Abonent MGTS",
-    "isp": "Abonent MGTS",
+    "asOrganization": "Republican Unitary Telecommunication Enterprise Beltelecom",
+    "isp": "Republican Unitary Telecommunication Enterprise Beltelecom",
     "net_type": "isp",
     "source": "@cmliussss_all"
   },
@@ -9806,8 +9740,8 @@
     "country_cn": "白俄罗斯",
     "country_emoji": "🇧🇾",
     "asn": "25106",
-    "asOrganization": "LLC Raccoon technology",
-    "isp": "LLC Raccoon technology",
+    "asOrganization": "Mobile TeleSystems JLLC",
+    "isp": "Mobile TeleSystems JLLC",
     "net_type": "isp",
     "source": "@cmliussss_all"
   },
@@ -10422,8 +10356,8 @@
     "country_cn": "土耳其",
     "country_emoji": "🇹🇷",
     "asn": "209604",
-    "asOrganization": "TALIDO Bilisim Teknolojileri Sanayi ve Ticaret Anonim Sirketi",
-    "isp": "TALIDO Bilisim Teknolojileri Sanayi ve Ticaret Anonim Sirketi",
+    "asOrganization": "2E TELEKOMUNIKASYON LTD STI",
+    "isp": "2E TELEKOMUNIKASYON LTD STI",
     "net_type": "isp",
     "source": "@cmliussss_all"
   },
@@ -10444,8 +10378,8 @@
     "country_cn": "韩国",
     "country_emoji": "🇰🇷",
     "asn": "9318",
-    "asOrganization": "SK Broadband Co Ltd",
-    "isp": "SK Broadband Co Ltd",
+    "asOrganization": "SK Broadband",
+    "isp": "SK Broadband",
     "net_type": "isp",
     "source": "@cmliussss_all"
   },
@@ -10972,8 +10906,8 @@
     "country_cn": "韩国",
     "country_emoji": "🇰🇷",
     "asn": "9318",
-    "asOrganization": "SK Broadband Co Ltd",
-    "isp": "SK Broadband Co Ltd",
+    "asOrganization": "SK Broadband",
+    "isp": "SK Broadband",
     "net_type": "isp",
     "source": "@cmliussss_all"
   },
@@ -11236,8 +11170,8 @@
     "country_cn": "韩国",
     "country_emoji": "🇰🇷",
     "asn": "9318",
-    "asOrganization": "SK Broadband Co Ltd",
-    "isp": "SK Broadband Co Ltd",
+    "asOrganization": "SK Broadband",
+    "isp": "SK Broadband",
     "net_type": "isp",
     "source": "@cmliussss_all"
   },
@@ -11412,8 +11346,8 @@
     "country_cn": "白俄罗斯",
     "country_emoji": "🇧🇾",
     "asn": "25106",
-    "asOrganization": "LLC Raccoon technology",
-    "isp": "LLC Raccoon technology",
+    "asOrganization": "Mobile TeleSystems JLLC",
+    "isp": "Mobile TeleSystems JLLC",
     "net_type": "isp",
     "source": "@cmliussss_all"
   },
@@ -11456,8 +11390,8 @@
     "country_cn": "巴西",
     "country_emoji": "🇧🇷",
     "asn": "8167",
-    "asOrganization": "V tal",
-    "isp": "V tal",
+    "asOrganization": "V.tal",
+    "isp": "V.tal",
     "net_type": "isp",
     "source": "@danfeng2"
   },
@@ -11874,8 +11808,8 @@
     "country_cn": "美国",
     "country_emoji": "🇺🇸",
     "asn": "204785",
-    "asOrganization": "TAKEHOST OU",
-    "isp": "TAKEHOST OU",
+    "asOrganization": "'Ghita Telekom'",
+    "isp": "'Ghita Telekom'",
     "net_type": "isp",
     "source": "@cmliussss_all"
   },
@@ -12826,28 +12760,6 @@
     "source": "@danfeng2"
   },
   {
-    "proxy": "154.21.206.111:443",
-    "ip": "154.21.206.111",
-    "port": 443,
-    "tls": true,
-    "clientIp": "0",
-    "clientIps": [
-      "0"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "174",
-    "asOrganization": "Cogent Communications, LLC",
-    "isp": "Cogent Communications, LLC",
-    "net_type": "isp",
-    "source": "2026-07-24 21:48:42"
-  },
-  {
     "proxy": "89.45.45.144:443",
     "ip": "89.45.45.144",
     "port": 443,
@@ -12864,8 +12776,8 @@
     "country_cn": "土耳其",
     "country_emoji": "🇹🇷",
     "asn": "209604",
-    "asOrganization": "2E Telekomunikasyon LTD. STI.",
-    "isp": "2E Telekomunikasyon LTD. STI.",
+    "asOrganization": "2E TELEKOMUNIKASYON LTD STI",
+    "isp": "2E TELEKOMUNIKASYON LTD STI",
     "net_type": "isp",
     "source": "@cmliussss_all"
   },
@@ -13197,7 +13109,7 @@
     "asOrganization": "Hurricane Electric LLC",
     "isp": "Hurricane Electric LLC",
     "net_type": "isp",
-    "source": "@cmliussss_all"
+    "source": "@danfeng2"
   },
   {
     "proxy": "179.255.187.48:443",
@@ -18342,8 +18254,8 @@
     "country_cn": "韩国",
     "country_emoji": "🇰🇷",
     "asn": "9318",
-    "asOrganization": "SK Broadband Co Ltd",
-    "isp": "SK Broadband Co Ltd",
+    "asOrganization": "SK Broadband",
+    "isp": "SK Broadband",
     "net_type": "isp",
     "source": "@cmliussss_all"
   },
@@ -18540,8 +18452,8 @@
     "country_cn": "韩国",
     "country_emoji": "🇰🇷",
     "asn": "9318",
-    "asOrganization": "SK Broadband Co Ltd",
-    "isp": "SK Broadband Co Ltd",
+    "asOrganization": "SK Broadband",
+    "isp": "SK Broadband",
     "net_type": "isp",
     "source": "@cmliussss_all"
   },
@@ -19358,5 +19270,49 @@
     "isp": "DNA Oyj",
     "net_type": "isp",
     "source": "@cmliussss_all"
+  },
+  {
+    "proxy": "64.178.113.180:30706",
+    "ip": "64.178.113.180",
+    "port": 30706,
+    "tls": true,
+    "clientIp": "1.162.134.184",
+    "clientIps": [
+      "1.162.134.184"
+    ],
+    "clientIpv4": "1.162.134.184",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "TW",
+    "country_name": "中国台湾",
+    "country_cn": "中国台湾",
+    "country_emoji": "🇹🇼",
+    "asn": "3462",
+    "asOrganization": "Chunghwa Telecom Co., Ltd.",
+    "isp": "Chunghwa Telecom Co., Ltd.",
+    "net_type": "isp",
+    "source": "@danfeng2"
+  },
+  {
+    "proxy": "216.23.122.71:30706",
+    "ip": "216.23.122.71",
+    "port": 30706,
+    "tls": true,
+    "clientIp": "1.162.134.184",
+    "clientIps": [
+      "1.162.134.184"
+    ],
+    "clientIpv4": "1.162.134.184",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "TW",
+    "country_name": "中国台湾",
+    "country_cn": "中国台湾",
+    "country_emoji": "🇹🇼",
+    "asn": "3462",
+    "asOrganization": "Chunghwa Telecom Co., Ltd.",
+    "isp": "Chunghwa Telecom Co., Ltd.",
+    "net_type": "isp",
+    "source": "@danfeng2"
   }
 ]

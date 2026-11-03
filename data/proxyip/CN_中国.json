@@ -88,28 +88,6 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "154.203.0.235:443",
-    "ip": "154.203.0.235",
-    "port": 443,
-    "tls": true,
-    "clientIp": "154.203.0.235",
-    "clientIps": [
-      "154.203.0.235"
-    ],
-    "clientIpv4": "154.203.0.235",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "CN",
-    "country_name": "中国",
-    "country_cn": "中国",
-    "country_emoji": "🇨🇳",
-    "asn": "10753",
-    "asOrganization": "XING XUN TECH LIMITED",
-    "isp": "XING XUN TECH LIMITED",
-    "net_type": "datacenter",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "14.127.210.38:8443",
     "ip": "14.127.210.38",
     "port": 8443,
@@ -130,27 +108,5 @@
     "isp": "China Telecom",
     "net_type": "isp",
     "source": "@cmliussss_all"
-  },
-  {
-    "proxy": "216.38.170.104:443",
-    "ip": "216.38.170.104",
-    "port": 443,
-    "tls": true,
-    "clientIp": "154.203.0.235",
-    "clientIps": [
-      "154.203.0.235"
-    ],
-    "clientIpv4": "154.203.0.235",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "CN",
-    "country_name": "中国",
-    "country_cn": "中国",
-    "country_emoji": "🇨🇳",
-    "asn": "10753",
-    "asOrganization": "XING XUN TECH LIMITED",
-    "isp": "XING XUN TECH LIMITED",
-    "net_type": "datacenter",
-    "source": "@danfeng2"
   }
 ]

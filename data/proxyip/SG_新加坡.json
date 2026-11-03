@@ -22,28 +22,6 @@
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "45.132.75.78:443",
-    "ip": "45.132.75.78",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2a0f:6284:4c00::cafe",
-    "clientIps": [
-      "2a0f:6284:4c00::cafe"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2a0f:6284:4c00::cafe",
-    "dual_stack": false,
-    "country": "SG",
-    "country_name": "新加坡",
-    "country_cn": "新加坡",
-    "country_emoji": "🇸🇬",
-    "asn": "63473",
-    "asOrganization": "HostHatch, LLC",
-    "isp": "HostHatch, LLC",
-    "net_type": "datacenter",
-    "source": "@otcjlq"
-  },
-  {
     "proxy": "217.116.170.182:443",
     "ip": "217.116.170.182",
     "port": 443,

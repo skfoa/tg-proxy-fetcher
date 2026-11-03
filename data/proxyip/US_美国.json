@@ -808,8 +808,8 @@
     "country_cn": "美国",
     "country_emoji": "🇺🇸",
     "asn": "214238",
-    "asOrganization": "IT Hostline Ltd",
-    "isp": "IT Hostline Ltd",
+    "asOrganization": "Host Telecom Ltd",
+    "isp": "Host Telecom Ltd",
     "net_type": "isp",
     "source": "@cmliussss_all"
   },
@@ -950,9 +950,9 @@
     "ip": "23.141.204.18",
     "port": 59611,
     "tls": true,
-    "clientIp": "0",
+    "clientIp": "23.141.204.18",
     "clientIps": [
-      "0"
+      "23.141.204.18"
     ],
     "clientIpv4": "",
     "clientIpv6": "",
@@ -965,7 +965,7 @@
     "asOrganization": "Cogent Communications, LLC",
     "isp": "Cogent Communications, LLC",
     "net_type": "isp",
-    "source": "2026-09-06 16:44:44"
+    "source": ""
   },
   {
     "proxy": "167.253.97.183:443",
@@ -3432,28 +3432,6 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "154.64.237.222:443",
-    "ip": "154.64.237.222",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2a09:bac1:76e0:3d0::26a:d5",
-    "clientIps": [
-      "2a09:bac1:76e0:3d0::26a:d5"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2a09:bac1:76e0:3d0::26a:d5",
-    "dual_stack": false,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "174",
-    "asOrganization": "Cogent Communications, LLC",
-    "isp": "Cogent Communications, LLC",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "154.29.150.41:443",
     "ip": "154.29.150.41",
     "port": 443,
@@ -3847,28 +3825,6 @@
     "asOrganization": "NetLab",
     "isp": "NetLab",
     "net_type": "business",
-    "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "154.21.206.104:443",
-    "ip": "154.21.206.104",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2a09:bac5:636b:281e::3ff:63",
-    "clientIps": [
-      "2a09:bac5:636b:281e::3ff:63"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2a09:bac5:636b:281e::3ff:63",
-    "dual_stack": false,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "174",
-    "asOrganization": "Cogent Communications, LLC",
-    "isp": "Cogent Communications, LLC",
-    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
@@ -8162,28 +8118,6 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "154.21.206.112:443",
-    "ip": "154.21.206.112",
-    "port": 443,
-    "tls": true,
-    "clientIp": "0",
-    "clientIps": [
-      "0"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "174",
-    "asOrganization": "Cogent Communications, LLC",
-    "isp": "Cogent Communications, LLC",
-    "net_type": "isp",
-    "source": "2026-09-16 08:20:44"
-  },
-  {
     "proxy": "38.207.182.87:443",
     "ip": "38.207.182.87",
     "port": 443,
@@ -10692,28 +10626,6 @@
     "source": "@danfeng2"
   },
   {
-    "proxy": "45.8.157.202:443",
-    "ip": "45.8.157.202",
-    "port": 443,
-    "tls": true,
-    "clientIp": "45.8.157.202",
-    "clientIps": [
-      "45.8.157.202"
-    ],
-    "clientIpv4": "45.8.157.202",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "216475",
-    "asOrganization": "NKtelecom Inc",
-    "isp": "NKtelecom Inc",
-    "net_type": "datacenter",
-    "source": "@danfeng2"
-  },
-  {
     "proxy": "154.64.224.211:443",
     "ip": "154.64.224.211",
     "port": 443,
@@ -11962,8 +11874,8 @@
     "country_cn": "美国",
     "country_emoji": "🇺🇸",
     "asn": "204785",
-    "asOrganization": "TAKEHOST OU",
-    "isp": "TAKEHOST OU",
+    "asOrganization": "'Ghita Telekom'",
+    "isp": "'Ghita Telekom'",
     "net_type": "isp",
     "source": "@cmliussss_all"
   },
@@ -11988,28 +11900,6 @@
     "isp": "Ezee Fiber",
     "net_type": "isp",
     "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "154.21.206.111:443",
-    "ip": "154.21.206.111",
-    "port": 443,
-    "tls": true,
-    "clientIp": "0",
-    "clientIps": [
-      "0"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "174",
-    "asOrganization": "Cogent Communications, LLC",
-    "isp": "Cogent Communications, LLC",
-    "net_type": "isp",
-    "source": "2026-07-24 21:48:42"
   },
   {
     "proxy": "154.41.80.234:443",
@@ -12053,7 +11943,7 @@
     "asOrganization": "Hurricane Electric LLC",
     "isp": "Hurricane Electric LLC",
     "net_type": "isp",
-    "source": "@cmliussss_all"
+    "source": "@danfeng2"
   },
   {
     "proxy": "154.44.20.17:39001",

@@ -174,5 +174,49 @@
     "isp": "Chunghwa Telecom HiNet",
     "net_type": "isp",
     "source": "@danfeng_chat"
+  },
+  {
+    "proxy": "64.178.113.180:30706",
+    "ip": "64.178.113.180",
+    "port": 30706,
+    "tls": true,
+    "clientIp": "1.162.134.184",
+    "clientIps": [
+      "1.162.134.184"
+    ],
+    "clientIpv4": "1.162.134.184",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "TW",
+    "country_name": "中国台湾",
+    "country_cn": "中国台湾",
+    "country_emoji": "🇹🇼",
+    "asn": "3462",
+    "asOrganization": "Chunghwa Telecom Co., Ltd.",
+    "isp": "Chunghwa Telecom Co., Ltd.",
+    "net_type": "isp",
+    "source": "@danfeng2"
+  },
+  {
+    "proxy": "216.23.122.71:30706",
+    "ip": "216.23.122.71",
+    "port": 30706,
+    "tls": true,
+    "clientIp": "1.162.134.184",
+    "clientIps": [
+      "1.162.134.184"
+    ],
+    "clientIpv4": "1.162.134.184",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "TW",
+    "country_name": "中国台湾",
+    "country_cn": "中国台湾",
+    "country_emoji": "🇹🇼",
+    "asn": "3462",
+    "asOrganization": "Chunghwa Telecom Co., Ltd.",
+    "isp": "Chunghwa Telecom Co., Ltd.",
+    "net_type": "isp",
+    "source": "@danfeng2"
   }
 ]
