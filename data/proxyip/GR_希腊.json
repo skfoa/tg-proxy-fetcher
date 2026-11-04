@@ -42,27 +42,5 @@
     "isp": "SYNAPSECOM S.A. Provider of Telecommunications and Internet Services",
     "net_type": "isp",
     "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "192.71.166.30:443",
-    "ip": "192.71.166.30",
-    "port": 443,
-    "tls": true,
-    "clientIp": "192.71.166.30",
-    "clientIps": [
-      "192.71.166.30"
-    ],
-    "clientIpv4": "192.71.166.30",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "GR",
-    "country_name": "希腊",
-    "country_cn": "希腊",
-    "country_emoji": "🇬🇷",
-    "asn": "8280",
-    "asOrganization": "SYNAPSECOM S.A. Provider of Telecommunications and Internet Services",
-    "isp": "SYNAPSECOM S.A. Provider of Telecommunications and Internet Services",
-    "net_type": "isp",
-    "source": "@danfeng2"
   }
 ]

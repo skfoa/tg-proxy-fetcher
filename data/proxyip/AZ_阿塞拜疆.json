@@ -20,27 +20,5 @@
     "isp": "Leased IPv4 Blocks",
     "net_type": "isp",
     "source": "@cmliussss_all"
-  },
-  {
-    "proxy": "185.135.231.175:8443",
-    "ip": "185.135.231.175",
-    "port": 8443,
-    "tls": true,
-    "clientIp": "205.252.135.234",
-    "clientIps": [
-      "205.252.135.234"
-    ],
-    "clientIpv4": "205.252.135.234",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "AZ",
-    "country_name": "阿塞拜疆",
-    "country_cn": "阿塞拜疆",
-    "country_emoji": "🇦🇿",
-    "asn": "50810",
-    "asOrganization": "Mobin Net Communication Company (Private Joint Stock)",
-    "isp": "Mobin Net Communication Company (Private Joint Stock)",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
   }
 ]

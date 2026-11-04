@@ -20,27 +20,5 @@
     "isp": "Akton d.o.o.",
     "net_type": "isp",
     "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "92.243.65.25:443",
-    "ip": "92.243.65.25",
-    "port": 443,
-    "tls": true,
-    "clientIp": "92.243.65.25",
-    "clientIps": [
-      "92.243.65.25"
-    ],
-    "clientIpv4": "92.243.65.25",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "HR",
-    "country_name": "克罗地亚",
-    "country_cn": "克罗地亚",
-    "country_emoji": "🇭🇷",
-    "asn": "25467",
-    "asOrganization": "Akton d.o.o.",
-    "isp": "Akton d.o.o.",
-    "net_type": "isp",
-    "source": "@danfeng2"
   }
 ]

@@ -44,28 +44,6 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "94.78.67.171:443",
-    "ip": "94.78.67.171",
-    "port": 443,
-    "tls": true,
-    "clientIp": "94.78.67.171",
-    "clientIps": [
-      "94.78.67.171"
-    ],
-    "clientIpv4": "94.78.67.171",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "CY",
-    "country_name": "塞浦路斯",
-    "country_cn": "塞浦路斯",
-    "country_emoji": "🇨🇾",
-    "asn": "44558",
-    "asOrganization": "Netonline Bilisim Sirketi LTD",
-    "isp": "Netonline Bilisim Sirketi LTD",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "213.7.187.34:443",
     "ip": "213.7.187.34",
     "port": 443,
@@ -86,5 +64,27 @@
     "isp": "Cyprus Telecommunications Authority",
     "net_type": "isp",
     "source": "@cmliussss_all"
+  },
+  {
+    "proxy": "94.78.67.171:443",
+    "ip": "94.78.67.171",
+    "port": 443,
+    "tls": true,
+    "clientIp": "94.78.67.171",
+    "clientIps": [
+      "94.78.67.171"
+    ],
+    "clientIpv4": "94.78.67.171",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "CY",
+    "country_name": "塞浦路斯",
+    "country_cn": "塞浦路斯",
+    "country_emoji": "🇨🇾",
+    "asn": "44558",
+    "asOrganization": "Netonline Bilisim Sirketi LTD",
+    "isp": "Netonline Bilisim Sirketi LTD",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
   }
 ]

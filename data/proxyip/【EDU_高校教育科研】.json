@@ -44,30 +44,8 @@
     "source": "@danfeng2"
   },
   {
-    "proxy": "169.244.243.245:8443",
-    "ip": "169.244.243.245",
-    "port": 8443,
-    "tls": true,
-    "clientIp": "169.244.243.245",
-    "clientIps": [
-      "169.244.243.245"
-    ],
-    "clientIpv4": "169.244.243.245",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "557",
-    "asOrganization": "University of Maine System",
-    "isp": "University of Maine System",
-    "net_type": "education",
-    "source": "@danfeng2"
-  },
-  {
-    "proxy": "169.244.242.249:8443",
-    "ip": "169.244.242.249",
+    "proxy": "169.244.242.250:8443",
+    "ip": "169.244.242.250",
     "port": 8443,
     "tls": true,
     "clientIp": "169.244.243.245",
@@ -110,6 +88,28 @@
     "source": "@danfeng2"
   },
   {
+    "proxy": "169.244.242.249:8443",
+    "ip": "169.244.242.249",
+    "port": 8443,
+    "tls": true,
+    "clientIp": "169.244.243.245",
+    "clientIps": [
+      "169.244.243.245"
+    ],
+    "clientIpv4": "169.244.243.245",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "US",
+    "country_name": "美国",
+    "country_cn": "美国",
+    "country_emoji": "🇺🇸",
+    "asn": "557",
+    "asOrganization": "University of Maine System",
+    "isp": "University of Maine System",
+    "net_type": "education",
+    "source": "@danfeng2"
+  },
+  {
     "proxy": "169.244.242.240:8443",
     "ip": "169.244.242.240",
     "port": 8443,
@@ -132,8 +132,8 @@
     "source": "@danfeng2"
   },
   {
-    "proxy": "169.244.242.250:8443",
-    "ip": "169.244.242.250",
+    "proxy": "169.244.243.245:8443",
+    "ip": "169.244.243.245",
     "port": 8443,
     "tls": true,
     "clientIp": "169.244.243.245",
@@ -154,24 +154,24 @@
     "source": "@danfeng2"
   },
   {
-    "proxy": "131.246.53.124:443",
-    "ip": "131.246.53.124",
+    "proxy": "140.115.53.51:443",
+    "ip": "140.115.53.51",
     "port": 443,
     "tls": true,
-    "clientIp": "2001:638:208:1405:be24:11ff:fee8:79e4",
+    "clientIp": "2a0e:b107:1954:5300:b93:3459:af45:28d8",
     "clientIps": [
-      "2001:638:208:1405:be24:11ff:fee8:79e4"
+      "2a0e:b107:1954:5300:b93:3459:af45:28d8"
     ],
     "clientIpv4": "",
-    "clientIpv6": "2001:638:208:1405:be24:11ff:fee8:79e4",
+    "clientIpv6": "2a0e:b107:1954:5300:b93:3459:af45:28d8",
     "dual_stack": false,
-    "country": "DE",
-    "country_name": "德国",
-    "country_cn": "德国",
-    "country_emoji": "🇩🇪",
-    "asn": "680",
-    "asOrganization": "Universitaet Kaiserslautern",
-    "isp": "Universitaet Kaiserslautern",
+    "country": "TW",
+    "country_name": "中国台湾",
+    "country_cn": "中国台湾",
+    "country_emoji": "🇹🇼",
+    "asn": "18420",
+    "asOrganization": "T-NCU.EDU.TW",
+    "isp": "T-NCU.EDU.TW",
     "net_type": "education",
     "source": "@cmliussss_all"
   },
@@ -196,5 +196,27 @@
     "isp": "Sekolah Tinggi Teknologi Kedirgantaraan Yogyakarta",
     "net_type": "education",
     "source": "@danfeng_chat"
+  },
+  {
+    "proxy": "131.246.53.124:443",
+    "ip": "131.246.53.124",
+    "port": 443,
+    "tls": true,
+    "clientIp": "2001:638:208:1405:be24:11ff:fee8:79e4",
+    "clientIps": [
+      "2001:638:208:1405:be24:11ff:fee8:79e4"
+    ],
+    "clientIpv4": "",
+    "clientIpv6": "2001:638:208:1405:be24:11ff:fee8:79e4",
+    "dual_stack": false,
+    "country": "DE",
+    "country_name": "德国",
+    "country_cn": "德国",
+    "country_emoji": "🇩🇪",
+    "asn": "680",
+    "asOrganization": "Universitaet Kaiserslautern",
+    "isp": "Universitaet Kaiserslautern",
+    "net_type": "education",
+    "source": "@cmliussss_all"
   }
 ]
