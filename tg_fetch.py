@@ -799,7 +799,7 @@ def fetch_edt_proxies(
     拉取外部 EDT-Pages/Proxy-List 的 {proto}.json 镜像源，
     采用【多镜像并发竞速机制】(Concurrent Racing)：同时向所有候选镜像发起请求，以最先返回有效合法数据的镜像为胜出者并立即采用，彻底避免慢镜像串行阻塞。
     直接过滤剔除机房 (datacenter) 节点，仅抓取保留高价值非机房节点（ISP 宽带、高校教育网、政务网、商业专线），
-    提取 clientIp 为实际 egress_ip，并自动去重与过滤墓地黑名单与持久化机房缓存。
+    提取 clientIp 为实际 egress_ip，并自动去重与过滤墓地黑名单。
     同时动态统计未收录在权威库中的自治系统 (ASN)。
     返回: (有效新增节点数, 未收录 ASN 列表)
     """
@@ -863,23 +863,9 @@ def fetch_edt_proxies(
 
     log.info("成功采用 %s 的 EDT %s 代理源数据: %d 条原始记录", success_url, proto_upper, len(data))
 
-    if ip_cache is None:
-        ip_cache = load_ip_cache()
-
     total_added = 0
     dc_filtered = 0
     unrecorded_asns_map: dict[str, dict] = {}
-
-    def _is_cached_datacenter(ip_addr: str) -> bool:
-        if not ip_cache or ip_addr not in ip_cache:
-            return False
-        c_info = ip_cache.get(ip_addr)
-        if not isinstance(c_info, dict):
-            return False
-        c_asn = _extract_asn_code(c_info.get("asn"), c_info.get("isp"))
-        if c_asn:
-            return classify_asn(c_asn, c_info.get("isp", "")) == "datacenter"
-        return c_info.get("net_type") in ("datacenter", "hosting")
 
     # 预先收集候选节点中未收录的 ASN 并执行批量在线探针定性入库，避免新 ASN 因默认安全降级为 datacenter 而被提前误滤
     pre_enrich_map: dict[str, dict] = {}
@@ -890,15 +876,14 @@ def fetch_edt_proxies(
         port = safe_int(item.get("port"), 0)
         if not ip or not (1 <= port <= 65535):
             continue
-        if _is_cached_datacenter(ip):
-            continue
         if is_tombstoned(f"{ip}:{port}", tombstone):
             continue
         asn_raw = str(item.get("asn") or "").strip()
         asn_code = f"AS{asn_raw}" if asn_raw and not asn_raw.upper().startswith("AS") else asn_raw.upper()
         org = str(item.get("asOrganization") or "").strip()
+        probe_ip = str(item.get("clientIp") or "").strip() or ip
         if asn_code and not is_asn_recorded(asn_code) and asn_code not in pre_enrich_map:
-            pre_enrich_map[asn_code] = {"asn": asn_code, "isp": org, "org": org, "ip": ip}
+            pre_enrich_map[asn_code] = {"asn": asn_code, "isp": org, "org": org, "ip": probe_ip}
 
     initially_unrecorded = set(pre_enrich_map.keys())
     if pre_enrich_map:
@@ -919,14 +904,9 @@ def fetch_edt_proxies(
         if not org and asn_code and asn_code in ASN_TO_PROVIDER:
             org = ASN_TO_PROVIDER[asn_code]
 
-        # 核心策略：严格过滤机房节点，仅保留非机房高价值代理
+        # 核心策略：基于权威 ASN 字典直接过滤机房节点，仅保留非机房高价值代理
         net_type = classify_asn(asn_code, org)
         if net_type == "datacenter":
-            dc_filtered += 1
-            continue
-
-        # 前置门禁：查本地持久化 ip_cache（优先按权威 ASN 实时定性），拦截已知数据中心机房 IP
-        if not asn_code and _is_cached_datacenter(ip):
             dc_filtered += 1
             continue
 
@@ -1061,9 +1041,6 @@ def fetch_proxifly_https_proxies(
 
     log.info("成功采用 %s 的 Proxifly HTTPS 代理源数据: %d 条原始记录", success_url, len(data))
 
-    if ip_cache is None:
-        ip_cache = load_ip_cache()
-
     total_added = 0
     tomb_filtered = 0
 
@@ -1076,26 +1053,25 @@ def fetch_proxifly_https_proxies(
             continue
 
         key = f"{ip}:{port}"
-        # 门禁 1: 墓碑黑名单 (淘汰死节点)
+        # 门禁: 墓碑黑名单 (淘汰死节点)
         if is_tombstoned(key, tombstone):
             tomb_filtered += 1
             continue
 
-        cached = ip_cache.get(ip, {})
-        c_asn = _extract_asn_code(cached.get("asn"), cached.get("isp"))
         geo = item.get("geolocation") or {}
-        country = str(geo.get("country") or "").strip().upper() or cached.get("country", "")
+        country = str(geo.get("country") or "").strip().upper()
 
+        # 不将入口 IP 缓存强赋给候选节点，防止多跳/动态轮换隧道入口机房属性污染真实落地出口，交由质检穿透核验
         meta_dict = {
             "url": f"https://{ip}:{port}",
             "proto": "https",
             "host": ip,
             "port": port,
             "country": country,
-            "egress_ip": cached.get("resolved_ip", "") or ip,
-            "asn": cached.get("asn", ""),
-            "isp": cached.get("isp", ""),
-            "net_type": classify_asn(c_asn, cached.get("isp", "")) if c_asn else cached.get("net_type", ""),
+            "egress_ip": "",
+            "asn": "",
+            "isp": "",
+            "net_type": "",
             "source": "proxifly",
             "status": "pending",
         }

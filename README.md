@@ -40,7 +40,7 @@
   - **识别并剔除异构 CDN 伪节点 (`non_cf_cdn`)**：准确识别并剔除混入的 Fastly、Akamai 等非 Cloudflare 伪造节点，保证优选节点池纯净度。
 - **📊 通用代理质检可观测性与分流策略**：`proxies_verify.py` 引入失败原因分布统计（细分 `connect_timeout`、`tls_error`、`http_status_xxx` 等）与协议明细汇总日志；实行精细化分协议淘汰机制（明文 HTTP 专属严格阈值 `--http-max-fails 1`，其他高可用协议维持缓冲容错），并支持 `--strict` 极致纯净模式。
 - **🌐 原生支持 TURN 穿透协议**：完整支持 `turn://` 协议节点的解析、存活质检与单协议数据导出（`.txt` / `.csv` / `.json`），兼容 RFC 5389 STUN Binding 校验与自定义外部检测端点，并支持自动区分机房与家庭宽带（`isp`）等网络画像。
-- **🗃️ `ip_cache` 与墓碑黑名单分层防御**：引入 `prune_ip_cache` 机制动态保护在用活跃 IP 并将孤儿机房记录上限控制在 5,000 条；配合 `tombstone.json` 墓碑冷却库，对真实质检中连续失败达标的死节点实行 7 天隔离冷却与生命周期闭环管理，彻底杜绝公网死节点被爬虫重复引入或频繁测速浪费配额。
+- **🗃️ `ip_cache` 活跃集修剪与墓碑死节点隔离**：`prune_ip_cache` 动态对齐 `proxies`、`cf_ips`、`scan_ips` 与 `proxyip` 全量在用活跃节点（含域名、多跳落地出口与解析映射），自动剔除已淘汰节点的孤儿缓存；配合 `tombstone.json` 墓碑冷却库，对连续探测失败达标的物理死节点实行 7 天隔离冷却与生命周期闭环管理，杜绝公网死节点被重复引入浪费探测配额。
 - **🧪 演练诊断模式（Dry-run & Diag Output）**：`proxyip_verify.py` 与 `cf_verify.py` 支持 `--dry-run` 诊断与 `--diag-output` 输出详细故障分布，便于在不触碰生产数据的前提下全景评估网络状况。
 - **⚡ 精细化分段锁调度（`ip:port` 锁粒度）**：内置基于 `zlib.crc32` 的 8192 桶位哈希分段锁（`get_keyed_lock`），并发互斥粒度细化至 `ip:port`，同 IP 异端口节点并发探测，彻底解除死节点多端口串行死锁排队（单个死 IP 挂载数十个端口排队超时从 50s+ 骤降至秒级）；异 IP 互不干扰，分段锁内存维持在常数级 $O(1)$。
 - **⚡ 全量 SSL 上下文单例复用**：质检引擎全面复用全局单例 SSL 证书上下文（`INSECURE_SSL_CTX` 与 `SSL_CTX`），杜绝每次高并发探测协程重复同步读取操作系统 CA 根证书（消除 ~26ms 阻塞开销），事件循环并发吞吐能力彻底释放。
@@ -451,7 +451,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 * **全局 SSL 证书上下文单例复用**：
   在 `proxies_verify.py` 与 `cf_verify.py` 中，全面复用模块级单例 `INSECURE_SSL_CTX` 与 `SSL_CTX`。杜绝每次探针请求重复调用 `ssl.create_default_context()` 同步加载操作系统 CA 根证书（单次耗时约 26ms），在高并发下彻底释放异步事件循环，避免协程卡顿。
 * **`ip_cache` 活跃集修剪与紧凑序列化（`prune_ip_cache`）**：
-  在各质检引擎落盘后自动执行缓存修剪：动态提取 `scan_ips`、`proxyip` 与 `proxies` 中的全量活跃 IP，无条件保护在用画像；对历史已淘汰的孤儿机房黑名单严格限制在 `max_orphans=5000` 条以内，超出部分按规则修剪，并以紧凑 Compact JSON 格式原子覆盖，彻底解除缓存文件无界膨胀隐患。
+  在抓取、代理质检落盘及全流程终态校准后自动执行缓存修剪：动态提取 `cf_ips`、`scan_ips`、`proxyip` 的入出口 IP 以及 `proxies` 的入口 IP/域名、多跳落地出口（`egress_ip`）与域名解析映射（`resolved_ip`），完整保留在用活跃画像；已从全部活跃库淘汰的孤儿记录直接剔除（不保留静态机房 IP 黑名单），并以紧凑 Compact JSON 格式原子覆写，防止缓存文件膨胀。
 * **Windows-Safe 全链路原子文件落盘（`atomic_writer`）**：
   封装了具备 Windows 锁兼容与异常清理能力的原子文件写入套件。写盘时先写入 `.tmp` 临时文件，在进入 `os.replace` 覆写之前强制显式执行 `f.close()` 释放文件句柄，彻底杜绝 Windows 平台上的 `PermissionError: [WinError 32]`；若写入中途发生异常，自动拦截并清理未完成的 `.tmp` 临时文件，杜绝污染磁盘。
 * **双轨质检管道归一化（`_verify_and_persist`）**：

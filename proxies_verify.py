@@ -1916,7 +1916,7 @@ async def async_main(args):
     if dc_rejected_https > 0:
         log.info("🚫 【HTTPS 机房拦截】累计拦截并剔除数据中心/机房 HTTPS 节点 %d 个 (拒收准入存活列表)", dc_rejected_https)
 
-    # 沉淀本轮质检提取出的 IP 网络画像 (包含新检测出的机房黑名单与原生家宽指纹) 至持久化 ip_cache (彻底杜绝重复测速)
+    # 沉淀本轮质检提取出的出口 IP 与域名网络画像至持久化 ip_cache (待最终落盘后统一修剪孤儿记录)
     cache_updates = [r.get("_cache_update") for r in results if r.get("_cache_update")]
     if cache_updates:
         persistent_cache = load_ip_cache()
@@ -1967,20 +1967,18 @@ async def async_main(args):
                 # 严禁将出口 ASN 赋给入口 IP！保持 h 自身物理画像不受污染
                 pass
         save_ip_cache(persistent_cache)
-        prune_ip_cache(persistent_cache)
         log.info(
-            "【持久化 IP 缓存】本轮检测新增/更新画像 %d 个 (永久拦截机房 +%d, 家宽/专线 +%d)，当前总缓存库 %d 条",
+            "【持久化 IP 缓存】本轮检测新增/更新出口画像 %d 个 (机房画像 +%d, 家宽/专线 +%d)，当前缓存库 %d 条",
             len(cache_updates),
             added_dc,
             added_isp,
             len(persistent_cache),
         )
 
-    # 幸存者筛选（支持按协议分流淘汰阈值：HTTP 专属严格阈值，其余协议维持 max_fails 缓冲容错）
-    def _is_survivor(r):
+    # 识别因外部源机房准入策略被拒收的节点（与物理超时的死节点严格解耦，绝不写入墓地）
+    def _is_ext_datacenter(r) -> bool:
         if r.get("status") == "datacenter_rejected":
-            return False
-        # 核心准入策略：除了频道 (@ 开头) 和用户自留 (@user/user/manual/custom)，其余外部来源一律过滤机房
+            return True
         src_val = str(r.get("source") or "").strip()
         if not is_channel_or_user_source(src_val):
             nt_check = str(r.get("net_type") or "").strip().lower()
@@ -1988,52 +1986,38 @@ async def async_main(args):
                 c_code = _extract_asn_code(r.get("asn"), r.get("isp"))
                 nt_check = classify_asn(c_code, r.get("isp", "")) if c_code else ""
             if nt_check == "datacenter":
-                return False
+                return True
+        return False
+
+    # 幸存者筛选（支持按协议分流淘汰阈值：HTTP 专属严格阈值，其余协议维持 max_fails 缓冲容错）
+    def _is_survivor(r):
+        if _is_ext_datacenter(r):
+            return False
         proto = (r.get("proto") or "").lower()
         fc = safe_int(r.get("fail_count"), 0)
         eff_mf = h_mf if proto == "http" else args.max_fails
         return fc < eff_mf
 
     survivors = [r for r in results if _is_survivor(r)]
-    eliminated = total - len(survivors)
-    survivors_len = len(survivors)
-    proxies_f1 = sum(1 for r in survivors if safe_int(r.get("fail_count"), 0) == 1)
-    proxies_f2 = sum(1 for r in survivors if safe_int(r.get("fail_count"), 0) == 2)
-    proxies_buf_new = sum(
-        1 for r in results
-        if not r.get("is_alive")
-        and safe_int(r.get("_old_fc"), 0) == 0
-        and _is_survivor(r)
-    )
-    proxies_buf_rec = sum(
-        1 for r in results
-        if r.get("is_alive") and safe_int(r.get("_old_fc"), 0) > 0
-    )
+    dc_rejected_all = sum(1 for r in results if _is_ext_datacenter(r))
+    dead_nodes = [r for r in results if not _is_survivor(r) and not _is_ext_datacenter(r)]
+    eliminated = len(dead_nodes)
 
-    # 仅统计本次实测存活节点的网络延迟（排除处于缓冲期但本次已连通失败节点的旧延迟）
-    alive_delays = [
-        int(r.get("delay_ms", 0))
-        for r in results
-        if r.get("is_alive") and safe_int(r.get("delay_ms"), 0) > 0
-    ]
-    avg_delay = int(sum(alive_delays) / len(alive_delays)) if alive_delays else 0
-
-    if eliminated > 0:
-        dead_nodes = [r for r in results if not _is_survivor(r) and r.get("status") != "datacenter_rejected"]
-        log.info("[通用代理 淘汰] 剔除 %d 条达到淘汰阈值的死节点 (HTTP专属: >= %d 次, 其余协议: >= %d 次; 排除机房拒收节点 %d 条)", len(dead_nodes), h_mf, args.max_fails, dc_rejected_https)
-        dead_keys = [
-            canonical_key(r.get("host", ""), r.get("port", 0))
-            for r in dead_nodes
-            if r.get("host") and safe_int(r.get("port"), 0) > 0
-        ]
-        newly_tombstoned = record_tombstone(dead_keys)
-        log.info("[通用代理 墓地] 已登记 %d 个淘汰死节点至墓地冷却库 (新增: %d 个, 隔离期 7 天)", len(dead_keys), newly_tombstoned)
+    if dead_nodes or dc_rejected_all > 0:
+        log.info("[通用代理 淘汰] 剔除 %d 条达到淘汰阈值的死节点 (HTTP专属: >= %d 次, 其余协议: >= %d 次; 另拒收外部机房节点 %d 条)", len(dead_nodes), h_mf, args.max_fails, dc_rejected_all)
+        if dead_nodes:
+            dead_keys = [
+                canonical_key(r.get("host", ""), r.get("port", 0))
+                for r in dead_nodes
+                if r.get("host") and safe_int(r.get("port"), 0) > 0
+            ]
+            newly_tombstoned = record_tombstone(dead_keys)
+            log.info("[通用代理 墓地] 已登记 %d 个淘汰死节点至墓地冷却库 (新增: %d 个, 隔离期 7 天)", len(dead_keys), newly_tombstoned)
     else:
         log.info("[通用代理 淘汰] 本次无节点达到淘汰阈值")
 
     # 补全出口 IP 对应的 ASN 与网络属性打标
     net_stats = await enrich_proxies_metadata(survivors)
-    log.info("[通用代理 网络属性] %s", net_stats)
 
     # 准入安全兜底：再次过滤打标后确认属于机房 (datacenter) 的非频道/非用户外部来源节点
     ext_dc_dropped = 0
@@ -2048,9 +2032,35 @@ async def async_main(args):
     if ext_dc_dropped > 0:
         log.info("[通用代理 准入控制] 剔除 %d 个外部来源的机房 (datacenter) 节点", ext_dc_dropped)
         survivors = clean_survivors
-        survivors_len = len(survivors)
+        net_stats = {}
+        for r in survivors:
+            nt = r.get("net_type") or "datacenter"
+            net_stats[nt] = net_stats.get(nt, 0) + 1
+    log.info("[通用代理 网络属性] %s", net_stats)
+
+    survivors_len = len(survivors)
+    pass_count = sum(1 for r in survivors if r.get("is_alive"))
+    proxies_f1 = sum(1 for r in survivors if safe_int(r.get("fail_count"), 0) == 1)
+    proxies_f2 = sum(1 for r in survivors if safe_int(r.get("fail_count"), 0) == 2)
+    proxies_buf_new = sum(
+        1 for r in survivors
+        if not r.get("is_alive") and safe_int(r.get("_old_fc"), 0) == 0
+    )
+    proxies_buf_rec = sum(
+        1 for r in survivors
+        if r.get("is_alive") and safe_int(r.get("_old_fc"), 0) > 0
+    )
+
+    # 仅统计最终幸存且本次实测存活节点的网络延迟（排除处于缓冲期但本次已连通失败节点的旧延迟）
+    alive_delays = [
+        int(r.get("delay_ms", 0))
+        for r in survivors
+        if r.get("is_alive") and safe_int(r.get("delay_ms"), 0) > 0
+    ]
+    avg_delay = int(sum(alive_delays) / len(alive_delays)) if alive_delays else 0
 
     save_proxies_data(survivors, PROXIES_TXT, PROXIES_CSV)
+    prune_ip_cache()
 
     elapsed = time.time() - t_start
     log.info("通用代理连通性质检执行完毕，总耗时 %.2f 秒 (✅ 存活: %d | 均延: %dms | ⚠️ 缓冲: %d [新增: %d, 取消恢复: %d])", elapsed, pass_count, avg_delay, (survivors_len - pass_count), proxies_buf_new, proxies_buf_rec)

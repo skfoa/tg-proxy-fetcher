@@ -953,90 +953,135 @@ def save_ip_cache(cache: dict[str, dict], filepath: str = "", compact: bool = Tr
 def prune_ip_cache(
     cache: dict[str, dict] | None = None,
     active_ips: set[str] | None = None,
-    max_orphans: int = 5000,
     filepath: str = "",
 ) -> int:
     """
-    修剪持久化 IP 缓存 (data/ip_cache.json)，防止无界无限膨胀：
-    1. 动态提取当前库中所有活跃 IP（scan_ips 入口与出口、proxyip、proxies 中的在用节点）；
-    2. 无条件完整保留活跃 IP 的画像；
-    3. 对已从活跃库淘汰但曾标记为机房/黑名单的孤儿 IP，最多保留 max_orphans (默认 5000) 条高频防护样本，超额部分予以物理剔除；
+    修剪持久化 IP 缓存 (data/ip_cache.json)，仅保留当前在用活跃节点画像，防止无界膨胀：
+    1. 动态提取当前库中所有在用活跃标识（cf_ips、scan_ips、proxyip 的入出口 IP，以及 proxies 的入口 IP/域名与多跳落地出口 egress_ip）；
+    2. 对在用域名缓存关联的 resolved_ip 同步保护保留；
+    3. 已从全部活跃库淘汰的孤儿记录直接物理剔除（不保留静态机房 IP 黑名单）；
     4. 修剪后以紧凑 Compact JSON 原子覆写。
-    返回修剪淘汰的孤儿 IP 数量。
+    返回修剪淘汰的孤儿记录数量。
     """
     target_path = filepath or IP_CACHE_PATH
+    explicit_cache = cache is not None
     if cache is None:
-        cache = load_ip_cache()
+        cache = load_ip_cache(filepath=target_path)
     if not cache:
         return 0
 
     if active_ips is None:
         active_ips = set()
         base_dir = os.path.dirname(os.path.abspath(target_path))
-        # 扫描优选库与反代库
-        for fname in ("scan_ips.csv", "proxyip.csv"):
+        has_any_dataset = False
+
+        def _add_key(val: str):
+            v = (val or "").strip().strip("[]")
+            if v:
+                active_ips.add(v)
+                active_ips.add(v.lower())
+
+        # 1. 扫描单条优选、扫描优选与反代库 (入口 IP + 出口 IPv4/IPv6)
+        for fname in ("cf_ips.csv", "scan_ips.csv", "proxyip.csv"):
             fpath = os.path.join(base_dir, fname)
             if os.path.isfile(fpath):
+                has_any_dataset = True
                 try:
                     with open(fpath, "r", encoding="utf-8-sig", errors="ignore") as f:
                         for row in csv.DictReader(f):
-                            ip = (row.get("ip") or "").strip()
-                            if ip:
-                                active_ips.add(ip)
-                            exit_ip = (row.get("exit_ip") or "").strip()
-                            if exit_ip:
-                                for ep in extract_ips(exit_ip):
-                                    active_ips.add(ep)
-                            exit_ipv6 = (row.get("exit_ipv6") or "").strip()
-                            if exit_ipv6:
-                                for ep in extract_ips(exit_ipv6):
-                                    active_ips.add(ep)
+                            raw_ip = (row.get("ip") or "").strip()
+                            if raw_ip:
+                                _add_key(raw_ip)
+                                for ep in extract_ips(raw_ip):
+                                    _add_key(ep)
+                            for col in ("exit_ip", "exit_ipv6"):
+                                col_val = (row.get(col) or "").strip()
+                                if col_val:
+                                    for ep in extract_ips(col_val):
+                                        _add_key(ep)
                 except Exception as e:
                     log.debug("读取 %s 收集活跃 IP 异常: %s", fpath, e)
 
-        # 扫描原始代理池
-        proxies_path = os.path.join(base_dir, "proxies.txt")
-        if os.path.isfile(proxies_path):
+        # 2. 扫描结构化代理总表 proxies.csv (覆盖入口 IP/域名与多跳落地出口 egress_ip)
+        proxies_csv_path = os.path.join(base_dir, "proxies.csv")
+        if os.path.isfile(proxies_csv_path):
+            has_any_dataset = True
             try:
-                with open(proxies_path, "r", encoding="utf-8", errors="ignore") as f:
-                    for line in f:
-                        m = re.findall(r"(?:[0-9]{1,3}\.){3}[0-9]{1,3}", line)
-                        for ip in m:
-                            active_ips.add(ip)
+                with open(proxies_csv_path, "r", encoding="utf-8-sig", errors="ignore") as f:
+                    for row in csv.DictReader(f):
+                        host_val = (row.get("host") or "").strip()
+                        if host_val:
+                            _add_key(host_val)
+                        url_val = (row.get("url") or "").strip()
+                        if url_val:
+                            try:
+                                parsed_u = urllib.parse.urlparse(url_val)
+                                if parsed_u.hostname:
+                                    _add_key(parsed_u.hostname)
+                            except Exception:
+                                pass
+                        egress_val = (row.get("egress_ip") or "").strip()
+                        if egress_val:
+                            _add_key(egress_val)
+                            for ep in extract_ips(egress_val):
+                                _add_key(ep)
             except Exception as e:
-                log.debug("读取 %s 收集活跃 IP 异常: %s", proxies_path, e)
+                log.debug("读取 %s 收集活跃 IP/域名异常: %s", proxies_csv_path, e)
+
+        # 3. 兜底扫描原始代理池 proxies.txt (兼容手工追加尚未进入 csv 的节点)
+        proxies_txt_path = os.path.join(base_dir, "proxies.txt")
+        if os.path.isfile(proxies_txt_path):
+            has_any_dataset = True
+            try:
+                with open(proxies_txt_path, "r", encoding="utf-8", errors="ignore") as f:
+                    for line in f:
+                        s = line.strip()
+                        if not s or s.startswith("#"):
+                            continue
+                        try:
+                            parsed_u = urllib.parse.urlparse(s)
+                            if parsed_u.hostname:
+                                _add_key(parsed_u.hostname)
+                        except Exception:
+                            pass
+                        for ep in extract_ips(s):
+                            _add_key(ep)
+            except Exception as e:
+                log.debug("读取 %s 收集活跃 IP/域名异常: %s", proxies_txt_path, e)
+
+        if not has_any_dataset:
+            return 0
+
+    # 同步保护在用域名缓存中关联的 resolved_ip，避免重复 DNS -> ASN 查询
+    resolved_linked = set()
+    for k, entry in cache.items():
+        if isinstance(entry, dict) and (k in active_ips or str(k).lower() in active_ips):
+            res_ip = (entry.get("resolved_ip") or "").strip()
+            if res_ip:
+                resolved_linked.add(res_ip)
+                resolved_linked.add(res_ip.lower())
+    effective_active = active_ips | resolved_linked
 
     pruned_cache = {}
-    orphan_dc = {}
     pruned_count = 0
 
     for ip_key, entry in cache.items():
         if not isinstance(entry, dict):
+            pruned_count += 1
             continue
-        if ip_key in active_ips:
+        if ip_key in effective_active or str(ip_key).lower() in effective_active:
             pruned_cache[ip_key] = entry
-        elif entry.get("net_type") in ("datacenter", "hosting"):
-            orphan_dc[ip_key] = entry
         else:
             pruned_count += 1
 
-    # 对机房黑名单孤儿 IP，限制最大保留数量
-    if len(orphan_dc) > max_orphans:
-        pruned_count += (len(orphan_dc) - max_orphans)
-        for k in list(orphan_dc.keys())[:max_orphans]:
-            pruned_cache[k] = orphan_dc[k]
-    else:
-        pruned_cache.update(orphan_dc)
-
-    save_ip_cache(pruned_cache, filepath=target_path, compact=True)
+    if pruned_count > 0 or explicit_cache:
+        save_ip_cache(pruned_cache, filepath=target_path, compact=True)
     if pruned_count > 0:
         log.info(
-            "已修剪 IP 缓存 %s: 剔除 %d 条淘汰孤儿记录，当前保留 %d 条 (活跃: %d, 机房黑名单: %d)",
+            "已修剪 IP 缓存 %s: 剔除 %d 条淘汰孤儿记录，当前保留 %d 条活跃画像",
             target_path,
             pruned_count,
             len(pruned_cache),
-            len(pruned_cache) - min(len(orphan_dc), max_orphans),
-            min(len(orphan_dc), max_orphans),
         )
     return pruned_count
 
@@ -3972,7 +4017,18 @@ def calibrate_all_datasets(
         except Exception as e:
             log.warning("校准 proxyip 数据异常: %s", e)
 
-    # 4. 墓地机制已彻底解耦：机房拒收节点不再入墓地，入出口画像已完全解耦。
+    # 4. 终态修剪 ip_cache.json：在全部数据集完成淘汰与分流校准后，剔除已不在活跃库中的孤儿缓存记录
+    base_cache_dir = os.path.dirname(os.path.abspath(ip_cache_path))
+    if not proxies_only and os.path.isfile(ip_cache_path) and any(
+        os.path.isfile(os.path.join(base_cache_dir, fn))
+        for fn in ("cf_ips.csv", "scan_ips.csv", "proxyip.csv", "proxies.csv")
+    ):
+        try:
+            stats["ip_cache_pruned"] = prune_ip_cache(filepath=ip_cache_path)
+        except Exception as e:
+            log.warning("终态修剪 ip_cache.json 异常: %s", e)
+
+    # 5. 墓地机制已彻底解耦：机房拒收节点不再入墓地，入出口画像已完全解耦。
     # 墓地中记录的均为真实超时/不可达的物理死节点，不再执行基于非机房标签的自动解封，
     # 确保死节点严格遵循 7 天隔离冷却期，彻底杜绝死节点诈尸回流。
     stats["tombstone_unbanned"] = 0
