@@ -26508,5 +26508,49 @@
     "isp": "Chunghwa Telecom Co., Ltd.",
     "net_type": "isp",
     "source": "@danfeng2"
+  },
+  {
+    "proxy": "104.160.37.241:443",
+    "ip": "104.160.37.241",
+    "port": 443,
+    "tls": true,
+    "clientIp": "108.41.209.111",
+    "clientIps": [
+      "108.41.209.111"
+    ],
+    "clientIpv4": "108.41.209.111",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "US",
+    "country_name": "美国",
+    "country_cn": "美国",
+    "country_emoji": "🇺🇸",
+    "asn": "701",
+    "asOrganization": "Verizon Business",
+    "isp": "Verizon Business",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
+  },
+  {
+    "proxy": "107.175.226.207:443",
+    "ip": "107.175.226.207",
+    "port": 443,
+    "tls": true,
+    "clientIp": "2001:470:c:a38::2",
+    "clientIps": [
+      "2001:470:c:a38::2"
+    ],
+    "clientIpv4": "",
+    "clientIpv6": "2001:470:c:a38::2",
+    "dual_stack": false,
+    "country": "US",
+    "country_name": "美国",
+    "country_cn": "美国",
+    "country_emoji": "🇺🇸",
+    "asn": "6939",
+    "asOrganization": "Hurricane Electric LLC",
+    "isp": "Hurricane Electric LLC",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
   }
 ]

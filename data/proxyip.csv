@@ -1204,3 +1204,5 @@
 62.78.157.86,443,true,0,0,HEL,欧洲 · 芬兰 · Helsinki,AS16086 DNA Oyj,DNA Oyj,2026-11-02 14:11:42,@cmliussss_all,2,isp,2001:14ba:46f2:de00::191,2001:14ba:46f2:de00::191,AS16086 DNA Oyj,DNA Oyj
 64.178.113.180,30706,true,70,2557,TPE,Taiwan · Taipei,AS400951 Akari Networks LLC,Akari Networks LLC,2026-09-06 16:44:44,@danfeng2,0,isp,1.162.134.184,,"AS3462 Chunghwa Telecom HiNet (Chunghwa Telecom Co., Ltd.)","Chunghwa Telecom Co., Ltd."
 216.23.122.71,30706,true,156,15,TPE,Taiwan · Taipei,AS205548 Zouter,Zouter,2026-08-13 20:31:20,@danfeng2,0,isp,1.162.134.184,,"AS3462 Chunghwa Telecom HiNet (Chunghwa Telecom Co., Ltd.)","Chunghwa Telecom Co., Ltd."
+104.160.37.241,443,true,10,,EWR,United States · New York City,AS25820 BandwagonHost,BandwagonHost,2026-10-18 21:42:14,@danfeng_chat,0,isp,108.41.209.111,,AS701 Verizon Business,Verizon Business
+107.175.226.207,443,true,61,,IAD,United States · Lauderdale,AS36352 HostPapa,HostPapa,2026-10-18 21:42:26,@danfeng_chat,0,isp,2001:470:c:a38::2,2001:470:c:a38::2,AS6939 Hurricane Electric LLC,Hurricane Electric LLC
