@@ -9306,28 +9306,6 @@
     "source": "EDT-Pages"
   },
   {
-    "proxy": "socks5://185.243.99.64:1080",
-    "protocol": "socks5",
-    "ip": "185.243.99.64",
-    "port": 1080,
-    "clientIp": "185.243.99.63",
-    "clientIps": [
-      "185.243.99.63"
-    ],
-    "clientIpv4": "185.243.99.63",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "UA",
-    "country_name": "乌克兰",
-    "country_cn": "乌克兰",
-    "country_emoji": "🇺🇦",
-    "asn": "48693",
-    "asOrganization": "Rices Privately owned enterprise",
-    "isp": "Rices Privately owned enterprise",
-    "net_type": "datacenter",
-    "source": "EDT-Pages"
-  },
-  {
     "proxy": "socks5://216.236.6.203:7890",
     "protocol": "socks5",
     "ip": "216.236.6.203",
@@ -9941,28 +9919,6 @@
     "asOrganization": "JSC Ukrtelecom",
     "isp": "JSC Ukrtelecom",
     "net_type": "isp",
-    "source": "EDT-Pages"
-  },
-  {
-    "proxy": "socks5://45.143.94.111:1080",
-    "protocol": "socks5",
-    "ip": "45.143.94.111",
-    "port": 1080,
-    "clientIp": "45.143.94.111",
-    "clientIps": [
-      "45.143.94.111"
-    ],
-    "clientIpv4": "45.143.94.111",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "RU",
-    "country_name": "俄罗斯",
-    "country_cn": "俄罗斯",
-    "country_emoji": "🇷🇺",
-    "asn": "214822",
-    "asOrganization": "MT FINANCE LLC",
-    "isp": "MT FINANCE LLC",
-    "net_type": "datacenter",
     "source": "EDT-Pages"
   },
   {

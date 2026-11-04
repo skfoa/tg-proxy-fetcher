@@ -3676,9 +3676,12 @@ def calibrate_all_datasets(
                 rows = list(reader)
 
             changed_proxies = 0
+            clean_rows = []
+            dropped_edt_dc = 0
             for r in rows:
                 code = _extract_asn_code(r.get("asn"), r.get("isp"))
                 isp_val = r.get("isp") or ""
+                correct_nt = ""
                 if code:
                     std_isp = ASN_TO_PROVIDER.get(code) or ASN_DATABASE_ASN_TO_ISP.get(code) or isp_val
                     if std_isp and not isp_val:
@@ -3688,6 +3691,23 @@ def calibrate_all_datasets(
                     if correct_nt and r.get("net_type") != correct_nt:
                         r["net_type"] = correct_nt
                         changed_proxies += 1
+                else:
+                    correct_nt = str(r.get("net_type") or "").strip().lower()
+
+                # 准入规则：EDT-Pages 来源严格要求为非机房节点，若校准为 datacenter 坚决剔除淘汰（其他来源允许机房）
+                src_val = str(r.get("source") or "").strip()
+                eff_nt = correct_nt or str(r.get("net_type") or "").strip().lower()
+                if src_val == "EDT-Pages" and eff_nt == "datacenter":
+                    dropped_edt_dc += 1
+                    changed_proxies += 1
+                    log.info("【全量校准 准入拦截】清理 EDT-Pages 来源的机房节点: %s (%s)", r.get("url"), r.get("asn"))
+                    continue
+
+                clean_rows.append(r)
+
+            if dropped_edt_dc > 0:
+                log.info("【全量校准 准入拦截】共清理剔除 %d 个 EDT-Pages 来源的机房 (datacenter) 节点", dropped_edt_dc)
+            rows = clean_rows
 
             if changed_proxies > 0 or not proxies_only:
                 save_proxies_csv(rows, csv_path=proxies_csv_path)

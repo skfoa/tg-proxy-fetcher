@@ -1018,9 +1018,10 @@ async def probe_single(
         )
     elif proto == "https":
         # 核心分流准入控制：
-        # 1. 频道与群组 / 内部来源 (@otcjlq, @otcfxq, @danfeng_chat, @user, EDT-Pages 等)：
+        # 1. 外部公用代理源 EDT-Pages：严格执行“非机房”准入策略，坚决拒收剔除机房托管节点 (datacenter_rejected)。
+        # 2. 频道与群组 / 内部来源 (@otcjlq, @otcfxq, @danfeng_chat, @user 等)：
         #    执行“全收”策略，直接走本地 probe_https 进行报文级穿透测活。不论机房或家宽，只要连通即准入存活，严禁判死剔除。
-        # 2. 外部全网海量公用爬虫源 (source 为 proxifly 等)：
+        # 3. 外部全网海量公用爬虫源 (source 为 proxifly 等)：
         #    执行“严选”住宅准入策略，通过 CF_CHECK_ENDPOINT 端点深度校验真实出口，坚决剔除机房垃圾节点 (datacenter_rejected)。
         is_trusted_or_local = (row.get("source") != "proxifly") or not cf_check_endpoint
 
@@ -1955,6 +1956,14 @@ async def async_main(args):
     def _is_survivor(r):
         if r.get("status") == "datacenter_rejected":
             return False
+        # 核心准入策略：EDT-Pages 来源严格要求非机房，若已知为机房则坚决不准入
+        if str(r.get("source") or "").strip() == "EDT-Pages":
+            nt_check = str(r.get("net_type") or "").strip().lower()
+            if not nt_check:
+                c_code = _extract_asn_code(r.get("asn"), r.get("isp"))
+                nt_check = classify_asn(c_code, r.get("isp", "")) if c_code else ""
+            if nt_check == "datacenter":
+                return False
         proto = (r.get("proto") or "").lower()
         fc = safe_int(r.get("fail_count"), 0)
         eff_mf = h_mf if proto == "http" else args.max_fails
@@ -2000,6 +2009,21 @@ async def async_main(args):
     # 补全出口 IP 对应的 ASN 与网络属性打标
     net_stats = await enrich_proxies_metadata(survivors)
     log.info("[通用代理 网络属性] %s", net_stats)
+
+    # 准入安全兜底：再次过滤打标后确认属于机房 (datacenter) 的 EDT-Pages 节点
+    edt_dc_dropped = 0
+    clean_survivors = []
+    for r in survivors:
+        src_val = str(r.get("source") or "").strip()
+        nt_val = str(r.get("net_type") or "").strip().lower()
+        if src_val == "EDT-Pages" and nt_val == "datacenter":
+            edt_dc_dropped += 1
+            continue
+        clean_survivors.append(r)
+    if edt_dc_dropped > 0:
+        log.info("[通用代理 准入控制] 剔除 %d 个 EDT-Pages 来源的机房 (datacenter) 节点", edt_dc_dropped)
+        survivors = clean_survivors
+        survivors_len = len(survivors)
 
     save_proxies_data(survivors, PROXIES_TXT, PROXIES_CSV)
 

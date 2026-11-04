@@ -404,6 +404,16 @@ def load_existing_proxies(
                     u = (r.get("url") or "").strip()
                     if not u:
                         continue
+                    src_val = (r.get("source") or "").strip()
+                    asn_val = r.get("asn", "")
+                    isp_val = r.get("isp", "")
+                    c_code = _extract_asn_code(asn_val, isp_val)
+                    cur_nt = classify_asn(c_code, isp_val) if c_code else str(r.get("net_type") or "").strip().lower()
+
+                    # 准入过滤：历史记录中 EDT-Pages 来源如果当前被裁决为机房 (datacenter)，不再回流载入
+                    if src_val == "EDT-Pages" and cur_nt == "datacenter":
+                        continue
+
                     meta = {
                         "url": u,
                         "first_seen": (r.get("first_seen") or "").strip() or LEGACY_DEFAULT_FIRST_SEEN,
@@ -415,8 +425,8 @@ def load_existing_proxies(
                         "egress_ip": r.get("egress_ip", ""),
                         "asn": r.get("asn", ""),
                         "isp": r.get("isp", ""),
-                        "net_type": r.get("net_type", ""),
-                        "source": (r.get("source") or "").strip(),
+                        "net_type": cur_nt or r.get("net_type", ""),
+                        "source": src_val,
                     }
                     if u not in csv_meta_by_url:
                         csv_meta_by_url[u] = meta
