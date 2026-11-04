@@ -73,6 +73,7 @@ from providers import (
     prune_tombstone,
     is_tombstoned,
     load_ip_cache,
+    save_ip_cache,
     prune_ip_cache,
     LEGACY_DEFAULT_FIRST_SEEN,
     atomic_writer,
@@ -1352,7 +1353,12 @@ def fetch_zip_proxyips(
     return total_added, list(unrecorded_asns_map.values())
 
 
-def scrape_channel_web(channel: str, cutoff: datetime, proxy: str = "") -> tuple[list[tuple[str, str]], list[dict]]:
+def scrape_channel_web(
+    channel: str,
+    cutoff: datetime,
+    proxy: str = "",
+    ip_cache: dict[str, dict] | None = None,
+) -> tuple[list[tuple[str, str]], list[dict]]:
     clean_channel = channel.lstrip("@")
     base_url = f"https://t.me/s/{clean_channel}"
     
@@ -1431,7 +1437,7 @@ def scrape_channel_web(channel: str, cutoff: datetime, proxy: str = "") -> tuple
             for p_url, key in extract_proxies(cleaned_text):
                 proxies_found.append((p_url, key))
 
-            cf_data = parse_cf_ip(cleaned_text, default_channel=channel)
+            cf_data = parse_cf_ip(cleaned_text, default_channel=channel, ip_cache=ip_cache)
             if cf_data:
                 if not cf_data.get("first_seen") and dt:
                     cf_data["first_seen"] = dt.astimezone(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S")
@@ -1677,6 +1683,7 @@ def merge_and_save(
     scraped_proxyips: dict | None = None,
     edt_unrecorded_asns: list[dict] | None = None,
     proxy: str = "",
+    ip_cache: dict[str, dict] | None = None,
 ):
     """
     智能增量合并：历史保留，重复更新，新增追加，并持久化落盘与发送通知。
@@ -1688,7 +1695,8 @@ def merge_and_save(
     scraped_proxyips = scraped_proxyips or {}
 
     tombstone = load_tombstone()
-    ip_cache = load_ip_cache()
+    if ip_cache is None:
+        ip_cache = load_ip_cache()
 
     # 1. 过滤掉命中墓地的节点 (双重防御，杜绝死节点进入待存集合)
     scraped_proxies = {k: v for k, v in scraped_proxies.items() if not is_tombstoned(k, tombstone)}
@@ -2047,6 +2055,7 @@ def run_web_scraper():
 
     tombstone = load_tombstone()
     log.info("已加载墓地黑名单: %d 个冷却中死节点（7天内淘汰）", len(tombstone))
+    ip_cache = load_ip_cache()
 
     cutoff = datetime.now(timezone.utc) - timedelta(days=FETCH_DAYS)
     all_channels = sorted(set(PROXY_CHANNELS + CF_IP_CHANNELS))
@@ -2061,7 +2070,7 @@ def run_web_scraper():
         log.info("-" * 50)
         log.info("开始处理频道: %s (代理: %s, 优选IP: %s)", channel, is_proxy_target, is_cf_target)
 
-        raw_proxies, raw_cf_ips = scrape_channel_web(channel, cutoff, proxy=proxy)
+        raw_proxies, raw_cf_ips = scrape_channel_web(channel, cutoff, proxy=proxy, ip_cache=ip_cache)
 
         if is_proxy_target:
             p_cnt = 0
@@ -2088,7 +2097,6 @@ def run_web_scraper():
     fetch_external_subscriptions(SUB_URLS, proxy, tombstone, scraped_proxies)
 
     # 1.6 外部 EDT-Pages 多协议代理源抓取 (HTTPS / HTTP / SOCKS5 多镜像容灾、非机房高价值过滤、元数据丰富)
-    ip_cache = load_ip_cache()
     edt_unrec_all = []
     for proto_name, urls in [("https", EDT_HTTPS_URLS), ("http", EDT_HTTP_URLS), ("socks5", EDT_SOCKS5_URLS)]:
         _, unrec = fetch_edt_proxies(proto_name, urls, proxy, tombstone, scraped_proxies, ip_cache=ip_cache)
@@ -2117,6 +2125,7 @@ def run_web_scraper():
         scraped_proxyips=scraped_proxyips,
         edt_unrecorded_asns=edt_unrec_all,
         proxy=proxy,
+        ip_cache=ip_cache,
     )
 
 async def run_telethon():
@@ -2139,6 +2148,7 @@ async def run_telethon():
     tombstone = load_tombstone()
     log.info("已加载墓地黑名单: %d 个冷却中死节点（7天内淘汰）", len(tombstone))
     ip_cache = load_ip_cache()
+    ip_cache_dirty = False
 
     client = TelegramClient(
         StringSession(TG_SESSION_STR), int(TG_API_ID), TG_API_HASH
@@ -2219,7 +2229,7 @@ async def run_telethon():
 
                     if is_cf_target:
                         if msg.text:
-                            cf_data = parse_cf_ip(msg.text, default_channel=channel_name)
+                            cf_data = parse_cf_ip(msg.text, default_channel=channel_name, ip_cache=ip_cache)
                             if cf_data:
                                 cf_key = f"{cf_data['ip']}:{cf_data['port']}"
                                 if not is_tombstoned(cf_key, tombstone):
@@ -2243,29 +2253,67 @@ async def run_telethon():
                                     if doc_bytes:
                                         doc_text = doc_bytes.decode("utf-8", errors="ignore")
                                         doc_date_str = msg.date.astimezone(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S") if msg.date else ""
-                                        # 优先 CSV 解析，若失败则尝试 OTC SCAN TXT 解析
-                                        doc_items = parse_cf_csv_content(doc_text, default_channel=channel_name, filename=msg.file.name, dt_str=doc_date_str)
-                                        if not doc_items:
-                                            doc_items = parse_otc_scan_content(doc_text, default_channel=channel_name, filename=msg.file.name, dt_str=doc_date_str)
-                                        
-                                        doc_proxy_added = 0
-                                        doc_scan_added = 0
+                                        base_fname_lower = os.path.basename(msg.file.name.replace("\\", "/")).lower()
+                                        if base_fname_lower.startswith("otc_scan"):
+                                            doc_items = parse_otc_scan_content(
+                                                doc_text, default_channel=channel_name, filename=msg.file.name, dt_str=doc_date_str, ip_cache=ip_cache
+                                            )
+                                            if not doc_items:
+                                                doc_items = parse_cf_csv_content(
+                                                    doc_text, default_channel=channel_name, filename=msg.file.name, dt_str=doc_date_str, ip_cache=ip_cache
+                                                )
+                                        else:
+                                            # 优先 CSV 解析，若失败则尝试 OTC SCAN TXT 解析
+                                            doc_items = parse_cf_csv_content(
+                                                doc_text, default_channel=channel_name, filename=msg.file.name, dt_str=doc_date_str, ip_cache=ip_cache
+                                            )
+                                            if not doc_items:
+                                                doc_items = parse_otc_scan_content(
+                                                    doc_text, default_channel=channel_name, filename=msg.file.name, dt_str=doc_date_str, ip_cache=ip_cache
+                                                )
+
+                                        active_doc_items: list[tuple[str, dict]] = []
                                         for cf_item in doc_items:
                                             cf_key = f"{cf_item['ip']}:{cf_item['port']}"
-                                            if is_tombstoned(cf_key, tombstone):
-                                                continue
+                                            if not is_tombstoned(cf_key, tombstone):
+                                                active_doc_items.append((cf_key, cf_item))
 
-                                            # 架构核心准则：优选看入口，ProxyIP 看出口
-                                            exit_ip = cf_item.get("exit_ip") or ""
-                                            raw_asn = cf_item.get("raw_asn") or ""
+                                        # 若缺少有效 ASN 且配置了在线探针端点，在工作线程池中并发补全（避免阻塞 Telethon 事件循环）并回写出口缓存
+                                        if CHECK_PROXYIP_URL and active_doc_items:
+                                            missing_asn_items = [
+                                                item
+                                                for _, item in active_doc_items
+                                                if not item.get("raw_asn") or item.get("raw_asn") in ("AS0", "0", "AS_UNKNOWN", "UNKNOWN")
+                                            ]
+                                            if missing_asn_items:
+                                                def _batch_probe_proxyip(batch: list[dict]) -> dict[tuple[str, int], dict]:
+                                                    targets = {(it["ip"], int(it["port"])) for it in batch}
+                                                    res_map: dict[tuple[str, int], dict] = {}
+                                                    with ThreadPoolExecutor(
+                                                        max_workers=min(16, max(1, len(targets))),
+                                                        thread_name_prefix="fetch-proxyip-probe",
+                                                    ) as pool:
+                                                        fmap = {
+                                                            pool.submit(probe_check_proxyip_api, tip, tport): (tip, tport)
+                                                            for (tip, tport) in targets
+                                                        }
+                                                        for fut in as_completed(fmap):
+                                                            tk = fmap[fut]
+                                                            try:
+                                                                res_map[tk] = fut.result() or {}
+                                                            except Exception as pe:
+                                                                log.debug("CHECK_PROXYIP_URL 探测 %s:%s 异常: %s", tk[0], tk[1], pe)
+                                                                res_map[tk] = {}
+                                                    return res_map
 
-                                            # 若缺少有效 ASN 且配置了在线探针端点，执行在线探针补全
-                                            if (not raw_asn or raw_asn in ("AS0", "0", "AS_UNKNOWN", "UNKNOWN")) and CHECK_PROXYIP_URL:
-                                                probe_res = probe_check_proxyip_api(cf_item['ip'], int(cf_item['port']))
-                                                if probe_res.get("success"):
-                                                    if not exit_ip and probe_res.get("exit_ip"):
-                                                        exit_ip = probe_res["exit_ip"]
-                                                        cf_item["exit_ip"] = exit_ip
+                                                probe_map = await asyncio.to_thread(_batch_probe_proxyip, missing_asn_items)
+                                                for cf_item in missing_asn_items:
+                                                    probe_res = probe_map.get((cf_item["ip"], int(cf_item["port"]))) or {}
+                                                    if not probe_res.get("success"):
+                                                        continue
+                                                    p_exit_ip = probe_res.get("exit_ip") or ""
+                                                    if not cf_item.get("exit_ip") and p_exit_ip:
+                                                        cf_item["exit_ip"] = p_exit_ip
                                                     if not cf_item.get("exit_ipv6") and probe_res.get("exit_ipv6"):
                                                         cf_item["exit_ipv6"] = probe_res["exit_ipv6"]
                                                     if not cf_item.get("colo") and probe_res.get("colo"):
@@ -2275,16 +2323,30 @@ async def run_telethon():
                                                         cf_item["cf_location"] = " · ".join(loc_parts)
                                                     if probe_res.get("net_type") and not cf_item.get("net_type"):
                                                         cf_item["net_type"] = probe_res["net_type"]
-                                                    if probe_res.get("exit_asn"):
-                                                        cf_item["exit_asn"] = format_asn_isp(probe_res["exit_asn"], probe_res.get("exit_isp", ""))
+                                                    p_exit_asn = probe_res.get("exit_asn") or ""
+                                                    p_exit_isp = probe_res.get("exit_isp") or ""
+                                                    if p_exit_asn:
+                                                        cf_item["exit_asn"] = format_asn_isp(p_exit_asn, p_exit_isp)
                                                         if not cf_item.get("raw_asn") or cf_item["raw_asn"] in ("AS0", "0", "AS_UNKNOWN", "UNKNOWN"):
-                                                            cf_item["raw_asn"] = probe_res["exit_asn"]
+                                                            cf_item["raw_asn"] = p_exit_asn
                                                             cf_item["asn"] = cf_item["exit_asn"]
-                                                    if probe_res.get("exit_isp"):
-                                                        cf_item["exit_isp"] = probe_res["exit_isp"]
+                                                    if p_exit_isp:
+                                                        cf_item["exit_isp"] = p_exit_isp
                                                         if not cf_item.get("isp"):
-                                                            cf_item["isp"] = probe_res["exit_isp"]
+                                                            cf_item["isp"] = p_exit_isp
+                                                    if p_exit_ip and p_exit_asn and (is_valid_ipv4(p_exit_ip) or is_valid_ipv6(p_exit_ip)):
+                                                        ip_cache[p_exit_ip] = {
+                                                            "asn": p_exit_asn,
+                                                            "isp": p_exit_isp or ASN_TO_PROVIDER.get(p_exit_asn, ""),
+                                                            "net_type": probe_res.get("net_type") or classify_asn(p_exit_asn, p_exit_isp),
+                                                            "country": probe_res.get("country") or "",
+                                                            "resolved_ip": p_exit_ip,
+                                                        }
+                                                        ip_cache_dirty = True
 
+                                        doc_proxy_added = 0
+                                        doc_scan_added = 0
+                                        for cf_key, cf_item in active_doc_items:
                                             # 终极分流：出口即正义（目标网站只认真实出口 IP）
                                             is_proxyip, effective_nt = classify_node_proxyip_or_scan(cf_item, ip_cache)
                                             cf_item["net_type"] = effective_nt
@@ -2299,7 +2361,7 @@ async def run_telethon():
                                                     scraped_scan_ips[cf_key] = cf_item
                                                     scan_count += 1
                                                     doc_scan_added += 1
-                                        
+
                                         log.info(
                                             "从频道 %s 附件 %s 中提取并按属性分流: 非机房ProxyIP %d 条, 机房扫描优选 %d 条",
                                             channel_name, msg.file.name, doc_proxy_added, doc_scan_added
@@ -2316,8 +2378,10 @@ async def run_telethon():
         web_proxy = PROXY or get_system_proxy()
         fetch_external_subscriptions(SUB_URLS, web_proxy, tombstone, scraped_proxies)
 
+        if ip_cache_dirty:
+            save_ip_cache(ip_cache)
+
         # 1.6 外部 EDT-Pages 多协议代理源抓取 (HTTPS / HTTP / SOCKS5 多镜像容灾、非机房高价值过滤、元数据丰富)
-        ip_cache = load_ip_cache()
         edt_unrec_all = []
         for proto_name, urls in [("https", EDT_HTTPS_URLS), ("http", EDT_HTTP_URLS), ("socks5", EDT_SOCKS5_URLS)]:
             _, unrec = fetch_edt_proxies(proto_name, urls, web_proxy, tombstone, scraped_proxies, ip_cache=ip_cache)
@@ -2342,6 +2406,7 @@ async def run_telethon():
             scraped_proxyips=scraped_proxyips,
             edt_unrecorded_asns=edt_unrec_all,
             proxy=web_proxy,
+            ip_cache=ip_cache,
         )
 
     finally:

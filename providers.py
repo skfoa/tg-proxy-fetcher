@@ -439,6 +439,7 @@ import re
 import shutil
 import socket
 import subprocess
+import threading
 import time
 import urllib.parse
 import urllib.request
@@ -1397,7 +1398,12 @@ async def resolve_asn_batch_online_async(
     return await asyncio.to_thread(resolve_asn_batch_online, targets, max_chunk_size, persist, db_path, cache_path)
 
 
-def resolve_ip_asn(ip: str = "", isp_hint: str = "", allow_online: bool = False) -> tuple[str, str]:
+def resolve_ip_asn(
+    ip: str = "",
+    isp_hint: str = "",
+    allow_online: bool = False,
+    ip_cache: dict[str, dict] | None = None,
+) -> tuple[str, str]:
     """
     智能解析/补全 ASN 与 ISP：
     [纯本地极速查表 - 零网络阻塞，微秒级响应]
@@ -1434,7 +1440,7 @@ def resolve_ip_asn(ip: str = "", isp_hint: str = "", allow_online: bool = False)
     # 2.5 检查本地持久化 IP 缓存 (data/ip_cache.json)
     if ip and ip not in ("AS_UNKNOWN", "unknown", "127.0.0.1"):
         try:
-            cache = load_ip_cache()
+            cache = ip_cache if ip_cache is not None else load_ip_cache()
             if ip in cache and cache[ip].get("asn"):
                 c_asn = cache[ip]["asn"]
                 c_isp = cache[ip].get("isp") or ASN_TO_PROVIDER.get(c_asn, clean_isp)
@@ -3261,15 +3267,22 @@ def extract_ipinfo_page_meta(html: str) -> tuple[str, str]:
     return net_type, as_name
 
 
+_DEAD_IPINFO_PROXIES: set[str] = set()
+_PROBE_FAILED_ASNS: set[str] = set()
+_IPINFO_STATE_LOCK = threading.Lock()
+
+
 def probe_asn_from_ipinfo(
     asn: str,
     proxy_candidates: list[str] | None = None,
     timeout: float = 4.0,
     max_tries: int = 2,
+    start_offset: int = 0,
 ) -> tuple[str, str]:
     """
     通过本地代理池轮换出口对 IPinfo.io 发起微探针，精准提取官方 ASN 权威类型与机构名称。
     用于在 GitHub Actions 运行收录全新 ASN 时消除启发式正则推测误差，实现 100% 官方标准注入。
+    内置坏代理熔断 (_DEAD_IPINFO_PROXIES) 与跨区偏移轮换 (start_offset)，避免死代理重复超时及单出口频控。
     返回: (official_type, official_name)，如 ("isp", "Starry, Inc.")；失败时返回 ("", "")。
     """
     clean_code = (asn or "").strip().upper()
@@ -3295,13 +3308,26 @@ def probe_asn_from_ipinfo(
 
     url = f"https://ipinfo.io/{clean_code}"
 
-    # 组织候选代理列表：优先使用传入的代理池，兜底加入直连
+    # 组织候选代理列表：过滤本轮已熔断失效代理，并按 start_offset 跨国家桶轮换起点，兜底加入直连
     cand_proxies = list(proxy_candidates) if proxy_candidates is not None else get_top_quality_proxies()
-    trials = cand_proxies[:max_tries] if cand_proxies else [""]
+    with _IPINFO_STATE_LOCK:
+        dead_snapshot = set(_DEAD_IPINFO_PROXIES)
+    healthy_proxies = [p for p in cand_proxies if p and p not in dead_snapshot]
+    if healthy_proxies:
+        offset = max(0, int(start_offset)) % len(healthy_proxies)
+        rotated = healthy_proxies[offset:] + healthy_proxies[:offset]
+        trials = rotated[:max_tries]
+    else:
+        trials = []
     if "" not in trials:
         trials.append("")
 
     curl_bin = "curl.exe" if shutil.which("curl.exe") else ("curl" if shutil.which("curl") else "")
+
+    def _mark_dead_proxy(bad_proxy: str) -> None:
+        if bad_proxy:
+            with _IPINFO_STATE_LOCK:
+                _DEAD_IPINFO_PROXIES.add(bad_proxy)
 
     for p in trials:
         html = ""
@@ -3333,27 +3359,38 @@ def probe_asn_from_ipinfo(
                 with opener.open(req, timeout=timeout) as resp:
                     html = resp.read().decode("utf-8", errors="ignore")
         except Exception as e:
-            log.debug("IPinfo 代理探针尝试 %s 访问 %s 异常: %s", p or "直连", clean_code, e)
+            _mark_dead_proxy(p)
+            log.debug("IPinfo 代理探针尝试 %s 访问 %s 异常 (已熔断该代理): %s", p or "直连", clean_code, e)
             continue
 
-        if html:
-            # 避坑：若遭遇 Cloudflare 拦截页面，安全跳过此代理
-            if "Just a moment" in html or "challenge-platform" in html:
-                log.debug("IPinfo 代理探针访问 %s 触发 Cloudflare 验证码 (跳过此代理 %s)", clean_code, p or "直连")
-                continue
+        if not html:
+            _mark_dead_proxy(p)
+            continue
 
-            raw_type, raw_name = extract_ipinfo_page_meta(html)
-            if raw_type:
-                log.info("【IPinfo 官方探针精准命中】%s -> Type: %s | Name: %s (出海通道: %s)", clean_code, raw_type, raw_name, p or "直连")
-                return raw_type, raw_name
+        # 避坑：若遭遇 Cloudflare 拦截、429 频控或非 IPinfo 错误页，熔断跳过此代理
+        if (
+            "Just a moment" in html
+            or "challenge-platform" in html
+            or "429 Too Many Requests" in html
+            or "ipinfo" not in html.lower()
+        ):
+            _mark_dead_proxy(p)
+            log.debug("IPinfo 代理探针访问 %s 触发风控或非预期响应 (已熔断此代理 %s)", clean_code, p or "直连")
+            continue
+
+        raw_type, raw_name = extract_ipinfo_page_meta(html)
+        if raw_type:
+            log.info("【IPinfo 官方探针精准命中】%s -> Type: %s | Name: %s (出海通道: %s)", clean_code, raw_type, raw_name, p or "直连")
+            return raw_type, raw_name
 
     return "", ""
 
 
-_PROBE_FAILED_ASNS: set[str] = set()
-
-
-def auto_enrich_and_save_asns(unrecorded_items: list[dict], proxy: str = "") -> int:
+def auto_enrich_and_save_asns(
+    unrecorded_items: list[dict],
+    proxy: str = "",
+    max_workers: int = 4,
+) -> int:
     """
     针对自带 ASN / 组织机构属性的数据源（如 EDT-Pages、测速扫描附件、质检在线反查等）：
     在全链路各阶段自动完成网络类型属性分类并持久化入库到 data/asn_database.json。
@@ -3364,6 +3401,7 @@ def auto_enrich_and_save_asns(unrecorded_items: list[dict], proxy: str = "") -> 
     3. 【运行时防重试风暴】：同进程生命周期内失败的 ASN 记录进 _PROBE_FAILED_ASNS，避免重复发起探测。
     4. 【云厂商 SSOT 保护】：若传入的 ASN 属于内置权威已知云厂商，强制维持权威标准名称与 datacenter 属性。
     5. 【LRU 缓存实时自愈】：写盘入库后同步更新运行时字典与 fast-path，并主动清空 classify_asn LRU 缓存。
+    6. 【有界跨区并发探测】：对去重后的待查 ASN 执行有界并发探测（默认 max_workers=4，按跨国代理桶轮换起点），单线程汇总原子落盘。
     """
     if not unrecorded_items:
         return 0
@@ -3372,6 +3410,13 @@ def auto_enrich_and_save_asns(unrecorded_items: list[dict], proxy: str = "") -> 
         to_save_map: dict[str, dict] = {}
         # 预先拉取一次候选优质代理列表（复用，避免在循环中重复读取 CSV 文件）
         top_proxies = get_top_quality_proxies()
+        if proxy and proxy not in top_proxies:
+            top_proxies.append(proxy)
+
+        code_to_items: dict[str, list[dict]] = {}
+        code_fallback_org: dict[str, str] = {}
+        with _IPINFO_STATE_LOCK:
+            failed_snapshot = set(_PROBE_FAILED_ASNS)
 
         for item in unrecorded_items:
             try:
@@ -3384,7 +3429,7 @@ def auto_enrich_and_save_asns(unrecorded_items: list[dict], proxy: str = "") -> 
                     continue
 
                 # 运行期防重复探测拦截
-                if code in _PROBE_FAILED_ASNS:
+                if code in failed_snapshot:
                     continue
 
                 # 云厂商 SSOT 保护：若命中内置权威已知云厂商，坚决维持权威定义，直接跳过并拒绝外部污染
@@ -3396,38 +3441,65 @@ def auto_enrich_and_save_asns(unrecorded_items: list[dict], proxy: str = "") -> 
                 if is_asn_recorded(code):
                     continue
 
-                org = re.sub(r"^AS\d+\s*", "", raw_isp, flags=re.IGNORECASE).strip()
+                code_to_items.setdefault(code, []).append(item)
+                if not code_fallback_org.get(code):
+                    org_clean = re.sub(r"^AS\d+\s*", "", raw_isp, flags=re.IGNORECASE).strip()
+                    if org_clean:
+                        code_fallback_org[code] = org_clean
+            except Exception as item_err:
+                log.debug("解析单条未收录 ASN 条目发生异常 (已隔离跳过): %s (%s)", item, item_err)
+                continue
 
-                # 通道 0 (最高权威优先): 通过代理池探针直连 IPinfo 取得 100% 精准官方网络类型与机构名
-                official_type = ""
-                official_name = ""
-                try:
-                    official_type, official_name = probe_asn_from_ipinfo(code, proxy_candidates=top_proxies, timeout=4.0)
-                except Exception as probe_err:
-                    log.debug("IPinfo 探针探测 ASN %s 异常 (已安全跳过): %s", code, probe_err)
+        codes_to_probe = list(code_to_items.keys())
+        if not codes_to_probe:
+            return 0
 
-                if official_type and official_type in EXTERNAL_NET_TYPE_MAP:
-                    net_type = EXTERNAL_NET_TYPE_MAP[official_type]
-                    if official_name:
-                        org = official_name
-                    log.info("【ASN 精准注入】ASN %s 成功通过 IPinfo 官方探针精准打标: %s -> %s", code, org, net_type)
-                    if code not in to_save_map:
-                        to_save_map[code] = {
-                            "asn": code,
-                            "isp": org,
-                            "net_type": net_type,
-                        }
+        def _probe_single_code(idx_and_code: tuple[int, str]) -> tuple[str, str, str]:
+            idx, c = idx_and_code
+            try:
+                o_type, o_name = probe_asn_from_ipinfo(
+                    c,
+                    proxy_candidates=top_proxies,
+                    timeout=4.0,
+                    start_offset=idx,
+                )
+                return c, o_type, o_name
+            except Exception as probe_err:
+                log.debug("IPinfo 探针探测 ASN %s 异常 (已安全跳过): %s", c, probe_err)
+                return c, "", ""
+
+        probe_results: list[tuple[str, str, str]] = []
+        workers = max(1, min(int(max_workers), len(codes_to_probe)))
+        if workers == 1:
+            probe_results = [_probe_single_code((0, codes_to_probe[0]))]
+        else:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=workers, thread_name_prefix="ipinfo-asn") as pool:
+                probe_results = list(pool.map(_probe_single_code, enumerate(codes_to_probe)))
+
+        newly_failed: list[str] = []
+        for code, official_type, official_name in probe_results:
+            org = official_name or code_fallback_org.get(code, "")
+            if official_type and official_type in EXTERNAL_NET_TYPE_MAP:
+                net_type = EXTERNAL_NET_TYPE_MAP[official_type]
+                log.info("【ASN 精准注入】ASN %s 成功通过 IPinfo 官方探针精准打标: %s -> %s", code, org, net_type)
+                to_save_map[code] = {
+                    "asn": code,
+                    "isp": org,
+                    "net_type": net_type,
+                }
+                for item in code_to_items.get(code, ()):
                     if org:
                         item["org"] = org
                         item["isp"] = org
                     item["net_type"] = net_type
-                else:
-                    # 探针未响应/拦截/失败：坚决不拿正则猜测充数入库，记录防重试集合并安全跳过
-                    _PROBE_FAILED_ASNS.add(code)
-                    log.debug("ASN %s 探针未获取到官方有效网络类型，跳过持久化写入（避免猜测污染数据库）", code)
-            except Exception as item_err:
-                log.debug("解析单条未收录 ASN 条目发生异常 (已隔离跳过): %s (%s)", item, item_err)
-                continue
+            else:
+                # 探针未响应/拦截/失败：坚决不拿正则猜测充数入库，记录防重试集合并安全跳过
+                newly_failed.append(code)
+                log.debug("ASN %s 探针未获取到官方有效网络类型，跳过持久化写入（避免猜测污染数据库）", code)
+
+        if newly_failed:
+            with _IPINFO_STATE_LOCK:
+                _PROBE_FAILED_ASNS.update(newly_failed)
 
         if not to_save_map:
             return 0

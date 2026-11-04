@@ -979,7 +979,11 @@ async def probe_single(
     http_max_fails: int = HTTP_MAX_FAILS,
 ) -> dict:
     """协议分流路由与执行"""
-    if sem is not None:
+    proto = row.get("proto", "socks5").lower()
+    uses_cf_worker = bool(cf_check_endpoint) and (
+        proto == "sstp" or (proto == "https" and row.get("source") == "proxifly")
+    )
+    if sem is not None and not uses_cf_worker:
         async with sem:
             return await probe_single(
                 row,
@@ -995,7 +999,6 @@ async def probe_single(
                 http_max_fails=http_max_fails,
             )
 
-    proto = row.get("proto", "socks5").lower()
     host = row.get("host", "")
     port = safe_int(row.get("port"), 0)
     user = row.get("user") or None
@@ -1724,7 +1727,11 @@ async def async_main(args):
         host = r.get("host", "")
         port = r.get("port", 0)
         lock_key = f"{host}:{port}"
-        async with sem:
+        proto_lower = (r.get("proto") or "socks5").lower()
+        uses_cf_worker = bool(cf_endpoint) and (
+            proto_lower == "sstp" or (proto_lower == "https" and r.get("source") == "proxifly")
+        )
+        if uses_cf_worker:
             async with get_keyed_lock(lock_key):
                 res = await probe_single(
                     r,
@@ -1739,6 +1746,22 @@ async def async_main(args):
                     max_fails=args.max_fails,
                     http_max_fails=h_mf,
                 )
+        else:
+            async with sem:
+                async with get_keyed_lock(lock_key):
+                    res = await probe_single(
+                        r,
+                        sem=None,
+                        timeout=args.timeout,
+                        http_timeout=args.http_timeout,
+                        sstp_timeout=args.sstp_timeout,
+                        cf_check_endpoint=cf_endpoint,
+                        cf_executor=cf_executor,
+                        http_probe_timeout=h_to,
+                        http_max_latency_ms=h_lat,
+                        max_fails=args.max_fails,
+                        http_max_fails=h_mf,
+                    )
         completed += 1
 
         proto = res.get("proto", "unknown")

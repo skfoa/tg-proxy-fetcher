@@ -214,7 +214,12 @@ def parse_speed_to_kbs(
     return max(0, int(val))
 
 
-def resolve_and_clean_asn(ip: str, raw_asn: str = "", raw_isp: str = "") -> tuple[str, str]:
+def resolve_and_clean_asn(
+    ip: str,
+    raw_asn: str = "",
+    raw_isp: str = "",
+    ip_cache: dict[str, dict] | None = None,
+) -> tuple[str, str]:
     """
     统一解析与补全 (asn, isp)：
     1. 从 raw_asn 中正则提取标准 AS\d+ 编号（严格遵循 RFC 7607 排除非路由保留编号 AS0）；
@@ -244,10 +249,12 @@ def resolve_and_clean_asn(ip: str, raw_asn: str = "", raw_isp: str = "") -> tupl
             elif not raw_isp and raw_asn not in ("-", "UNKNOWN", "AS_UNKNOWN", "AS0", "0"):
                 raw_isp = raw_asn
 
+    cache = ip_cache
     # 优先查验本地 IP 缓存：若当前 IP 已有确凿真实的 BGP ASN，且当前标记为空/未知/或误标为 Cloudflare (AS13335)，坚决以 IP 真实 ASN 为准
     if ip and ip not in ("AS_UNKNOWN", "unknown", "127.0.0.1"):
         try:
-            cache = load_ip_cache()
+            if cache is None:
+                cache = load_ip_cache()
             if ip in cache and cache[ip].get("asn"):
                 cached_asn = cache[ip]["asn"]
                 if cached_asn and cached_asn.upper() not in ("AS0", "AS_UNKNOWN", "UNKNOWN"):
@@ -260,7 +267,7 @@ def resolve_and_clean_asn(ip: str, raw_asn: str = "", raw_isp: str = "") -> tupl
             pass
 
     if not asn_clean or asn_clean in ("AS0", "AS_UNKNOWN", "UNKNOWN"):
-        found_asn, found_isp = resolve_ip_asn(ip, raw_isp)
+        found_asn, found_isp = resolve_ip_asn(ip, raw_isp, ip_cache=cache)
         if found_asn and found_asn.upper() not in ("AS0", "AS_UNKNOWN", "UNKNOWN"):
             asn_clean = found_asn
             if not raw_isp and found_isp:
@@ -274,7 +281,11 @@ def resolve_and_clean_asn(ip: str, raw_asn: str = "", raw_isp: str = "") -> tupl
     return asn_clean or "", raw_isp
 
 
-def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
+def parse_cf_ip(
+    text: str,
+    default_channel: str = "",
+    ip_cache: dict[str, dict] | None = None,
+) -> dict | None:
     """从单条优选 IP 消息卡片中提取结构化字段"""
     ip_m = RE_CF_IP.search(text)
     port_m = RE_CF_PORT.search(text)
@@ -305,7 +316,7 @@ def parse_cf_ip(text: str, default_channel: str = "") -> dict | None:
     raw_asn = asn_m.group(1).replace("`", "").strip() if asn_m else ""
     raw_isp = isp_m.group(1).replace("`", "").strip() if isp_m else ""
 
-    asn_val, raw_isp = resolve_and_clean_asn(ip, raw_asn, raw_isp)
+    asn_val, raw_isp = resolve_and_clean_asn(ip, raw_asn, raw_isp, ip_cache=ip_cache)
     final_asn = format_asn_isp(asn_val, raw_isp)
 
     return {
@@ -330,6 +341,7 @@ def parse_cf_csv_content(
     default_channel: str = "@danfeng_chat",
     filename: str = "",
     dt_str: str = "",
+    ip_cache: dict[str, dict] | None = None,
 ) -> list[dict]:
     """解析 Cloudflare 优选测速与反代 ProxyIP CSV 格式内容（支持 DanFeng、CheckProxyIP、云厂商测速等）"""
     fn_asn = ""
@@ -339,8 +351,11 @@ def parse_cf_csv_content(
 
     if filename:
         fn_lower = filename.lower()
-        # 1. 优先从文件名正则匹配 AS 编号与 ISP (支持 DanFeng 命名规范，如 AS45102_CNNICALIBABACNNETAP_20260906_190653.csv, AS61112_AkileCloud_Network_20260831_012345.csv)
         base_fn = os.path.basename(filename.replace("\\", "/"))
+        # OTC 优选扫描导出文件 (OTC_SCAN_*) 交由专属 parse_otc_scan_content 解析，避免被无表头 CSV 模式误吞截断字段
+        if base_fn.lower().startswith("otc_scan"):
+            return []
+        # 1. 优先从文件名正则匹配 AS 编号与 ISP (支持 DanFeng 命名规范，如 AS45102_CNNICALIBABACNNETAP_20260906_190653.csv, AS61112_AkileCloud_Network_20260831_012345.csv)
         m_fn = re.search(r"(?i)(?P<asn>AS\d+)_(?P<isp>.+?)(?:_(?P<date>\d{8})_(?P<time>\d{6}))?\.(?:csv|txt)$", base_fn)
         if m_fn:
             fn_asn = m_fn.group("asn").upper()
@@ -367,6 +382,8 @@ def parse_cf_csv_content(
     if not clean_text:
         return results
 
+    local_cache = ip_cache
+
     try:
         lines = clean_text.splitlines()
         first_line = lines[0].strip() if lines else ""
@@ -381,6 +398,17 @@ def parse_cf_csv_content(
             is_headerless = True
 
         if is_headerless:
+            # 防误吞守卫：若无表头行携带显式 AS\d+ 列或 OTC 多列扫描特征（国家/ASN/ISP/机房/出口IP/栈类型），交由 parse_otc_scan_content 处理
+            if any(re.match(r"^AS\d+$", p, re.IGNORECASE) for p in first_parts[1:]) or (
+                len(first_parts) >= 6
+                and (
+                    "ipv" in first_parts[-1].lower()
+                    or "双栈" in first_parts[-1]
+                    or is_valid_ip(first_parts[-2])
+                )
+            ):
+                return []
+
             reader_rows = csv.reader(lines, delimiter=delimiter)
             for row in reader_rows:
                 if not row or not row[0].strip():
@@ -421,11 +449,14 @@ def parse_cf_csv_content(
                 if not (1 <= port <= 65535):
                     continue
                 delay_ms = ""
-                m_delay = re.search(r"(\d+(?:\.\d+)?)", raw_delay)
-                if m_delay:
-                    delay_ms = int(float(m_delay.group(1)))
+                if raw_delay and not re.match(r"^AS\d+\b", raw_delay.strip(), re.IGNORECASE):
+                    m_delay = re.search(r"(\d+(?:\.\d+)?)", raw_delay)
+                    if m_delay:
+                        delay_ms = int(float(m_delay.group(1)))
 
-                row_asn, row_isp = resolve_and_clean_asn(raw_ip, fn_asn, fn_isp)
+                if local_cache is None:
+                    local_cache = load_ip_cache()
+                row_asn, row_isp = resolve_and_clean_asn(raw_ip, fn_asn, fn_isp, ip_cache=local_cache)
 
                 results.append({
                     "ip": raw_ip,
@@ -643,10 +674,12 @@ def parse_cf_csv_content(
             if not raw_isp or raw_isp in ("-", "UNKNOWN", "AS_UNKNOWN"):
                 raw_isp = fn_isp
 
-            asn_val, raw_isp = resolve_and_clean_asn(raw_ip, raw_asn, raw_isp)
+            if local_cache is None:
+                local_cache = load_ip_cache()
+            asn_val, raw_isp = resolve_and_clean_asn(raw_ip, raw_asn, raw_isp, ip_cache=local_cache)
             # 仅当入口 ASN 完全缺失且本地 IP 缓存未收录时，才允许使用 exit_asn 兜底
             if (not asn_val or asn_val in ("AS0", "AS_UNKNOWN", "UNKNOWN")) and raw_exit_asn:
-                asn_val, raw_isp = resolve_and_clean_asn(raw_ip, raw_exit_asn, raw_exit_isp or raw_isp)
+                asn_val, raw_isp = resolve_and_clean_asn(raw_ip, raw_exit_asn, raw_exit_isp or raw_isp, ip_cache=local_cache)
 
             raw_time = row.get(field_map.get("time", ""), "").strip()
             first_seen = normalize_timestamp(raw_time, fn_time)
@@ -680,7 +713,8 @@ def parse_otc_scan_content(
     text: str,
     default_channel: str = "@otcjlq",
     filename: str = "",
-    dt_str: str = ""
+    dt_str: str = "",
+    ip_cache: dict[str, dict] | None = None,
 ) -> list[dict]:
     """解析 OTC 优选扫描或测速导出的文本/CSV文件内容 (OTC_SCAN_YX_*.txt, 纯 IP:Port 列表等)"""
     fn_asn = ""
@@ -693,6 +727,7 @@ def parse_otc_scan_content(
         if m_port and (1 <= int(m_port.group(1)) <= 65535):
             fn_port = m_port.group(1)
 
+    local_cache = ip_cache
     results = []
     for raw_line in text.splitlines():
         line = raw_line.strip()
@@ -898,7 +933,9 @@ def parse_otc_scan_content(
         if not loc and line_remark:
             loc = line_remark
 
-        clean_asn_code, isp = resolve_and_clean_asn(ip, asn, isp)
+        if local_cache is None:
+            local_cache = load_ip_cache()
+        clean_asn_code, isp = resolve_and_clean_asn(ip, asn, isp, ip_cache=local_cache)
 
         tls = "true" if port in (443, 8443, 2053, 2083, 2087, 2096) else "false"
 

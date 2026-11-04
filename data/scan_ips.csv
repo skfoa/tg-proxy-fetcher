@@ -667,7 +667,7 @@
 154.86.29.193,2087,true,543,,MSP,,"AS140227 Hong Kong Communications International Co., Limited","Hong Kong Communications International Co., Limited",2026-11-03 11:01:06,@otcjlq,0,154.86.29.193,"AS140227 Hong Kong Communications International Co., Limited (HONG KONG COMMUNICATIONS INTERNATIONAL CO.,LIMITED)","HONG KONG COMMUNICATIONS INTERNATIONAL CO.,LIMITED",Hong Kong · ZA
 154.86.29.193,2083,true,577,,MSP,,"AS140227 Hong Kong Communications International Co., Limited","Hong Kong Communications International Co., Limited",2026-11-03 11:01:06,@otcjlq,0,154.86.29.193,"AS140227 Hong Kong Communications International Co., Limited (HONG KONG COMMUNICATIONS INTERNATIONAL CO.,LIMITED)","HONG KONG COMMUNICATIONS INTERNATIONAL CO.,LIMITED",Hong Kong · ZA
 38.47.220.144,443,true,760,,MSP,,"AS140227 Hong Kong Communications International Co., Limited","Hong Kong Communications International Co., Limited",2026-11-03 11:01:06,@otcjlq,0,38.47.220.144,"AS140227 Hong Kong Communications International Co., Limited (HONG KONG COMMUNICATIONS INTERNATIONAL CO.,LIMITED)","HONG KONG COMMUNICATIONS INTERNATIONAL CO.,LIMITED",Hong Kong · HK
-104.143.39.177,8443,true,140227,,,,"AS140227 Hong Kong Communications International Co., Limited","Hong Kong Communications International Co., Limited",2026-11-03 11:01:06,@otcjlq,2,,"AS140227 Hong Kong Communications International Co., Limited","Hong Kong Communications International Co., Limited",Hong Kong · US
+104.143.39.177,8443,true,,,HKG,中国-香港,"AS140227 Hong Kong Communications International Co., Limited","Hong Kong Communications International Co., Limited",2026-11-03 11:01:06,@otcjlq,2,104.143.39.177,"AS140227 Hong Kong Communications International Co., Limited","Hong Kong Communications International Co., Limited",Hong Kong · US
 152.42.146.174,443,true,59,,YYZ,北美洲 · 加拿大 · 多伦多,AS14061 DigitalOcean,DigitalOcean,2026-10-18 21:44:10,@danfeng_chat,0,2604:a880:cad:d0:0:1:92f6:3001,AS14061 DigitalOcean,DigitalOcean,Toronto · US
 147.182.156.112,2053,true,59,,YYZ,北美洲 · 加拿大 · 多伦多,AS14061 DigitalOcean,DigitalOcean,2026-10-18 21:43:48,@danfeng_chat,0,147.182.156.112,AS14061 DigitalOcean,DigitalOcean,Toronto · US
 147.182.158.54,2083,true,63,,YYZ,北美洲 · 加拿大 · 多伦多,AS14061 DigitalOcean,DigitalOcean,2026-10-18 21:43:48,@danfeng_chat,0,2604:a880:cad:d0:0:1:adda:f001,AS14061 DigitalOcean,DigitalOcean,Toronto · US
@@ -26419,33 +26419,33 @@
 179.255.127.45,443,true,2359,,MSP,,AS906 DMIT,DMIT,2026-11-03 12:42:13,@otcjlq,0,2605:52c0:2:5e82:be24:11ff:febd:d807,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
 179.253.227.218,4443,true,132,,LAX,北美洲 · 美国 · 洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-10-24 11:18:42,@danfeng_chat,1,2605:52c0:2:6e68:be24:11ff:feb3:9bfc,,,
 154.17.6.106,10443,true,141,,LAX,北美洲 · 美国 · 洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-10-24 11:18:51,@danfeng_chat,1,2605:52c0:2:6a39:be24:11ff:fec0:f8cd,,,
-154.17.6.106,443,true,906,,MSP,,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,1,2605:52c0:2:6a39:be24:11ff:fec0:f8cd,AS906 DMIT,DMIT Cloud Services,
-179.255.103.98,443,true,906,,MSP,,AS906 DMIT,DMIT,2026-11-03 12:42:13,@otcjlq,1,2605:52c0:2:6801:be24:11ff:fe66:1c58,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
-131.143.182.11,8443,true,906,,MSP,,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,1,2605:52c0:2:5a7b:be24:11ff:fe33:dccc,AS906 DMIT,DMIT Cloud Services,
-131.143.182.11,443,true,906,,MSP,,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,1,2605:52c0:2:5a7b:be24:11ff:fe33:dccc,AS906 DMIT,DMIT Cloud Services,
-64.186.226.224,443,true,906,,MSP,,AS906 DMIT,DMIT,2026-11-03 12:42:13,@otcjlq,1,2605:52c0:2:3d9e:be24:11ff:fe74:137a,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
-179.255.127.130,443,true,906,,MSP,,AS906 DMIT,DMIT,2026-11-03 12:42:13,@otcjlq,1,2605:52c0:2:69b2:be24:11ff:fe5a:9a13,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
-179.255.123.88,443,true,906,,MSP,,AS906 DMIT,DMIT,2026-11-03 12:42:13,@otcjlq,1,2605:52c0:2:6768:be24:11ff:fefe:5a3b,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
-179.255.126.253,443,true,906,,MSP,,AS906 DMIT,DMIT,2026-11-03 12:42:13,@otcjlq,1,2605:52c0:2:3213:be24:11ff:fe12:bc50,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
-179.255.142.21,8443,true,906,,MSP,,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,1,2605:52c0:2:5d05:be24:11ff:fe68:2dbc,AS906 DMIT,DMIT Cloud Services,
-179.255.102.237,443,true,906,,MSP,,AS906 DMIT,DMIT,2026-11-03 12:42:13,@otcjlq,1,2605:52c0:2:1e27:be24:11ff:fe2d:fb69,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
-179.255.123.159,443,true,906,,MSP,,AS906 DMIT,DMIT,2026-11-03 12:42:13,@otcjlq,1,2605:52c0:2:6b2d:be24:11ff:fecc:43a9,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
-179.253.255.184,443,true,906,,MSP,,AS906 DMIT,DMIT,2026-11-03 12:42:13,@otcjlq,1,2605:52c0:2:6c50:be24:11ff:fe51:c7e1,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
-179.253.255.7,443,true,906,,MSP,,AS906 DMIT,DMIT,2026-11-03 12:42:13,@otcjlq,1,2605:52c0:2:4355:be24:11ff:fe43:ab2,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
-191.222.220.169,443,true,906,,MSP,,AS906 DMIT,DMIT Cloud Service - Hong Kong,2026-11-03 12:42:13,@otcjlq,1,2403:18c0:3:a1:be24:11ff:fe83:9a39,AS906 DMIT,DMIT Cloud Service - Hong Kong,
-140.235.96.74,443,true,906,,MSP,,AS906 DMIT,DMIT Cloud Service - Los Angeles,2026-11-03 12:42:13,@otcjlq,1,2403:18c0:4:557:be24:11ff:feca:5de1,AS906 DMIT,DMIT Cloud Service - Los Angeles,
-179.253.226.191,8443,true,906,,MSP,,AS906 DMIT,DMIT,2026-11-03 12:42:13,@otcjlq,1,2605:52c0:2:25d9:544b:36ff:fe4c:54ef,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
+154.17.6.106,443,true,94,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,1,2605:52c0:2:6a39:be24:11ff:fec0:f8cd,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
+179.255.103.98,443,true,106,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,1,2605:52c0:2:6801:be24:11ff:fe66:1c58,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
+131.143.182.11,8443,true,109,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,1,2605:52c0:2:5a7b:be24:11ff:fe33:dccc,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
+131.143.182.11,443,true,109,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,1,2605:52c0:2:5a7b:be24:11ff:fe33:dccc,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
+64.186.226.224,443,true,129,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,1,2605:52c0:2:3d9e:be24:11ff:fe74:137a,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
+179.255.127.130,443,true,135,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,1,2605:52c0:2:69b2:be24:11ff:fe5a:9a13,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
+179.255.123.88,443,true,144,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,1,2605:52c0:2:6768:be24:11ff:fefe:5a3b,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
+179.255.126.253,443,true,146,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,1,2605:52c0:2:3213:be24:11ff:fe12:bc50,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
+179.255.142.21,8443,true,149,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,1,2605:52c0:2:5d05:be24:11ff:fe68:2dbc,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
+179.255.102.237,443,true,155,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,1,2605:52c0:2:1e27:be24:11ff:fe2d:fb69,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
+179.255.123.159,443,true,167,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,1,2605:52c0:2:6b2d:be24:11ff:fecc:43a9,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
+179.253.255.184,443,true,170,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,1,2605:52c0:2:6c50:be24:11ff:fe51:c7e1,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
+179.253.255.7,443,true,337,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,1,2605:52c0:2:4355:be24:11ff:fe43:ab2,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
+191.222.220.169,443,true,399,,HKG,中国-香港,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,1,2403:18c0:3:a1:be24:11ff:fe83:9a39,AS906 DMIT,DMIT Cloud Services,Hong Kong · CN
+140.235.96.74,443,true,400,,HKG,中国-香港,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,1,2403:18c0:4:557:be24:11ff:feca:5de1,AS906 DMIT,DMIT Cloud Services,Hong Kong · CN
+179.253.226.191,8443,true,824,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,1,2605:52c0:2:25d9:544b:36ff:fe4c:54ef,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
 179.255.133.144,443,true,35,,LAX,北美洲 · 美国 · 洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-10-24 11:18:56,@danfeng_chat,2,2605:52c0:2:71f8:be24:11ff:fe9f:62fd,AS906 DMIT,DMIT,Los Angeles · US
 179.253.255.191,443,true,41,,LAX,北美洲 · 美国 · 洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-10-24 11:18:58,@danfeng_chat,2,2605:52c0:2:6cb7:be24:11ff:fedb:7554,AS906 DMIT,DMIT,Los Angeles · US
 179.253.243.101,443,true,44,,LAX,北美洲 · 美国 · 洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-10-24 11:19:06,@danfeng_chat,2,2605:52c0:2:682b:be24:11ff:fe2a:1d28,AS906 DMIT,DMIT,Los Angeles · US
 154.17.12.150,443,true,45,,LAX,北美洲 · 美国 · 洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-10-24 11:19:19,@danfeng_chat,2,2605:52c0:2:6787:be24:11ff:fed5:3bd2,AS906 DMIT,DMIT,Los Angeles · US
 191.223.217.144,443,true,482,,HKG,亚洲 · 香港,AS906 DMIT,DMIT,2026-10-18 21:47:10,@danfeng_chat,2,2403:18c0:5:da:be24:11ff:fe3e:3f7d,AS906 DMIT,DMIT,Kwai Chung · US
-179.253.255.64,443,true,906,,,,AS906 DMIT,DMIT,2026-11-03 12:42:13,@otcjlq,2,,,,Los Angeles · US
-131.143.180.57,443,true,906,,,,AS906 DMIT,DMIT,2026-11-03 12:42:13,@otcjlq,2,,,,Los Angeles · US
-179.255.132.69,443,true,906,,,,AS906 DMIT,DMIT,2026-11-03 12:42:13,@otcjlq,2,,,,Los Angeles · US
-179.253.231.12,443,true,906,,,,AS906 DMIT,DMIT,2026-11-03 12:42:13,@otcjlq,2,,,,Los Angeles · US
-69.63.214.68,443,true,906,,,,AS906 DMIT,DMIT,2026-11-03 12:42:13,@otcjlq,2,,,,Los Angeles · US
-179.255.127.209,443,true,906,,,,AS906 DMIT,DMIT,2026-11-03 12:42:13,@otcjlq,2,,AS906 DMIT,DMIT,Los Angeles · US
+179.253.255.64,443,true,,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,2,2605:52c0:2:65e9:be24:11ff:fea0:b457,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
+131.143.180.57,443,true,,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,2,2605:52c0:2:7235:be24:11ff:fe7f:9d1f,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
+179.255.132.69,443,true,,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,2,2605:52c0:2:6f68:be24:11ff:fee5:3a99,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
+179.253.231.12,443,true,,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,2,2605:52c0:2:4afe:be24:11ff:fedc:b633,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
+69.63.214.68,443,true,,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,2,69.63.214.68,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
+179.255.127.209,443,true,,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,2,2605:52c0:2:6d99:be24:11ff:fefb:9c95,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
 176.53.161.177,443,true,479,,AMS,欧洲 · 荷兰 · 阿姆斯特丹,"AS9123 JSC ""TIMEWEB""","JSC ""TIMEWEB""",2026-10-18 21:46:02,@danfeng_chat,0,176.53.161.177,"AS9123 JSC ""TIMEWEB""","JSC ""TIMEWEB""",Saint Petersburg · RU
 147.45.212.207,443,true,482,,FRA,Moscow · 俄罗斯,"AS9123 JSC ""TIMEWEB""","JSC ""TIMEWEB""",2026-09-16 08:19:53,@danfeng2,0,2a03:6f00:a::a36b,"AS9123 JSC ""TIMEWEB""","JSC ""TIMEWEB""",Moscow · RU
 85.193.81.94,443,true,489,,AMS,欧洲 · 荷兰 · 阿姆斯特丹,"AS9123 JSC ""TIMEWEB""","JSC ""TIMEWEB""",2026-10-18 21:52:35,@danfeng_chat,0,85.193.81.94,"AS9123 JSC ""TIMEWEB""","JSC ""TIMEWEB""",Saint Petersburg · RU
@@ -26665,9 +26665,9 @@
 38.213.228.141,443,true,251,0,IAH,Mexico City · 墨西哥,AS984 OCTOPUS WEB SOLUTION INC,OCTOPUS WEB SOLUTION INC,2026-10-15 12:44:41,@cmliussss_all,0,2606:fb40:1201:1001::8a,AS984 OCTOPUS WEB SOLUTION INC,OCTOPUS WEB SOLUTION INC,Mexico City · US
 38.213.228.91,443,true,282,,IAH,北美洲 · 美国 · 休斯顿,AS984 OCTOPUS WEB SOLUTION INC,OCTOPUS WEB SOLUTION INC,2026-10-18 21:50:10,@danfeng_chat,0,2606:fb40:1201:1001::28c,AS984 OCTOPUS WEB SOLUTION INC,OCTOPUS WEB SOLUTION INC,Mexico City · US
 tp50001.kr.proxyip.fgfw.eu.org,50001,true,1060,,ICN,Chuncheon · KR,AS_UNKNOWN,,2026-10-25 18:30:49,@user,0,144.24.87.69,AS31898 Oracle Cloud (Oracle Corp UK Ltd),Oracle Corp UK Ltd,Chuncheon · KR
-179.255.133.165,443,true,906,,,,AS_UNKNOWN,,2026-11-03 12:42:13,@otcjlq,2,,,,
-191.222.220.109,443,true,906,,,,AS_UNKNOWN,,2026-11-03 12:42:13,@otcjlq,2,,,,
-179.255.115.126,443,true,906,,,,AS_UNKNOWN,,2026-11-03 12:42:13,@otcjlq,2,,,,
+179.255.133.165,443,true,,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,2,2605:52c0:2:70a6:be24:11ff:fef3:685,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
+191.222.220.109,443,true,,,HKG,中国-香港,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,2,2403:18c0:3:71:be24:11ff:fef2:f92b,AS906 DMIT,DMIT Cloud Services,Hong Kong · CN
+179.255.115.126,443,true,,,LAX,美国-洛杉矶,AS906 DMIT,DMIT Cloud Services,2026-11-03 12:42:13,@otcjlq,2,179.255.115.126,AS906 DMIT,DMIT Cloud Services,Los Angeles · US
 177.3.89.108,443,true,137535,,,,AS_UNKNOWN,,2026-11-03 11:01:06,@otcjlq,2,,,,
 177.3.92.246,443,true,137535,,,,AS_UNKNOWN,,2026-11-03 11:01:06,@otcjlq,2,,,,
-45.194.21.121,443,true,140227,,,,AS_UNKNOWN,,2026-11-03 11:01:06,@otcjlq,2,,,,
+45.194.21.121,443,true,,,HKG,中国-香港,"AS140227 Hong Kong Communications International Co., Limited","Hong Kong Communications International Co., Limited",2026-11-03 11:01:06,@otcjlq,2,45.194.21.121,"AS140227 Hong Kong Communications International Co., Limited","Hong Kong Communications International Co., Limited",Hong Kong · CN
