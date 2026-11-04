@@ -2803,6 +2803,21 @@ def resolve_node_exit_and_net_type(
     return False, "datacenter", "", ""
 
 
+def is_channel_or_user_source(source: str) -> bool:
+    """
+    判断代理来源是否为 Telegram 频道/群组或用户自留数据：
+    - 允许保留机房的来源白名单：以 '@' 开头的频道/交流群（如 @danfeng_chat, @otcjlq, @otcfxq, @user 等）
+      以及明确标明用户自留提供者 ('user', 'manual', 'custom')。
+    - 其余所有外部订阅、镜像爬虫源（EDT-Pages, vpngate, proxifly, subscription 等）：严格过滤机房节点！
+    """
+    s = str(source or "").strip()
+    if not s:
+        return False
+    if s.startswith("@"):
+        return True
+    return s.lower() in ("user", "manual", "custom")
+
+
 def format_proxyip_json_item(r_dict: dict) -> dict:
     """
     转换为适配第三方调用、反代配置与前端订阅的标准化 ProxyIP JSON 字典对象：
@@ -3694,19 +3709,21 @@ def calibrate_all_datasets(
                 else:
                     correct_nt = str(r.get("net_type") or "").strip().lower()
 
-                # 准入规则：EDT-Pages 来源严格要求为非机房节点，若校准为 datacenter 坚决剔除淘汰（其他来源允许机房）
+                # 准入规则：除了频道（@ 开头）和用户自留提供者 (@user / user / manual / custom)，
+                # 其余所有外部来源 (EDT-Pages, vpngate, proxifly, subscription 等) 均严格过滤机房节点，
+                # 若校准裁决为 datacenter 坚决剔除淘汰！
                 src_val = str(r.get("source") or "").strip()
                 eff_nt = correct_nt or str(r.get("net_type") or "").strip().lower()
-                if src_val == "EDT-Pages" and eff_nt == "datacenter":
+                if not is_channel_or_user_source(src_val) and eff_nt == "datacenter":
                     dropped_edt_dc += 1
                     changed_proxies += 1
-                    log.info("【全量校准 准入拦截】清理 EDT-Pages 来源的机房节点: %s (%s)", r.get("url"), r.get("asn"))
+                    log.info("【全量校准 准入拦截】清理非频道/非用户来源的机房节点: %s (%s, 来源: %s)", r.get("url"), r.get("asn"), src_val)
                     continue
 
                 clean_rows.append(r)
 
             if dropped_edt_dc > 0:
-                log.info("【全量校准 准入拦截】共清理剔除 %d 个 EDT-Pages 来源的机房 (datacenter) 节点", dropped_edt_dc)
+                log.info("【全量校准 准入拦截】共清理剔除 %d 个外部来源的机房 (datacenter) 节点", dropped_edt_dc)
             rows = clean_rows
 
             if changed_proxies > 0 or not proxies_only:

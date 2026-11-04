@@ -220,28 +220,6 @@
     "source": "vpngate"
   },
   {
-    "proxy": "sstp://vpn:vpn@vpn981204829.opengw.net:443",
-    "protocol": "sstp",
-    "ip": "vpn981204829.opengw.net",
-    "port": 443,
-    "clientIp": "150.40.105.12",
-    "clientIps": [
-      "150.40.105.12"
-    ],
-    "clientIpv4": "150.40.105.12",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "HR",
-    "country_name": "HR",
-    "country_cn": "HR",
-    "country_emoji": "🇭🇷",
-    "asn": "211619",
-    "asOrganization": "MAXKO d.o.o.",
-    "isp": "MAXKO d.o.o.",
-    "net_type": "datacenter",
-    "source": "vpngate"
-  },
-  {
     "proxy": "sstp://vpn:vpn@vpn398736484.opengw.net:1723",
     "protocol": "sstp",
     "ip": "vpn398736484.opengw.net",
@@ -7832,28 +7810,6 @@
     "source": "vpngate"
   },
   {
-    "proxy": "sstp://vpn:vpn@public-vpn-158.opengw.net:443",
-    "protocol": "sstp",
-    "ip": "public-vpn-158.opengw.net",
-    "port": 443,
-    "clientIp": "219.100.37.123",
-    "clientIps": [
-      "219.100.37.123"
-    ],
-    "clientIpv4": "219.100.37.123",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "36599",
-    "asOrganization": "SoftEther",
-    "isp": "SoftEther",
-    "net_type": "datacenter",
-    "source": "vpngate"
-  },
-  {
     "proxy": "sstp://vpn:vpn@vpn780884596.opengw.net:995",
     "protocol": "sstp",
     "ip": "vpn780884596.opengw.net",
@@ -8008,28 +7964,6 @@
     "source": "vpngate"
   },
   {
-    "proxy": "sstp://vpn:vpn@public-vpn-122.opengw.net:443",
-    "protocol": "sstp",
-    "ip": "public-vpn-122.opengw.net",
-    "port": 443,
-    "clientIp": "219.100.37.62",
-    "clientIps": [
-      "219.100.37.62"
-    ],
-    "clientIpv4": "219.100.37.62",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "36599",
-    "asOrganization": "SoftEther",
-    "isp": "SoftEther",
-    "net_type": "datacenter",
-    "source": "vpngate"
-  },
-  {
     "proxy": "sstp://vpn:vpn@vpn375055460.opengw.net:1875",
     "protocol": "sstp",
     "ip": "vpn375055460.opengw.net",
@@ -8052,28 +7986,6 @@
     "source": "vpngate"
   },
   {
-    "proxy": "sstp://vpn:vpn@opengw.opengw.net:443",
-    "protocol": "sstp",
-    "ip": "opengw.opengw.net",
-    "port": 443,
-    "clientIp": "217.138.212.62",
-    "clientIps": [
-      "217.138.212.62"
-    ],
-    "clientIpv4": "217.138.212.62",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "9009",
-    "asOrganization": "M247",
-    "isp": "M247",
-    "net_type": "datacenter",
-    "source": "vpngate"
-  },
-  {
     "proxy": "sstp://vpn:vpn@vpn609012261.opengw.net:1276",
     "protocol": "sstp",
     "ip": "vpn609012261.opengw.net",
@@ -8093,50 +8005,6 @@
     "asOrganization": "BIGLOBE Inc.",
     "isp": "BIGLOBE Inc.",
     "net_type": "isp",
-    "source": "vpngate"
-  },
-  {
-    "proxy": "sstp://vpn:vpn@public-vpn-228.opengw.net:443",
-    "protocol": "sstp",
-    "ip": "public-vpn-228.opengw.net",
-    "port": 443,
-    "clientIp": "219.100.37.220",
-    "clientIps": [
-      "219.100.37.220"
-    ],
-    "clientIpv4": "219.100.37.220",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "36599",
-    "asOrganization": "SoftEther",
-    "isp": "SoftEther",
-    "net_type": "datacenter",
-    "source": "vpngate"
-  },
-  {
-    "proxy": "sstp://vpn:vpn@public-vpn-41.opengw.net:443",
-    "protocol": "sstp",
-    "ip": "public-vpn-41.opengw.net",
-    "port": 443,
-    "clientIp": "219.100.37.5",
-    "clientIps": [
-      "219.100.37.5"
-    ],
-    "clientIpv4": "219.100.37.5",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "36599",
-    "asOrganization": "SoftEther",
-    "isp": "SoftEther",
-    "net_type": "datacenter",
     "source": "vpngate"
   },
   {
@@ -8184,50 +8052,6 @@
     "source": "vpngate"
   },
   {
-    "proxy": "sstp://vpn:vpn@public-vpn-155.opengw.net:443",
-    "protocol": "sstp",
-    "ip": "public-vpn-155.opengw.net",
-    "port": 443,
-    "clientIp": "219.100.37.110",
-    "clientIps": [
-      "219.100.37.110"
-    ],
-    "clientIpv4": "219.100.37.110",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "36599",
-    "asOrganization": "SoftEther",
-    "isp": "SoftEther",
-    "net_type": "datacenter",
-    "source": "vpngate"
-  },
-  {
-    "proxy": "sstp://vpn:vpn@public-vpn-108.opengw.net:443",
-    "protocol": "sstp",
-    "ip": "public-vpn-108.opengw.net",
-    "port": 443,
-    "clientIp": "219.100.37.98",
-    "clientIps": [
-      "219.100.37.98"
-    ],
-    "clientIpv4": "219.100.37.98",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "36599",
-    "asOrganization": "SoftEther",
-    "isp": "SoftEther",
-    "net_type": "datacenter",
-    "source": "vpngate"
-  },
-  {
     "proxy": "sstp://vpn:vpn@vpn639179927.opengw.net:1688",
     "protocol": "sstp",
     "ip": "vpn639179927.opengw.net",
@@ -8247,50 +8071,6 @@
     "asOrganization": "CenturyLink Communications, LLC",
     "isp": "CenturyLink Communications, LLC",
     "net_type": "isp",
-    "source": "vpngate"
-  },
-  {
-    "proxy": "sstp://vpn:vpn@public-vpn-242.opengw.net:443",
-    "protocol": "sstp",
-    "ip": "public-vpn-242.opengw.net",
-    "port": 443,
-    "clientIp": "219.100.37.186",
-    "clientIps": [
-      "219.100.37.186"
-    ],
-    "clientIpv4": "219.100.37.186",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "36599",
-    "asOrganization": "SoftEther",
-    "isp": "SoftEther",
-    "net_type": "datacenter",
-    "source": "vpngate"
-  },
-  {
-    "proxy": "sstp://vpn:vpn@public-vpn-48.opengw.net:443",
-    "protocol": "sstp",
-    "ip": "public-vpn-48.opengw.net",
-    "port": 443,
-    "clientIp": "219.100.37.12",
-    "clientIps": [
-      "219.100.37.12"
-    ],
-    "clientIpv4": "219.100.37.12",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "36599",
-    "asOrganization": "SoftEther",
-    "isp": "SoftEther",
-    "net_type": "datacenter",
     "source": "vpngate"
   },
   {
@@ -8316,28 +8096,6 @@
     "source": "vpngate"
   },
   {
-    "proxy": "sstp://vpn:vpn@public-vpn-90.opengw.net:443",
-    "protocol": "sstp",
-    "ip": "public-vpn-90.opengw.net",
-    "port": 443,
-    "clientIp": "219.100.37.55",
-    "clientIps": [
-      "219.100.37.55"
-    ],
-    "clientIpv4": "219.100.37.55",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "36599",
-    "asOrganization": "SoftEther",
-    "isp": "SoftEther",
-    "net_type": "datacenter",
-    "source": "vpngate"
-  },
-  {
     "proxy": "sstp://vpn:vpn@vpn183424407.opengw.net:995",
     "protocol": "sstp",
     "ip": "vpn183424407.opengw.net",
@@ -8357,50 +8115,6 @@
     "asOrganization": "Korea Telecom",
     "isp": "Korea Telecom",
     "net_type": "isp",
-    "source": "vpngate"
-  },
-  {
-    "proxy": "sstp://vpn:vpn@public-vpn-47.opengw.net:443",
-    "protocol": "sstp",
-    "ip": "public-vpn-47.opengw.net",
-    "port": 443,
-    "clientIp": "219.100.37.11",
-    "clientIps": [
-      "219.100.37.11"
-    ],
-    "clientIpv4": "219.100.37.11",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "36599",
-    "asOrganization": "SoftEther",
-    "isp": "SoftEther",
-    "net_type": "datacenter",
-    "source": "vpngate"
-  },
-  {
-    "proxy": "sstp://vpn:vpn@public-vpn-137.opengw.net:443",
-    "protocol": "sstp",
-    "ip": "public-vpn-137.opengw.net",
-    "port": 443,
-    "clientIp": "219.100.37.116",
-    "clientIps": [
-      "219.100.37.116"
-    ],
-    "clientIpv4": "219.100.37.116",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "36599",
-    "asOrganization": "SoftEther",
-    "isp": "SoftEther",
-    "net_type": "datacenter",
     "source": "vpngate"
   },
   {
@@ -8734,28 +8448,6 @@
     "source": "vpngate"
   },
   {
-    "proxy": "sstp://vpn:vpn@public-vpn-251.opengw.net:443",
-    "protocol": "sstp",
-    "ip": "public-vpn-251.opengw.net",
-    "port": 443,
-    "clientIp": "219.100.37.223",
-    "clientIps": [
-      "219.100.37.223"
-    ],
-    "clientIpv4": "219.100.37.223",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "36599",
-    "asOrganization": "SoftEther",
-    "isp": "SoftEther",
-    "net_type": "datacenter",
-    "source": "vpngate"
-  },
-  {
     "proxy": "sstp://vpn:vpn@vpn299982459.opengw.net:1902",
     "protocol": "sstp",
     "ip": "vpn299982459.opengw.net",
@@ -8775,50 +8467,6 @@
     "asOrganization": "NTT Communications Corporation",
     "isp": "NTT Communications Corporation",
     "net_type": "isp",
-    "source": "vpngate"
-  },
-  {
-    "proxy": "sstp://vpn:vpn@public-vpn-211.opengw.net:443",
-    "protocol": "sstp",
-    "ip": "public-vpn-211.opengw.net",
-    "port": 443,
-    "clientIp": "219.100.37.168",
-    "clientIps": [
-      "219.100.37.168"
-    ],
-    "clientIpv4": "219.100.37.168",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "36599",
-    "asOrganization": "SoftEther",
-    "isp": "SoftEther",
-    "net_type": "datacenter",
-    "source": "vpngate"
-  },
-  {
-    "proxy": "sstp://vpn:vpn@public-vpn-153.opengw.net:443",
-    "protocol": "sstp",
-    "ip": "public-vpn-153.opengw.net",
-    "port": 443,
-    "clientIp": "219.100.37.109",
-    "clientIps": [
-      "219.100.37.109"
-    ],
-    "clientIpv4": "219.100.37.109",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "36599",
-    "asOrganization": "SoftEther",
-    "isp": "SoftEther",
-    "net_type": "datacenter",
     "source": "vpngate"
   },
   {
@@ -8863,28 +8511,6 @@
     "asOrganization": "Primorye NET",
     "isp": "Primorye NET",
     "net_type": "isp",
-    "source": "vpngate"
-  },
-  {
-    "proxy": "sstp://vpn:vpn@public-vpn-241.opengw.net:443",
-    "protocol": "sstp",
-    "ip": "public-vpn-241.opengw.net",
-    "port": 443,
-    "clientIp": "219.100.37.182",
-    "clientIps": [
-      "219.100.37.182"
-    ],
-    "clientIpv4": "219.100.37.182",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "36599",
-    "asOrganization": "SoftEther",
-    "isp": "SoftEther",
-    "net_type": "datacenter",
     "source": "vpngate"
   },
   {
@@ -8998,72 +8624,6 @@
     "source": "vpngate"
   },
   {
-    "proxy": "sstp://vpn:vpn@public-vpn-186.opengw.net:443",
-    "protocol": "sstp",
-    "ip": "public-vpn-186.opengw.net",
-    "port": 443,
-    "clientIp": "219.100.37.163",
-    "clientIps": [
-      "219.100.37.163"
-    ],
-    "clientIpv4": "219.100.37.163",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "36599",
-    "asOrganization": "SoftEther",
-    "isp": "SoftEther",
-    "net_type": "datacenter",
-    "source": "vpngate"
-  },
-  {
-    "proxy": "sstp://vpn:vpn@public-vpn-71.opengw.net:443",
-    "protocol": "sstp",
-    "ip": "public-vpn-71.opengw.net",
-    "port": 443,
-    "clientIp": "219.100.37.25",
-    "clientIps": [
-      "219.100.37.25"
-    ],
-    "clientIpv4": "219.100.37.25",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "36599",
-    "asOrganization": "SoftEther",
-    "isp": "SoftEther",
-    "net_type": "datacenter",
-    "source": "vpngate"
-  },
-  {
-    "proxy": "sstp://vpn:vpn@public-vpn-185.opengw.net:443",
-    "protocol": "sstp",
-    "ip": "public-vpn-185.opengw.net",
-    "port": 443,
-    "clientIp": "219.100.37.193",
-    "clientIps": [
-      "219.100.37.193"
-    ],
-    "clientIpv4": "219.100.37.193",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "36599",
-    "asOrganization": "SoftEther",
-    "isp": "SoftEther",
-    "net_type": "datacenter",
-    "source": "vpngate"
-  },
-  {
     "proxy": "sstp://vpn:vpn@vpn733995151.opengw.net:1241",
     "protocol": "sstp",
     "ip": "vpn733995151.opengw.net",
@@ -9105,50 +8665,6 @@
     "asOrganization": "NTT Communications Corporation",
     "isp": "NTT Communications Corporation",
     "net_type": "isp",
-    "source": "vpngate"
-  },
-  {
-    "proxy": "sstp://vpn:vpn@public-vpn-85.opengw.net:443",
-    "protocol": "sstp",
-    "ip": "public-vpn-85.opengw.net",
-    "port": 443,
-    "clientIp": "219.100.37.81",
-    "clientIps": [
-      "219.100.37.81"
-    ],
-    "clientIpv4": "219.100.37.81",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "36599",
-    "asOrganization": "SoftEther",
-    "isp": "SoftEther",
-    "net_type": "datacenter",
-    "source": "vpngate"
-  },
-  {
-    "proxy": "sstp://vpn:vpn@public-vpn-231.opengw.net:443",
-    "protocol": "sstp",
-    "ip": "public-vpn-231.opengw.net",
-    "port": 443,
-    "clientIp": "219.100.37.188",
-    "clientIps": [
-      "219.100.37.188"
-    ],
-    "clientIpv4": "219.100.37.188",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "36599",
-    "asOrganization": "SoftEther",
-    "isp": "SoftEther",
-    "net_type": "datacenter",
     "source": "vpngate"
   },
   {
@@ -9196,28 +8712,6 @@
     "source": "vpngate"
   },
   {
-    "proxy": "sstp://vpn:vpn@public-vpn-142.opengw.net:443",
-    "protocol": "sstp",
-    "ip": "public-vpn-142.opengw.net",
-    "port": 443,
-    "clientIp": "219.100.37.114",
-    "clientIps": [
-      "219.100.37.114"
-    ],
-    "clientIpv4": "219.100.37.114",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "36599",
-    "asOrganization": "SoftEther",
-    "isp": "SoftEther",
-    "net_type": "datacenter",
-    "source": "vpngate"
-  },
-  {
     "proxy": "sstp://vpn:vpn@vpn181851097.opengw.net:1210",
     "protocol": "sstp",
     "ip": "vpn181851097.opengw.net",
@@ -9237,28 +8731,6 @@
     "asOrganization": "SoftBank Corp.",
     "isp": "SoftBank Corp.",
     "net_type": "isp",
-    "source": "vpngate"
-  },
-  {
-    "proxy": "sstp://vpn:vpn@public-vpn-160.opengw.net:443",
-    "protocol": "sstp",
-    "ip": "public-vpn-160.opengw.net",
-    "port": 443,
-    "clientIp": "219.100.37.124",
-    "clientIps": [
-      "219.100.37.124"
-    ],
-    "clientIpv4": "219.100.37.124",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "36599",
-    "asOrganization": "SoftEther",
-    "isp": "SoftEther",
-    "net_type": "datacenter",
     "source": "vpngate"
   }
 ]

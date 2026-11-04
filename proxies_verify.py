@@ -77,6 +77,7 @@ from providers import (
     atomic_write_json,
     auto_enrich_and_save_asns,
     is_asn_recorded,
+    is_channel_or_user_source,
 )
 
 # 确保本地 .env 加载
@@ -1956,8 +1957,9 @@ async def async_main(args):
     def _is_survivor(r):
         if r.get("status") == "datacenter_rejected":
             return False
-        # 核心准入策略：EDT-Pages 来源严格要求非机房，若已知为机房则坚决不准入
-        if str(r.get("source") or "").strip() == "EDT-Pages":
+        # 核心准入策略：除了频道 (@ 开头) 和用户自留 (@user/user/manual/custom)，其余外部来源一律过滤机房
+        src_val = str(r.get("source") or "").strip()
+        if not is_channel_or_user_source(src_val):
             nt_check = str(r.get("net_type") or "").strip().lower()
             if not nt_check:
                 c_code = _extract_asn_code(r.get("asn"), r.get("isp"))
@@ -2010,18 +2012,18 @@ async def async_main(args):
     net_stats = await enrich_proxies_metadata(survivors)
     log.info("[通用代理 网络属性] %s", net_stats)
 
-    # 准入安全兜底：再次过滤打标后确认属于机房 (datacenter) 的 EDT-Pages 节点
-    edt_dc_dropped = 0
+    # 准入安全兜底：再次过滤打标后确认属于机房 (datacenter) 的非频道/非用户外部来源节点
+    ext_dc_dropped = 0
     clean_survivors = []
     for r in survivors:
         src_val = str(r.get("source") or "").strip()
         nt_val = str(r.get("net_type") or "").strip().lower()
-        if src_val == "EDT-Pages" and nt_val == "datacenter":
-            edt_dc_dropped += 1
+        if not is_channel_or_user_source(src_val) and nt_val == "datacenter":
+            ext_dc_dropped += 1
             continue
         clean_survivors.append(r)
-    if edt_dc_dropped > 0:
-        log.info("[通用代理 准入控制] 剔除 %d 个 EDT-Pages 来源的机房 (datacenter) 节点", edt_dc_dropped)
+    if ext_dc_dropped > 0:
+        log.info("[通用代理 准入控制] 剔除 %d 个外部来源的机房 (datacenter) 节点", ext_dc_dropped)
         survivors = clean_survivors
         survivors_len = len(survivors)
 

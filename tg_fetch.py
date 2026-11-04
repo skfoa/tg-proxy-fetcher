@@ -81,6 +81,7 @@ from providers import (
     CHECK_PROXYIP_URL,
     probe_check_proxyip_api,
     auto_enrich_and_save_asns,
+    is_channel_or_user_source,
 )
 from parsers import (
     extract_proxies,
@@ -410,8 +411,8 @@ def load_existing_proxies(
                     c_code = _extract_asn_code(asn_val, isp_val)
                     cur_nt = classify_asn(c_code, isp_val) if c_code else str(r.get("net_type") or "").strip().lower()
 
-                    # 准入过滤：历史记录中 EDT-Pages 来源如果当前被裁决为机房 (datacenter)，不再回流载入
-                    if src_val == "EDT-Pages" and cur_nt == "datacenter":
+                    # 准入过滤：历史记录中除了频道 (@ 开头) 和用户自留 (@user/user/manual/custom)，其余外部来源若裁决为机房 (datacenter)，不再回流载入
+                    if not is_channel_or_user_source(src_val) and cur_nt == "datacenter":
                         continue
 
                     meta = {

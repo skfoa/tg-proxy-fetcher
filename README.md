@@ -171,6 +171,9 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
   - **高可用协议缓冲容错（`--max-fails 3`）**：SOCKS5、HTTPS、TURN、SSTP 等协议维持连续 3 次全网不可达方才淘汰的缓冲保护，避免网络抖动误杀；
   - **延迟熔断与极致纯净**：支持 `--http-max-latency` 超时剔除与 `--strict` 极致纯净模式（全协议失败 1 次即刻淘汰）。
 * **全链路失败可观测性**：探测过程由 `reasons_counter` 细分记录具体失败成因（`connect_timeout`、`tls_error`、`http_status_xxx`、`dc_rejected` 等），并在日志中输出详细的协议分布与成因汇总。
+* **来源分层机房准入控制**：
+  - **频道与用户来源白名单**：来自 Telegram 公开频道/群组（以 `@` 开头，如 `@danfeng_chat`、`@otcjlq`、`@otcfxq` 等）以及用户自留提供者（`@user`、`user`、`manual`、`custom`）执行全收策略，允许连通的机房节点保留存活；
+  - **外部源严格过滤机房（零容忍）**：其余所有外部订阅与公开数据源（涵盖 `EDT-Pages`、`vpngate`、`proxifly`、`subscription` 等）一律严格过滤机房托管节点，一旦被权威知识库或探针确认为 `datacenter`，在抓取载入、存活质检与终态校准三大防线中坚决剔除淘汰，确保外部引入的均为优质原生网络资产。
 * **协议专属分类与多格式导出（按协议分块归类，避免混杂）：**
   - `data/proxies.txt`：全量代理汇总纯文本，按协议分段归类输出（`# SOCKS5 代理`、`# TURN 协议`、`# SSTP 协议` 等），段内按实测延迟严选升序排列。
   - `data/proxies.csv`：结构化质检总表（15 字段完整凭据），严格按协议大类分块聚集排序（SOCKS5 块 ➔ TURN 块 ➔ SSTP 块），行与行之间无交错混插。
