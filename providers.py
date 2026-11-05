@@ -3495,7 +3495,7 @@ def probe_asn_from_ipinfo(
 
         raw_type, raw_name = extract_ipinfo_page_meta(html)
         if raw_type:
-            log.info("【IPinfo 官方探针精准命中】%s -> Type: %s | Name: %s (出海通道: %s)", clean_code, raw_type, raw_name, p or "直连")
+            log.debug("【IPinfo 官方探针精准命中】%s -> Type: %s | Name: %s (出海通道: %s)", clean_code, raw_type, raw_name, p or "直连")
             return raw_type, raw_name
 
     return "", ""
@@ -3596,7 +3596,7 @@ def auto_enrich_and_save_asns(
             org = official_name or code_fallback_org.get(code, "")
             if official_type and official_type in EXTERNAL_NET_TYPE_MAP:
                 net_type = EXTERNAL_NET_TYPE_MAP[official_type]
-                log.info("【ASN 精准注入】ASN %s 成功通过 IPinfo 官方探针精准打标: %s -> %s", code, org, net_type)
+                log.debug("【ASN 精准注入】ASN %s 成功通过 IPinfo 官方探针精准打标: %s -> %s", code, org, net_type)
                 to_save_map[code] = {
                     "asn": code,
                     "isp": org,
@@ -3645,6 +3645,8 @@ def auto_enrich_and_save_asns(
             classify_asn.cache_clear()
 
             sample_str = ", ".join(f"{c}[{info['net_type']}]" for c, info in list(to_save_map.items())[:6])
+            if len(to_save_map) > 6:
+                sample_str += f" 等共 {len(to_save_map)} 个"
             log.info("【批量自动持久化新 ASN】提取并持久化 %d 个全新自治系统并原子写入数据库: %s", added_count, sample_str)
         return added_count
     except Exception:
