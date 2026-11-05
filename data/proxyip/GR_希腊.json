@@ -20,27 +20,5 @@
     "isp": "Interconnect Sm LLC",
     "net_type": "isp",
     "source": "@danfeng2"
-  },
-  {
-    "proxy": "212.52.16.31:443",
-    "ip": "212.52.16.31",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2a03:f80:30:1620::1",
-    "clientIps": [
-      "2a03:f80:30:1620::1"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2a03:f80:30:1620::1",
-    "dual_stack": false,
-    "country": "GR",
-    "country_name": "希腊",
-    "country_cn": "希腊",
-    "country_emoji": "🇬🇷",
-    "asn": "8280",
-    "asOrganization": "SYNAPSECOM S.A. Provider of Telecommunications and Internet Services",
-    "isp": "SYNAPSECOM S.A. Provider of Telecommunications and Internet Services",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
   }
 ]

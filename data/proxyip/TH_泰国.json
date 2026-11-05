@@ -1,36 +1,14 @@
 [
   {
-    "proxy": "27.254.216.110:443",
-    "ip": "27.254.216.110",
+    "proxy": "61.91.54.186:443",
+    "ip": "61.91.54.186",
     "port": 443,
     "tls": true,
-    "clientIp": "27.254.216.110",
+    "clientIp": "49.0.67.36",
     "clientIps": [
-      "27.254.216.110"
+      "49.0.67.36"
     ],
-    "clientIpv4": "27.254.216.110",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "TH",
-    "country_name": "泰国",
-    "country_cn": "泰国",
-    "country_emoji": "🇹🇭",
-    "asn": "9891",
-    "asOrganization": "CS LOXINFO Public Company Limited.",
-    "isp": "CS LOXINFO Public Company Limited.",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "61.47.83.74:443",
-    "ip": "61.47.83.74",
-    "port": 443,
-    "tls": true,
-    "clientIp": "27.130.15.12",
-    "clientIps": [
-      "27.130.15.12"
-    ],
-    "clientIpv4": "27.130.15.12",
+    "clientIpv4": "49.0.67.36",
     "clientIpv6": "",
     "dual_stack": false,
     "country": "TH",
@@ -38,32 +16,10 @@
     "country_cn": "泰国",
     "country_emoji": "🇹🇭",
     "asn": "133481",
-    "asOrganization": "AIS-Fibre",
-    "isp": "AIS-Fibre",
+    "asOrganization": "AIS Fibre",
+    "isp": "AIS Fibre",
     "net_type": "isp",
     "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "101.108.49.121:443",
-    "ip": "101.108.49.121",
-    "port": 443,
-    "tls": true,
-    "clientIp": "101.108.49.121",
-    "clientIps": [
-      "101.108.49.121"
-    ],
-    "clientIpv4": "101.108.49.121",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "TH",
-    "country_name": "泰国",
-    "country_cn": "泰国",
-    "country_emoji": "🇹🇭",
-    "asn": "23974",
-    "asOrganization": "Dynamic IP assignment for broadband service",
-    "isp": "Dynamic IP assignment for broadband service",
-    "net_type": "government",
-    "source": "@cmliussss_all"
   },
   {
     "proxy": "64.90.21.49:52840",
@@ -110,6 +66,50 @@
     "source": "@danfeng_chat"
   },
   {
+    "proxy": "27.254.216.110:443",
+    "ip": "27.254.216.110",
+    "port": 443,
+    "tls": true,
+    "clientIp": "27.254.216.110",
+    "clientIps": [
+      "27.254.216.110"
+    ],
+    "clientIpv4": "27.254.216.110",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "TH",
+    "country_name": "泰国",
+    "country_cn": "泰国",
+    "country_emoji": "🇹🇭",
+    "asn": "9891",
+    "asOrganization": "CS LOXINFO Public Company Limited.",
+    "isp": "CS LOXINFO Public Company Limited.",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
+  },
+  {
+    "proxy": "101.108.49.121:443",
+    "ip": "101.108.49.121",
+    "port": 443,
+    "tls": true,
+    "clientIp": "101.108.49.121",
+    "clientIps": [
+      "101.108.49.121"
+    ],
+    "clientIpv4": "101.108.49.121",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "TH",
+    "country_name": "泰国",
+    "country_cn": "泰国",
+    "country_emoji": "🇹🇭",
+    "asn": "23974",
+    "asOrganization": "Dynamic IP assignment for broadband service",
+    "isp": "Dynamic IP assignment for broadband service",
+    "net_type": "government",
+    "source": "@cmliussss_all"
+  },
+  {
     "proxy": "64.90.10.71:39328",
     "ip": "64.90.10.71",
     "port": 39328,
@@ -132,15 +132,15 @@
     "source": "@danfeng2"
   },
   {
-    "proxy": "61.91.54.186:443",
-    "ip": "61.91.54.186",
+    "proxy": "61.47.83.74:443",
+    "ip": "61.47.83.74",
     "port": 443,
     "tls": true,
-    "clientIp": "49.0.67.36",
+    "clientIp": "27.130.15.12",
     "clientIps": [
-      "49.0.67.36"
+      "27.130.15.12"
     ],
-    "clientIpv4": "49.0.67.36",
+    "clientIpv4": "27.130.15.12",
     "clientIpv6": "",
     "dual_stack": false,
     "country": "TH",
@@ -148,8 +148,8 @@
     "country_cn": "泰国",
     "country_emoji": "🇹🇭",
     "asn": "133481",
-    "asOrganization": "AIS Fibre",
-    "isp": "AIS Fibre",
+    "asOrganization": "AIS-Fibre",
+    "isp": "AIS-Fibre",
     "net_type": "isp",
     "source": "@danfeng_chat"
   }

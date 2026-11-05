@@ -1,5 +1,27 @@
 [
   {
+    "proxy": "157.20.27.130:8443",
+    "ip": "157.20.27.130",
+    "port": 8443,
+    "tls": true,
+    "clientIp": "157.20.27.130",
+    "clientIps": [
+      "157.20.27.130"
+    ],
+    "clientIpv4": "157.20.27.130",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "IN",
+    "country_name": "印度",
+    "country_cn": "印度",
+    "country_emoji": "🇮🇳",
+    "asn": "58678",
+    "asOrganization": "MANNDESHI GURU NET PRIVATE LIMITED",
+    "isp": "MANNDESHI GURU NET PRIVATE LIMITED",
+    "net_type": "isp",
+    "source": "@cmliussss_all"
+  },
+  {
     "proxy": "143.110.188.241:443",
     "ip": "143.110.188.241",
     "port": 443,
@@ -22,24 +44,24 @@
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "157.20.27.130:8443",
-    "ip": "157.20.27.130",
-    "port": 8443,
+    "proxy": "157.20.27.35:443",
+    "ip": "157.20.27.35",
+    "port": 443,
     "tls": true,
-    "clientIp": "157.20.27.130",
+    "clientIp": "2602:fa08:50:4500::a",
     "clientIps": [
-      "157.20.27.130"
+      "2602:fa08:50:4500::a"
     ],
-    "clientIpv4": "157.20.27.130",
-    "clientIpv6": "",
+    "clientIpv4": "",
+    "clientIpv6": "2602:fa08:50:4500::a",
     "dual_stack": false,
     "country": "IN",
     "country_name": "印度",
     "country_cn": "印度",
     "country_emoji": "🇮🇳",
-    "asn": "58678",
-    "asOrganization": "MANNDESHI GURU NET PRIVATE LIMITED",
-    "isp": "MANNDESHI GURU NET PRIVATE LIMITED",
+    "asn": "149020",
+    "asOrganization": "WebHorizon Internet Services",
+    "isp": "WebHorizon Internet Services",
     "net_type": "isp",
     "source": "@cmliussss_all"
   },
@@ -64,27 +86,5 @@
     "isp": "Bharti Airtel Ltd.",
     "net_type": "isp",
     "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "157.20.27.35:443",
-    "ip": "157.20.27.35",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2602:fa08:50:4500::a",
-    "clientIps": [
-      "2602:fa08:50:4500::a"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2602:fa08:50:4500::a",
-    "dual_stack": false,
-    "country": "IN",
-    "country_name": "印度",
-    "country_cn": "印度",
-    "country_emoji": "🇮🇳",
-    "asn": "149020",
-    "asOrganization": "WebHorizon Internet Services",
-    "isp": "WebHorizon Internet Services",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
   }
 ]

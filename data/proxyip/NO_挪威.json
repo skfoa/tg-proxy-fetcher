@@ -22,28 +22,6 @@
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "81.166.76.218:443",
-    "ip": "81.166.76.218",
-    "port": 443,
-    "tls": true,
-    "clientIp": "81.166.76.218",
-    "clientIps": [
-      "81.166.76.218"
-    ],
-    "clientIpv4": "81.166.76.218",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "NO",
-    "country_name": "挪威",
-    "country_cn": "挪威",
-    "country_emoji": "🇳🇴",
-    "asn": "29695",
-    "asOrganization": "Lyse Tele",
-    "isp": "Lyse Tele",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "84.208.211.208:8443",
     "ip": "84.208.211.208",
     "port": 8443,
@@ -64,5 +42,27 @@
     "isp": "Telia Norge AS",
     "net_type": "isp",
     "source": "@user"
+  },
+  {
+    "proxy": "81.166.76.218:443",
+    "ip": "81.166.76.218",
+    "port": 443,
+    "tls": true,
+    "clientIp": "81.166.76.218",
+    "clientIps": [
+      "81.166.76.218"
+    ],
+    "clientIpv4": "81.166.76.218",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "NO",
+    "country_name": "挪威",
+    "country_cn": "挪威",
+    "country_emoji": "🇳🇴",
+    "asn": "29695",
+    "asOrganization": "Lyse Tele",
+    "isp": "Lyse Tele",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
   }
 ]
