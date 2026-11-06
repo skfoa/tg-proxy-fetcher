@@ -20,27 +20,5 @@
     "isp": "AS INFONET",
     "net_type": "isp",
     "source": "@cmliussss_all"
-  },
-  {
-    "proxy": "130.78.190.134:443",
-    "ip": "130.78.190.134",
-    "port": 443,
-    "tls": true,
-    "clientIp": "130.78.190.134",
-    "clientIps": [
-      "130.78.190.134"
-    ],
-    "clientIpv4": "130.78.190.134",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "EE",
-    "country_name": "爱沙尼亚",
-    "country_cn": "爱沙尼亚",
-    "country_emoji": "🇪🇪",
-    "asn": "204785",
-    "asOrganization": "TakeHost OU",
-    "isp": "TakeHost OU",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
   }
 ]

@@ -1,25 +1,25 @@
 [
   {
-    "proxy": "140.115.53.51:443",
-    "ip": "140.115.53.51",
-    "port": 443,
+    "proxy": "216.23.122.71:30706",
+    "ip": "216.23.122.71",
+    "port": 30706,
     "tls": true,
-    "clientIp": "2a0e:b107:1954:5300:b93:3459:af45:28d8",
+    "clientIp": "1.162.134.184",
     "clientIps": [
-      "2a0e:b107:1954:5300:b93:3459:af45:28d8"
+      "1.162.134.184"
     ],
-    "clientIpv4": "",
-    "clientIpv6": "2a0e:b107:1954:5300:b93:3459:af45:28d8",
+    "clientIpv4": "1.162.134.184",
+    "clientIpv6": "",
     "dual_stack": false,
     "country": "TW",
     "country_name": "中国台湾",
     "country_cn": "中国台湾",
     "country_emoji": "🇹🇼",
-    "asn": "18420",
-    "asOrganization": "T-NCU.EDU.TW",
-    "isp": "T-NCU.EDU.TW",
-    "net_type": "education",
-    "source": "@cmliussss_all"
+    "asn": "3462",
+    "asOrganization": "Chunghwa Telecom Co., Ltd.",
+    "isp": "Chunghwa Telecom Co., Ltd.",
+    "net_type": "isp",
+    "source": "@danfeng2"
   },
   {
     "proxy": "64.178.113.180:30706",
@@ -44,25 +44,25 @@
     "source": "@danfeng2"
   },
   {
-    "proxy": "216.23.122.71:30706",
-    "ip": "216.23.122.71",
-    "port": 30706,
+    "proxy": "140.115.53.51:443",
+    "ip": "140.115.53.51",
+    "port": 443,
     "tls": true,
-    "clientIp": "1.162.134.184",
+    "clientIp": "2a0e:b107:1954:5300:b93:3459:af45:28d8",
     "clientIps": [
-      "1.162.134.184"
+      "2a0e:b107:1954:5300:b93:3459:af45:28d8"
     ],
-    "clientIpv4": "1.162.134.184",
-    "clientIpv6": "",
+    "clientIpv4": "",
+    "clientIpv6": "2a0e:b107:1954:5300:b93:3459:af45:28d8",
     "dual_stack": false,
     "country": "TW",
     "country_name": "中国台湾",
     "country_cn": "中国台湾",
     "country_emoji": "🇹🇼",
-    "asn": "3462",
-    "asOrganization": "Chunghwa Telecom Co., Ltd.",
-    "isp": "Chunghwa Telecom Co., Ltd.",
-    "net_type": "isp",
-    "source": "@danfeng2"
+    "asn": "18420",
+    "asOrganization": "T-NCU.EDU.TW",
+    "isp": "T-NCU.EDU.TW",
+    "net_type": "education",
+    "source": "@cmliussss_all"
   }
 ]
