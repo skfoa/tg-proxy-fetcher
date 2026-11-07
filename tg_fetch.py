@@ -82,6 +82,7 @@ from providers import (
     CHECK_PROXYIP_URL,
     probe_check_proxyip_api,
     auto_enrich_and_save_asns,
+    get_session_enriched_asns,
     is_channel_or_user_source,
 )
 from parsers import (
@@ -663,7 +664,7 @@ def send_tg_notification(
             items = []
             for item in valid_unrecorded[:4]:
                 c = item.get("asn", "")
-                o = str(item.get("org") or item.get("isp") or "").strip()
+                o = str(ASN_TO_PROVIDER.get(c) or item.get("org") or item.get("isp") or "").strip()
                 cnt = item.get("count", 0)
                 name_str = f" {o}" if o else ""
                 cnt_str = f" ({cnt} 条)" if cnt else ""
@@ -882,13 +883,26 @@ def fetch_edt_proxies(
         asn_code = f"AS{asn_raw}" if asn_raw and not asn_raw.upper().startswith("AS") else asn_raw.upper()
         org = str(item.get("asOrganization") or "").strip()
         probe_ip = str(item.get("clientIp") or "").strip() or ip
-        if asn_code and not is_asn_recorded(asn_code) and asn_code not in pre_enrich_map:
-            pre_enrich_map[asn_code] = {"asn": asn_code, "isp": org, "org": org, "ip": probe_ip}
+        if asn_code and not is_asn_recorded(asn_code):
+            if asn_code not in pre_enrich_map:
+                pre_enrich_map[asn_code] = {"asn": asn_code, "isp": org, "org": org, "ip": probe_ip, "count": 0}
+            pre_enrich_map[asn_code]["count"] += 1
 
-    initially_unrecorded = set(pre_enrich_map.keys())
     if pre_enrich_map:
         log.info("EDT %s 发现 %d 个未收录候选 ASN，前置执行权威探针定性入库...", proto_upper, len(pre_enrich_map))
         auto_enrich_and_save_asns(list(pre_enrich_map.values()), proxy=proxy)
+        for asn_code, p_item in pre_enrich_map.items():
+            if is_asn_recorded(asn_code):
+                auth_org = ASN_TO_PROVIDER.get(asn_code) or p_item.get("org") or p_item.get("isp") or ""
+                unrecorded_asns_map[asn_code] = {
+                    "asn": asn_code,
+                    "org": auth_org,
+                    "isp": auth_org,
+                    "ip": p_item.get("ip", ""),
+                    "net_type": classify_asn(asn_code, auth_org),
+                    "count": max(1, safe_int(p_item.get("count"), 1)),
+                    "already_enriched": True,
+                }
 
     for item in data:
         if not isinstance(item, dict):
@@ -901,7 +915,7 @@ def fetch_edt_proxies(
         asn_raw = str(item.get("asn") or "").strip()
         asn_code = f"AS{asn_raw}" if asn_raw and not asn_raw.upper().startswith("AS") else asn_raw.upper()
         org = str(item.get("asOrganization") or "").strip()
-        if not org and asn_code and asn_code in ASN_TO_PROVIDER:
+        if asn_code and asn_code in ASN_TO_PROVIDER and ASN_TO_PROVIDER[asn_code]:
             org = ASN_TO_PROVIDER[asn_code]
 
         # 核心策略：基于权威 ASN 字典直接过滤机房节点，仅保留非机房高价值代理
@@ -914,18 +928,18 @@ def fetch_edt_proxies(
         if is_tombstoned(key, tombstone):
             continue
 
-        # 检查是否为本次新收录的有效非机房 ASN (仅针对通过过滤且存活的高价值候选节点进行收录统计)
-        if asn_code and (asn_code in initially_unrecorded or not is_asn_recorded(asn_code, org)):
-            if asn_code not in unrecorded_asns_map:
-                unrecorded_asns_map[asn_code] = {
-                    "asn": asn_code,
-                    "org": org,
-                    "isp": org,
-                    "ip": ip,
-                    "net_type": net_type,
-                    "count": 0,
-                    "already_enriched": is_asn_recorded(asn_code),
-                }
+        # 兜底收集尚未收录的候选 ASN (已前置入库的 ASN 已在 pre_enrich_map 阶段完整登记)
+        if asn_code and asn_code not in unrecorded_asns_map and not is_asn_recorded(asn_code, org):
+            unrecorded_asns_map[asn_code] = {
+                "asn": asn_code,
+                "org": org,
+                "isp": org,
+                "ip": ip,
+                "net_type": net_type,
+                "count": 1,
+                "already_enriched": False,
+            }
+        elif asn_code and asn_code in unrecorded_asns_map and not unrecorded_asns_map[asn_code].get("already_enriched"):
             unrecorded_asns_map[asn_code]["count"] += 1
 
         client_ip = str(item.get("clientIp") or "").strip()
@@ -1188,19 +1202,33 @@ def fetch_zip_proxyips(
         ports = [p for p in ports if 1 <= p <= 65535]
         if not ip or not ports or not is_valid_host(ip):
             continue
-        if all(is_tombstoned(f"{ip}:{p}", tombstone) for p in ports):
+        valid_ports = [p for p in ports if not is_tombstoned(f"{ip}:{p}", tombstone)]
+        if not valid_ports:
             continue
         meta = item.get("meta") if isinstance(item.get("meta"), dict) else {}
         raw_asn = str(meta.get("asn") or item.get("asn") or "").strip()
         raw_isp = str(meta.get("asOrganization") or meta.get("isp") or item.get("asOrganization") or item.get("isp") or "").strip()
         asn_code = _extract_asn_code(raw_asn, raw_isp)
-        if asn_code and not is_asn_recorded(asn_code) and asn_code not in pre_enrich_map:
-            pre_enrich_map[asn_code] = {"asn": asn_code, "isp": raw_isp, "org": raw_isp, "ip": ip}
+        if asn_code and not is_asn_recorded(asn_code):
+            if asn_code not in pre_enrich_map:
+                pre_enrich_map[asn_code] = {"asn": asn_code, "isp": raw_isp, "org": raw_isp, "ip": ip, "count": 0}
+            pre_enrich_map[asn_code]["count"] += len(valid_ports)
 
-    initially_unrecorded = set(pre_enrich_map.keys())
     if pre_enrich_map:
         log.info("外部 ProxyIP 聚合源发现 %d 个未收录候选 ASN，前置执行权威探针定性入库...", len(pre_enrich_map))
         auto_enrich_and_save_asns(list(pre_enrich_map.values()), proxy=proxy)
+        for asn_code, p_item in pre_enrich_map.items():
+            if is_asn_recorded(asn_code):
+                auth_org = ASN_TO_PROVIDER.get(asn_code) or p_item.get("org") or p_item.get("isp") or ""
+                unrecorded_asns_map[asn_code] = {
+                    "asn": asn_code,
+                    "org": auth_org,
+                    "isp": auth_org,
+                    "ip": p_item.get("ip", ""),
+                    "net_type": classify_asn(asn_code, auth_org),
+                    "count": max(1, safe_int(p_item.get("count"), 1)),
+                    "already_enriched": True,
+                }
 
     for item in data:
         if not isinstance(item, dict):
@@ -1241,8 +1269,8 @@ def fetch_zip_proxyips(
         raw_isp = str(meta.get("asOrganization") or meta.get("isp") or item.get("asOrganization") or item.get("isp") or "").strip()
         asn_code = _extract_asn_code(raw_asn, raw_isp)
 
-        # Cloudflare speed meta 原生不返回 asOrganization，若本地权威对照表已收录该 ASN 则自动补全标准 ISP
-        if not raw_isp and asn_code and asn_code in ASN_TO_PROVIDER:
+        # 优先采用本地权威对照表（含刚通过 IPinfo 探针入库的官方标准 ISP），自动补全或修正上游偏差的 asOrganization
+        if asn_code and asn_code in ASN_TO_PROVIDER and ASN_TO_PROVIDER[asn_code]:
             raw_isp = ASN_TO_PROVIDER[asn_code]
 
         # 核心策略：严格只收录非机房，常规 datacenter 机房节点直接过滤剔除
@@ -1301,18 +1329,18 @@ def fetch_zip_proxyips(
             if key not in scraped_proxyips:
                 scraped_proxyips[key] = proxyip_item
                 total_added += 1
-                # 检查是否为本次新收录的有效非机房 ASN (仅针对通过过滤且存活的高价值候选节点进行收录统计)
-                if asn_code and (asn_code in initially_unrecorded or not is_asn_recorded(asn_code, raw_isp)):
-                    if asn_code not in unrecorded_asns_map:
-                        unrecorded_asns_map[asn_code] = {
-                            "asn": asn_code,
-                            "org": raw_isp,
-                            "isp": raw_isp,
-                            "ip": ip,
-                            "net_type": net_type,
-                            "count": 0,
-                            "already_enriched": is_asn_recorded(asn_code),
-                        }
+                # 兜底收集尚未收录的候选 ASN (已前置入库的 ASN 已在 pre_enrich_map 阶段完整登记)
+                if asn_code and asn_code not in unrecorded_asns_map and not is_asn_recorded(asn_code, raw_isp):
+                    unrecorded_asns_map[asn_code] = {
+                        "asn": asn_code,
+                        "org": raw_isp,
+                        "isp": raw_isp,
+                        "ip": ip,
+                        "net_type": net_type,
+                        "count": 1,
+                        "already_enriched": False,
+                    }
+                elif asn_code and asn_code in unrecorded_asns_map and not unrecorded_asns_map[asn_code].get("already_enriched"):
                     unrecorded_asns_map[asn_code]["count"] += 1
             elif isinstance(scraped_proxyips[key], dict):
                 for mk in ("colo", "cf_location", "isp", "asn", "net_type", "exit_ip", "exit_ipv6", "exit_asn", "exit_isp", "raw_asn"):
@@ -1739,7 +1767,7 @@ def merge_and_save(
     if edt_unrecorded_asns:
         seen_codes = {x.get("asn") for x in new_asn_records if x.get("asn")}
         for item in edt_unrecorded_asns:
-            # 严格防穿透：绝不接纳 count <= 0 的幽灵条目，仅收录具有真实存活候选节点的有效 ASN
+            # 严格防穿透：绝不接纳 count <= 0 的幽灵条目，仅收录具有真实候选节点的有效 ASN
             if item.get("count", 0) <= 0:
                 continue
             c = _extract_asn_code(item.get("asn"), item.get("isp") or item.get("org"))
@@ -1748,6 +1776,14 @@ def merge_and_save(
                 seen_codes.add(c)
                 if item.get("already_enriched"):
                     pre_enriched_count += 1
+            elif c and c in seen_codes:
+                for ex in new_asn_records:
+                    if ex.get("asn") == c:
+                        ex["count"] = max(safe_int(ex.get("count"), 0), safe_int(item.get("count"), 0))
+                        if item.get("already_enriched") and not ex.get("already_enriched"):
+                            ex["already_enriched"] = True
+                            pre_enriched_count += 1
+                        break
 
     pending_to_enrich = [item for item in new_asn_records if not item.get("already_enriched") and not is_asn_recorded(item.get("asn", ""))]
     enriched_now = 0
@@ -1755,7 +1791,30 @@ def merge_and_save(
         log.info("本次抓取全源汇总检测到 %d 个待入库未收录 ASN，执行统一单次批量原子持久化入库...", len(pending_to_enrich))
         enriched_now = auto_enrich_and_save_asns(pending_to_enrich, proxy=proxy)
 
-    total_enriched_count = pre_enriched_count + enriched_now
+    # 合并本进程内所有实际写入 asn_database.json 的新增 ASN（确保与数据库落盘 100% 对齐，且同步权威标准 ISP 名称）
+    session_enriched = get_session_enriched_asns()
+    if session_enriched:
+        by_asn = {_extract_asn_code(x.get("asn"), x.get("isp") or x.get("org")): x for x in new_asn_records if x.get("asn")}
+        for s_item in session_enriched:
+            sc = s_item.get("asn", "")
+            if not sc:
+                continue
+            if sc not in by_asn:
+                s_copy = dict(s_item)
+                s_copy["already_enriched"] = True
+                new_asn_records.append(s_copy)
+                by_asn[sc] = s_copy
+            else:
+                by_asn[sc]["already_enriched"] = True
+                by_asn[sc]["count"] = max(safe_int(by_asn[sc].get("count"), 0), safe_int(s_item.get("count"), 1))
+
+    for item in new_asn_records:
+        c_code = _extract_asn_code(item.get("asn"), item.get("isp") or item.get("org"))
+        if c_code and c_code in ASN_TO_PROVIDER and ASN_TO_PROVIDER[c_code]:
+            item["org"] = ASN_TO_PROVIDER[c_code]
+            item["isp"] = ASN_TO_PROVIDER[c_code]
+
+    total_enriched_count = len(session_enriched) if session_enriched else (pre_enriched_count + enriched_now)
     if total_enriched_count > 0:
         log.info("【批量自动持久化新 ASN】全流程批量入库完成: 本次共新收录 %d 个全新自治系统到权威库！", total_enriched_count)
     elif new_asn_records:
@@ -1797,9 +1856,14 @@ def merge_and_save(
                 scraped_scan_ips[k] = v
 
     # 仅当本次实际入库了新 ASN，且节点计数 > 0，才在通知卡片中展示新收录清单；无新增或 0 条则 0 视觉噪音
+    session_codes = {x.get("asn") for x in session_enriched if x.get("asn")}
     card_unrecorded = [
         item for item in new_asn_records
-        if item.get("count", 0) > 0 and is_asn_recorded(_extract_asn_code(item.get("asn"), item.get("isp") or item.get("org")))
+        if item.get("count", 0) > 0 and (
+            _extract_asn_code(item.get("asn"), item.get("isp") or item.get("org")) in session_codes
+            if session_codes
+            else is_asn_recorded(_extract_asn_code(item.get("asn"), item.get("isp") or item.get("org")))
+        )
     ] if total_enriched_count > 0 else []
 
     new_proxy_cnt = sum(1 for k in scraped_proxies if k not in existing_proxies)

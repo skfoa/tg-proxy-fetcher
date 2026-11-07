@@ -1460,17 +1460,21 @@ async def enrich_proxies_metadata(survivors: list[dict]) -> dict[str, int]:
     for tip, (asn_c, isp_n) in ip_cache.items():
         code = _extract_asn_code(asn_c, isp_n)
         if code and not is_asn_recorded(code) and code not in unrecorded_map:
-            unrecorded_map[code] = {"asn": code, "isp": isp_n, "ip": tip}
+            unrecorded_map[code] = {"asn": code, "isp": isp_n, "ip": tip, "count": 0}
     for r in survivors:
         tip = r.get("egress_ip", "").strip() or r.get("host", "").strip()
         raw_a = r.get("asn", "").strip()
         raw_i = r.get("isp", "").strip()
+        if not raw_a and tip and tip in ip_cache:
+            raw_a, raw_i = ip_cache[tip]
         if not raw_a and tip and tip in persistent_cache:
             raw_a = persistent_cache[tip].get("asn", "")
             raw_i = persistent_cache[tip].get("isp", "")
         code = _extract_asn_code(raw_a, raw_i)
-        if code and not is_asn_recorded(code) and code not in unrecorded_map:
-            unrecorded_map[code] = {"asn": code, "isp": raw_i, "ip": tip if is_valid_public_ip(tip) else ""}
+        if code and not is_asn_recorded(code):
+            if code not in unrecorded_map:
+                unrecorded_map[code] = {"asn": code, "isp": raw_i, "ip": tip if is_valid_public_ip(tip) else "", "count": 0}
+            unrecorded_map[code]["count"] = unrecorded_map[code].get("count", 0) + 1
     if unrecorded_map:
         log.info("【质检在线反查】发现 %d 个未收录 ASN，执行权威自动入库...", len(unrecorded_map))
         auto_enrich_and_save_asns(list(unrecorded_map.values()))
@@ -1806,8 +1810,10 @@ async def async_main(args):
             c_asn = w_exit.get("clean_asn", "")
             c_isp = w_exit.get("clean_isp", "")
             e_ip = w_exit.get("exit_ip", "") or r.get("host", "")
-            if c_asn and not is_asn_recorded(c_asn) and c_asn not in worker_unrecorded_map:
-                worker_unrecorded_map[c_asn] = {"asn": c_asn, "isp": c_isp, "ip": e_ip if is_valid_public_ip(e_ip) else ""}
+            if c_asn and not is_asn_recorded(c_asn):
+                if c_asn not in worker_unrecorded_map:
+                    worker_unrecorded_map[c_asn] = {"asn": c_asn, "isp": c_isp, "ip": e_ip if is_valid_public_ip(e_ip) else "", "count": 0}
+                worker_unrecorded_map[c_asn]["count"] = worker_unrecorded_map[c_asn].get("count", 0) + 1
         if worker_unrecorded_map:
             log.info("【Worker 出口鉴真】发现 %d 个未收录出口 ASN，执行批量权威探针入库与二次准入裁决...", len(worker_unrecorded_map))
             auto_enrich_and_save_asns(list(worker_unrecorded_map.values()))

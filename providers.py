@@ -3384,7 +3384,73 @@ def extract_ipinfo_page_meta(html: str) -> tuple[str, str]:
 
 _DEAD_IPINFO_PROXIES: set[str] = set()
 _PROBE_FAILED_ASNS: set[str] = set()
+_SESSION_ENRICHED_ASNS: dict[str, dict] = {}
 _IPINFO_STATE_LOCK = threading.Lock()
+
+
+def get_session_enriched_asns() -> list[dict]:
+    """返回当前进程生命周期内通过 auto_enrich_and_save_asns 实际新增写入 asn_database.json 的 ASN 列表副本"""
+    with _IPINFO_STATE_LOCK:
+        return [dict(v) for v in _SESSION_ENRICHED_ASNS.values()]
+
+
+def _sync_enriched_asns_to_fetch_stats(
+    newly_persisted: list[dict],
+    fetch_stats_path: str = os.path.join("data", ".fetch_stats.json"),
+) -> None:
+    """
+    若磁盘上已存在流水线暂存的 data/.fetch_stats.json（如在 proxies_verify / proxyip_verify / cf_verify 阶段），
+    将本阶段实际新增入库的 ASN 增量合并进 stats["unrecorded_asns"]，确保最终通知卡片与 asn_database.json 的新增入库数严格 100% 一致。
+    """
+    if not newly_persisted or not os.path.isfile(fetch_stats_path):
+        return
+    try:
+        with open(fetch_stats_path, "r", encoding="utf-8") as f:
+            stats = json.load(f)
+        if not isinstance(stats, dict):
+            return
+        existing_list = stats.get("unrecorded_asns")
+        if not isinstance(existing_list, list):
+            existing_list = []
+        by_code: dict[str, dict] = {}
+        ordered_codes: list[str] = []
+        for item in existing_list:
+            if not isinstance(item, dict):
+                continue
+            c = _extract_asn_code(item.get("asn"), item.get("isp") or item.get("org"))
+            if c and c not in by_code:
+                by_code[c] = dict(item)
+                ordered_codes.append(c)
+        changed = False
+        for item in newly_persisted:
+            c = _extract_asn_code(item.get("asn"), item.get("isp") or item.get("org"))
+            if not c:
+                continue
+            auth_org = ASN_TO_PROVIDER.get(c) or item.get("org") or item.get("isp") or ""
+            cnt = max(1, safe_int(item.get("count"), 1))
+            if c not in by_code:
+                by_code[c] = {
+                    "asn": c,
+                    "org": auth_org,
+                    "isp": auth_org,
+                    "net_type": item.get("net_type") or classify_asn(c, auth_org),
+                    "count": cnt,
+                }
+                ordered_codes.append(c)
+                changed = True
+            else:
+                if auth_org and by_code[c].get("org") != auth_org:
+                    by_code[c]["org"] = auth_org
+                    by_code[c]["isp"] = auth_org
+                    changed = True
+                if safe_int(by_code[c].get("count"), 0) <= 0:
+                    by_code[c]["count"] = cnt
+                    changed = True
+        if changed:
+            stats["unrecorded_asns"] = [by_code[c] for c in ordered_codes]
+            atomic_write_json(fetch_stats_path, stats)
+    except Exception as e:
+        log.debug("同步新入库 ASN 至 %s 异常 (已忽略): %s", fetch_stats_path, e)
 
 
 def probe_asn_from_ipinfo(
@@ -3621,6 +3687,7 @@ def auto_enrich_and_save_asns(
 
         i2a, a2i, a2nt = load_asn_database()
         added_count = 0
+        newly_persisted: list[dict] = []
         for code, info in to_save_map.items():
             if code in AUTHORITATIVE_CLOUD_ASNS:
                 continue
@@ -3629,6 +3696,14 @@ def auto_enrich_and_save_asns(
             if code not in a2nt:
                 a2nt[code] = n_type
                 added_count += 1
+                raw_cnt = sum(max(1, safe_int(it.get("count"), 1)) for it in code_to_items.get(code, []))
+                newly_persisted.append({
+                    "asn": code,
+                    "org": org,
+                    "isp": org,
+                    "net_type": n_type,
+                    "count": max(1, raw_cnt),
+                })
             if org:
                 if code not in a2i:
                     a2i[code] = org
@@ -3643,10 +3718,27 @@ def auto_enrich_and_save_asns(
             ASN_DATABASE_ASN_TO_NET_TYPE.update(a2nt)
             ASN_EXACT_NET_TYPE.update(a2nt)
             classify_asn.cache_clear()
+            format_asn_isp.cache_clear()
 
-            sample_str = ", ".join(f"{c}[{info['net_type']}]" for c, info in list(to_save_map.items())[:6])
-            if len(to_save_map) > 6:
-                sample_str += f" 等共 {len(to_save_map)} 个"
+            with _IPINFO_STATE_LOCK:
+                for entry in newly_persisted:
+                    c_key = entry["asn"]
+                    auth_org = ASN_TO_PROVIDER.get(c_key) or entry["org"]
+                    entry["org"] = auth_org
+                    entry["isp"] = auth_org
+                    if c_key not in _SESSION_ENRICHED_ASNS:
+                        _SESSION_ENRICHED_ASNS[c_key] = dict(entry)
+                    else:
+                        _SESSION_ENRICHED_ASNS[c_key]["count"] = max(
+                            _SESSION_ENRICHED_ASNS[c_key].get("count", 1),
+                            entry["count"],
+                        )
+
+            _sync_enriched_asns_to_fetch_stats(newly_persisted)
+
+            sample_str = ", ".join(f"{e['asn']}[{e['net_type']}]" for e in newly_persisted[:6])
+            if len(newly_persisted) > 6:
+                sample_str += f" 等共 {len(newly_persisted)} 个"
             log.info("【批量自动持久化新 ASN】提取并持久化 %d 个全新自治系统并原子写入数据库: %s", added_count, sample_str)
         return added_count
     except Exception:
@@ -3810,8 +3902,7 @@ def calibrate_all_datasets(
     返回各校准项变更计数统计字典。
     """
     # 0. 兜底扫描并自动收录所有数据集中可能遗漏的新 ASN
-    unrec_candidates = []
-    seen_unrec = set()
+    unrec_map_cal: dict[str, dict] = {}
     for ds_path in (proxies_csv_path, proxyip_csv_path):
         if os.path.isfile(ds_path):
             try:
@@ -3822,24 +3913,27 @@ def calibrate_all_datasets(
                             (row.get("asn", ""), row.get("isp", ""), row.get("host") or row.get("ip", "")),
                         ):
                             c = _extract_asn_code(asn_val, isp_val)
-                            if c and not is_asn_recorded(c) and c not in seen_unrec:
-                                seen_unrec.add(c)
-                                unrec_candidates.append({
-                                    "asn": c,
-                                    "isp": isp_val,
-                                    "ip": ip_val,
-                                })
+                            if c and not is_asn_recorded(c):
+                                if c not in unrec_map_cal:
+                                    unrec_map_cal[c] = {
+                                        "asn": c,
+                                        "isp": isp_val,
+                                        "ip": ip_val,
+                                        "count": 0,
+                                    }
+                                unrec_map_cal[c]["count"] += 1
             except Exception:
                 pass
-    if unrec_candidates:
-        enriched_count = auto_enrich_and_save_asns(unrec_candidates)
+    enriched_count = 0
+    if unrec_map_cal:
+        enriched_count = auto_enrich_and_save_asns(list(unrec_map_cal.values()))
         if enriched_count > 0:
             log.info("【全量校准】自动捕获并沉淀入库 %d 个未收录 ASN", enriched_count)
             classify_asn.cache_clear()
 
     classify_asn.cache_clear()
     stats = {
-        "asns_enriched": len(unrec_candidates),
+        "asns_enriched": enriched_count,
         "ip_cache_updated": 0,
         "proxies_csv_updated": 0,
         "proxies_sub_updated": 0,

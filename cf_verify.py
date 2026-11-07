@@ -676,7 +676,7 @@ def send_verify_notification(
                 items = []
                 for item in valid_unrecorded[:4]:
                     c = item.get("asn", "")
-                    o = str(item.get("org") or item.get("isp") or "").strip()
+                    o = str(ASN_TO_PROVIDER.get(c) or item.get("org") or item.get("isp") or "").strip()
                     cnt = item.get("count", 0)
                     name_str = f" {o}" if o else ""
                     cnt_str = f" ({cnt} 条)" if cnt else ""
@@ -852,8 +852,10 @@ async def enrich_scan_ips_exits(
                 e_asn = _extract_asn_code(res.get("exit_asn"), res.get("exit_isp")) or ""
                 e_isp = str(res.get("exit_isp") or "").strip()
                 e_ip = str(res.get("exit_ip") or row.get("ip") or "").strip()
-                if e_asn and not is_asn_recorded(e_asn) and e_asn not in unrec_map:
-                    unrec_map[e_asn] = {"asn": e_asn, "isp": e_isp, "ip": e_ip}
+                if e_asn and not is_asn_recorded(e_asn):
+                    if e_asn not in unrec_map:
+                        unrec_map[e_asn] = {"asn": e_asn, "isp": e_isp, "ip": e_ip, "count": 0}
+                    unrec_map[e_asn]["count"] = unrec_map[e_asn].get("count", 0) + 1
             if unrec_map:
                 auto_enrich_and_save_asns(list(unrec_map.values()))
 

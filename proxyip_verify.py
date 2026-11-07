@@ -608,8 +608,10 @@ async def verify_proxyips(
         unrec_map: dict[str, dict] = {}
         for r in pending_asn_rows:
             e_asn, e_isp, e_ip = r.get("_pending_exit_asn")
-            if e_asn and not is_asn_recorded(e_asn) and e_asn not in unrec_map:
-                unrec_map[e_asn] = {"asn": e_asn, "isp": e_isp, "ip": e_ip}
+            if e_asn and not is_asn_recorded(e_asn):
+                if e_asn not in unrec_map:
+                    unrec_map[e_asn] = {"asn": e_asn, "isp": e_isp, "ip": e_ip, "count": 0}
+                unrec_map[e_asn]["count"] = unrec_map[e_asn].get("count", 0) + 1
         if unrec_map:
             auto_enrich_and_save_asns(list(unrec_map.values()))
         for r in pending_asn_rows:
