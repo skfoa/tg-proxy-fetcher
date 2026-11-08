@@ -1492,17 +1492,21 @@ async def enrich_proxies_metadata(survivors: list[dict]) -> dict[str, int]:
                 if target_ip in ip_cache:
                     asn_code, isp_name = ip_cache[target_ip]
                     if asn_code:
-                        r["asn"] = format_asn_isp(asn_code, isp_name)
+                        code_only = _extract_asn_code(asn_code, isp_name) or asn_code
+                        isp_name = ASN_TO_PROVIDER.get(code_only) or isp_name
+                        r["asn"] = format_asn_isp(code_only, isp_name)
                         r["isp"] = isp_name
-                        r["net_type"] = classify_asn(asn_code, isp_name)
+                        r["net_type"] = classify_asn(code_only, isp_name)
                 elif target_ip in persistent_cache:
                     c_item = persistent_cache[target_ip]
                     asn_code = c_item.get("asn", "")
                     isp_name = c_item.get("isp", "")
                     if asn_code:
-                        r["asn"] = format_asn_isp(asn_code, isp_name)
+                        code_only = _extract_asn_code(asn_code, isp_name) or asn_code
+                        isp_name = ASN_TO_PROVIDER.get(code_only) or isp_name
+                        r["asn"] = format_asn_isp(code_only, isp_name)
                         r["isp"] = isp_name
-                        r["net_type"] = classify_asn(asn_code, isp_name)
+                        r["net_type"] = classify_asn(code_only, isp_name)
 
             if not curr_country:
                 c_code = ""

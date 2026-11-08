@@ -903,18 +903,9 @@ def resolve_asn_online(ip: str, isp_hint: str = "", persist: bool = False, db_pa
             log.debug("IP %s 命中权威已知 ASN %s: %s (忽略 API 原始标签: %s)", ip, clean_asn, std_isp, clean_isp)
             return clean_asn, std_isp
 
-        # 若为全新未收录自治系统，更新本进程运行时内存字典高速缓存
+        # 在线 IP 反查仅用于识别 IP 所属 ASN 与 ISP 名称，未通过 IPinfo 官方探针定性前不写入权威 ASN 数据库字典
         clean_isp = clean_isp or isp_hint
-        if clean_isp and clean_isp not in ASN_DATABASE_ISP_TO_ASN:
-            ASN_DATABASE_ISP_TO_ASN[clean_isp] = clean_asn
-            ASN_DATABASE_ISP_LOWER[clean_isp.lower()] = (clean_asn, clean_isp)
-        if clean_asn not in ASN_DATABASE_ASN_TO_ISP:
-            ASN_DATABASE_ASN_TO_ISP[clean_asn] = clean_isp
-        if clean_asn not in ASN_TO_PROVIDER:
-            ASN_TO_PROVIDER[clean_asn] = clean_isp
-
-        # 在线 IP 反查仅用于识别 IP 所属 ASN 与 ISP 名称，严禁将未探针定性的猜测 net_type 写入持久化映射
-        log.debug("【内存缓存更新】在线反查新 IP %s: %s -> %s", ip, clean_asn, clean_isp)
+        log.debug("【在线 IP 反查】识别新 IP %s: %s -> %s", ip, clean_asn, clean_isp)
         return clean_asn, clean_isp
 
     return "", ""
@@ -1309,9 +1300,6 @@ def resolve_asn_batch_online(
 
     log.info("【批量 ASN 解析】待解析出口 IP 数量: %d 个 (分批步长: %d)", len(pending_ips), max_chunk_size)
 
-    cache_modified = False
-    asn_db_modified = False
-
     # 按 max_chunk_size 切块批量 POST
     for i in range(0, len(pending_ips), max_chunk_size):
         chunk = pending_ips[i : i + max_chunk_size]
@@ -1354,22 +1342,11 @@ def resolve_asn_batch_online(
                                 raw_as, raw_combined_isp
                             )
                             if clean_asn:
-                                # SSOT 权威校验
+                                # SSOT 权威校验：已收录于权威字典的 ASN 直接采用权威标准名；未收录新 ASN 统一交由后续 auto_enrich_and_save_asns 经 IPinfo 探针定性入库
                                 if clean_asn in ASN_TO_PROVIDER:
                                     clean_isp = ASN_TO_PROVIDER[clean_asn]
 
-                                # 内存运行时热更新
-                                if clean_isp and clean_isp not in ASN_DATABASE_ISP_TO_ASN:
-                                    ASN_DATABASE_ISP_TO_ASN[clean_isp] = clean_asn
-                                    ASN_DATABASE_ISP_LOWER[clean_isp.lower()] = (clean_asn, clean_isp)
-                                    asn_db_modified = True
-                                if clean_asn not in ASN_DATABASE_ASN_TO_ISP:
-                                    ASN_DATABASE_ASN_TO_ISP[clean_asn] = clean_isp
-                                    asn_db_modified = True
-                                if clean_asn not in ASN_TO_PROVIDER:
-                                    ASN_TO_PROVIDER[clean_asn] = clean_isp
-
-                                # 动态研判 net_type (仅用于当前 IP 缓存条目画像，不写入持久化 ASN 数据库)
+                                # 动态研判 net_type (仅用于当前 IP 缓存条目画像，不越权直接写持久化 ASN 数据库)
                                 n_type = ASN_EXACT_NET_TYPE.get(clean_asn) or ext_net_type or classify_asn(clean_asn, clean_isp)
 
                                 cache_entry = {
@@ -1401,7 +1378,6 @@ def resolve_asn_batch_online(
                     cache_entry = {"asn": fallback_asn, "isp": fallback_isp, "net_type": n_type, "country": ""}
                     cache[ip] = cache_entry
                     cache_modified = True
-                    asn_db_modified = True
                     for tgt in ip_to_targets.get(ip, []):
                         results[tgt] = (fallback_asn, fallback_isp)
                         if tgt != ip:
@@ -1417,10 +1393,6 @@ def resolve_asn_batch_online(
                 time.sleep(x_ttl + 1)
             else:
                 time.sleep(0.5)
-
-    if persist and asn_db_modified:
-        save_asn_database(ASN_DATABASE_ISP_TO_ASN, ASN_DATABASE_ASN_TO_ISP, ASN_DATABASE_ASN_TO_NET_TYPE, db_path=db_path)
-        log.info("【持久化 ASN 数据库】已批量同步更新本地 data/asn_database.json (含 net_type)")
 
     if persist and cache_modified:
         if cache_path:
