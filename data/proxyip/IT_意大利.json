@@ -1,27 +1,5 @@
 [
   {
-    "proxy": "179.255.190.21:443",
-    "ip": "179.255.190.21",
-    "port": 443,
-    "tls": true,
-    "clientIp": "179.255.190.21",
-    "clientIps": [
-      "179.255.190.21"
-    ],
-    "clientIpv4": "179.255.190.21",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "IT",
-    "country_name": "意大利",
-    "country_cn": "意大利",
-    "country_emoji": "🇮🇹",
-    "asn": "214238",
-    "asOrganization": "IT Hostline Ltd",
-    "isp": "IT Hostline Ltd",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
-  },
-  {
     "proxy": "179.255.190.4:443",
     "ip": "179.255.190.4",
     "port": 443,
@@ -38,8 +16,30 @@
     "country_cn": "意大利",
     "country_emoji": "🇮🇹",
     "asn": "214238",
-    "asOrganization": "IT Hostline Ltd",
-    "isp": "IT Hostline Ltd",
+    "asOrganization": "Host Telecom Ltd",
+    "isp": "Host Telecom Ltd",
+    "net_type": "isp",
+    "source": "@cmliussss_all"
+  },
+  {
+    "proxy": "179.255.190.21:443",
+    "ip": "179.255.190.21",
+    "port": 443,
+    "tls": true,
+    "clientIp": "179.255.190.21",
+    "clientIps": [
+      "179.255.190.21"
+    ],
+    "clientIpv4": "179.255.190.21",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "IT",
+    "country_name": "意大利",
+    "country_cn": "意大利",
+    "country_emoji": "🇮🇹",
+    "asn": "214238",
+    "asOrganization": "Host Telecom Ltd",
+    "isp": "Host Telecom Ltd",
     "net_type": "isp",
     "source": "@cmliussss_all"
   },
@@ -86,27 +86,5 @@
     "isp": "Level 3 Communications",
     "net_type": "isp",
     "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "179.255.190.24:443",
-    "ip": "179.255.190.24",
-    "port": 443,
-    "tls": true,
-    "clientIp": "179.255.190.24",
-    "clientIps": [
-      "179.255.190.24"
-    ],
-    "clientIpv4": "179.255.190.24",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "IT",
-    "country_name": "意大利",
-    "country_cn": "意大利",
-    "country_emoji": "🇮🇹",
-    "asn": "214238",
-    "asOrganization": "IT Hostline Ltd",
-    "isp": "IT Hostline Ltd",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
   }
 ]

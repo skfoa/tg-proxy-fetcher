@@ -1,27 +1,5 @@
 [
   {
-    "proxy": "206.168.133.137:443",
-    "ip": "206.168.133.137",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2602:fbd9:100:bb::1",
-    "clientIps": [
-      "2602:fbd9:100:bb::1"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2602:fbd9:100:bb::1",
-    "dual_stack": false,
-    "country": "AU",
-    "country_name": "澳大利亚",
-    "country_cn": "澳大利亚",
-    "country_emoji": "🇦🇺",
-    "asn": "142064",
-    "asOrganization": "SMC Server Solutions",
-    "isp": "SMC Server Solutions",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
-  },
-  {
     "proxy": "206.168.133.66:443",
     "ip": "206.168.133.66",
     "port": 443,
@@ -44,6 +22,28 @@
     "source": "@danfeng_chat"
   },
   {
+    "proxy": "123.51.23.113:443",
+    "ip": "123.51.23.113",
+    "port": 443,
+    "tls": true,
+    "clientIp": "123.51.23.113",
+    "clientIps": [
+      "123.51.23.113"
+    ],
+    "clientIpv4": "123.51.23.113",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "AU",
+    "country_name": "澳大利亚",
+    "country_cn": "澳大利亚",
+    "country_emoji": "🇦🇺",
+    "asn": "38333",
+    "asOrganization": "Symbio Networks",
+    "isp": "Symbio Networks",
+    "net_type": "isp",
+    "source": "@cmliussss_all"
+  },
+  {
     "proxy": "202.27.229.7:443",
     "ip": "202.27.229.7",
     "port": 443,
@@ -60,8 +60,8 @@
     "country_cn": "澳大利亚",
     "country_emoji": "🇦🇺",
     "asn": "10143",
-    "asOrganization": "SUPERLOOP (AUSTRALIA) PTY LTD",
-    "isp": "SUPERLOOP (AUSTRALIA) PTY LTD",
+    "asOrganization": "Exetel Pty Ltd",
+    "isp": "Exetel Pty Ltd",
     "net_type": "isp",
     "source": "@cmliussss_all"
   },
@@ -82,30 +82,30 @@
     "country_cn": "澳大利亚",
     "country_emoji": "🇦🇺",
     "asn": "10143",
-    "asOrganization": "SUPERLOOP (AUSTRALIA) PTY LTD",
-    "isp": "SUPERLOOP (AUSTRALIA) PTY LTD",
+    "asOrganization": "Exetel Pty Ltd",
+    "isp": "Exetel Pty Ltd",
     "net_type": "isp",
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "123.51.23.113:443",
-    "ip": "123.51.23.113",
+    "proxy": "206.168.133.137:443",
+    "ip": "206.168.133.137",
     "port": 443,
     "tls": true,
-    "clientIp": "123.51.23.113",
+    "clientIp": "2602:fbd9:100:bb::1",
     "clientIps": [
-      "123.51.23.113"
+      "2602:fbd9:100:bb::1"
     ],
-    "clientIpv4": "123.51.23.113",
-    "clientIpv6": "",
+    "clientIpv4": "",
+    "clientIpv6": "2602:fbd9:100:bb::1",
     "dual_stack": false,
     "country": "AU",
     "country_name": "澳大利亚",
     "country_cn": "澳大利亚",
     "country_emoji": "🇦🇺",
-    "asn": "38333",
-    "asOrganization": "Level 6, 9-13 Young Street",
-    "isp": "Level 6, 9-13 Young Street",
+    "asn": "142064",
+    "asOrganization": "VergeTel",
+    "isp": "VergeTel",
     "net_type": "isp",
     "source": "@cmliussss_all"
   }

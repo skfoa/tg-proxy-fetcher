@@ -3111,7 +3111,9 @@
     "WideOpenWest Finance LLC": "AS12083",
     "PT Artha Media Lintas Nusa": "AS63490",
     "NCT": "AS59126",
-    "NCT CO.,LTD.": "AS59126"
+    "NCT CO.,LTD.": "AS59126",
+    "Nagasaki Cable Media": "AS10000",
+    "Nagasaki Cable Media Inc.": "AS10000"
   },
   "asn_to_isp": {
     "AS10001": "Mics Network Corporation",
@@ -6119,7 +6121,8 @@
     "AS41789": "LLC Teledyne Systems Limited",
     "AS12083": "WideOpenWest Finance LLC",
     "AS63490": "PT Artha Media Lintas Nusa",
-    "AS59126": "NCT"
+    "AS59126": "NCT",
+    "AS10000": "Nagasaki Cable Media"
   },
   "asn_to_net_type": {
     "AS10001": "isp",
@@ -10120,6 +10123,7 @@
     "AS9615": "isp",
     "AS17072": "isp",
     "AS41789": "isp",
-    "AS59126": "isp"
+    "AS59126": "isp",
+    "AS10000": "isp"
   }
 }
