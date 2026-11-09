@@ -22,28 +22,6 @@
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "116.118.8.67:443",
-    "ip": "116.118.8.67",
-    "port": 443,
-    "tls": true,
-    "clientIp": "116.118.8.67",
-    "clientIps": [
-      "116.118.8.67"
-    ],
-    "clientIpv4": "116.118.8.67",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "VN",
-    "country_name": "越南",
-    "country_cn": "越南",
-    "country_emoji": "🇻🇳",
-    "asn": "7602",
-    "asOrganization": "Sai gon Postel Corporation",
-    "isp": "Sai gon Postel Corporation",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "165.101.114.172:443",
     "ip": "165.101.114.172",
     "port": 443,
@@ -64,5 +42,27 @@
     "isp": "AI APPLICATION SOFTWARE COMPANY LIMITED",
     "net_type": "isp",
     "source": "@danfeng2"
+  },
+  {
+    "proxy": "116.118.8.67:443",
+    "ip": "116.118.8.67",
+    "port": 443,
+    "tls": true,
+    "clientIp": "116.118.8.67",
+    "clientIps": [
+      "116.118.8.67"
+    ],
+    "clientIpv4": "116.118.8.67",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "VN",
+    "country_name": "越南",
+    "country_cn": "越南",
+    "country_emoji": "🇻🇳",
+    "asn": "7602",
+    "asOrganization": "Sai gon Postel Corporation",
+    "isp": "Sai gon Postel Corporation",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
   }
 ]

@@ -3113,7 +3113,12 @@
     "NCT": "AS59126",
     "NCT CO.,LTD.": "AS59126",
     "Nagasaki Cable Media": "AS10000",
-    "Nagasaki Cable Media Inc.": "AS10000"
+    "Nagasaki Cable Media Inc.": "AS10000",
+    "Cia Proc. de Dados do Estado de S Paulo - Prodesp": "AS28637",
+    "AntiDDoS Networks LTD": "AS218239",
+    "Nexus IS": "AS53315",
+    "4 EVER PLUG,C.A.": "AS271951",
+    "PT. Cyberindo Mega Persada": "AS132644"
   },
   "asn_to_isp": {
     "AS10001": "Mics Network Corporation",
@@ -6122,7 +6127,13 @@
     "AS12083": "WideOpenWest Finance LLC",
     "AS63490": "PT Artha Media Lintas Nusa",
     "AS59126": "NCT",
-    "AS10000": "Nagasaki Cable Media"
+    "AS10000": "Nagasaki Cable Media",
+    "AS28637": "Cia Proc. de Dados do Estado de S Paulo - Prodesp",
+    "AS218239": "AntiDDoS Networks LTD",
+    "AS17864": "SK Broadband Co Ltd",
+    "AS53315": "Nexus IS",
+    "AS271951": "4 EVER PLUG,C.A.",
+    "AS132644": "PT. Cyberindo Mega Persada"
   },
   "asn_to_net_type": {
     "AS10001": "isp",
@@ -10124,6 +10135,12 @@
     "AS17072": "isp",
     "AS41789": "isp",
     "AS59126": "isp",
-    "AS10000": "isp"
+    "AS10000": "isp",
+    "AS28637": "government",
+    "AS218239": "datacenter",
+    "AS17864": "isp",
+    "AS53315": "business",
+    "AS271951": "isp",
+    "AS132644": "datacenter"
   }
 }

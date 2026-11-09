@@ -22,9 +22,9 @@
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "181.36.229.212:2096",
+    "proxy": "181.36.229.212:2083",
     "ip": "181.36.229.212",
-    "port": 2096,
+    "port": 2083,
     "tls": true,
     "clientIp": "181.36.229.211",
     "clientIps": [
@@ -66,9 +66,9 @@
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "181.36.229.212:2083",
+    "proxy": "181.36.229.212:8443",
     "ip": "181.36.229.212",
-    "port": 2083,
+    "port": 8443,
     "tls": true,
     "clientIp": "181.36.229.211",
     "clientIps": [
@@ -88,9 +88,9 @@
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "181.36.229.212:8443",
+    "proxy": "181.36.229.212:2096",
     "ip": "181.36.229.212",
-    "port": 8443,
+    "port": 2096,
     "tls": true,
     "clientIp": "181.36.229.211",
     "clientIps": [
