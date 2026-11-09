@@ -78,6 +78,7 @@ from providers import (
     auto_enrich_and_save_asns,
     is_asn_recorded,
     is_channel_or_user_source,
+    get_country_code,
 )
 
 # 确保本地 .env 加载
@@ -395,6 +396,47 @@ def is_datacenter_result(cf_res: dict) -> bool:
 
     nt = classify_asn(asn_code, isp_str)
     return nt not in ("isp", "business", "education", "government")
+
+
+def extract_worker_country_code(exit_info: dict) -> str:
+    """
+    从 Worker 返回的 exit_info 结构中严谨提取符合 ISO 3166-1 alpha-2 标准的两位大写国家代码。
+    严格仅返回收录于 ISO_3166_COUNTRY_CODES 的合法国家代码（如 'US', 'GB', 'HK'）。
+    对非标准代码（如 'UK'）自动归一为 'GB'；对无效代码（如 'ZZ'）或未知字符串安全返回空字符串，
+    杜绝向 proxies.csv / 数据库写入脏数据，未识别项统一留待二阶段按 IP 查询离线权威库。
+    """
+    if not isinstance(exit_info, dict):
+        return ""
+
+    loc_obj = exit_info.get("location") if isinstance(exit_info.get("location"), dict) else {}
+    asn_obj = exit_info.get("asn") if isinstance(exit_info.get("asn"), dict) else {}
+
+    # 1. 优先提取明确的代码候选字段并通过 get_country_code 严格校验合法性
+    code_candidates = [
+        exit_info.get("country_code"),
+        exit_info.get("countryCode"),
+        loc_obj.get("country_code"),
+        loc_obj.get("countryCode"),
+        asn_obj.get("country"),
+    ]
+    for cand in code_candidates:
+        if isinstance(cand, str) and cand.strip():
+            code = get_country_code(cand.strip())
+            if code:
+                return code
+
+    # 2. 次选包含国名全称的候选字段（中/英文国名）
+    name_candidates = [
+        exit_info.get("country"),
+        loc_obj.get("country"),
+    ]
+    for name_cand in name_candidates:
+        if isinstance(name_cand, str) and name_cand.strip():
+            code = get_country_code(name_cand.strip())
+            if code:
+                return code
+
+    return ""
 
 
 # ---------- 协议探测实现 ----------
@@ -1073,7 +1115,7 @@ async def probe_single(
                 if not is_valid_public_ip(exit_ip):
                     exit_ip = host if is_valid_public_ip(host) else ""
 
-                c_code = str(exit_info.get("country_code") or exit_info.get("country") or "").strip().upper()
+                c_code = extract_worker_country_code(exit_info)
                 calc_delay = max(1, int((time.monotonic() - t_cf0) * 1000))
                 worker_delay_ms = safe_int(
                     cf_res.get("responseTime") or cf_res.get("latency_ms") or cf_res.get("time") or calc_delay,
@@ -1182,11 +1224,11 @@ async def probe_single(
                 exit_ip = str(exit_info.get("ip") or "").strip()
                 if is_valid_public_ip(exit_ip):
                     egress_ip = exit_ip
-                c_code = str(exit_info.get("country_code") or exit_info.get("country") or "").strip().upper()
+                asn_obj = exit_info.get("asn") or {}
+                c_code = extract_worker_country_code(exit_info)
                 if c_code:
                     country = c_code
                 # 若 Worker 已附带 ASN/ISP 归属，直接结构化丰富
-                asn_obj = exit_info.get("asn") or {}
                 cf_asn_raw = str(asn_obj.get("asn") or "").strip()
                 cf_isp_raw = str(asn_obj.get("name") or asn_obj.get("org") or "").strip()
                 cf_asn = _extract_asn_code(cf_asn_raw, cf_isp_raw) or cf_asn_raw

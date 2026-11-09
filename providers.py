@@ -2013,7 +2013,7 @@ COUNTRY_FLAGS = {
 
 COUNTRY_TO_CODE = {
     "美国": "US", "德国": "DE", "荷兰": "NL", "瑞典": "SE", "新加坡": "SG",
-    "日本": "JP", "英国": "UK", "芬兰": "FI", "香港": "HK", "法国": "FR",
+    "日本": "JP", "英国": "GB", "芬兰": "FI", "香港": "HK", "法国": "FR",
     "波兰": "PL", "爱沙尼亚": "EE", "拉脱维亚": "LV", "瑞士": "CH", "立陶宛": "LT",
     "西班牙": "ES", "加拿大": "CA", "奥地利": "AT", "保加利亚": "BG", "捷克": "CZ",
     "韩国": "KR", "印度": "IN", "意大利": "IT", "俄罗斯": "RU", "土耳其": "TR",
@@ -2035,16 +2035,85 @@ COUNTRY_TO_CODE = {
 CODE_TO_COUNTRY = {v: k for k, v in COUNTRY_TO_CODE.items() if k != "其他地区"}
 CODE_TO_COUNTRY["GB"] = "英国"
 
+# 权威 ISO 3166-1 alpha-2 标准国家/地区代码完整全集 (249 项官方 ISO 代码 + XK 科索沃 + EU 欧盟网络区域)
+ISO_3166_COUNTRY_CODES: frozenset[str] = frozenset({
+    "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ",
+    "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS",
+    "BT", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN",
+    "CO", "CR", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DJ", "DK", "DM", "DO", "DZ", "EC", "EE",
+    "EG", "EH", "ER", "ES", "ET", "EU", "FI", "FJ", "FK", "FM", "FO", "FR", "GA", "GB", "GD", "GE",
+    "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK",
+    "HM", "HN", "HR", "HT", "HU", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE",
+    "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB",
+    "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH",
+    "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ",
+    "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NU", "NZ", "OM", "PA", "PE", "PF",
+    "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU",
+    "RW", "SA", "SB", "SC", "SD", "SE", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR",
+    "SS", "ST", "SV", "SX", "SY", "SZ", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN",
+    "TO", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG",
+    "VI", "VN", "VU", "WF", "WS", "XK", "YE", "YT", "ZA", "ZM", "ZW"
+})
+
+ENGLISH_COUNTRY_TO_CODE: dict[str, str] = {
+    "UNITED STATES": "US", "UNITED STATES OF AMERICA": "US", "USA": "US",
+    "UNITED KINGDOM": "GB", "GREAT BRITAIN": "GB", "UK": "GB",
+    "CHINA": "CN", "PEOPLE'S REPUBLIC OF CHINA": "CN",
+    "HONG KONG": "HK", "TAIWAN": "TW", "MACAO": "MO", "MACAU": "MO",
+    "JAPAN": "JP", "SOUTH KOREA": "KR", "KOREA": "KR", "REPUBLIC OF KOREA": "KR",
+    "SINGAPORE": "SG", "GERMANY": "DE", "FRANCE": "FR", "NETHERLANDS": "NL",
+    "RUSSIA": "RU", "RUSSIAN FEDERATION": "RU", "CANADA": "CA", "AUSTRALIA": "AU",
+    "INDIA": "IN", "BRAZIL": "BR", "ITALY": "IT", "SPAIN": "ES",
+    "SWITZERLAND": "CH", "SWEDEN": "SE", "NORWAY": "NO", "FINLAND": "FI",
+    "POLAND": "PL", "TURKEY": "TR", "TURKIYE": "TR",
+    "UNITED ARAB EMIRATES": "AE", "UAE": "AE",
+    "VIETNAM": "VN", "THAILAND": "TH", "MALAYSIA": "MY", "INDONESIA": "ID", "PHILIPPINES": "PH",
+    "UKRAINE": "UA", "CZECH REPUBLIC": "CZ", "CZECHIA": "CZ", "AUSTRIA": "AT",
+    "BELGIUM": "BE", "DENMARK": "DK", "IRELAND": "IE", "NEW ZEALAND": "NZ",
+    "PORTUGAL": "PT", "GREECE": "GR", "HUNGARY": "HU", "ROMANIA": "RO",
+    "BULGARIA": "BG", "SLOVAKIA": "SK", "SLOVENIA": "SI", "CROATIA": "HR",
+    "SERBIA": "RS", "ESTONIA": "EE", "LATVIA": "LV", "LITHUANIA": "LT",
+    "ICELAND": "IS", "ISRAEL": "IL", "SOUTH AFRICA": "ZA", "MEXICO": "MX",
+    "ARGENTINA": "AR", "CHILE": "CL", "COLOMBIA": "CO", "PERU": "PE",
+    "SAUDI ARABIA": "SA", "QATAR": "QA", "KUWAIT": "KW", "OMAN": "OM",
+    "BAHRAIN": "BH", "EGYPT": "EG", "PAKISTAN": "PK", "BANGLADESH": "BD",
+    "KAZAKHSTAN": "KZ", "UZBEKISTAN": "UZ", "GEORGIA": "GE", "ARMENIA": "AM",
+    "AZERBAIJAN": "AZ", "CYPRUS": "CY", "MALTA": "MT", "LUXEMBOURG": "LU",
+    "BELARUS": "BY", "MOLDOVA": "MD", "ALBANIA": "AL", "BOSNIA AND HERZEGOVINA": "BA",
+    "NORTH MACEDONIA": "MK", "MONTENEGRO": "ME",
+    "GUERNSEY": "GG", "ISLE OF MAN": "IM", "JERSEY": "JE", "EUROPEAN UNION": "EU",
+}
+
 
 def get_country_code(country_name: str) -> str:
-    """获取国家或地区的标准 ISO 二字代码"""
+    """获取国家或地区的标准 ISO 3166-1 alpha-2 两位大写代码（支持两位代码本身、中英文国名转换，非标准代码如 UK 强制归一为 GB，无效代码返回空串）"""
     clean_name = (country_name or "").strip()
+    if not clean_name:
+        return ""
+    uname = clean_name.upper()
+    # 1. 兼容性非标准二位代码强制修正为官方 ISO 3166-1 代码 (UK -> GB)
+    if uname == "UK":
+        return "GB"
+    # 2. 若本身已是合法受支持的两位 ISO 3166-1 代码，直接返回
+    if len(uname) == 2 and uname in ISO_3166_COUNTRY_CODES:
+        return uname
+    # 3. 英文国名全称转换
+    if uname in ENGLISH_COUNTRY_TO_CODE:
+        code = ENGLISH_COUNTRY_TO_CODE[uname]
+        return "GB" if code == "UK" else code
+    # 4. 中文国名转换
     if clean_name in COUNTRY_TO_CODE:
-        return COUNTRY_TO_CODE[clean_name]
+        code = COUNTRY_TO_CODE[clean_name]
+        return "GB" if code == "UK" else code
+    # 5. Emoji 国旗转换
     flag = COUNTRY_FLAGS.get(clean_name, "")
     if len(flag) == 2:
         try:
-            return "".join(chr(ord(c) - 0x1F1E6 + ord('A')) for c in flag)
+            cand = "".join(chr(ord(c) - 0x1F1E6 + ord('A')) for c in flag).upper()
+            if cand == "UK":
+                return "GB"
+            if cand in ISO_3166_COUNTRY_CODES:
+                return cand
         except Exception:
             pass
     return ""
@@ -2202,6 +2271,7 @@ COUNTRY_NAME_MAP: dict[str, str] = {
     "SA": "沙特阿拉伯", "YE": "也门", "OM": "阿曼", "AE": "阿联酋",
     "QA": "卡塔尔", "KW": "科威特", "BH": "巴林", "CY": "塞浦路斯",
     "TR": "土耳其", "GE": "格鲁吉亚", "AM": "亚美尼亚", "AZ": "阿塞拜疆",
+    "IO": "英属印度洋领地", "CC": "科科斯群岛", "CX": "圣诞岛",
 
     # 欧洲 (Europe)
     "RU": "俄罗斯", "UA": "乌克兰", "BY": "白俄罗斯", "MD": "摩尔多瓦",
@@ -2218,6 +2288,7 @@ COUNTRY_NAME_MAP: dict[str, str] = {
     "HR": "克罗地亚", "SI": "斯洛文尼亚", "XK": "科索沃",
     "NO": "挪威", "SE": "瑞典", "FI": "芬兰", "DK": "丹麦",
     "IS": "冰岛", "FO": "法罗群岛", "AX": "奥兰群岛", "SJ": "斯瓦尔巴群岛",
+    "GG": "根西岛", "JE": "泽西岛", "IM": "马恩岛", "EU": "欧盟",
 
     # 北美洲 (North America)
     "US": "美国", "CA": "加拿大", "MX": "墨西哥", "GL": "格陵兰", "BM": "百慕大",
@@ -2231,6 +2302,7 @@ COUNTRY_NAME_MAP: dict[str, str] = {
     "KN": "圣基茨和尼维斯", "VC": "圣文森特和格林纳丁斯", "TC": "特克斯和凯科斯群岛",
     "SX": "荷属圣马丁", "MF": "法属圣马丁", "BL": "圣巴泰勒米", "PM": "圣皮埃尔和密克隆",
     "AI": "安圭拉", "MS": "蒙特塞拉特", "BQ": "荷兰加勒比区",
+    "GP": "瓜德罗普", "MQ": "马提尼克", "UM": "美国本土外小岛屿",
 
     # 南美洲 (South America)
     "BR": "巴西", "AR": "阿根廷", "CL": "智利", "CO": "哥伦比亚",
@@ -2262,7 +2334,12 @@ COUNTRY_NAME_MAP: dict[str, str] = {
     "LR": "利比里亚", "MR": "毛里塔尼亚", "GM": "冈比亚", "GW": "几内亚比绍",
     "CV": "佛得角", "ST": "圣多美和普林西比", "GQ": "赤道几内亚",
     "KM": "科摩罗", "LS": "莱索托", "SZ": "斯威士兰", "RE": "留尼汪",
-    "YT": "马约特", "SH": "圣赫勒拿",
+    "YT": "马约特", "SH": "圣赫勒拿", "EH": "西撒哈拉",
+
+    # 南极与极地岛屿 (Polar & Remote Islands)
+    "AQ": "南极洲", "BV": "布韦岛", "GS": "南乔治亚和南桑威奇群岛",
+    "HM": "赫德岛和麦克唐纳群岛", "NF": "诺福克岛", "PN": "皮特凯恩群岛",
+    "TF": "法属南部领地",
 }
 
 # 确保双向对照表完整对齐
