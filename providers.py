@@ -1516,6 +1516,11 @@ load_dotenv()
 TG_BOT_TOKEN = os.getenv("TG_BOT_TOKEN") or ""
 TG_CHAT_ID = os.getenv("TG_CHAT_ID") or ""
 CHECK_PROXYIP_URL = os.getenv("CHECK_PROXYIP_URL") or ""
+CHECK_PROXYIP_TOKEN = (
+    os.getenv("CHECK_PROXYIP_TOKEN", "").strip()
+    or os.getenv("CF_CHECK_TOKEN", "").strip()
+    or os.getenv("AUTH_TOKEN", "").strip()
+)
 
 
 # =====================================================================
@@ -4327,6 +4332,7 @@ def probe_check_proxyip_api(
     port: int,
     endpoint: str = "",
     timeout: float = 6.0,
+    token: str = "",
 ) -> dict:
     """
     通过 Check ProxyIP API 在线探测节点的出口真实 IP、出口 ASN、机房、真实握手延迟与地理位置。
@@ -4344,13 +4350,18 @@ def probe_check_proxyip_api(
     if not target_url:
         return {"success": False, "reason": "invalid_url", "network_error": False}
 
+    auth_token = token.strip() if token else CHECK_PROXYIP_TOKEN
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)",
+        "Accept": "application/json",
+    }
+    if auth_token:
+        headers["Authorization"] = f"Bearer {auth_token}"
+
     try:
         req = urllib.request.Request(
             target_url,
-            headers={
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)",
-                "Accept": "application/json",
-            },
+            headers=headers,
         )
         with urllib.request.urlopen(req, timeout=http_outer_timeout) as resp:
             if resp.status != 200:

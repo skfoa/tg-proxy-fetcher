@@ -18,6 +18,14 @@ on:
         description: "Check ProxyIP 外部穿透鉴真端点 URL (混合分流模式：未知新节点走端点鉴真补全，已存老节点走本地极速原生探测)"
         required: false
         default: ""
+      cf_check_token:
+        description: "SSTP / Cloudflare Workers 检测端点鉴权 Token (Bearer，留空读取 Secret/Var)"
+        required: false
+        default: ""
+      check_proxyip_token:
+        description: "Check ProxyIP 端点鉴权 Token (Bearer，留空读取 Secret/Var)"
+        required: false
+        default: ""
       edt_mirrors:
         description: "EDT 镜像加速源列表 (支持逗号/空格分隔多个加速域名/前缀，留空则自动竞速内置镜像)"
         required: false
@@ -77,17 +85,20 @@ jobs:
           EDT_SOCKS5_URLS: ${{ vars.EDT_SOCKS5_URLS }}
           PROXIFLY_HTTPS_URLS: ${{ vars.PROXIFLY_HTTPS_URLS }}
           CHECK_PROXYIP_URL: ${{ inputs.check_proxyip_url || vars.CHECK_PROXYIP_URL || secrets.CHECK_PROXYIP_URL || '' }}
+          CHECK_PROXYIP_TOKEN: ${{ inputs.check_proxyip_token || secrets.CHECK_PROXYIP_TOKEN || secrets.CF_CHECK_TOKEN || secrets.AUTH_TOKEN || vars.CHECK_PROXYIP_TOKEN || '' }}
           DEFER_NOTIFY: "1"
         run: python tg_fetch.py
 
       - name: 🚀 通用代理多协议连通性质检
         env:
           CF_CHECK_ENDPOINT: ${{ inputs.cf_check_endpoint || vars.CF_CHECK_ENDPOINT || secrets.CF_CHECK_ENDPOINT || '' }}
+          CF_CHECK_TOKEN: ${{ inputs.cf_check_token || secrets.CF_CHECK_TOKEN || secrets.CHECK_PROXYIP_TOKEN || secrets.AUTH_TOKEN || vars.CF_CHECK_TOKEN || '' }}
         run: python proxies_verify.py --concurrency 300 --max-fails 3 --no-notify
 
       - name: 🔍 ProxyIP 穿透存活质检
         env:
           CHECK_PROXYIP_URL: ${{ inputs.check_proxyip_url || vars.CHECK_PROXYIP_URL || secrets.CHECK_PROXYIP_URL || '' }}
+          CHECK_PROXYIP_TOKEN: ${{ inputs.check_proxyip_token || secrets.CHECK_PROXYIP_TOKEN || secrets.CF_CHECK_TOKEN || secrets.AUTH_TOKEN || vars.CHECK_PROXYIP_TOKEN || '' }}
         run: python proxyip_verify.py --concurrency 250 --max-fails 3 --no-notify
 
       - name: 🛡️ 优选 IP 两阶段主动校验（TLS + 301）
@@ -95,6 +106,7 @@ jobs:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
           CHECK_PROXYIP_URL: ${{ inputs.check_proxyip_url || vars.CHECK_PROXYIP_URL || secrets.CHECK_PROXYIP_URL || '' }}
+          CHECK_PROXYIP_TOKEN: ${{ inputs.check_proxyip_token || secrets.CHECK_PROXYIP_TOKEN || secrets.CF_CHECK_TOKEN || secrets.AUTH_TOKEN || vars.CHECK_PROXYIP_TOKEN || '' }}
         run: python cf_verify.py --concurrency 250 --max-fails 3 --timeout 3.0
 
       - name: 🚨 任务失败告警推送

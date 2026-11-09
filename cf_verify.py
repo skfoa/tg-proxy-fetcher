@@ -116,6 +116,11 @@ PROXYIP_JSON = os.path.join(DATA_DIR, "proxyip.json")
 PROXYIP_DIR = os.path.join(DATA_DIR, "proxyip")
 
 CHECK_ENDPOINT = os.getenv("CHECK_PROXYIP_URL", "").strip()
+CHECK_TOKEN = (
+    os.getenv("CHECK_PROXYIP_TOKEN", "").strip()
+    or os.getenv("CF_CHECK_TOKEN", "").strip()
+    or os.getenv("AUTH_TOKEN", "").strip()
+)
 CHECK_CONCURRENCY = safe_int(os.getenv("CHECK_CONCURRENCY"), 32)
 
 PROBE_HOST = "crypto.cloudflare.com"
@@ -756,6 +761,7 @@ async def enrich_scan_ips_exits(
     check_endpoint: str = "",
     check_concurrency: int = CHECK_CONCURRENCY,
     dry_run: bool = False,
+    check_token: str = "",
 ) -> int:
     """
     对本地已通过 TLS + 301 校验且存活 (fail_count == 0) 但 exit_ip 缺失的扫描优选 IP 执行外部穿透鉴真。
@@ -763,6 +769,7 @@ async def enrich_scan_ips_exits(
     自动晋升收录至 data/proxyip.csv。
     """
     endpoint = check_endpoint.strip() if check_endpoint else CHECK_ENDPOINT
+    token = check_token.strip() if check_token else CHECK_TOKEN
     if not endpoint:
         log.info("[扫描优选] 未配置 CHECK_PROXYIP_URL，跳过存活缺失出口画像补全与 ProxyIP 晋升")
         return 0
@@ -776,7 +783,7 @@ async def enrich_scan_ips_exits(
         log.info("[扫描优选] 存活节点中无缺失 exit_ip 的候选，无需调用外部鉴真")
         return 0
 
-    if not check_proxyip_endpoint_health(endpoint, timeout=5.0):
+    if not check_proxyip_endpoint_health(endpoint, timeout=5.0, token=token):
         log.warning("[扫描优选] Check ProxyIP 外部端点健康探针失败，安全熔断跳过出口画像补全")
         return 0
 
@@ -816,6 +823,7 @@ async def enrich_scan_ips_exits(
                     port,
                     endpoint,
                     6.0,
+                    token,
                 )
 
             if res.get("success") and res.get("exit_ip"):
@@ -1129,6 +1137,7 @@ async def async_main(args):
                 check_endpoint=getattr(args, "check_endpoint", CHECK_ENDPOINT),
                 check_concurrency=getattr(args, "check_concurrency", CHECK_CONCURRENCY),
                 dry_run=getattr(args, "dry_run", False),
+                check_token=getattr(args, "check_token", CHECK_TOKEN),
             )
 
     scan_res = await _verify_and_persist(
@@ -1232,6 +1241,7 @@ def main():
     parser.add_argument("--probe-baseline", action="store_true", help="探测 300 个官方 Cloudflare Anycast IP 作为并发与网络基线")
     parser.add_argument("--diag-output", type=str, default="", help="诊断结果输出 JSON 路径，记录每个节点的探测原因明细")
     parser.add_argument("--check-endpoint", type=str, default=CHECK_ENDPOINT, help="Check ProxyIP 外部穿透鉴真端点 URL (默认读取 CHECK_PROXYIP_URL)")
+    parser.add_argument("--check-token", type=str, default=CHECK_TOKEN, help="Check ProxyIP 外部穿透鉴真端点鉴权 Token (Bearer，默认读取 CHECK_PROXYIP_TOKEN / AUTH_TOKEN)")
     parser.add_argument("--check-concurrency", type=int, default=CHECK_CONCURRENCY, help=f"外部鉴真端点专用并发线程数 (默认 {CHECK_CONCURRENCY})")
     parser.add_argument("--no-enrich-exits", action="store_true", help="禁用存活扫描优选 IP 出口画像外部鉴真与 ProxyIP 晋升")
     args = parser.parse_args()

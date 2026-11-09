@@ -122,6 +122,11 @@ MAX_FAILS = 3        # 连续失败物理淘汰阈值（第 1~2 次缓冲容错�
 # 2. 已知画像且非机房的老节点走本地极速原生探测（零外部消耗、250 高并发）；
 # 3. 仅对缺少 exit_ip、未定性或 ASN 未知的新节点，通过专用线程池非阻塞调用外部端点补全画像。
 CHECK_ENDPOINT = os.getenv("CHECK_PROXYIP_URL", "").strip()
+CHECK_TOKEN = (
+    os.getenv("CHECK_PROXYIP_TOKEN", "").strip()
+    or os.getenv("CF_CHECK_TOKEN", "").strip()
+    or os.getenv("AUTH_TOKEN", "").strip()
+)
 CHECK_CONCURRENCY = safe_int(os.getenv("CHECK_CONCURRENCY"), 32)
 _CHECK_EXECUTOR: concurrent.futures.ThreadPoolExecutor | None = None
 
@@ -147,7 +152,7 @@ def shutdown_check_executor(wait: bool = False, cancel_futures: bool = True) -> 
         _CHECK_EXECUTOR = None
 
 
-def check_proxyip_endpoint_health(endpoint: str, timeout: float = 6.0) -> bool:
+def check_proxyip_endpoint_health(endpoint: str, timeout: float = 6.0, token: str = "") -> bool:
     """
     质检开始前，对 Check ProxyIP 外部检测端点进行全局健康探针校验。
     确认端点在线可用、域名正确且未欠费或被封禁。
@@ -160,10 +165,13 @@ def check_proxyip_endpoint_health(endpoint: str, timeout: float = 6.0) -> bool:
         probe_urls = [clean_ep]
     else:
         probe_urls = [f"{clean_ep}/check", clean_ep]
+    auth_token = token.strip() if token else CHECK_TOKEN
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)",
         "Accept": "application/json",
     }
+    if auth_token:
+        headers["Authorization"] = f"Bearer {auth_token}"
     for target in probe_urls:
         try:
             req = urllib.request.Request(target, headers=headers)
@@ -183,13 +191,15 @@ def _sync_check_proxyip_endpoint(
     ip: str,
     port: int,
     timeout: float = 7.0,
+    token: str = "",
 ) -> tuple[bool, int, str, str, bool, dict]:
     """
     同步调用 Check ProxyIP 外部检测接口（在独立线程池中并发执行，不阻塞事件循环）。
     返回 (is_alive, latency_ms, colo, reason, network_error, profile_dict)
     """
     t0 = time.monotonic()
-    res = probe_check_proxyip_api(ip, port, endpoint=endpoint, timeout=timeout)
+    auth_token = token.strip() if token else CHECK_TOKEN
+    res = probe_check_proxyip_api(ip, port, endpoint=endpoint, timeout=timeout, token=auth_token)
     outer_ms = max(1, int((time.monotonic() - t0) * 1000))
     if res.get("success"):
         worker_delay = safe_int(res.get("delay_ms"), 0)
@@ -728,6 +738,7 @@ async def async_main(args):
 
     ip_cache = load_ip_cache()
     endpoint = getattr(args, "check_endpoint", "").strip() or CHECK_ENDPOINT
+    check_token = getattr(args, "check_token", "").strip() or CHECK_TOKEN
     check_concurrency = getattr(args, "check_concurrency", CHECK_CONCURRENCY)
     check_executor = None
 
@@ -740,7 +751,7 @@ async def async_main(args):
         endpoint = ""
     elif endpoint:
         # 仅在确有缺失画像的节点时，对 Check ProxyIP 端点执行单次健康探针校验
-        is_endpoint_ok = await asyncio.to_thread(check_proxyip_endpoint_health, endpoint)
+        is_endpoint_ok = await asyncio.to_thread(check_proxyip_endpoint_health, endpoint, 6.0, check_token)
         if is_endpoint_ok:
             check_executor = get_check_executor(max_workers=check_concurrency)
             log.info(
@@ -935,6 +946,7 @@ def main():
     parser.add_argument("--timeout", type=float, default=TIMEOUT, help=f"单节点连接与 TLS 握手超时秒数 (默认 {TIMEOUT})")
     parser.add_argument("--http-timeout", type=float, default=HTTP_TIMEOUT, help=f"单节点 HTTP 校验超时秒数 (默认 {HTTP_TIMEOUT})")
     parser.add_argument("--check-endpoint", type=str, default=CHECK_ENDPOINT, help="Check ProxyIP 外部检测端点 URL (默认读取环境变量 CHECK_PROXYIP_URL，留空使用本地直接探测)")
+    parser.add_argument("--check-token", type=str, default=CHECK_TOKEN, help="Check ProxyIP 外部检测端点鉴权 Token (Bearer，默认读取 CHECK_PROXYIP_TOKEN / AUTH_TOKEN)")
     parser.add_argument("--check-concurrency", type=int, default=CHECK_CONCURRENCY, help=f"外部检测端点并发线程数 (默认 {CHECK_CONCURRENCY})")
     parser.add_argument("--no-notify", action="store_true", help="静默模式，不单独发送 Telegram 质检通知（供流水线协同使用）")
     parser.add_argument("--dry-run", action="store_true", help="演练诊断模式，仅探测统计原因，不覆写数据文件也不登记墓地")

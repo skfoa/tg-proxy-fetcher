@@ -501,7 +501,9 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `PROXIFLY_HTTPS_URLS` | 外部 HTTPS 代理源候选列表（逗号/空格分隔） | 留空（默认并发竞速内置源） | 可选 | 支持自定义传入外部代理源 JSON 链接，并发多源竞速拉取 |
 | `PROXYIP_ZIP_URLS` | 反代 ProxyIP 外部在线归档 URL 列表（逗号/空格分隔） | 内置归档端点（留空默认） | 可选 | 从外部在线归档端点拉取全量反代 ProxyIP 节点并去重入库；如不使用外部归档可留空或自定义指定自建端点 |
 | `CF_CHECK_ENDPOINT` | SSTP 代理出口检测端点 URL | 留空（不执行） | 可选 | 用于存活 SSTP 节点的第二阶段真实出口 IP 与链路鉴真。<br>💡 **建议自行部署**：本项目**默认不预设第三方公共端点**（避免依赖外部私人服务或产生不可控限流）。推荐使用开源项目 [CF-Workers-CheckSocks5](https://github.com/cmliu/CF-Workers-CheckSocks5) 部署到个人 Cloudflare Workers 免费账号，部署后将个人 Worker 域名填入此处。若留空则仅使用本地探测，完全不调用外部服务。 |
-| `CHECK_PROXYIP_URL` | 外部探针鉴真检测 API 端点 | 留空（不执行） | 可选 | 自定义外部鉴真端点（如自建 Cloudflare Worker 或后端检测 API）。配置后系统自动对缺少出口信息或未识别 ASN 的节点进行在线探测，提取真实出口 IP 与网络归属；默认留空，仅依赖本地解析与自带数据，不调用任何外部服务 |
+| `CF_CHECK_TOKEN` | SSTP 代理检测端点鉴权 Token | 留空（不鉴权） | 可选 | 当自建的 Cloudflare Worker 开启了 `AUTH_TOKEN` 鉴权时配置，请求时自动附带 `Authorization: Bearer <token>` 请求头（支持自动回退读取 `AUTH_TOKEN`） |
+| `CHECK_PROXYIP_URL` | 外部探针鉴真检测 API 端点 | 留空（不执行） | 可选 | 用于存活反代 ProxyIP 与扫描优选出口画像的穿透鉴真与补全。<br>💡 **建议自行部署**：推荐使用开源项目 [CF-Workers-CheckProxyIP](https://github.com/cmliu/CF-Workers-CheckProxyIP) 部署到个人 Cloudflare Workers 免费账号，部署后将个人 Worker 域名填入此处。配置后系统自动对缺少出口信息或未识别 ASN 的节点进行在线探测；默认留空，仅依赖本地原生探测与自带库，不调用任何外部服务。 |
+| `CHECK_PROXYIP_TOKEN` | Check ProxyIP 外部鉴真端点鉴权 Token | 留空（不鉴权） | 可选 | 当自建的 Check ProxyIP 端点开启了 `AUTH_TOKEN` 鉴权时配置，请求时自动附带 `Authorization: Bearer <token>` 请求头（支持自动回退读取 `CF_CHECK_TOKEN` 或 `AUTH_TOKEN`） |
 
 ### 3. 高级调优参数与本地调试对照（可选）
 
@@ -522,7 +524,9 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `--diag-output` | `proxyip_verify.py` / `cf_verify.py` | 留空 | 留空 | 诊断结果输出 JSON 路径，记录每个节点的探测原因明细 |
 | `--probe-baseline` | `cf_verify.py` | 关闭 | 关闭 | 探测 300 个官方 Cloudflare Anycast IP 作为并发与网络基线 |
 | `--cf-check-endpoint` | `proxies_verify.py` | 留空 | 留空 | SSTP 真实出口与 PPP 链路鉴真端点 URL（默认留空不执行外部检测，可配置个人自建 Worker 端点） |
+| `--cf-check-token` | `proxies_verify.py` | 留空 | 留空 | Cloudflare Workers 代理检测端点鉴权 Token (Bearer，默认读取环境变量 `CF_CHECK_TOKEN` / `AUTH_TOKEN`) |
 | `--check-endpoint` | `proxyip_verify.py` / `cf_verify.py` | 留空 | 留空 | 外部穿透鉴真端点 URL（默认读取环境变量 `CHECK_PROXYIP_URL`，留空使用本地直接探测） |
+| `--check-token` | `proxyip_verify.py` / `cf_verify.py` | 留空 | 留空 | Check ProxyIP 外部穿透鉴真端点鉴权 Token (Bearer，默认读取环境变量 `CHECK_PROXYIP_TOKEN` / `AUTH_TOKEN`) |
 | `--check-concurrency` | `proxyip_verify.py` / `cf_verify.py` | `32` | `32` | Check ProxyIP 外部穿透鉴真并发线程数 (默认读取环境变量 `CHECK_CONCURRENCY`，并发多线程调度不盲等) |
 | `--no-enrich-exits` | `cf_verify.py` | 关闭 | 关闭 | 禁用扫描优选 IP 存活节点的出口画像探测与非机房反代晋升 |
 | `--validate` | `providers.py` | CI 自动运行 | - | 静态门禁预检：校验 ASN 数据库结构完整性、字段合法性与代码内置映射一致性 |
@@ -672,7 +676,8 @@ python providers.py --calibrate
 - **开源代理与工具项目**：
   - [EDT-Pages/Proxy-List](https://github.com/EDT-Pages/Proxy-List)（开源多协议代理数据源）
   - [Proxifly/free-proxy-list](https://github.com/proxifly/free-proxy-list)（开源多协议代理镜像）
-  - [cmliu/CF-Workers-CheckSocks5](https://github.com/cmliu/CF-Workers-CheckSocks5)（开源 Cloudflare Workers 鉴真检测端点实现）
+  - [cmliu/CF-Workers-CheckSocks5](https://github.com/cmliu/CF-Workers-CheckSocks5)（开源 Cloudflare Workers 多协议鉴真检测端点实现）
+  - [cmliu/CF-Workers-CheckProxyIP](https://github.com/cmliu/CF-Workers-CheckProxyIP)（开源 Cloudflare Workers 反代 ProxyIP 穿透检测端点实现）
   - [VPN Gate 学术实验项目](https://www.vpngate.net/)（日本国立筑波大学研究生院全球分布式学术中继网络）
 
 ---

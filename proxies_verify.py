@@ -163,6 +163,10 @@ RE_HTTP_200 = re.compile(r"\b200\b")
 RE_HTTP_407 = re.compile(r"\b407\b")
 
 CF_CHECK_ENDPOINT = os.getenv("CF_CHECK_ENDPOINT", "").strip()
+CF_CHECK_TOKEN = (
+    os.getenv("CF_CHECK_TOKEN", "").strip()
+    or os.getenv("AUTH_TOKEN", "").strip()
+)
 CF_CONCURRENCY = safe_int(os.getenv("CF_CONCURRENCY"), 32)
 _CF_CHECK_EXECUTOR: concurrent.futures.ThreadPoolExecutor | None = None
 
@@ -251,20 +255,23 @@ def build_sstp_url(host: str, port: int, user: str | None = None, pwd: str | Non
     return build_proxy_url_for_cf("sstp", host, port, user or "vpn", pwd or "vpn")
 
 
-def check_cf_worker_health(endpoint: str, timeout: float = 6.0) -> bool:
+def check_cf_worker_health(endpoint: str, timeout: float = 6.0, token: str = "") -> bool:
     """
     质检开始前，对 Cloudflare Worker 外部检测端点进行全局健康探针校验。
-    优先探测零外部子请求开销的 /ip.json（回退至 /locations 与 / 根路径），
+    优先探测零外部子请求开销的 /ip.json（回退至 /locations 与 / 根路径，支持 Token 鉴权），
     确认 Worker 端点在线可用、域名正确且未欠费或被封禁（注：验证 Worker 自身存活，不代表上游 iplocate.io 连通性）。
     若探测失败，则安全熔断并全局降级为本地轻量握手探测，避免单节点频繁失败或卡顿。
     """
     clean_ep = normalize_endpoint(endpoint)
     if not clean_ep:
         return False
-    probe_urls = [f"{clean_ep}/ip.json", f"{clean_ep}/locations", f"{clean_ep}/"]
+    auth_token = token.strip() if token else CF_CHECK_TOKEN
+    probe_urls = [f"{clean_ep}/check", f"{clean_ep}/ip.json", f"{clean_ep}/locations", f"{clean_ep}/"]
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
     }
+    if auth_token:
+        headers["Authorization"] = f"Bearer {auth_token}"
     opener = get_cf_opener()
     for target in probe_urls:
         try:
@@ -272,12 +279,17 @@ def check_cf_worker_health(endpoint: str, timeout: float = 6.0) -> bool:
             with opener.open(req, timeout=timeout) as resp:
                 if resp.status in (200, 204):
                     return True
+        except urllib.error.HTTPError as he:
+            # 端点返回 400（如 /check 缺少参数）说明服务在线且鉴权通过
+            if he.code in (200, 204, 400):
+                return True
+            log.debug("Cloudflare Worker 端点健康探针 [%s] HTTP 异常: %s", target, he.code)
         except Exception as e:
             log.debug("Cloudflare Worker 端点健康探针 [%s] 异常: %s", target, e)
     return False
 
 
-def _sync_cf_check(endpoint: str, proxy_url: str, timeout: float = 18.0) -> dict:
+def _sync_cf_check(endpoint: str, proxy_url: str, timeout: float = 18.0, token: str = "") -> dict:
     """
     同步调用 Cloudflare Worker 代理检测接口。
     Worker 内部超时通常为 12s，将 Python 端超时放宽至 18s 以便完整接收 Worker 的超时返回。
@@ -286,9 +298,12 @@ def _sync_cf_check(endpoint: str, proxy_url: str, timeout: float = 18.0) -> dict
       - 网络/HTTP崩溃: {"success": False, "error": "...", "network_error": True}
     """
     target_url = f"{endpoint}/check?proxy={urllib.parse.quote(proxy_url)}"
+    auth_token = token.strip() if token else CF_CHECK_TOKEN
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
     }
+    if auth_token:
+        headers["Authorization"] = f"Bearer {auth_token}"
     req = urllib.request.Request(target_url, headers=headers)
     opener = get_cf_opener()
     try:
@@ -327,6 +342,7 @@ async def check_proxy_exit_cf_worker(
     proxy_url: str,
     timeout: float = 18.0,
     executor: concurrent.futures.ThreadPoolExecutor | None = None,
+    token: str = "",
 ) -> dict:
     """
     异步调用 Cloudflare Worker 端点针对指定代理执行直连全链路穿透鉴真与出口 IP/ASN 探测。
@@ -338,7 +354,8 @@ async def check_proxy_exit_cf_worker(
         return {"success": False, "error": "endpoint_empty"}
     exec_pool = executor or get_cf_check_executor()
     loop = asyncio.get_running_loop()
-    return await loop.run_in_executor(exec_pool, _sync_cf_check, clean_ep, proxy_url, timeout)
+    auth_token = token.strip() if token else CF_CHECK_TOKEN
+    return await loop.run_in_executor(exec_pool, _sync_cf_check, clean_ep, proxy_url, timeout, auth_token)
 
 
 async def check_sstp_exit_cf_worker(
@@ -349,10 +366,11 @@ async def check_sstp_exit_cf_worker(
     pwd: str | None = None,
     timeout: float = 18.0,
     executor: concurrent.futures.ThreadPoolExecutor | None = None,
+    token: str = "",
 ) -> dict:
     """向后兼容 SSTP 质检专用封装"""
     proxy_url = build_sstp_url(host, port, user, pwd)
-    return await check_proxy_exit_cf_worker(endpoint, proxy_url, timeout=timeout, executor=executor)
+    return await check_proxy_exit_cf_worker(endpoint, proxy_url, timeout=timeout, executor=executor, token=token)
 
 
 def is_datacenter_result(cf_res: dict) -> bool:
@@ -1709,11 +1727,12 @@ async def async_main(args):
         r.setdefault("_old_fc", safe_int(r.get("fail_count"), 0))
 
     cf_endpoint = normalize_endpoint(getattr(args, "cf_check_endpoint", CF_CHECK_ENDPOINT))
+    cf_token = getattr(args, "cf_check_token", "").strip() or CF_CHECK_TOKEN
     cf_concurrency = getattr(args, "cf_concurrency", CF_CONCURRENCY)
     cf_executor = None
     if cf_endpoint:
         # 质检启动前对 Worker 端点进行单次健康探针校验，若端点自身不可达则全局安全熔断降级
-        is_worker_ok = await asyncio.to_thread(check_cf_worker_health, cf_endpoint)
+        is_worker_ok = await asyncio.to_thread(check_cf_worker_health, cf_endpoint, 6.0, cf_token)
         if is_worker_ok:
             cf_executor = get_cf_check_executor(max_workers=cf_concurrency)
             log.info(
@@ -2199,6 +2218,12 @@ def main():
         type=str,
         default=CF_CHECK_ENDPOINT,
         help="Cloudflare Workers 代理检测端点 (用于 SSTP 真实出口与链路鉴真，默认留空不执行外部检测，需自行部署 CF-Workers-CheckSocks5)",
+    )
+    parser.add_argument(
+        "--cf-check-token",
+        type=str,
+        default=CF_CHECK_TOKEN,
+        help="Cloudflare Workers 代理检测端点鉴权 Token (Bearer，默认读取 CF_CHECK_TOKEN / AUTH_TOKEN)",
     )
     parser.add_argument("--no-notify", action="store_true", help="静默模式，不单独发送 Telegram 质检通知")
     parser.add_argument("--enrich-only", action="store_true", help="仅对现有 proxies.csv 补全 ASN 与网络属性打标，跳过网络连通性探测")
