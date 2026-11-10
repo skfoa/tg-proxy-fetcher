@@ -2819,9 +2819,9 @@ CF_BASE_CSV_FIELDS = [
     "cf_location",
     "asn",
     "isp",
+    "fail_count",
     "first_seen",
     "channel",
-    "fail_count",
 ]
 SCAN_CSV_FIELDS = CF_BASE_CSV_FIELDS + ["exit_ip", "exit_asn", "exit_isp", "exit_location"]
 PROXYIP_CSV_FIELDS = CF_BASE_CSV_FIELDS + ["net_type", "exit_ip", "exit_ipv6", "exit_asn", "exit_isp"]
