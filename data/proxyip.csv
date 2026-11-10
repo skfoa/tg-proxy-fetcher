@@ -184,6 +184,9 @@
 216.195.213.96,1891,true,89,41114,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,216.195.213.75,,AS979 NetLab,NetLab
 72.249.204.132,55852,true,89,50533,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,72.249.204.132,,AS979 NetLab,NetLab
 216.195.213.133,1891,true,89,42579,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,216.195.213.75,,AS979 NetLab,NetLab
+211.72.119.198,14026,true,90,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,19570,true,90,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,36984,true,90,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 38.127.121.215,443,true,90,,LAX,Pasadena · US,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",2026-10-18 21:50:07,@danfeng_chat,0,isp,38.127.121.215,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 24.120.102.146,443,true,90,,LAS,Las Vegas · US,AS22773 Cox Communications Inc.,Cox Communications Inc.,2026-10-18 21:49:30,@danfeng_chat,0,isp,2001:57a:f200:b900::104,2001:57a:f200:b900::104,AS22773 Cox Communications Inc.,Cox Communications Inc.
 23.144.68.108,8443,true,90,,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-10-18 21:49:22,@danfeng_chat,0,business,23.144.68.15,,AS979 NetLab,NetLab
@@ -196,11 +199,14 @@
 154.9.250.212,22460,true,90,22667,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,154.9.250.212,,AS979 NetLab,NetLab
 72.249.207.87,32876,true,90,11274,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,72.249.207.87,,AS979 NetLab,NetLab
 154.9.250.178,15495,true,90,21780,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,154.9.250.178,,AS979 NetLab,NetLab
+211.72.119.198,18160,true,91,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,20393,true,91,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 64.81.29.78,443,true,91,,LAX,Los Angeles · US,AS3257 GTT Communications,GTT Communications,2026-10-18 21:51:44,@danfeng_chat,0,isp,64.81.29.78,,AS3257 GTT Communications,GTT Communications
 23.144.20.118,443,true,91,,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-10-18 21:49:22,@danfeng_chat,0,business,23.144.20.118,,AS979 NetLab,NetLab
 23.141.196.61,443,true,91,,LAX,Los Angeles · US,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",2026-10-18 21:49:22,@danfeng_chat,0,isp,23.141.196.61,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 216.36.82.13,443,true,91,,LAX,Los Angeles · US,AS3257 GTT Communications,GTT Communications,2026-10-18 21:49:02,@danfeng_chat,0,isp,216.36.82.13,,AS3257 GTT Communications,GTT Communications
 154.7.179.136,57887,true,91,15530,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,154.7.179.136,,AS979 NetLab,NetLab
+211.72.119.198,38622,true,92,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 38.244.17.147,443,true,92,,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-10-18 21:50:10,@danfeng_chat,0,business,38.244.17.147,,AS979 NetLab,NetLab
 23.172.40.230,443,true,92,,LAX,Los Angeles · US,AS63150 Bage Cloud,Bage Cloud,2026-10-18 21:49:23,@danfeng_chat,0,isp,2602:f988:93:49e::fc2,2602:f988:93:49e::fc2,AS63150 Bage Cloud,Bage Cloud
 216.36.121.136,443,true,92,,LAX,Los Angeles · US,AS3257 GTT Communications,GTT Communications,2026-10-18 21:49:02,@danfeng_chat,0,isp,216.36.121.136,,AS3257 GTT Communications,GTT Communications
@@ -229,10 +235,13 @@
 154.21.199.138,443,true,94,,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-10-18 21:44:34,@danfeng_chat,0,business,154.21.199.138,,AS979 NetLab,NetLab
 216.195.213.97,1891,true,94,26217,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,216.195.213.75,,AS979 NetLab,NetLab
 72.249.207.87,13069,true,94,11364,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,72.249.207.87,,AS979 NetLab,NetLab
+211.72.119.198,21267,true,95,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 216.36.82.194,443,true,95,,LAX,Los Angeles · US,AS3257 GTT Communications,GTT Communications,2026-10-18 21:49:02,@danfeng_chat,0,isp,216.36.82.194,,AS3257 GTT Communications,GTT Communications
 24.109.36.190,8443,true,95,0,YVR,British Columbia · North Vancouver · 加拿大,AS6327 Shaw Communications,Shaw Communications,2026-10-13 14:49:53,@cmliussss_all,0,isp,2604:3d08:1:1d:c148:da8d:9f58:59bb,2604:3d08:1:1d:c148:da8d:9f58:59bb,AS6327 Shaw Communications,Shaw Communications
 216.195.213.118,1891,true,95,56111,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,216.195.213.75,,AS979 NetLab,NetLab
 38.58.58.173,50792,true,95,7139,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,38.34.6.143,,AS979 NetLab,NetLab
+211.72.119.198,15233,true,96,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,35108,true,96,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 38.69.195.13,443,true,96,,LAX,Los Angeles · US,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",2026-10-18 21:50:14,@danfeng_chat,0,isp,2001:550:a29::121,2001:550:a29::121,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 216.36.104.115,8443,true,96,,LAX,Los Angeles · US,AS3257 GTT Communications,GTT Communications,2026-10-18 21:49:02,@danfeng_chat,0,isp,216.36.104.115,,AS3257 GTT Communications,GTT Communications
 192.220.11.193,443,true,96,,LAX,北美洲 · 美国 · 洛杉矶,"AS2914 NTT America, Inc.","NTT America, Inc.",2026-10-18 21:47:16,@danfeng_chat,0,isp,192.220.11.193,,"AS2914 NTT America, Inc.","NTT America, Inc."
@@ -269,6 +278,7 @@
 72.249.207.137,4271,true,100,9444,LAX,Los Angeles · US,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",2026-09-06 16:44:44,@danfeng2,0,isp,38.244.26.41,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 154.36.130.164,11874,true,100,15871,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,154.36.130.164,,AS979 NetLab,NetLab
 154.40.35.57,24845,true,100,1356,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,154.40.35.57,,AS979 NetLab,NetLab
+211.72.119.198,13059,true,101,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 154.44.0.214,443,true,101,,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-10-02 00:15:40,@danfeng_chat,0,business,154.44.0.214,,AS979 NetLab,NetLab
 38.150.33.168,29173,true,101,39213,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,38.150.33.168,,AS979 NetLab,NetLab
 38.92.14.48,12791,true,101,1932,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,38.92.14.48,,AS979 NetLab,NetLab
@@ -276,44 +286,88 @@
 154.9.236.70,15228,true,101,25985,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,154.9.236.70,,AS979 NetLab,NetLab
 154.36.135.232,31741,true,102,22569,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,154.36.135.232,,AS979 NetLab,NetLab
 216.195.213.87,1891,true,102,38916,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,216.195.213.75,,AS979 NetLab,NetLab
+211.72.119.198,11551,true,103,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,13395,true,103,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 64.98.217.88,443,true,103,,LAX,Los Angeles · US,AS32133 Ting Fiber Inc.,Ting Fiber Inc.,2026-10-18 21:51:44,@danfeng_chat,0,isp,64.98.217.88,,AS32133 Ting Fiber Inc.,Ting Fiber Inc.
 38.207.166.106,24683,true,103,22384,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,38.207.166.106,,AS979 NetLab,NetLab
 154.9.250.200,53733,true,103,20953,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,154.9.250.200,,AS979 NetLab,NetLab
 154.9.240.98,8443,true,103,15345,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-07-27 18:43:10,@danfeng2,0,business,154.9.240.98,,AS979 NetLab,NetLab
+211.72.119.198,11174,true,104,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,12728,true,104,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,12685,true,104,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,19392,true,104,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,20037,true,104,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,24395,true,104,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,34804,true,104,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,35330,true,104,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,36535,true,104,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,38044,true,104,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 38.244.12.48,443,true,104,,LAX,Los Angeles · US,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",2026-10-18 21:50:10,@danfeng_chat,0,isp,38.244.12.48,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 205.206.222.52,443,true,104,,YVR,Calgary · CA,AS852 TELUS Communications Inc.,TELUS Communications Inc.,2026-10-18 21:48:10,@danfeng_chat,0,isp,205.206.222.52,,AS852 TELUS Communications Inc.,TELUS Communications Inc.
 155.117.18.57,443,true,104,,LAX,Los Angeles · US,AS63150 Bage Cloud,Bage Cloud,2026-10-18 21:44:52,@danfeng_chat,0,isp,155.117.18.57,,AS63150 Bage Cloud,Bage Cloud
 144.225.5.86,51463,true,104,34647,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,144.225.5.86,,AS979 NetLab,NetLab
 72.249.207.88,29111,true,104,11354,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,72.249.207.88,,AS979 NetLab,NetLab
+211.72.119.198,18551,true,105,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,22140,true,105,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 155.117.19.23,443,true,105,,LAX,Los Angeles · US,AS63150 Bage Cloud,Bage Cloud,2026-10-18 21:44:53,@danfeng_chat,0,isp,155.117.19.23,,AS63150 Bage Cloud,Bage Cloud
 72.249.207.88,44138,true,105,10788,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,72.249.207.88,,AS979 NetLab,NetLab
+211.72.119.198,10393,true,106,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,11432,true,106,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,13258,true,106,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 154.40.34.41,443,true,106,,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-10-18 21:44:35,@danfeng_chat,0,business,154.40.34.41,,AS979 NetLab,NetLab
 23.144.20.184,22940,true,106,44158,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,23.144.20.184,,AS979 NetLab,NetLab
 144.225.5.100,30011,true,106,22205,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,144.225.5.100,,AS979 NetLab,NetLab
+211.72.119.198,26868,true,107,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 154.40.50.111,8443,true,107,0,LAX,北美洲 · 美国 · Los Angeles,AS979 NetLab,NetLab,2026-11-10 15:23:15,@cmliussss_all,0,business,154.40.50.111,,AS979 NetLab,NetLab
 38.150.35.61,443,true,107,,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-10-18 21:50:08,@danfeng_chat,0,business,38.150.35.61,,AS979 NetLab,NetLab
 23.144.124.135,443,true,107,,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-10-18 21:49:22,@danfeng_chat,0,business,23.144.124.135,,AS979 NetLab,NetLab
 154.64.224.211,443,true,107,,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-10-18 21:44:36,@danfeng_chat,0,business,154.64.224.211,,AS979 NetLab,NetLab
+211.72.119.198,16700,true,108,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,29735,true,108,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,31882,true,108,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 38.175.220.17,443,true,108,,LAX,Los Angeles · US,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",2026-10-18 21:50:08,@danfeng_chat,0,isp,38.175.220.17,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 38.133.154.123,443,true,108,,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-10-18 21:50:07,@danfeng_chat,0,business,38.133.154.123,,AS979 NetLab,NetLab
 154.44.1.165,57708,true,108,7184,LAX,Los Angeles · US,"AS2914 NTT America, Inc.","NTT America, Inc.",2026-09-06 16:44:44,@danfeng2,0,isp,216.167.121.82,,"AS2914 NTT America, Inc.","NTT America, Inc."
 216.195.213.78,1891,true,108,43871,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,216.195.213.75,,AS979 NetLab,NetLab
 72.249.207.87,18135,true,108,11170,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,72.249.207.87,,AS979 NetLab,NetLab
+211.72.119.198,10512,true,109,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,26808,true,109,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 154.21.195.212,16000,true,109,6077,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,154.21.195.212,,AS979 NetLab,NetLab
 216.195.213.89,1891,true,109,35553,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,216.195.213.75,,AS979 NetLab,NetLab
 154.12.51.194,12597,true,109,5662,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,154.12.51.194,,AS979 NetLab,NetLab
+211.72.119.198,13848,true,110,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,17033,true,110,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,20369,true,110,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,32565,true,110,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,33951,true,110,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,34582,true,110,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,37555,true,110,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,11595,true,111,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,12504,true,111,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,12693,true,111,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,21034,true,111,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,22355,true,111,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,33920,true,111,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 154.12.52.216,443,true,111,,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-16 08:20:42,@danfeng2,0,business,154.12.52.216,,AS979 NetLab,NetLab
+211.72.119.198,15102,true,112,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,15622,true,112,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,39310,true,112,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 64.83.22.125,443,true,112,,LAX,Chicago · US,AS979 NetLab,NetLab,2026-10-18 21:51:44,@danfeng_chat,0,business,157.238.163.196,,AS979 NetLab,NetLab
 154.9.227.100,443,true,113,0,LAX,北美洲 · 美国 · Los Angeles,AS979 NetLab,NetLab,2026-11-10 15:23:15,@cmliussss_all,0,business,154.9.227.100,,AS979 NetLab,NetLab
 154.29.150.164,8443,true,113,,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-10-18 21:44:35,@danfeng_chat,0,business,154.29.150.164,,AS979 NetLab,NetLab
 23.17.17.215,443,true,114,,SEA,Calgary · CA,AS852 TELUS Communications Inc.,TELUS Communications Inc.,2026-10-18 21:49:23,@danfeng_chat,0,isp,23.17.17.215,,AS852 TELUS Communications Inc.,TELUS Communications Inc.
 154.44.0.214,21274,true,115,4033,LAX,California · Los Angeles · 美国,"AS979 NetLab (PSINet, Inc.)","PSINet, Inc.",2026-09-06 16:44:44,@danfeng2,0,business,154.44.0.214,,"AS979 NetLab (PSINet, Inc.)","PSINet, Inc."
+211.72.119.198,15842,true,116,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+211.72.119.198,29031,true,116,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 192.220.99.140,8443,true,117,,LAX,Los Angeles · US,"AS2914 NTT America, Inc.","NTT America, Inc.",2026-10-18 21:47:17,@danfeng_chat,0,isp,192.220.99.140,,"AS2914 NTT America, Inc.","NTT America, Inc."
+211.72.119.198,11043,true,119,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 64.49.28.173,443,true,119,,LAX,El Segundo · US,AS54286 TAIPEI101 NETWORK LLC,TAIPEI101 NETWORK LLC,2026-10-18 21:51:43,@danfeng_chat,0,isp,2602:faa8:205:3fb1::1,2602:faa8:205:3fb1::1,AS54286 TAIPEI101 NETWORK LLC,TAIPEI101 NETWORK LLC
 154.21.196.84,443,true,119,,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-10-18 21:44:33,@danfeng_chat,0,business,154.21.196.84,,AS979 NetLab,NetLab
 64.81.29.4,443,true,119,,LAX,Los Angeles · US,AS3257 GTT Communications,GTT Communications,2026-09-16 08:33:17,@danfeng2,0,isp,64.81.29.4,,AS3257 GTT Communications,GTT Communications
+211.72.119.198,10124,true,121,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 154.12.52.178,32443,true,124,0,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,154.12.52.178,,AS979 NetLab,NetLab
 216.195.213.93,1891,true,124,1007,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,216.195.213.75,,AS979 NetLab,NetLab
+211.72.119.198,35812,true,125,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 154.12.50.186,30820,true,127,10773,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,154.12.50.186,,AS979 NetLab,NetLab
 216.23.88.7,8443,true,128,,LAX,Los Angeles · US,AS209699 Coaxial Cable LLC,Coaxial Cable LLC,2026-07-27 18:49:25,@danfeng2,0,isp,216.23.88.7,,AS209699 Coaxial Cable LLC,Coaxial Cable LLC
 23.246.167.8,443,true,129,0,SJC,北美洲 · 美国 · Hayward,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",2026-11-10 15:23:15,@cmliussss_all,0,isp,2600:1700:443:580f:a::755f,2600:1700:443:580f:a::755f,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC"
@@ -324,6 +378,7 @@
 70.249.178.241,443,true,136,0,STL,北美洲 · 美国 · Brookfield,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",2026-11-10 15:23:15,@cmliussss_all,0,isp,2600:1700:1331:ac0:49e4:466:b768:26ec,2600:1700:1331:ac0:49e4:466:b768:26ec,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC"
 154.41.80.178,443,true,136,,LAX,Los Angeles · US,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",2026-10-18 21:44:36,@danfeng_chat,0,isp,154.41.80.178,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 154.36.137.201,40306,true,136,0,LAX,Los Angeles · US,AS979 NetLab,NetLab,2026-09-06 16:44:44,@danfeng2,0,business,154.36.137.201,,AS979 NetLab,NetLab
+211.72.119.198,26102,true,137,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,2026-11-10 17:56:26,@manual_import,0,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 162.230.251.4,443,true,139,0,CLE,北美洲 · 美国 · Southfield,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",2026-11-10 15:23:15,@cmliussss_all,0,isp,2600:1700:b2f2:8100::25,2600:1700:b2f2:8100::25,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC"
 216.167.78.116,443,true,139,,LAX,Los Angeles · US,"AS2914 NTT America, Inc.","NTT America, Inc.",2026-10-18 21:48:59,@danfeng_chat,0,isp,216.167.78.116,,"AS2914 NTT America, Inc.","NTT America, Inc."
 76.250.141.252,443,true,140,0,STL,北美洲 · 美国 · Pewaukee,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",2026-11-10 15:23:15,@cmliussss_all,0,isp,2600:1700:dc30:a10:9c46:c8f4:d7a5:a82,2600:1700:dc30:a10:9c46:c8f4:d7a5:a82,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC"
