@@ -3118,7 +3118,13 @@
     "AntiDDoS Networks LTD": "AS218239",
     "Nexus IS": "AS53315",
     "4 EVER PLUG,C.A.": "AS271951",
-    "PT. Cyberindo Mega Persada": "AS132644"
+    "PT. Cyberindo Mega Persada": "AS132644",
+    "Sibirskie Seti Ltd.": "AS41794",
+    "PrefixLabs DOO": "AS218664",
+    "CHINATELECOM Jiangsu province Suzhou 5G network": "AS140292",
+    "Astrix Co., Ltd.": "AS212259",
+    "Jiangsu Wuxi International IDC network": "AS138950",
+    "ImOn Communications, LLC": "AS393238"
   },
   "asn_to_isp": {
     "AS10001": "Mics Network Corporation",
@@ -6133,7 +6139,13 @@
     "AS17864": "SK Broadband Co Ltd",
     "AS53315": "Nexus IS",
     "AS271951": "4 EVER PLUG,C.A.",
-    "AS132644": "PT. Cyberindo Mega Persada"
+    "AS132644": "PT. Cyberindo Mega Persada",
+    "AS41794": "Sibirskie Seti Ltd.",
+    "AS218664": "PrefixLabs DOO",
+    "AS140292": "CHINATELECOM Jiangsu province Suzhou 5G network",
+    "AS212259": "Astrix Co., Ltd.",
+    "AS138950": "Jiangsu Wuxi International IDC network",
+    "AS393238": "ImOn Communications, LLC"
   },
   "asn_to_net_type": {
     "AS10001": "isp",
@@ -10141,6 +10153,12 @@
     "AS17864": "isp",
     "AS53315": "business",
     "AS271951": "isp",
-    "AS132644": "datacenter"
+    "AS132644": "datacenter",
+    "AS41794": "isp",
+    "AS218664": "datacenter",
+    "AS140292": "isp",
+    "AS212259": "datacenter",
+    "AS138950": "datacenter",
+    "AS393238": "isp"
   }
 }

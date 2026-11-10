@@ -22,16 +22,16 @@
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "58.96.64.83:443",
-    "ip": "58.96.64.83",
+    "proxy": "202.27.229.7:443",
+    "ip": "202.27.229.7",
     "port": 443,
     "tls": true,
-    "clientIp": "2406:3400:309:5ef0::1",
+    "clientIp": "2406:3400:388:300::1e",
     "clientIps": [
-      "2406:3400:309:5ef0::1"
+      "2406:3400:388:300::1e"
     ],
     "clientIpv4": "",
-    "clientIpv6": "2406:3400:309:5ef0::1",
+    "clientIpv6": "2406:3400:388:300::1e",
     "dual_stack": false,
     "country": "AU",
     "country_name": "澳大利亚",
@@ -88,16 +88,16 @@
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "202.27.229.7:443",
-    "ip": "202.27.229.7",
+    "proxy": "58.96.64.83:443",
+    "ip": "58.96.64.83",
     "port": 443,
     "tls": true,
-    "clientIp": "2406:3400:388:300::1e",
+    "clientIp": "2406:3400:309:5ef0::1",
     "clientIps": [
-      "2406:3400:388:300::1e"
+      "2406:3400:309:5ef0::1"
     ],
     "clientIpv4": "",
-    "clientIpv6": "2406:3400:388:300::1e",
+    "clientIpv6": "2406:3400:309:5ef0::1",
     "dual_stack": false,
     "country": "AU",
     "country_name": "澳大利亚",

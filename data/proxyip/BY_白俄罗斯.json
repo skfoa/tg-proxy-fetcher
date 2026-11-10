@@ -1,27 +1,5 @@
 [
   {
-    "proxy": "93.85.236.9:443",
-    "ip": "93.85.236.9",
-    "port": 443,
-    "tls": true,
-    "clientIp": "93.85.236.9",
-    "clientIps": [
-      "93.85.236.9"
-    ],
-    "clientIpv4": "93.85.236.9",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "BY",
-    "country_name": "白俄罗斯",
-    "country_cn": "白俄罗斯",
-    "country_emoji": "🇧🇾",
-    "asn": "6697",
-    "asOrganization": "Republican Unitary Telecommunication Enterprise Beltelecom",
-    "isp": "Republican Unitary Telecommunication Enterprise Beltelecom",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
-  },
-  {
     "proxy": "95.130.84.36:8443",
     "ip": "95.130.84.36",
     "port": 8443,
@@ -62,6 +40,28 @@
     "asn": "25106",
     "asOrganization": "Mobile TeleSystems JLLC",
     "isp": "Mobile TeleSystems JLLC",
+    "net_type": "isp",
+    "source": "@cmliussss_all"
+  },
+  {
+    "proxy": "93.85.236.9:443",
+    "ip": "93.85.236.9",
+    "port": 443,
+    "tls": true,
+    "clientIp": "93.85.236.9",
+    "clientIps": [
+      "93.85.236.9"
+    ],
+    "clientIpv4": "93.85.236.9",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "BY",
+    "country_name": "白俄罗斯",
+    "country_cn": "白俄罗斯",
+    "country_emoji": "🇧🇾",
+    "asn": "6697",
+    "asOrganization": "Republican Unitary Telecommunication Enterprise Beltelecom",
+    "isp": "Republican Unitary Telecommunication Enterprise Beltelecom",
     "net_type": "isp",
     "source": "@cmliussss_all"
   }
