@@ -1,27 +1,5 @@
 [
   {
-    "proxy": "83.99.190.32:443",
-    "ip": "83.99.190.32",
-    "port": 443,
-    "tls": true,
-    "clientIp": "83.99.190.32",
-    "clientIps": [
-      "83.99.190.32"
-    ],
-    "clientIpv4": "83.99.190.32",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "LV",
-    "country_name": "拉脱维亚",
-    "country_cn": "拉脱维亚",
-    "country_emoji": "🇱🇻",
-    "asn": "24651",
-    "asOrganization": "Jsc Balticom",
-    "isp": "Jsc Balticom",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "217.28.49.84:8443",
     "ip": "217.28.49.84",
     "port": 8443,
@@ -42,5 +20,27 @@
     "isp": "RETN Limited",
     "net_type": "isp",
     "source": "@cmliussss_all"
+  },
+  {
+    "proxy": "83.99.190.32:443",
+    "ip": "83.99.190.32",
+    "port": 443,
+    "tls": true,
+    "clientIp": "83.99.190.32",
+    "clientIps": [
+      "83.99.190.32"
+    ],
+    "clientIpv4": "83.99.190.32",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "LV",
+    "country_name": "拉脱维亚",
+    "country_cn": "拉脱维亚",
+    "country_emoji": "🇱🇻",
+    "asn": "24651",
+    "asOrganization": "Jsc Balticom",
+    "isp": "Jsc Balticom",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
   }
 ]

@@ -1,14 +1,14 @@
 [
   {
-    "proxy": "158.51.78.180:443",
-    "ip": "158.51.78.180",
+    "proxy": "136.175.82.62:443",
+    "ip": "136.175.82.62",
     "port": 443,
     "tls": true,
-    "clientIp": "158.51.78.180",
+    "clientIp": "136.175.82.62",
     "clientIps": [
-      "158.51.78.180"
+      "136.175.82.62"
     ],
-    "clientIpv4": "158.51.78.180",
+    "clientIpv4": "136.175.82.62",
     "clientIpv6": "",
     "dual_stack": false,
     "country": "BG",
@@ -16,21 +16,21 @@
     "country_cn": "保加利亚",
     "country_emoji": "🇧🇬",
     "asn": "209604",
-    "asOrganization": "2E TELEKOMUNIKASYON LTD STI",
-    "isp": "2E TELEKOMUNIKASYON LTD STI",
+    "asOrganization": "Private Customer",
+    "isp": "Private Customer",
     "net_type": "isp",
-    "source": "@danfeng_chat"
+    "source": "@otcjlq"
   },
   {
-    "proxy": "158.51.78.244:443",
-    "ip": "158.51.78.244",
+    "proxy": "108.165.233.9:443",
+    "ip": "108.165.233.9",
     "port": 443,
     "tls": true,
-    "clientIp": "158.51.78.244",
+    "clientIp": "108.165.233.9",
     "clientIps": [
-      "158.51.78.244"
+      "108.165.233.9"
     ],
-    "clientIpv4": "158.51.78.244",
+    "clientIpv4": "108.165.233.9",
     "clientIpv6": "",
     "dual_stack": false,
     "country": "BG",
@@ -38,10 +38,10 @@
     "country_cn": "保加利亚",
     "country_emoji": "🇧🇬",
     "asn": "209604",
-    "asOrganization": "2E TELEKOMUNIKASYON LTD STI",
-    "isp": "2E TELEKOMUNIKASYON LTD STI",
+    "asOrganization": "2E Telecommunications Ltd. Co.",
+    "isp": "2E Telecommunications Ltd. Co.",
     "net_type": "isp",
-    "source": "@danfeng_chat"
+    "source": "@otcjlq"
   },
   {
     "proxy": "45.39.253.22:443",
@@ -63,7 +63,29 @@
     "asOrganization": "2E TELEKOMUNIKASYON LTD STI",
     "isp": "2E TELEKOMUNIKASYON LTD STI",
     "net_type": "isp",
-    "source": "@danfeng_chat"
+    "source": "@otcjlq"
+  },
+  {
+    "proxy": "93.115.10.148:443",
+    "ip": "93.115.10.148",
+    "port": 443,
+    "tls": true,
+    "clientIp": "93.115.10.148",
+    "clientIps": [
+      "93.115.10.148"
+    ],
+    "clientIpv4": "93.115.10.148",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "BG",
+    "country_name": "保加利亚",
+    "country_cn": "保加利亚",
+    "country_emoji": "🇧🇬",
+    "asn": "209604",
+    "asOrganization": "2E TELEKOMUNIKASYON LTD STI",
+    "isp": "2E TELEKOMUNIKASYON LTD STI",
+    "net_type": "isp",
+    "source": "@otcjlq"
   },
   {
     "proxy": "185.240.147.103:2053",
@@ -88,6 +110,28 @@
     "source": "@cmliussss_all"
   },
   {
+    "proxy": "185.93.70.173:443",
+    "ip": "185.93.70.173",
+    "port": 443,
+    "tls": true,
+    "clientIp": "185.93.70.173",
+    "clientIps": [
+      "185.93.70.173"
+    ],
+    "clientIpv4": "185.93.70.173",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "BG",
+    "country_name": "保加利亚",
+    "country_cn": "保加利亚",
+    "country_emoji": "🇧🇬",
+    "asn": "209604",
+    "asOrganization": "--------- Domain Cloud and Dedicated Hosting Provider --------",
+    "isp": "--------- Domain Cloud and Dedicated Hosting Provider --------",
+    "net_type": "isp",
+    "source": "@otcjlq"
+  },
+  {
     "proxy": "83.228.117.233:443",
     "ip": "83.228.117.233",
     "port": 443,
@@ -110,15 +154,81 @@
     "source": "@danfeng2"
   },
   {
-    "proxy": "136.175.82.62:443",
-    "ip": "136.175.82.62",
+    "proxy": "185.255.93.189:443",
+    "ip": "185.255.93.189",
     "port": 443,
     "tls": true,
-    "clientIp": "136.175.82.62",
+    "clientIp": "185.255.93.189",
     "clientIps": [
-      "136.175.82.62"
+      "185.255.93.189"
     ],
-    "clientIpv4": "136.175.82.62",
+    "clientIpv4": "185.255.93.189",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "BG",
+    "country_name": "保加利亚",
+    "country_cn": "保加利亚",
+    "country_emoji": "🇧🇬",
+    "asn": "209604",
+    "asOrganization": "2E TELEKOMUNIKASYON LTD STI",
+    "isp": "2E TELEKOMUNIKASYON LTD STI",
+    "net_type": "isp",
+    "source": "@otcjlq"
+  },
+  {
+    "proxy": "89.45.45.144:443",
+    "ip": "89.45.45.144",
+    "port": 443,
+    "tls": true,
+    "clientIp": "89.45.45.144",
+    "clientIps": [
+      "89.45.45.144"
+    ],
+    "clientIpv4": "89.45.45.144",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "BG",
+    "country_name": "保加利亚",
+    "country_cn": "保加利亚",
+    "country_emoji": "🇧🇬",
+    "asn": "209604",
+    "asOrganization": "2E Telekomunikasyon LTD. STI.",
+    "isp": "2E Telekomunikasyon LTD. STI.",
+    "net_type": "isp",
+    "source": "@otcjlq"
+  },
+  {
+    "proxy": "194.36.85.113:443",
+    "ip": "194.36.85.113",
+    "port": 443,
+    "tls": true,
+    "clientIp": "194.36.85.113",
+    "clientIps": [
+      "194.36.85.113"
+    ],
+    "clientIpv4": "194.36.85.113",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "BG",
+    "country_name": "保加利亚",
+    "country_cn": "保加利亚",
+    "country_emoji": "🇧🇬",
+    "asn": "209604",
+    "asOrganization": "TALIDO Bilisim Teknolojileri Sanayi ve Ticaret Anonim Sirketi",
+    "isp": "TALIDO Bilisim Teknolojileri Sanayi ve Ticaret Anonim Sirketi",
+    "net_type": "isp",
+    "source": "@otcjlq"
+  },
+  {
+    "proxy": "158.51.78.180:443",
+    "ip": "158.51.78.180",
+    "port": 443,
+    "tls": true,
+    "clientIp": "158.51.78.180",
+    "clientIps": [
+      "158.51.78.180"
+    ],
+    "clientIpv4": "158.51.78.180",
     "clientIpv6": "",
     "dual_stack": false,
     "country": "BG",
@@ -152,5 +262,27 @@
     "isp": "High Speed Telekomunikasyon ve Hab. Hiz. Ltd. Sti.",
     "net_type": "isp",
     "source": "@danfeng_chat"
+  },
+  {
+    "proxy": "108.165.233.203:443",
+    "ip": "108.165.233.203",
+    "port": 443,
+    "tls": true,
+    "clientIp": "108.165.233.203",
+    "clientIps": [
+      "108.165.233.203"
+    ],
+    "clientIpv4": "108.165.233.203",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "BG",
+    "country_name": "保加利亚",
+    "country_cn": "保加利亚",
+    "country_emoji": "🇧🇬",
+    "asn": "209604",
+    "asOrganization": "2E Telecommunications Ltd. Co.",
+    "isp": "2E Telecommunications Ltd. Co.",
+    "net_type": "isp",
+    "source": "@otcjlq"
   }
 ]
