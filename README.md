@@ -119,8 +119,8 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | **`data/scan_ips.csv`** | 扫描测速优选 IP（出入口双维度解耦数据表，16 字段含 `exit_ip`, `exit_asn`, `exit_isp`, `exit_location`） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/scan_ips.csv` |
 | **`data/proxyip.txt`** | 反代 ProxyIP 总清单（按存活/缓冲质检状态分层排序，纯文本） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip.txt` |
 | **`data/proxyip.json`** | 反代 ProxyIP 全量标准化 JSON 端点（包含 `ip`, `port`, `tls`, `clientIp` 出口真实 IP, `clientIps` 真实出口列表, `clientIpv4`, `clientIpv6`, `dual_stack` 双栈标识, 国家, ASN, ISP 与网络属性） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip.json` |
-| **`data/proxyip/*.txt`** | 独立国家/地区纯净反代列表（纯文本 `IP:端口`，如 `US_美国.txt`、`JP_日本.txt`） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip/{地区}.txt` |
-| **`data/proxyip/*.json`** | 独立国家/地区标准化 JSON 反代数据（如 `US_美国.json`、`JP_日本.json`，含 `clientIp`/`clientIps` 双出口画像） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip/{地区}.json` |
+| **`data/proxyip/*.txt`** | 独立国家/地区纯净反代列表（纯文本 `IP:端口`，如 `US_美国.txt`、`JP_日本.txt`、`OTHER_其他地区.txt`） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip/{地区}.txt` |
+| **`data/proxyip/*.json`** | 独立国家/地区标准化 JSON 反代数据（如 `US_美国.json`、`JP_日本.json`、`OTHER_其他地区.json`，含 `clientIp`/`clientIps` 双出口画像） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip/{地区}.json` |
 | **`data/proxyip/【...】.txt` / `.json`** | 稀缺网络属性独立反代列表与 JSON（原生宽带/商业/教育/政务，ASN 粗筛） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip/【ISP_运营商原生宽带】.json` 等 |
 | **`data/proxyip/domains.txt`** | 反代 ProxyIP 人工维护动态域名清单（DoH `A` 默认 `443` + `TXT` 严格 `IP:端口` 增量发现） | 人工维护输入（重建保留） | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip/domains.txt` |
 | **`data/proxyip.csv`** | 反代 ProxyIP 详细数据表（17 字段出入口双维度解耦，含 `net_type` 网络分类、`exit_ip` 真实出站落地 IP、`exit_ipv6` 出口 IPv6、`exit_asn` 出口 ASN 与 `exit_isp` 出口运营商） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip.csv` |
@@ -216,7 +216,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 * **动态域名增量发现（`data/proxyip/domains.txt`）**：每行配置一个域名（可选 `:端口`），抓取阶段仅读取该输入清单（不从输出分组文件反推），通过 DoH 查询 `A` 记录（默认端口）与 `TXT` 记录（仅接受显式 `公网IP:端口`）增量入库；DoH 查询失败时不清理历史记录，历史解析出的旧 IP 由 `proxyip_verify.py` 正常验证与淘汰，分国导出重建时始终保留 `domains.txt`。
 * **质检分层排序与分国专属列表**：`data/proxyip.txt` 按缓冲状态与存活状态清晰分段，段内按实测延迟升序排列；各国家/地区专属分类由 `data/proxyip/*.txt` 独立提供。
 * **分国家/地区独立单文件**：
-  - `data/proxyip/*.txt` / `*.json`：在 `data/proxyip/` 目录下按国家/地区拆分为独立文件（如 `data/proxyip/US_美国.txt`、`data/proxyip/JP_日本.txt`、`data/proxyip/HK_香港.txt` 及对应 `.json`），内容为纯净的 `IP:端口` 格式或标准化 JSON，方便直接复制或作为分地区订阅。
+  - `data/proxyip/*.txt` / `*.json`：在 `data/proxyip/` 目录下按国家/地区拆分为独立文件（如 `data/proxyip/US_美国.txt`、`data/proxyip/JP_日本.txt`、`data/proxyip/HK_香港.txt`、`data/proxyip/OTHER_其他地区.txt` 及对应 `.json`），内容为纯净的 `IP:端口` 格式或标准化 JSON，方便直接复制或作为分地区订阅。仅有效 ISO 3166-1 alpha-2 国家/地区码才独立成国别文件，无法确权的节点统一折叠进 `OTHER_其他地区.*`（JSON 中 `country=""`、`country_name="其他地区"`、`country_emoji="🌐"`）。
 * **纯净反代准入与双向自动分流（CF 入口永久拒收 + 机房降级 + 家宽晋升）**：
   在抓取的反代与扫描节点中，系统全面实施**「入口排他 + 出口鉴真」深度纠偏与双向动态流转**策略：
   - **Cloudflare 自身入口永久拒收，第三方机房/WARP 出口自动降级（`proxyip` ➔ `scan_ips`）**：经官方 CIDR、`ip_cache` 或在线 BGP 确认为 Cloudflare 自身入口的节点在全链条直接移除（不入墓地）；若为第三方反代节点但其真实落地出口（`exit_ip` / `exit_ipv6`）或自治系统经权威库、`ip_cache` 画像或 Cloudflare 官方 IPv4/IPv6 CIDR（`_CF_NETWORKS`）确权为数据中心机房（`datacenter`/`hosting`）或 Cloudflare WARP 出口，系统自动将其从 `proxyip.csv` 中剔除并无损降级迁移至 `data/scan_ips.csv` 扫描优选池；

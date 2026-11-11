@@ -2285,6 +2285,33 @@ def get_country_code(country_name: str) -> str:
     return ""
 
 
+def _country_from_hyphen(part: str, normalize_fn) -> str:
+    """从连字符拼接地名（如 '美国-波士顿'、'US-CA'）提取标准化国家名；严格限制仅纯大写两位代码触发 ISO 匹配。"""
+    segs = [s.strip() for s in re.split(r"[-－–—]", part) if s.strip()]
+    if len(segs) <= 1:
+        return ""
+    # 第一遍（从右向左）：优先识别中文国名、完整英文国名与已知城市名，跳过两位字母缩写以免 US-CA 等州码抢先误判
+    for seg in reversed(segs):
+        if len(seg) == 2 and seg.isascii() and seg.isalpha():
+            continue
+        n = normalize_fn(seg)
+        if n != "其他地区" and (n in COUNTRY_FLAGS or n in COUNTRY_TO_CODE):
+            return n
+        if seg in CITY_TO_COUNTRY:
+            return CITY_TO_COUNTRY[seg]
+        useg = seg.upper()
+        if useg in ENGLISH_COUNTRY_TO_CODE:
+            code = ENGLISH_COUNTRY_TO_CODE[useg]
+            return COUNTRY_NAME_MAP.get(code, n)
+    # 第二遍（从左向右）：仅允许纯大写两位 ISO 代码（拒绝 si/do/de 等小写词缀误匹配 CODE_TO_COUNTRY）
+    for seg in segs:
+        if len(seg) == 2 and seg.isascii() and seg.isalpha() and seg.isupper():
+            n = normalize_fn(seg)
+            if n != "其他地区" and (n in COUNTRY_FLAGS or n in COUNTRY_TO_CODE):
+                return n
+    return ""
+
+
 @functools.lru_cache(maxsize=2048)
 def extract_country(cf_location: str | None, colo: str | None) -> str:
     """
@@ -2342,11 +2369,21 @@ def extract_country(cf_location: str | None, colo: str | None) -> str:
     if colo in COLO_TO_COUNTRY:
         return COLO_TO_COUNTRY[colo]
 
-    # 5. 非大洲名称的两段式/单段式兜底
+    # 4.5 连字符组合形式 (如 美国-波士顿, 阿曼-马斯喀特)：仅在常规国家/城市/colo 未命中时补救
+    for p in reversed(parts):
+        c_hyphen = _country_from_hyphen(p, _normalize_name)
+        if c_hyphen:
+            return c_hyphen
+
+    # 5. 白名单兜底：仅放行可映射为权威 ISO 3166-1 国家的候选段并统一归一中文名，否则归入 其他地区
     for p in reversed(parts):
         n = _normalize_name(p)
-        if n and n not in ("北美洲", "欧洲", "亚洲", "大洋洲", "南美洲", "非洲"):
-            return n
+        if n and n not in ("北美洲", "欧洲", "亚洲", "大洋洲", "南美洲", "非洲", "其他地区"):
+            if n in COUNTRY_FLAGS or n in COUNTRY_TO_CODE:
+                return n
+            code = get_country_code(n)
+            if code and len(code) == 2 and code.isalpha():
+                return COUNTRY_NAME_MAP.get(code.upper(), n)
 
     return "其他地区"
 
@@ -3459,14 +3496,14 @@ def format_proxyip_json_item(r_dict: dict) -> dict:
     else:
         country_name = extract_country(r_dict.get("cf_location"), r_dict.get("colo"))
         code = get_country_code(country_name)
-        if code and len(code) == 2:
+        if code and len(code) == 2 and code.isalpha():
             c_code = code.upper()
             c_name = COUNTRY_NAME_MAP.get(c_code, country_name or c_code)
             c_emoji = country_code_to_emoji(c_code)
         else:
             c_code = ""
-            c_name = country_name or ""
-            c_emoji = country_code_to_emoji(c_code) if c_code else ("🌐" if country_name else "")
+            c_name = "其他地区"
+            c_emoji = "🌐"
 
     _, resolved_nt, exit_code, exit_isp = resolve_node_exit_and_net_type(r_dict)
     eff_code = exit_code or _extract_asn_code(r_dict.get("asn"), r_dict.get("isp")) or ""
@@ -3522,9 +3559,23 @@ def save_proxyip_json(rows: list, json_path: str = "data/proxyip.json") -> int:
     return len(json_list)
 
 
+def _resolve_proxyip_country_bucket(raw_country_label: str) -> tuple[str, str]:
+    """校验并归并国家/地区分组键为 (code, safe_display)，异常或未知标签统一折叠进 ('OTHER', '其他地区')。"""
+    sanitized = re.sub(r'[\\/:*?"<>|]', "_", (raw_country_label or "")).strip().strip(" .")
+    if not sanitized or sanitized == "其他地区":
+        return "OTHER", "其他地区"
+    code = get_country_code(sanitized) or get_country_code(raw_country_label or "")
+    if code and len(code) == 2 and code.isalpha():
+        code_u = code.upper()
+        display = COUNTRY_NAME_MAP.get(code_u, sanitized)
+        display_safe = re.sub(r'[\\/:*?"<>|]', "_", display).strip().strip(" .") or "其他地区"
+        return code_u, display_safe
+    return "OTHER", "其他地区"
+
+
 def save_proxyip_by_country(rows: list, output_dir: str) -> int:
     """
-    将 ProxyIP 列表按国家/地区拆分输出为独立的纯文本与标准化 JSON 文件（如 美国.txt / 美国.json）。
+    将 ProxyIP 列表按国家/地区拆分输出为独立的纯文本与标准化 JSON 文件（如 US_美国.txt / US_美国.json）。
     同时自动提取高价值稀缺属性节点导出为独立专用清单（如 【ISP_运营商原生宽带】.txt / .json 等）。
     纯文本内容仅包含纯净的 IP:端口，JSON 文件包含完整元数据（含 clientIp 出口 IP）。
     自动清理目录中已不存在的旧地区文件，返回生成的独立文件数量。
@@ -3535,12 +3586,13 @@ def save_proxyip_by_country(rows: list, output_dir: str) -> int:
         return 0
 
     os.makedirs(output_dir, exist_ok=True)
-    groups: dict[str, list] = {}
+    groups: dict[tuple[str, str], list] = {}
     type_groups: dict[str, list] = {}
 
     for r in rows:
-        country = extract_country(r.get("cf_location"), r.get("colo"))
-        groups.setdefault(country, []).append(r)
+        raw_country = extract_country(r.get("cf_location"), r.get("colo"))
+        bucket = _resolve_proxyip_country_bucket(raw_country)
+        groups.setdefault(bucket, []).append(r)
 
         # 始终依据出口真实 ASN 与权威研判实时校准网络类型，确保分流分类一致
         _, nt, _, _ = resolve_node_exit_and_net_type(r)
@@ -3551,7 +3603,7 @@ def save_proxyip_by_country(rows: list, output_dir: str) -> int:
     active_files = set()
 
     # 1. 导出各国家/地区独立清单 (.txt 与 .json)
-    for country, members in groups.items():
+    for (code, safe_country), members in groups.items():
         valid_members = [
             r for r in members
             if (r.get("ip") or "").strip() and safe_int(r.get("port"), 0) > 0
@@ -3559,8 +3611,6 @@ def save_proxyip_by_country(rows: list, output_dir: str) -> int:
         if not valid_members:
             continue
         lines = [f"{(r.get('ip') or '').strip()}:{r.get('port')}\n" for r in valid_members]
-        safe_country = re.sub(r'[\\/:*?"<>|]', "_", country).strip() or "其他地区"
-        code = get_country_code(safe_country) or get_country_code(country)
         base_name = f"{code}_{safe_country}" if code else safe_country
         txt_fname = f"{base_name}.txt"
         json_fname = f"{base_name}.json"
