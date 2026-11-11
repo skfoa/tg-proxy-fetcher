@@ -1167,6 +1167,27 @@ def is_valid_public_ip(ip_str: str) -> bool:
         return False
 
 
+_HOSTNAME_LABEL_RE = re.compile(r"^[a-z0-9](?:[a-z0-9_-]{0,61}[a-z0-9])?$")
+_HOSTNAME_TLD_RE = re.compile(r"(?:[a-z]{2,}|xn--[a-z0-9]{2,})")
+
+
+def is_valid_resolvable_hostname(host: str) -> bool:
+    """校验是否为可用于 DNS/DoH 解析的合法多段域名（大小写归一化，允许下划线与 xn-- 顶级域，拒绝 IP 字面量）"""
+    if not host or not isinstance(host, str):
+        return False
+    clean = host.strip().strip("[]").lower().removesuffix(".")
+    if not clean or len(clean) > 253:
+        return False
+    if is_valid_ipv4(clean) or is_valid_ipv6(clean):
+        return False
+    labels = clean.split(".")
+    if len(labels) < 2:
+        return False
+    if any(not _HOSTNAME_LABEL_RE.fullmatch(lb) for lb in labels):
+        return False
+    return bool(_HOSTNAME_TLD_RE.fullmatch(labels[-1]))
+
+
 _DOH_RECORD_TYPES = {"A": 1, "TXT": 16, "AAAA": 28}
 
 
@@ -1388,9 +1409,10 @@ def resolve_asn_batch_online(
                 continue
 
         if not is_valid_public_ip(clean_t):
-            # 若缓存已有合法 resolved_ip 则无需重新 DoH 解析
+            # 若缓存已有合法 resolved_ip 则无需重新 DoH 解析；仅对合法可解析域名入队，杜绝私网/保留 IP 与畸形串触发无效 DNS
             if not (clean_t in cache and is_valid_public_ip(cache[clean_t].get("resolved_ip", ""))):
-                unresolved_domains.add(clean_t)
+                if is_valid_resolvable_hostname(clean_t):
+                    unresolved_domains.add(clean_t)
 
     # 2. 对所有待解析域名进行多线程并发 DNS / DoH 解析
     domain_to_ip: dict[str, str] = {}
@@ -3143,6 +3165,31 @@ def is_cloudflare_node(
     )
 
 
+def _rescue_lookup_key(row: dict) -> str:
+    """统一提取 BGP 纠偏查询目标：公网入口 IP → 公网 resolved_ip → 合法可解析域名；其余返回空串。"""
+    host = extract_node_host(row)
+    res_ip = str(row.get("resolved_ip") or "").strip().strip("[]")
+    if is_valid_public_ip(host):
+        return host
+    if is_valid_public_ip(res_ip):
+        return res_ip
+    if is_valid_resolvable_hostname(host):
+        return host.strip().strip("[]").lower().removesuffix(".")
+    return ""
+
+
+def _lookup_ip_cache_entry(cache: dict, *keys: str) -> dict | None:
+    """按候选键（含域名小写回退）从 ip_cache 读取结构化画像。"""
+    for raw_k in keys:
+        if not raw_k:
+            continue
+        for cand in (raw_k, raw_k.lower()):
+            entry = cache.get(cand)
+            if isinstance(entry, dict):
+                return entry
+    return None
+
+
 def rescue_mislabeled_cloudflare_rows(
     rows: list[dict],
     ip_cache: dict | None = None,
@@ -3150,7 +3197,7 @@ def rescue_mislabeled_cloudflare_rows(
     cache_path: str = "",
 ) -> tuple[dict[str, dict], int]:
     """
-    对未命中 Cloudflare CIDR、且尚未入缓存却在文本中被标为 Cloudflare ASN/ISP 的入口 IP，
+    对未命中 Cloudflare CIDR、且尚未入缓存却在文本中被标为 Cloudflare ASN/ISP 的入口 IP/域名，
     批量反查其真实 BGP 归属：将第三方机房+WARP 出站被上游误标为 Cloudflare London LLC/AS13335 的节点自动纠正并保留。
     返回: (更新后的 ip_cache, 纠正还原的节点数)
     """
@@ -3164,18 +3211,14 @@ def rescue_mislabeled_cloudflare_rows(
         if not isinstance(r, dict):
             continue
         host = extract_node_host(r)
-        res_ip = str(r.get("resolved_ip") or "").strip().strip("[]")
-        lookup_ip = host if is_valid_public_ip(host) else (res_ip if is_valid_public_ip(res_ip) else "")
+        lookup_ip = _rescue_lookup_key(r)
         if not lookup_ip or is_cloudflare_ip(lookup_ip) or (host and is_cloudflare_ip(host)):
             continue
         is_proxy_row = "url" in r or "proto" in r or "egress_ip" in r
         egress = str(r.get("egress_ip") or "").strip().strip("[]")
         if is_proxy_row and egress and egress != host:
             continue
-        cached = (
-            cache.get(lookup_ip) if isinstance(cache.get(lookup_ip), dict)
-            else (cache.get(host) if host and isinstance(cache.get(host), dict) else None)
-        )
+        cached = _lookup_ip_cache_entry(cache, lookup_ip, host)
         if isinstance(cached, dict) and _extract_asn_code(cached.get("asn"), cached.get("isp")):
             continue
         if is_cloudflare_asn_or_isp(str(r.get("asn") or ""), str(r.get("isp") or "")):
@@ -3211,16 +3254,12 @@ def rescue_mislabeled_cloudflare_rows(
         if not isinstance(r, dict):
             continue
         host = extract_node_host(r)
-        res_ip = str(r.get("resolved_ip") or "").strip().strip("[]")
-        lookup_ip = host if is_valid_public_ip(host) else (res_ip if is_valid_public_ip(res_ip) else host)
+        lookup_ip = _rescue_lookup_key(r)
         if not lookup_ip or is_cloudflare_ip(lookup_ip) or (host and is_cloudflare_ip(host)):
             continue
         if not is_cloudflare_asn_or_isp(str(r.get("asn") or ""), str(r.get("isp") or "")):
             continue
-        c_entry = (
-            cache.get(lookup_ip) if isinstance(cache.get(lookup_ip), dict)
-            else (cache.get(host) if host and isinstance(cache.get(host), dict) else None)
-        )
+        c_entry = _lookup_ip_cache_entry(cache, lookup_ip, host)
         real_asn, real_isp = ("", "")
         if isinstance(c_entry, dict):
             real_asn = _extract_asn_code(c_entry.get("asn"), c_entry.get("isp"))
@@ -4226,6 +4265,7 @@ def merge_demoted_into_scan_ips(
     scan_csv_path: str = "data/scan_ips.csv",
     scan_txt_path: str = "data/scan_ips.txt",
     scan_dir_path: str = "data/scan_ips",
+    ip_cache_path: str = "",
 ) -> int:
     """
     将经校准或外部鉴真确认为机房 (net_type == 'datacenter') 的节点从 ProxyIP 池安全移入 scan_ips 优选池，
@@ -4236,7 +4276,7 @@ def merge_demoted_into_scan_ips(
         return 0
 
     tombstone = load_tombstone()
-    ip_cache = load_ip_cache()
+    ip_cache = load_ip_cache(filepath=ip_cache_path)
     scan_map: dict[str, dict] = {}
     cf_purged_existing = 0
     if scan_csv_path and os.path.isfile(scan_csv_path):
@@ -4615,6 +4655,7 @@ def calibrate_all_datasets(
                     scan_csv_path=scan_csv_path,
                     scan_txt_path=scan_txt_path,
                     scan_dir_path=scan_dir_path,
+                    ip_cache_path=ip_cache_path,
                 )
                 stats["proxyip_demoted_to_scan"] = len(dc_demoted_rows)
                 log.info("【全量校准】检测到 %d 条 ProxyIP 节点经校准属于机房属性 (并入 scan_ips: %d 条)", len(dc_demoted_rows), demoted_cnt)

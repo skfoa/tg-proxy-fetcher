@@ -341,6 +341,13 @@ CF_IP_DIR = os.path.join(DATA_DIR, "cf_ips")
 CF_IP_DOMAINS_FILE = os.path.join(CF_IP_DIR, "domains.txt")
 CF_TLS_PORTS = frozenset({443, 8443, 2053, 2083, 2087, 2096})
 FETCH_STATS_FILE = os.path.join(DATA_DIR, ".fetch_stats.json")
+
+
+def _ip_cache_path() -> str:
+    """动态解析当前 DATA_DIR 下的持久化 IP 缓存路径（便于测试隔离 DATA_DIR）"""
+    return os.path.join(DATA_DIR, "ip_cache.json")
+
+
 # ============================================
 
 
@@ -411,7 +418,7 @@ def load_existing_proxies(
     existing = {}
     csv_meta_by_url = {}
     csv_meta_by_key = {}
-    ip_cache = load_ip_cache()
+    ip_cache = load_ip_cache(filepath=_ip_cache_path())
 
     def _ingest_csv(path: str):
         if not os.path.isfile(path):
@@ -558,7 +565,7 @@ def load_existing_cf_ips(filepath: str = OUTPUT_CF_FILE, label: str = "优选 IP
     if not os.path.exists(filepath):
         return existing
     tombstone = load_tombstone()
-    ip_cache = load_ip_cache()
+    ip_cache = load_ip_cache(filepath=_ip_cache_path())
     try:
         with open(filepath, "r", encoding="utf-8-sig") as f:
             reader = csv.DictReader(f)
@@ -1564,7 +1571,8 @@ def _prepare_domain_candidates(
             seen_ips.add(ip_val)
             unique_ips.append(ip_val)
 
-    local_cache = ip_cache if ip_cache is not None else load_ip_cache()
+    cache_path = _ip_cache_path()
+    local_cache = ip_cache if ip_cache is not None else load_ip_cache(filepath=cache_path)
     if not active_endpoints:
         return [], local_cache, {}, tomb_filtered
 
@@ -1578,8 +1586,8 @@ def _prepare_domain_candidates(
         )
     ]
     if missing_ips:
-        resolve_asn_batch_online(missing_ips, persist=True)
-        disk_cache = load_ip_cache()
+        resolve_asn_batch_online(missing_ips, persist=True, cache_path=cache_path)
+        disk_cache = load_ip_cache(filepath=cache_path)
         for ip_val in missing_ips:
             if ip_val in disk_cache and isinstance(disk_cache[ip_val], dict):
                 local_cache[ip_val] = disk_cache[ip_val]
@@ -2098,7 +2106,7 @@ def save_and_notify(
     scan_ips_total = 0
     asn_groups_total = 0
     asn_groups = {}
-    local_ip_cache = load_ip_cache() if (final_scan_ips or final_proxyips) else {}
+    local_ip_cache = load_ip_cache(filepath=_ip_cache_path()) if (final_scan_ips or final_proxyips) else {}
     if final_scan_ips is not None and (final_scan_ips or os.path.exists(OUTPUT_SCAN_FILE)):
         os.makedirs(OUTPUT_SCAN_DIR, exist_ok=True)
 
@@ -2282,9 +2290,10 @@ def merge_and_save(
     existing_proxyips = existing_proxyips or {}
     scraped_proxyips = scraped_proxyips or {}
 
+    cache_path = _ip_cache_path()
     tombstone = load_tombstone()
     if ip_cache is None:
-        ip_cache = load_ip_cache()
+        ip_cache = load_ip_cache(filepath=cache_path)
 
     # 1. 过滤掉命中墓地的节点 (双重防御，杜绝死节点进入待存集合)
     scraped_proxies = {k: v for k, v in scraped_proxies.items() if not is_tombstoned(k, tombstone)}
@@ -2297,7 +2306,6 @@ def merge_and_save(
     existing_proxyips = {k: v for k, v in existing_proxyips.items() if not is_tombstoned(k, tombstone)}
 
     # 1.1 纠正上游将第三方 VPS+WARP 出站误标为 Cloudflare (AS13335/Cloudflare London LLC) 的入口归属，随后全量拒收真实 Cloudflare 入口节点
-    is_prod_data_dir = os.path.abspath(DATA_DIR) == os.path.abspath("data")
     suspect_rows = [
         v
         for d in (
@@ -2313,7 +2321,12 @@ def merge_and_save(
         for v in d.values()
         if isinstance(v, dict)
     ]
-    ip_cache, _ = rescue_mislabeled_cloudflare_rows(suspect_rows, ip_cache=ip_cache, persist=is_prod_data_dir)
+    ip_cache, _ = rescue_mislabeled_cloudflare_rows(
+        suspect_rows,
+        ip_cache=ip_cache,
+        persist=True,
+        cache_path=cache_path,
+    )
 
     cf_dropped_counts: dict[str, int] = {}
 
@@ -2676,7 +2689,15 @@ def merge_and_save(
     for k in list(cleaned_proxyips.keys()):
         cleaned_scan_ips.pop(k, None)
 
-    final_ip_cache = load_ip_cache() if is_prod_data_dir else ip_cache
+    disk_final = load_ip_cache(filepath=cache_path)
+    final_ip_cache = {k: dict(v) for k, v in (disk_final or {}).items() if isinstance(v, dict)}
+    for _k, _v in ip_cache.items():
+        if not isinstance(_v, dict):
+            continue
+        tgt = final_ip_cache.setdefault(_k, {})
+        for _fk, _fv in _v.items():
+            if _fv not in ("", None):
+                tgt[_fk] = _fv
     final_proxies = {k: v for k, v in final_proxies.items() if not is_cloudflare_node(v, final_ip_cache)}
     final_cf_ips = {k: v for k, v in final_cf_ips.items() if not is_cloudflare_node(v, final_ip_cache)}
     final_scan_ips = {k: v for k, v in cleaned_scan_ips.items() if not is_cloudflare_node(v, final_ip_cache)}
@@ -2752,7 +2773,7 @@ def run_web_scraper():
 
     tombstone = load_tombstone()
     log.info("已加载墓地黑名单: %d 个冷却中死节点（7天内淘汰）", len(tombstone))
-    ip_cache = load_ip_cache()
+    ip_cache = load_ip_cache(filepath=_ip_cache_path())
 
     cutoff = datetime.now(timezone.utc) - timedelta(days=FETCH_DAYS)
     all_channels = sorted(set(PROXY_CHANNELS + CF_IP_CHANNELS))
@@ -2863,7 +2884,7 @@ async def run_telethon():
 
     tombstone = load_tombstone()
     log.info("已加载墓地黑名单: %d 个冷却中死节点（7天内淘汰）", len(tombstone))
-    ip_cache = load_ip_cache()
+    ip_cache = load_ip_cache(filepath=_ip_cache_path())
     ip_cache_dirty = False
 
     client = TelegramClient(
@@ -3104,7 +3125,7 @@ async def run_telethon():
         fetch_external_subscriptions(SUB_URLS, web_proxy, tombstone, scraped_proxies)
 
         if ip_cache_dirty:
-            save_ip_cache(ip_cache)
+            save_ip_cache(ip_cache, filepath=_ip_cache_path())
 
         # 1.6 外部 EDT-Pages 多协议代理源抓取 (HTTPS / HTTP / SOCKS5 多镜像容灾、非机房高价值过滤、元数据丰富)
         edt_unrec_all = []
@@ -3167,7 +3188,7 @@ def main():
 
     # 主动修剪磁盘上超过 7 天的过期墓碑条目并原子持久化 (函数内已记录日志)
     prune_tombstone()
-    prune_ip_cache()
+    prune_ip_cache(filepath=_ip_cache_path())
 
     if TG_API_ID and TG_API_HASH and TG_SESSION_STR:
         import importlib.util

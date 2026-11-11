@@ -535,22 +535,39 @@ class TestDomainProxyIPAndCFIntegration(unittest.TestCase):
         def _fake_save(final_proxies, final_cf_ips, final_scan_ips=None, final_proxyips=None, **kwargs):
             captured["cf_ips"] = final_cf_ips
 
-        with patch("tg_fetch.load_tombstone", return_value={}), \
-             patch("tg_fetch.auto_enrich_and_save_asns", return_value=0), \
-             patch("tg_fetch.get_session_enriched_asns", return_value=[]), \
-             patch("tg_fetch.save_and_notify", side_effect=_fake_save):
-            tg_fetch.merge_and_save(
-                existing_proxies={},
-                scraped_proxies={},
-                existing_cf_ips=existing_cf_ips,
-                scraped_cf_ips=scraped_cf_ips,
-                existing_scan_ips={},
-                scraped_scan_ips={},
-                existing_proxyips={},
-                scraped_proxyips={},
-                edt_unrecorded_asns=[],
-                ip_cache=fake_ip_cache,
-            )
+        with tempfile.TemporaryDirectory() as merge_tmpdir:
+            tmp_cache_path = os.path.join(merge_tmpdir, "ip_cache.json")
+            with open(tmp_cache_path, "w", encoding="utf-8") as f:
+                json.dump({}, f)
+
+            repo_cache_abs = os.path.abspath(providers.IP_CACHE_PATH)
+            orig_save_ip_cache = providers.save_ip_cache
+            save_paths = []
+
+            def _spy_save_ip_cache(cache, filepath="", compact=True):
+                save_paths.append(os.path.abspath(filepath or providers.IP_CACHE_PATH))
+                return orig_save_ip_cache(cache, filepath=filepath, compact=compact)
+
+            with patch.object(tg_fetch, "DATA_DIR", merge_tmpdir), \
+                 patch("providers.save_ip_cache", side_effect=_spy_save_ip_cache), \
+                 patch("tg_fetch.load_tombstone", return_value={}), \
+                 patch("tg_fetch.auto_enrich_and_save_asns", return_value=0), \
+                 patch("tg_fetch.get_session_enriched_asns", return_value=[]), \
+                 patch("tg_fetch.save_and_notify", side_effect=_fake_save):
+                tg_fetch.merge_and_save(
+                    existing_proxies={},
+                    scraped_proxies={},
+                    existing_cf_ips=existing_cf_ips,
+                    scraped_cf_ips=scraped_cf_ips,
+                    existing_scan_ips={},
+                    scraped_scan_ips={},
+                    existing_proxyips={},
+                    scraped_proxyips={},
+                    edt_unrecorded_asns=[],
+                    ip_cache=fake_ip_cache,
+                )
+
+            self.assertTrue(all(p != repo_cache_abs for p in save_paths))
 
         merged_cf = captured["cf_ips"]
         self.assertNotIn("104.16.1.1:443", merged_cf)
@@ -642,22 +659,39 @@ class TestDomainProxyIPAndCFIntegration(unittest.TestCase):
             "218.157.145.120": {"asn": "AS4766", "isp": "Korea Telecom", "net_type": "isp", "country": "KR"},
         }
 
-        with patch("tg_fetch.load_tombstone", return_value={}), \
-             patch("tg_fetch.auto_enrich_and_save_asns", return_value=0), \
-             patch("tg_fetch.get_session_enriched_asns", return_value=[]), \
-             patch("tg_fetch.save_and_notify", side_effect=_fake_save):
-            tg_fetch.merge_and_save(
-                existing_proxies={},
-                scraped_proxies={},
-                existing_cf_ips={},
-                scraped_cf_ips={},
-                existing_scan_ips={},
-                scraped_scan_ips={},
-                existing_proxyips=existing_proxyips,
-                scraped_proxyips=scraped_proxyips,
-                edt_unrecorded_asns=[],
-                ip_cache=ip_cache,
-            )
+        with tempfile.TemporaryDirectory() as merge_tmpdir:
+            tmp_cache_path = os.path.join(merge_tmpdir, "ip_cache.json")
+            with open(tmp_cache_path, "w", encoding="utf-8") as f:
+                json.dump({}, f)
+
+            repo_cache_abs = os.path.abspath(providers.IP_CACHE_PATH)
+            orig_save_ip_cache = providers.save_ip_cache
+            save_paths = []
+
+            def _spy_save_ip_cache(cache, filepath="", compact=True):
+                save_paths.append(os.path.abspath(filepath or providers.IP_CACHE_PATH))
+                return orig_save_ip_cache(cache, filepath=filepath, compact=compact)
+
+            with patch.object(tg_fetch, "DATA_DIR", merge_tmpdir), \
+                 patch("providers.save_ip_cache", side_effect=_spy_save_ip_cache), \
+                 patch("tg_fetch.load_tombstone", return_value={}), \
+                 patch("tg_fetch.auto_enrich_and_save_asns", return_value=0), \
+                 patch("tg_fetch.get_session_enriched_asns", return_value=[]), \
+                 patch("tg_fetch.save_and_notify", side_effect=_fake_save):
+                tg_fetch.merge_and_save(
+                    existing_proxies={},
+                    scraped_proxies={},
+                    existing_cf_ips={},
+                    scraped_cf_ips={},
+                    existing_scan_ips={},
+                    scraped_scan_ips={},
+                    existing_proxyips=existing_proxyips,
+                    scraped_proxyips=scraped_proxyips,
+                    edt_unrecorded_asns=[],
+                    ip_cache=ip_cache,
+                )
+
+            self.assertTrue(all(p != repo_cache_abs for p in save_paths))
 
         kept = captured["proxyips"]["183.101.136.209:443"]
         self.assertEqual(kept["first_seen"], "2026-10-25 18:30:49")

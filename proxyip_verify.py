@@ -112,6 +112,11 @@ SCAN_CSV = os.path.join(DATA_DIR, "scan_ips.csv")
 SCAN_TXT = os.path.join(DATA_DIR, "scan_ips.txt")
 SCAN_DIR = os.path.join(DATA_DIR, "scan_ips")
 
+
+def _ip_cache_path() -> str:
+    """动态解析当前 DATA_DIR 下的持久化 IP 缓存路径（便于测试隔离 DATA_DIR）"""
+    return os.path.join(DATA_DIR, "ip_cache.json")
+
 PROBE_HOST = "speed.cloudflare.com"
 PROBE_PATH = "/cdn-cgi/trace"
 
@@ -511,7 +516,7 @@ async def verify_proxyips(
         return rows
 
     if ip_cache is None:
-        ip_cache = load_ip_cache()
+        ip_cache = load_ip_cache(filepath=_ip_cache_path())
     if check_endpoint and check_executor is None:
         check_executor = get_check_executor()
 
@@ -756,9 +761,15 @@ async def async_main(args):
         return
     log.info(">>> 开始执行 ProxyIP 穿透质检 (%s): 共 %d 条记录...", PROXYIP_CSV, total)
 
-    ip_cache = load_ip_cache()
+    cache_path = _ip_cache_path()
+    ip_cache = load_ip_cache(filepath=cache_path)
     is_dry_run = getattr(args, "dry_run", False)
-    ip_cache, _ = rescue_mislabeled_cloudflare_rows(rows, ip_cache=ip_cache, persist=not is_dry_run)
+    ip_cache, _ = rescue_mislabeled_cloudflare_rows(
+        rows,
+        ip_cache=ip_cache,
+        persist=not is_dry_run,
+        cache_path=cache_path,
+    )
     clean_init_rows = [r for r in rows if not is_cloudflare_node(r, ip_cache)]
     cf_init_dropped = len(rows) - len(clean_init_rows)
     if cf_init_dropped > 0:
@@ -823,7 +834,7 @@ async def async_main(args):
     eliminated = total - len(survivors_all)
 
     # 机房归池闭环：先过滤 Cloudflare 入口（直接抛弃、不进入 scan_ips），再将非 CF 机房移入 scan_ips.csv
-    ip_cache = load_ip_cache()
+    ip_cache = load_ip_cache(filepath=_ip_cache_path())
     survivors: list[dict] = []
     demoted_dc_rows: list[dict] = []
     for r in survivors_all:
@@ -913,6 +924,7 @@ async def async_main(args):
             scan_csv_path=SCAN_CSV,
             scan_txt_path=SCAN_TXT,
             scan_dir_path=SCAN_DIR,
+            ip_cache_path=_ip_cache_path(),
         )
 
     if eliminated > 0:

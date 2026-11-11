@@ -119,6 +119,11 @@ PROXYIP_TXT = os.path.join(DATA_DIR, "proxyip.txt")
 PROXYIP_JSON = os.path.join(DATA_DIR, "proxyip.json")
 PROXYIP_DIR = os.path.join(DATA_DIR, "proxyip")
 
+
+def _ip_cache_path() -> str:
+    """动态解析当前 DATA_DIR 下的持久化 IP 缓存路径（便于测试隔离 DATA_DIR）"""
+    return os.path.join(DATA_DIR, "ip_cache.json")
+
 CHECK_ENDPOINT = os.getenv("CHECK_PROXYIP_URL", "").strip()
 CHECK_TOKEN = (
     os.getenv("CHECK_PROXYIP_TOKEN", "").strip()
@@ -1020,7 +1025,13 @@ async def _verify_and_persist(csv_path: str, tag: str, args, on_save, pre_save_h
         return res
 
     is_dry_run = getattr(args, "dry_run", False)
-    init_cache, _ = rescue_mislabeled_cloudflare_rows(rows, ip_cache=load_ip_cache(), persist=not is_dry_run)
+    cache_path = _ip_cache_path()
+    init_cache, _ = rescue_mislabeled_cloudflare_rows(
+        rows,
+        ip_cache=load_ip_cache(filepath=cache_path),
+        persist=not is_dry_run,
+        cache_path=cache_path,
+    )
     clean_init = [r for r in rows if not is_cloudflare_node(r, init_cache)]
     cf_init_dropped = len(rows) - len(clean_init)
     if cf_init_dropped > 0:
@@ -1083,7 +1094,7 @@ async def _verify_and_persist(csv_path: str, tag: str, args, on_save, pre_save_h
     # 严格保证保存先于登记墓地：若保存失败触发异常，避免墓地预先登记导致状态不一致
     if pre_save_hook:
         await pre_save_hook(survivors)
-    final_cache = load_ip_cache()
+    final_cache = load_ip_cache(filepath=_ip_cache_path())
     non_cf_survivors = [r for r in survivors if not is_cloudflare_node(r, final_cache)]
     if len(non_cf_survivors) != len(survivors):
         survivors = non_cf_survivors
@@ -1130,7 +1141,7 @@ async def async_main(args):
     # ================= 2. 校验扫描优选 IP (scan_ips) =================
     def _save_scan_track(survivors):
         asn_groups = defaultdict(list)
-        local_ip_cache = load_ip_cache()
+        local_ip_cache = load_ip_cache(filepath=_ip_cache_path())
         for row in survivors:
             cur_ip = row.get("ip") or ""
             asn_clean = clean_asn(row.get("asn", ""), row.get("isp", ""))
@@ -1240,7 +1251,21 @@ async def async_main(args):
     # 全链路终态属性校准闭环：在全流程结束前对全量数据集执行最终一致性校准
     if not getattr(args, "dry_run", False):
         try:
-            cal_stats = calibrate_all_datasets()
+            cal_stats = calibrate_all_datasets(
+                proxies_dir=os.path.join(DATA_DIR, "proxies"),
+                proxies_csv_path=os.path.join(DATA_DIR, "proxies.csv"),
+                proxyip_csv_path=PROXYIP_CSV,
+                proxyip_dir=PROXYIP_DIR,
+                ip_cache_path=_ip_cache_path(),
+                proxyip_txt_path=PROXYIP_TXT,
+                proxyip_json_path=PROXYIP_JSON,
+                scan_csv_path=SCAN_CSV,
+                scan_txt_path=SCAN_TXT,
+                scan_dir_path=SCAN_DIR,
+                proxies_txt_path="",
+                cf_csv_path=CF_CSV,
+                cf_txt_path="",
+            )
             log.info("【全流程属性校准闭环】已完成最终一致性校准: %s", cal_stats)
         except Exception as e:
             log.warning("全流程终态校准异常: %s", e)

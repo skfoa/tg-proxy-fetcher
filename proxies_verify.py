@@ -107,6 +107,11 @@ PROXIES_TXT = os.path.join(DATA_DIR, "proxies.txt")
 PROXIES_CSV = os.path.join(DATA_DIR, "proxies.csv")
 PROXIES_DIR = os.path.join(DATA_DIR, "proxies")
 
+
+def _ip_cache_path() -> str:
+    """动态解析当前 DATA_DIR 下的持久化 IP 缓存路径（便于测试隔离 DATA_DIR）"""
+    return os.path.join(DATA_DIR, "ip_cache.json")
+
 PROBE_HOST = "speed.cloudflare.com"
 PROBE_PATH = "/cdn-cgi/trace"
 PROBE_PORT = 80
@@ -1485,7 +1490,7 @@ def load_proxies_data(
     return list(url_map.values())
 
 
-async def enrich_proxies_metadata(survivors: list[dict]) -> dict[str, int]:
+async def enrich_proxies_metadata(survivors: list[dict], cache_path: str = "") -> dict[str, int]:
     """
     为质检存活代理节点补全 ASN、ISP 及网络属性 (net_type：isp/datacenter/business 等)：
     1. 优先使用已有的有效 asn / isp / net_type（避免重复网络查询）
@@ -1496,7 +1501,7 @@ async def enrich_proxies_metadata(survivors: list[dict]) -> dict[str, int]:
     if not survivors:
         return {}
 
-    persistent_cache = load_ip_cache()
+    persistent_cache = load_ip_cache(filepath=cache_path)
     ip_to_resolve = set()
     for r in survivors:
         asn = r.get("asn", "").strip()
@@ -1521,7 +1526,7 @@ async def enrich_proxies_metadata(survivors: list[dict]) -> dict[str, int]:
     ip_cache: dict[str, tuple[str, str]] = {}
     if ip_to_resolve:
         log.info("正在为 %d 个唯一出口 IP/域名批量解析 ASN 与国家属性...", len(ip_to_resolve))
-        ip_cache = await resolve_asn_batch_online_async(list(ip_to_resolve))
+        ip_cache = await resolve_asn_batch_online_async(list(ip_to_resolve), cache_path=cache_path)
 
     # 统一汇流 ip_cache、存活节点自身 asn 与持久化缓存中所有未收录 ASN，单次批量定性入库后再执行 classify_asn
     unrecorded_map: dict[str, dict] = {}
@@ -1547,7 +1552,7 @@ async def enrich_proxies_metadata(survivors: list[dict]) -> dict[str, int]:
         log.info("【质检在线反查】发现 %d 个未收录 ASN，执行权威自动入库...", len(unrecorded_map))
         auto_enrich_and_save_asns(list(unrecorded_map.values()))
 
-    persistent_cache = load_ip_cache()
+    persistent_cache = load_ip_cache(filepath=cache_path)
     net_stats: dict[str, int] = {}
     for r in survivors:
         curr_asn = r.get("asn", "").strip()
@@ -1617,7 +1622,7 @@ async def enrich_proxies_metadata(survivors: list[dict]) -> dict[str, int]:
         net_stats[nt] = net_stats.get(nt, 0) + 1
 
     try:
-        save_ip_cache(persistent_cache, compact=True)
+        save_ip_cache(persistent_cache, filepath=cache_path, compact=True)
     except Exception as e:
         log.debug("保存同步后的 ip_cache 失败: %s", e)
 
@@ -1740,12 +1745,13 @@ def send_proxies_notification(
 async def async_main(args):
     t_start = time.time()
     rows = load_proxies_data(PROXIES_TXT, PROXIES_CSV, proxies_dir=PROXIES_DIR)
-    is_prod_data_dir = os.path.abspath(DATA_DIR) == os.path.abspath("data")
+    cache_path = _ip_cache_path()
     init_cache, _ = await asyncio.to_thread(
         rescue_mislabeled_cloudflare_rows,
         rows,
-        load_ip_cache(),
-        is_prod_data_dir,
+        load_ip_cache(filepath=cache_path),
+        True,
+        cache_path,
     )
     filtered_rows = [r for r in rows if not is_cloudflare_node(r, init_cache)]
     cf_init_dropped = len(rows) - len(filtered_rows)
@@ -2014,7 +2020,7 @@ async def async_main(args):
     # 沉淀本轮质检提取出的出口 IP 与域名网络画像至持久化 ip_cache (待最终落盘后统一修剪孤儿记录)
     cache_updates = [r.get("_cache_update") for r in results if r.get("_cache_update")]
     if cache_updates:
-        persistent_cache = load_ip_cache()
+        persistent_cache = load_ip_cache(filepath=_ip_cache_path())
         added_dc = 0
         added_isp = 0
         for upd in cache_updates:
@@ -2061,7 +2067,7 @@ async def async_main(args):
                 # h 为 IP 且 h != res_ip (多跳/隧道代理)：
                 # 严禁将出口 ASN 赋给入口 IP！保持 h 自身物理画像不受污染
                 pass
-        save_ip_cache(persistent_cache)
+        save_ip_cache(persistent_cache, filepath=_ip_cache_path())
         log.info(
             "【持久化 IP 缓存】本轮检测新增/更新出口画像 %d 个 (机房画像 +%d, 家宽/专线 +%d)，当前缓存库 %d 条",
             len(cache_updates),
@@ -2104,10 +2110,10 @@ async def async_main(args):
         log.info("[通用代理 淘汰] 本次无节点达到淘汰阈值")
 
     # 补全出口 IP 对应的 ASN 与网络属性打标
-    net_stats = await enrich_proxies_metadata(survivors)
+    net_stats = await enrich_proxies_metadata(survivors, cache_path=_ip_cache_path())
 
     # 准入安全兜底：过滤打标后确认属于 Cloudflare 入口的节点，或非频道/非用户外部来源的机房 (datacenter) 节点
-    post_cache = load_ip_cache()
+    post_cache = load_ip_cache(filepath=_ip_cache_path())
     cf_dropped = 0
     ext_dc_dropped = 0
     clean_survivors = []
@@ -2163,7 +2169,7 @@ async def async_main(args):
         ]
         newly_tombstoned = record_tombstone(dead_keys)
         log.info("[通用代理 墓地] 已登记 %d 个淘汰死节点至墓地冷却库 (新增: %d 个, 隔离期 7 天)", len(dead_keys), newly_tombstoned)
-    prune_ip_cache()
+    prune_ip_cache(filepath=_ip_cache_path())
 
     elapsed = time.time() - t_start
     log.info("通用代理连通性质检执行完毕，总耗时 %.2f 秒 (✅ 存活: %d | 均延: %dms | ⚠️ 缓冲: %d [新增: %d, 取消恢复: %d])", elapsed, pass_count, avg_delay, (survivors_len - pass_count), proxies_buf_new, proxies_buf_rec)
@@ -2248,15 +2254,17 @@ async def enrich_existing_proxies_file(
             rows.append(item)
 
     log.info("【全量 ASN 补全模式】从 %s 读取到 %d 个现有节点", csv_path, len(rows))
-    is_prod = os.path.abspath(os.path.dirname(os.path.abspath(csv_path))) == os.path.abspath("data")
+    cache_path = os.path.join(os.path.dirname(os.path.abspath(csv_path)), "ip_cache.json")
     rescued_cache, _ = await asyncio.to_thread(
         rescue_mislabeled_cloudflare_rows,
         rows,
-        load_ip_cache(),
-        is_prod,
+        load_ip_cache(filepath=cache_path),
+        True,
+        cache_path,
     )
-    net_stats = await enrich_proxies_metadata(rows)
-    final_cache = load_ip_cache() if is_prod else rescued_cache
+    net_stats = await enrich_proxies_metadata(rows, cache_path=cache_path)
+    disk_final = load_ip_cache(filepath=cache_path)
+    final_cache = {**(rescued_cache or {}), **(disk_final or {})}
     rows = [r for r in rows if not is_cloudflare_node(r, final_cache)]
     log.info("【全量 ASN 补全模式】完成网络属性画像打标: %s (剔除 CF 后保留 %d 个)", net_stats, len(rows))
     save_proxies_data(rows, txt_path=txt_path, csv_path=csv_path, proxies_dir=proxies_dir)

@@ -163,6 +163,113 @@ class TestCloudflarePrimitives(unittest.TestCase):
         self.assertTrue(providers.is_cloudflare_node(rows[1], ip_cache=updated_cache))
         self.assertFalse(providers.is_cloudflare_node(rows[2], ip_cache=updated_cache))
 
+    def test_rescue_mislabeled_domain_ingress_queries_and_handles_third_party_vs_cf(self):
+        rows = [
+            {
+                "url": "https://node-a.example.com:443",
+                "proto": "https",
+                "host": "node-a.example.com",
+                "port": "443",
+                "asn": "AS13335 Cloudflare",
+                "isp": "Cloudflare, Inc.",
+            },
+            {
+                "url": "https://cf-edge.example.com:443",
+                "proto": "https",
+                "host": "cf-edge.example.com",
+                "port": "443",
+                "asn": "AS13335 Cloudflare",
+                "isp": "Cloudflare, Inc.",
+            },
+        ]
+        ip_cache = {}
+        queried_batches = []
+
+        def _fake_resolve(targets, max_chunk_size=100, persist=True, db_path="", cache_path=""):
+            queried_batches.append((list(targets), persist, cache_path))
+            mapping = {
+                "node-a.example.com": ("AS132203", "Tencent Cloud"),
+                "cf-edge.example.com": ("AS13335", "Cloudflare, Inc."),
+            }
+            return {t: mapping[t] for t in targets if t in mapping}
+
+        with patch("providers.load_ip_cache", return_value={}), \
+             patch("providers.resolve_asn_batch_online", side_effect=_fake_resolve):
+            updated_cache, rescued_count = providers.rescue_mislabeled_cloudflare_rows(
+                rows, ip_cache=ip_cache, persist=False
+            )
+
+        self.assertEqual(rescued_count, 1)
+        self.assertEqual(queried_batches, [(["node-a.example.com", "cf-edge.example.com"], False, "")])
+        self.assertFalse(providers.is_cloudflare_node(rows[0], ip_cache=updated_cache))
+        self.assertIn("AS132203", rows[0]["asn"])
+        self.assertTrue(providers.is_cloudflare_node(rows[1], ip_cache=updated_cache))
+        self.assertIn("AS13335", rows[1]["asn"])
+
+    def test_hostname_validator_and_batch_online_filter_invalid_and_private_targets(self):
+        for valid_host in (
+            "Node-A.Example.COM",
+            "ns1.example.com.",
+            "static.4.3.2.1.clients.your-server.de",
+            "xn--80ak6aa92e.xn--p1ai",
+            "host.example.co.uk",
+            "node_b.example.com",
+        ):
+            self.assertTrue(providers.is_valid_resolvable_hostname(valid_host), msg=valid_host)
+
+        for invalid_host in (
+            "192.168.1.1",
+            "10.0.0.1",
+            "198.51.100.77",
+            "127.0.0.1",
+            "::1",
+            "localhost",
+            "a..b.com",
+            "a.b",
+            "foo.123ab",
+            "-a.example.com",
+            "a-.example.com",
+            "ns1.example.com..",
+            f"{'a' * 64}.example.com",
+        ):
+            self.assertFalse(providers.is_valid_resolvable_hostname(invalid_host), msg=invalid_host)
+
+        suspect_rows = [
+            {"host": "192.168.1.1", "port": "443", "asn": "AS13335", "isp": "Cloudflare"},
+            {"host": "10.0.0.1", "port": "443", "asn": "AS13335", "isp": "Cloudflare"},
+            {"host": "198.51.100.77", "port": "443", "asn": "AS13335", "isp": "Cloudflare"},
+            {"host": "127.0.0.1", "port": "443", "asn": "AS13335", "isp": "Cloudflare"},
+            {"host": "localhost", "port": "443", "asn": "AS13335", "isp": "Cloudflare"},
+            {"host": "a..b.com", "port": "443", "asn": "AS13335", "isp": "Cloudflare"},
+            {"host": "a.b", "port": "443", "asn": "AS13335", "isp": "Cloudflare"},
+            {"host": "Node-A.Example.COM", "port": "443", "asn": "AS13335", "isp": "Cloudflare"},
+        ]
+        rescue_targets = []
+
+        def _fake_rescue_resolve(targets, max_chunk_size=100, persist=True, db_path="", cache_path=""):
+            rescue_targets.extend(targets)
+            return {"node-a.example.com": ("AS132203", "Tencent Cloud")}
+
+        cache = {}
+        with patch("providers.load_ip_cache", return_value={}), \
+             patch("providers.resolve_asn_batch_online", side_effect=_fake_rescue_resolve):
+            _, rescued = providers.rescue_mislabeled_cloudflare_rows(suspect_rows, ip_cache=cache, persist=False)
+
+        self.assertEqual(rescued, 1)
+        self.assertEqual(rescue_targets, ["node-a.example.com"])
+        self.assertFalse(providers.is_cloudflare_node(suspect_rows[-1], ip_cache=cache))
+
+        dns_targets = []
+        with patch("providers.load_ip_cache", return_value={}), \
+             patch("providers.save_ip_cache"), \
+             patch("providers.resolve_domain_to_ip", side_effect=lambda d: (dns_targets.append(d), "")[1]), \
+             patch("providers.resolve_asn_online", return_value=("", "")):
+            providers.resolve_asn_batch_online(
+                ["192.168.1.1", "10.0.0.1", "198.51.100.77", "127.0.0.1", "localhost", "a..b.com", "a.b", "Node-A.Example.COM"],
+                persist=False,
+            )
+        self.assertEqual(dns_targets, ["Node-A.Example.COM"])
+
 
 class TestMergeAndCalibrateCloudflarePurge(unittest.TestCase):
     def test_merge_and_save_purges_cloudflare_all_pools_while_rescuing_vps_warp(self):
@@ -248,24 +355,41 @@ class TestMergeAndCalibrateCloudflarePurge(unittest.TestCase):
                     res[t] = ("AS132203", "Tencent Cloud")
             return res
 
-        with patch("tg_fetch.load_tombstone", return_value={}), \
-             patch("tg_fetch.auto_enrich_and_save_asns", return_value=0), \
-             patch("tg_fetch.get_session_enriched_asns", return_value=[]), \
-             patch("tg_fetch.resolve_asn_batch_online", side_effect=_fake_rescue_resolve), \
-             patch("providers.resolve_asn_batch_online", side_effect=_fake_rescue_resolve), \
-             patch("tg_fetch.save_and_notify", side_effect=_fake_save):
-            tg_fetch.merge_and_save(
-                existing_proxies=existing_proxies,
-                scraped_proxies=scraped_proxies,
-                existing_cf_ips=existing_cf_ips,
-                scraped_cf_ips=scraped_cf_ips,
-                existing_scan_ips=existing_scan_ips,
-                scraped_scan_ips=scraped_scan_ips,
-                existing_proxyips=existing_proxyips,
-                scraped_proxyips={},
-                edt_unrecorded_asns=[],
-                ip_cache=ip_cache,
-            )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp_cache_path = os.path.join(tmpdir, "ip_cache.json")
+            with open(tmp_cache_path, "w", encoding="utf-8") as f:
+                json.dump({}, f)
+
+            repo_cache_abs = os.path.abspath(providers.IP_CACHE_PATH)
+            orig_save_ip_cache = providers.save_ip_cache
+            save_paths = []
+
+            def _spy_save_ip_cache(cache, filepath="", compact=True):
+                save_paths.append(os.path.abspath(filepath or providers.IP_CACHE_PATH))
+                return orig_save_ip_cache(cache, filepath=filepath, compact=compact)
+
+            with patch.object(tg_fetch, "DATA_DIR", tmpdir), \
+                 patch("providers.save_ip_cache", side_effect=_spy_save_ip_cache), \
+                 patch("tg_fetch.load_tombstone", return_value={}), \
+                 patch("tg_fetch.auto_enrich_and_save_asns", return_value=0), \
+                 patch("tg_fetch.get_session_enriched_asns", return_value=[]), \
+                 patch("tg_fetch.resolve_asn_batch_online", side_effect=_fake_rescue_resolve), \
+                 patch("providers.resolve_asn_batch_online", side_effect=_fake_rescue_resolve), \
+                 patch("tg_fetch.save_and_notify", side_effect=_fake_save):
+                tg_fetch.merge_and_save(
+                    existing_proxies=existing_proxies,
+                    scraped_proxies=scraped_proxies,
+                    existing_cf_ips=existing_cf_ips,
+                    scraped_cf_ips=scraped_cf_ips,
+                    existing_scan_ips=existing_scan_ips,
+                    scraped_scan_ips=scraped_scan_ips,
+                    existing_proxyips=existing_proxyips,
+                    scraped_proxyips={},
+                    edt_unrecorded_asns=[],
+                    ip_cache=ip_cache,
+                )
+
+            self.assertTrue(all(p != repo_cache_abs for p in save_paths))
 
         self.assertEqual(set(captured["proxies"].keys()), {"socks5://65.49.233.236:1080"})
         self.assertEqual(set(captured["cf_ips"].keys()), {"65.49.233.236:443"})
@@ -776,7 +900,21 @@ class TestVerifiersCloudflareExclusion(unittest.TestCase):
                 }
                 return {t: mapping[t] for t in targets if t in mapping}
 
-            with patch("tg_fetch.load_tombstone", return_value={}), \
+            tmp_cache_path = os.path.join(tmpdir, "ip_cache.json")
+            with open(tmp_cache_path, "w", encoding="utf-8") as f:
+                json.dump({}, f)
+
+            repo_cache_abs = os.path.abspath(providers.IP_CACHE_PATH)
+            orig_save_ip_cache = providers.save_ip_cache
+            save_paths = []
+
+            def _spy_save_ip_cache(cache, filepath="", compact=True):
+                save_paths.append(os.path.abspath(filepath or providers.IP_CACHE_PATH))
+                return orig_save_ip_cache(cache, filepath=filepath, compact=compact)
+
+            with patch.object(tg_fetch, "DATA_DIR", tmpdir), \
+                 patch("providers.save_ip_cache", side_effect=_spy_save_ip_cache), \
+                 patch("tg_fetch.load_tombstone", return_value={}), \
                  patch("tg_fetch.auto_enrich_and_save_asns", return_value=0), \
                  patch("tg_fetch.get_session_enriched_asns", return_value=[]), \
                  patch("tg_fetch.resolve_asn_batch_online", side_effect=_fake_rescue_resolve), \
@@ -794,6 +932,8 @@ class TestVerifiersCloudflareExclusion(unittest.TestCase):
                     edt_unrecorded_asns=[],
                     ip_cache=ip_cache,
                 )
+
+            self.assertTrue(all(p != repo_cache_abs for p in save_paths))
 
             self.assertEqual(set(captured["proxies"].keys()), {"43.167.11.157:1080"})
             self.assertIn("AS132203", captured["proxies"]["43.167.11.157:1080"]["asn"])
@@ -1012,6 +1152,149 @@ class TestVerifiersCloudflareExclusion(unittest.TestCase):
             self.assertIn("AS132203", cf_after[0]["asn"])
             self.assertEqual([r["ip"] for r in scan_after], ["43.167.11.157"])
             self.assertIn("AS132203", scan_after[0]["asn"])
+
+    def test_data_dir_cache_path_follows_patched_dir_across_cwd_and_preserves_memory_cache(self):
+        class _FakeUrlResp:
+            def __init__(self, payload: list[dict]):
+                self._raw = json.dumps(payload).encode("utf-8")
+                self.headers = {}
+
+            def read(self) -> bytes:
+                return self._raw
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, tb):
+                return False
+
+        with tempfile.TemporaryDirectory() as data_tmp, tempfile.TemporaryDirectory() as cwd_tmp:
+            tmp_cache_path = os.path.join(data_tmp, "ip_cache.json")
+            with open(tmp_cache_path, "w", encoding="utf-8") as f:
+                json.dump({}, f)
+
+            repo_cache_abs = os.path.abspath(providers.IP_CACHE_PATH)
+            orig_save = providers.save_ip_cache
+            orig_load = providers.load_ip_cache
+            observed_saves = []
+            observed_loads = []
+
+            def _spy_save(cache, filepath="", compact=True):
+                observed_saves.append(os.path.abspath(filepath or providers.IP_CACHE_PATH))
+                return orig_save(cache, filepath=filepath, compact=compact)
+
+            def _spy_load(filepath=""):
+                resolved = os.path.abspath(filepath or providers.IP_CACHE_PATH)
+                observed_loads.append(resolved)
+                if resolved == repo_cache_abs:
+                    raise AssertionError(f"Unexpected repo ip_cache read: {resolved}")
+                return orig_load(filepath=filepath)
+
+            captured = {}
+
+            def _fake_save(final_proxies, final_cf_ips, final_scan_ips=None, final_proxyips=None, **kwargs):
+                captured["proxies"] = final_proxies
+                captured["cf_ips"] = final_cf_ips
+
+            # BYOIP entry stays only in caller memory; mislabeled non-CIDR 43.167.11.157 triggers disk persistence
+            caller_cache = {
+                "45.85.118.10": {"asn": "AS209242", "isp": "Cloudflare London LLC", "net_type": "datacenter", "country": "GB"},
+                "43.167.11.157": {"asn": "", "country": ""},
+            }
+            existing_cf = {
+                "43.167.11.157:443": {"ip": "43.167.11.157", "port": "443", "asn": "AS13335 Cloudflare", "isp": "Cloudflare London LLC"},
+                "45.85.118.10:443": {"ip": "45.85.118.10", "port": "443", "asn": "AS25820 Bandwagon"},
+            }
+            payload = [{"status": "success", "query": "43.167.11.157", "countryCode": "JP", "as": "AS132203 Tencent Cloud", "isp": "Tencent Cloud"}]
+
+            orig_cwd = os.getcwd()
+            os.chdir(cwd_tmp)
+            try:
+                with patch.object(tg_fetch, "DATA_DIR", data_tmp), \
+                     patch("providers.load_ip_cache", side_effect=_spy_load), \
+                     patch("tg_fetch.load_ip_cache", side_effect=_spy_load), \
+                     patch("providers.save_ip_cache", side_effect=_spy_save), \
+                     patch("urllib.request.urlopen", return_value=_FakeUrlResp(payload)), \
+                     patch("tg_fetch.load_tombstone", return_value={}), \
+                     patch("tg_fetch.auto_enrich_and_save_asns", return_value=0), \
+                     patch("tg_fetch.get_session_enriched_asns", return_value=[]), \
+                     patch("tg_fetch.save_and_notify", side_effect=_fake_save):
+                    tg_fetch.merge_and_save(
+                        existing_proxies={},
+                        scraped_proxies={},
+                        existing_cf_ips=existing_cf,
+                        scraped_cf_ips={},
+                        existing_scan_ips={},
+                        scraped_scan_ips={},
+                        existing_proxyips={},
+                        scraped_proxyips={},
+                        edt_unrecorded_asns=[],
+                        ip_cache=caller_cache,
+                    )
+            finally:
+                os.chdir(orig_cwd)
+
+            self.assertEqual(observed_saves, [os.path.abspath(tmp_cache_path)])
+            self.assertTrue(observed_loads)
+            self.assertTrue(all(p == os.path.abspath(tmp_cache_path) for p in observed_loads))
+            persisted = orig_load(filepath=tmp_cache_path)
+            self.assertEqual(persisted["43.167.11.157"]["asn"], "AS132203")
+            self.assertEqual(set(captured["cf_ips"].keys()), {"43.167.11.157:443"})
+            self.assertIn("AS132203", captured["cf_ips"]["43.167.11.157:443"]["asn"])
+
+    def test_merge_demoted_into_scan_ips_uses_explicit_ip_cache_path(self):
+        demoted = [
+            {
+                "ip": "45.85.118.10",
+                "port": "443",
+                "asn": "AS25820 IT7 Networks",
+                "isp": "IT7 Networks",
+                "net_type": "datacenter",
+            }
+        ]
+        with tempfile.TemporaryDirectory() as tmp_cf, tempfile.TemporaryDirectory() as tmp_ok:
+            for d in (tmp_cf, tmp_ok):
+                os.makedirs(os.path.join(d, "scan_ips"), exist_ok=True)
+            cf_cache_path = os.path.join(tmp_cf, "ip_cache.json")
+            ok_cache_path = os.path.join(tmp_ok, "ip_cache.json")
+            with open(cf_cache_path, "w", encoding="utf-8") as f:
+                json.dump({"45.85.118.10": {"asn": "AS209242", "isp": "Cloudflare London LLC", "net_type": "datacenter"}}, f)
+            with open(ok_cache_path, "w", encoding="utf-8") as f:
+                json.dump({"45.85.118.10": {"asn": "AS25820", "isp": "IT7 Networks", "net_type": "datacenter"}}, f)
+
+            repo_cache_abs = os.path.abspath(providers.IP_CACHE_PATH)
+            orig_load = providers.load_ip_cache
+            load_targets = []
+
+            def _spy_load(filepath=""):
+                resolved = os.path.abspath(filepath or providers.IP_CACHE_PATH)
+                load_targets.append(resolved)
+                if resolved == repo_cache_abs:
+                    raise AssertionError(f"Unexpected repo ip_cache read: {resolved}")
+                return orig_load(filepath=filepath)
+
+            with patch("providers.load_ip_cache", side_effect=_spy_load), \
+                 patch("providers.load_tombstone", return_value={}):
+                cnt_cf = providers.merge_demoted_into_scan_ips(
+                    demoted,
+                    scan_csv_path=os.path.join(tmp_cf, "scan_ips.csv"),
+                    scan_txt_path=os.path.join(tmp_cf, "scan_ips.txt"),
+                    scan_dir_path=os.path.join(tmp_cf, "scan_ips"),
+                    ip_cache_path=cf_cache_path,
+                )
+                cnt_ok = providers.merge_demoted_into_scan_ips(
+                    demoted,
+                    scan_csv_path=os.path.join(tmp_ok, "scan_ips.csv"),
+                    scan_txt_path=os.path.join(tmp_ok, "scan_ips.txt"),
+                    scan_dir_path=os.path.join(tmp_ok, "scan_ips"),
+                    ip_cache_path=ok_cache_path,
+                )
+
+            self.assertEqual(load_targets, [os.path.abspath(cf_cache_path), os.path.abspath(ok_cache_path)])
+            self.assertEqual(cnt_cf, 0)
+            self.assertEqual(cnt_ok, 1)
+            self.assertEqual(_read_csv(os.path.join(tmp_cf, "scan_ips.csv")), [])
+            self.assertEqual([r["ip"] for r in _read_csv(os.path.join(tmp_ok, "scan_ips.csv"))], ["45.85.118.10"])
 
 
 if __name__ == "__main__":
