@@ -346,7 +346,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `clientIpv6` | 字符串 | **【IPv6 出口落地】** 穿透测试出的 IPv6 出站落地 IP（若无则为空串 `""`） | `2602:f988:210:c4f::7f4` |
 | `dual_stack` | 布尔值 | **【双栈路由能力】** 是否同时具备 IPv4 与 IPv6 双出口能力（`true`/`false`） | `true` |
 | `country` | 字符串 | ISO 3166-1 alpha-2 两位大写国家代码 | `US`、`HK` |
-| `country_name` | 字符串 | 国家/地区中文名称 | `美国`、`中国香港` |
+| `country_name` | 字符串 | 国家/地区中文名称 | `美国`、`香港` |
 | `country_emoji` | 字符串 | 国家/地区国旗 Emoji 标识符 | `🇺🇸`、`🇭🇰` |
 | `asn` | 字符串 / 整数 | 自治系统纯数字编号 | `9269` |
 | `asOrganization` | 字符串 | 自治系统组织 / 运营商全称 | `HKBN Hong Kong Broadband` |

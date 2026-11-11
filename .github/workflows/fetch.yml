@@ -115,10 +115,14 @@ jobs:
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
-        run: python -c "from providers import send_ci_failure_alert; send_ci_failure_alert()"
+        run: |
+          echo "⚠️ 流水线步骤执行失败，跳过正式 data/ 提交。当前工作区未提交变动诊断信息："
+          git status --short data/ || true
+          git diff --stat data/ || true
+          python -c "from providers import send_ci_failure_alert; send_ci_failure_alert()"
 
       - name: 📄 提交并推送数据
-        if: always()
+        if: success()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |

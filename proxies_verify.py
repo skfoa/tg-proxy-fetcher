@@ -2076,14 +2076,6 @@ async def async_main(args):
 
     if dead_nodes or dc_rejected_all > 0:
         log.info("[通用代理 淘汰] 剔除 %d 条达到淘汰阈值的死节点 (HTTP专属: >= %d 次, 其余协议: >= %d 次; 另拒收外部机房节点 %d 条)", len(dead_nodes), h_mf, args.max_fails, dc_rejected_all)
-        if dead_nodes:
-            dead_keys = [
-                canonical_key(r.get("host", ""), r.get("port", 0))
-                for r in dead_nodes
-                if r.get("host") and safe_int(r.get("port"), 0) > 0
-            ]
-            newly_tombstoned = record_tombstone(dead_keys)
-            log.info("[通用代理 墓地] 已登记 %d 个淘汰死节点至墓地冷却库 (新增: %d 个, 隔离期 7 天)", len(dead_keys), newly_tombstoned)
     else:
         log.info("[通用代理 淘汰] 本次无节点达到淘汰阈值")
 
@@ -2131,6 +2123,14 @@ async def async_main(args):
     avg_delay = int(sum(alive_delays) / len(alive_delays)) if alive_delays else 0
 
     save_proxies_data(survivors, PROXIES_TXT, PROXIES_CSV)
+    if dead_nodes:
+        dead_keys = [
+            canonical_key(r.get("host", ""), r.get("port", 0))
+            for r in dead_nodes
+            if r.get("host") and safe_int(r.get("port"), 0) > 0
+        ]
+        newly_tombstoned = record_tombstone(dead_keys)
+        log.info("[通用代理 墓地] 已登记 %d 个淘汰死节点至墓地冷却库 (新增: %d 个, 隔离期 7 天)", len(dead_keys), newly_tombstoned)
     prune_ip_cache()
 
     elapsed = time.time() - t_start

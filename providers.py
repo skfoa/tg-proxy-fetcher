@@ -505,6 +505,34 @@ def atomic_write_json(path: str, obj, *, indent: int | None = 2, newline: str | 
     atomic_write_text(path, text, encoding="utf-8", newline=newline)
 
 
+def inspect_csv_state(
+    path: str,
+    required_columns: tuple[str, ...] = ("ip", "port"),
+) -> tuple[list[str], int]:
+    """
+    校验已有 CSV 文件的表头合法性并统计原始数据行数（不含表头与全空行）。
+    若文件不存在返回 ([], 0)；若文件存在但为 0 字节、无表头或缺失必需列，抛出 ValueError。
+    """
+    if not os.path.exists(path):
+        return [], 0
+    with open(path, "r", encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f)
+        fields = [str(col).strip() for col in (reader.fieldnames or []) if col is not None]
+        missing = [col for col in required_columns if col not in fields]
+        if not fields or missing:
+            raise ValueError(f"{path} 表头无效或文件为空（缺失必需列 {', '.join(required_columns)}: {fields}）")
+        raw_count = sum(
+            1
+            for r in reader
+            if any(
+                str(x or "").strip()
+                for v in r.values()
+                for x in (v if isinstance(v, list) else [v])
+            )
+        )
+    return fields, raw_count
+
+
 # ---------- 持久化 ASN 数据库加载与在线动态解析补库 ----------
 
 ASN_DATABASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "asn_database.json")
@@ -2131,6 +2159,12 @@ def extract_country(cf_location: str | None, colo: str | None) -> str:
     def _normalize_name(name: str) -> str:
         name = name.strip()
         uname = name.upper()
+        if "香港" in name or uname in ("HK", "HONG KONG"):
+            return "香港"
+        if "台湾" in name or uname in ("TW", "TAIWAN"):
+            return "台湾"
+        if "澳门" in name or uname in ("MO", "MACAO", "MACAU"):
+            return "澳门"
         if uname in CODE_TO_COUNTRY:
             return CODE_TO_COUNTRY[uname]
         if name in ("捷克共和国", "捷克", "Czechia", "Czech Republic"):
@@ -2141,12 +2175,6 @@ def extract_country(cf_location: str | None, colo: str | None) -> str:
             return "阿联酋"
         if name in ("US", "USA", "United States"):
             return "美国"
-        if name in ("TW", "Taiwan"):
-            return "台湾"
-        if "香港" in name or name in ("HK", "Hong Kong"):
-            return "香港"
-        if "澳门" in name or name in ("MO", "Macao", "Macau"):
-            return "澳门"
         if "巴基斯坦" in name:
             return "巴基斯坦"
         if "多明尼加" in name or "多米尼加" in name:
@@ -2257,7 +2285,7 @@ LEGACY_DEFAULT_FIRST_SEEN = "2026-10-01 00:00:00"
 # ISO 3166-1 alpha-2 全量国家/地区标准中文映射表
 COUNTRY_NAME_MAP: dict[str, str] = {
     # 亚洲 (Asia)
-    "CN": "中国", "HK": "中国香港", "MO": "中国澳门", "TW": "中国台湾",
+    "CN": "中国", "HK": "香港", "MO": "澳门", "TW": "台湾",
     "JP": "日本", "KR": "韩国", "KP": "朝鲜", "MN": "蒙古",
     "SG": "新加坡", "MY": "马来西亚", "TH": "泰国", "VN": "越南",
     "ID": "印度尼西亚", "PH": "菲律宾", "MM": "缅甸", "KH": "柬埔寨",
@@ -2345,6 +2373,13 @@ COUNTRY_NAME_MAP: dict[str, str] = {
 # 确保双向对照表完整对齐
 CODE_TO_COUNTRY.update(COUNTRY_NAME_MAP)
 COUNTRY_TO_CODE.update({v: k for k, v in COUNTRY_NAME_MAP.items() if k != "UK"})
+COUNTRY_TO_CODE.update({
+    "中国香港": "HK",
+    "中国台湾": "TW",
+    "中国澳门": "MO",
+    "香港特别行政区": "HK",
+    "澳门特别行政区": "MO",
+})
 
 
 @functools.lru_cache(maxsize=512)
@@ -3119,7 +3154,9 @@ def save_proxyip_by_country(rows: list, output_dir: str) -> int:
     纯文本内容仅包含纯净的 IP:端口，JSON 文件包含完整元数据（含 clientIp 出口 IP）。
     自动清理目录中已不存在的旧地区文件，返回生成的独立文件数量。
     """
-    if not rows:
+    if rows is None or not isinstance(rows, (list, tuple, set)):
+        raise ValueError(f"save_proxyip_by_country requires a valid list of rows, got {type(rows).__name__}")
+    if not rows and not os.path.isdir(output_dir):
         return 0
 
     os.makedirs(output_dir, exist_ok=True)
@@ -3204,7 +3241,9 @@ def save_scan_ips_by_asn(asn_groups: dict, output_dir: str, min_nodes: int = 5) 
     - 死节点被淘汰后，若某个 ASN 文本文件已无活跃 IP，会自动清除删除（保留 .gitkeep 保持目录结构）
     返回生成的独立文件数量。
     """
-    if not asn_groups:
+    if asn_groups is None or not isinstance(asn_groups, dict):
+        raise ValueError(f"save_scan_ips_by_asn requires a valid dict of asn_groups, got {type(asn_groups).__name__}")
+    if not asn_groups and not os.path.isdir(output_dir):
         return 0
 
     os.makedirs(output_dir, exist_ok=True)
@@ -4025,6 +4064,9 @@ def calibrate_all_datasets(
             rows = []
             with open(proxies_csv_path, "r", encoding="utf-8-sig") as f:
                 reader = csv.DictReader(f)
+                p_fields = list(reader.fieldnames or [])
+                if not p_fields or "url" not in p_fields:
+                    raise ValueError(f"{proxies_csv_path} 表头无效或文件为空（缺失必需列 url: {p_fields}）")
                 rows = list(reader)
 
             changed_proxies = 0
@@ -4084,6 +4126,8 @@ def calibrate_all_datasets(
             with open(proxyip_csv_path, "r", encoding="utf-8-sig") as f:
                 reader = csv.DictReader(f)
                 orig_fields = list(reader.fieldnames or [])
+                if not orig_fields or "ip" not in orig_fields or "port" not in orig_fields:
+                    raise ValueError(f"{proxyip_csv_path} 表头无效或文件为空（缺失必需列 ip/port: {orig_fields}）")
                 proxyip_rows = list(reader)
 
             schema_upgraded = orig_fields != PROXYIP_CSV_FIELDS
@@ -4160,12 +4204,13 @@ def calibrate_all_datasets(
                     save_proxyip_json(clean_proxyip_rows, json_path=proxyip_json_path)
                 stats["proxyip_csv_updated"] = changed_proxyip + len(dc_demoted_rows)
 
-            if proxyip_dir and clean_proxyip_rows:
+            if proxyip_dir:
                 written_files = save_proxyip_by_country(clean_proxyip_rows, output_dir=proxyip_dir)
                 stats["proxyip_files_written"] = written_files
                 log.info("【全量校准】已校准 proxyip.csv (保留非机房 %d 条, 移出机房 %d 条, 属性更新 %d 条)，并在 %s/ 生成 %d 个分流文件", len(clean_proxyip_rows), len(dc_demoted_rows), changed_proxyip, proxyip_dir, written_files)
         except Exception as e:
-            log.warning("校准 proxyip 数据异常: %s", e)
+            log.error("校准 proxyip 数据异常，保留现有分组文件并中止校准: %s", e)
+            raise
 
     # 4. 终态修剪 ip_cache.json：在全部数据集完成淘汰与分流校准后，剔除已不在活跃库中的孤儿缓存记录
     base_cache_dir = os.path.dirname(os.path.abspath(ip_cache_path))
@@ -4213,6 +4258,7 @@ def load_tombstone(
     filepath: str | None = None,
     max_age_days: int = TOMBSTONE_MAX_AGE_DAYS,
     force_reload: bool = False,
+    strict: bool = False,
 ) -> dict[str, int]:
     """
     读取墓地黑名单 (已被淘汰的死节点记忆库)。
@@ -4242,14 +4288,18 @@ def load_tombstone(
     try:
         with open(target_path, "r", encoding="utf-8") as f:
             data = json.load(f)
-        if isinstance(data, dict):
-            for k, ts in data.items():
-                if isinstance(ts, (int, float)) and (now - int(ts)) < max_age_sec:
-                    valid[str(k).strip().lower()] = int(ts)
+        if not isinstance(data, dict):
+            raise ValueError(f"墓地文件顶层结构必须为 JSON 对象 (dict)，实际为 {type(data).__name__}")
+        for k, ts in data.items():
+            if isinstance(ts, (int, float)) and (now - int(ts)) < max_age_sec:
+                valid[str(k).strip().lower()] = int(ts)
         _TOMBSTONE_CACHE = valid
         _TOMBSTONE_CACHE_FILE = target_path
         _TOMBSTONE_CACHE_MTIME = mtime
     except Exception as e:
+        if strict:
+            log.error("读取墓地文件 %s 失败: %s", target_path, e)
+            raise RuntimeError(f"读取墓地文件 {target_path} 失败: {e}") from e
         log.warning("读取墓地文件 %s 失败: %s", target_path, e)
     return dict(valid)
 
@@ -4272,8 +4322,8 @@ def prune_tombstone(
         with open(target_path, "r", encoding="utf-8") as f:
             data = json.load(f)
     except Exception as e:
-        log.warning("读取墓地文件 %s 执行修剪失败: %s", target_path, e)
-        return 0
+        log.error("读取墓地文件 %s 执行修剪失败: %s", target_path, e)
+        raise RuntimeError(f"读取墓地文件 {target_path} 执行修剪失败: {e}") from e
 
     if not isinstance(data, dict) or not data:
         return 0
@@ -4300,7 +4350,9 @@ def prune_tombstone(
                 _TOMBSTONE_CACHE = None
             log.info("已主动修剪墓地文件 %s: 剔除 %d 个超过 %d 天的过期条目 (剩余: %d 个)", target_path, pruned_count, max_age_days, len(valid))
         except Exception as e:
-            log.warning("写回修剪后的墓地文件 %s 失败: %s", target_path, e)
+            _TOMBSTONE_CACHE = None
+            log.error("写回修剪后的墓地文件 %s 失败: %s", target_path, e)
+            raise RuntimeError(f"写回修剪后的墓地文件 {target_path} 失败: {e}") from e
 
     return pruned_count
 
@@ -4314,7 +4366,7 @@ def record_tombstone(
     将新淘汰的死节点 canonical_key 批量登记至墓地持久化文件。
     登记时间为当前 Unix 时间戳，同时自动修剪超过 max_age_days 的历史陈旧死节点。
     采用原子写入 (.tmp -> os.replace) 防止并发损坏。
-    返回本次新增登记的节点数量。
+    返回本次新增登记的节点数量；若读取或持久化失败则抛出 RuntimeError，确保调用方与流水线感知失败。
     """
     global _TOMBSTONE_CACHE, _TOMBSTONE_CACHE_FILE, _TOMBSTONE_CACHE_MTIME
     if not keys:
@@ -4323,7 +4375,7 @@ def record_tombstone(
     if filepath is None:
         filepath = TOMBSTONE_FILE
     now = int(time.time())
-    tombstone = load_tombstone(filepath=filepath, max_age_days=max_age_days)
+    tombstone = load_tombstone(filepath=filepath, max_age_days=max_age_days, strict=True)
     new_count = 0
     for k in keys:
         if not k:
@@ -4342,7 +4394,9 @@ def record_tombstone(
         except OSError:
             _TOMBSTONE_CACHE = None
     except Exception as e:
-        log.warning("写入墓地文件 %s 失败: %s", filepath, e)
+        _TOMBSTONE_CACHE = None
+        log.error("写入墓地文件 %s 失败: %s", filepath, e)
+        raise RuntimeError(f"写入墓地文件 {filepath} 失败: {e}") from e
     return new_count
 
 

@@ -76,6 +76,7 @@ from providers import (
     is_valid_ipv4,
     is_valid_ipv6,
     resolve_node_exit_and_net_type,
+    inspect_csv_state,
 )
 from proxyip_verify import (
     load_proxyip_csv,
@@ -353,6 +354,9 @@ def load_csv(path: str) -> list:
     rows = []
     with open(path, "r", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
+        fields = list(reader.fieldnames or [])
+        if not fields or "ip" not in fields or "port" not in fields:
+            raise ValueError(f"{path} 表头无效或文件为空（缺失必需列 ip/port: {fields}）")
         for r in reader:
             ip = str(r.get("ip") or "").strip()
             port_val = safe_int(r.get("port"), 0)
@@ -997,6 +1001,18 @@ async def _verify_and_persist(csv_path: str, tag: str, args, on_save, pre_save_h
         "buf_rec": 0,
     }
     if not rows:
+        if os.path.exists(csv_path):
+            _, raw_count = inspect_csv_state(csv_path, ("ip", "port"))
+            if raw_count > 0:
+                log.warning(
+                    ">>> %s 含 %d 条原始记录但过滤后可用节点为 0（墓地拦截或非法行），保留现有文件并跳过%s校验",
+                    csv_path,
+                    raw_count,
+                    tag,
+                )
+                return res
+            if on_save and not getattr(args, "dry_run", False):
+                on_save([])
         log.info(">>> %s 文件不存在或无数据，跳过%s校验", csv_path, tag)
         return res
 

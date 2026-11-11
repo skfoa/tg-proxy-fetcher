@@ -78,6 +78,7 @@ from providers import (
     extract_ips,
     is_valid_ipv4,
     is_valid_ipv6,
+    inspect_csv_state,
 )
 
 # 确保本地 .env 加载
@@ -376,7 +377,10 @@ def load_proxyip_csv(path: str) -> list:
     rows = []
     with open(path, "r", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
-        has_exit_asn_col = "exit_asn" in (reader.fieldnames or [])
+        fields = list(reader.fieldnames or [])
+        if not fields or "ip" not in fields or "port" not in fields:
+            raise ValueError(f"{path} 表头无效或文件为空（缺失必需列 ip/port: {fields}）")
+        has_exit_asn_col = "exit_asn" in fields
         for r in reader:
             ip = str(r.get("ip") or "").strip()
             port = safe_int(r.get("port"), 0)
@@ -734,6 +738,19 @@ async def async_main(args):
 
     rows = load_proxyip_csv(PROXYIP_CSV)
     total = len(rows)
+    if total == 0:
+        _, raw_count = inspect_csv_state(PROXYIP_CSV, ("ip", "port"))
+        if raw_count > 0:
+            log.warning(
+                ">>> %s 含 %d 条原始记录但过滤后可用节点为 0（墓地拦截或非法行），保留现有文件并跳过 ProxyIP 质检",
+                PROXYIP_CSV,
+                raw_count,
+            )
+            return
+        if not getattr(args, "dry_run", False):
+            save_proxyip([], csv_path=PROXYIP_CSV, txt_path=PROXYIP_TXT, dir_path=PROXYIP_DIR, json_path=PROXYIP_JSON)
+        log.info(">>> %s 无数据记录，已同步清理衍生输出并跳过 ProxyIP 质检", PROXYIP_CSV)
+        return
     log.info(">>> 开始执行 ProxyIP 穿透质检 (%s): 共 %d 条记录...", PROXYIP_CSV, total)
 
     ip_cache = load_ip_cache()
@@ -868,6 +885,7 @@ async def async_main(args):
         csv_path=PROXYIP_CSV,
         txt_path=PROXYIP_TXT,
         dir_path=PROXYIP_DIR,
+        json_path=PROXYIP_JSON,
     )
 
     if demoted_dc_rows:

@@ -536,6 +536,9 @@ def load_existing_cf_ips(filepath: str = OUTPUT_CF_FILE, label: str = "优选 IP
     try:
         with open(filepath, "r", encoding="utf-8-sig") as f:
             reader = csv.DictReader(f)
+            fields = list(reader.fieldnames or [])
+            if not fields or "ip" not in fields or "port" not in fields:
+                raise ValueError(f"{filepath} 表头无效或文件为空（缺失必需列 ip/port: {fields}）")
             for row in reader:
                 ip = row.get("ip", "").strip()
                 port = row.get("port", "").strip()
@@ -570,7 +573,8 @@ def load_existing_cf_ips(filepath: str = OUTPUT_CF_FILE, label: str = "优选 IP
                         existing[key] = row
         log.info("已加载本地已存%s记录: %d 条（历史有效记录全部保留）", label, len(existing))
     except Exception as e:
-        log.warning("读取已有%s文件失败: %s", label, e)
+        log.error("读取已有%s文件 (%s) 失败，中止运行以保护存量数据: %s", label, filepath, e)
+        raise
     return existing
 
 
@@ -1515,7 +1519,7 @@ def save_and_notify(
     asn_groups_total = 0
     asn_groups = {}
     local_ip_cache = load_ip_cache() if (final_scan_ips or final_proxyips) else {}
-    if final_scan_ips:
+    if final_scan_ips is not None and (final_scan_ips or os.path.exists(OUTPUT_SCAN_FILE)):
         os.makedirs(OUTPUT_SCAN_DIR, exist_ok=True)
 
         asn_groups = defaultdict(list)
@@ -1578,7 +1582,7 @@ def save_and_notify(
 
     # 4. 保存反代 ProxyIP 独立池（原子写入）
     proxyip_total = 0
-    if final_proxyips:
+    if final_proxyips is not None and (final_proxyips or os.path.exists(OUTPUT_PROXYIP_FILE)):
         def _proxyip_sort_key(x):
             d = safe_int(x.get("delay_ms"), 0)
             delay = d if d > 0 else 99999
