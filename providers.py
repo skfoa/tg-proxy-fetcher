@@ -1361,7 +1361,7 @@ def resolve_asn_batch_online(
     if not targets:
         return {}
 
-    cache = load_ip_cache()
+    cache = load_ip_cache(filepath=cache_path)
     results: dict[str, tuple[str, str]] = {}
     ip_to_targets: dict[str, list[str]] = {}
     cache_modified = False
@@ -1439,7 +1439,7 @@ def resolve_asn_batch_online(
     pending_ips = [ip for ip in ip_to_targets if ip not in results]
     if not pending_ips:
         if persist and cache_modified:
-            save_ip_cache(cache)
+            save_ip_cache(cache, filepath=cache_path)
         return results
 
     log.info("【批量 ASN 解析】待解析出口 IP 数量: %d 个 (分批步长: %d)", len(pending_ips), max_chunk_size)
@@ -3107,15 +3107,23 @@ def is_cloudflare_ingress(
     return False
 
 
-def is_cloudflare_node(item: dict | str, ip_cache: dict | None = None) -> bool:
+def is_cloudflare_node(
+    item: dict | str,
+    ip_cache: dict | None = None,
+    *,
+    trusts_asn_label: bool | None = None,
+) -> bool:
     """
     统一判定任意池节点 (proxies / cf_ips / scan_ips / proxyip) 入口是否属于 Cloudflare 系。
     对携带独立隧道出口 (egress_ip != host) 的通用代理或走 WARP 出站的第三方 ProxyIP/scan_ips，
-    仅核验入口本身，不因 WARP 出口为 AS13335 而误伤第三方入口节点。
+    仅核验入口本身，不因 WARP 出口为 AS13335 而误伤第三方入口节点；
+    传入 trusts_asn_label=False 时仅依据 CIDR / ip_cache / resolved_ip 确定性拦截，
+    用于历史加载与初采阶段放行未缓存嫌疑节点至后续 BGP 纠偏。
     """
     if isinstance(item, str):
         host = extract_node_host(item)
-        return is_cloudflare_ingress(host, ip_cache=ip_cache)
+        eff_trust = True if trusts_asn_label is None else bool(trusts_asn_label)
+        return is_cloudflare_ingress(host, ip_cache=ip_cache, trusts_asn_label=eff_trust)
     if not isinstance(item, dict):
         return False
 
@@ -3123,14 +3131,15 @@ def is_cloudflare_node(item: dict | str, ip_cache: dict | None = None) -> bool:
     res_ip = str(item.get("resolved_ip") or "").strip().strip("[]")
     is_proxy_row = "url" in item or "proto" in item or "egress_ip" in item
     egress = str(item.get("egress_ip") or "").strip().strip("[]")
-    trusts_asn_label = not (is_proxy_row and egress and egress != host)
+    default_trust = not (is_proxy_row and egress and egress != host)
+    eff_trust = default_trust if trusts_asn_label is None else (default_trust and bool(trusts_asn_label))
     return is_cloudflare_ingress(
         host,
         asn=str(item.get("asn") or ""),
         isp=str(item.get("isp") or ""),
         ip_cache=ip_cache,
         resolved_ip=res_ip,
-        trusts_asn_label=trusts_asn_label,
+        trusts_asn_label=eff_trust,
     )
 
 
@@ -3138,13 +3147,14 @@ def rescue_mislabeled_cloudflare_rows(
     rows: list[dict],
     ip_cache: dict | None = None,
     persist: bool = True,
+    cache_path: str = "",
 ) -> tuple[dict[str, dict], int]:
     """
     对未命中 Cloudflare CIDR、且尚未入缓存却在文本中被标为 Cloudflare ASN/ISP 的入口 IP，
     批量反查其真实 BGP 归属：将第三方机房+WARP 出站被上游误标为 Cloudflare London LLC/AS13335 的节点自动纠正并保留。
     返回: (更新后的 ip_cache, 纠正还原的节点数)
     """
-    cache = ip_cache if isinstance(ip_cache, dict) else load_ip_cache()
+    cache = ip_cache if isinstance(ip_cache, dict) else load_ip_cache(filepath=cache_path)
     if not rows:
         return cache, 0
 
@@ -3154,35 +3164,45 @@ def rescue_mislabeled_cloudflare_rows(
         if not isinstance(r, dict):
             continue
         host = extract_node_host(r)
-        if not host or not is_valid_public_ip(host) or is_cloudflare_ip(host):
+        res_ip = str(r.get("resolved_ip") or "").strip().strip("[]")
+        lookup_ip = host if is_valid_public_ip(host) else (res_ip if is_valid_public_ip(res_ip) else "")
+        if not lookup_ip or is_cloudflare_ip(lookup_ip) or (host and is_cloudflare_ip(host)):
             continue
         is_proxy_row = "url" in r or "proto" in r or "egress_ip" in r
         egress = str(r.get("egress_ip") or "").strip().strip("[]")
         if is_proxy_row and egress and egress != host:
             continue
-        cached = cache.get(host)
+        cached = (
+            cache.get(lookup_ip) if isinstance(cache.get(lookup_ip), dict)
+            else (cache.get(host) if host and isinstance(cache.get(host), dict) else None)
+        )
         if isinstance(cached, dict) and _extract_asn_code(cached.get("asn"), cached.get("isp")):
             continue
         if is_cloudflare_asn_or_isp(str(r.get("asn") or ""), str(r.get("isp") or "")):
-            if host not in seen:
-                seen.add(host)
-                suspects.append(host)
+            if lookup_ip not in seen:
+                seen.add(lookup_ip)
+                suspects.append(lookup_ip)
 
     resolved_map: dict[str, tuple[str, str]] = {}
     if suspects:
         try:
-            resolved_map = resolve_asn_batch_online(suspects, persist=persist) or {}
+            resolved_map = resolve_asn_batch_online(suspects, persist=persist, cache_path=cache_path) or {}
             if persist:
-                cache = load_ip_cache()
-            else:
-                for tip, (r_asn, r_isp) in resolved_map.items():
-                    c_code = _extract_asn_code(r_asn, r_isp)
-                    if c_code:
-                        cache[tip] = {
-                            "asn": c_code,
-                            "isp": r_isp or ASN_TO_PROVIDER.get(c_code, ""),
-                            "net_type": classify_asn(c_code, r_isp),
-                        }
+                disk_cache = load_ip_cache(filepath=cache_path)
+                if isinstance(disk_cache, dict):
+                    for k, v in disk_cache.items():
+                        if isinstance(v, dict):
+                            cache[k] = v
+            for tip, (r_asn, r_isp) in resolved_map.items():
+                c_code = _extract_asn_code(r_asn, r_isp)
+                if c_code:
+                    prev = cache.get(tip) if isinstance(cache.get(tip), dict) else {}
+                    cache[tip] = {
+                        **prev,
+                        "asn": c_code,
+                        "isp": r_isp or ASN_TO_PROVIDER.get(c_code, "") or prev.get("isp", ""),
+                        "net_type": classify_asn(c_code, r_isp) or prev.get("net_type", ""),
+                    }
         except Exception as e:
             log.warning("批量核验疑似 Cloudflare 误标节点真实 BGP 失败: %s", e)
 
@@ -3191,17 +3211,22 @@ def rescue_mislabeled_cloudflare_rows(
         if not isinstance(r, dict):
             continue
         host = extract_node_host(r)
-        if not host or is_cloudflare_ip(host):
+        res_ip = str(r.get("resolved_ip") or "").strip().strip("[]")
+        lookup_ip = host if is_valid_public_ip(host) else (res_ip if is_valid_public_ip(res_ip) else host)
+        if not lookup_ip or is_cloudflare_ip(lookup_ip) or (host and is_cloudflare_ip(host)):
             continue
         if not is_cloudflare_asn_or_isp(str(r.get("asn") or ""), str(r.get("isp") or "")):
             continue
-        c_entry = cache.get(host)
+        c_entry = (
+            cache.get(lookup_ip) if isinstance(cache.get(lookup_ip), dict)
+            else (cache.get(host) if host and isinstance(cache.get(host), dict) else None)
+        )
         real_asn, real_isp = ("", "")
         if isinstance(c_entry, dict):
             real_asn = _extract_asn_code(c_entry.get("asn"), c_entry.get("isp"))
             real_isp = str(c_entry.get("isp") or "").strip()
-        elif host in resolved_map:
-            raw_a, raw_i = resolved_map[host]
+        elif lookup_ip in resolved_map:
+            raw_a, raw_i = resolved_map[lookup_ip]
             real_asn = _extract_asn_code(raw_a, raw_i)
             real_isp = str(raw_i or "").strip()
         if real_asn and not is_cloudflare_asn_or_isp(real_asn, real_isp):
@@ -4424,8 +4449,14 @@ def calibrate_all_datasets(
                 if not p_fields or "url" not in p_fields:
                     raise ValueError(f"{proxies_csv_path} 表头无效或文件为空（缺失必需列 url: {p_fields}）")
                 rows = list(reader)
+            cache, rescued_proxies = rescue_mislabeled_cloudflare_rows(
+                rows,
+                ip_cache=cache,
+                persist=bool(ip_cache_path),
+                cache_path=ip_cache_path,
+            )
 
-            changed_proxies = 0
+            changed_proxies = rescued_proxies
             clean_rows = []
             dropped_edt_dc = 0
             dropped_cf_proxies = 0
@@ -4498,9 +4529,15 @@ def calibrate_all_datasets(
                 if not orig_fields or "ip" not in orig_fields or "port" not in orig_fields:
                     raise ValueError(f"{proxyip_csv_path} 表头无效或文件为空（缺失必需列 ip/port: {orig_fields}）")
                 proxyip_rows = list(reader)
+            cache, rescued_proxyip = rescue_mislabeled_cloudflare_rows(
+                proxyip_rows,
+                ip_cache=cache,
+                persist=bool(ip_cache_path),
+                cache_path=ip_cache_path,
+            )
 
             schema_upgraded = orig_fields != PROXYIP_CSV_FIELDS
-            changed_proxyip = 0
+            changed_proxyip = rescued_proxyip
             dropped_cf_proxyip = 0
             clean_proxyip_rows: list[dict] = []
             dc_demoted_rows: list[dict] = []
@@ -4610,6 +4647,12 @@ def calibrate_all_datasets(
                 reader = csv.DictReader(f)
                 cf_fields = list(reader.fieldnames or [])
                 cf_rows_raw = list(reader) if ("ip" in cf_fields and "port" in cf_fields) else []
+            cache, rescued_cf = rescue_mislabeled_cloudflare_rows(
+                cf_rows_raw,
+                ip_cache=cache,
+                persist=bool(ip_cache_path),
+                cache_path=ip_cache_path,
+            )
             clean_cf_rows: list[dict] = []
             dropped_cf_ips = 0
             for r in cf_rows_raw:
@@ -4617,7 +4660,7 @@ def calibrate_all_datasets(
                     dropped_cf_ips += 1
                     continue
                 clean_cf_rows.append(r)
-            if dropped_cf_ips > 0:
+            if dropped_cf_ips > 0 or rescued_cf > 0:
                 with atomic_writer(eff_cf_csv, encoding="utf-8-sig", newline="") as f:
                     writer = csv.DictWriter(f, fieldnames=CF_BASE_CSV_FIELDS, extrasaction="ignore")
                     writer.writeheader()
@@ -4631,9 +4674,10 @@ def calibrate_all_datasets(
                             port = safe_int(r.get("port"), 0)
                             if ip and 1 <= port <= 65535:
                                 f.write(f"{ip}:{port}\n")
-                stats["cf_ips_cf_removed"] = dropped_cf_ips
-                stats["cf_removed"] += dropped_cf_ips
-                log.info("【全量校准 CF 拦截】从 %s 剔除 %d 条 Cloudflare 入口单条优选记录", eff_cf_csv, dropped_cf_ips)
+                if dropped_cf_ips > 0:
+                    stats["cf_ips_cf_removed"] = dropped_cf_ips
+                    stats["cf_removed"] += dropped_cf_ips
+                    log.info("【全量校准 CF 拦截】从 %s 剔除 %d 条 Cloudflare 入口单条优选记录", eff_cf_csv, dropped_cf_ips)
         except Exception as e:
             log.warning("校准 %s 异常: %s", eff_cf_csv, e)
 
@@ -4643,9 +4687,15 @@ def calibrate_all_datasets(
                 reader = csv.DictReader(f)
                 scan_fields = list(reader.fieldnames or [])
                 scan_rows_raw = list(reader) if ("ip" in scan_fields and "port" in scan_fields) else []
+            cache, rescued_scan = rescue_mislabeled_cloudflare_rows(
+                scan_rows_raw,
+                ip_cache=cache,
+                persist=bool(ip_cache_path),
+                cache_path=ip_cache_path,
+            )
             clean_scan_rows: list[dict] = []
             dropped_cf_scan = 0
-            scan_asn_fixed = 0
+            scan_asn_fixed = rescued_scan
             for r in scan_rows_raw:
                 ip = str(r.get("ip") or "").strip()
                 ing_code = _extract_asn_code(r.get("asn"), r.get("isp"))

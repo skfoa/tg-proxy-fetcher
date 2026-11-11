@@ -432,6 +432,7 @@ def load_existing_proxies(
                     if is_cloudflare_node(
                         {"url": u, "host": extract_node_host(u), "egress_ip": r.get("egress_ip", ""), "asn": asn_val, "isp": isp_val},
                         ip_cache,
+                        trusts_asn_label=False,
                     ):
                         continue
 
@@ -518,7 +519,7 @@ def load_existing_proxies(
                     if not line_s or line_s.startswith("#"):
                         continue
                     for url, key in extract_proxies(line_s):
-                        if is_cloudflare_node({"url": url}, ip_cache):
+                        if is_cloudflare_node({"url": url}, ip_cache, trusts_asn_label=False):
                             continue
                         if not is_tombstoned(key, tombstone) and key not in existing:
                             meta = csv_meta_by_key.get(key) or csv_meta_by_url.get(url, {})
@@ -571,7 +572,7 @@ def load_existing_cf_ips(filepath: str = OUTPUT_CF_FILE, label: str = "优选 IP
                     key = f"{ip}:{port}"
                     if is_tombstoned(key, tombstone):
                         continue
-                    if is_cloudflare_node(row, ip_cache):
+                    if is_cloudflare_node(row, ip_cache, trusts_asn_label=False):
                         continue
                     row["fail_count"] = safe_int(row.get("fail_count"), 0)
                     row["first_seen"] = normalize_timestamp(str(row.get("first_seen") or row.get("tested_at") or ""))
@@ -2020,12 +2021,12 @@ def scrape_channel_web(
             cleaned_text = html.unescape(cleaned_text).strip()
 
             for p_url, key in extract_proxies(cleaned_text):
-                if is_cloudflare_ingress(extract_node_host(p_url), ip_cache=ip_cache):
+                if is_cloudflare_ingress(extract_node_host(p_url), ip_cache=ip_cache, trusts_asn_label=False):
                     continue
                 proxies_found.append((p_url, key))
 
             cf_data = parse_cf_ip(cleaned_text, default_channel=channel, ip_cache=ip_cache)
-            if cf_data and not is_cloudflare_node(cf_data, ip_cache):
+            if cf_data and not is_cloudflare_node(cf_data, ip_cache, trusts_asn_label=False):
                 if not cf_data.get("first_seen") and dt:
                     cf_data["first_seen"] = dt.astimezone(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S")
                 cf_ips_found.append(cf_data)
@@ -2300,9 +2301,11 @@ def merge_and_save(
     suspect_rows = [
         v
         for d in (
+            scraped_proxies,
             scraped_scan_ips,
             scraped_cf_ips,
             scraped_proxyips,
+            existing_proxies,
             existing_scan_ips,
             existing_cf_ips,
             existing_proxyips,
@@ -2913,7 +2916,7 @@ async def run_telethon():
                     if is_proxy_target:
                         if msg.text:
                             for url, key in extract_proxies(msg.text):
-                                if is_tombstoned(key, tombstone) or is_cloudflare_ingress(extract_node_host(url), ip_cache=ip_cache):
+                                if is_tombstoned(key, tombstone) or is_cloudflare_ingress(extract_node_host(url), ip_cache=ip_cache, trusts_asn_label=False):
                                     continue
                                 if key not in scraped_proxies:
                                     scraped_proxies[key] = {"url": url, "source": channel_name}
@@ -2930,7 +2933,7 @@ async def run_telethon():
                                         doc_proxies = parse_proxy_attachment_content(doc_text)
                                         doc_added = 0
                                         for url, key in doc_proxies:
-                                            if is_tombstoned(key, tombstone) or is_cloudflare_ingress(extract_node_host(url), ip_cache=ip_cache):
+                                            if is_tombstoned(key, tombstone) or is_cloudflare_ingress(extract_node_host(url), ip_cache=ip_cache, trusts_asn_label=False):
                                                 continue
                                             if key not in scraped_proxies:
                                                 scraped_proxies[key] = {"url": url, "source": channel_name}
@@ -2943,7 +2946,7 @@ async def run_telethon():
                     if is_cf_target:
                         if msg.text:
                             cf_data = parse_cf_ip(msg.text, default_channel=channel_name, ip_cache=ip_cache)
-                            if cf_data and not is_cloudflare_node(cf_data, ip_cache):
+                            if cf_data and not is_cloudflare_node(cf_data, ip_cache, trusts_asn_label=False):
                                 cf_key = f"{cf_data['ip']}:{cf_data['port']}"
                                 if not is_tombstoned(cf_key, tombstone):
                                     if cf_key not in scraped_cf_ips:

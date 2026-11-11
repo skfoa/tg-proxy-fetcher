@@ -668,6 +668,351 @@ class TestVerifiersCloudflareExclusion(unittest.TestCase):
             self.assertNotIn("104.16.1.1", probed_hosts)
             self.assertEqual([r["host"] for r in _read_csv(pr_csv)], ["65.49.233.236"])
 
+    def test_load_existing_cf_ips_and_proxies_preserve_uncached_mislabeled_for_rescue(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cf_csv = os.path.join(tmpdir, "cf_ips.csv")
+            pr_csv = os.path.join(tmpdir, "proxies.csv")
+            pr_txt = os.path.join(tmpdir, "proxies.txt")
+            pr_dir = os.path.join(tmpdir, "proxies")
+            os.makedirs(pr_dir, exist_ok=True)
+
+            ip_cache = {
+                "45.85.118.10": {"asn": "AS209242", "isp": "Cloudflare London LLC", "net_type": "datacenter", "country": "GB"},
+            }
+
+            _write_csv(
+                cf_csv,
+                providers.CF_BASE_CSV_FIELDS,
+                [
+                    {"ip": "104.16.1.1", "port": "443", "asn": "AS13335 Cloudflare", "isp": "Cloudflare, Inc."},
+                    {"ip": "45.85.118.10", "port": "443", "asn": "AS209242 Cloudflare", "isp": "Cloudflare London LLC"},
+                    {"ip": "45.85.118.11", "port": "443", "asn": "AS13335 Cloudflare", "isp": "Cloudflare London LLC"},
+                    {
+                        "ip": "43.167.11.157",
+                        "port": "443",
+                        "asn": "AS13335 Cloudflare",
+                        "isp": "Cloudflare London LLC",
+                        "exit_ip": "2a09:bac5::1",
+                        "exit_asn": "AS13335 Cloudflare",
+                    },
+                ],
+            )
+            _write_csv(
+                pr_csv,
+                proxies_verify.PROXY_CSV_FIELDS,
+                [
+                    {
+                        "url": "socks5://104.16.1.1:1080",
+                        "proto": "socks5",
+                        "host": "104.16.1.1",
+                        "port": "1080",
+                        "source": "@danfeng_chat",
+                        "first_seen": "2026-11-10 00:00:00",
+                        "fail_count": "0",
+                        "asn": "AS13335 Cloudflare",
+                        "isp": "Cloudflare, Inc.",
+                    },
+                    {
+                        "url": "socks5://43.167.11.157:1080",
+                        "proto": "socks5",
+                        "host": "43.167.11.157",
+                        "resolved_ip": "",
+                        "egress_ip": "",
+                        "port": "1080",
+                        "source": "@danfeng_chat",
+                        "first_seen": "2026-11-10 00:00:00",
+                        "fail_count": "1",
+                        "asn": "AS13335 Cloudflare",
+                        "isp": "Cloudflare London LLC",
+                    },
+                    {
+                        "url": "https://45.85.118.11:443",
+                        "proto": "https",
+                        "host": "45.85.118.11",
+                        "resolved_ip": "",
+                        "egress_ip": "",
+                        "port": "443",
+                        "source": "@otcjlq",
+                        "first_seen": "2026-11-10 00:00:00",
+                        "fail_count": "0",
+                        "asn": "AS13335 Cloudflare",
+                        "isp": "Cloudflare London LLC",
+                    },
+                ],
+            )
+            with open(pr_txt, "w", encoding="utf-8") as f:
+                f.write("socks5://104.16.1.1:1080\nsocks5://43.167.11.157:1080\nhttps://45.85.118.11:443\n")
+
+            with patch("tg_fetch.load_ip_cache", return_value=ip_cache), \
+                 patch("tg_fetch.load_tombstone", return_value={}):
+                loaded_cf = tg_fetch.load_existing_cf_ips(cf_csv, "测试单条优选IP")
+                loaded_proxies = tg_fetch.load_existing_proxies(pr_txt, pr_csv, pr_dir)
+
+            self.assertNotIn("104.16.1.1:443", loaded_cf)
+            self.assertNotIn("45.85.118.10:443", loaded_cf)
+            self.assertIn("43.167.11.157:443", loaded_cf)
+            self.assertIn("45.85.118.11:443", loaded_cf)
+
+            self.assertNotIn("104.16.1.1:1080", loaded_proxies)
+            self.assertIn("43.167.11.157:1080", loaded_proxies)
+            self.assertIn("45.85.118.11:443", loaded_proxies)
+            kept_proxy = loaded_proxies["43.167.11.157:1080"]
+            self.assertEqual(kept_proxy["source"], "@danfeng_chat")
+            self.assertEqual(kept_proxy["first_seen"], "2026-11-10 00:00:00")
+            self.assertEqual(int(kept_proxy["fail_count"]), 1)
+
+            captured = {}
+
+            def _fake_save(final_proxies, final_cf_ips, final_scan_ips=None, final_proxyips=None, **kwargs):
+                captured["proxies"] = final_proxies
+                captured["cf_ips"] = final_cf_ips
+                captured["scan_ips"] = final_scan_ips
+                captured["proxyips"] = final_proxyips
+
+            def _fake_rescue_resolve(targets, max_chunk_size=100, persist=True, db_path="", cache_path=""):
+                mapping = {
+                    "43.167.11.157": ("AS132203", "Tencent Cloud"),
+                    "45.85.118.11": ("AS209242", "Cloudflare London LLC"),
+                }
+                return {t: mapping[t] for t in targets if t in mapping}
+
+            with patch("tg_fetch.load_tombstone", return_value={}), \
+                 patch("tg_fetch.auto_enrich_and_save_asns", return_value=0), \
+                 patch("tg_fetch.get_session_enriched_asns", return_value=[]), \
+                 patch("tg_fetch.resolve_asn_batch_online", side_effect=_fake_rescue_resolve), \
+                 patch("providers.resolve_asn_batch_online", side_effect=_fake_rescue_resolve), \
+                 patch("tg_fetch.save_and_notify", side_effect=_fake_save):
+                tg_fetch.merge_and_save(
+                    existing_proxies=loaded_proxies,
+                    scraped_proxies={},
+                    existing_cf_ips=loaded_cf,
+                    scraped_cf_ips={},
+                    existing_scan_ips={},
+                    scraped_scan_ips={},
+                    existing_proxyips={},
+                    scraped_proxyips={},
+                    edt_unrecorded_asns=[],
+                    ip_cache=ip_cache,
+                )
+
+            self.assertEqual(set(captured["proxies"].keys()), {"43.167.11.157:1080"})
+            self.assertIn("AS132203", captured["proxies"]["43.167.11.157:1080"]["asn"])
+            self.assertEqual(set(captured["cf_ips"].keys()), {"43.167.11.157:443"})
+            self.assertIn("AS132203", captured["cf_ips"]["43.167.11.157:443"]["asn"])
+
+    def test_proxies_verify_rescues_uncached_mislabeled_before_filtering(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            pr_csv = os.path.join(tmpdir, "proxies.csv")
+            pr_txt = os.path.join(tmpdir, "proxies.txt")
+            pr_dir = os.path.join(tmpdir, "proxies")
+            os.makedirs(pr_dir, exist_ok=True)
+
+            _write_csv(
+                pr_csv,
+                proxies_verify.PROXY_CSV_FIELDS,
+                [
+                    {
+                        "url": "socks5://104.16.1.1:1080",
+                        "proto": "socks5",
+                        "host": "104.16.1.1",
+                        "port": "1080",
+                        "source": "@danfeng_chat",
+                        "asn": "AS13335 Cloudflare",
+                        "isp": "Cloudflare, Inc.",
+                    },
+                    {
+                        "url": "socks5://43.167.11.157:1080",
+                        "proto": "socks5",
+                        "host": "43.167.11.157",
+                        "resolved_ip": "",
+                        "egress_ip": "",
+                        "port": "1080",
+                        "source": "@danfeng_chat",
+                        "asn": "AS13335 Cloudflare",
+                        "isp": "Cloudflare London LLC",
+                    },
+                    {
+                        "url": "https://45.85.118.11:443",
+                        "proto": "https",
+                        "host": "45.85.118.11",
+                        "resolved_ip": "",
+                        "egress_ip": "",
+                        "port": "443",
+                        "source": "@otcjlq",
+                        "asn": "AS13335 Cloudflare",
+                        "isp": "Cloudflare London LLC",
+                    },
+                ],
+            )
+            args = SimpleNamespace(
+                concurrency=4,
+                max_fails=3,
+                timeout=2.0,
+                http_timeout=2.0,
+                sstp_timeout=2.0,
+                no_notify=True,
+                dry_run=False,
+                diag_output="",
+            )
+            shared_cache = {}
+            probed_hosts = []
+
+            def _fake_rescue_resolve(targets, max_chunk_size=100, persist=True, db_path="", cache_path=""):
+                mapping = {
+                    "43.167.11.157": ("AS132203", "Tencent Cloud"),
+                    "45.85.118.11": ("AS209242", "Cloudflare London LLC"),
+                    "104.28.1.1": ("AS13335", "Cloudflare, Inc."),
+                }
+                return {t: mapping[t] for t in targets if t in mapping}
+
+            async def _fake_resolve_async(targets, **kwargs):
+                return _fake_rescue_resolve(targets)
+
+            async def _fake_probe_single(row, **kwargs):
+                probed_hosts.append(row["host"])
+                return {
+                    **row,
+                    "is_alive": True,
+                    "status": "alive",
+                    "resolved_ip": row["host"],
+                    "egress_ip": "104.28.1.1",
+                    "country": "JP",
+                    "delay_ms": 95,
+                    "speed_kbs": 800,
+                }
+
+            with patch.object(proxies_verify, "DATA_DIR", tmpdir), \
+                 patch.object(proxies_verify, "PROXIES_CSV", pr_csv), \
+                 patch.object(proxies_verify, "PROXIES_TXT", pr_txt), \
+                 patch.object(proxies_verify, "PROXIES_DIR", pr_dir), \
+                 patch("proxies_verify.load_ip_cache", return_value=shared_cache), \
+                 patch("proxies_verify.save_ip_cache"), \
+                 patch("proxies_verify.prune_ip_cache", return_value=0), \
+                 patch("proxies_verify.load_tombstone", return_value={}), \
+                 patch("proxies_verify.record_tombstone"), \
+                 patch("proxies_verify.auto_enrich_and_save_asns", return_value=0), \
+                 patch("providers.resolve_asn_batch_online", side_effect=_fake_rescue_resolve), \
+                 patch("proxies_verify.resolve_asn_batch_online_async", side_effect=_fake_resolve_async), \
+                 patch("proxies_verify.probe_single", side_effect=_fake_probe_single):
+                asyncio.run(proxies_verify.async_main(args))
+
+            self.assertEqual(probed_hosts, ["43.167.11.157"])
+            rows_after = _read_csv(pr_csv)
+            self.assertEqual([r["host"] for r in rows_after], ["43.167.11.157"])
+            self.assertIn("AS132203", rows_after[0]["asn"])
+
+    def test_calibrate_all_datasets_rescues_uncached_mislabeled_and_drops_byoip(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            proxies_dir = os.path.join(tmpdir, "proxies")
+            proxyip_dir = os.path.join(tmpdir, "proxyip")
+            scan_dir = os.path.join(tmpdir, "scan_ips")
+            os.makedirs(proxies_dir, exist_ok=True)
+            os.makedirs(proxyip_dir, exist_ok=True)
+            os.makedirs(scan_dir, exist_ok=True)
+
+            proxies_csv = os.path.join(tmpdir, "proxies.csv")
+            proxies_txt = os.path.join(tmpdir, "proxies.txt")
+            proxyip_csv = os.path.join(tmpdir, "proxyip.csv")
+            proxyip_txt = os.path.join(tmpdir, "proxyip.txt")
+            proxyip_json = os.path.join(tmpdir, "proxyip.json")
+            cf_csv = os.path.join(tmpdir, "cf_ips.csv")
+            cf_txt = os.path.join(tmpdir, "cf_ips.txt")
+            scan_csv = os.path.join(tmpdir, "scan_ips.csv")
+            scan_txt = os.path.join(tmpdir, "scan_ips.txt")
+            ip_cache_path = os.path.join(tmpdir, "ip_cache.json")
+
+            with open(ip_cache_path, "w", encoding="utf-8") as f:
+                json.dump({}, f)
+
+            _write_csv(
+                proxies_csv,
+                proxies_verify.PROXY_CSV_FIELDS,
+                [
+                    {"url": "socks5://104.16.1.1:1080", "proto": "socks5", "host": "104.16.1.1", "port": "1080", "source": "@danfeng_chat", "asn": "AS13335 Cloudflare", "isp": "Cloudflare, Inc."},
+                    {"url": "socks5://43.167.11.157:1080", "proto": "socks5", "host": "43.167.11.157", "port": "1080", "source": "@danfeng_chat", "asn": "AS13335 Cloudflare", "isp": "Cloudflare London LLC"},
+                    {"url": "https://45.85.118.11:443", "proto": "https", "host": "45.85.118.11", "port": "443", "source": "@otcjlq", "asn": "AS13335 Cloudflare", "isp": "Cloudflare London LLC"},
+                ],
+            )
+            _write_csv(
+                proxyip_csv,
+                providers.PROXYIP_CSV_FIELDS,
+                [
+                    {"ip": "1.1.1.1", "port": "443", "asn": "AS13335 Cloudflare", "isp": "Cloudflare, Inc.", "net_type": "isp"},
+                    {"ip": "218.157.145.120", "port": "443", "asn": "AS13335 Cloudflare", "isp": "Cloudflare London LLC", "net_type": "isp"},
+                    {"ip": "45.85.118.11", "port": "443", "asn": "AS13335 Cloudflare", "isp": "Cloudflare London LLC", "net_type": "isp"},
+                ],
+            )
+            _write_csv(
+                cf_csv,
+                providers.CF_BASE_CSV_FIELDS,
+                [
+                    {"ip": "104.16.1.1", "port": "443", "asn": "AS13335 Cloudflare", "isp": "Cloudflare, Inc."},
+                    {"ip": "43.167.11.157", "port": "443", "asn": "AS13335 Cloudflare", "isp": "Cloudflare London LLC"},
+                    {"ip": "45.85.118.11", "port": "443", "asn": "AS13335 Cloudflare", "isp": "Cloudflare London LLC"},
+                ],
+            )
+            _write_csv(
+                scan_csv,
+                providers.SCAN_CSV_FIELDS,
+                [
+                    {"ip": "172.68.10.20", "port": "443", "asn": "AS13335 Cloudflare", "isp": "Cloudflare, Inc."},
+                    {"ip": "43.167.11.157", "port": "8443", "asn": "AS13335 Cloudflare", "isp": "Cloudflare London LLC", "exit_ip": "2a09:bac5::1", "exit_asn": "AS13335 Cloudflare"},
+                    {"ip": "45.85.118.11", "port": "8443", "asn": "AS13335 Cloudflare", "isp": "Cloudflare London LLC"},
+                ],
+            )
+
+            seen_cache_paths = []
+
+            def _fake_rescue_resolve(targets, max_chunk_size=100, persist=True, db_path="", cache_path=""):
+                seen_cache_paths.append(cache_path)
+                mapping = {
+                    "43.167.11.157": ("AS132203", "Tencent Cloud"),
+                    "218.157.145.120": ("AS4766", "Korea Telecom"),
+                    "45.85.118.11": ("AS209242", "Cloudflare London LLC"),
+                }
+                return {t: mapping[t] for t in targets if t in mapping}
+
+            with patch("providers.load_tombstone", return_value={}), \
+                 patch("providers.prune_tombstone", return_value={}), \
+                 patch("providers.prune_ip_cache", return_value=0), \
+                 patch("providers.resolve_asn_batch_online", side_effect=_fake_rescue_resolve):
+                stats = providers.calibrate_all_datasets(
+                    proxies_dir=proxies_dir,
+                    proxies_csv_path=proxies_csv,
+                    proxyip_csv_path=proxyip_csv,
+                    proxyip_dir=proxyip_dir,
+                    ip_cache_path=ip_cache_path,
+                    proxyip_txt_path=proxyip_txt,
+                    proxyip_json_path=proxyip_json,
+                    scan_csv_path=scan_csv,
+                    scan_txt_path=scan_txt,
+                    scan_dir_path=scan_dir,
+                    proxies_txt_path=proxies_txt,
+                    cf_csv_path=cf_csv,
+                    cf_txt_path=cf_txt,
+                )
+
+            self.assertTrue(seen_cache_paths)
+            self.assertTrue(all(cp == ip_cache_path for cp in seen_cache_paths))
+            self.assertEqual(stats["proxies_cf_removed"], 2)
+            self.assertEqual(stats["proxyip_cf_removed"], 2)
+            self.assertEqual(stats["cf_ips_cf_removed"], 2)
+            self.assertEqual(stats["scan_ips_cf_removed"], 2)
+
+            proxies_after = _read_csv(proxies_csv)
+            proxyip_after = _read_csv(proxyip_csv)
+            cf_after = _read_csv(cf_csv)
+            scan_after = _read_csv(scan_csv)
+
+            self.assertEqual([r["host"] for r in proxies_after], ["43.167.11.157"])
+            self.assertIn("AS132203", proxies_after[0]["asn"])
+            self.assertEqual([r["ip"] for r in proxyip_after], ["218.157.145.120"])
+            self.assertIn("AS4766", proxyip_after[0]["asn"])
+            self.assertEqual([r["ip"] for r in cf_after], ["43.167.11.157"])
+            self.assertIn("AS132203", cf_after[0]["asn"])
+            self.assertEqual([r["ip"] for r in scan_after], ["43.167.11.157"])
+            self.assertIn("AS132203", scan_after[0]["asn"])
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

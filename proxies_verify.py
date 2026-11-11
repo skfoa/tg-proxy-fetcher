@@ -65,6 +65,7 @@ from providers import (
     resolve_asn_batch_online_async,
     load_ip_cache,
     is_cloudflare_node,
+    rescue_mislabeled_cloudflare_rows,
     save_ip_cache,
     prune_ip_cache,
     classify_asn,
@@ -1739,7 +1740,13 @@ def send_proxies_notification(
 async def async_main(args):
     t_start = time.time()
     rows = load_proxies_data(PROXIES_TXT, PROXIES_CSV, proxies_dir=PROXIES_DIR)
-    init_cache = load_ip_cache()
+    is_prod_data_dir = os.path.abspath(DATA_DIR) == os.path.abspath("data")
+    init_cache, _ = await asyncio.to_thread(
+        rescue_mislabeled_cloudflare_rows,
+        rows,
+        load_ip_cache(),
+        is_prod_data_dir,
+    )
     filtered_rows = [r for r in rows if not is_cloudflare_node(r, init_cache)]
     cf_init_dropped = len(rows) - len(filtered_rows)
     if cf_init_dropped > 0:
@@ -2241,8 +2248,15 @@ async def enrich_existing_proxies_file(
             rows.append(item)
 
     log.info("【全量 ASN 补全模式】从 %s 读取到 %d 个现有节点", csv_path, len(rows))
+    is_prod = os.path.abspath(os.path.dirname(os.path.abspath(csv_path))) == os.path.abspath("data")
+    rescued_cache, _ = await asyncio.to_thread(
+        rescue_mislabeled_cloudflare_rows,
+        rows,
+        load_ip_cache(),
+        is_prod,
+    )
     net_stats = await enrich_proxies_metadata(rows)
-    final_cache = load_ip_cache()
+    final_cache = load_ip_cache() if is_prod else rescued_cache
     rows = [r for r in rows if not is_cloudflare_node(r, final_cache)]
     log.info("【全量 ASN 补全模式】完成网络属性画像打标: %s (剔除 CF 后保留 %d 个)", net_stats, len(rows))
     save_proxies_data(rows, txt_path=txt_path, csv_path=csv_path, proxies_dir=proxies_dir)

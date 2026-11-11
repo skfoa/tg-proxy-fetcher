@@ -35,8 +35,9 @@
 - **📁 智能 ASN 分组与命名**：
   - **DanFeng 测速**：CSV 内部无 ASN 列时自动从文件名（如 `AS45102_CNNICALIBABACNNETAP_*.csv`）解析归类。
   - **OTC 优选扫描**：单 ASN 文件以文件名目标 ASN 为准；混合扫描文件（如 `OTC_SCAN_YX_杂.txt`）自动逐行提取具体 ASN 与 ISP 拆分归类。
-- **🔬 报文特征级质检识别**：质检引擎深入分析响应报文底层特征，打破传统单一依赖 HTTP 状态码的局限：
-  - **兼容 Cloudflare 1034 边缘受限真节点**：对返回 403 但包含官方 `Server: cloudflare` 与 `CF-RAY` 特征的边缘节点自动放行并提取三字机房代码（`colo`），避免误杀；
+- **🔬 报文特征级质检识别与 Cloudflare 入口永久拒收**：质检引擎深入分析响应报文底层特征，并在全链路执行入口鉴真隔离：
+  - **永久拒收 Cloudflare 自身入口，保留第三方 VPS + WARP 出站**：在抓取、加载、四阶段质检与全量校准中，通过官方 CIDR、`ip_cache` 与在线 BGP 纠偏（`rescue_mislabeled_cloudflare_rows`）永久剔除 Cloudflare 自身入口节点（直接移除、不入墓地）；对仅因 WARP 出站被上游误标为 `AS13335` 的第三方节点，先做在线 BGP 反查纠偏后再裁决，避免误删；
+  - **识别第三方反代 1034 边缘受限响应**：针对第三方优选 IP / ProxyIP 穿透访问 Cloudflare 目标站点时返回 403 但包含官方 `Server: cloudflare` 与 `CF-RAY` 的响应提取三字机房代码（`colo`），不放行 Cloudflare 自身入口 IP；
   - **识别并剔除异构 CDN 伪节点 (`non_cf_cdn`)**：准确识别并剔除混入的 Fastly、Akamai 等非 Cloudflare 伪造节点，保证优选节点池纯净度。
 - **📊 通用代理质检可观测性与分流策略**：`proxies_verify.py` 引入失败原因分布统计（细分 `connect_timeout`、`tls_error`、`http_status_xxx` 等）与协议明细汇总日志；实行精细化分协议淘汰机制（明文 HTTP 专属严格阈值 `--http-max-fails 1`，其他高可用协议维持缓冲容错），并支持 `--strict` 极致纯净模式。
 - **🌐 原生支持 TURN 穿透协议**：完整支持 `turn://` 协议节点的解析、存活质检与单协议数据导出（`.txt` / `.csv` / `.json`），兼容 RFC 5389 STUN Binding 校验与自定义外部检测端点，并支持自动区分机房与家庭宽带（`isp`）等网络画像。
@@ -110,8 +111,9 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | **`data/proxies/*.txt`** | 按协议独立拆分的纯净单协议代理清单（涵盖 `socks5.txt`、`http.txt`、`https.txt`、`turn.txt`、`sstp.txt`，纯文本无注释行） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies/{协议}.txt` |
 | **`data/proxies/*.csv`** | 按协议独立拆分的纯净单协议结构化数据表（涵盖 `socks5.csv`、`http.csv`、`https.csv`、`turn.csv`、`sstp.csv`，15 字段含 `source`） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies/{协议}.csv` |
 | **`data/proxies/*.json`** | 按协议独立拆分的标准化 JSON 端点（涵盖 `socks5.json`、`http.json`、`https.json`、`turn.json`、`sstp.json`，结构化输出协议、国家、出口真实 IP、ASN、网络属性与来源 `source`，兼容 EDT-Toolkit / 油猴脚本及各类客户端导入） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxies/{协议}.json` |
-| **`data/cf_ips.txt`** | 频道日常单条优选 IP（纯文本） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/cf_ips.txt` |
-| **`data/cf_ips.csv`** | 频道日常单条优选 IP（数据表） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/cf_ips.csv` |
+| **`data/cf_ips.txt`** | 频道日常与动态域名优选 IP（纯文本，已剔除 CF 自身入口） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/cf_ips.txt` |
+| **`data/cf_ips.csv`** | 频道日常与动态域名优选 IP（数据表，已剔除 CF 自身入口） | 全模式支持 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/cf_ips.csv` |
+| **`data/cf_ips/domains.txt`** | 单条优选 IP 人工维护动态域名清单（每行一个域名，DoH `A` 记录增量发现） | 人工维护输入 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/cf_ips/domains.txt` |
 | **`data/scan_ips.txt`** | 扫描测速总清单（按存活/缓冲质检状态分层排序，纯文本） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/scan_ips.txt` |
 | **`data/scan_ips/*.txt`** | 独立 ASN + 厂商纯文本列表（单文件） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/scan_ips/AS{ASN}_{ISP}.txt` |
 | **`data/scan_ips.csv`** | 扫描测速优选 IP（出入口双维度解耦数据表，16 字段含 `exit_ip`, `exit_asn`, `exit_isp`, `exit_location`） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/scan_ips.csv` |
@@ -120,6 +122,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | **`data/proxyip/*.txt`** | 独立国家/地区纯净反代列表（纯文本 `IP:端口`，如 `US_美国.txt`、`JP_日本.txt`） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip/{地区}.txt` |
 | **`data/proxyip/*.json`** | 独立国家/地区标准化 JSON 反代数据（如 `US_美国.json`、`JP_日本.json`，含 `clientIp`/`clientIps` 双出口画像） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip/{地区}.json` |
 | **`data/proxyip/【...】.txt` / `.json`** | 稀缺网络属性独立反代列表与 JSON（原生宽带/商业/教育/政务，ASN 粗筛） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip/【ISP_运营商原生宽带】.json` 等 |
+| **`data/proxyip/domains.txt`** | 反代 ProxyIP 人工维护动态域名清单（DoH `A` 默认 `443` + `TXT` 严格 `IP:端口` 增量发现） | 人工维护输入（重建保留） | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip/domains.txt` |
 | **`data/proxyip.csv`** | 反代 ProxyIP 详细数据表（17 字段出入口双维度解耦，含 `net_type` 网络分类、`exit_ip` 真实出站落地 IP、`exit_ipv6` 出口 IPv6、`exit_asn` 出口 ASN 与 `exit_isp` 出口运营商） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip.csv` |
 | **`data/asn_database.json`** | 内置离线 ASN 知识库（收录 2,600+ 条双向索引映射与 3,580+ 条网络分类基准；遇到新 ASN 时自动在线查询增量同步） | 运行时增量维护（由 CI 自动提交） | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/asn_database.json` |
 | **`data/tombstone.json`** | 质检死节点冷却库（7 天隔离冷却与生命周期闭环防回流，仅登记连续失败达标的死节点，机房拒收节点不进墓地） | 全模式支持（质检引擎运行触发） | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/tombstone.json` |
@@ -184,8 +187,9 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
     - `data/proxies/http.txt` / `http.csv` / `http.json`：HTTP 代理节点列表、表格与 JSON；
     - `data/proxies/https.txt` / `https.csv` / `https.json`：HTTPS 代理节点列表、表格与 JSON。
 
-### 2. `data/cf_ips.txt` / `data/cf_ips.csv`（频道日常单条优选 IP）
-* 仅收录频道日常消息正文中发布的单条优选 IP（如 `@danfeng_chat`、`@otcjlq` 的实时测速通报）。
+### 2. `data/cf_ips.txt` / `data/cf_ips.csv`（频道日常与动态域名优选 IP）
+* 收录频道日常消息正文中发布的单条优选 IP（如 `@danfeng_chat`、`@otcjlq` 的实时测速通报），以及 `data/cf_ips/domains.txt` 动态域名清单通过 DoH `A` 记录增量发现的非 Cloudflare 自身入口节点。
+* 若某域名在后续解析中不再返回历史 IP，已入库的历史 IP 仍按现有 `cf_verify.py` 质检生命周期保留与淘汰，不因 DNS 变更直接抹除。
 * `data/cf_ips.txt` 为纯文本格式，每行一个 `IP:端口`。
 * `data/cf_ips.csv` 为 UTF-8-SIG 结构化表格，可直接用 Excel 查看。
 
@@ -208,13 +212,14 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
   3. **结构化总表（`data/scan_ips.csv`）**：按 ASN 字母序聚合排序，方便通过 Excel 集中筛选分析。
 
 ### 4. `data/proxyip/`（反代 ProxyIP 专属池、分国别与网络属性分类）
-* **独立反代池**：专门收录来自频道发布的反代文件（如 `Global-proxyip-443.csv`、`Global-proxyip-8443.csv` 等）。
+* **独立反代池**：专门收录来自频道发布的反代文件（如 `Global-proxyip-443.csv`、`Global-proxyip-8443.csv` 等）、外部订阅源及人工维护的动态域名输入清单 `data/proxyip/domains.txt`。
+* **动态域名增量发现（`data/proxyip/domains.txt`）**：每行配置一个域名（可选 `:端口`），抓取阶段仅读取该输入清单（不从输出分组文件反推），通过 DoH 查询 `A` 记录（默认端口）与 `TXT` 记录（仅接受显式 `公网IP:端口`）增量入库；DoH 查询失败时不清理历史记录，历史解析出的旧 IP 由 `proxyip_verify.py` 正常验证与淘汰，分国导出重建时始终保留 `domains.txt`。
 * **质检分层排序与分国专属列表**：`data/proxyip.txt` 按缓冲状态与存活状态清晰分段，段内按实测延迟升序排列；各国家/地区专属分类由 `data/proxyip/*.txt` 独立提供。
 * **分国家/地区独立单文件**：
   - `data/proxyip/*.txt` / `*.json`：在 `data/proxyip/` 目录下按国家/地区拆分为独立文件（如 `data/proxyip/US_美国.txt`、`data/proxyip/JP_日本.txt`、`data/proxyip/HK_香港.txt` 及对应 `.json`），内容为纯净的 `IP:端口` 格式或标准化 JSON，方便直接复制或作为分地区订阅。
-* **纯净反代准入与双向自动分流（机房 0 容忍 + 家宽自动晋升）**：
-  在抓取的反代与扫描节点中，系统全面实施**「出口即正义」深度纠偏与双向动态流转**策略：
-  - **机房与 WARP 出口自动降级分流（`proxyip` ➔ `scan_ips`）**：若反代节点的真实落地出口（`exit_ip` / `exit_ipv6`）或自治系统经权威库、`ip_cache` 画像或 Cloudflare 官方 IPv4/IPv6 CIDR（`_CF_NETWORKS`）确权为数据中心机房（`datacenter`/`hosting`）或 Cloudflare WARP 出口，系统自动将其从 `proxyip.csv` 中剔除并无损降级迁移至 `data/scan_ips.csv` 扫描优选池；
+* **纯净反代准入与双向自动分流（CF 入口永久拒收 + 机房降级 + 家宽晋升）**：
+  在抓取的反代与扫描节点中，系统全面实施**「入口排他 + 出口鉴真」深度纠偏与双向动态流转**策略：
+  - **Cloudflare 自身入口永久拒收，第三方机房/WARP 出口自动降级（`proxyip` ➔ `scan_ips`）**：经官方 CIDR、`ip_cache` 或在线 BGP 确认为 Cloudflare 自身入口的节点在全链条直接移除（不入墓地）；若为第三方反代节点但其真实落地出口（`exit_ip` / `exit_ipv6`）或自治系统经权威库、`ip_cache` 画像或 Cloudflare 官方 IPv4/IPv6 CIDR（`_CF_NETWORKS`）确权为数据中心机房（`datacenter`/`hosting`）或 Cloudflare WARP 出口，系统自动将其从 `proxyip.csv` 中剔除并无损降级迁移至 `data/scan_ips.csv` 扫描优选池；
   - **原生非机房节点自动晋升（`scan_ips` ➔ `proxyip`）**：若扫描优选池中的存活节点经外部鉴真端点或权威画像确认为真实非 Cloudflare 出口且属于非机房网络（`isp` / `business` / `education` / `government`），系统自动将其晋升合流至 `data/proxyip.csv` 并从 `scan_ips.csv` 中移出，确保双池零交叉重叠；
   - **专属稀缺网络独立导出**：经过分流清洗后，`data/proxyip.csv` 仅保留 100% 纯净的运营商原生宽带、商业专线、教育与政务网络资产，并在 `data/proxyip/` 目录下单独导出（文件名前缀加 `【...】`，排序置顶）：
     - **`【ISP_运营商原生宽带】.txt`**：电信运营商原生宽带与精品线路网络（收录 中国电信 CN2、中国联通 9929/CUG、中国移动 CMIN2，以及 Comcast, Spectrum, Cox, HKT, HKBN, KT, SK Broadband, Vodafone, Orange 等常见电信服务商）。
@@ -244,7 +249,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 * 全项目共有 4 个核心 CSV 数据表，按用途与结构分为以下 3 大规范体系：
 
 #### ① 优选 IP 测速数据表（`data/cf_ips.csv`）
-*共 12 个字段，记录 Cloudflare 优选 IP 的真实测速指标与机房归属：*
+*共 12 个字段，记录第三方 Cloudflare 优选 IP 的真实测速指标与机房归属（已永久排除 Cloudflare 自身入口）：*
 
 | 字段 | 类型 | 说明 | 示例 |
 | :--- | :--- | :--- | :--- |
@@ -288,7 +293,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 
 | 字段 | 类型 | 说明 | 示例 |
 | :--- | :--- | :--- | :--- |
-| `ip` | 字符串 | 反代 IP 地址 | `104.16.132.229` |
+| `ip` | 字符串 | 反代 IP 地址 | `218.157.145.120` |
 | `port` | 整数 | 反代端口 | `443` |
 | `tls` | 字符串 | 是否开启 TLS (`true`/`false`) | `true` |
 | `delay_ms` | 整数 | /cdn-cgi/trace 穿透响应延迟（毫秒） | `145` |
@@ -328,8 +333,8 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `colo` | 字符串 | 通过该代理中继访问返回的 Cloudflare 机房代号 | `NRT` |
 | `country` | 字符串 | 出口落地国家或地区 ISO 二字代码（Cloudflare trace `loc`） | `JP`、`US` |
 | `egress_ip` | 字符串 | 代理节点向外访问时 Cloudflare 观测到的出口真实 IP（直连隧道为节点 host） | `198.51.100.2` |
-| `asn` | 字符串 | 自治系统编号与运营商标准归属（一体化直观标签） | `AS13335 Cloudflare`、`AS34343 Eweka` |
-| `isp` | 字符串 | **【核心凭据】** 自治系统所属运营商 / 托管商组织名称（与 `proxyip.csv` 规范统一对齐） | `Cloudflare, Inc.`、`Eweka Internet Services B.V.` |
+| `asn` | 字符串 | 自治系统编号与运营商标准归属（一体化直观标签） | `AS24940 Hetzner`、`AS34343 Eweka` |
+| `isp` | 字符串 | **【核心凭据】** 自治系统所属运营商 / 托管商组织名称（与 `proxyip.csv` 规范统一对齐） | `Hetzner Online GmbH`、`Eweka Internet Services B.V.` |
 | `net_type` | 字符串 | **【核心凭据】** 网络类型属性分类（`isp` 原生家宽 / `datacenter` 机房 / `business` 商业专线等） | `isp`、`datacenter` |
 | `first_seen` | 时间字符串 | 首次收录时间（以第一次抓取入库为准，永久不变，用于统计节点存活时长与长期可用性；注：针对 2026-10-01 前无此字段的历史旧节点，统一兼容赋予 2026-10-01 00:00:00 作为基准初值） | `2026-10-01 00:00:00` |
 | `source` | 字符串 | **【来源渠道】** 代理节点抓取/获取渠道（如 `EDT-Pages`、`@danfeng_chat`、`@otcjlq`、`vpngate` 等，精准标识来源） | `EDT-Pages`、`@danfeng_chat` |
@@ -339,7 +344,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 
 | 字段 | 类型 | 说明 | 示例 |
 | :--- | :--- | :--- | :--- |
-| `proxy` | 字符串 | 节点连接串（ProxyIP 为 `ip:port`，通用代理为完整 URL） | `104.16.132.229:443` 或 `socks5://...` |
+| `proxy` | 字符串 | 节点连接串（ProxyIP 为 `ip:port`，通用代理为完整 URL） | `218.157.145.120:443` 或 `socks5://...` |
 | `clientIp` | 字符串 | **【主要出口 IP】** 单一出口 IP 字符串（向下兼容旧版前端与解析器；双栈时优先填入 IPv4，无 IPv4 时填入 IPv6） | `192.241.216.172` |
 | `clientIps` | 字符串数组 | **【全量出口列表】** 穿透测试出的所有真实出口 IP 数组（去重有序排列，含 IPv4 与 IPv6） | `["192.241.216.172", "2602:f988:210:c4f::7f4"]` |
 | `clientIpv4` | 字符串 | **【IPv4 出口落地】** 穿透测试出的 IPv4 出站落地 IP（若无则为空串 `""`） | `192.241.216.172` |
@@ -552,12 +557,12 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 🔀 反代 ProxyIP：1,678 条 (✅ 1,612 存活 · ⚠️ 66 缓冲 [+14 新进 · 19 恢复])
    └ 出口画像: ISP/原生宽带 201 个 · 商业专线 15 个 · 教育政务 6 个
 💡 新收录 ASN (已自动归类入库)：
-   • AS13335 Cloudflare, Inc. (12 条)
+   • AS24940 Hetzner Online GmbH (12 条)
    • AS210644 Aeza Group LLC (8 条)
    └ 共 2 个已自动收录入库
 ━━━━━━━━━━━━━━━━━━━━
 🛡️ 主动鉴真淘汰：
-   • 质检规范：报文级穿透鉴真 (放行 CF 1034 边缘节点 · 过滤异构 CDN 伪节点 · 代理多协议穿透)
+   • 质检规范：报文级穿透鉴真 (永久拒收 CF 自身入口 · 保留第三方 1034 反代 · 过滤异构 CDN · 多协议穿透)
    • 缓冲动态：⚠️ 新增缓冲 66 条 · ♻️ 取消缓冲 91 条 (恢复健康)
    • 淘汰死节点：21 条 [代理 3, 反代 8, 扫描优选 10] (连续失败 ≥ 3 次)
 📡 频道与数据源：@danfeng_chat, @otcjlq 等公开频道与外部订阅源
@@ -649,14 +654,14 @@ python proxies_verify.py --concurrency 100 --no-notify
 # 极速画像补全模式（跳过网络连通性探测，仅刷新 ASN/ISP/net_type）：
 python proxies_verify.py --enrich-only
 
-# ③ 反代 ProxyIP 应用层穿透质检（深入报文特征放行 CF 1034 边缘真节点并过滤异构 CDN 伪节点）
+# ③ 反代 ProxyIP 应用层穿透质检（永久拒收 CF 自身入口，校验第三方 1034 反代并过滤异构 CDN 伪节点）
 python proxyip_verify.py --concurrency 150 --no-notify
 # 演练诊断模式（仅探测与统计，不覆写生产数据也不登记墓地）：
 python proxyip_verify.py --concurrency 150 --dry-run --diag-output diag_proxyip.json
 
-# ④ 全量优选 IP 两阶段（TLS + HTTP 301）主动鉴真（包含官方 300 基线与报文特征排他）
+# ④ 全量优选 IP 两阶段（TLS + HTTP 301）主动鉴真（永久拒收 CF 自身入口，执行报文特征排他）
 python cf_verify.py --concurrency 150 --timeout 3.0
-# 官方 Anycast 300 基线诊断与演练：
+# 官方 Anycast 300 基线诊断与演练（仅诊断探测，不纳入产物池）：
 python cf_verify.py --probe-baseline
 python cf_verify.py --dry-run --diag-output diag_cf.json
 
