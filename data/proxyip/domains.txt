@@ -1,0 +1,6 @@
+# ProxyIP 动态域名清单（每行一个，支持 domain 或 domain:port，以 # 开头为注释）
+# 每次抓取通过 DoH 查询 A（默认端口 443 或指定端口）与 TXT（仅接受显式 公网IP:端口），增量并入 ProxyIP 池。
+# 此文件为人工维护输入，生成国别/ISP 订阅文件时会自动保留。
+kr.william.us.ci
+tw.william.us.ci
+

@@ -1167,34 +1167,150 @@ def is_valid_public_ip(ip_str: str) -> bool:
         return False
 
 
-def doh_resolve_public_ip(domain: str, timeout: float = 3.5) -> str:
-    """通过安全加密 DNS (DoH) 解析域名，绕过本地 DNS 污染/劫持返回真实公网 IP"""
-    if not domain or not isinstance(domain, str):
+_DOH_RECORD_TYPES = {"A": 1, "TXT": 16, "AAAA": 28}
+
+
+def _clean_doh_txt_data(raw: str) -> str:
+    """规范化还原 DoH JSON 返回的 RFC-1035 TXT 字符串（支持单段与超长分段拼接引号）"""
+    s = str(raw or "").strip()
+    if not s:
         return ""
-    clean = domain.strip().lower()
+    if re.fullmatch(r'(?:"(?:[^"\\]|\\.)*"\s*)+', s):
+        chunks = re.findall(r'"((?:[^"\\]|\\.)*)"', s)
+        joined = "".join(c.replace('\\"', '"').replace("\\\\", "\\") for c in chunks)
+        return joined.strip()
+    if len(s) >= 2 and s[0] == '"' and s[-1] == '"':
+        return s[1:-1].replace('\\"', '"').replace("\\\\", "\\").strip()
+    return s
+
+
+def doh_query_dns_records(
+    domain: str,
+    record_type: str = "A",
+    timeout: float = 3.5,
+    proxy: str = "",
+) -> tuple[list[str], bool, str]:
+    """
+    通过安全加密 DNS (DoH) 查询域名指定类型（A / TXT / AAAA）的全部权威记录，
+    支持全球与国内直连多端点容灾及可选 HTTP 代理。
+    返回 (records, ok, detail):
+      - ok=True  表示 DoH 查询成功得到权威 DNS 状态（含明确无记录 empty/nxdomain 与有记录 ok）
+      - ok=False 表示全部 DoH 端点请求失败或返回 SERVFAIL 等异常状态（此时 detail 记录具体原因）
+    """
+    if not domain or not isinstance(domain, str):
+        return [], False, "invalid_domain"
+    clean = domain.strip().rstrip(".").lower()
+    rtype = str(record_type or "A").strip().upper()
+    target_type = _DOH_RECORD_TYPES.get(rtype)
+    if not clean or target_type is None:
+        return [], False, "invalid_query"
+
+    q_name = urllib.parse.quote(clean, safe="")
     doh_endpoints = [
-        f"https://1.1.1.1/dns-query?name={clean}&type=A",
-        f"https://cloudflare-dns.com/dns-query?name={clean}&type=A",
-        f"https://dns.google/resolve?name={clean}&type=A",
+        (f"https://1.1.1.1/dns-query?name={q_name}&type={rtype}", False),
+        (f"https://cloudflare-dns.com/dns-query?name={q_name}&type={rtype}", False),
+        (f"https://dns.google/resolve?name={q_name}&type={rtype}", False),
+        (f"https://223.5.5.5/resolve?name={q_name}&type={rtype}", True),
+        (f"https://1.12.12.12/dns-query?name={q_name}&type={rtype}", True),
     ]
-    for url in doh_endpoints:
-        try:
-            req = urllib.request.Request(
-                url,
-                headers={"Accept": "application/dns-json", "User-Agent": "Mozilla/5.0 (compatible; tg-proxy-fetcher/2.0)"},
-            )
-            with urllib.request.urlopen(req, timeout=timeout) as resp:
-                data = json.loads(resp.read().decode("utf-8", errors="ignore"))
+
+    headers = {
+        "Accept": "application/dns-json",
+        "User-Agent": "Mozilla/5.0 (compatible; tg-proxy-fetcher/2.0)",
+    }
+    proxy_str = str(proxy or "").strip()
+    proxy_opener = (
+        urllib.request.build_opener(urllib.request.ProxyHandler({"http": proxy_str, "https": proxy_str}))
+        if proxy_str and not proxy_str.startswith("socks")
+        else None
+    )
+    direct_opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+
+    any_valid_dns_resp = False
+    last_err = "all_doh_endpoints_failed"
+
+    for url, is_cn_direct in doh_endpoints:
+        openers = []
+        if proxy_opener is not None:
+            openers.append(proxy_opener)
+            if is_cn_direct:
+                openers.append(direct_opener)
+        else:
+            openers.append(urllib.request.build_opener())
+            if is_cn_direct:
+                openers.append(direct_opener)
+
+        for opener in openers:
+            try:
+                req = urllib.request.Request(url, headers=headers)
+                with opener.open(req, timeout=timeout) as resp:
+                    data = json.loads(resp.read().decode("utf-8", errors="ignore"))
+                if not isinstance(data, dict):
+                    last_err = "invalid_json_type"
+                    continue
+                status = data.get("Status")
+                if status not in (0, 3):
+                    last_err = f"dns_status_{status}"
+                    continue
+
                 answers = data.get("Answer", [])
+                results: list[str] = []
+                seen: set[str] = set()
+                has_cname_only = False
                 if isinstance(answers, list):
                     for ans in answers:
-                        if isinstance(ans, dict) and ans.get("type") == 1:
-                            cand_ip = str(ans.get("data", "")).strip()
-                            if is_valid_public_ip(cand_ip):
-                                return cand_ip
-        except Exception:
-            continue
-    return ""
+                        if not isinstance(ans, dict):
+                            continue
+                        ans_type = ans.get("type")
+                        if ans_type == 5:
+                            has_cname_only = True
+                        if ans_type != target_type:
+                            continue
+                        raw_val = str(ans.get("data", "")).strip()
+                        if rtype in ("A", "AAAA"):
+                            if is_valid_public_ip(raw_val) and raw_val not in seen:
+                                seen.add(raw_val)
+                                results.append(raw_val)
+                        elif rtype == "TXT":
+                            cleaned_txt = _clean_doh_txt_data(raw_val)
+                            if cleaned_txt and cleaned_txt not in seen:
+                                seen.add(cleaned_txt)
+                                results.append(cleaned_txt)
+
+                if results:
+                    return results, True, "ok"
+                if status == 3:
+                    return [], True, "nxdomain"
+                if status == 0 and not has_cname_only:
+                    return [], True, "no_records"
+                any_valid_dns_resp = True
+            except Exception as e:
+                last_err = f"{type(e).__name__}: {e}"
+                continue
+
+    if any_valid_dns_resp:
+        return [], True, "no_records"
+    return [], False, last_err
+
+
+def doh_resolve_dns_records(
+    domain: str,
+    record_type: str = "A",
+    timeout: float = 3.5,
+    proxy: str = "",
+) -> list[str]:
+    """
+    通过安全加密 DNS (DoH) 查询域名指定类型（A / TXT / AAAA）的全部权威记录，
+    返回去重且保序的记录列表；若需区分“确认无记录”与“查询失败”，请使用 `doh_query_dns_records`。
+    """
+    records, _, _ = doh_query_dns_records(domain, record_type=record_type, timeout=timeout, proxy=proxy)
+    return records
+
+
+def doh_resolve_public_ip(domain: str, timeout: float = 3.5, proxy: str = "") -> str:
+    """通过安全加密 DNS (DoH) 解析域名，绕过本地 DNS 污染/劫持返回首选真实公网 IP"""
+    records, _, _ = doh_query_dns_records(domain, record_type="A", timeout=timeout, proxy=proxy)
+    return records[0] if records else ""
 
 
 @functools.lru_cache(maxsize=4096)
@@ -2888,6 +3004,8 @@ _CF_NETWORKS = tuple(
         "2a06:98c0::/29",
         "2c0f:f248::/32",
         "2a09:bac0::/29",
+        "1.1.1.0/24",
+        "1.0.0.0/24",
     )
 )
 
@@ -2902,6 +3020,199 @@ def is_cloudflare_ip(ip_str: str) -> bool:
         return any(addr in net for net in _CF_NETWORKS)
     except Exception:
         return False
+
+
+CLOUDFLARE_ASNS: frozenset[str] = frozenset({
+    "AS13335",   # Cloudflare, Inc. (Primary Anycast / WARP)
+    "AS209242",  # Cloudflare London, LLC / BYOIP
+    "AS132892",  # Cloudflare, Inc.
+    "AS394536",  # Cloudflare (CLOUDFLARENET-SFO)
+    "AS395747",  # Cloudflare (CLOUDFLARENET-SFO05)
+    "AS14789",   # Cloudflare, Inc.
+    "AS202623",  # Cloudflare Inc (CLOUDFLARENET-CORE)
+    "AS203898",  # Cloudflare, Inc.
+})
+_CF_NAME_RE = re.compile(r"(?<![a-z0-9])cloudflare", re.IGNORECASE)
+
+
+def is_cloudflare_asn_or_isp(asn: str = "", isp: str = "") -> bool:
+    """判定 ASN 或 ISP/Org 名称是否明确归属 Cloudflare 系自治系统"""
+    code = _extract_asn_code(asn, isp)
+    if code in CLOUDFLARE_ASNS:
+        return True
+    combined = f"{asn or ''} {isp or ''}".strip()
+    return bool(combined and _CF_NAME_RE.search(combined))
+
+
+def extract_node_host(item: dict | str) -> str:
+    """从节点字典或 URL 中提取标准化的入口 host/IP"""
+    if isinstance(item, str):
+        raw = item.strip()
+        m = re.match(r"^[a-z0-9+.-]+://(?:[^/@]+@)?(\[[^\]]+\]|[^:/?#]+)", raw, re.IGNORECASE)
+        return (m.group(1) if m else raw.split(":")[0]).strip().strip("[]")
+    if not isinstance(item, dict):
+        return ""
+    host = str(item.get("ip") or item.get("host") or "").strip().strip("[]")
+    if not host and item.get("url"):
+        m = re.match(r"^[a-z0-9+.-]+://(?:[^/@]+@)?(\[[^\]]+\]|[^:/?#]+)", str(item["url"]).strip(), re.IGNORECASE)
+        if m:
+            host = m.group(1).strip().strip("[]")
+    return host
+
+
+def is_cloudflare_ingress(
+    host_or_ip: str = "",
+    asn: str = "",
+    isp: str = "",
+    ip_cache: dict | None = None,
+    resolved_ip: str = "",
+    trusts_asn_label: bool = True,
+) -> bool:
+    """
+    判定节点【入口】是否属于 Cloudflare 系网络（CIDR + ip_cache BGP + 入口 ASN/ISP）：
+    - 若入口 IP/解析 IP 命中 Cloudflare CIDR (_CF_NETWORKS)，直接判为 True；
+    - 若 ip_cache 已记录该入口 IP 的非 Cloudflare BGP ASN，以真实 BGP 为准返回 False（避免第三方 VPS + WARP 出站被误标连坐）；
+    - 否则依据缓存 BGP ASN 或可信入口 ASN/ISP 标签判定是否归属 Cloudflare。
+    """
+    host = str(host_or_ip or "").strip().strip("[]")
+    res_ip = str(resolved_ip or "").strip().strip("[]")
+    if host and is_cloudflare_ip(host):
+        return True
+    if res_ip and is_cloudflare_ip(res_ip):
+        return True
+
+    if isinstance(ip_cache, dict):
+        c_entry = None
+        for key in (host, host.lower(), res_ip):
+            if key and isinstance(ip_cache.get(key), dict):
+                c_entry = ip_cache[key]
+                break
+        if isinstance(c_entry, dict):
+            c_res = str(c_entry.get("resolved_ip") or "").strip().strip("[]")
+            if c_res and is_cloudflare_ip(c_res):
+                return True
+            c_asn = _extract_asn_code(c_entry.get("asn"), c_entry.get("isp"))
+            c_isp = str(c_entry.get("isp") or "").strip()
+            if not c_asn and c_res and isinstance(ip_cache.get(c_res), dict):
+                r_entry = ip_cache[c_res]
+                c_asn = _extract_asn_code(r_entry.get("asn"), r_entry.get("isp"))
+                c_isp = str(r_entry.get("isp") or "").strip() or c_isp
+            if c_asn:
+                return is_cloudflare_asn_or_isp(c_asn, c_isp)
+            if c_isp and is_cloudflare_asn_or_isp("", c_isp):
+                return True
+
+    if trusts_asn_label and is_cloudflare_asn_or_isp(asn, isp):
+        return True
+    return False
+
+
+def is_cloudflare_node(item: dict | str, ip_cache: dict | None = None) -> bool:
+    """
+    统一判定任意池节点 (proxies / cf_ips / scan_ips / proxyip) 入口是否属于 Cloudflare 系。
+    对携带独立隧道出口 (egress_ip != host) 的通用代理或走 WARP 出站的第三方 ProxyIP/scan_ips，
+    仅核验入口本身，不因 WARP 出口为 AS13335 而误伤第三方入口节点。
+    """
+    if isinstance(item, str):
+        host = extract_node_host(item)
+        return is_cloudflare_ingress(host, ip_cache=ip_cache)
+    if not isinstance(item, dict):
+        return False
+
+    host = extract_node_host(item)
+    res_ip = str(item.get("resolved_ip") or "").strip().strip("[]")
+    is_proxy_row = "url" in item or "proto" in item or "egress_ip" in item
+    egress = str(item.get("egress_ip") or "").strip().strip("[]")
+    trusts_asn_label = not (is_proxy_row and egress and egress != host)
+    return is_cloudflare_ingress(
+        host,
+        asn=str(item.get("asn") or ""),
+        isp=str(item.get("isp") or ""),
+        ip_cache=ip_cache,
+        resolved_ip=res_ip,
+        trusts_asn_label=trusts_asn_label,
+    )
+
+
+def rescue_mislabeled_cloudflare_rows(
+    rows: list[dict],
+    ip_cache: dict | None = None,
+    persist: bool = True,
+) -> tuple[dict[str, dict], int]:
+    """
+    对未命中 Cloudflare CIDR、且尚未入缓存却在文本中被标为 Cloudflare ASN/ISP 的入口 IP，
+    批量反查其真实 BGP 归属：将第三方机房+WARP 出站被上游误标为 Cloudflare London LLC/AS13335 的节点自动纠正并保留。
+    返回: (更新后的 ip_cache, 纠正还原的节点数)
+    """
+    cache = ip_cache if isinstance(ip_cache, dict) else load_ip_cache()
+    if not rows:
+        return cache, 0
+
+    suspects: list[str] = []
+    seen: set[str] = set()
+    for r in rows:
+        if not isinstance(r, dict):
+            continue
+        host = extract_node_host(r)
+        if not host or not is_valid_public_ip(host) or is_cloudflare_ip(host):
+            continue
+        is_proxy_row = "url" in r or "proto" in r or "egress_ip" in r
+        egress = str(r.get("egress_ip") or "").strip().strip("[]")
+        if is_proxy_row and egress and egress != host:
+            continue
+        cached = cache.get(host)
+        if isinstance(cached, dict) and _extract_asn_code(cached.get("asn"), cached.get("isp")):
+            continue
+        if is_cloudflare_asn_or_isp(str(r.get("asn") or ""), str(r.get("isp") or "")):
+            if host not in seen:
+                seen.add(host)
+                suspects.append(host)
+
+    resolved_map: dict[str, tuple[str, str]] = {}
+    if suspects:
+        try:
+            resolved_map = resolve_asn_batch_online(suspects, persist=persist) or {}
+            if persist:
+                cache = load_ip_cache()
+            else:
+                for tip, (r_asn, r_isp) in resolved_map.items():
+                    c_code = _extract_asn_code(r_asn, r_isp)
+                    if c_code:
+                        cache[tip] = {
+                            "asn": c_code,
+                            "isp": r_isp or ASN_TO_PROVIDER.get(c_code, ""),
+                            "net_type": classify_asn(c_code, r_isp),
+                        }
+        except Exception as e:
+            log.warning("批量核验疑似 Cloudflare 误标节点真实 BGP 失败: %s", e)
+
+    rescued = 0
+    for r in rows:
+        if not isinstance(r, dict):
+            continue
+        host = extract_node_host(r)
+        if not host or is_cloudflare_ip(host):
+            continue
+        if not is_cloudflare_asn_or_isp(str(r.get("asn") or ""), str(r.get("isp") or "")):
+            continue
+        c_entry = cache.get(host)
+        real_asn, real_isp = ("", "")
+        if isinstance(c_entry, dict):
+            real_asn = _extract_asn_code(c_entry.get("asn"), c_entry.get("isp"))
+            real_isp = str(c_entry.get("isp") or "").strip()
+        elif host in resolved_map:
+            raw_a, raw_i = resolved_map[host]
+            real_asn = _extract_asn_code(raw_a, raw_i)
+            real_isp = str(raw_i or "").strip()
+        if real_asn and not is_cloudflare_asn_or_isp(real_asn, real_isp):
+            std_isp = ASN_TO_PROVIDER.get(real_asn) or real_isp
+            r["asn"] = format_asn_isp(real_asn, std_isp)
+            r["isp"] = std_isp
+            rescued += 1
+
+    if rescued > 0:
+        log.info("【BGP 纠偏】从上游误标 Cloudflare 的节点中成功还原 %d 条第三方入口真实 ASN/ISP", rescued)
+    return cache, rescued
 
 
 def resolve_node_exit_and_net_type(
@@ -3215,12 +3526,13 @@ def save_proxyip_by_country(rows: list, output_dir: str) -> int:
         atomic_write_json(os.path.join(output_dir, json_fname), json_items)
         active_files.add(json_fname)
 
-    # 清理已不存在或旧命名格式的 .txt 与 .json 文件（保留 .gitkeep 等非数据标记文件，以及 custom_ / manual_ 用户自定义文件）
+    # 清理已不存在或旧命名格式的 .txt 与 .json 文件（保留 domains.txt、.gitkeep 等标记文件，以及 custom_ / manual_ 用户自定义文件）
     for old_f in os.listdir(output_dir):
         fpath = os.path.join(output_dir, old_f)
         if (
             os.path.isfile(fpath)
             and (old_f.endswith(".txt") or old_f.endswith(".json"))
+            and old_f != "domains.txt"
             and old_f not in active_files
             and not old_f.startswith("custom_")
             and not old_f.startswith("manual_")
@@ -3839,6 +4151,51 @@ def auto_enrich_and_save_asns(
         return 0
 
 
+def _write_scan_ips_outputs(
+    scan_rows: list[dict],
+    scan_csv_path: str,
+    scan_txt_path: str = "",
+    scan_dir_path: str = "",
+) -> int:
+    """按 ASN 分组并统一排序输出 scan_ips.csv、scan_ips.txt 与 scan_ips/ ASN 分组文件（自动过滤 AS13335 分组）。"""
+    asn_groups: dict[str, list] = {}
+    for r in scan_rows:
+        ing_asn = _extract_asn_code(r.get("asn"), r.get("isp"))
+        ex_asn = _extract_asn_code(r.get("exit_asn"), r.get("exit_isp"))
+        if ing_asn and not is_cloudflare_asn_or_isp(ing_asn, r.get("isp", "")):
+            c_asn = ing_asn
+        elif ex_asn and not is_cloudflare_asn_or_isp(ex_asn, r.get("exit_isp", "")):
+            c_asn = ex_asn
+        else:
+            c_asn = "AS_UNKNOWN"
+        asn_groups.setdefault(c_asn, []).append(r)
+
+    sorted_scan_rows: list[dict] = []
+    for asn_name in sorted(asn_groups.keys()):
+        grp = sorted(asn_groups[asn_name], key=lambda x: str(x.get("first_seen") or ""), reverse=True)
+        grp = sorted(
+            grp,
+            key=lambda x: (
+                safe_int(x.get("fail_count"), 0),
+                safe_int(x.get("delay_ms"), 0) if safe_int(x.get("delay_ms"), 0) > 0 else 99999,
+            ),
+        )
+        sorted_scan_rows.extend(grp)
+
+    if scan_csv_path:
+        with atomic_writer(scan_csv_path, encoding="utf-8-sig", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=SCAN_CSV_FIELDS, extrasaction="ignore")
+            writer.writeheader()
+            for r in sorted_scan_rows:
+                writer.writerow(r)
+
+    if scan_txt_path:
+        atomic_write_text(scan_txt_path, format_scan_ips_txt(sorted_scan_rows))
+    if scan_dir_path:
+        save_scan_ips_by_asn(asn_groups, scan_dir_path)
+    return len(sorted_scan_rows)
+
+
 def merge_demoted_into_scan_ips(
     demoted_rows: list[dict],
     scan_csv_path: str = "data/scan_ips.csv",
@@ -3847,14 +4204,16 @@ def merge_demoted_into_scan_ips(
 ) -> int:
     """
     将经校准或外部鉴真确认为机房 (net_type == 'datacenter') 的节点从 ProxyIP 池安全移入 scan_ips 优选池，
-    同步更新 scan_ips.csv、scan_ips.txt 与 scan_ips/ ASN 分组目录（幂等合并，严格过滤墓地死节点）。
+    同步更新 scan_ips.csv、scan_ips.txt 与 scan_ips/ ASN 分组目录（幂等合并，严格过滤墓地死节点与 Cloudflare 入口）。
     返回本次新并入或补全的记录条数。
     """
     if not demoted_rows:
         return 0
 
     tombstone = load_tombstone()
+    ip_cache = load_ip_cache()
     scan_map: dict[str, dict] = {}
+    cf_purged_existing = 0
     if scan_csv_path and os.path.isfile(scan_csv_path):
         try:
             with open(scan_csv_path, "r", encoding="utf-8-sig") as f:
@@ -3864,11 +4223,15 @@ def merge_demoted_into_scan_ips(
                     if not ip or port <= 0 or port > 65535:
                         continue
                     k = canonical_key(ip, port)
-                    if not is_tombstoned(k, tombstone):
-                        r["ip"] = ip
-                        r["port"] = str(port)
-                        r["fail_count"] = safe_int(r.get("fail_count"), 0)
-                        scan_map[k] = r
+                    if is_tombstoned(k, tombstone):
+                        continue
+                    if is_cloudflare_node(r, ip_cache):
+                        cf_purged_existing += 1
+                        continue
+                    r["ip"] = ip
+                    r["port"] = str(port)
+                    r["fail_count"] = safe_int(r.get("fail_count"), 0)
+                    scan_map[k] = r
         except Exception as e:
             log.warning("读取 %s 以合并降级机房节点失败: %s", scan_csv_path, e)
 
@@ -3879,7 +4242,7 @@ def merge_demoted_into_scan_ips(
         if not ip or port <= 0 or port > 65535:
             continue
         k = canonical_key(ip, port)
-        if is_tombstoned(k, tombstone):
+        if is_tombstoned(k, tombstone) or is_cloudflare_node(dr, ip_cache):
             continue
 
         cand_exits = extract_ips([dr.get("exit_ip"), dr.get("exit_ipv6")])
@@ -3899,7 +4262,10 @@ def merge_demoted_into_scan_ips(
             ex_isp = ASN_TO_PROVIDER.get(ex_code) or ASN_DATABASE_ASN_TO_ISP.get(ex_code) or ""
 
         eff_exit_asn = format_asn_isp(ex_code, ex_isp) if ex_code else ""
-        eff_ing_asn = format_asn_isp(ing_code or ex_code or "", ing_isp or ex_isp)
+        # 严禁将 WARP 出口 (Cloudflare) 回写为未知入口节点的 ingress ASN
+        non_cf_ex_code = ex_code if (ex_code and not is_cloudflare_asn_or_isp(ex_code, ex_isp)) else ""
+        eff_ing_asn = format_asn_isp(ing_code or non_cf_ex_code, ing_isp or (ex_isp if non_cf_ex_code else ""))
+        eff_ing_isp = ing_isp or (ex_isp if non_cf_ex_code else "")
 
         if k not in scan_map:
             scan_map[k] = {
@@ -3911,7 +4277,7 @@ def merge_demoted_into_scan_ips(
                 "colo": str(dr.get("colo") or ""),
                 "cf_location": str(dr.get("cf_location") or ""),
                 "asn": eff_ing_asn,
-                "isp": ing_isp or ex_isp,
+                "isp": eff_ing_isp,
                 "first_seen": normalize_timestamp(str(dr.get("first_seen") or "")),
                 "channel": str(dr.get("channel") or ""),
                 "fail_count": safe_int(dr.get("fail_count"), 0),
@@ -3928,7 +4294,7 @@ def merge_demoted_into_scan_ips(
                 ("colo", dr.get("colo")),
                 ("cf_location", dr.get("cf_location")),
                 ("asn", eff_ing_asn),
-                ("isp", ing_isp or ex_isp),
+                ("isp", eff_ing_isp),
                 ("exit_ip", eff_exit_ip),
                 ("exit_asn", eff_exit_asn),
                 ("exit_isp", ex_isp),
@@ -3939,35 +4305,14 @@ def merge_demoted_into_scan_ips(
             if updated:
                 merged_cnt += 1
 
-    if merged_cnt > 0 and scan_csv_path:
-        asn_groups: dict[str, list] = {}
-        for r in scan_map.values():
-            c_asn = _extract_asn_code(r.get("asn"), r.get("isp")) or _extract_asn_code(r.get("exit_asn"), r.get("exit_isp")) or "AS_UNKNOWN"
-            asn_groups.setdefault(c_asn, []).append(r)
-
-        sorted_scan_rows: list[dict] = []
-        for asn_name in sorted(asn_groups.keys()):
-            grp = sorted(asn_groups[asn_name], key=lambda x: str(x.get("first_seen") or ""), reverse=True)
-            grp = sorted(
-                grp,
-                key=lambda x: (
-                    safe_int(x.get("fail_count"), 0),
-                    safe_int(x.get("delay_ms"), 0) if safe_int(x.get("delay_ms"), 0) > 0 else 99999,
-                ),
-            )
-            sorted_scan_rows.extend(grp)
-
-        with atomic_writer(scan_csv_path, encoding="utf-8-sig", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=SCAN_CSV_FIELDS, extrasaction="ignore")
-            writer.writeheader()
-            for r in sorted_scan_rows:
-                writer.writerow(r)
-
-        if scan_txt_path:
-            atomic_write_text(scan_txt_path, format_scan_ips_txt(sorted_scan_rows))
-        if scan_dir_path:
-            save_scan_ips_by_asn(asn_groups, scan_dir_path)
-        log.info("【机房归池闭环】已将 %d 条机房属性节点从 ProxyIP 池安全移入 %s", merged_cnt, scan_csv_path)
+    if (merged_cnt > 0 or cf_purged_existing > 0) and scan_csv_path:
+        _write_scan_ips_outputs(
+            list(scan_map.values()),
+            scan_csv_path=scan_csv_path,
+            scan_txt_path=scan_txt_path,
+            scan_dir_path=scan_dir_path,
+        )
+        log.info("【机房归池闭环】已将 %d 条机房属性节点从 ProxyIP 池安全移入 %s (同步清理 CF 入口 %d 条)", merged_cnt, scan_csv_path, cf_purged_existing)
 
     return merged_cnt
 
@@ -3984,17 +4329,21 @@ def calibrate_all_datasets(
     scan_csv_path: str = "data/scan_ips.csv",
     scan_txt_path: str = "data/scan_ips.txt",
     scan_dir_path: str = "data/scan_ips",
+    proxies_txt_path: str = "",
+    cf_csv_path: str = "",
+    cf_txt_path: str = "",
 ) -> dict[str, int]:
     """
     全量数据自动化属性校准闭环引擎：
     以 data/asn_database.json 与 classify_asn 为权威唯一真实来源 (SSOT)，
-    自动对整个项目中所有持久化数据文件执行网络属性与元数据校准同步：
+    自动对整个项目中所有持久化数据文件执行网络属性、Cloudflare 入口剔除与元数据校准同步：
     1. 【ip_cache.json】：校准所有持久化 IP 缓存中的 net_type 与标准 ISP 名称
-    2. 【data/proxies/ 与 data/proxies.csv】：重新核算 net_type 与 ASN 标准格式，重新生成 .csv、.txt、.json
-    3. 【data/proxyip.csv & data/proxyip/】：按统一出口口径校准 ProxyIP 属性，自动将校准为 datacenter 的节点移入 scan_ips.csv，并同步重建 proxyip.txt、proxyip.json 与全部分流文件
+    2. 【data/proxies/ 与 data/proxies.csv】：重新核算 net_type 与 ASN 标准格式，剔除 Cloudflare 入口，重建 .csv/.txt/.json
+    3. 【data/proxyip.csv & data/proxyip/】：剔除 Cloudflare 入口并按统一出口口径校准 ProxyIP 属性，自动将校准为 datacenter 的非 CF 节点移入 scan_ips.csv，重建 proxyip 产出
+    4. 【data/cf_ips.csv & data/scan_ips.csv】：剔除 Cloudflare 入口节点，使用本地 ip_cache 纠偏并重建对应输出文件
     返回各校准项变更计数统计字典。
     """
-    # 0. 兜底扫描并自动收录所有数据集中可能遗漏的新 ASN
+    # 0. 兜底扫描并自动收录所有数据集中可能遗漏的新 ASN（跳过 Cloudflare 入口）
     unrec_map_cal: dict[str, dict] = {}
     for ds_path in (proxies_csv_path, proxyip_csv_path):
         if os.path.isfile(ds_path):
@@ -4005,6 +4354,8 @@ def calibrate_all_datasets(
                             (row.get("exit_asn", ""), row.get("exit_isp", ""), row.get("exit_ip") or row.get("ip", "")),
                             (row.get("asn", ""), row.get("isp", ""), row.get("host") or row.get("ip", "")),
                         ):
+                            if is_cloudflare_ip(ip_val) or is_cloudflare_asn_or_isp(asn_val, isp_val):
+                                continue
                             c = _extract_asn_code(asn_val, isp_val)
                             if c and not is_asn_recorded(c):
                                 if c not in unrec_map_cal:
@@ -4033,6 +4384,11 @@ def calibrate_all_datasets(
         "proxyip_csv_updated": 0,
         "proxyip_demoted_to_scan": 0,
         "proxyip_files_written": 0,
+        "cf_removed": 0,
+        "proxies_cf_removed": 0,
+        "proxyip_cf_removed": 0,
+        "cf_ips_cf_removed": 0,
+        "scan_ips_cf_removed": 0,
     }
 
     # 1. 校准 data/ip_cache.json
@@ -4072,7 +4428,13 @@ def calibrate_all_datasets(
             changed_proxies = 0
             clean_rows = []
             dropped_edt_dc = 0
+            dropped_cf_proxies = 0
             for r in rows:
+                if is_cloudflare_node(r, cache):
+                    dropped_cf_proxies += 1
+                    changed_proxies += 1
+                    continue
+
                 code = _extract_asn_code(r.get("asn"), r.get("isp"))
                 isp_val = r.get("isp") or ""
                 correct_nt = ""
@@ -4101,6 +4463,10 @@ def calibrate_all_datasets(
 
                 clean_rows.append(r)
 
+            if dropped_cf_proxies > 0:
+                log.info("【全量校准 CF 拦截】清理剔除 %d 个 Cloudflare 入口通用代理节点", dropped_cf_proxies)
+                stats["proxies_cf_removed"] = dropped_cf_proxies
+                stats["cf_removed"] += dropped_cf_proxies
             if dropped_edt_dc > 0:
                 log.info("【全量校准 准入拦截】共清理剔除 %d 个外部来源的机房 (datacenter) 节点", dropped_edt_dc)
             rows = clean_rows
@@ -4108,17 +4474,20 @@ def calibrate_all_datasets(
             if changed_proxies > 0 or not proxies_only:
                 save_proxies_csv(rows, csv_path=proxies_csv_path)
                 stats["proxies_csv_updated"] = changed_proxies
+                eff_proxies_txt = proxies_txt_path or os.path.join(os.path.dirname(proxies_csv_path), "proxies.txt")
+                if eff_proxies_txt and (proxies_txt_path or os.path.isfile(eff_proxies_txt)):
+                    atomic_write_text(eff_proxies_txt, format_proxies_txt(rows))
                 if proxies_dir and os.path.isdir(proxies_dir):
                     sub_counts = save_proxies_by_protocol(rows, output_dir=proxies_dir)
                     stats["proxies_sub_updated"] = sum(sub_counts.values())
-                    log.info("【全量校准】已校准并在 %s/ 重建 %d 个协议节点 (更新 %d 条网络类型)", proxies_dir, sum(sub_counts.values()), changed_proxies)
+                    log.info("【全量校准】已校准并在 %s/ 重建 %d 个协议节点 (更新 %d 条)", proxies_dir, sum(sub_counts.values()), changed_proxies)
         except Exception as e:
             log.warning("校准 proxies 数据异常: %s", e)
 
     if proxies_only:
         return stats
 
-    # 3. 校准 data/proxyip.csv 与 data/proxyip/ (统一出口口径 + 机房节点自动归入 scan_ips)
+    # 3. 校准 data/proxyip.csv 与 data/proxyip/ (剔除 Cloudflare 入口 + 统一出口口径 + 非 CF 机房节点自动归入 scan_ips)
     if os.path.isfile(proxyip_csv_path):
         try:
             proxyip_rows = []
@@ -4132,6 +4501,7 @@ def calibrate_all_datasets(
 
             schema_upgraded = orig_fields != PROXYIP_CSV_FIELDS
             changed_proxyip = 0
+            dropped_cf_proxyip = 0
             clean_proxyip_rows: list[dict] = []
             dc_demoted_rows: list[dict] = []
 
@@ -4142,6 +4512,21 @@ def calibrate_all_datasets(
                     r["first_seen"] = normalize_timestamp(raw_ch)
                     r["channel"] = ""
                     changed_proxyip += 1
+
+                row_ip = str(r.get("ip") or "").strip()
+                ing_code_pre = _extract_asn_code(r.get("asn"), r.get("isp"))
+                if row_ip and row_ip in cache and isinstance(cache[row_ip], dict):
+                    c_code = _extract_asn_code(cache[row_ip].get("asn"), cache[row_ip].get("isp"))
+                    c_isp = str(cache[row_ip].get("isp") or "").strip() or ASN_TO_PROVIDER.get(c_code, "")
+                    if c_code and (not ing_code_pre or (is_cloudflare_asn_or_isp(ing_code_pre, r.get("isp", "")) and not is_cloudflare_asn_or_isp(c_code, c_isp))):
+                        r["asn"] = format_asn_isp(c_code, c_isp)
+                        r["isp"] = c_isp
+                        changed_proxyip += 1
+
+                if is_cloudflare_node(r, cache):
+                    dropped_cf_proxyip += 1
+                    changed_proxyip += 1
+                    continue
 
                 cand_exits = extract_ips([r.get("exit_ip"), r.get("exit_ipv6")])
                 v4_exits = [cip for cip in cand_exits if is_valid_ipv4(cip)]
@@ -4162,7 +4547,7 @@ def calibrate_all_datasets(
                     if std_ing_isp and not ing_isp:
                         r["isp"] = std_ing_isp
                     r["asn"] = format_asn_isp(ing_code, r.get("isp", ""))
-                elif exit_code:
+                elif exit_code and not is_cloudflare_asn_or_isp(exit_code, exit_isp):
                     r["isp"] = exit_isp
                     r["asn"] = format_asn_isp(exit_code, exit_isp)
 
@@ -4182,6 +4567,11 @@ def calibrate_all_datasets(
                 else:
                     clean_proxyip_rows.append(r)
 
+            if dropped_cf_proxyip > 0:
+                log.info("【全量校准 CF 拦截】从 proxyip.csv 剔除 %d 条 Cloudflare 入口节点", dropped_cf_proxyip)
+                stats["proxyip_cf_removed"] = dropped_cf_proxyip
+                stats["cf_removed"] += dropped_cf_proxyip
+
             if dc_demoted_rows:
                 demoted_cnt = merge_demoted_into_scan_ips(
                     dc_demoted_rows,
@@ -4192,7 +4582,7 @@ def calibrate_all_datasets(
                 stats["proxyip_demoted_to_scan"] = len(dc_demoted_rows)
                 log.info("【全量校准】检测到 %d 条 ProxyIP 节点经校准属于机房属性 (并入 scan_ips: %d 条)", len(dc_demoted_rows), demoted_cnt)
 
-            if changed_proxyip > 0 or dc_demoted_rows or schema_upgraded:
+            if changed_proxyip > 0 or dc_demoted_rows or dropped_cf_proxyip > 0 or schema_upgraded:
                 with atomic_writer(proxyip_csv_path, encoding="utf-8-sig", newline="") as f:
                     writer = csv.DictWriter(f, fieldnames=PROXYIP_CSV_FIELDS, extrasaction="ignore")
                     writer.writeheader()
@@ -4211,6 +4601,87 @@ def calibrate_all_datasets(
         except Exception as e:
             log.error("校准 proxyip 数据异常，保留现有分组文件并中止校准: %s", e)
             raise
+
+    # 3.5 校准 data/cf_ips.csv 与 data/scan_ips.csv（剔除 Cloudflare 入口，保留非 CF + WARP 出站第三方节点）
+    eff_cf_csv = cf_csv_path or (os.path.join(os.path.dirname(scan_csv_path), "cf_ips.csv") if scan_csv_path else "")
+    if eff_cf_csv and os.path.isfile(eff_cf_csv):
+        try:
+            with open(eff_cf_csv, "r", encoding="utf-8-sig") as f:
+                reader = csv.DictReader(f)
+                cf_fields = list(reader.fieldnames or [])
+                cf_rows_raw = list(reader) if ("ip" in cf_fields and "port" in cf_fields) else []
+            clean_cf_rows: list[dict] = []
+            dropped_cf_ips = 0
+            for r in cf_rows_raw:
+                if is_cloudflare_node(r, cache):
+                    dropped_cf_ips += 1
+                    continue
+                clean_cf_rows.append(r)
+            if dropped_cf_ips > 0:
+                with atomic_writer(eff_cf_csv, encoding="utf-8-sig", newline="") as f:
+                    writer = csv.DictWriter(f, fieldnames=CF_BASE_CSV_FIELDS, extrasaction="ignore")
+                    writer.writeheader()
+                    for r in clean_cf_rows:
+                        writer.writerow(r)
+                eff_cf_txt = cf_txt_path or os.path.join(os.path.dirname(eff_cf_csv), "cf_ips.txt")
+                if eff_cf_txt and (cf_txt_path or os.path.isfile(eff_cf_txt)):
+                    with atomic_writer(eff_cf_txt, encoding="utf-8") as f:
+                        for r in clean_cf_rows:
+                            ip = str(r.get("ip") or "").strip()
+                            port = safe_int(r.get("port"), 0)
+                            if ip and 1 <= port <= 65535:
+                                f.write(f"{ip}:{port}\n")
+                stats["cf_ips_cf_removed"] = dropped_cf_ips
+                stats["cf_removed"] += dropped_cf_ips
+                log.info("【全量校准 CF 拦截】从 %s 剔除 %d 条 Cloudflare 入口单条优选记录", eff_cf_csv, dropped_cf_ips)
+        except Exception as e:
+            log.warning("校准 %s 异常: %s", eff_cf_csv, e)
+
+    if scan_csv_path and os.path.isfile(scan_csv_path):
+        try:
+            with open(scan_csv_path, "r", encoding="utf-8-sig") as f:
+                reader = csv.DictReader(f)
+                scan_fields = list(reader.fieldnames or [])
+                scan_rows_raw = list(reader) if ("ip" in scan_fields and "port" in scan_fields) else []
+            clean_scan_rows: list[dict] = []
+            dropped_cf_scan = 0
+            scan_asn_fixed = 0
+            for r in scan_rows_raw:
+                ip = str(r.get("ip") or "").strip()
+                ing_code = _extract_asn_code(r.get("asn"), r.get("isp"))
+                if ip and ip in cache and isinstance(cache[ip], dict):
+                    c_code = _extract_asn_code(cache[ip].get("asn"), cache[ip].get("isp"))
+                    c_isp = str(cache[ip].get("isp") or "").strip() or ASN_TO_PROVIDER.get(c_code, "")
+                    if c_code and (not ing_code or (is_cloudflare_asn_or_isp(ing_code, r.get("isp", "")) and not is_cloudflare_asn_or_isp(c_code, c_isp))):
+                        r["asn"] = format_asn_isp(c_code, c_isp)
+                        r["isp"] = c_isp
+                        scan_asn_fixed += 1
+                if is_cloudflare_node(r, cache):
+                    dropped_cf_scan += 1
+                    continue
+                r["fail_count"] = safe_int(r.get("fail_count"), 0)
+                clean_scan_rows.append(r)
+
+            stale_cf_files = (
+                scan_dir_path
+                and os.path.isdir(scan_dir_path)
+                and any(
+                    fn.endswith(".txt") and any(fn.upper().startswith(a) for a in CLOUDFLARE_ASNS)
+                    for fn in os.listdir(scan_dir_path)
+                )
+            )
+            if dropped_cf_scan > 0 or scan_asn_fixed > 0 or stale_cf_files:
+                _write_scan_ips_outputs(
+                    clean_scan_rows,
+                    scan_csv_path=scan_csv_path,
+                    scan_txt_path=scan_txt_path,
+                    scan_dir_path=scan_dir_path,
+                )
+                stats["scan_ips_cf_removed"] = dropped_cf_scan
+                stats["cf_removed"] += dropped_cf_scan
+                log.info("【全量校准 CF 拦截】清理 scan_ips.csv: 剔除 Cloudflare 入口 %d 条 (BGP 纠偏 %d 条, 剩余 %d 条)", dropped_cf_scan, scan_asn_fixed, len(clean_scan_rows))
+        except Exception as e:
+            log.warning("校准 %s 异常: %s", scan_csv_path, e)
 
     # 4. 终态修剪 ip_cache.json：在全部数据集完成淘汰与分流校准后，剔除已不在活跃库中的孤儿缓存记录
     base_cache_dir = os.path.dirname(os.path.abspath(ip_cache_path))

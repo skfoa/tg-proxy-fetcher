@@ -54,6 +54,9 @@ from providers import (
     resolve_node_exit_and_net_type,
     merge_demoted_into_scan_ips,
     load_ip_cache,
+    is_cloudflare_asn_or_isp,
+    is_cloudflare_node,
+    rescue_mislabeled_cloudflare_rows,
     normalize_timestamp,
     record_tombstone,
     load_tombstone,
@@ -451,7 +454,7 @@ def save_proxyip(
         if ing_code:
             row["asn"] = format_asn_isp(ing_code, ing_isp)
             row["isp"] = ing_isp
-        elif exit_code:
+        elif exit_code and not is_cloudflare_asn_or_isp(exit_code, exit_isp):
             row["asn"] = format_asn_isp(exit_code, exit_isp)
             row["isp"] = exit_isp
         else:
@@ -754,6 +757,19 @@ async def async_main(args):
     log.info(">>> 开始执行 ProxyIP 穿透质检 (%s): 共 %d 条记录...", PROXYIP_CSV, total)
 
     ip_cache = load_ip_cache()
+    is_dry_run = getattr(args, "dry_run", False)
+    ip_cache, _ = rescue_mislabeled_cloudflare_rows(rows, ip_cache=ip_cache, persist=not is_dry_run)
+    clean_init_rows = [r for r in rows if not is_cloudflare_node(r, ip_cache)]
+    cf_init_dropped = len(rows) - len(clean_init_rows)
+    if cf_init_dropped > 0:
+        log.info(">>> 已前置拒收 %d 条 Cloudflare 入口 ProxyIP 节点", cf_init_dropped)
+        rows = clean_init_rows
+        total = len(rows)
+        if total == 0:
+            if not is_dry_run:
+                save_proxyip([], csv_path=PROXYIP_CSV, txt_path=PROXYIP_TXT, dir_path=PROXYIP_DIR, json_path=PROXYIP_JSON)
+            log.info(">>> 过滤 Cloudflare 入口后剩余 0 条 ProxyIP，已同步清理衍生输出并跳过质检")
+            return
     endpoint = getattr(args, "check_endpoint", "").strip() or CHECK_ENDPOINT
     check_token = getattr(args, "check_token", "").strip() or CHECK_TOKEN
     check_concurrency = getattr(args, "check_concurrency", CHECK_CONCURRENCY)
@@ -806,10 +822,13 @@ async def async_main(args):
     survivors_all = [r for r in rows if _get_fc(r) < args.max_fails]
     eliminated = total - len(survivors_all)
 
-    # 机房归池闭环：将经外部鉴真或权威库判定为 datacenter 的存活/缓冲节点移出至 scan_ips.csv
+    # 机房归池闭环：先过滤 Cloudflare 入口（直接抛弃、不进入 scan_ips），再将非 CF 机房移入 scan_ips.csv
+    ip_cache = load_ip_cache()
     survivors: list[dict] = []
     demoted_dc_rows: list[dict] = []
     for r in survivors_all:
+        if is_cloudflare_node(r, ip_cache):
+            continue
         is_p, eff_nt, exit_code, exit_isp = resolve_node_exit_and_net_type(r, ip_cache)
         r["net_type"] = eff_nt
         if exit_code and not _extract_asn_code(r.get("exit_asn"), r.get("exit_isp")):

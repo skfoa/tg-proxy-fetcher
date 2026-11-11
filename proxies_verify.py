@@ -64,6 +64,7 @@ from providers import (
     LEGACY_DEFAULT_FIRST_SEEN,
     resolve_asn_batch_online_async,
     load_ip_cache,
+    is_cloudflare_node,
     save_ip_cache,
     prune_ip_cache,
     classify_asn,
@@ -1510,6 +1511,12 @@ async def enrich_proxies_metadata(survivors: list[dict]) -> dict[str, int]:
             if target_ip and target_ip not in ("127.0.0.1", "localhost"):
                 ip_to_resolve.add(target_ip)
 
+        host_ip = r.get("host", "").strip()
+        if host_ip and host_ip not in ("127.0.0.1", "localhost"):
+            h_entry = persistent_cache.get(host_ip, {})
+            if not h_entry.get("asn") or (not is_valid_public_ip(host_ip) and not h_entry.get("resolved_ip")):
+                ip_to_resolve.add(host_ip)
+
     ip_cache: dict[str, tuple[str, str]] = {}
     if ip_to_resolve:
         log.info("正在为 %d 个唯一出口 IP/域名批量解析 ASN 与国家属性...", len(ip_to_resolve))
@@ -1731,7 +1738,17 @@ def send_proxies_notification(
 
 async def async_main(args):
     t_start = time.time()
-    rows = load_proxies_data(PROXIES_TXT, PROXIES_CSV)
+    rows = load_proxies_data(PROXIES_TXT, PROXIES_CSV, proxies_dir=PROXIES_DIR)
+    init_cache = load_ip_cache()
+    filtered_rows = [r for r in rows if not is_cloudflare_node(r, init_cache)]
+    cf_init_dropped = len(rows) - len(filtered_rows)
+    if cf_init_dropped > 0:
+        log.info("[通用代理 CF 拦截] 前置拒收 %d 个 Cloudflare 入口节点", cf_init_dropped)
+        rows = filtered_rows
+        if not rows:
+            save_proxies_data([], PROXIES_TXT, PROXIES_CSV, proxies_dir=PROXIES_DIR)
+            log.info("剔除 Cloudflare 入口后已清空通用代理产物，流程结束")
+            return
     total = len(rows)
     if total == 0:
         log.warning("未加载到任何待检代理节点，流程结束")
@@ -2082,18 +2099,26 @@ async def async_main(args):
     # 补全出口 IP 对应的 ASN 与网络属性打标
     net_stats = await enrich_proxies_metadata(survivors)
 
-    # 准入安全兜底：再次过滤打标后确认属于机房 (datacenter) 的非频道/非用户外部来源节点
+    # 准入安全兜底：过滤打标后确认属于 Cloudflare 入口的节点，或非频道/非用户外部来源的机房 (datacenter) 节点
+    post_cache = load_ip_cache()
+    cf_dropped = 0
     ext_dc_dropped = 0
     clean_survivors = []
     for r in survivors:
+        if is_cloudflare_node(r, post_cache):
+            cf_dropped += 1
+            continue
         src_val = str(r.get("source") or "").strip()
         nt_val = str(r.get("net_type") or "").strip().lower()
         if not is_channel_or_user_source(src_val) and nt_val == "datacenter":
             ext_dc_dropped += 1
             continue
         clean_survivors.append(r)
-    if ext_dc_dropped > 0:
-        log.info("[通用代理 准入控制] 剔除 %d 个外部来源的机房 (datacenter) 节点", ext_dc_dropped)
+    if cf_dropped > 0 or ext_dc_dropped > 0:
+        if cf_dropped > 0:
+            log.info("[通用代理 CF 拦截] 剔除 %d 个 Cloudflare 入口节点", cf_dropped)
+        if ext_dc_dropped > 0:
+            log.info("[通用代理 准入控制] 剔除 %d 个外部来源的机房 (datacenter) 节点", ext_dc_dropped)
         survivors = clean_survivors
         net_stats = {}
         for r in survivors:
@@ -2122,7 +2147,7 @@ async def async_main(args):
     ]
     avg_delay = int(sum(alive_delays) / len(alive_delays)) if alive_delays else 0
 
-    save_proxies_data(survivors, PROXIES_TXT, PROXIES_CSV)
+    save_proxies_data(survivors, PROXIES_TXT, PROXIES_CSV, proxies_dir=PROXIES_DIR)
     if dead_nodes:
         dead_keys = [
             canonical_key(r.get("host", ""), r.get("port", 0))
@@ -2217,7 +2242,9 @@ async def enrich_existing_proxies_file(
 
     log.info("【全量 ASN 补全模式】从 %s 读取到 %d 个现有节点", csv_path, len(rows))
     net_stats = await enrich_proxies_metadata(rows)
-    log.info("【全量 ASN 补全模式】完成网络属性画像打标: %s", net_stats)
+    final_cache = load_ip_cache()
+    rows = [r for r in rows if not is_cloudflare_node(r, final_cache)]
+    log.info("【全量 ASN 补全模式】完成网络属性画像打标: %s (剔除 CF 后保留 %d 个)", net_stats, len(rows))
     save_proxies_data(rows, txt_path=txt_path, csv_path=csv_path, proxies_dir=proxies_dir)
     log.info("【全量 ASN 补全模式】数据已全部保存覆写完毕！")
 

@@ -84,6 +84,15 @@ from providers import (
     auto_enrich_and_save_asns,
     get_session_enriched_asns,
     is_channel_or_user_source,
+    COUNTRY_NAME_MAP,
+    doh_query_dns_records,
+    is_valid_public_ip,
+    extract_node_host,
+    is_cloudflare_asn_or_isp,
+    is_cloudflare_ingress,
+    is_cloudflare_node,
+    rescue_mislabeled_cloudflare_rows,
+    resolve_asn_batch_online,
 )
 from parsers import (
     extract_proxies,
@@ -91,6 +100,8 @@ from parsers import (
     parse_cf_csv_content,
     parse_otc_scan_content,
     parse_proxy_attachment_content,
+    parse_proxyip_domain_spec,
+    parse_proxyip_txt_endpoints,
     is_valid_host,
     is_valid_ipv4,
     is_valid_ipv6,
@@ -325,6 +336,10 @@ OUTPUT_PROXYIP_FILE = os.path.join(DATA_DIR, "proxyip.csv")
 OUTPUT_PROXYIP_TXT = os.path.join(DATA_DIR, "proxyip.txt")
 OUTPUT_PROXYIP_JSON = os.path.join(DATA_DIR, "proxyip.json")
 OUTPUT_PROXYIP_DIR = os.path.join(DATA_DIR, "proxyip")
+PROXYIP_DOMAINS_FILE = os.path.join(OUTPUT_PROXYIP_DIR, "domains.txt")
+CF_IP_DIR = os.path.join(DATA_DIR, "cf_ips")
+CF_IP_DOMAINS_FILE = os.path.join(CF_IP_DIR, "domains.txt")
+CF_TLS_PORTS = frozenset({443, 8443, 2053, 2083, 2087, 2096})
 FETCH_STATS_FILE = os.path.join(DATA_DIR, ".fetch_stats.json")
 # ============================================
 
@@ -396,6 +411,7 @@ def load_existing_proxies(
     existing = {}
     csv_meta_by_url = {}
     csv_meta_by_key = {}
+    ip_cache = load_ip_cache()
 
     def _ingest_csv(path: str):
         if not os.path.isfile(path):
@@ -412,6 +428,12 @@ def load_existing_proxies(
                     isp_val = r.get("isp", "")
                     c_code = _extract_asn_code(asn_val, isp_val)
                     cur_nt = classify_asn(c_code, isp_val) if c_code else str(r.get("net_type") or "").strip().lower()
+
+                    if is_cloudflare_node(
+                        {"url": u, "host": extract_node_host(u), "egress_ip": r.get("egress_ip", ""), "asn": asn_val, "isp": isp_val},
+                        ip_cache,
+                    ):
+                        continue
 
                     # 准入过滤：历史记录中除了频道 (@ 开头) 和用户自留 (@user/user/manual/custom)，其余外部来源若裁决为机房 (datacenter)，不再回流载入
                     if not is_channel_or_user_source(src_val) and cur_nt == "datacenter":
@@ -496,6 +518,8 @@ def load_existing_proxies(
                     if not line_s or line_s.startswith("#"):
                         continue
                     for url, key in extract_proxies(line_s):
+                        if is_cloudflare_node({"url": url}, ip_cache):
+                            continue
                         if not is_tombstoned(key, tombstone) and key not in existing:
                             meta = csv_meta_by_key.get(key) or csv_meta_by_url.get(url, {})
                             existing[key] = {
@@ -528,11 +552,12 @@ def load_existing_proxies(
 
 
 def load_existing_cf_ips(filepath: str = OUTPUT_CF_FILE, label: str = "优选 IP") -> dict:
-    """读取本地已保存的优选 IP，保留历史累积数据（已淘汰进入墓地的节点跳过）"""
+    """读取本地已保存的优选 IP，保留历史累积数据（已淘汰进入墓地的节点与 Cloudflare 入口节点跳过）"""
     existing = {}
     if not os.path.exists(filepath):
         return existing
     tombstone = load_tombstone()
+    ip_cache = load_ip_cache()
     try:
         with open(filepath, "r", encoding="utf-8-sig") as f:
             reader = csv.DictReader(f)
@@ -544,33 +569,36 @@ def load_existing_cf_ips(filepath: str = OUTPUT_CF_FILE, label: str = "优选 IP
                 port = row.get("port", "").strip()
                 if ip and port:
                     key = f"{ip}:{port}"
-                    if not is_tombstoned(key, tombstone):
-                        row["fail_count"] = safe_int(row.get("fail_count"), 0)
-                        row["first_seen"] = normalize_timestamp(str(row.get("first_seen") or row.get("tested_at") or ""))
-                        raw_asn = row.get("asn", "").replace("`", "").strip()
-                        raw_isp = row.get("isp", "").replace("`", "").strip()
-                        row["asn"] = format_asn_isp(raw_asn, raw_isp)
-                        row["isp"] = raw_isp
-                        row["colo"] = row.get("colo", "").replace("`", "").strip()
-                        row["cf_location"] = row.get("cf_location", "").replace("`", "").strip()
-                        if "exit_ip" in row or "exit_ipv6" in row:
-                            cand_exits = extract_ips([row.get("exit_ip"), row.get("exit_ipv6")])
-                            v4_exits = [cip for cip in cand_exits if is_valid_ipv4(cip)]
-                            v6_exits = [cip for cip in cand_exits if is_valid_ipv6(cip)]
-                            row["exit_ip"] = v4_exits[0] if v4_exits else (v6_exits[0] if v6_exits else "")
-                            if "exit_ipv6" in row:
-                                row["exit_ipv6"] = v6_exits[0] if v6_exits else ""
-                        if "exit_asn" in row or "exit_isp" in row:
-                            raw_exit_asn = str(row.get("exit_asn") or "").replace("`", "").strip()
-                            raw_exit_isp = str(row.get("exit_isp") or "").replace("`", "").strip()
-                            exit_code = _extract_asn_code(raw_exit_asn, raw_exit_isp)
-                            if exit_code:
-                                row["exit_asn"] = format_asn_isp(exit_code, raw_exit_isp)
-                                row["exit_isp"] = raw_exit_isp
-                            else:
-                                row["exit_asn"] = ""
-                                row["exit_isp"] = ""
-                        existing[key] = row
+                    if is_tombstoned(key, tombstone):
+                        continue
+                    if is_cloudflare_node(row, ip_cache):
+                        continue
+                    row["fail_count"] = safe_int(row.get("fail_count"), 0)
+                    row["first_seen"] = normalize_timestamp(str(row.get("first_seen") or row.get("tested_at") or ""))
+                    raw_asn = row.get("asn", "").replace("`", "").strip()
+                    raw_isp = row.get("isp", "").replace("`", "").strip()
+                    row["asn"] = format_asn_isp(raw_asn, raw_isp)
+                    row["isp"] = raw_isp
+                    row["colo"] = row.get("colo", "").replace("`", "").strip()
+                    row["cf_location"] = row.get("cf_location", "").replace("`", "").strip()
+                    if "exit_ip" in row or "exit_ipv6" in row:
+                        cand_exits = extract_ips([row.get("exit_ip"), row.get("exit_ipv6")])
+                        v4_exits = [cip for cip in cand_exits if is_valid_ipv4(cip)]
+                        v6_exits = [cip for cip in cand_exits if is_valid_ipv6(cip)]
+                        row["exit_ip"] = v4_exits[0] if v4_exits else (v6_exits[0] if v6_exits else "")
+                        if "exit_ipv6" in row:
+                            row["exit_ipv6"] = v6_exits[0] if v6_exits else ""
+                    if "exit_asn" in row or "exit_isp" in row:
+                        raw_exit_asn = str(row.get("exit_asn") or "").replace("`", "").strip()
+                        raw_exit_isp = str(row.get("exit_isp") or "").replace("`", "").strip()
+                        exit_code = _extract_asn_code(raw_exit_asn, raw_exit_isp)
+                        if exit_code:
+                            row["exit_asn"] = format_asn_isp(exit_code, raw_exit_isp)
+                            row["exit_isp"] = raw_exit_isp
+                        else:
+                            row["exit_asn"] = ""
+                            row["exit_isp"] = ""
+                    existing[key] = row
         log.info("已加载本地已存%s记录: %d 条（历史有效记录全部保留）", label, len(existing))
     except Exception as e:
         log.error("读取已有%s文件 (%s) 失败，中止运行以保护存量数据: %s", label, filepath, e)
@@ -771,6 +799,8 @@ def fetch_external_subscriptions(
                 sub_proxies = extract_proxies(sub_content)
                 sub_added = 0
                 for url, key in sub_proxies:
+                    if is_cloudflare_ingress(extract_node_host(url)):
+                        continue
                     if is_tombstoned(key, tombstone):
                         continue
                     if key not in scraped_proxies:
@@ -886,6 +916,8 @@ def fetch_edt_proxies(
         asn_raw = str(item.get("asn") or "").strip()
         asn_code = f"AS{asn_raw}" if asn_raw and not asn_raw.upper().startswith("AS") else asn_raw.upper()
         org = str(item.get("asOrganization") or "").strip()
+        if is_cloudflare_ingress(ip, asn_code, org, ip_cache=ip_cache):
+            continue
         probe_ip = str(item.get("clientIp") or "").strip() or ip
         if asn_code and not is_asn_recorded(asn_code):
             if asn_code not in pre_enrich_map:
@@ -922,9 +954,9 @@ def fetch_edt_proxies(
         if asn_code and asn_code in ASN_TO_PROVIDER and ASN_TO_PROVIDER[asn_code]:
             org = ASN_TO_PROVIDER[asn_code]
 
-        # 核心策略：基于权威 ASN 字典直接过滤机房节点，仅保留非机房高价值代理
+        # 核心策略：拒绝 Cloudflare 入口并基于权威 ASN 字典过滤机房节点，仅保留高价值非机房代理
         net_type = classify_asn(asn_code, org)
-        if net_type == "datacenter":
+        if net_type == "datacenter" or is_cloudflare_ingress(ip, asn_code, org, ip_cache=ip_cache):
             dc_filtered += 1
             continue
 
@@ -1068,6 +1100,8 @@ def fetch_proxifly_https_proxies(
         ip = str(item.get("ip") or "").strip()
         port = safe_int(item.get("port"), 0)
         if not ip or not (1 <= port <= 65535):
+            continue
+        if is_cloudflare_ingress(ip, ip_cache=ip_cache):
             continue
 
         key = f"{ip}:{port}"
@@ -1213,6 +1247,8 @@ def fetch_zip_proxyips(
         raw_asn = str(meta.get("asn") or item.get("asn") or "").strip()
         raw_isp = str(meta.get("asOrganization") or meta.get("isp") or item.get("asOrganization") or item.get("isp") or "").strip()
         asn_code = _extract_asn_code(raw_asn, raw_isp)
+        if is_cloudflare_ingress(ip, asn_code, raw_isp):
+            continue
         if asn_code and not is_asn_recorded(asn_code):
             if asn_code not in pre_enrich_map:
                 pre_enrich_map[asn_code] = {"asn": asn_code, "isp": raw_isp, "org": raw_isp, "ip": ip, "count": 0}
@@ -1277,9 +1313,9 @@ def fetch_zip_proxyips(
         if asn_code and asn_code in ASN_TO_PROVIDER and ASN_TO_PROVIDER[asn_code]:
             raw_isp = ASN_TO_PROVIDER[asn_code]
 
-        # 核心策略：严格只收录非机房，常规 datacenter 机房节点直接过滤剔除
+        # 核心策略：拒绝 Cloudflare 入口，严格只收录非机房，常规 datacenter 机房节点直接过滤剔除
         net_type = classify_asn(asn_code, raw_isp)
-        if net_type == "datacenter":
+        if net_type == "datacenter" or is_cloudflare_ingress(ip, asn_code, raw_isp):
             dc_filtered += 1
             continue
 
@@ -1359,6 +1395,547 @@ def fetch_zip_proxyips(
     )
 
     return total_added, list(unrecorded_asns_map.values())
+
+
+def load_domain_manifest(filepath: str) -> list[str]:
+    """
+    读取人工维护的域名清单文件（每行一个 domain 或 domain:port，忽略空行与 # 注释）。
+    文件不存在时返回空列表；遇到格式无效的非空行仅记录告警并跳过。
+    """
+    if not filepath or not os.path.isfile(filepath):
+        return []
+    try:
+        with open(filepath, "r", encoding="utf-8-sig") as f:
+            raw_lines = f.read().splitlines()
+    except OSError as e:
+        log.warning("读取域名清单文件失败 (%s): %s", filepath, e)
+        return []
+
+    specs: list[str] = []
+    seen_domains: set[str] = set()
+    for line_no, raw_line in enumerate(raw_lines, start=1):
+        clean_line = raw_line.split("#", 1)[0].strip()
+        if not clean_line:
+            continue
+        parsed = parse_proxyip_domain_spec(clean_line)
+        if not parsed:
+            log.warning("域名清单 %s 第 %d 行格式无效，已跳过: %r", filepath, line_no, clean_line)
+            continue
+        dom, port = parsed
+        if dom in seen_domains:
+            continue
+        seen_domains.add(dom)
+        specs.append(f"{dom}:{port}" if port != 443 else dom)
+    return specs
+
+
+def _parse_domain_manifest_specs(domain_specs: list[str]) -> list[tuple[str, int]]:
+    """规范化并按域名去重解析清单配置列表。"""
+    parsed_specs: list[tuple[str, int]] = []
+    seen_domains: set[str] = set()
+    for raw_spec in domain_specs:
+        parsed = parse_proxyip_domain_spec(raw_spec)
+        if parsed and parsed[0] not in seen_domains:
+            seen_domains.add(parsed[0])
+            parsed_specs.append(parsed)
+    return parsed_specs
+
+
+def _resolve_domain_endpoints_doh(
+    parsed_specs: list[tuple[str, int]],
+    *,
+    include_txt: bool,
+    timeout: float,
+    proxy: str,
+    pool_label: str,
+) -> list[tuple[str, str, int]]:
+    """并发通过 DoH 查询域名 A（以及可选 TXT）记录并返回去重后的公网 IP:Port 列表。"""
+
+    def _resolve_single_domain(
+        spec: tuple[str, int],
+    ) -> tuple[str, list[tuple[str, int]], list[str], bool, str, list[str], bool, str]:
+        dom, def_port = spec
+        a_ips, a_ok, a_detail = doh_query_dns_records(dom, record_type="A", timeout=timeout, proxy=proxy)
+        txt_recs: list[str] = []
+        txt_ok, txt_detail = True, "skipped"
+        txt_eps: list[tuple[str, int]] = []
+        if include_txt:
+            txt_recs, txt_ok, txt_detail = doh_query_dns_records(dom, record_type="TXT", timeout=timeout, proxy=proxy)
+            txt_eps = parse_proxyip_txt_endpoints(txt_recs, default_port=def_port, allow_bare_ip=False)
+
+        eps: list[tuple[str, int]] = []
+        seen_ep: set[tuple[str, int]] = set()
+        for ip_val in a_ips:
+            if is_valid_public_ip(ip_val):
+                pair = (ip_val, def_port)
+                if pair not in seen_ep:
+                    seen_ep.add(pair)
+                    eps.append(pair)
+        for ip_val, port_val in txt_eps:
+            if is_valid_public_ip(ip_val) and 1 <= port_val <= 65535:
+                pair = (ip_val, port_val)
+                if pair not in seen_ep:
+                    seen_ep.add(pair)
+                    eps.append(pair)
+        return dom, eps, a_ips, a_ok, a_detail, txt_recs, txt_ok, txt_detail
+
+    domain_endpoints: list[tuple[str, str, int]] = []
+    workers = min(8, max(1, len(parsed_specs)))
+    thread_prefix = "proxyip-doh" if include_txt else "cfip-doh"
+    with ThreadPoolExecutor(max_workers=workers, thread_name_prefix=thread_prefix) as pool:
+        futures = {pool.submit(_resolve_single_domain, spec): spec[0] for spec in parsed_specs}
+        for fut in as_completed(futures):
+            dom_name = futures[fut]
+            try:
+                dom, eps, a_ips, a_ok, a_detail, txt_recs, txt_ok, txt_detail = fut.result()
+                if not a_ok:
+                    log.warning("%s 域名 %s DoH A 记录查询失败: %s", pool_label, dom, a_detail)
+                if include_txt and not txt_ok:
+                    log.warning(
+                        "%s 域名 %s DoH TXT 记录查询失败（非权威确认空值，可能缺失非 443 端口端点）: %s",
+                        pool_label,
+                        dom,
+                        txt_detail,
+                    )
+                if eps:
+                    for ip_val, port_val in eps:
+                        domain_endpoints.append((dom, ip_val, port_val))
+                    if include_txt:
+                        log.info(
+                            "%s 域名 %s DoH 展开候选: A=%d 条 (%s), TXT=%d 条 (%s) -> 提取 %d 个 IP:Port",
+                            pool_label,
+                            dom,
+                            len(a_ips),
+                            a_detail,
+                            len(txt_recs),
+                            txt_detail,
+                            len(eps),
+                        )
+                    else:
+                        log.info(
+                            "%s 域名 %s DoH 展开候选: A=%d 条 (%s) -> 提取 %d 个 IP:Port",
+                            pool_label,
+                            dom,
+                            len(a_ips),
+                            a_detail,
+                            len(eps),
+                        )
+                elif a_ok and (not include_txt or txt_ok):
+                    log.info(
+                        "%s 域名 %s DoH 权威确认无可用公网 IP 记录 (A=%s%s)",
+                        pool_label,
+                        dom,
+                        a_detail,
+                        f", TXT={txt_detail}" if include_txt else "",
+                    )
+                else:
+                    log.warning(
+                        "%s 域名 %s DoH 未获取到任何有效公网 IP:Port 且存在查询失败 (A=%s%s)",
+                        pool_label,
+                        dom,
+                        a_detail,
+                        f", TXT={txt_detail}" if include_txt else "",
+                    )
+            except Exception as e:
+                log.warning("%s 域名 %s DoH 解析异常: %s", pool_label, dom_name, e)
+    return domain_endpoints
+
+
+def _prepare_domain_candidates(
+    domain_endpoints: list[tuple[str, str, int]],
+    tombstone: dict[str, int],
+    ip_cache: dict[str, dict] | None,
+    proxy: str,
+    pool_label: str,
+) -> tuple[list[tuple[str, str, int]], dict[str, dict], dict[str, dict], int]:
+    """对域名展开端点执行墓地过滤、IP/ASN 缓存补全与未收录 ASN 前置探针。"""
+    active_endpoints: list[tuple[str, str, int]] = []
+    unique_ips: list[str] = []
+    seen_ips: set[str] = set()
+    tomb_filtered = 0
+    for dom, ip_val, port_val in domain_endpoints:
+        key = f"{ip_val}:{port_val}"
+        if is_tombstoned(key, tombstone):
+            tomb_filtered += 1
+            continue
+        active_endpoints.append((dom, ip_val, port_val))
+        if ip_val not in seen_ips:
+            seen_ips.add(ip_val)
+            unique_ips.append(ip_val)
+
+    local_cache = ip_cache if ip_cache is not None else load_ip_cache()
+    if not active_endpoints:
+        return [], local_cache, {}, tomb_filtered
+
+    missing_ips = [
+        ip_val
+        for ip_val in unique_ips
+        if not (
+            isinstance(local_cache.get(ip_val), dict)
+            and local_cache[ip_val].get("asn")
+            and local_cache[ip_val].get("country")
+        )
+    ]
+    if missing_ips:
+        resolve_asn_batch_online(missing_ips, persist=True)
+        disk_cache = load_ip_cache()
+        for ip_val in missing_ips:
+            if ip_val in disk_cache and isinstance(disk_cache[ip_val], dict):
+                local_cache[ip_val] = disk_cache[ip_val]
+
+    pre_enrich_map: dict[str, dict] = {}
+    ip_ep_counts: dict[str, int] = {}
+    for _, ip_val, _ in active_endpoints:
+        ip_ep_counts[ip_val] = ip_ep_counts.get(ip_val, 0) + 1
+    for ip_val in unique_ips:
+        c_entry = local_cache.get(ip_val) if isinstance(local_cache.get(ip_val), dict) else {}
+        raw_asn = str(c_entry.get("asn") or "").strip()
+        raw_isp = str(c_entry.get("isp") or "").strip()
+        asn_code = _extract_asn_code(raw_asn, raw_isp)
+        if asn_code and not is_asn_recorded(asn_code):
+            if asn_code not in pre_enrich_map:
+                pre_enrich_map[asn_code] = {
+                    "asn": asn_code,
+                    "isp": raw_isp,
+                    "org": raw_isp,
+                    "ip": ip_val,
+                    "count": 0,
+                }
+            pre_enrich_map[asn_code]["count"] += ip_ep_counts.get(ip_val, 1)
+
+    unrecorded_asns_map: dict[str, dict] = {}
+    if pre_enrich_map:
+        log.info("%s 动态域名发现 %d 个未收录候选 ASN，前置执行权威探针定性入库...", pool_label, len(pre_enrich_map))
+        auto_enrich_and_save_asns(list(pre_enrich_map.values()), proxy=proxy)
+        for asn_code, p_item in pre_enrich_map.items():
+            if is_asn_recorded(asn_code):
+                auth_org = ASN_TO_PROVIDER.get(asn_code) or p_item.get("org") or p_item.get("isp") or ""
+                unrecorded_asns_map[asn_code] = {
+                    "asn": asn_code,
+                    "org": auth_org,
+                    "isp": auth_org,
+                    "ip": p_item.get("ip", ""),
+                    "net_type": classify_asn(asn_code, auth_org),
+                    "count": max(1, safe_int(p_item.get("count"), 1)),
+                    "already_enriched": True,
+                }
+
+    return active_endpoints, local_cache, unrecorded_asns_map, tomb_filtered
+
+
+def _enrich_domain_endpoint_meta(ip_val: str, local_cache: dict[str, dict]) -> tuple[str, str, str, str, str]:
+    """提取域名展开端点的 (asn_code, raw_isp, formatted_asn, cf_location, net_type)。"""
+    c_entry = local_cache.get(ip_val) if isinstance(local_cache.get(ip_val), dict) else {}
+    raw_asn = str(c_entry.get("asn") or "").strip()
+    raw_isp = str(c_entry.get("isp") or "").strip()
+    asn_code = _extract_asn_code(raw_asn, raw_isp)
+    if asn_code and asn_code in ASN_TO_PROVIDER and ASN_TO_PROVIDER[asn_code]:
+        raw_isp = ASN_TO_PROVIDER[asn_code]
+    net_type = classify_asn(asn_code, raw_isp)
+    cc = str(c_entry.get("country") or "").strip().upper()
+    cf_location = COUNTRY_NAME_MAP.get(cc, cc) if cc else ""
+    formatted_asn = format_asn_isp(asn_code or raw_asn, raw_isp)
+    return asn_code, raw_isp, formatted_asn, cf_location, net_type
+
+
+def _record_unrecorded_asn(
+    unrecorded_asns_map: dict[str, dict],
+    asn_code: str,
+    raw_isp: str,
+    ip_val: str,
+    net_type: str,
+) -> None:
+    """记录尚未收录于 ASN_TO_PROVIDER 的候选 ASN 统计条目。"""
+    if not asn_code:
+        return
+    if asn_code not in unrecorded_asns_map and not is_asn_recorded(asn_code, raw_isp):
+        unrecorded_asns_map[asn_code] = {
+            "asn": asn_code,
+            "org": raw_isp,
+            "isp": raw_isp,
+            "ip": ip_val,
+            "net_type": net_type,
+            "count": 1,
+            "already_enriched": False,
+        }
+    elif asn_code in unrecorded_asns_map and not unrecorded_asns_map[asn_code].get("already_enriched"):
+        unrecorded_asns_map[asn_code]["count"] += 1
+
+
+def _cleanup_admitted_domain_keys(expanded_domains: set[str], *pools: dict, pool_label: str) -> int:
+    """仅对已有端点准入的域名，清理指定池中遗留的未展开裸域名条目。"""
+    if not expanded_domains:
+        return 0
+    removed_stale = 0
+    for pool in pools:
+        for k in list(pool.keys()):
+            host_part = k.rsplit(":", 1)[0].strip().strip("[]").rstrip(".").lower()
+            if host_part in expanded_domains:
+                pool.pop(k, None)
+                removed_stale += 1
+    if removed_stale > 0:
+        log.info("已清理已展开 %s 域名的历史未展开裸域名条目: %d 条", pool_label, removed_stale)
+    return removed_stale
+
+
+def fetch_domain_proxyips(
+    domain_specs: list[str] | None,
+    proxy: str,
+    tombstone: dict[str, int],
+    scraped_proxyips: dict[str, dict],
+    ip_cache: dict[str, dict] | None = None,
+    timeout: float = 5.0,
+    expanded_domains_out: set[str] | None = None,
+) -> tuple[int, list[dict]]:
+    """
+    解析 ProxyIP 动态域名（默认读取 data/proxyip/domains.txt，查询 DoH A 与 TXT 记录；
+    TXT 仅接受显式 公网IP:端口，不把裸 IP 或孤立端口与 A 记录交叉组合）。
+    展开为公网 IP:Port 候选并排除机房 ASN 后增量写入 scraped_proxyips。
+    仅当某域名至少有 1 个端点准入 scraped_proxyips 后，才记入 expanded_domains_out。
+    返回: (有效新增 ProxyIP 条数, 未收录 ASN 列表)
+    """
+    specs = load_domain_manifest(PROXYIP_DOMAINS_FILE) if domain_specs is None else domain_specs
+    parsed_specs = _parse_domain_manifest_specs(specs)
+    if not parsed_specs:
+        return 0, []
+
+    log.info("-" * 50)
+    log.info(
+        "开始解析 ProxyIP 动态域名 (DoH A + 显式 IP:Port TXT 展开, 共 %d 个): %s",
+        len(parsed_specs),
+        ", ".join(d for d, _ in parsed_specs),
+    )
+
+    domain_endpoints = _resolve_domain_endpoints_doh(
+        parsed_specs, include_txt=True, timeout=timeout, proxy=proxy, pool_label="ProxyIP"
+    )
+    if not domain_endpoints:
+        return 0, []
+
+    active_endpoints, local_cache, unrecorded_asns_map, tomb_filtered = _prepare_domain_candidates(
+        domain_endpoints, tombstone, ip_cache, proxy, pool_label="ProxyIP"
+    )
+    if not active_endpoints:
+        log.info("ProxyIP 动态域名解析完成: 共 %d 个端点全部命中墓地黑名单跳过", tomb_filtered)
+        return 0, []
+
+    now_bjt = datetime.now(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S")
+    plain_http_ports = {80, 8080, 8880, 2052, 2082, 2086, 2095}
+    total_added = 0
+    dc_filtered = 0
+
+    for dom, ip_val, port_val in active_endpoints:
+        asn_code, raw_isp, formatted_asn, cf_location, net_type = _enrich_domain_endpoint_meta(ip_val, local_cache)
+        if net_type == "datacenter" or is_cloudflare_ingress(ip_val, asn_code, raw_isp, ip_cache=local_cache):
+            dc_filtered += 1
+            continue
+
+        key = f"{ip_val}:{port_val}"
+        proxyip_item = {
+            "ip": ip_val,
+            "port": str(port_val),
+            "tls": "false" if port_val in plain_http_ports else "true",
+            "delay_ms": 0,
+            "speed_kbs": 0,
+            "colo": "",
+            "cf_location": cf_location,
+            "isp": raw_isp,
+            "asn": formatted_asn,
+            "raw_asn": asn_code,
+            "exit_ip": "",
+            "exit_ipv6": "",
+            "exit_asn": "",
+            "exit_isp": "",
+            "first_seen": now_bjt,
+            "channel": f"@{dom}",
+            "fail_count": 0,
+            "net_type": net_type,
+        }
+
+        if key not in scraped_proxyips:
+            scraped_proxyips[key] = proxyip_item
+            total_added += 1
+            if expanded_domains_out is not None:
+                expanded_domains_out.add(dom)
+            _record_unrecorded_asn(unrecorded_asns_map, asn_code, raw_isp, ip_val, net_type)
+        elif isinstance(scraped_proxyips[key], dict):
+            if expanded_domains_out is not None:
+                expanded_domains_out.add(dom)
+            for mk in ("cf_location", "isp", "asn", "net_type", "raw_asn", "channel"):
+                if proxyip_item.get(mk) and not scraped_proxyips[key].get(mk):
+                    scraped_proxyips[key][mk] = proxyip_item[mk]
+
+    log.info(
+        "ProxyIP 动态域名提取完成: 新增候选 %d 个 (墓地过滤 %d 个, 机房过滤 %d 个, 未收录 ASN %d 个)",
+        total_added,
+        tomb_filtered,
+        dc_filtered,
+        len(unrecorded_asns_map),
+    )
+    return total_added, list(unrecorded_asns_map.values())
+
+
+def fetch_domain_cf_ips(
+    domain_specs: list[str] | None,
+    proxy: str,
+    tombstone: dict[str, int],
+    scraped_cf_ips: dict[str, dict],
+    ip_cache: dict[str, dict] | None = None,
+    timeout: float = 5.0,
+    expanded_domains_out: set[str] | None = None,
+) -> tuple[int, list[dict]]:
+    """
+    解析优选 IP 动态域名（默认读取 data/cf_ips/domains.txt，仅通过 DoH 查询 A 记录并与配置端口组合；
+    不将 TXT 记录默认解析为端口端点，允许非 Cloudflare 的合法机房 / 运营商 ASN，但坚决拦截 Cloudflare 入口节点）。
+    返回: (有效新增优选 IP 条数, 未收录 ASN 列表)
+    """
+    specs = load_domain_manifest(CF_IP_DOMAINS_FILE) if domain_specs is None else domain_specs
+    parsed_specs = _parse_domain_manifest_specs(specs)
+    if not parsed_specs:
+        return 0, []
+
+    log.info("-" * 50)
+    log.info(
+        "开始解析优选 IP 动态域名 (DoH A 记录展开, 共 %d 个): %s",
+        len(parsed_specs),
+        ", ".join(d for d, _ in parsed_specs),
+    )
+
+    domain_endpoints = _resolve_domain_endpoints_doh(
+        parsed_specs, include_txt=False, timeout=timeout, proxy=proxy, pool_label="优选 IP"
+    )
+    if not domain_endpoints:
+        return 0, []
+
+    active_endpoints, local_cache, unrecorded_asns_map, tomb_filtered = _prepare_domain_candidates(
+        domain_endpoints, tombstone, ip_cache, proxy, pool_label="优选 IP"
+    )
+    if not active_endpoints:
+        log.info("优选 IP 动态域名解析完成: 共 %d 个端点全部命中墓地黑名单跳过", tomb_filtered)
+        return 0, []
+
+    now_bjt = datetime.now(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S")
+    total_added = 0
+    cf_filtered = 0
+
+    for dom, ip_val, port_val in active_endpoints:
+        asn_code, raw_isp, formatted_asn, cf_location, net_type = _enrich_domain_endpoint_meta(ip_val, local_cache)
+        if is_cloudflare_ingress(ip_val, asn_code, raw_isp, ip_cache=local_cache):
+            cf_filtered += 1
+            continue
+        key = f"{ip_val}:{port_val}"
+        cf_item = {
+            "ip": ip_val,
+            "port": str(port_val),
+            "tls": "true" if port_val in CF_TLS_PORTS else "false",
+            "delay_ms": "",
+            "speed_kbs": "",
+            "colo": "",
+            "cf_location": cf_location,
+            "asn": formatted_asn,
+            "raw_asn": asn_code,
+            "isp": raw_isp,
+            "fail_count": 0,
+            "first_seen": now_bjt,
+            "channel": f"@{dom}",
+        }
+
+        if key not in scraped_cf_ips:
+            scraped_cf_ips[key] = cf_item
+            total_added += 1
+            if expanded_domains_out is not None:
+                expanded_domains_out.add(dom)
+            _record_unrecorded_asn(unrecorded_asns_map, asn_code, raw_isp, ip_val, net_type)
+        elif isinstance(scraped_cf_ips[key], dict):
+            if expanded_domains_out is not None:
+                expanded_domains_out.add(dom)
+            for mk in ("cf_location", "isp", "asn", "raw_asn", "channel"):
+                if cf_item.get(mk) and not scraped_cf_ips[key].get(mk):
+                    scraped_cf_ips[key][mk] = cf_item[mk]
+
+    log.info(
+        "优选 IP 动态域名提取完成: 新增候选 %d 个 (墓地过滤 %d 个, Cloudflare 拦截 %d 个, 未收录 ASN %d 个)",
+        total_added,
+        tomb_filtered,
+        cf_filtered,
+        len(unrecorded_asns_map),
+    )
+    return total_added, list(unrecorded_asns_map.values())
+
+
+def collect_external_proxyips(
+    proxy: str,
+    tombstone: dict[str, int],
+    existing_proxyips: dict,
+    scraped_proxyips: dict,
+    existing_scan_ips: dict,
+    scraped_scan_ips: dict,
+    ip_cache: dict[str, dict] | None = None,
+) -> list[dict]:
+    """
+    统一执行外部 ProxyIP 聚合源拉取与清单域名 (data/proxyip/domains.txt) DoH 展开，
+    并清理已成功展开域名的历史未展开域名残留行。
+    返回本阶段发现的未收录候选 ASN 列表。
+    """
+    unrec_all: list[dict] = []
+    _, zip_unrec = fetch_zip_proxyips(PROXYIP_ZIP_URLS, proxy, tombstone, scraped_proxyips)
+    unrec_all.extend(zip_unrec)
+
+    expanded_domains: set[str] = set()
+    domain_specs = load_domain_manifest(PROXYIP_DOMAINS_FILE)
+    _, dom_unrec = fetch_domain_proxyips(
+        domain_specs,
+        proxy,
+        tombstone,
+        scraped_proxyips,
+        ip_cache=ip_cache,
+        expanded_domains_out=expanded_domains,
+    )
+    unrec_all.extend(dom_unrec)
+
+    _cleanup_admitted_domain_keys(
+        expanded_domains,
+        existing_proxyips,
+        scraped_proxyips,
+        existing_scan_ips,
+        scraped_scan_ips,
+        pool_label="ProxyIP",
+    )
+
+    return unrec_all
+
+
+def collect_domain_cf_ips(
+    proxy: str,
+    tombstone: dict[str, int],
+    existing_cf_ips: dict,
+    scraped_cf_ips: dict,
+    ip_cache: dict[str, dict] | None = None,
+) -> list[dict]:
+    """
+    读取优选 IP 域名清单 (data/cf_ips/domains.txt) 并通过 DoH 展开增量写入 scraped_cf_ips，
+    同时清理已成功展开域名的历史未展开裸域名条目。
+    """
+    domain_specs = load_domain_manifest(CF_IP_DOMAINS_FILE)
+    if not domain_specs:
+        return []
+
+    expanded_domains: set[str] = set()
+    _, dom_unrec = fetch_domain_cf_ips(
+        domain_specs,
+        proxy,
+        tombstone,
+        scraped_cf_ips,
+        ip_cache=ip_cache,
+        expanded_domains_out=expanded_domains,
+    )
+    _cleanup_admitted_domain_keys(
+        expanded_domains,
+        existing_cf_ips,
+        scraped_cf_ips,
+        pool_label="优选 IP",
+    )
+    return dom_unrec
 
 
 def scrape_channel_web(
@@ -1443,10 +2020,12 @@ def scrape_channel_web(
             cleaned_text = html.unescape(cleaned_text).strip()
 
             for p_url, key in extract_proxies(cleaned_text):
+                if is_cloudflare_ingress(extract_node_host(p_url), ip_cache=ip_cache):
+                    continue
                 proxies_found.append((p_url, key))
 
             cf_data = parse_cf_ip(cleaned_text, default_channel=channel, ip_cache=ip_cache)
-            if cf_data:
+            if cf_data and not is_cloudflare_node(cf_data, ip_cache):
                 if not cf_data.get("first_seen") and dt:
                     cf_data["first_seen"] = dt.astimezone(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S")
                 cf_ips_found.append(cf_data)
@@ -1611,7 +2190,7 @@ def save_and_notify(
                 if ing_code:
                     row["asn"] = format_asn_isp(ing_code, ing_isp)
                     row["isp"] = ing_isp
-                elif exit_code:
+                elif exit_code and not is_cloudflare_asn_or_isp(exit_code, exit_isp):
                     row["asn"] = format_asn_isp(exit_code, exit_isp)
                     row["isp"] = exit_isp
                 else:
@@ -1715,6 +2294,43 @@ def merge_and_save(
     existing_cf_ips = {k: v for k, v in existing_cf_ips.items() if not is_tombstoned(k, tombstone)}
     existing_scan_ips = {k: v for k, v in existing_scan_ips.items() if not is_tombstoned(k, tombstone)}
     existing_proxyips = {k: v for k, v in existing_proxyips.items() if not is_tombstoned(k, tombstone)}
+
+    # 1.1 纠正上游将第三方 VPS+WARP 出站误标为 Cloudflare (AS13335/Cloudflare London LLC) 的入口归属，随后全量拒收真实 Cloudflare 入口节点
+    is_prod_data_dir = os.path.abspath(DATA_DIR) == os.path.abspath("data")
+    suspect_rows = [
+        v
+        for d in (
+            scraped_scan_ips,
+            scraped_cf_ips,
+            scraped_proxyips,
+            existing_scan_ips,
+            existing_cf_ips,
+            existing_proxyips,
+        )
+        for v in d.values()
+        if isinstance(v, dict)
+    ]
+    ip_cache, _ = rescue_mislabeled_cloudflare_rows(suspect_rows, ip_cache=ip_cache, persist=is_prod_data_dir)
+
+    cf_dropped_counts: dict[str, int] = {}
+
+    def _strip_cf_dict(pool: dict, pool_name: str) -> dict:
+        kept = {k: v for k, v in pool.items() if not is_cloudflare_node(v, ip_cache)}
+        dropped = len(pool) - len(kept)
+        if dropped > 0:
+            cf_dropped_counts[pool_name] = cf_dropped_counts.get(pool_name, 0) + dropped
+        return kept
+
+    scraped_proxies = _strip_cf_dict(scraped_proxies, "scraped_proxies")
+    scraped_cf_ips = _strip_cf_dict(scraped_cf_ips, "scraped_cf_ips")
+    scraped_scan_ips = _strip_cf_dict(scraped_scan_ips, "scraped_scan_ips")
+    scraped_proxyips = _strip_cf_dict(scraped_proxyips, "scraped_proxyips")
+    existing_proxies = _strip_cf_dict(existing_proxies, "existing_proxies")
+    existing_cf_ips = _strip_cf_dict(existing_cf_ips, "existing_cf_ips")
+    existing_scan_ips = _strip_cf_dict(existing_scan_ips, "existing_scan_ips")
+    existing_proxyips = _strip_cf_dict(existing_proxyips, "existing_proxyips")
+    if cf_dropped_counts:
+        log.info("【CF 入口永久拒收】合并前拦截剔除 Cloudflare 入口节点: %s", cf_dropped_counts)
 
     # 1.5 前置巡检并入库本次新增的未收录 ASN (必须在 classify_node_proxyip_or_scan 分流前完成，确保新 ASN 定性及时生效)
     from collections import Counter
@@ -1917,14 +2533,35 @@ def merge_and_save(
                         item[meta_key] = v[meta_key]
             final_proxies[k] = item
 
+    def _has_positive_metric(val) -> bool:
+        try:
+            return float(str(val).strip()) > 0
+        except (ValueError, TypeError):
+            return False
+
     final_cf_ips = dict(existing_cf_ips)
     for k, v in scraped_cf_ips.items():
         if k in final_cf_ips:
-            # 关键修复：保留已有质检 fail_count，不被抓取默认的 0 抹除
-            v["fail_count"] = final_cf_ips[k].get("fail_count", 0)
-            if not v.get("first_seen"):
-                v["first_seen"] = final_cf_ips[k].get("first_seen") or final_cf_ips[k].get("tested_at", "")
-            final_cf_ips[k].update(v)
+            # 关键修复：保留已有质检 fail_count、首次收录时间与已测速/地区画像字段，不被增量重抓抹除
+            ex_cf = final_cf_ips[k]
+            v["fail_count"] = ex_cf.get("fail_count", 0)
+            if ex_cf.get("first_seen") or ex_cf.get("tested_at"):
+                v["first_seen"] = ex_cf.get("first_seen") or ex_cf.get("tested_at", "")
+            elif not v.get("first_seen"):
+                v["first_seen"] = ""
+            if not _has_positive_metric(v.get("delay_ms")) and _has_positive_metric(ex_cf.get("delay_ms")):
+                v["delay_ms"] = ex_cf["delay_ms"]
+            if not _has_positive_metric(v.get("speed_kbs")) and _has_positive_metric(ex_cf.get("speed_kbs")):
+                v["speed_kbs"] = ex_cf["speed_kbs"]
+            for keep_k in ("channel", "colo", "cf_location"):
+                if ex_cf.get(keep_k):
+                    v[keep_k] = ex_cf[keep_k]
+            if ex_cf.get("tls") and ex_cf.get("tls") != "unknown":
+                v["tls"] = ex_cf["tls"]
+            for fill_k in ("asn", "raw_asn", "isp"):
+                if not v.get(fill_k) and ex_cf.get(fill_k):
+                    v[fill_k] = ex_cf[fill_k]
+            ex_cf.update(v)
         else:
             final_cf_ips[k] = v
 
@@ -1955,11 +2592,21 @@ def merge_and_save(
     final_proxyips = dict(existing_proxyips)
     for k, v in scraped_proxyips.items():
         if k in final_proxyips:
-            # 关键修复：保留已有 ProxyIP 失败计数与已补全的非空出口画像字段
+            # 关键修复：保留已有 ProxyIP 首次收录时间、延迟/速率/失败计数与已补全的非空画像字段
             ex_proxy = final_proxyips[k]
             v["fail_count"] = ex_proxy.get("fail_count", 0)
-            if not v.get("first_seen"):
+            if ex_proxy.get("first_seen") or ex_proxy.get("tested_at"):
                 v["first_seen"] = ex_proxy.get("first_seen") or ex_proxy.get("tested_at", "")
+            elif not v.get("first_seen"):
+                v["first_seen"] = ""
+            if safe_int(v.get("delay_ms"), 0) <= 0 and safe_int(ex_proxy.get("delay_ms"), 0) > 0:
+                v["delay_ms"] = ex_proxy["delay_ms"]
+            if safe_int(v.get("speed_kbs"), 0) <= 0 and safe_int(ex_proxy.get("speed_kbs"), 0) > 0:
+                v["speed_kbs"] = ex_proxy["speed_kbs"]
+            if ex_proxy.get("channel"):
+                v["channel"] = ex_proxy["channel"]
+            if ex_proxy.get("tls") and ex_proxy.get("tls") != "unknown":
+                v["tls"] = ex_proxy["tls"]
             for keep_k in ("exit_ip", "exit_ipv6", "exit_asn", "exit_isp", "colo", "cf_location"):
                 if not v.get(keep_k) and ex_proxy.get(keep_k):
                     v[keep_k] = ex_proxy[keep_k]
@@ -2026,8 +2673,11 @@ def merge_and_save(
     for k in list(cleaned_proxyips.keys()):
         cleaned_scan_ips.pop(k, None)
 
-    final_scan_ips = cleaned_scan_ips
-    final_proxyips = cleaned_proxyips
+    final_ip_cache = load_ip_cache() if is_prod_data_dir else ip_cache
+    final_proxies = {k: v for k, v in final_proxies.items() if not is_cloudflare_node(v, final_ip_cache)}
+    final_cf_ips = {k: v for k, v in final_cf_ips.items() if not is_cloudflare_node(v, final_ip_cache)}
+    final_scan_ips = {k: v for k, v in cleaned_scan_ips.items() if not is_cloudflare_node(v, final_ip_cache)}
+    final_proxyips = {k: v for k, v in cleaned_proxyips.items() if not is_cloudflare_node(v, final_ip_cache)}
 
     log.info("=" * 50)
     log.info(
@@ -2149,13 +2799,32 @@ def run_web_scraper():
     # 1.6.5 外部 Proxifly 开源 HTTPS 代理源抓取 (前置墓碑与持久化机房 IP 双重过滤)
     fetch_proxifly_https_proxies(PROXIFLY_HTTPS_URLS, proxy, tombstone, scraped_proxies, ip_cache=ip_cache)
 
-    # 1.7 外部 ProxyIP 聚合源抓取 (仅收录非机房原生宽带、教育、专线等高价值反代节点)
-    scraped_proxyips = {}
-    _, zip_unrec = fetch_zip_proxyips(PROXYIP_ZIP_URLS, proxy, tombstone, scraped_proxyips)
-    edt_unrec_all.extend(zip_unrec)
-
     # Web 预览模式仅提取正文单条代理与优选 IP，扫描附件需 API 模式自动获取
     scraped_scan_ips = {}
+
+    # 1.7 外部 ProxyIP 聚合源与动态域名 DoH 展开抓取 (仅收录非机房原生宽带、教育、专线等高价值反代节点)
+    scraped_proxyips = {}
+    edt_unrec_all.extend(
+        collect_external_proxyips(
+            proxy,
+            tombstone,
+            existing_proxyips,
+            scraped_proxyips,
+            existing_scan_ips,
+            scraped_scan_ips,
+            ip_cache=ip_cache,
+        )
+    )
+    # 1.8 优选 IP 动态域名清单 (data/cf_ips/domains.txt) DoH 展开抓取
+    edt_unrec_all.extend(
+        collect_domain_cf_ips(
+            proxy,
+            tombstone,
+            existing_cf_ips,
+            scraped_cf_ips,
+            ip_cache=ip_cache,
+        )
+    )
 
     # 2. 智能增量合并并落盘保存 (统一单次原子持久化写盘)
     merge_and_save(
@@ -2244,7 +2913,7 @@ async def run_telethon():
                     if is_proxy_target:
                         if msg.text:
                             for url, key in extract_proxies(msg.text):
-                                if is_tombstoned(key, tombstone):
+                                if is_tombstoned(key, tombstone) or is_cloudflare_ingress(extract_node_host(url), ip_cache=ip_cache):
                                     continue
                                 if key not in scraped_proxies:
                                     scraped_proxies[key] = {"url": url, "source": channel_name}
@@ -2261,7 +2930,7 @@ async def run_telethon():
                                         doc_proxies = parse_proxy_attachment_content(doc_text)
                                         doc_added = 0
                                         for url, key in doc_proxies:
-                                            if is_tombstoned(key, tombstone):
+                                            if is_tombstoned(key, tombstone) or is_cloudflare_ingress(extract_node_host(url), ip_cache=ip_cache):
                                                 continue
                                             if key not in scraped_proxies:
                                                 scraped_proxies[key] = {"url": url, "source": channel_name}
@@ -2274,7 +2943,7 @@ async def run_telethon():
                     if is_cf_target:
                         if msg.text:
                             cf_data = parse_cf_ip(msg.text, default_channel=channel_name, ip_cache=ip_cache)
-                            if cf_data:
+                            if cf_data and not is_cloudflare_node(cf_data, ip_cache):
                                 cf_key = f"{cf_data['ip']}:{cf_data['port']}"
                                 if not is_tombstoned(cf_key, tombstone):
                                     if cf_key not in scraped_cf_ips:
@@ -2318,7 +2987,12 @@ async def run_telethon():
 
                                         active_doc_items: list[tuple[str, dict]] = []
                                         for cf_item in doc_items:
-                                            cf_key = f"{cf_item['ip']}:{cf_item['port']}"
+                                            cf_ip = cf_item.get("ip", "")
+                                            # 跳过明确属于 Cloudflare 网段或 ip_cache 已证实接入为 Cloudflare 的节点；
+                                            # 未缓存的非网段 AS13335 仍放行至 merge_and_save() 抢救潜在 VPS+WARP 误标节点
+                                            if is_cloudflare_ingress(cf_ip, ip_cache=ip_cache, trusts_asn_label=False):
+                                                continue
+                                            cf_key = f"{cf_ip}:{cf_item['port']}"
                                             if not is_tombstoned(cf_key, tombstone):
                                                 active_doc_items.append((cf_key, cf_item))
 
@@ -2369,14 +3043,18 @@ async def run_telethon():
                                                         cf_item["net_type"] = probe_res["net_type"]
                                                     p_exit_asn = probe_res.get("exit_asn") or ""
                                                     p_exit_isp = probe_res.get("exit_isp") or ""
+                                                    exit_is_cf = is_cloudflare_asn_or_isp(p_exit_asn, p_exit_isp)
                                                     if p_exit_asn:
                                                         cf_item["exit_asn"] = format_asn_isp(p_exit_asn, p_exit_isp)
-                                                        if not cf_item.get("raw_asn") or cf_item["raw_asn"] in ("AS0", "0", "AS_UNKNOWN", "UNKNOWN"):
+                                                        if (not exit_is_cf) and (
+                                                            not cf_item.get("raw_asn")
+                                                            or cf_item["raw_asn"] in ("AS0", "0", "AS_UNKNOWN", "UNKNOWN")
+                                                        ):
                                                             cf_item["raw_asn"] = p_exit_asn
                                                             cf_item["asn"] = cf_item["exit_asn"]
                                                     if p_exit_isp:
                                                         cf_item["exit_isp"] = p_exit_isp
-                                                        if not cf_item.get("isp"):
+                                                        if (not exit_is_cf) and (not cf_item.get("isp")):
                                                             cf_item["isp"] = p_exit_isp
                                                     if p_exit_ip and p_exit_asn and (is_valid_ipv4(p_exit_ip) or is_valid_ipv6(p_exit_ip)):
                                                         ip_cache[p_exit_ip] = {
@@ -2434,9 +3112,28 @@ async def run_telethon():
         # 1.6.5 外部 Proxifly 开源 HTTPS 代理源抓取 (前置墓碑与持久化机房 IP 双重过滤)
         fetch_proxifly_https_proxies(PROXIFLY_HTTPS_URLS, web_proxy, tombstone, scraped_proxies, ip_cache=ip_cache)
 
-        # 1.7 外部 ProxyIP 聚合源抓取 (与频道附件中提取到的 ProxyIP 增量合并，仅收录非机房)
-        _, zip_unrec = fetch_zip_proxyips(PROXYIP_ZIP_URLS, web_proxy, tombstone, scraped_proxyips)
-        edt_unrec_all.extend(zip_unrec)
+        # 1.7 外部 ProxyIP 聚合源与动态域名 DoH 展开抓取 (与频道附件中提取到的 ProxyIP 增量合并，仅收录非机房)
+        edt_unrec_all.extend(
+            collect_external_proxyips(
+                web_proxy,
+                tombstone,
+                existing_proxyips,
+                scraped_proxyips,
+                existing_scan_ips,
+                scraped_scan_ips,
+                ip_cache=ip_cache,
+            )
+        )
+        # 1.8 优选 IP 动态域名清单 (data/cf_ips/domains.txt) DoH 展开抓取
+        edt_unrec_all.extend(
+            collect_domain_cf_ips(
+                web_proxy,
+                tombstone,
+                existing_cf_ips,
+                scraped_cf_ips,
+                ip_cache=ip_cache,
+            )
+        )
 
         # 2. 智能增量合并并落盘保存 (统一单次原子持久化写盘)
         merge_and_save(

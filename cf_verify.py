@@ -77,6 +77,9 @@ from providers import (
     is_valid_ipv6,
     resolve_node_exit_and_net_type,
     inspect_csv_state,
+    is_cloudflare_asn_or_isp,
+    is_cloudflare_node,
+    rescue_mislabeled_cloudflare_rows,
 )
 from proxyip_verify import (
     load_proxyip_csv,
@@ -1016,6 +1019,20 @@ async def _verify_and_persist(csv_path: str, tag: str, args, on_save, pre_save_h
         log.info(">>> %s 文件不存在或无数据，跳过%s校验", csv_path, tag)
         return res
 
+    is_dry_run = getattr(args, "dry_run", False)
+    init_cache, _ = rescue_mislabeled_cloudflare_rows(rows, ip_cache=load_ip_cache(), persist=not is_dry_run)
+    clean_init = [r for r in rows if not is_cloudflare_node(r, init_cache)]
+    cf_init_dropped = len(rows) - len(clean_init)
+    if cf_init_dropped > 0:
+        log.info("[%s CF 拦截] 前置拒收 %d 条 Cloudflare 入口节点", tag, cf_init_dropped)
+        rows = clean_init
+        total = len(rows)
+        if not rows:
+            if on_save and not is_dry_run:
+                on_save([])
+            log.info("[%s] 剔除 Cloudflare 入口后已清空数据文件，跳过探测", tag)
+            return res
+
     log.info(">>> 开始校验%s IP (%s): 共 %d 条...", tag, csv_path, total)
     await verify_all(
         rows,
@@ -1066,6 +1083,11 @@ async def _verify_and_persist(csv_path: str, tag: str, args, on_save, pre_save_h
     # 严格保证保存先于登记墓地：若保存失败触发异常，避免墓地预先登记导致状态不一致
     if pre_save_hook:
         await pre_save_hook(survivors)
+    final_cache = load_ip_cache()
+    non_cf_survivors = [r for r in survivors if not is_cloudflare_node(r, final_cache)]
+    if len(non_cf_survivors) != len(survivors):
+        survivors = non_cf_survivors
+    if pre_save_hook or len(non_cf_survivors) != res["survivors"]:
         res["survivors"] = len(survivors)
         res["pass"] = sum(1 for r in survivors if safe_int(r.get("fail_count"), 0) == 0)
         res["buf_rec"] = sum(
@@ -1116,7 +1138,7 @@ async def async_main(args):
                 cached = local_ip_cache[cur_ip]
                 cached_code = clean_asn(cached.get("asn"), cached.get("isp"))
                 if cached_code and cached_code.upper() not in ("AS0", "AS_UNKNOWN", "UNKNOWN", "AS"):
-                    if not asn_clean or (asn_clean == "AS13335" and cached_code != "AS13335"):
+                    if not asn_clean or (is_cloudflare_asn_or_isp(asn_clean, row.get("isp", "")) and not is_cloudflare_asn_or_isp(cached_code, cached.get("isp", ""))):
                         cached_isp = cached.get("isp") or ASN_TO_PROVIDER.get(cached_code, "")
                         row["raw_asn"] = cached_code
                         row["asn"] = format_asn_isp(cached_code, cached_isp)
@@ -1134,7 +1156,8 @@ async def async_main(args):
                 row["exit_asn"] = format_asn_isp(exit_code, exit_isp)
                 if exit_isp and not row.get("exit_isp"):
                     row["exit_isp"] = exit_isp
-            asn_groups[asn_clean].append(row)
+            group_asn = asn_clean if (asn_clean and not is_cloudflare_asn_or_isp(asn_clean, row.get("isp", ""))) else "AS_UNKNOWN"
+            asn_groups[group_asn].append(row)
 
         all_sorted_scan = []
         for asn_name in sorted(asn_groups.keys()):

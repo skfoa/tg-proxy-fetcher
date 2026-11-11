@@ -15,13 +15,14 @@ import ipaddress
 import logging
 import os
 import re
-from urllib.parse import parse_qs
+from urllib.parse import parse_qs, urlparse
 
 from providers import (
     KNOWN_CLOUD_PROVIDERS,
     ASN_TO_PROVIDER,
     SORTED_CLOUD_PROVIDER_KEYS,
     format_asn_isp,
+    is_valid_public_ip,
     load_ip_cache,
     normalize_timestamp,
     resolve_ip_asn,
@@ -1022,3 +1023,98 @@ def parse_proxy_attachment_content(text: str) -> list[tuple[str, str]]:
                     results.append((url, key))
 
     return results
+
+
+RE_IPV6_PORT = re.compile(r"^\[([0-9a-fA-F:]+)\]:(\d{1,5})$")
+RE_IPV4_PORT = re.compile(r"^((?:\d{1,3}\.){3}\d{1,3}):(\d{1,5})$")
+
+
+def parse_proxyip_domain_spec(spec: str, default_port: int = 443) -> tuple[str, int] | None:
+    """
+    解析 ProxyIP 域名配置条目（如 'kr.william.us.ci' 或 'example.com:8443'），
+    返回规范化的 (domain, default_port)；非法或纯 IP 输入返回 None。
+    """
+    raw = str(spec or "").strip().split("#", 1)[0].strip()
+    if not raw or not (1 <= default_port <= 65535):
+        return None
+
+    domain = ""
+    port = default_port
+    if "://" in raw:
+        try:
+            parsed = urlparse(raw)
+            domain = (parsed.hostname or "").strip().rstrip(".").lower()
+            if parsed.port is not None:
+                port = parsed.port
+        except Exception:
+            return None
+    else:
+        raw_clean = raw.strip("[]")
+        if ":" in raw_clean:
+            host_part, port_part = raw_clean.rsplit(":", 1)
+            if not port_part.isdigit():
+                return None
+            port = int(port_part)
+            domain = host_part.strip().rstrip(".").lower()
+        else:
+            domain = raw_clean.strip().rstrip(".").lower()
+
+    if not domain or not (1 <= port <= 65535):
+        return None
+    if not is_valid_host(domain) or is_valid_ip(domain):
+        return None
+    return domain, port
+
+
+def parse_proxyip_txt_endpoints(
+    txt_records: list[str] | str,
+    default_port: int = 443,
+    allow_bare_ip: bool = False,
+) -> list[tuple[str, int]]:
+    """
+    从 DNS TXT 记录文本中提取所有有效的 ProxyIP (ip, port) 端点，
+    支持逗号/分号/空白分隔、IPv4:Port、[IPv6]:Port、无端口裸 IP（回退 default_port）及 # 备注过滤。
+    """
+    if not txt_records:
+        return []
+    raw_list = [txt_records] if isinstance(txt_records, str) else list(txt_records)
+    endpoints: list[tuple[str, int]] = []
+    seen: set[tuple[str, int]] = set()
+
+    for raw_txt in raw_list:
+        text = str(raw_txt or "").strip()
+        if not text:
+            continue
+        for seg in re.split(r"[,;\r\n]+", text):
+            seg_clean = seg.split("#", 1)[0].strip()
+            if not seg_clean:
+                continue
+            for tok in seg_clean.split():
+                clean_tok = tok.split("#", 1)[0].strip().strip("'\"")
+                if not clean_tok:
+                    continue
+
+                ip_val = ""
+                port_val = 0
+                m6 = RE_IPV6_PORT.match(clean_tok)
+                if m6:
+                    ip_val = m6.group(1).strip()
+                    port_val = int(m6.group(2))
+                else:
+                    m4 = RE_IPV4_PORT.match(clean_tok)
+                    if m4:
+                        ip_val = m4.group(1).strip()
+                        port_val = int(m4.group(2))
+                    elif allow_bare_ip:
+                        bare = clean_tok.strip("[]")
+                        if is_valid_ip(bare) and 1 <= default_port <= 65535:
+                            ip_val = bare
+                            port_val = default_port
+
+                if ip_val and (1 <= port_val <= 65535) and is_valid_public_ip(ip_val):
+                    pair = (ip_val, port_val)
+                    if pair not in seen:
+                        seen.add(pair)
+                        endpoints.append(pair)
+
+    return endpoints

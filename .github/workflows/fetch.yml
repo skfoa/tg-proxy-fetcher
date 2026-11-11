@@ -84,6 +84,7 @@ jobs:
           EDT_HTTP_URLS: ${{ vars.EDT_HTTP_URLS }}
           EDT_SOCKS5_URLS: ${{ vars.EDT_SOCKS5_URLS }}
           PROXIFLY_HTTPS_URLS: ${{ vars.PROXIFLY_HTTPS_URLS }}
+          PROXYIP_ZIP_URLS: ${{ vars.PROXYIP_ZIP_URLS }}
           CHECK_PROXYIP_URL: ${{ inputs.check_proxyip_url || vars.CHECK_PROXYIP_URL || secrets.CHECK_PROXYIP_URL || '' }}
           CHECK_PROXYIP_TOKEN: ${{ inputs.check_proxyip_token || secrets.CHECK_PROXYIP_TOKEN || secrets.CF_CHECK_TOKEN || secrets.AUTH_TOKEN || vars.CHECK_PROXYIP_TOKEN || '' }}
           DEFER_NOTIFY: "1"
