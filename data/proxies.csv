@@ -84,6 +84,7 @@ socks5://72.214.108.67:4145,socks5,72.214.108.67,4145,1129,0,alive,ATL,US,72.214
 socks5://72.207.109.5:4145,socks5,72.207.109.5,4145,1145,0,alive,ATL,US,72.207.109.5,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://98.188.47.150:4145,socks5,98.188.47.150,4145,1155,0,alive,ATL,US,98.188.47.150,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://98.178.72.30:4145,socks5,98.178.72.30,4145,1172,0,alive,ATL,US,98.178.72.30,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-09 22:46:01,EDT-Pages
+socks5://elm29:9m2lazw1@178.92.112.234:5432,socks5,178.92.112.234,5432,1172,0,alive,LHR,GB,178.92.112.234,AS2856 British Telecommunications Limited,British Telecommunications Limited,isp,2026-11-11 19:32:27,@user
 socks5://98.190.239.3:4145,socks5,98.190.239.3,4145,1192,0,alive,ATL,US,98.190.239.3,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://root:123456@101.89.207.142:1080,socks5,101.89.207.142,1080,1197,0,alive,FRA,CN,101.89.207.142,AS4811 China Telecom,China Telecom,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://1:1@103.243.244.133:1080,socks5,103.243.244.133,1080,1213,0,alive,CGP,BD,103.243.244.133,AS137953 Bismillah IT Solution,Bismillah IT Solution,isp,2026-10-01 00:00:00,@danfeng_chat
@@ -105,6 +106,7 @@ socks5://174.75.211.193:4145,socks5,174.75.211.193,4145,1284,0,alive,ATL,US,174.
 socks5://test123:test123@31.40.212.146:1080,socks5,31.40.212.146,1080,1284,0,alive,EZE,AR,31.40.212.146,AS136258 BrainStorm Network,BrainStorm Network,datacenter,2026-10-01 00:00:00,@danfeng_chat
 socks5://72.207.33.64:4145,socks5,72.207.33.64,4145,1288,0,alive,ATL,US,72.207.33.64,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-09 22:46:01,EDT-Pages
 socks5://72.194.42.131:4145,socks5,72.194.42.131,4145,1316,0,alive,ATL,US,72.194.42.131,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-10-09 22:46:01,EDT-Pages
+socks5://abiv1:lg02s6oh@200.203.4.4:5432,socks5,200.203.4.4,5432,1327,0,alive,DFW,US,200.203.4.4,AS213541 WS Telecom Inc,WS Telecom Inc,isp,2026-11-11 19:32:27,@user
 socks5://1:1@103.130.196.61:1080,socks5,103.130.196.61,1080,1332,0,alive,CGP,BD,103.130.196.110,AS138043 T Network,T Network,isp,2026-10-25T10:15:36Z,@user
 socks5://demo:demo@103.138.26.161:1080,socks5,103.138.26.161,1080,1342,0,alive,DAC,BD,103.96.106.235,AS134153 Xplore Net BD,Xplore Net BD,isp,2026-10-01 00:00:00,@danfeng_chat
 socks5://demo:demo@103.138.26.73:1080,socks5,103.138.26.73,1080,1354,0,alive,DAC,BD,103.96.106.235,AS134153 Xplore Net BD,Xplore Net BD,isp,2026-10-01 00:00:00,@danfeng_chat

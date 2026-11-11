@@ -3137,7 +3137,8 @@
     "Cloudvalley Sdn. Bhd.": "AS154376",
     "Kawaii Networks LLC": "AS27523",
     "SHINE TELECOM CO., LTD.": "AS63902",
-    "Rakuten Mobile Network, Inc.": "AS138384"
+    "Rakuten Mobile Network, Inc.": "AS138384",
+    "WS Telecom Inc": "AS213541"
   },
   "asn_to_isp": {
     "AS10001": "Mics Network Corporation",
@@ -6175,7 +6176,8 @@
     "AS27523": "Kawaii Networks LLC",
     "AS63902": "SHINE TELECOM CO., LTD.",
     "AS38095": "SK Broadband Co Ltd",
-    "AS138384": "Rakuten Mobile Network, Inc."
+    "AS138384": "Rakuten Mobile Network, Inc.",
+    "AS213541": "WS Telecom Inc"
   },
   "asn_to_net_type": {
     "AS10001": "isp",
@@ -10206,6 +10208,7 @@
     "AS27523": "datacenter",
     "AS63902": "isp",
     "AS38095": "isp",
-    "AS138384": "isp"
+    "AS138384": "isp",
+    "AS213541": "isp"
   }
 }
