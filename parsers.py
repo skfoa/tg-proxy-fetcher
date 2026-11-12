@@ -710,6 +710,11 @@ def parse_cf_csv_content(
     return results
 
 
+_CORP_SUFFIX_3 = frozenset({
+    "LTD", "PTE", "LLC", "INC", "PLC", "PVT", "GMB", "COR", "LLP", "SPA", "SRL", "SAS", "OOO", "JSC",
+})
+
+
 def parse_otc_scan_content(
     text: str,
     default_channel: str = "@otcjlq",
@@ -800,22 +805,35 @@ def parse_otc_scan_content(
 
         # 特征探测：判断是否为标准的 OTC 7 列优选测速扫描格式
         # 标准格式: {ip:port},{country},{asn},{isp/org},{colo(loc)},{exit_ip},{ip_stack}
+        # rem_parts 已剥离首列 IP (及独立端口列)，通过右锚定 ip_stack / exit_ip 兼容 ISP 内含未引号逗号的拆分场景
         is_otc_7col = False
-        if len(parts) >= 6:
-            last_token = parts[-1].strip()
+        has_stack_col = False
+        if len(rem_parts) >= 5:
+            last_token = rem_parts[-1].strip()
             if "ipv" in last_token.lower() or "双栈" in last_token:
                 is_otc_7col = True
-            elif len(parts) >= 7 and is_valid_ip(parts[5]):
+                has_stack_col = True
+            elif is_valid_ip(last_token):
                 is_otc_7col = True
 
         if is_otc_7col:
-            # 模式 A：精准定长 7 字段解析，杜绝字段错位与误吞 (兼容 IP:Port 与 IP,Port 独立分列变体)
-            sub_parts = parts[2:] if (":" not in first_token and len(parts) > 1 and parts[1].strip().isdigit()) else parts[1:]
-            c_country = sub_parts[0].strip() if len(sub_parts) > 0 else ""
-            c_asn = sub_parts[1].strip() if len(sub_parts) > 1 else ""
-            c_isp = sub_parts[2].strip() if len(sub_parts) > 2 else ""
-            c_colo_loc = sub_parts[3].strip() if len(sub_parts) > 3 else ""
-            c_exit = sub_parts[4].strip() if len(sub_parts) > 4 else ""
+            # 模式 A：左锚定 country/asn + 右锚定 colo_loc/exit_ip[/ip_stack]，中间多段逗号碎片以 ", " 重组为完整 ISP
+            c_country = rem_parts[0].strip() if len(rem_parts) > 0 else ""
+            c_asn = rem_parts[1].strip() if len(rem_parts) > 1 else ""
+            if has_stack_col:
+                if len(rem_parts) >= 6:
+                    c_exit = rem_parts[-2].strip()
+                    c_colo_loc = rem_parts[-3].strip()
+                    isp_parts = rem_parts[2:-3]
+                else:
+                    c_exit = ""
+                    c_colo_loc = rem_parts[-2].strip()
+                    isp_parts = rem_parts[2:-2]
+            else:
+                c_exit = rem_parts[-1].strip()
+                c_colo_loc = rem_parts[-2].strip()
+                isp_parts = rem_parts[2:-2]
+            c_isp = ", ".join(p.strip() for p in isp_parts if p and p.strip())
 
             # 1. 提取 ASN (格式如 AS139659)
             if c_asn:
@@ -827,13 +845,15 @@ def parse_otc_scan_content(
             if c_isp and not is_valid_ip(c_isp) and not c_isp.isdigit():
                 isp = c_isp
 
-            # 3. 提取机房代号与位置 (如 HKG (中国-香港))
+            # 3. 提取机房代号与位置 (如 HKG (中国-香港)，严防公司后缀 LTD/PTE/LLC 误判为 IATA 码)
             if c_colo_loc:
                 m_cl = re.match(r"^([A-Z]{3})\s*\((.*?)\)", c_colo_loc)
                 if m_cl:
-                    colo = m_cl.group(1).upper()
+                    cand_colo = m_cl.group(1).upper()
+                    if cand_colo not in _CORP_SUFFIX_3:
+                        colo = cand_colo
                     loc = m_cl.group(2).strip()
-                elif len(c_colo_loc) == 3 and c_colo_loc.isupper():
+                elif len(c_colo_loc) == 3 and c_colo_loc.isupper() and c_colo_loc.upper() not in _CORP_SUFFIX_3:
                     colo = c_colo_loc.upper()
                 else:
                     loc = c_colo_loc.strip("()")
@@ -886,14 +906,15 @@ def parse_otc_scan_content(
                 if "(" in p_val and ")" in p_val and not loc:
                     m_cl = re.match(r"^([A-Z]{3})\s*\((.*?)\)", p_val)
                     if m_cl:
-                        colo = m_cl.group(1)
+                        if m_cl.group(1).upper() not in _CORP_SUFFIX_3:
+                            colo = m_cl.group(1).upper()
                         loc = m_cl.group(2)
                     else:
                         loc = p_val.strip("()")
                     continue
 
-                # 5. 独立匹配纯三位大写 IATA 机房码 (如 HKG, SJC, NRT, FRA)
-                if p_val.isupper() and len(p_val) == 3 and not colo:
+                # 5. 独立匹配纯三位大写 IATA 机房码 (如 HKG, SJC, NRT, FRA，排除公司后缀 PTE/LLC/LTD 等)
+                if p_val.isupper() and len(p_val) == 3 and p_val not in _CORP_SUFFIX_3 and not colo:
                     colo = p_val
                     continue
 
@@ -916,27 +937,45 @@ def parse_otc_scan_content(
                     if len(p_val) > 2 and not p_val.startswith("仅") and not is_valid_ip(p_val) and not is_valid_host(p_val):
                         isp = p_val
 
-        # 核心 ASN 优先级规则：
-        # 1. 优先使用行内真实提取出的合法 ASN；
-        # 2. 行内无 ASN 时，若文件名明确指定了目标 ASN（如 OTC_SCAN_YX_AS210644.txt），采用文件名 ASN 兜底；
-        # 3. 否则交由 resolve_and_clean_asn 根据 IP 权威反查。
-        if not asn or asn in ("AS0", "AS_UNKNOWN", "UNKNOWN"):
-            if fn_asn:
-                asn = fn_asn
-
-        if not isp and asn and asn not in ("AS0", "AS_UNKNOWN") and asn in ASN_TO_PROVIDER:
-            isp = ASN_TO_PROVIDER[asn]
-
         if not colo and line_remark:
             m_iata = re.search(r"\b([A-Z]{3})\b", line_remark)
-            if m_iata:
+            if m_iata and m_iata.group(1) not in _CORP_SUFFIX_3:
                 colo = m_iata.group(1)
         if not loc and line_remark:
             loc = line_remark
 
         if local_cache is None:
             local_cache = load_ip_cache()
-        clean_asn_code, isp = resolve_and_clean_asn(ip, asn, isp, ip_cache=local_cache)
+
+        has_separate_exit = bool(exit_ip and is_valid_ip(exit_ip) and exit_ip != ip)
+        if has_separate_exit:
+            # 出入口严格解耦：行内 ASN/ISP 仅归属出口 exit_ip (绝不用 fn_asn 填出口)；
+            # 入口仅查独立 ip_cache / 离线 BGP 反查，未命中则留空交由后续批量在线反查补全，杜绝出口属性污染入口
+            exit_asn_code, exit_isp_val = resolve_and_clean_asn(exit_ip, asn, isp, ip_cache=local_cache)
+            if not exit_isp_val and exit_asn_code and exit_asn_code in ASN_TO_PROVIDER:
+                exit_isp_val = ASN_TO_PROVIDER[exit_asn_code]
+            clean_asn_code, ingress_isp_val = resolve_and_clean_asn(ip, "", "", ip_cache=local_cache)
+            if not ingress_isp_val and clean_asn_code and clean_asn_code in ASN_TO_PROVIDER:
+                ingress_isp_val = ASN_TO_PROVIDER[clean_asn_code]
+        else:
+            # 同出口或单 IP 场景：fn_asn 降级为无冲突 hint（仅当行内无 ASN 且独立反查未命中时采用）
+            if not asn or asn in ("AS0", "AS_UNKNOWN", "UNKNOWN"):
+                probe_asn_code, probe_isp_val = resolve_and_clean_asn(ip, "", isp, ip_cache=local_cache)
+                if probe_asn_code:
+                    clean_asn_code, ingress_isp_val = probe_asn_code, probe_isp_val
+                elif fn_asn:
+                    asn = fn_asn
+                    if not isp and asn in ASN_TO_PROVIDER:
+                        isp = ASN_TO_PROVIDER[asn]
+                    clean_asn_code, ingress_isp_val = resolve_and_clean_asn(ip, asn, isp, ip_cache=local_cache)
+                else:
+                    clean_asn_code, ingress_isp_val = probe_asn_code, probe_isp_val
+            else:
+                if not isp and asn in ASN_TO_PROVIDER:
+                    isp = ASN_TO_PROVIDER[asn]
+                clean_asn_code, ingress_isp_val = resolve_and_clean_asn(ip, asn, isp, ip_cache=local_cache)
+            exit_asn_code = clean_asn_code
+            exit_isp_val = ingress_isp_val
 
         tls = "true" if port in (443, 8443, 2053, 2083, 2087, 2096) else "false"
 
@@ -948,16 +987,16 @@ def parse_otc_scan_content(
             "speed_kbs": speed_kbs,
             "colo": colo,
             "cf_location": loc,
-            "isp": isp,
-            "asn": format_asn_isp(clean_asn_code, isp),
+            "isp": ingress_isp_val,
+            "asn": format_asn_isp(clean_asn_code, ingress_isp_val) if clean_asn_code else "",
             "raw_asn": clean_asn_code,
             "first_seen": dt_str,
             "channel": default_channel,
             "fail_count": 0,
             "exit_ip": exit_ip,
             "exit_ipv6": exit_ip if is_valid_ipv6(exit_ip) else "",
-            "exit_asn": clean_asn_code,
-            "exit_isp": isp,
+            "exit_asn": exit_asn_code,
+            "exit_isp": exit_isp_val,
         })
     return results
 

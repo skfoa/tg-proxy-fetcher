@@ -441,6 +441,7 @@ import socket
 import subprocess
 import threading
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 import zlib
@@ -855,12 +856,209 @@ ASN_EXACT_NET_TYPE.update(MANUAL_OVERRIDE_NET_TYPES)
 
 
 
-def resolve_asn_online(ip: str, isp_hint: str = "", persist: bool = False, db_path: str = "") -> tuple[str, str]:
+_DEAD_IP_PROBE_PROXIES: set[str] = set()
+_IP_PROBE_STATE_LOCK = threading.Lock()
+_IP_PROBE_RR_COUNTER: int = 0
+_LAST_ONLINE_COUNTRIES: dict[str, str] = {}
+
+_DEFAULT_BROWSER_UA = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+)
+
+
+def _next_ip_probe_offset() -> int:
+    """线程安全地递增并返回下一个 IP 探针代理轮换起始偏移。"""
+    global _IP_PROBE_RR_COUNTER
+    with _IP_PROBE_STATE_LOCK:
+        offset = _IP_PROBE_RR_COUNTER
+        _IP_PROBE_RR_COUNTER += 1
+    return offset
+
+
+def _mark_dead_proxy_in(bad_proxy: str, dead_set: set[str], lock: threading.Lock) -> None:
+    """将失效或触发风控的代理加入指定熔断集合。"""
+    if bad_proxy:
+        with lock:
+            dead_set.add(bad_proxy)
+
+
+def _build_proxy_trials(
+    proxy_candidates: list[str] | None,
+    dead_set: set[str],
+    lock: threading.Lock,
+    start_offset: int = 0,
+    max_tries: int = 2,
+    limit: int = 16,
+    max_delay: int = 500,
+    include_direct: bool = True,
+    exclude_proxies: set[str] | None = None,
+) -> list[str]:
+    """过滤已熔断代理，按 start_offset 跨桶轮换构建尝试序列，并按需追加直连兜底。"""
+    cand_proxies = (
+        list(proxy_candidates)
+        if proxy_candidates is not None
+        else get_top_quality_proxies(limit=limit, max_delay=max_delay)
+    )
+    with lock:
+        dead_snapshot = set(dead_set)
+    if exclude_proxies:
+        dead_snapshot.update(exclude_proxies)
+
+    healthy_proxies = [p for p in cand_proxies if p and p not in dead_snapshot]
+    if healthy_proxies and max_tries > 0:
+        offset = max(0, int(start_offset)) % len(healthy_proxies)
+        rotated = healthy_proxies[offset:] + healthy_proxies[:offset]
+        trials = rotated[:max_tries]
+    else:
+        trials = []
+    if include_direct and "" not in trials:
+        trials.append("")
+    return trials
+
+
+def _parse_curl_http_response(raw_stdout: str) -> tuple[int, dict[str, str], str]:
+    """解析 curl -sSL -D - -w '\\n__CURL_STATUS__:%{http_code}' 输出的最终状态码、小写响应头与正文。"""
+    status_code = 0
+    text = raw_stdout or ""
+    m_status = re.search(r"(?:\r?\n)?__CURL_STATUS__:(\d{3})\s*$", text)
+    if m_status:
+        status_code = int(m_status.group(1))
+        text = text[:m_status.start()]
+
+    last_headers: dict[str, str] = {}
+    remaining = text
+    while re.match(r"^HTTP/\d(?:\.\d)?\s+\d{3}", remaining):
+        split_match = re.search(r"\r?\n\r?\n", remaining)
+        if not split_match:
+            break
+        header_block = remaining[:split_match.start()]
+        remaining = remaining[split_match.end():]
+        parsed_headers: dict[str, str] = {}
+        for line in header_block.splitlines()[1:]:
+            if ":" in line:
+                k, v = line.split(":", 1)
+                parsed_headers[k.strip().lower()] = v.strip()
+        last_headers = parsed_headers
+
+    return status_code, last_headers, remaining
+
+
+def _fetch_url_via_proxy(
+    url: str,
+    proxy: str = "",
+    timeout: float = 4.0,
+    method: str = "GET",
+    data: bytes | None = None,
+    headers: dict[str, str] | None = None,
+    prefer_curl_direct: bool = False,
+) -> tuple[int, dict[str, str], str]:
+    """
+    通过指定代理或直连请求 HTTP/HTTPS 资源，统一返回 (status_code, headers_lower, body)。
+    直连且 prefer_curl_direct=False 时固定走 urllib.request.urlopen，确保单测补丁完全兼容。
+    """
+    req_headers = dict(headers or {})
+    curl_bin = "curl.exe" if shutil.which("curl.exe") else ("curl" if shutil.which("curl") else "")
+
+    if curl_bin and (proxy or prefer_curl_direct):
+        ua = req_headers.get("User-Agent", _DEFAULT_BROWSER_UA)
+        cmd = [
+            curl_bin,
+            "-sSL",
+            "-D",
+            "-",
+            "-w",
+            "\n__CURL_STATUS__:%{http_code}",
+            "-A",
+            ua,
+            "--max-time",
+            str(max(1, int(round(timeout)))),
+        ]
+        for hk, hv in req_headers.items():
+            if hk.lower() != "user-agent":
+                cmd.extend(["-H", f"{hk}: {hv}"])
+        if proxy:
+            cmd.extend(["-x", proxy])
+        req_method = (method or "GET").upper()
+        if req_method != "GET":
+            cmd.extend(["-X", req_method])
+        if data is not None:
+            cmd.extend(["--data-binary", "@-"])
+        cmd.append(url)
+        res = subprocess.run(
+            cmd,
+            input=data,
+            capture_output=True,
+            text=False,
+            timeout=timeout + 2,
+            check=False,
+        )
+        raw_stdout = (res.stdout or b"").decode("utf-8", errors="ignore")
+        status_code, resp_headers, body = _parse_curl_http_response(raw_stdout)
+        if res.returncode != 0 and status_code == 0:
+            raise RuntimeError(f"curl exited with {res.returncode}")
+        return status_code, resp_headers, body
+
+    if proxy and proxy.startswith("socks"):
+        raise RuntimeError("curl unavailable for socks proxy")
+
+    req_headers.setdefault("User-Agent", "Mozilla/5.0")
+    req = urllib.request.Request(
+        url,
+        data=data,
+        headers=req_headers,
+        method=(method or "GET").upper(),
+    )
+    try:
+        if proxy:
+            opener = urllib.request.build_opener(urllib.request.ProxyHandler({"http": proxy, "https": proxy}))
+            cm = opener.open(req, timeout=timeout)
+        else:
+            cm = urllib.request.urlopen(req, timeout=timeout)
+        with cm as resp:
+            status_code = getattr(resp, "status", 200) or 200
+            raw_hdrs = getattr(resp, "headers", None)
+            resp_headers = {k.lower(): v for k, v in raw_hdrs.items()} if raw_hdrs else {}
+            body = resp.read().decode("utf-8", errors="ignore")
+            return int(status_code), resp_headers, body
+    except urllib.error.HTTPError as he:
+        raw_hdrs = getattr(he, "headers", None)
+        resp_headers = {k.lower(): v for k, v in raw_hdrs.items()} if raw_hdrs else {}
+        body = he.read().decode("utf-8", errors="ignore") if hasattr(he, "read") else ""
+        return int(he.code), resp_headers, body
+
+
+def _record_online_country(ip: str, country_code: str) -> None:
+    """记录在线单点或批量反查顺带获取的国家码，供增量写回 ip_cache 复用。"""
+    cc = (country_code or "").strip().upper()
+    if ip and cc:
+        with _IP_PROBE_STATE_LOCK:
+            if len(_LAST_ONLINE_COUNTRIES) > 4096:
+                _LAST_ONLINE_COUNTRIES.clear()
+            _LAST_ONLINE_COUNTRIES[ip] = cc
+
+
+def pop_online_country(ip: str) -> str:
+    """提取并移除最近一次在线反查记录的国家码，不存在则返回空串。"""
+    if not ip:
+        return ""
+    with _IP_PROBE_STATE_LOCK:
+        return _LAST_ONLINE_COUNTRIES.pop(ip, "")
+
+
+def resolve_asn_online(
+    ip: str,
+    isp_hint: str = "",
+    persist: bool = False,
+    db_path: str = "",
+    proxy_candidates: list[str] | None = None,
+    start_offset: int = 0,
+) -> tuple[str, str]:
     """
     当本地权威库与持久化库无法识别 ASN 时，在线向权威 BGP 数据库实时反查：
     返回 (clean_asn, clean_isp)。
-    多通道高可用安全反查架构：
-      - 通道 1 (首选)：ip-api.com (结构化解析: 优先取实际商业 ISP 运营商名称与 org，技术域别名 asname)
+    多通道高可用安全反查架构（内置优质代理池轮换 + 坏代理熔断 + 直连兜底）：
+      - 通道 1 (首选)：ip-api.com (结构化解析: 优先取实际商业 ISP 运营商名称与 org，技术域别名 asname，含 countryCode)
       - 通道 2 (备选)：iplocate.io (全量 HTTPS，免 Key，原生结构化 ASN 对象)
       - 通道 3 (备选)：ipapi.co (全量 HTTPS，免 Key 每日限额)
     核心防御与防污染机制：
@@ -876,14 +1074,45 @@ def resolve_asn_online(ip: str, isp_hint: str = "", persist: bool = False, db_pa
     clean_asn = ""
     clean_isp = ""
     ext_net_type = ""
+    effective_offset = (
+        _next_ip_probe_offset()
+        if (proxy_candidates is None and start_offset == 0)
+        else start_offset
+    )
+    trials = _build_proxy_trials(
+        proxy_candidates,
+        _DEAD_IP_PROBE_PROXIES,
+        _IP_PROBE_STATE_LOCK,
+        start_offset=effective_offset,
+        max_tries=2,
+        limit=16,
+        max_delay=500,
+        include_direct=True,
+    )
+
+    def _is_proxy_unhealthy(bad_proxy: str) -> bool:
+        if not bad_proxy:
+            return False
+        with _IP_PROBE_STATE_LOCK:
+            return bad_proxy in _DEAD_IP_PROBE_PROXIES
 
     # 通道 1 (首选): ip-api.com (语义优先: 实际商业 isp > 组织机构 org > 路由技术别名 asname)
-    try:
-        url = f"http://ip-api.com/json/{ip}?fields=status,message,as,asname,org,isp"
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=3.5) as res:
-            data = json.loads(res.read().decode("utf-8", errors="ignore"))
-            if data.get("status") == "success":
+    url_ipapi = f"http://ip-api.com/json/{ip}?fields=status,message,countryCode,as,asname,org,isp"
+    for p in trials:
+        if _is_proxy_unhealthy(p):
+            continue
+        try:
+            status_code, _, body = _fetch_url_via_proxy(
+                url_ipapi,
+                proxy=p,
+                timeout=3.5,
+                headers={"User-Agent": "Mozilla/5.0"},
+            )
+            if status_code == 429 or status_code >= 500 or status_code == 0 or not body:
+                _mark_dead_proxy_in(p, _DEAD_IP_PROBE_PROXIES, _IP_PROBE_STATE_LOCK)
+                continue
+            data = json.loads(body)
+            if isinstance(data, dict) and data.get("status") == "success":
                 raw_as = str(data.get("as") or "")
                 raw_isp_val = (data.get("isp") or "").strip()
                 raw_org_val = (data.get("org") or "").strip()
@@ -892,36 +1121,75 @@ def resolve_asn_online(ip: str, isp_hint: str = "", persist: bool = False, db_pa
                 clean_asn, clean_isp, ext_net_type = normalize_external_asn_info(
                     raw_as, raw_isp, isp_hint=isp_hint
                 )
-    except Exception as e:
-        log.debug("ip-api.com 在线解析 IP %s 失败: %s", ip, e)
+                if clean_asn:
+                    _record_online_country(ip, data.get("countryCode") or "")
+                    break
+            elif status_code == 200 and isinstance(data, dict) and "limit" in str(data.get("message") or "").lower():
+                _mark_dead_proxy_in(p, _DEAD_IP_PROBE_PROXIES, _IP_PROBE_STATE_LOCK)
+                continue
+        except Exception as e:
+            _mark_dead_proxy_in(p, _DEAD_IP_PROBE_PROXIES, _IP_PROBE_STATE_LOCK)
+            log.debug("ip-api.com 在线解析 IP %s 失败 (通道: %s): %s", ip, p or "直连", e)
 
     # 通道 2 (备选容灾): iplocate.io (HTTPS, 免 Key)
     if not clean_asn:
-        try:
-            url = f"https://www.iplocate.io/api/lookup/{ip}"
-            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-            with urllib.request.urlopen(req, timeout=3.5) as res:
-                data = json.loads(res.read().decode("utf-8", errors="ignore"))
-                asn_obj = data.get("asn") or {}
-                clean_asn, clean_isp, ext_net_type = normalize_external_asn_info(
-                    asn_obj.get("asn"),
-                    asn_obj.get("name"),
-                    raw_type=asn_obj.get("type", ""),
-                    isp_hint=isp_hint,
+        url_iplocate = f"https://www.iplocate.io/api/lookup/{ip}"
+        for p in trials:
+            if _is_proxy_unhealthy(p):
+                continue
+            try:
+                status_code, _, body = _fetch_url_via_proxy(
+                    url_iplocate,
+                    proxy=p,
+                    timeout=3.5,
+                    headers={"User-Agent": "Mozilla/5.0"},
                 )
-        except Exception as e:
-            log.debug("iplocate.io 在线解析 IP %s 失败: %s", ip, e)
+                if status_code == 429 or status_code >= 500 or status_code == 0 or not body:
+                    _mark_dead_proxy_in(p, _DEAD_IP_PROBE_PROXIES, _IP_PROBE_STATE_LOCK)
+                    continue
+                data = json.loads(body)
+                if isinstance(data, dict):
+                    asn_obj = data.get("asn") or {}
+                    clean_asn, clean_isp, ext_net_type = normalize_external_asn_info(
+                        asn_obj.get("asn"),
+                        asn_obj.get("name"),
+                        raw_type=asn_obj.get("type", ""),
+                        isp_hint=isp_hint,
+                    )
+                    if clean_asn:
+                        _record_online_country(ip, data.get("country_code") or "")
+                        break
+            except Exception as e:
+                _mark_dead_proxy_in(p, _DEAD_IP_PROBE_PROXIES, _IP_PROBE_STATE_LOCK)
+                log.debug("iplocate.io 在线解析 IP %s 失败 (通道: %s): %s", ip, p or "直连", e)
 
     # 通道 3 (备选容灾): ipapi.co (HTTPS, 免 Key)
     if not clean_asn:
-        try:
-            url = f"https://ipapi.co/{ip}/json/"
-            req = urllib.request.Request(url, headers={"User-Agent": "ipapi.co/#python-v1.0.3"})
-            with urllib.request.urlopen(req, timeout=3.5) as res:
-                data = json.loads(res.read().decode("utf-8", errors="ignore"))
-                clean_asn, clean_isp, ext_net_type = normalize_external_asn_info(data.get("asn"), data.get("org"), isp_hint=isp_hint)
-        except Exception as e:
-            log.debug("ipapi.co 在线解析 IP %s 失败: %s", ip, e)
+        url_ipapico = f"https://ipapi.co/{ip}/json/"
+        for p in trials:
+            if _is_proxy_unhealthy(p):
+                continue
+            try:
+                status_code, _, body = _fetch_url_via_proxy(
+                    url_ipapico,
+                    proxy=p,
+                    timeout=3.5,
+                    headers={"User-Agent": "ipapi.co/#python-v1.0.3"},
+                )
+                if status_code == 429 or status_code >= 500 or status_code == 0 or not body:
+                    _mark_dead_proxy_in(p, _DEAD_IP_PROBE_PROXIES, _IP_PROBE_STATE_LOCK)
+                    continue
+                data = json.loads(body)
+                if isinstance(data, dict):
+                    clean_asn, clean_isp, ext_net_type = normalize_external_asn_info(
+                        data.get("asn"), data.get("org"), isp_hint=isp_hint
+                    )
+                    if clean_asn:
+                        _record_online_country(ip, data.get("country_code") or "")
+                        break
+            except Exception as e:
+                _mark_dead_proxy_in(p, _DEAD_IP_PROBE_PROXIES, _IP_PROBE_STATE_LOCK)
+                log.debug("ipapi.co 在线解析 IP %s 失败 (通道: %s): %s", ip, p or "直连", e)
 
     if clean_asn:
         # SSOT 权威优先机制：若该 ASN 已属于权威收录厂商（如 AS132203=Tencent Cloud, AS45102=Alibaba Cloud），
@@ -1368,6 +1636,8 @@ def resolve_asn_batch_online(
     persist: bool = True,
     db_path: str = "",
     cache_path: str = "",
+    proxy_candidates: list[str] | None = None,
+    start_offset: int = 0,
 ) -> dict[str, tuple[str, str]]:
     """
     高吞吐批量在线解析目标（IP 或域名）的 ASN 与 ISP：
@@ -1466,99 +1736,173 @@ def resolve_asn_batch_online(
 
     log.info("【批量 ASN 解析】待解析出口 IP 数量: %d 个 (分批步长: %d)", len(pending_ips), max_chunk_size)
 
-    # 按 max_chunk_size 切块批量 POST
-    for i in range(0, len(pending_ips), max_chunk_size):
-        chunk = pending_ips[i : i + max_chunk_size]
-        payload = json.dumps([
-            {"query": ip, "fields": "status,message,query,countryCode,as,asname,org,isp"}
-            for ip in chunk
-        ]).encode("utf-8")
+    cand_proxies = (
+        list(proxy_candidates)
+        if proxy_candidates is not None
+        else get_top_quality_proxies(limit=16, max_delay=500)
+    )
+    throttled_proxies: set[str] = set()
+    fallback_pool: concurrent.futures.ThreadPoolExecutor | None = None
 
-        req = urllib.request.Request(
-            "http://ip-api.com/batch",
-            data=payload,
-            headers={"Content-Type": "application/json", "User-Agent": "Mozilla/5.0 (compatible; tg-proxy-fetcher/2.0)"},
-        )
+    try:
+        # 按 max_chunk_size 切块批量 POST
+        for i in range(0, len(pending_ips), max_chunk_size):
+            chunk = pending_ips[i : i + max_chunk_size]
+            payload = json.dumps([
+                {"query": ip, "fields": "status,message,query,countryCode,as,asname,org,isp"}
+                for ip in chunk
+            ]).encode("utf-8")
 
-        x_rl = None
-        x_ttl = None
+            chunk_idx = i // max(1, max_chunk_size)
+            chunk_trials = _build_proxy_trials(
+                cand_proxies,
+                _DEAD_IP_PROBE_PROXIES,
+                _IP_PROBE_STATE_LOCK,
+                start_offset=int(start_offset) + chunk_idx,
+                max_tries=min(3, max(1, len(cand_proxies))) if cand_proxies else 0,
+                include_direct=True,
+                exclude_proxies=throttled_proxies,
+            )
 
-        try:
-            with urllib.request.urlopen(req, timeout=10.0) as resp:
-                raw_data = resp.read().decode("utf-8", errors="ignore")
-                data_list = json.loads(raw_data)
-                headers = resp.headers
-                x_rl = safe_int(headers.get("X-Rl"), -1)
-                x_ttl = safe_int(headers.get("X-Ttl"), -1)
+            x_rl = None
+            x_ttl = None
+            used_proxy = ""
+            batch_ok = False
+            last_err: Exception | None = None
 
-                if isinstance(data_list, list):
-                    for item in data_list:
-                        query_ip = (item.get("query") or "").strip()
-                        if not query_ip:
-                            continue
-                        if item.get("status") == "success":
-                            raw_as = str(item.get("as") or "")
-                            raw_isp = (item.get("isp") or "").strip()
-                            raw_org = (item.get("org") or "").strip()
-                            raw_asname = (item.get("asname") or "").strip()
-                            raw_combined_isp = raw_isp or raw_org or raw_asname
-                            country_code = (item.get("countryCode") or "").strip().upper()
+            for p in chunk_trials:
+                try:
+                    status_code, resp_headers, raw_data = _fetch_url_via_proxy(
+                        "http://ip-api.com/batch",
+                        proxy=p,
+                        timeout=10.0,
+                        method="POST",
+                        data=payload,
+                        headers={
+                            "Content-Type": "application/json",
+                            "User-Agent": "Mozilla/5.0 (compatible; tg-proxy-fetcher/2.0)",
+                        },
+                    )
+                    x_rl = safe_int(resp_headers.get("x-rl"), -1)
+                    x_ttl = safe_int(resp_headers.get("x-ttl"), -1)
+                    if status_code == 429 or status_code >= 500 or status_code == 0:
+                        _mark_dead_proxy_in(p, _DEAD_IP_PROBE_PROXIES, _IP_PROBE_STATE_LOCK)
+                        continue
+                    data_list = json.loads(raw_data)
+                    if isinstance(data_list, list):
+                        used_proxy = p
+                        batch_ok = True
+                        for item in data_list:
+                            query_ip = (item.get("query") or "").strip()
+                            if not query_ip:
+                                continue
+                            if item.get("status") == "success":
+                                raw_as = str(item.get("as") or "")
+                                raw_isp = (item.get("isp") or "").strip()
+                                raw_org = (item.get("org") or "").strip()
+                                raw_asname = (item.get("asname") or "").strip()
+                                raw_combined_isp = raw_isp or raw_org or raw_asname
+                                country_code = (item.get("countryCode") or "").strip().upper()
 
-                            clean_asn, clean_isp, ext_net_type = normalize_external_asn_info(
-                                raw_as, raw_combined_isp
-                            )
-                            if clean_asn:
-                                # SSOT 权威校验：已收录于权威字典的 ASN 直接采用权威标准名；未收录新 ASN 统一交由后续 auto_enrich_and_save_asns 经 IPinfo 探针定性入库
-                                if clean_asn in ASN_TO_PROVIDER:
-                                    clean_isp = ASN_TO_PROVIDER[clean_asn]
+                                clean_asn, clean_isp, ext_net_type = normalize_external_asn_info(
+                                    raw_as, raw_combined_isp
+                                )
+                                if clean_asn:
+                                    # SSOT 权威校验：已收录于权威字典的 ASN 直接采用权威标准名；未收录新 ASN 统一交由后续 auto_enrich_and_save_asns 经 IPinfo 探针定性入库
+                                    if clean_asn in ASN_TO_PROVIDER:
+                                        clean_isp = ASN_TO_PROVIDER[clean_asn]
 
-                                # 动态研判 net_type (仅用于当前 IP 缓存条目画像，不越权直接写持久化 ASN 数据库)
-                                n_type = ASN_EXACT_NET_TYPE.get(clean_asn) or ext_net_type or classify_asn(clean_asn, clean_isp)
+                                    # 动态研判 net_type (仅用于当前 IP 缓存条目画像，不越权直接写持久化 ASN 数据库)
+                                    n_type = ASN_EXACT_NET_TYPE.get(clean_asn) or ext_net_type or classify_asn(clean_asn, clean_isp)
 
-                                cache_entry = {
-                                    "asn": clean_asn,
-                                    "isp": clean_isp,
-                                    "net_type": n_type,
-                                    "country": country_code,
-                                }
-                                cache[query_ip] = cache_entry
-                                cache_modified = True
-                                results[query_ip] = (clean_asn, clean_isp)
+                                    cache_entry = {
+                                        "asn": clean_asn,
+                                        "isp": clean_isp,
+                                        "net_type": n_type,
+                                        "country": country_code,
+                                    }
+                                    cache[query_ip] = cache_entry
+                                    cache_modified = True
+                                    results[query_ip] = (clean_asn, clean_isp)
+                                    if country_code:
+                                        _record_online_country(query_ip, country_code)
 
-                                for tgt in ip_to_targets.get(query_ip, []):
-                                    results[tgt] = (clean_asn, clean_isp)
-                                    if tgt != query_ip:
-                                        tgt_entry = dict(cache_entry)
-                                        tgt_entry["resolved_ip"] = query_ip
-                                        cache[tgt] = tgt_entry
-        except Exception as e:
-            log.warning("【批量 ASN 解析】第 %d 批 (共 %d 个 IP) 请求失败: %s", (i // max_chunk_size) + 1, len(chunk), e)
+                                    for tgt in ip_to_targets.get(query_ip, []):
+                                        results[tgt] = (clean_asn, clean_isp)
+                                        if tgt != query_ip:
+                                            tgt_entry = dict(cache_entry)
+                                            tgt_entry["resolved_ip"] = query_ip
+                                            cache[tgt] = tgt_entry
+                        break
+                    _mark_dead_proxy_in(p, _DEAD_IP_PROBE_PROXIES, _IP_PROBE_STATE_LOCK)
+                except Exception as e:
+                    last_err = e
+                    _mark_dead_proxy_in(p, _DEAD_IP_PROBE_PROXIES, _IP_PROBE_STATE_LOCK)
+                    log.debug("【批量 ASN 解析】第 %d 批代理 %s 请求异常: %s", chunk_idx + 1, p or "直连", e)
 
-        # 若批量失败或个别 IP 漏失，针对缺失 IP 尝试单点通道兜底
-        for ip in chunk:
-            if ip not in results:
-                fallback_asn, fallback_isp = resolve_asn_online(ip, persist=False, db_path=db_path)
-                if fallback_asn:
-                    results[ip] = (fallback_asn, fallback_isp)
-                    n_type = ASN_EXACT_NET_TYPE.get(fallback_asn) or classify_asn(fallback_asn, fallback_isp)
-                    cache_entry = {"asn": fallback_asn, "isp": fallback_isp, "net_type": n_type, "country": ""}
-                    cache[ip] = cache_entry
-                    cache_modified = True
-                    for tgt in ip_to_targets.get(ip, []):
-                        results[tgt] = (fallback_asn, fallback_isp)
-                        if tgt != ip:
-                            tgt_entry = dict(cache_entry)
-                            tgt_entry["resolved_ip"] = ip
-                            cache[tgt] = tgt_entry
+            if not batch_ok and last_err is not None:
+                log.warning("【批量 ASN 解析】第 %d 批 (共 %d 个 IP) 请求失败: %s", chunk_idx + 1, len(chunk), last_err)
 
-        # 自适应限流退避处理 (ip-api batch 限制 15 req/min)
-        has_more = (i + max_chunk_size) < len(pending_ips)
-        if has_more:
-            if x_rl is not None and x_rl <= 1 and x_ttl is not None and x_ttl > 0:
-                log.info("【批量 ASN 限流保护】接近配额上限 (剩余: %d)，安全等待 %d 秒...", x_rl, x_ttl + 1)
-                time.sleep(x_ttl + 1)
-            else:
-                time.sleep(0.5)
+            # 若批量失败或个别 IP 漏失，针对缺失 IP 在复用线程池内并发调用单点通道兜底
+            missed_ips = [ip for ip in chunk if ip not in results]
+            if missed_ips:
+                if fallback_pool is None:
+                    fallback_pool = concurrent.futures.ThreadPoolExecutor(
+                        max_workers=2,
+                        thread_name_prefix="ip-probe-fallback",
+                    )
+                fut_to_ip = {
+                    fallback_pool.submit(resolve_asn_online, ip, persist=False, db_path=db_path): ip
+                    for ip in missed_ips
+                }
+                for fut in concurrent.futures.as_completed(fut_to_ip):
+                    ip = fut_to_ip[fut]
+                    try:
+                        fallback_asn, fallback_isp = fut.result()
+                    except Exception as fe:
+                        log.debug("单点 ASN 兜底解析 %s 异常: %s", ip, fe)
+                        fallback_asn, fallback_isp = "", ""
+                    if fallback_asn:
+                        fallback_country = pop_online_country(ip)
+                        results[ip] = (fallback_asn, fallback_isp)
+                        n_type = ASN_EXACT_NET_TYPE.get(fallback_asn) or classify_asn(fallback_asn, fallback_isp)
+                        cache_entry = {
+                            "asn": fallback_asn,
+                            "isp": fallback_isp,
+                            "net_type": n_type,
+                            "country": fallback_country,
+                        }
+                        cache[ip] = cache_entry
+                        cache_modified = True
+                        for tgt in ip_to_targets.get(ip, []):
+                            results[tgt] = (fallback_asn, fallback_isp)
+                            if tgt != ip:
+                                tgt_entry = dict(cache_entry)
+                                tgt_entry["resolved_ip"] = ip
+                                cache[tgt] = tgt_entry
+
+            # 自适应限流退避处理：接近配额上限时优先切换其他健康代理继续，仅无替代健康代理时才 sleep 退避
+            has_more = (i + max_chunk_size) < len(pending_ips)
+            if has_more:
+                if x_rl is not None and 0 <= x_rl <= 1 and x_ttl is not None and x_ttl > 0:
+                    if used_proxy:
+                        throttled_proxies.add(used_proxy)
+                    with _IP_PROBE_STATE_LOCK:
+                        dead_snapshot = set(_DEAD_IP_PROBE_PROXIES)
+                    has_alt_proxy = any(
+                        p and p != used_proxy and p not in dead_snapshot and p not in throttled_proxies
+                        for p in cand_proxies
+                    )
+                    if has_alt_proxy:
+                        log.info("【批量 ASN 轮换】当前通道 %s 接近限额 (剩余: %d)，切换下一健康代理继续...", used_proxy or "直连", x_rl)
+                    else:
+                        log.info("【批量 ASN 限流保护】无可用替代代理且接近配额上限 (剩余: %d)，安全等待 %d 秒...", x_rl, x_ttl + 1)
+                        time.sleep(x_ttl + 1)
+                elif not used_proxy:
+                    time.sleep(0.5)
+    finally:
+        if fallback_pool is not None:
+            fallback_pool.shutdown(wait=True)
 
     if persist and cache_modified:
         if cache_path:
@@ -1576,9 +1920,20 @@ async def resolve_asn_batch_online_async(
     persist: bool = True,
     db_path: str = "",
     cache_path: str = "",
+    proxy_candidates: list[str] | None = None,
+    start_offset: int = 0,
 ) -> dict[str, tuple[str, str]]:
     """resolve_asn_batch_online 的异步无阻塞封装，在独立线程执行批量 I/O，杜绝阻塞主事件循环"""
-    return await asyncio.to_thread(resolve_asn_batch_online, targets, max_chunk_size, persist, db_path, cache_path)
+    return await asyncio.to_thread(
+        resolve_asn_batch_online,
+        targets,
+        max_chunk_size,
+        persist,
+        db_path,
+        cache_path,
+        proxy_candidates,
+        start_offset,
+    )
 
 
 def resolve_ip_asn(
@@ -4009,62 +4364,40 @@ def probe_asn_from_ipinfo(
     url = f"https://ipinfo.io/{clean_code}"
 
     # 组织候选代理列表：过滤本轮已熔断失效代理，并按 start_offset 跨国家桶轮换起点，兜底加入直连
-    cand_proxies = list(proxy_candidates) if proxy_candidates is not None else get_top_quality_proxies()
-    with _IPINFO_STATE_LOCK:
-        dead_snapshot = set(_DEAD_IPINFO_PROXIES)
-    healthy_proxies = [p for p in cand_proxies if p and p not in dead_snapshot]
-    if healthy_proxies:
-        offset = max(0, int(start_offset)) % len(healthy_proxies)
-        rotated = healthy_proxies[offset:] + healthy_proxies[:offset]
-        trials = rotated[:max_tries]
-    else:
-        trials = []
-    if "" not in trials:
-        trials.append("")
-
-    curl_bin = "curl.exe" if shutil.which("curl.exe") else ("curl" if shutil.which("curl") else "")
-
-    def _mark_dead_proxy(bad_proxy: str) -> None:
-        if bad_proxy:
-            with _IPINFO_STATE_LOCK:
-                _DEAD_IPINFO_PROXIES.add(bad_proxy)
+    trials = _build_proxy_trials(
+        proxy_candidates,
+        _DEAD_IPINFO_PROXIES,
+        _IPINFO_STATE_LOCK,
+        start_offset=start_offset,
+        max_tries=max_tries,
+        include_direct=True,
+    )
 
     for p in trials:
         html = ""
         try:
-            if curl_bin:
-                cmd = [
-                    curl_bin, "-sL",
-                    "-A", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                    "--max-time", str(int(timeout)),
-                ]
-                if p:
-                    cmd.extend(["-x", p])
-                cmd.append(url)
-                res = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="ignore", timeout=timeout + 2, check=False)
-                if res.returncode == 0 and res.stdout:
-                    html = res.stdout
-            elif not p or not p.startswith("socks"):
-                handlers = []
-                if p:
-                    handlers.append(urllib.request.ProxyHandler({"http": p, "https": p}))
-                opener = urllib.request.build_opener(*handlers)
-                req = urllib.request.Request(
-                    url,
-                    headers={
-                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                    }
-                )
-                with opener.open(req, timeout=timeout) as resp:
-                    html = resp.read().decode("utf-8", errors="ignore")
+            status_code, _, body = _fetch_url_via_proxy(
+                url,
+                proxy=p,
+                timeout=timeout,
+                method="GET",
+                headers={
+                    "User-Agent": _DEFAULT_BROWSER_UA,
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                },
+                prefer_curl_direct=True,
+            )
+            if status_code == 200 and body:
+                html = body
+            elif status_code in (403, 429) or status_code >= 500:
+                html = body
         except Exception as e:
-            _mark_dead_proxy(p)
+            _mark_dead_proxy_in(p, _DEAD_IPINFO_PROXIES, _IPINFO_STATE_LOCK)
             log.debug("IPinfo 代理探针尝试 %s 访问 %s 异常 (已熔断该代理): %s", p or "直连", clean_code, e)
             continue
 
         if not html:
-            _mark_dead_proxy(p)
+            _mark_dead_proxy_in(p, _DEAD_IPINFO_PROXIES, _IPINFO_STATE_LOCK)
             continue
 
         # 避坑：若遭遇 Cloudflare 拦截、429 频控或非 IPinfo 错误页，熔断跳过此代理
@@ -4074,7 +4407,7 @@ def probe_asn_from_ipinfo(
             or "429 Too Many Requests" in html
             or "ipinfo" not in html.lower()
         ):
-            _mark_dead_proxy(p)
+            _mark_dead_proxy_in(p, _DEAD_IPINFO_PROXIES, _IPINFO_STATE_LOCK)
             log.debug("IPinfo 代理探针访问 %s 触发风控或非预期响应 (已熔断此代理 %s)", clean_code, p or "直连")
             continue
 

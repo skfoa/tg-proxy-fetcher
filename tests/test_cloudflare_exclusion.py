@@ -144,7 +144,7 @@ class TestCloudflarePrimitives(unittest.TestCase):
         ip_cache = {}
         queried_batches = []
 
-        def _fake_resolve(targets, max_chunk_size=100, persist=True, db_path="", cache_path=""):
+        def _fake_resolve(targets, max_chunk_size=100, persist=True, db_path="", cache_path="", **kwargs):
             queried_batches.append((list(targets), persist))
             res = {}
             for t in targets:
@@ -185,7 +185,7 @@ class TestCloudflarePrimitives(unittest.TestCase):
         ip_cache = {}
         queried_batches = []
 
-        def _fake_resolve(targets, max_chunk_size=100, persist=True, db_path="", cache_path=""):
+        def _fake_resolve(targets, max_chunk_size=100, persist=True, db_path="", cache_path="", **kwargs):
             queried_batches.append((list(targets), persist, cache_path))
             mapping = {
                 "node-a.example.com": ("AS132203", "Tencent Cloud"),
@@ -246,7 +246,7 @@ class TestCloudflarePrimitives(unittest.TestCase):
         ]
         rescue_targets = []
 
-        def _fake_rescue_resolve(targets, max_chunk_size=100, persist=True, db_path="", cache_path=""):
+        def _fake_rescue_resolve(targets, max_chunk_size=100, persist=True, db_path="", cache_path="", **kwargs):
             rescue_targets.extend(targets)
             return {"node-a.example.com": ("AS132203", "Tencent Cloud")}
 
@@ -348,7 +348,7 @@ class TestMergeAndCalibrateCloudflarePurge(unittest.TestCase):
             "218.157.145.120:443": {"ip": "218.157.145.120", "port": "443", "asn": "AS4766 Korea Telecom", "isp": "Korea Telecom", "net_type": "isp"},
         }
 
-        def _fake_rescue_resolve(targets, max_chunk_size=100, persist=True, db_path="", cache_path=""):
+        def _fake_rescue_resolve(targets, max_chunk_size=100, persist=True, db_path="", cache_path="", **kwargs):
             res = {}
             for t in targets:
                 if t == "43.167.11.157":
@@ -737,7 +737,7 @@ class TestVerifiersCloudflareExclusion(unittest.TestCase):
                 probed_hosts.append(row["host"])
                 return {**row, "fail_count": 0, "delay_ms": 42, "_invalid": False}
 
-            async def _fake_resolve_async(targets, max_chunk_size=100, persist=True, db_path="", cache_path=""):
+            async def _fake_resolve_async(targets, max_chunk_size=100, persist=True, db_path="", cache_path="", **kwargs):
                 res = {}
                 for t in targets:
                     if t == "cf-edge.example.com":
@@ -893,7 +893,7 @@ class TestVerifiersCloudflareExclusion(unittest.TestCase):
                 captured["scan_ips"] = final_scan_ips
                 captured["proxyips"] = final_proxyips
 
-            def _fake_rescue_resolve(targets, max_chunk_size=100, persist=True, db_path="", cache_path=""):
+            def _fake_rescue_resolve(targets, max_chunk_size=100, persist=True, db_path="", cache_path="", **kwargs):
                 mapping = {
                     "43.167.11.157": ("AS132203", "Tencent Cloud"),
                     "45.85.118.11": ("AS209242", "Cloudflare London LLC"),
@@ -997,7 +997,7 @@ class TestVerifiersCloudflareExclusion(unittest.TestCase):
             shared_cache = {}
             probed_hosts = []
 
-            def _fake_rescue_resolve(targets, max_chunk_size=100, persist=True, db_path="", cache_path=""):
+            def _fake_rescue_resolve(targets, max_chunk_size=100, persist=True, db_path="", cache_path="", **kwargs):
                 mapping = {
                     "43.167.11.157": ("AS132203", "Tencent Cloud"),
                     "45.85.118.11": ("AS209242", "Cloudflare London LLC"),
@@ -1103,7 +1103,7 @@ class TestVerifiersCloudflareExclusion(unittest.TestCase):
 
             seen_cache_paths = []
 
-            def _fake_rescue_resolve(targets, max_chunk_size=100, persist=True, db_path="", cache_path=""):
+            def _fake_rescue_resolve(targets, max_chunk_size=100, persist=True, db_path="", cache_path="", **kwargs):
                 seen_cache_paths.append(cache_path)
                 mapping = {
                     "43.167.11.157": ("AS132203", "Tencent Cloud"),

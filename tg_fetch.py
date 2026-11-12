@@ -50,6 +50,7 @@ from providers import (
     format_asn_isp,
     send_tg_message,
     ASN_TO_PROVIDER,
+    ASN_EXACT_NET_TYPE,
     TG_BOT_TOKEN,
     TG_CHAT_ID,
     format_proxyip_txt,
@@ -93,6 +94,7 @@ from providers import (
     is_cloudflare_node,
     rescue_mislabeled_cloudflare_rows,
     resolve_asn_batch_online,
+    pop_online_country,
 )
 from parsers import (
     extract_proxies,
@@ -3068,9 +3070,10 @@ async def run_telethon():
                                                     p_exit_asn = probe_res.get("exit_asn") or ""
                                                     p_exit_isp = probe_res.get("exit_isp") or ""
                                                     exit_is_cf = is_cloudflare_asn_or_isp(p_exit_asn, p_exit_isp)
+                                                    same_ingress_exit = (not p_exit_ip) or (p_exit_ip == cf_item.get("ip"))
                                                     if p_exit_asn:
                                                         cf_item["exit_asn"] = format_asn_isp(p_exit_asn, p_exit_isp)
-                                                        if (not exit_is_cf) and (
+                                                        if same_ingress_exit and (not exit_is_cf) and (
                                                             not cf_item.get("raw_asn")
                                                             or cf_item["raw_asn"] in ("AS0", "0", "AS_UNKNOWN", "UNKNOWN")
                                                         ):
@@ -3078,7 +3081,7 @@ async def run_telethon():
                                                             cf_item["asn"] = cf_item["exit_asn"]
                                                     if p_exit_isp:
                                                         cf_item["exit_isp"] = p_exit_isp
-                                                        if (not exit_is_cf) and (not cf_item.get("isp")):
+                                                        if same_ingress_exit and (not exit_is_cf) and (not cf_item.get("isp")):
                                                             cf_item["isp"] = p_exit_isp
                                                     if p_exit_ip and p_exit_asn and (is_valid_ipv4(p_exit_ip) or is_valid_ipv6(p_exit_ip)):
                                                         ip_cache[p_exit_ip] = {
@@ -3089,6 +3092,89 @@ async def run_telethon():
                                                             "resolved_ip": p_exit_ip,
                                                         }
                                                         ip_cache_dirty = True
+
+                                        # 增量靶向补全解耦后仍缺失独立 ASN 的入口/出口公网 IP（如出入口分离场景的未知入口 IP）
+                                        if active_doc_items:
+                                            missing_probe_ips: list[str] = []
+                                            seen_probe_ips: set[str] = set()
+                                            for _, cf_item in active_doc_items:
+                                                ing_ip = (cf_item.get("ip") or "").strip()
+                                                if is_valid_public_ip(ing_ip) and (
+                                                    not cf_item.get("raw_asn")
+                                                    or cf_item.get("raw_asn") in ("AS0", "0", "AS_UNKNOWN", "UNKNOWN")
+                                                ):
+                                                    cached_ing = ip_cache.get(ing_ip)
+                                                    if isinstance(cached_ing, dict) and cached_ing.get("asn"):
+                                                        c_asn = cached_ing["asn"]
+                                                        c_isp = cached_ing.get("isp") or ASN_TO_PROVIDER.get(c_asn, "")
+                                                        cf_item["raw_asn"] = c_asn
+                                                        cf_item["isp"] = c_isp
+                                                        cf_item["asn"] = format_asn_isp(c_asn, c_isp)
+                                                    elif ing_ip not in seen_probe_ips:
+                                                        seen_probe_ips.add(ing_ip)
+                                                        missing_probe_ips.append(ing_ip)
+
+                                                ex_ip = (cf_item.get("exit_ip") or "").strip()
+                                                if is_valid_public_ip(ex_ip) and (
+                                                    not cf_item.get("exit_asn")
+                                                    or cf_item.get("exit_asn") in ("AS0", "0", "AS_UNKNOWN", "UNKNOWN")
+                                                ):
+                                                    cached_ex = ip_cache.get(ex_ip)
+                                                    if isinstance(cached_ex, dict) and cached_ex.get("asn"):
+                                                        c_asn = cached_ex["asn"]
+                                                        c_isp = cached_ex.get("isp") or ASN_TO_PROVIDER.get(c_asn, "")
+                                                        cf_item["exit_asn"] = c_asn
+                                                        cf_item["exit_isp"] = c_isp
+                                                    elif ex_ip not in seen_probe_ips:
+                                                        seen_probe_ips.add(ex_ip)
+                                                        missing_probe_ips.append(ex_ip)
+
+                                            if missing_probe_ips:
+                                                doc_cache_path = _ip_cache_path()
+                                                probe_asn_map = await asyncio.to_thread(
+                                                    resolve_asn_batch_online,
+                                                    missing_probe_ips,
+                                                    persist=False,
+                                                    cache_path=doc_cache_path,
+                                                ) or {}
+                                                for p_ip, res_pair in probe_asn_map.items():
+                                                    if not res_pair or not res_pair[0]:
+                                                        continue
+                                                    p_asn = res_pair[0]
+                                                    p_isp = res_pair[1] or ASN_TO_PROVIDER.get(p_asn, "")
+                                                    existing_entry = ip_cache.get(p_ip) if isinstance(ip_cache.get(p_ip), dict) else {}
+                                                    p_country = pop_online_country(p_ip) or existing_entry.get("country", "")
+                                                    if not existing_entry.get("asn") or (p_country and not existing_entry.get("country")):
+                                                        ip_cache[p_ip] = {
+                                                            "asn": p_asn,
+                                                            "isp": p_isp,
+                                                            "net_type": ASN_EXACT_NET_TYPE.get(p_asn) or classify_asn(p_asn, p_isp),
+                                                            "country": p_country,
+                                                        }
+                                                        ip_cache_dirty = True
+
+                                                for _, cf_item in active_doc_items:
+                                                    ing_ip = (cf_item.get("ip") or "").strip()
+                                                    if ing_ip in probe_asn_map and (
+                                                        not cf_item.get("raw_asn")
+                                                        or cf_item.get("raw_asn") in ("AS0", "0", "AS_UNKNOWN", "UNKNOWN")
+                                                    ):
+                                                        p_asn, p_isp = probe_asn_map[ing_ip]
+                                                        if p_asn:
+                                                            p_isp = p_isp or ASN_TO_PROVIDER.get(p_asn, "")
+                                                            cf_item["raw_asn"] = p_asn
+                                                            cf_item["isp"] = p_isp
+                                                            cf_item["asn"] = format_asn_isp(p_asn, p_isp)
+                                                    ex_ip = (cf_item.get("exit_ip") or "").strip()
+                                                    if ex_ip in probe_asn_map and (
+                                                        not cf_item.get("exit_asn")
+                                                        or cf_item.get("exit_asn") in ("AS0", "0", "AS_UNKNOWN", "UNKNOWN")
+                                                    ):
+                                                        p_asn, p_isp = probe_asn_map[ex_ip]
+                                                        if p_asn:
+                                                            p_isp = p_isp or ASN_TO_PROVIDER.get(p_asn, "")
+                                                            cf_item["exit_asn"] = p_asn
+                                                            cf_item["exit_isp"] = p_isp
 
                                         doc_proxy_added = 0
                                         doc_scan_added = 0
