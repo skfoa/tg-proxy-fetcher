@@ -1,15 +1,15 @@
 [
   {
-    "proxy": "43.229.254.71:443",
-    "ip": "43.229.254.71",
+    "proxy": "43.229.254.182:443",
+    "ip": "43.229.254.182",
     "port": 443,
     "tls": true,
-    "clientIp": "2401:2900:108::135",
+    "clientIp": "2401:2900:108::116",
     "clientIps": [
-      "2401:2900:108::135"
+      "2401:2900:108::116"
     ],
     "clientIpv4": "",
-    "clientIpv6": "2401:2900:108::135",
+    "clientIpv6": "2401:2900:108::116",
     "dual_stack": false,
     "country": "ID",
     "country_name": "印度尼西亚",
@@ -22,38 +22,16 @@
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "103.153.131.67:443",
-    "ip": "103.153.131.67",
+    "proxy": "43.229.254.71:443",
+    "ip": "43.229.254.71",
     "port": 443,
     "tls": true,
-    "clientIp": "103.153.131.67",
+    "clientIp": "2401:2900:108::135",
     "clientIps": [
-      "103.153.131.67"
-    ],
-    "clientIpv4": "103.153.131.67",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "ID",
-    "country_name": "印度尼西亚",
-    "country_cn": "印度尼西亚",
-    "country_emoji": "🇮🇩",
-    "asn": "140463",
-    "asOrganization": "Sekolah Tinggi Teknologi Kedirgantaraan Yogyakarta",
-    "isp": "Sekolah Tinggi Teknologi Kedirgantaraan Yogyakarta",
-    "net_type": "education",
-    "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "43.229.254.182:443",
-    "ip": "43.229.254.182",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2401:2900:108::116",
-    "clientIps": [
-      "2401:2900:108::116"
+      "2401:2900:108::135"
     ],
     "clientIpv4": "",
-    "clientIpv6": "2401:2900:108::116",
+    "clientIpv6": "2401:2900:108::135",
     "dual_stack": false,
     "country": "ID",
     "country_name": "印度尼西亚",

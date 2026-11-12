@@ -44,6 +44,28 @@
     "source": "@danfeng_chat"
   },
   {
+    "proxy": "194.5.98.105:8443",
+    "ip": "194.5.98.105",
+    "port": 8443,
+    "tls": true,
+    "clientIp": "194.5.98.105",
+    "clientIps": [
+      "194.5.98.105"
+    ],
+    "clientIpv4": "194.5.98.105",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "NO",
+    "country_name": "挪威",
+    "country_cn": "挪威",
+    "country_emoji": "🇳🇴",
+    "asn": "149020",
+    "asOrganization": "WebHorizon Internet Services",
+    "isp": "WebHorizon Internet Services",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
+  },
+  {
     "proxy": "84.208.211.208:8443",
     "ip": "84.208.211.208",
     "port": 8443,

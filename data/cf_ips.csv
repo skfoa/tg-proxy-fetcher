@@ -1,148 +1,150 @@
 ﻿ip,port,tls,delay_ms,speed_kbs,colo,cf_location,asn,isp,fail_count,first_seen,channel
-179.255.116.154,47492,true,69,,SJC,北美洲 · 美国圣何塞,AS906 DMIT,DMIT Cloud Services,0,2026-09-16 12:00:32,@danfeng_chat
-136.175.177.113,443,true,112,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT,DMIT Cloud Services,0,2026-11-09 18:00:30,@danfeng_chat
-179.255.101.54,443,true,112,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT (NetCrew),NetCrew,0,2026-10-29 06:00:33,@danfeng_chat
-95.169.10.15,443,true,112,,SJC,北美洲 · 美国圣何塞,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-09-11 18:00:33,@danfeng_chat
-67.216.206.14,443,true,113,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-11-07 06:00:23,@danfeng_chat
-64.186.234.81,25218,true,113,,SJC,北美洲 · 美国圣何塞,AS906 DMIT,DMIT Cloud Services,0,2026-09-10 00:34:58,@otcfxq
-179.253.247.192,443,true,118,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT (NetCrew),NetCrew,0,2026-11-11 00:00:24,@danfeng_chat
-154.17.225.143,26676,true,118,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT,DMIT Cloud Services,0,2026-10-31 12:00:23,@danfeng_chat
-179.253.241.115,443,true,118,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT (NetCrew),NetCrew,0,2026-10-28 00:00:33,@danfeng_chat
-95.169.6.159,443,true,118,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-10-23 18:00:34,@danfeng_chat
-154.17.0.168,1335,true,118,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT,DMIT Cloud Services,0,2026-10-11 00:00:30,@danfeng_chat
-179.255.148.152,34353,true,118,,TPE,亚洲 · 中国台北,AS906 DMIT,DMIT Cloud Services,0,2026-09-28 11:04:25,@otcfxq
-107.182.30.238,443,true,119,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-11-09 00:00:22,@danfeng_chat
-144.34.146.17,443,true,119,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-11-08 00:00:32,@danfeng_chat
-64.178.113.73,443,true,119,,LAX,北美洲 · 美国洛杉矶,AS400951 Akari Networks LLC,AKARI,0,2026-11-05 12:00:28,@danfeng_chat
-179.255.105.145,11603,true,119,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT (NetCrew),NetCrew,0,2026-10-19 18:00:30,@danfeng_chat
-179.253.243.70,443,true,119,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT (NetCrew),NetCrew,0,2026-10-19 00:00:27,@danfeng_chat
-23.236.67.84,443,true,119,,LAX,北美洲 · 美国洛杉矶,AS967 VMISS,VMISS Inc.,0,2026-10-08 00:00:33,@danfeng_chat
-107.182.190.159,443,true,119,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-10-04 06:00:32,@danfeng_chat
-69.63.203.93,33333,true,119,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT,DMIT Cloud Services,0,2026-10-02 12:00:29,@danfeng_chat
-154.36.135.232,39487,true,119,,LAX,北美洲 · 美国洛杉矶,AS979 NetLab,NetLab Global,0,2026-09-24 00:00:32,@danfeng_chat
-69.63.215.115,30684,true,119,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT,DMIT Cloud Services,0,2026-09-21 09:34:30,@otcfxq
-89.208.251.252,443,true,119,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-09-15 18:00:26,@danfeng_chat
-69.63.202.75,17640,true,119,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT,DMIT Cloud Services,0,2026-09-09 19:04:23,@otcfxq
-154.17.30.36,15282,true,120,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT,DMIT Cloud Services,0,2026-10-12 12:00:34,@danfeng_chat
-192.243.119.97,443,true,121,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-11-10 12:00:26,@danfeng_chat
-154.36.170.93,443,true,121,,LAX,北美洲 · 美国洛杉矶,AS979 NetLab,NetLab Global,0,2026-11-05 18:00:29,@danfeng_chat
-64.186.226.227,16770,true,121,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT,DMIT Cloud Services,0,2026-11-01 12:00:29,@danfeng_chat
-95.169.6.241,443,true,121,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-10-27 00:00:28,@danfeng_chat
-38.65.95.18,26524,true,121,,LAX,北美洲 · 美国洛杉矶,AS46783 EASY LINK LLC,Easy Link LLC,0,2026-10-25 06:00:24,@danfeng_chat
-45.78.72.73,443,true,121,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-10-24 12:00:22,@danfeng_chat
-154.17.10.244,15787,true,121,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT,DMIT Cloud Services,0,2026-10-18 18:00:38,@danfeng_chat
-179.255.146.197,38989,true,121,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT,DMIT Cloud Services,0,2026-10-16 06:00:28,@danfeng_chat
-216.24.188.6,443,true,121,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-10-16 00:00:30,@danfeng_chat
-216.195.213.111,1891,true,121,,LAX,北美洲 · 美国洛杉矶,AS979 NetLab,NetLab Global,0,2026-10-13 06:00:33,@danfeng_chat
-192.69.89.173,443,true,121,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-10-10 18:00:29,@danfeng_chat
-104.243.23.31,8443,true,121,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-10-10 06:00:27,@danfeng_chat
-154.17.30.170,49589,true,121,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT,DMIT Cloud Services,0,2026-10-09 18:00:27,@danfeng_chat
-154.9.240.98,8443,true,121,,LAX,北美洲 · 美国洛杉矶,AS979 NetLab,NetLab Global,0,2026-10-06 12:00:26,@danfeng_chat
-185.218.7.129,443,true,121,,SJC,北美洲 · 美国圣何塞,AS51089 Kirino (SnapStack Limited),SnapStack Limited,0,2026-10-06 06:00:23,@danfeng_chat
-174.136.206.39,31666,true,121,,TPE,亚洲 · 中国台北,AS906 DMIT,DMIT Cloud Services,0,2026-09-28 09:18:41,@otcfxq
-144.34.169.73,443,true,121,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-09-16 18:00:28,@danfeng_chat
-64.186.234.87,15984,true,121,,SJC,北美洲 · 美国圣何塞,AS906 DMIT,DMIT Cloud Services,0,2026-09-10 00:42:09,@otcfxq
-179.255.115.221,443,true,122,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT,DMIT Cloud Services,0,2026-11-10 18:00:28,@danfeng_chat
-207.57.146.209,443,true,122,,LAX,北美洲 · 美国洛杉矶,AS1054 Zont LLC (NTT America),NTT America,0,2026-11-08 12:00:26,@danfeng_chat
-104.194.77.57,443,true,122,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-11-04 18:00:33,@danfeng_chat
-23.172.40.15,443,true,122,,LAX,北美洲 · 美国洛杉矶,AS63150 Bage Cloud,Bage Cloud LLC,0,2026-11-03 12:00:27,@danfeng_chat
-104.243.20.49,443,true,122,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-11-03 06:00:21,@danfeng_chat
-23.166.168.9,443,true,122,,LAX,北美洲 · 美国洛杉矶,AS8796 Kurun Cloud (Fastnet Data Inc),Fastnet Data Inc,0,2026-11-01 18:00:29,@danfeng_chat
-67.230.190.50,443,true,122,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-10-16 12:00:33,@danfeng_chat
-179.255.118.32,20974,true,122,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT (NetCrew),NetCrew,0,2026-10-15 06:00:27,@danfeng_chat
-97.64.29.11,443,true,122,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-10-11 12:00:24,@danfeng_chat
-216.195.213.79,1891,true,122,,LAX,北美洲 · 美国洛杉矶,AS979 NetLab,NetLab Global,0,2026-10-06 18:00:32,@danfeng_chat
-154.36.137.248,443,true,125,,LAX,北美洲 · 美国洛杉矶,AS979 NetLab,NetLab Global,0,2026-11-05 06:00:28,@danfeng_chat
-179.253.240.96,443,true,125,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT (NetCrew),NetCrew,0,2026-11-04 00:00:31,@danfeng_chat
-64.118.155.168,443,true,125,,SJC,北美洲 · 美国圣何塞,AS138997 Eons Data,Eons Data Communications Limited,0,2026-09-22 06:00:33,@danfeng_chat
-99.83.207.43,443,true,133,,SEA,北美洲 · Seattle,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",0,2026-10-22 06:00:28,@danfeng_chat
-166.117.140.55,443,true,140,,IAD,北美洲 · 美国阿什伯恩,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",0,2026-10-27 06:00:27,@danfeng_chat
-179.255.127.43,443,true,141,,PDX,北美洲 · 美国波特兰,AS906 DMIT (NetCrew),NetCrew,0,2026-10-14 06:00:33,@danfeng_chat
-65.49.233.236,443,true,165,,YVR,北美洲 · Vancouver,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-11-11 06:00:26,@danfeng_chat
-108.165.23.16,30472,true,176,,STL,北美洲 · 圣路易斯,AS203090 BITSFLOWCLOUD LTD,Bitsflowcloud LTD,0,2026-09-30 06:00:33,@danfeng_chat
-54.85.135.212,443,true,184,,IAD,北美洲 · 美国阿什伯恩,"AS14618 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",0,2026-11-08 18:00:32,@danfeng_chat
-54.83.72.82,443,true,187,,IAD,北美洲 · 美国阿什伯恩,"AS14618 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",0,2026-11-02 06:00:28,@danfeng_chat
-44.197.227.132,443,true,193,,IAD,北美洲 · 美国阿什伯恩,AS14618 Amazon AWS (Amazon.com),Amazon.com,0,2026-10-18 00:00:23,@danfeng_chat
-98.85.241.163,443,true,197,,IAD,北美洲 · 美国阿什伯恩,"AS14618 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",0,2026-09-14 06:00:33,@danfeng_chat
-44.207.27.42,443,true,199,,IAD,北美洲 · 美国阿什伯恩,AS14618 Amazon AWS (Amazon.com),Amazon.com,0,2026-10-15 00:00:19,@danfeng_chat
-154.19.187.81,2052,true,250,,NRT,亚太 · 日本东京,AS149042 Silicon Cloud Global (US) (HONGKONG),"SICLOUD INFORMATION TECHNOLOGY (HONGKONG) CO., LIMITED",0,2026-10-12 06:00:28,@danfeng_chat
-154.31.112.237,26418,true,260,,NRT,亚洲 · 日本东京,AS906 DMIT,DMIT Cloud Services,0,2026-09-10 10:28:04,@otcfxq
-154.31.114.162,8443,true,260,,NRT,亚洲 · 日本东京,AS906 DMIT,DMIT Cloud Services,0,2026-09-08 16:34:36,@otcfxq
-13.230.4.244,443,true,261,,NRT,亚太 · 日本东京,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",0,2026-11-02 00:00:28,@danfeng_chat
-5.34.220.118,44302,true,279,,KIX,亚太 · 大阪,AS38136 Akari Networks Limited,Akari Networks Limited,0,2026-10-29 18:00:27,@danfeng_chat
-18.180.25.22,443,true,279,,NRT,亚太 · 日本东京,AS16509 Amazon AWS (Amazon Technologies Inc.),Amazon Technologies Inc.,0,2026-10-14 00:00:29,@danfeng_chat
-156.231.117.230,443,true,279,,NRT,亚太 · 日本东京,AS61112 AkileCloud (Akile LTD),Akile LTD,0,2026-09-28 18:00:23,@danfeng_chat
-216.195.205.0,1891,true,283,,NRT,亚太 · 日本东京,AS138997 Eons Data,Eons Data Communications Limited,0,2026-10-26 06:00:34,@danfeng_chat
-185.184.223.73,50005,true,283,,NRT,亚太 · 日本东京,AS3258 xTom Japan,xTom Japan Corporation,0,2026-10-22 18:00:27,@danfeng_chat
-14.137.235.178,443,true,283,,NRT,亚太 · 日本东京,AS2497 Internet Initiative Japan Inc.,Internet Initiative Japan Inc.,0,2026-10-07 12:00:22,@danfeng_chat
-154.83.94.119,18181,true,283,,NRT,亚太 · 日本东京,AS61112 AkileCloud (Akile LTD),Akile LTD,0,2026-10-07 00:00:28,@danfeng_chat
-156.246.89.106,53341,true,284,,NRT,亚太 · 日本东京,AS61112 AkileCloud (Akile LTD),Akile LTD,0,2026-11-03 00:00:27,@danfeng_chat
-166.88.99.195,443,true,284,,KIX,亚太 · 大阪,AS149440 Evoxt,Evoxt Sdn. Bhd.,0,2026-10-11 18:00:31,@danfeng_chat
-216.195.203.252,1891,true,284,,NRT,亚太 · 日本东京,AS138997 Eons Data,Eons Data Communications Limited,0,2026-09-23 18:00:33,@danfeng_chat
-178.157.60.242,20000,true,285,,KIX,亚太 · 大阪,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-11-10 06:00:27,@danfeng_chat
-45.66.216.81,25071,true,285,,NRT,亚太 · 日本东京,AS3258 xTom Japan (VIRMACH),VIRMACH,0,2026-11-02 12:00:33,@danfeng_chat
-156.246.95.200,42550,true,285,,NRT,亚太 · 日本东京,AS61112 AkileCloud (Akile LTD),Akile LTD,0,2026-10-30 12:00:28,@danfeng_chat
-156.246.92.204,14050,true,285,,NRT,亚太 · 日本东京,AS61112 AkileCloud (Akile LTD),Akile LTD,0,2026-10-28 06:00:28,@danfeng_chat
-156.246.95.15,20580,true,285,,NRT,亚太 · 日本东京,AS61112 AkileCloud (Akile LTD),Akile LTD,0,2026-09-28 12:00:19,@danfeng_chat
-166.88.100.64,22222,true,285,,KIX,亚太 · 大阪,AS149440 Evoxt,Evoxt Sdn. Bhd.,0,2026-09-15 12:00:28,@danfeng_chat
-216.236.1.34,1891,true,285,,NRT,亚太 · 日本东京,AS138997 Eons Data,Eons Data Communications Limited,0,2026-09-11 12:00:27,@danfeng_chat
-216.195.204.64,24457,true,286,,NRT,亚太 · 日本东京,AS138997 Eons Data,Eons Data Communications Limited,0,2026-11-06 06:00:31,@danfeng_chat
-104.194.88.96,443,true,286,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-10-30 00:00:33,@danfeng_chat
-195.245.242.47,10312,true,286,,NRT,亚太 · 日本东京,AS3258 xTom Japan,xTom Japan Corporation,0,2026-09-28 06:00:30,@danfeng_chat
-45.120.157.69,443,true,286,,NRT,亚太 · 日本东京,AS134835 Starry Network,Starry Network Limited,0,2026-09-25 00:00:27,@danfeng_chat
-151.241.128.88,15267,true,286,,NRT,亚太 · 日本东京,AS215023 LIMEE NETWORK LTD,LIMEE NETWORK LTD,0,2026-09-24 12:00:33,@danfeng_chat
-216.195.205.178,1891,true,287,,NRT,亚太 · 日本东京,AS138997 Eons Data,Eons Data Communications Limited,0,2026-10-14 18:00:28,@danfeng_chat
-52.209.88.160,443,true,288,,DUB,欧洲 · 都柏林,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",0,2026-10-31 18:00:33,@danfeng_chat
-142.248.139.237,51982,true,289,,NRT,亚太 · 日本东京,AS137535 JT Telecom,JT TELECOM INTERNATIONAL PTE.LTD.,0,2026-09-13 12:00:29,@danfeng_chat
-192.243.116.15,443,true,291,,EWR,北美洲 · 美国纽瓦克,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-09-27 06:00:32,@danfeng_chat
-38.59.230.210,14338,true,291,,AMS,欧洲 · 荷兰阿姆斯特丹,AS41378 KirinoNET (Kirino LLC),Kirino LLC,0,2026-09-13 06:00:28,@danfeng_chat
-140.235.39.38,20869,true,292,,TPE,亚太 · 台北,AS212336 ByteVirt (Sunoaki Network LLC),Sunoaki Network LLC,0,2026-10-26 00:00:24,@danfeng_chat
-193.177.220.197,13223,true,303,,SYD,大洋洲 · 澳大利亚悉尼,AS8888 xTom,xTom Pty Ltd,0,2026-10-31 06:00:34,@danfeng_chat
-213.210.4.187,21920,true,304,,TPE,亚太 · 台北,AS212336 ByteVirt,ByteVirt LLC,0,2026-10-18 06:00:27,@danfeng_chat
-77.90.35.230,45513,true,305,,SYD,大洋洲 · 澳大利亚悉尼,"AS63473 HostHatch, LLC",HostHatch,0,2026-10-07 18:00:32,@danfeng_chat
-216.236.51.12,1891,true,318,,HKG,亚太 · 香港,AS138997 Eons Data,Eons Data Communications Limited,0,2026-11-10 00:00:17,@danfeng_chat
-216.236.51.162,1891,true,318,,HKG,亚太 · 香港,AS138997 Eons Data,Eons Data Communications Limited,0,2026-09-27 12:00:29,@danfeng_chat
-155.254.104.174,44301,true,318,,HKG,亚太 · 香港,AS38136 Akari Networks Limited,Akari Networks Limited,0,2026-09-24 06:00:31,@danfeng_chat
-216.236.51.163,1891,true,330,,HKG,亚太 · 香港,AS138997 Eons Data,Eons Data Communications Limited,0,2026-11-04 12:00:33,@danfeng_chat
-38.55.199.222,443,true,334,,HKG,亚太 · 香港,AS139659 LUCIDACLOUD LIMITED (Cogent Communications),Cogent Communications,0,2026-10-08 12:00:33,@danfeng_chat
-216.236.51.150,1891,true,335,,HKG,亚太 · 香港,AS138997 Eons Data,Eons Data Communications Limited,0,2026-11-08 06:00:32,@danfeng_chat
-191.223.212.227,18443,true,335,,HKG,亚太 · 香港,AS906 DMIT,DMIT Cloud Services,0,2026-10-12 00:00:33,@danfeng_chat
-191.223.218.118,443,true,336,,HKG,亚太 · 香港,AS906 DMIT (NetCrew),NetCrew,0,2026-11-09 12:00:27,@danfeng_chat
-207.57.124.208,8446,true,336,,HKG,亚太 · 香港,AS139659 LUCIDACLOUD LIMITED (NTT America),NTT America,0,2026-10-27 12:00:31,@danfeng_chat
-45.207.157.100,17465,true,336,,HKG,亚太 · 香港,AS61112 AkileCloud (Akile LTD),Akile LTD,0,2026-10-05 00:00:28,@danfeng_chat
-38.22.94.79,33879,true,336,,HKG,亚太 · 香港,AS979 NetLab,NetLab Global,0,2026-09-16 06:00:32,@danfeng_chat
-103.135.251.71,32688,true,337,,HKG,亚太 · 香港,AS32519 DMIT Cloud Services,DMIT Cloud Services,0,2026-10-25 18:00:33,@danfeng_chat
-103.115.109.227,39738,true,337,,HKG,亚太 · 香港,AS152179 Global Communication Network,Global Communication Network Limited,0,2026-10-08 18:00:26,@danfeng_chat
-103.20.222.136,443,true,338,,HKG,亚太 · 香港,AS40065 CloudRadium (Hong Kong Business Telecom Limited),Hong Kong Business Telecom Limited,0,2026-11-06 00:00:23,@danfeng_chat
-151.242.125.151,80,true,338,,HKG,亚太 · 香港,AS61112 AkileCloud (Akile LTD),Akile LTD,0,2026-10-28 12:00:28,@danfeng_chat
-179.255.103.98,443,true,344,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT (NetCrew),NetCrew,0,2026-10-31 00:00:30,@danfeng_chat
-198.176.54.11,33344,true,344,,HKG,亚太 · 香港,AS400618 Prime Security,Prime Security Corp,0,2026-10-16 18:00:28,@danfeng_chat
-38.55.122.83,443,true,345,,HKG,亚太 · 香港,AS6134 Xnnet,Xnnet LLC,0,2026-10-13 12:00:24,@danfeng_chat
-45.135.119.251,32633,true,350,,HKG,亚太 · 香港,AS6134 Xnnet,Xnnet LLC,0,2026-11-11 12:00:27,@danfeng_chat
-85.149.211.62,8443,true,360,,SIN,亚太 · 新加坡,AS63150 Bage Cloud,Bage Cloud LLC,0,2026-09-26 18:00:33,@danfeng_chat
-116.206.178.154,19436,true,366,,HKG,亚太 · 香港,AS6134 Xnnet,Xnnet LLC,0,2026-09-12 18:00:31,@danfeng_chat
-96.9.212.206,60093,true,366,,SIN,亚洲 · 新加坡新加坡,AS8888 xTom,xTom Pty Ltd,0,2026-09-09 10:59:23,@otcfxq
-103.248.228.175,443,true,370,,SIN,亚太 · 新加坡,AS38136 Akari Networks Limited,Akari Networks Limited,0,2026-10-27 18:00:26,@danfeng_chat
-54.251.138.69,443,true,370,,SIN,亚太 · 新加坡,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",0,2026-10-09 06:00:32,@danfeng_chat
-185.36.193.13,54321,true,377,,SIN,亚太 · 新加坡,AS38136 Akari Networks Limited,Akari Networks Limited,0,2026-10-25 12:00:32,@danfeng_chat
-8.219.78.44,7445,true,378,,SIN,亚太 · 新加坡,AS45102 Alibaba Cloud (US),"Alibaba (US) Technology Co., Ltd.",0,2026-09-29 12:00:24,@danfeng_chat
-103.207.49.121,15357,true,379,,TPE,亚太 · 台北,AS31972 Emagine Concept,"Emagine Concept, Inc.",0,2026-10-17 12:00:31,@danfeng_chat
-179.255.154.69,16005,true,381,,SIN,亚太 · 新加坡,AS906 DMIT (NetCrew),NetCrew,0,2026-11-03 18:00:29,@danfeng_chat
-31.57.224.190,19343,true,383,,SIN,亚太 · 新加坡,"AS63473 HostHatch, LLC",HostHatch,0,2026-10-08 06:00:22,@danfeng_chat
-152.42.254.219,443,true,386,,SIN,亚太 · 新加坡,AS14061 DigitalOcean,"DigitalOcean, LLC",0,2026-11-07 12:00:22,@danfeng_chat
-166.0.253.110,39971,true,399,,SIN,亚太 · 新加坡,AS149440 Evoxt (Ace Data Centers),Ace Data Centers,0,2026-11-06 12:00:22,@danfeng_chat
-64.81.116.126,26950,true,423,,HKG,亚太 · 香港,AS979 NetLab,NetLab Global,0,2026-11-09 06:00:19,@danfeng_chat
-194.122.83.189,24443,true,484,,BOM,亚太 · 印度孟买,AS152179 Global Communication Network,Global Communication Network Limited,0,2026-10-02 18:00:32,@danfeng_chat
-194.122.83.139,24443,true,503,,BOM,亚太 · 印度孟买,AS152179 Global Communication Network,Global Communication Network Limited,0,2026-09-25 12:00:28,@danfeng_chat
-101.52.222.253,443,true,507,,HKG,亚洲 · 中国香港,AS4811 China Telecom (Group),China Telecom (Group),0,2026-09-23 17:58:44,@otcfxq
-191.40.11.102,1891,true,539,,FRA,欧洲 · 德国法兰克福,AS138997 Eons Data,Eons Data Communications Limited,0,2026-09-15 00:00:32,@danfeng_chat
-45.149.156.48,50035,true,553,,NRT,亚太 · 日本东京,AS3258 xTom Japan,xTom Japan Corporation,0,2026-10-30 06:00:26,@danfeng_chat
-191.40.11.160,1891,true,571,,WAW,欧洲 · 波兰华沙,AS138997 Eons Data,Eons Data Communications Limited,0,2026-11-07 00:00:29,@danfeng_chat
-216.195.221.245,1891,true,572,,FRA,欧洲 · 德国法兰克福,AS138997 Eons Data,Eons Data Communications Limited,0,2026-11-06 18:00:22,@danfeng_chat
-216.195.221.241,1891,true,591,,FRA,欧洲 · 德国法兰克福,AS138997 Eons Data,Eons Data Communications Limited,0,2026-10-07 06:00:23,@danfeng_chat
-216.195.221.195,1891,true,591,,FRA,欧洲 · 德国法兰克福,AS138997 Eons Data,Eons Data Communications Limited,0,2026-09-26 06:00:28,@danfeng_chat
-216.195.221.139,1891,true,591,,FRA,欧洲 · 德国法兰克福,AS138997 Eons Data,Eons Data Communications Limited,0,2026-09-17 12:00:33,@danfeng_chat
-61.172.182.19,443,true,772,,TPE,亚洲 · 中国台北,AS21859 Zenlayer (ZENLA-1),ZENLA-1,0,2026-09-24 09:05:22,@otcfxq
-38.58.57.214,443,true,1211,,LAX,北美洲 · 美国洛杉矶,AS979 NetLab,NetLab Global,0,2026-10-01 00:00:30,@danfeng_chat
-103.222.33.59,443,true,1831,,ORD,北美洲 · 美国芝加哥,AS4811 China Telecom (Group),China Telecom (Group),0,2026-09-23 17:58:44,@otcfxq
-137.220.151.249,443,true,352,,MRS,欧洲 · 法国马赛,AS152194 CTG Server Limited,CTG Server Limited,1,2026-10-19 12:00:31,@danfeng_chat
+166.117.140.55,443,true,33,,IAD,北美洲 · 美国阿什伯恩,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",0,2026-10-27 06:00:27,@danfeng_chat
+44.197.227.132,443,true,33,,IAD,北美洲 · 美国阿什伯恩,AS14618 Amazon AWS (Amazon.com),Amazon.com,0,2026-10-18 00:00:23,@danfeng_chat
+54.85.135.212,443,true,36,,IAD,北美洲 · 美国阿什伯恩,"AS14618 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",0,2026-11-08 18:00:32,@danfeng_chat
+54.83.72.82,443,true,36,,IAD,北美洲 · 美国阿什伯恩,"AS14618 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",0,2026-11-02 06:00:28,@danfeng_chat
+44.207.27.42,443,true,37,,IAD,北美洲 · 美国阿什伯恩,AS14618 Amazon AWS (Amazon.com),Amazon.com,0,2026-10-15 00:00:19,@danfeng_chat
+98.85.241.163,443,true,41,,IAD,北美洲 · 美国阿什伯恩,"AS14618 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",0,2026-09-14 06:00:33,@danfeng_chat
+34.198.11.167,443,true,42,,IAD,北美洲 · 美国阿什伯恩,"AS14618 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",0,2026-11-12 12:00:27,@danfeng_chat
+108.165.23.16,30472,true,87,,STL,北美洲 · 圣路易斯,AS203090 BITSFLOWCLOUD LTD,Bitsflowcloud LTD,0,2026-09-30 06:00:33,@danfeng_chat
+154.17.10.244,15787,true,144,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT,DMIT Cloud Services,0,2026-10-18 18:00:38,@danfeng_chat
+174.136.206.39,31666,true,144,,TPE,亚洲 · 中国台北,AS906 DMIT,DMIT Cloud Services,0,2026-09-28 09:18:41,@otcfxq
+179.255.103.98,443,true,184,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT (NetCrew),NetCrew,0,2026-10-31 00:00:30,@danfeng_chat
+38.65.95.18,26524,true,184,,LAX,北美洲 · 美国洛杉矶,AS46783 EASY LINK LLC,Easy Link LLC,0,2026-10-25 06:00:24,@danfeng_chat
+179.255.146.197,38989,true,184,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT,DMIT Cloud Services,0,2026-10-16 06:00:28,@danfeng_chat
+179.255.148.152,34353,true,209,,TPE,亚洲 · 中国台北,AS906 DMIT,DMIT Cloud Services,0,2026-09-28 11:04:25,@otcfxq
+144.34.146.17,443,true,210,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-11-08 00:00:32,@danfeng_chat
+154.36.137.248,443,true,210,,LAX,北美洲 · 美国洛杉矶,AS979 NetLab,NetLab Global,0,2026-11-05 06:00:28,@danfeng_chat
+154.17.225.143,26676,true,210,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT,DMIT Cloud Services,0,2026-10-31 12:00:23,@danfeng_chat
+179.253.243.70,443,true,210,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT (NetCrew),NetCrew,0,2026-10-19 00:00:27,@danfeng_chat
+64.186.234.81,25218,true,210,,SJC,北美洲 · 美国圣何塞,AS906 DMIT,DMIT Cloud Services,0,2026-09-10 00:34:58,@otcfxq
+69.63.202.75,17640,true,210,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT,DMIT Cloud Services,0,2026-09-09 19:04:23,@otcfxq
+45.78.72.73,443,true,211,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-10-24 12:00:22,@danfeng_chat
+154.17.30.36,15282,true,211,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT,DMIT Cloud Services,0,2026-10-12 12:00:34,@danfeng_chat
+64.178.113.73,443,true,216,,LAX,北美洲 · 美国洛杉矶,AS400951 Akari Networks LLC,AKARI,0,2026-11-05 12:00:28,@danfeng_chat
+179.253.247.192,443,true,217,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT (NetCrew),NetCrew,0,2026-11-11 00:00:24,@danfeng_chat
+179.255.115.221,443,true,217,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT,DMIT Cloud Services,0,2026-11-10 18:00:28,@danfeng_chat
+136.175.177.113,443,true,217,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT,DMIT Cloud Services,0,2026-11-09 18:00:30,@danfeng_chat
+67.216.206.14,443,true,217,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-11-07 06:00:23,@danfeng_chat
+23.166.168.9,443,true,217,,LAX,北美洲 · 美国洛杉矶,AS8796 Kurun Cloud (Fastnet Data Inc),Fastnet Data Inc,0,2026-11-01 18:00:29,@danfeng_chat
+179.253.241.115,443,true,217,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT (NetCrew),NetCrew,0,2026-10-28 00:00:33,@danfeng_chat
+179.255.105.145,11603,true,217,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT (NetCrew),NetCrew,0,2026-10-19 18:00:30,@danfeng_chat
+216.24.188.6,443,true,217,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-10-16 00:00:30,@danfeng_chat
+69.63.203.93,33333,true,217,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT,DMIT Cloud Services,0,2026-10-02 12:00:29,@danfeng_chat
+154.36.135.232,39487,true,217,,LAX,北美洲 · 美国洛杉矶,AS979 NetLab,NetLab Global,0,2026-09-24 00:00:32,@danfeng_chat
+179.255.121.61,51234,true,218,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT (NetCrew),NetCrew,0,2026-11-11 18:00:28,@danfeng_chat
+192.243.119.97,443,true,218,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-11-10 12:00:26,@danfeng_chat
+104.194.77.57,443,true,218,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-11-04 18:00:33,@danfeng_chat
+179.253.240.96,443,true,218,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT (NetCrew),NetCrew,0,2026-11-04 00:00:31,@danfeng_chat
+95.169.6.241,443,true,218,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-10-27 00:00:28,@danfeng_chat
+179.255.118.32,20974,true,218,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT (NetCrew),NetCrew,0,2026-10-15 06:00:27,@danfeng_chat
+179.255.127.43,443,true,218,,PDX,北美洲 · 美国波特兰,AS906 DMIT (NetCrew),NetCrew,0,2026-10-14 06:00:33,@danfeng_chat
+154.17.0.168,1335,true,218,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT,DMIT Cloud Services,0,2026-10-11 00:00:30,@danfeng_chat
+192.69.89.173,443,true,218,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-10-10 18:00:29,@danfeng_chat
+154.17.30.170,49589,true,218,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT,DMIT Cloud Services,0,2026-10-09 18:00:27,@danfeng_chat
+107.182.190.159,443,true,218,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-10-04 06:00:32,@danfeng_chat
+69.63.215.115,30684,true,218,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT,DMIT Cloud Services,0,2026-09-21 09:34:30,@otcfxq
+179.255.116.154,47492,true,218,,SJC,北美洲 · 美国圣何塞,AS906 DMIT,DMIT Cloud Services,0,2026-09-16 12:00:32,@danfeng_chat
+89.208.251.252,443,true,218,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-09-15 18:00:26,@danfeng_chat
+95.169.10.15,443,true,218,,SJC,北美洲 · 美国圣何塞,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-09-11 18:00:33,@danfeng_chat
+64.186.234.87,15984,true,218,,SJC,北美洲 · 美国圣何塞,AS906 DMIT,DMIT Cloud Services,0,2026-09-10 00:42:09,@otcfxq
+65.49.233.236,443,true,224,,YVR,北美洲 · Vancouver,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-11-11 06:00:26,@danfeng_chat
+154.36.170.93,443,true,224,,LAX,北美洲 · 美国洛杉矶,AS979 NetLab,NetLab Global,0,2026-11-05 18:00:29,@danfeng_chat
+23.172.40.15,443,true,224,,LAX,北美洲 · 美国洛杉矶,AS63150 Bage Cloud,Bage Cloud LLC,0,2026-11-03 12:00:27,@danfeng_chat
+104.243.20.49,443,true,224,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-11-03 06:00:21,@danfeng_chat
+104.194.88.96,443,true,224,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-10-30 00:00:33,@danfeng_chat
+95.169.6.159,443,true,224,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-10-23 18:00:34,@danfeng_chat
+67.230.190.50,443,true,224,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-10-16 12:00:33,@danfeng_chat
+97.64.29.11,443,true,224,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-10-11 12:00:24,@danfeng_chat
+104.243.23.31,8443,true,224,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-10-10 06:00:27,@danfeng_chat
+23.236.67.84,443,true,224,,LAX,北美洲 · 美国洛杉矶,AS967 VMISS,VMISS Inc.,0,2026-10-08 00:00:33,@danfeng_chat
+154.9.240.98,8443,true,224,,LAX,北美洲 · 美国洛杉矶,AS979 NetLab,NetLab Global,0,2026-10-06 12:00:26,@danfeng_chat
+45.62.114.36,443,true,225,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-11-12 00:00:22,@danfeng_chat
+107.182.30.238,443,true,225,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-11-09 00:00:22,@danfeng_chat
+99.83.207.43,443,true,225,,SEA,北美洲 · Seattle,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",0,2026-10-22 06:00:28,@danfeng_chat
+216.195.213.111,1891,true,225,,LAX,北美洲 · 美国洛杉矶,AS979 NetLab,NetLab Global,0,2026-10-13 06:00:33,@danfeng_chat
+216.195.213.79,1891,true,225,,LAX,北美洲 · 美国洛杉矶,AS979 NetLab,NetLab Global,0,2026-10-06 18:00:32,@danfeng_chat
+64.118.155.168,443,true,225,,SJC,北美洲 · 美国圣何塞,AS138997 Eons Data,Eons Data Communications Limited,0,2026-09-22 06:00:33,@danfeng_chat
+144.34.169.73,443,true,225,,LAX,北美洲 · 美国洛杉矶,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-09-16 18:00:28,@danfeng_chat
+52.209.88.160,443,true,227,,DUB,欧洲 · 都柏林,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",0,2026-10-31 18:00:33,@danfeng_chat
+38.59.230.210,14338,true,229,,AMS,欧洲 · 荷兰阿姆斯特丹,AS41378 KirinoNET (Kirino LLC),Kirino LLC,0,2026-09-13 06:00:28,@danfeng_chat
+192.243.116.15,443,true,340,,EWR,北美洲 · 美国纽瓦克,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-09-27 06:00:32,@danfeng_chat
+154.31.112.237,26418,true,385,,NRT,亚洲 · 日本东京,AS906 DMIT,DMIT Cloud Services,0,2026-09-10 10:28:04,@otcfxq
+154.31.114.162,8443,true,394,,NRT,亚洲 · 日本东京,AS906 DMIT,DMIT Cloud Services,0,2026-09-08 16:34:36,@otcfxq
+5.34.220.118,44302,true,395,,KIX,亚太 · 大阪,AS38136 Akari Networks Limited,Akari Networks Limited,0,2026-10-29 18:00:27,@danfeng_chat
+13.230.4.244,443,true,408,,NRT,亚太 · 日本东京,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",0,2026-11-02 00:00:28,@danfeng_chat
+142.248.139.237,51982,true,408,,NRT,亚太 · 日本东京,AS137535 JT Telecom,JT TELECOM INTERNATIONAL PTE.LTD.,0,2026-09-13 12:00:29,@danfeng_chat
+216.195.205.0,1891,true,409,,NRT,亚太 · 日本东京,AS138997 Eons Data,Eons Data Communications Limited,0,2026-10-26 06:00:34,@danfeng_chat
+156.231.117.230,443,true,409,,NRT,亚太 · 日本东京,AS61112 AkileCloud (Akile LTD),Akile LTD,0,2026-09-28 18:00:23,@danfeng_chat
+156.246.89.106,53341,true,411,,NRT,亚太 · 日本东京,AS61112 AkileCloud (Akile LTD),Akile LTD,0,2026-11-03 00:00:27,@danfeng_chat
+156.246.95.200,42550,true,411,,NRT,亚太 · 日本东京,AS61112 AkileCloud (Akile LTD),Akile LTD,0,2026-10-30 12:00:28,@danfeng_chat
+18.180.25.22,443,true,411,,NRT,亚太 · 日本东京,AS16509 Amazon AWS (Amazon Technologies Inc.),Amazon Technologies Inc.,0,2026-10-14 00:00:29,@danfeng_chat
+154.83.94.119,18181,true,411,,NRT,亚太 · 日本东京,AS61112 AkileCloud (Akile LTD),Akile LTD,0,2026-10-07 00:00:28,@danfeng_chat
+156.246.95.15,20580,true,411,,NRT,亚太 · 日本东京,AS61112 AkileCloud (Akile LTD),Akile LTD,0,2026-09-28 12:00:19,@danfeng_chat
+151.241.128.88,15267,true,411,,NRT,亚太 · 日本东京,AS215023 LIMEE NETWORK LTD,LIMEE NETWORK LTD,0,2026-09-24 12:00:33,@danfeng_chat
+216.195.203.252,1891,true,411,,NRT,亚太 · 日本东京,AS138997 Eons Data,Eons Data Communications Limited,0,2026-09-23 18:00:33,@danfeng_chat
+216.236.1.34,1891,true,411,,NRT,亚太 · 日本东京,AS138997 Eons Data,Eons Data Communications Limited,0,2026-09-11 12:00:27,@danfeng_chat
+178.157.60.242,20000,true,412,,KIX,亚太 · 大阪,AS25820 BandwagonHost (IT7 Networks Inc),IT7 Networks Inc,0,2026-11-10 06:00:27,@danfeng_chat
+45.66.216.81,25071,true,412,,NRT,亚太 · 日本东京,AS3258 xTom Japan (VIRMACH),VIRMACH,0,2026-11-02 12:00:33,@danfeng_chat
+156.246.92.204,14050,true,412,,NRT,亚太 · 日本东京,AS61112 AkileCloud (Akile LTD),Akile LTD,0,2026-10-28 06:00:28,@danfeng_chat
+185.184.223.73,50005,true,412,,NRT,亚太 · 日本东京,AS3258 xTom Japan,xTom Japan Corporation,0,2026-10-22 18:00:27,@danfeng_chat
+216.195.205.178,1891,true,412,,NRT,亚太 · 日本东京,AS138997 Eons Data,Eons Data Communications Limited,0,2026-10-14 18:00:28,@danfeng_chat
+166.88.99.195,443,true,412,,KIX,亚太 · 大阪,AS149440 Evoxt,Evoxt Sdn. Bhd.,0,2026-10-11 18:00:31,@danfeng_chat
+14.137.235.178,443,true,412,,NRT,亚太 · 日本东京,AS2497 Internet Initiative Japan Inc.,Internet Initiative Japan Inc.,0,2026-10-07 12:00:22,@danfeng_chat
+195.245.242.47,10312,true,412,,NRT,亚太 · 日本东京,AS3258 xTom Japan,xTom Japan Corporation,0,2026-09-28 06:00:30,@danfeng_chat
+166.88.100.64,22222,true,412,,KIX,亚太 · 大阪,AS149440 Evoxt,Evoxt Sdn. Bhd.,0,2026-09-15 12:00:28,@danfeng_chat
+45.120.157.69,443,true,413,,NRT,亚太 · 日本东京,AS134835 Starry Network,Starry Network Limited,0,2026-09-25 00:00:27,@danfeng_chat
+194.122.83.139,24443,true,415,,BOM,亚太 · 印度孟买,AS152179 Global Communication Network,Global Communication Network Limited,0,2026-09-25 12:00:28,@danfeng_chat
+140.235.39.38,20869,true,424,,TPE,亚太 · 台北,AS212336 ByteVirt (Sunoaki Network LLC),Sunoaki Network LLC,0,2026-10-26 00:00:24,@danfeng_chat
+194.122.83.189,24443,true,431,,BOM,亚太 · 印度孟买,AS152179 Global Communication Network,Global Communication Network Limited,0,2026-10-02 18:00:32,@danfeng_chat
+193.177.220.197,13223,true,438,,SYD,大洋洲 · 澳大利亚悉尼,AS8888 xTom,xTom Pty Ltd,0,2026-10-31 06:00:34,@danfeng_chat
+77.90.35.230,45513,true,439,,SYD,大洋洲 · 澳大利亚悉尼,"AS63473 HostHatch, LLC",HostHatch,0,2026-10-07 18:00:32,@danfeng_chat
+213.210.4.187,21920,true,446,,TPE,亚太 · 台北,AS212336 ByteVirt,ByteVirt LLC,0,2026-10-18 06:00:27,@danfeng_chat
+191.223.218.118,443,true,447,,HKG,亚太 · 香港,AS906 DMIT (NetCrew),NetCrew,0,2026-11-09 12:00:27,@danfeng_chat
+216.236.51.163,1891,true,449,,HKG,亚太 · 香港,AS138997 Eons Data,Eons Data Communications Limited,0,2026-11-04 12:00:33,@danfeng_chat
+155.254.104.174,44301,true,449,,HKG,亚太 · 香港,AS38136 Akari Networks Limited,Akari Networks Limited,0,2026-09-24 06:00:31,@danfeng_chat
+38.22.94.79,33879,true,449,,HKG,亚太 · 香港,AS979 NetLab,NetLab Global,0,2026-09-16 06:00:32,@danfeng_chat
+216.236.51.12,1891,true,450,,HKG,亚太 · 香港,AS138997 Eons Data,Eons Data Communications Limited,0,2026-11-10 00:00:17,@danfeng_chat
+151.242.125.151,80,true,450,,HKG,亚太 · 香港,AS61112 AkileCloud (Akile LTD),Akile LTD,0,2026-10-28 12:00:28,@danfeng_chat
+103.135.251.71,32688,true,450,,HKG,亚太 · 香港,AS32519 DMIT Cloud Services,DMIT Cloud Services,0,2026-10-25 18:00:33,@danfeng_chat
+38.55.199.222,443,true,450,,HKG,亚太 · 香港,AS139659 LUCIDACLOUD LIMITED (Cogent Communications),Cogent Communications,0,2026-10-08 12:00:33,@danfeng_chat
+216.236.51.162,1891,true,450,,HKG,亚太 · 香港,AS138997 Eons Data,Eons Data Communications Limited,0,2026-09-27 12:00:29,@danfeng_chat
+216.236.51.150,1891,true,451,,HKG,亚太 · 香港,AS138997 Eons Data,Eons Data Communications Limited,0,2026-11-08 06:00:32,@danfeng_chat
+198.176.54.11,33344,true,451,,HKG,亚太 · 香港,AS400618 Prime Security,Prime Security Corp,0,2026-10-16 18:00:28,@danfeng_chat
+45.207.157.100,17465,true,451,,HKG,亚太 · 香港,AS61112 AkileCloud (Akile LTD),Akile LTD,0,2026-10-05 00:00:28,@danfeng_chat
+103.20.222.136,443,true,452,,HKG,亚太 · 香港,AS40065 CloudRadium (Hong Kong Business Telecom Limited),Hong Kong Business Telecom Limited,0,2026-11-06 00:00:23,@danfeng_chat
+191.223.212.227,18443,true,452,,HKG,亚太 · 香港,AS906 DMIT,DMIT Cloud Services,0,2026-10-12 00:00:33,@danfeng_chat
+185.36.193.13,54321,true,459,,SIN,亚太 · 新加坡,AS38136 Akari Networks Limited,Akari Networks Limited,0,2026-10-25 12:00:32,@danfeng_chat
+96.9.212.206,60093,true,461,,SIN,亚洲 · 新加坡新加坡,AS8888 xTom,xTom Pty Ltd,0,2026-09-09 10:59:23,@otcfxq
+116.206.178.154,19436,true,469,,HKG,亚太 · 香港,AS6134 Xnnet,Xnnet LLC,0,2026-09-12 18:00:31,@danfeng_chat
+54.251.138.69,443,true,470,,SIN,亚太 · 新加坡,"AS16509 Amazon AWS (Amazon.com, Inc.)","Amazon.com, Inc.",0,2026-10-09 06:00:32,@danfeng_chat
+45.135.119.251,32633,true,473,,HKG,亚太 · 香港,AS6134 Xnnet,Xnnet LLC,0,2026-11-11 12:00:27,@danfeng_chat
+103.115.109.227,39738,true,474,,HKG,亚太 · 香港,AS152179 Global Communication Network,Global Communication Network Limited,0,2026-10-08 18:00:26,@danfeng_chat
+8.219.78.44,7445,true,474,,SIN,亚太 · 新加坡,AS45102 Alibaba Cloud (US),"Alibaba (US) Technology Co., Ltd.",0,2026-09-29 12:00:24,@danfeng_chat
+103.248.228.175,443,true,475,,SIN,亚太 · 新加坡,AS38136 Akari Networks Limited,Akari Networks Limited,0,2026-10-27 18:00:26,@danfeng_chat
+152.42.254.219,443,true,476,,SIN,亚太 · 新加坡,AS14061 DigitalOcean,"DigitalOcean, LLC",0,2026-11-07 12:00:22,@danfeng_chat
+216.195.204.64,24457,true,482,,NRT,亚太 · 日本东京,AS138997 Eons Data,Eons Data Communications Limited,0,2026-11-06 06:00:31,@danfeng_chat
+166.0.253.110,39971,true,508,,SIN,亚太 · 新加坡,AS149440 Evoxt (Ace Data Centers),Ace Data Centers,0,2026-11-06 12:00:22,@danfeng_chat
+31.57.224.190,19343,true,514,,SIN,亚太 · 新加坡,"AS63473 HostHatch, LLC",HostHatch,0,2026-10-08 06:00:22,@danfeng_chat
+64.81.116.126,26950,true,521,,HKG,亚太 · 香港,AS979 NetLab,NetLab Global,0,2026-11-09 06:00:19,@danfeng_chat
+191.40.11.160,1891,true,533,,WAW,欧洲 · 波兰华沙,AS138997 Eons Data,Eons Data Communications Limited,0,2026-11-07 00:00:29,@danfeng_chat
+191.40.11.102,1891,true,534,,FRA,欧洲 · 德国法兰克福,AS138997 Eons Data,Eons Data Communications Limited,0,2026-09-15 00:00:32,@danfeng_chat
+85.149.211.62,8443,true,536,,SIN,亚太 · 新加坡,AS63150 Bage Cloud,Bage Cloud LLC,0,2026-09-26 18:00:33,@danfeng_chat
+216.195.221.139,1891,true,553,,FRA,欧洲 · 德国法兰克福,AS138997 Eons Data,Eons Data Communications Limited,0,2026-09-17 12:00:33,@danfeng_chat
+216.195.221.245,1891,true,558,,FRA,欧洲 · 德国法兰克福,AS138997 Eons Data,Eons Data Communications Limited,0,2026-11-06 18:00:22,@danfeng_chat
+216.195.221.241,1891,true,574,,FRA,欧洲 · 德国法兰克福,AS138997 Eons Data,Eons Data Communications Limited,0,2026-10-07 06:00:23,@danfeng_chat
+216.195.221.195,1891,true,574,,FRA,欧洲 · 德国法兰克福,AS138997 Eons Data,Eons Data Communications Limited,0,2026-09-26 06:00:28,@danfeng_chat
+103.207.49.121,15357,true,593,,TPE,亚太 · 台北,AS31972 Emagine Concept,"Emagine Concept, Inc.",0,2026-10-17 12:00:31,@danfeng_chat
+154.19.187.81,2052,true,593,,NRT,亚太 · 日本东京,AS149042 Silicon Cloud Global (US) (HONGKONG),"SICLOUD INFORMATION TECHNOLOGY (HONGKONG) CO., LIMITED",0,2026-10-12 06:00:28,@danfeng_chat
+101.52.222.253,443,true,593,,HKG,亚洲 · 中国香港,AS4811 China Telecom (Group),China Telecom (Group),0,2026-09-23 17:58:44,@otcfxq
+45.149.156.48,50035,true,629,,NRT,亚太 · 日本东京,AS3258 xTom Japan,xTom Japan Corporation,0,2026-10-30 06:00:26,@danfeng_chat
+38.55.122.83,443,true,662,,HKG,亚太 · 香港,AS6134 Xnnet,Xnnet LLC,0,2026-10-13 12:00:24,@danfeng_chat
+103.222.33.59,443,true,675,,ORD,北美洲 · 美国芝加哥,AS4811 China Telecom (Group),China Telecom (Group),0,2026-09-23 17:58:44,@otcfxq
+179.255.101.54,443,true,949,,LAX,北美洲 · 美国洛杉矶,AS906 DMIT (NetCrew),NetCrew,0,2026-10-29 06:00:33,@danfeng_chat
+137.220.151.249,443,true,1723,,MRS,欧洲 · 法国马赛,AS152194 CTG Server Limited,CTG Server Limited,0,2026-10-19 12:00:31,@danfeng_chat
+61.172.182.19,443,true,1838,,TPE,亚洲 · 中国台北,AS21859 Zenlayer (ZENLA-1),ZENLA-1,0,2026-09-24 09:05:22,@otcfxq
+185.218.7.129,443,true,121,,SJC,北美洲 · 美国圣何塞,AS51089 Kirino (SnapStack Limited),SnapStack Limited,1,2026-10-06 06:00:23,@danfeng_chat
+207.57.146.209,443,true,122,,LAX,北美洲 · 美国洛杉矶,AS1054 Zont LLC (NTT America),NTT America,1,2026-11-08 12:00:26,@danfeng_chat
+207.57.124.208,8446,true,336,,HKG,亚太 · 香港,AS139659 LUCIDACLOUD LIMITED (NTT America),NTT America,1,2026-10-27 12:00:31,@danfeng_chat
+179.255.154.69,16005,true,381,,SIN,亚太 · 新加坡,AS906 DMIT (NetCrew),NetCrew,1,2026-11-03 18:00:29,@danfeng_chat
+38.58.57.214,443,true,1211,,LAX,北美洲 · 美国洛杉矶,AS979 NetLab,NetLab Global,1,2026-10-01 00:00:30,@danfeng_chat

@@ -1,22 +1,28 @@
 ﻿url,proto,host,port,delay_ms,fail_count,status,colo,country,egress_ip,asn,isp,net_type,first_seen,source
-http://8.209.255.13:3128,http,8.209.255.13,3128,227,0,alive,NRT,JP,8.209.255.13,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
-http://176.111.37.216:39811,http,176.111.37.216,39811,306,0,alive,ARN,SE,176.111.37.216,AS214743 Cogento Backbone Limited,Cogento Backbone Limited,isp,2026-10-25 14:07:00,EDT-Pages
-http://8.213.151.128:3128,http,8.213.151.128,3128,327,0,alive,NRT,KR,8.213.151.128,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
-http://176.111.37.5:39811,http,176.111.37.5,39811,334,0,alive,ARN,SE,176.111.37.5,AS214743 Cogento Backbone Limited,Cogento Backbone Limited,isp,2026-10-25 14:07:00,EDT-Pages
-http://4.144.146.21:80,http,4.144.146.21,80,364,0,alive,SIN,SG,20.44.210.140,AS8075 Microsoft Azure,Microsoft Azure,datacenter,2026-10-19 12:45:55,@otcfxq
-http://185.195.254.72:5432,http,185.195.254.72,5432,399,0,alive,IST,TR,185.195.254.72,AS206119 Veganet Teknolojileri ve Hizmetleri LTD STI,Veganet Teknolojileri ve Hizmetleri LTD STI,isp,2026-10-09 22:46:01,EDT-Pages
-http://49.229.100.235:8080,http,49.229.100.235,8080,408,0,alive,BKK,TH,49.229.100.235,AS7470 True Broadband by True Online,True Broadband by True Online,isp,2026-11-07 14:03:05,EDT-Pages
-http://45.189.57.114:3129,http,45.189.57.114,3129,426,0,alive,GYE,EC,45.189.57.114,AS269853 CBVISION S.A.,CBVISION S.A.,isp,2026-11-04 14:35:03,EDT-Pages
-http://45.186.6.104:3128,http,45.186.6.104,3128,450,0,alive,MIA,EC,45.186.6.104,AS269806 PEREZ TITO JULIO CESAR(FASTNETT),PEREZ TITO JULIO CESAR(FASTNETT),isp,2026-11-04 14:35:03,EDT-Pages
-http://78.186.146.140:3310,http,78.186.146.140,3310,454,0,alive,IST,TR,78.186.146.140,AS9121 TT ADSL-TTnet _static_aci,TT ADSL-TTnet _static_aci,isp,2026-11-04 14:35:03,EDT-Pages
-http://103.133.26.73:3128,http,103.133.26.73,3128,497,0,alive,CGK,ID,103.178.42.17,AS138130 PT PHATRIA INTI PERSADA,PT PHATRIA INTI PERSADA,isp,2026-10-12 15:18:13,EDT-Pages
-http://103.133.26.119:8080,http,103.133.26.119,8080,568,0,alive,CGK,ID,179.65.205.136,AS45700 PT Global Telecom Utama,PT Global Telecom Utama,isp,2026-11-01 14:11:17,EDT-Pages
-http://103.133.26.11:8080,http,103.133.26.11,8080,585,0,alive,CGK,ID,202.65.238.179,AS45700 PT Global Telecom Utama,PT Global Telecom Utama,isp,2026-11-01 14:11:17,EDT-Pages
-http://102.244.78.61:8089,http,102.244.78.61,8089,637,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-11-10 15:23:16,EDT-Pages
-http://102.244.78.61:8088,http,102.244.78.61,8088,667,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-11-09 14:39:00,EDT-Pages
-http://102.244.78.61:8082,http,102.244.78.61,8082,668,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-21 15:52:42,@otcfxq
-http://102.244.78.61:8081,http,102.244.78.61,8081,742,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-11-09 14:39:00,EDT-Pages
-http://102.244.78.61:8090,http,102.244.78.61,8090,789,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-11-10 15:23:16,EDT-Pages
-http://102.244.78.61:8080,http,102.244.78.61,8080,964,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-11-09 14:39:00,EDT-Pages
-http://36.147.78.166:443,http,36.147.78.166,443,1485,0,alive,LHR,CN,36.147.78.166,AS9808 China Mobile,China Mobile Communications Corporation,isp,2026-11-05 14:53:11,EDT-Pages
-http://160.22.45.114:8080,http,160.22.45.114,8080,2338,0,alive,SIN,ID,160.22.45.114,AS153067 Pt Celebes Multi Network,Pt Celebes Multi Network,isp,2026-11-10 15:23:16,EDT-Pages
+http://176.111.37.216:39811,http,176.111.37.216,39811,240,0,alive,ARN,SE,176.111.37.216,AS214743 Cogento Backbone Limited,Cogento Backbone Limited,isp,2026-10-25 14:07:00,EDT-Pages
+http://78.186.146.140:3310,http,78.186.146.140,3310,284,0,alive,IST,TR,78.186.146.140,AS9121 TT ADSL-TTnet _static_aci,TT ADSL-TTnet _static_aci,isp,2026-11-04 14:35:03,EDT-Pages
+http://8.209.255.13:3128,http,8.209.255.13,3128,312,0,alive,NRT,JP,8.209.255.13,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
+http://185.195.254.72:5432,http,185.195.254.72,5432,331,0,alive,IST,TR,185.195.254.72,AS206119 Veganet Teknolojileri ve Hizmetleri LTD STI,Veganet Teknolojileri ve Hizmetleri LTD STI,isp,2026-10-09 22:46:01,EDT-Pages
+http://8.213.151.128:3128,http,8.213.151.128,3128,355,0,alive,ICN,KR,8.213.151.128,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
+http://45.186.6.104:3128,http,45.186.6.104,3128,417,0,alive,MIA,EC,45.186.6.104,AS269806 PEREZ TITO JULIO CESAR(FASTNETT),PEREZ TITO JULIO CESAR(FASTNETT),isp,2026-11-04 14:35:03,EDT-Pages
+http://45.189.57.114:3129,http,45.189.57.114,3129,431,0,alive,GYE,EC,45.189.57.114,AS269853 CBVISION S.A.,CBVISION S.A.,isp,2026-11-04 14:35:03,EDT-Pages
+http://4.144.146.21:80,http,4.144.146.21,80,458,0,alive,SIN,SG,20.44.210.140,AS8075 Microsoft Azure,Microsoft Azure,datacenter,2026-10-19 12:45:55,@otcfxq
+http://176.111.37.5:39811,http,176.111.37.5,39811,474,0,alive,ARN,SE,176.111.37.5,AS214743 Cogento Backbone Limited,Cogento Backbone Limited,isp,2026-10-25 14:07:00,EDT-Pages
+http://189.51.168.164:999,http,189.51.168.164,999,530,0,alive,MIA,MX,189.51.168.164,AS270111 Comunicación por Fibra SA de CV,Comunicación por Fibra SA de CV,isp,2026-11-12 15:18:03,EDT-Pages
+http://49.229.100.235:8080,http,49.229.100.235,8080,539,0,alive,BKK,TH,171.100.254.137,AS7470 True Broadband by True Online,True Broadband by True Online,isp,2026-11-07 14:03:05,EDT-Pages
+http://38.75.209.14:999,http,38.75.209.14,999,541,0,alive,MIA,DO,38.75.209.101,AS274159 GURYFOY GLOBAL SRL,GURYFOY GLOBAL SRL,isp,2026-11-12 15:18:03,EDT-Pages
+http://103.133.26.73:3128,http,103.133.26.73,3128,565,0,alive,CGK,ID,103.178.42.17,AS138130 PT PHATRIA INTI PERSADA,PT PHATRIA INTI PERSADA,isp,2026-10-12 15:18:13,EDT-Pages
+http://102.244.78.61:8082,http,102.244.78.61,8082,594,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-21 15:52:42,@otcfxq
+http://102.244.78.61:8089,http,102.244.78.61,8089,601,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-11-10 15:23:16,EDT-Pages
+http://102.244.78.61:8090,http,102.244.78.61,8090,613,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-11-10 15:23:16,EDT-Pages
+http://102.244.78.61:8080,http,102.244.78.61,8080,614,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-11-09 14:39:00,EDT-Pages
+http://103.133.26.119:8080,http,103.133.26.119,8080,818,0,alive,CGK,ID,179.65.205.136,AS45700 PT Global Telecom Utama,PT Global Telecom Utama,isp,2026-11-01 14:11:17,EDT-Pages
+http://210.87.92.212:8080,http,210.87.92.212,8080,1137,0,alive,CGK,ID,210.87.92.209,AS149360 PT. INDONET DATA BERSAMA,PT. INDONET DATA BERSAMA,isp,2026-11-12 15:18:03,EDT-Pages
+http://185.191.106.0:8081,http,185.191.106.0,8081,1391,0,alive,MXP,IT,185.191.106.0,AS44092 TELNET S.r.l.,TELNET S.r.l.,isp,2026-11-12 15:18:03,EDT-Pages
+http://41.65.55.27:1976,http,41.65.55.27,1976,1507,0,alive,LHR,EG,41.65.55.27,AS36992 Abbasia Enterprise Customers Static IPs,Abbasia Enterprise Customers Static IPs,isp,2026-11-12 15:18:03,EDT-Pages
+http://103.152.21.59:3128,http,103.152.21.59,3128,1691,0,alive,CGK,ID,103.152.21.58,AS150191 PT Sarana Intimedia Telematika,PT Sarana Intimedia Telematika,isp,2026-11-12 15:18:03,EDT-Pages
+http://138.122.251.1:8080,http,138.122.251.1,8080,1797,0,alive,FOR,BR,138.122.251.1,AS262590 NET ON LINE LTDA,NET ON LINE LTDA,isp,2026-11-12 15:18:03,EDT-Pages
+http://36.147.78.166:443,http,36.147.78.166,443,1810,0,alive,LHR,CN,36.147.78.166,AS9808 China Mobile,China Mobile Communications Corporation,isp,2026-11-05 14:53:11,EDT-Pages
+http://38.58.174.85:999,http,38.58.174.85,999,2017,0,alive,QRO,MX,38.58.174.85,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",isp,2026-11-12 15:18:03,EDT-Pages
+http://121.101.133.105:8586,http,121.101.133.105,8586,2107,0,alive,CGK,ID,121.101.133.105,AS131706 Infrastruktur Terabit Jawa Tengah,Infrastruktur Terabit Jawa Tengah,isp,2026-11-12 15:18:03,EDT-Pages
+http://206.135.47.106:999,http,206.135.47.106,999,2213,0,alive,DFW,MX,206.135.47.106,AS28458 IENTC S de RL de CV,IENTC S de RL de CV,isp,2026-11-12 15:18:03,EDT-Pages

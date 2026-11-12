@@ -22,28 +22,6 @@
     "source": "@otcjlq"
   },
   {
-    "proxy": "154.46.31.118:443",
-    "ip": "154.46.31.118",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2a0b:8800:580::118",
-    "clientIps": [
-      "2a0b:8800:580::118"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2a0b:8800:580::118",
-    "dual_stack": false,
-    "country": "RO",
-    "country_name": "罗马尼亚",
-    "country_cn": "罗马尼亚",
-    "country_emoji": "🇷🇴",
-    "asn": "43376",
-    "asOrganization": "Dotro Telecom Srl",
-    "isp": "Dotro Telecom Srl",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
-  },
-  {
     "proxy": "154.46.31.21:443",
     "ip": "154.46.31.21",
     "port": 443,
@@ -64,5 +42,27 @@
     "isp": "Dotro Telecom Srl",
     "net_type": "isp",
     "source": "@danfeng2"
+  },
+  {
+    "proxy": "154.46.31.118:443",
+    "ip": "154.46.31.118",
+    "port": 443,
+    "tls": true,
+    "clientIp": "2a0b:8800:580::118",
+    "clientIps": [
+      "2a0b:8800:580::118"
+    ],
+    "clientIpv4": "",
+    "clientIpv6": "2a0b:8800:580::118",
+    "dual_stack": false,
+    "country": "RO",
+    "country_name": "罗马尼亚",
+    "country_cn": "罗马尼亚",
+    "country_emoji": "🇷🇴",
+    "asn": "43376",
+    "asOrganization": "Dotro Telecom Srl",
+    "isp": "Dotro Telecom Srl",
+    "net_type": "isp",
+    "source": "@cmliussss_all"
   }
 ]
