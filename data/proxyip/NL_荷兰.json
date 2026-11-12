@@ -330,28 +330,6 @@
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "154.59.111.152:2053",
-    "ip": "154.59.111.152",
-    "port": 2053,
-    "tls": true,
-    "clientIp": "154.59.111.152",
-    "clientIps": [
-      "154.59.111.152"
-    ],
-    "clientIpv4": "154.59.111.152",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "NL",
-    "country_name": "荷兰",
-    "country_cn": "荷兰",
-    "country_emoji": "🇳🇱",
-    "asn": "174",
-    "asOrganization": "Cogent Communications LLC",
-    "isp": "Cogent Communications LLC",
-    "net_type": "isp",
-    "source": "@otcjlq"
-  },
-  {
     "proxy": "85.223.6.92:443",
     "ip": "85.223.6.92",
     "port": 443,

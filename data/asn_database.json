@@ -3161,7 +3161,14 @@
     "Agência de Tecnologia da Informação do Piauí ATI": "AS265064",
     "MEGANET RJ INFORMÁTICA E TELECOMUNICAÇÕES LTDA": "AS52639",
     "SHARP TELECOM (PRIVATE) LIMITED": "AS9387",
-    "GENTE TELECOM DO BRASIL LTDA": "AS264892"
+    "GENTE TELECOM DO BRASIL LTDA": "AS264892",
+    "FanAvaran Mihan Mizban PJSC": "AS214922",
+    "HONG KONG LIGHTLAYER TECHNOLOGY CO., LIMITED": "AS139613",
+    "Castles LLC": "AS43278",
+    "Net Gate Telecom S.R.L.": "AS208185",
+    "Zhilian Technology CO., LTD.": "AS214432",
+    "Bocchi Network LLC": "AS218613",
+    "GRUPO CG LIMITADA": "AS270014"
   },
   "asn_to_isp": {
     "AS10001": "Mics Network Corporation",
@@ -6228,7 +6235,15 @@
     "AS265064": "Agência de Tecnologia da Informação do Piauí ATI",
     "AS52639": "MEGANET RJ INFORMÁTICA E TELECOMUNICAÇÕES LTDA",
     "AS9387": "SHARP TELECOM (PRIVATE) LIMITED",
-    "AS264892": "GENTE TELECOM DO BRASIL LTDA"
+    "AS264892": "GENTE TELECOM DO BRASIL LTDA",
+    "AS214922": "FanAvaran Mihan Mizban PJSC",
+    "AS139613": "HONG KONG LIGHTLAYER TECHNOLOGY CO., LIMITED",
+    "AS43278": "Castles LLC",
+    "AS208185": "Net Gate Telecom S.R.L.",
+    "AS214432": "Zhilian Technology CO., LTD.",
+    "AS218613": "Bocchi Network LLC",
+    "AS31400": "firstcolo GmbH",
+    "AS270014": "GRUPO CG LIMITADA"
   },
   "asn_to_net_type": {
     "AS10001": "isp",
@@ -10288,6 +10303,14 @@
     "AS265064": "government",
     "AS52639": "isp",
     "AS9387": "isp",
-    "AS264892": "isp"
+    "AS264892": "isp",
+    "AS214922": "datacenter",
+    "AS139613": "datacenter",
+    "AS43278": "datacenter",
+    "AS208185": "isp",
+    "AS214432": "datacenter",
+    "AS218613": "datacenter",
+    "AS31400": "datacenter",
+    "AS270014": "datacenter"
   }
 }
