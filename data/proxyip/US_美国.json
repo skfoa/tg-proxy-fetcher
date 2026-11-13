@@ -1298,28 +1298,6 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "154.26.240.39:443",
-    "ip": "154.26.240.39",
-    "port": 443,
-    "tls": true,
-    "clientIp": "154.26.240.39",
-    "clientIps": [
-      "154.26.240.39"
-    ],
-    "clientIpv4": "154.26.240.39",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "174",
-    "asOrganization": "Cogent Communications, LLC",
-    "isp": "Cogent Communications, LLC",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "154.29.154.17:443",
     "ip": "154.29.154.17",
     "port": 443,
@@ -1804,28 +1782,6 @@
     "source": "@danfeng2"
   },
   {
-    "proxy": "154.26.240.187:443",
-    "ip": "154.26.240.187",
-    "port": 443,
-    "tls": true,
-    "clientIp": "154.26.240.187",
-    "clientIps": [
-      "154.26.240.187"
-    ],
-    "clientIpv4": "154.26.240.187",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "174",
-    "asOrganization": "Cogent Communications, LLC",
-    "isp": "Cogent Communications, LLC",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "23.144.68.238:8443",
     "ip": "23.144.68.238",
     "port": 8443,
@@ -2021,28 +1977,6 @@
     "asOrganization": "NetLab",
     "isp": "NetLab",
     "net_type": "business",
-    "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "154.26.240.16:443",
-    "ip": "154.26.240.16",
-    "port": 443,
-    "tls": true,
-    "clientIp": "154.26.240.16",
-    "clientIps": [
-      "154.26.240.16"
-    ],
-    "clientIpv4": "154.26.240.16",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "174",
-    "asOrganization": "Cogent Communications, LLC",
-    "isp": "Cogent Communications, LLC",
-    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
@@ -3385,28 +3319,6 @@
     "asOrganization": "NetLab",
     "isp": "NetLab",
     "net_type": "business",
-    "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "64.204.27.110:443",
-    "ip": "64.204.27.110",
-    "port": 443,
-    "tls": true,
-    "clientIp": "64.204.27.110",
-    "clientIps": [
-      "64.204.27.110"
-    ],
-    "clientIpv4": "64.204.27.110",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "3257",
-    "asOrganization": "GTT Communications Inc.",
-    "isp": "GTT Communications Inc.",
-    "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
@@ -5786,28 +5698,6 @@
     "source": "@danfeng2"
   },
   {
-    "proxy": "64.204.26.15:443",
-    "ip": "64.204.26.15",
-    "port": 443,
-    "tls": true,
-    "clientIp": "64.204.26.15",
-    "clientIps": [
-      "64.204.26.15"
-    ],
-    "clientIpv4": "64.204.26.15",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "3257",
-    "asOrganization": "GTT Communications Inc.",
-    "isp": "GTT Communications Inc.",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "38.92.13.174:443",
     "ip": "38.92.13.174",
     "port": 443,
@@ -5938,28 +5828,6 @@
     "isp": "NetLab",
     "net_type": "business",
     "source": "@danfeng2"
-  },
-  {
-    "proxy": "64.204.26.153:443",
-    "ip": "64.204.26.153",
-    "port": 443,
-    "tls": true,
-    "clientIp": "64.204.26.153",
-    "clientIps": [
-      "64.204.26.153"
-    ],
-    "clientIpv4": "64.204.26.153",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "3257",
-    "asOrganization": "GTT Communications Inc.",
-    "isp": "GTT Communications Inc.",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
   },
   {
     "proxy": "38.58.108.84:443",
@@ -7214,28 +7082,6 @@
     "isp": "NetLab",
     "net_type": "business",
     "source": "@danfeng2"
-  },
-  {
-    "proxy": "68.164.22.213:443",
-    "ip": "68.164.22.213",
-    "port": 443,
-    "tls": true,
-    "clientIp": "68.164.22.213",
-    "clientIps": [
-      "68.164.22.213"
-    ],
-    "clientIpv4": "68.164.22.213",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "3257",
-    "asOrganization": "GTT Communications Inc.",
-    "isp": "GTT Communications Inc.",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
   },
   {
     "proxy": "76.250.141.252:443",
@@ -9680,28 +9526,6 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "64.204.24.79:443",
-    "ip": "64.204.24.79",
-    "port": 443,
-    "tls": true,
-    "clientIp": "64.204.24.79",
-    "clientIps": [
-      "64.204.24.79"
-    ],
-    "clientIpv4": "64.204.24.79",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "3257",
-    "asOrganization": "GTT Communications Inc.",
-    "isp": "GTT Communications Inc.",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "216.195.213.100:1891",
     "ip": "216.195.213.100",
     "port": 1891,
@@ -10470,28 +10294,6 @@
     "isp": "NetLab",
     "net_type": "business",
     "source": "@danfeng2"
-  },
-  {
-    "proxy": "68.164.22.163:443",
-    "ip": "68.164.22.163",
-    "port": 443,
-    "tls": true,
-    "clientIp": "68.164.22.163",
-    "clientIps": [
-      "68.164.22.163"
-    ],
-    "clientIpv4": "68.164.22.163",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "3257",
-    "asOrganization": "GTT Communications Inc.",
-    "isp": "GTT Communications Inc.",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
   },
   {
     "proxy": "34.221.216.166:443",
@@ -11814,50 +11616,6 @@
     "source": "@danfeng2"
   },
   {
-    "proxy": "38.114.88.94:8443",
-    "ip": "38.114.88.94",
-    "port": 8443,
-    "tls": true,
-    "clientIp": "38.114.88.94",
-    "clientIps": [
-      "38.114.88.94"
-    ],
-    "clientIpv4": "38.114.88.94",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "174",
-    "asOrganization": "Cogent Communications, LLC",
-    "isp": "Cogent Communications, LLC",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "38.114.88.94:443",
-    "ip": "38.114.88.94",
-    "port": 443,
-    "tls": true,
-    "clientIp": "38.114.88.94",
-    "clientIps": [
-      "38.114.88.94"
-    ],
-    "clientIpv4": "38.114.88.94",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "174",
-    "asOrganization": "Cogent Communications, LLC",
-    "isp": "Cogent Communications, LLC",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "38.207.170.180:59826",
     "ip": "38.207.170.180",
     "port": 59826,
@@ -13044,28 +12802,6 @@
     "isp": "NetLab",
     "net_type": "business",
     "source": "@danfeng2"
-  },
-  {
-    "proxy": "195.72.188.187:443",
-    "ip": "195.72.188.187",
-    "port": 443,
-    "tls": true,
-    "clientIp": "195.72.188.187",
-    "clientIps": [
-      "195.72.188.187"
-    ],
-    "clientIpv4": "195.72.188.187",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "3257",
-    "asOrganization": "GTT Communications Inc.",
-    "isp": "GTT Communications Inc.",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
   },
   {
     "proxy": "154.41.80.155:8443",
@@ -14560,28 +14296,6 @@
     "asn": "979",
     "asOrganization": "NetLab",
     "isp": "NetLab",
-    "net_type": "business",
-    "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "154.64.249.202:8443",
-    "ip": "154.64.249.202",
-    "port": 8443,
-    "tls": true,
-    "clientIp": "154.64.249.202",
-    "clientIps": [
-      "154.64.249.202"
-    ],
-    "clientIpv4": "154.64.249.202",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "979",
-    "asOrganization": "NetLab Global",
-    "isp": "NetLab Global",
     "net_type": "business",
     "source": "@danfeng_chat"
   },

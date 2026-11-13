@@ -22,50 +22,6 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "154.62.226.66:443",
-    "ip": "154.62.226.66",
-    "port": 443,
-    "tls": true,
-    "clientIp": "154.62.226.66",
-    "clientIps": [
-      "154.62.226.66"
-    ],
-    "clientIpv4": "154.62.226.66",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "ES",
-    "country_name": "西班牙",
-    "country_cn": "西班牙",
-    "country_emoji": "🇪🇸",
-    "asn": "174",
-    "asOrganization": "UltaHost",
-    "isp": "UltaHost",
-    "net_type": "isp",
-    "source": "@otcjlq"
-  },
-  {
-    "proxy": "154.62.226.66:8443",
-    "ip": "154.62.226.66",
-    "port": 8443,
-    "tls": true,
-    "clientIp": "154.62.226.66",
-    "clientIps": [
-      "154.62.226.66"
-    ],
-    "clientIpv4": "154.62.226.66",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "ES",
-    "country_name": "西班牙",
-    "country_cn": "西班牙",
-    "country_emoji": "🇪🇸",
-    "asn": "174",
-    "asOrganization": "UltaHost",
-    "isp": "UltaHost",
-    "net_type": "isp",
-    "source": "@otcjlq"
-  },
-  {
     "proxy": "79.112.138.33:443",
     "ip": "79.112.138.33",
     "port": 443,

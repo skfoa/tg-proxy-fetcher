@@ -94,6 +94,8 @@ from providers import (
     is_cloudflare_node,
     rescue_mislabeled_cloudflare_rows,
     resolve_asn_batch_online,
+    resolve_authoritative_cache_asn,
+    apply_authoritative_ip_cache,
     pop_online_country,
 )
 from parsers import (
@@ -406,6 +408,255 @@ def classify_node_proxyip_or_scan(item: dict, ip_cache: dict) -> tuple[bool, str
             item["exit_asn"] = ""
             item["exit_isp"] = ""
     return is_p, eff_nt
+
+
+VERIFY_LABELED_CHANNELS = frozenset({"@otcjlq", "@danfeng_chat", "@danfeng2"})
+_ASN_PROBE_BUDGET_DEFAULT = 2000
+_ASN_PROBE_P1_BUDGET_DEFAULT = 6000
+_ASN_PROBE_RETRY_COOLDOWN = 7 * 86400  # 与墓地 7 天周期对齐：近期反查失败节点冷却期内不再重复探测
+_ASN_PROBE_BUDGET: dict[str, int | None] = {
+    "p1_remaining": _ASN_PROBE_P1_BUDGET_DEFAULT,
+    "remaining": _ASN_PROBE_BUDGET_DEFAULT,
+    "total_remaining": None,
+}
+_SESSION_FAILED_IPS: set[str] = set()
+
+
+def _reset_asn_probe_budget(
+    limit: int | None = None,
+    p1_limit: int | None = None,
+) -> None:
+    """
+    重置单轮抓取的在线 ASN 探测预算与同轮失败去重集合：
+    - 默认无参调用：启用双池独立配额（P1 新抓缺失 6000 + P2/P3/P4 复核回补 2000）；
+    - 仅传 `limit`：设为单轮全池硬上限（优先供给 P1，余量再给 P2/P3/P4）；
+    - 显式传入 `p1_limit`：分别为 P1 与 P2/P3/P4 指定独立上限。
+    """
+    if limit is None and p1_limit is None:
+        _ASN_PROBE_BUDGET["p1_remaining"] = _ASN_PROBE_P1_BUDGET_DEFAULT
+        _ASN_PROBE_BUDGET["remaining"] = _ASN_PROBE_BUDGET_DEFAULT
+        _ASN_PROBE_BUDGET["total_remaining"] = None
+    elif p1_limit is None:
+        cap = max(0, int(limit or 0))
+        _ASN_PROBE_BUDGET["p1_remaining"] = cap
+        _ASN_PROBE_BUDGET["remaining"] = cap
+        _ASN_PROBE_BUDGET["total_remaining"] = cap
+    else:
+        eff_other = max(0, int(_ASN_PROBE_BUDGET_DEFAULT if limit is None else limit))
+        eff_p1 = max(0, int(p1_limit))
+        _ASN_PROBE_BUDGET["p1_remaining"] = eff_p1
+        _ASN_PROBE_BUDGET["remaining"] = eff_other
+        _ASN_PROBE_BUDGET["total_remaining"] = None
+    _SESSION_FAILED_IPS.clear()
+
+
+def _is_in_probe_cooldown(ip_cache: dict, ip: str, now_ts: int) -> bool:
+    """近期（<_ASN_PROBE_RETRY_COOLDOWN）在线反查失败的 IP 本轮直接跳过，避免消耗后续配额。"""
+    if not isinstance(ip_cache, dict) or not ip:
+        return False
+    entry = ip_cache.get(ip)
+    if not isinstance(entry, dict):
+        entry = ip_cache.get(ip.lower())
+    if not isinstance(entry, dict):
+        return False
+    failed_at = entry.get("probe_failed_at")
+    if isinstance(failed_at, bool) or not isinstance(failed_at, (int, float)):
+        return False
+    return 0 <= now_ts - int(failed_at) < _ASN_PROBE_RETRY_COOLDOWN
+
+
+def _extract_row_ingress_code(row: dict) -> str:
+    """统一提取行内当前有效入口 AS 编号（兼容含 raw_asn 的解析行与 CSV 加载行）。"""
+    return _extract_asn_code(row.get("raw_asn") or row.get("asn"), row.get("isp")) or ""
+
+
+def _sort_tier_by_never_failed_first(ips: list[str], ip_cache: dict) -> list[str]:
+    """同一优先级队列内排序：从未失败的 IP 优先于曾记录 probe_failed_at 的 IP。"""
+    fresh: list[str] = []
+    retried: list[str] = []
+    for ip in ips:
+        entry = ip_cache.get(ip) if isinstance(ip_cache, dict) else None
+        if isinstance(entry, dict) and entry.get("probe_failed_at"):
+            retried.append(ip)
+        else:
+            fresh.append(ip)
+    return fresh + retried
+
+
+def _apply_row_hint_fallback(row: dict) -> None:
+    """仅当入口仍无有效 ASN 且不存在独立出口时，消费解析阶段降级保存的 asn_hint / isp_hint 兜底。"""
+    hint_asn = _extract_asn_code(row.pop("asn_hint", ""), "") or ""
+    hint_isp_raw = str(row.pop("isp_hint", "") or "").strip()
+    if not hint_asn or _extract_row_ingress_code(row):
+        return
+    ing_ip = str(row.get("ip") or "").strip()
+    ex_ip = str(row.get("exit_ip") or "").strip()
+    if ex_ip and ing_ip and ex_ip != ing_ip:
+        return
+    hint_isp = hint_isp_raw or ASN_TO_PROVIDER.get(hint_asn, "")
+    if "raw_asn" in row:
+        row["raw_asn"] = hint_asn
+    row["isp"] = hint_isp
+    row["asn"] = format_asn_isp(hint_asn, hint_isp)
+    if not ex_ip or ex_ip == ing_ip:
+        if not _extract_asn_code(row.get("exit_asn"), row.get("exit_isp")):
+            row["exit_asn"] = hint_asn
+            row["exit_isp"] = hint_isp
+
+
+def _targeted_asn_probe(
+    newly_scraped_rows: list[dict],
+    ip_cache: dict[str, dict],
+    *,
+    existing_rows: list[dict] | None = None,
+    cache_path: str = "",
+    persist: bool = False,
+    apply_hints: bool = True,
+    include_whitelist: bool = True,
+) -> tuple[bool, dict[str, tuple[str, str]]]:
+    """
+    统一靶向在线 ASN 探测与权威缓存回填引擎（覆盖附件实时抓取、正文单条与历史全量数据）：
+    - Step A: 先对所有行执行权威 ip_cache 入/出口回填（含非 Cloudflare 错标纠偏）
+    - Step B: P1(新抓缺失/哨兵，全频道) 与 P2(新抓白名单有标未缓存) > P3(历史缺失/哨兵) > P4(历史白名单有标未缓存)
+              严格收集合法公网 IP；队列内从未失败者优先于 probe_failed_at 历史失败者；P1 与 P2/P3/P4 分池限额避免单附件大文件饿死后续频道与存量回补
+    - Step C: 在线批量反查仅写命中结果与负缓存时间戳，失败绝不覆写既有标签；最后消费剩余未解析行 hint 兜底
+    返回 `(ip_cache_dirty, probed_asn_map)`。
+    """
+    dirty = False
+    resolved_map: dict[str, tuple[str, str]] = {}
+    new_list = [r for r in (newly_scraped_rows or []) if isinstance(r, dict)]
+    old_list = [r for r in (existing_rows or []) if isinstance(r, dict)]
+    all_rows = new_list + old_list
+
+    if not all_rows:
+        return False, resolved_map
+
+    for row in all_rows:
+        ing_ip = str(row.get("ip") or "").strip()
+        apply_authoritative_ip_cache(row, ing_ip, ip_cache, update_raw_asn=("raw_asn" in row))
+
+    p1_ips: list[str] = []
+    p2_ips: list[str] = []
+    p3_ips: list[str] = []
+    p4_ips: list[str] = []
+    queued: set[str] = set()
+    now_ts = int(time.time())
+
+    def _enqueue_ip(
+        ip: str,
+        is_wl: bool,
+        is_missing: bool,
+        missing_q: list[str],
+        whitelist_q: list[str],
+    ) -> None:
+        if not is_valid_public_ip(ip) or ip in queued or ip in _SESSION_FAILED_IPS:
+            return
+        if _is_in_probe_cooldown(ip_cache, ip, now_ts):
+            return
+        if resolve_authoritative_cache_asn(ip_cache, ip)[0]:
+            return
+        if is_missing:
+            queued.add(ip)
+            missing_q.append(ip)
+        elif is_wl:
+            queued.add(ip)
+            whitelist_q.append(ip)
+
+    def _enqueue_group(rows: list[dict], missing_q: list[str], whitelist_q: list[str]) -> None:
+        for row in rows:
+            ch = str(row.get("channel") or "").strip().lower()
+            is_wl = include_whitelist and (ch in VERIFY_LABELED_CHANNELS)
+
+            ing_ip = str(row.get("ip") or "").strip()
+            _enqueue_ip(ing_ip, is_wl, not _extract_row_ingress_code(row), missing_q, whitelist_q)
+
+            ex_ip = str(row.get("exit_ip") or "").strip()
+            _enqueue_ip(
+                ex_ip,
+                is_wl,
+                not _extract_asn_code(row.get("exit_asn"), row.get("exit_isp")),
+                missing_q,
+                whitelist_q,
+            )
+
+    _enqueue_group(new_list, p1_ips, p2_ips)
+    _enqueue_group(old_list, p3_ips, p4_ips)
+
+    p1_ordered = _sort_tier_by_never_failed_first(p1_ips, ip_cache)
+    other_ordered = (
+        _sort_tier_by_never_failed_first(p2_ips, ip_cache)
+        + _sort_tier_by_never_failed_first(p3_ips, ip_cache)
+        + _sort_tier_by_never_failed_first(p4_ips, ip_cache)
+    )
+
+    total_rem = _ASN_PROBE_BUDGET.get("total_remaining")
+    if total_rem is not None:
+        cap = max(0, int(total_rem))
+        to_probe = (p1_ordered + other_ordered)[:cap]
+        if to_probe:
+            _ASN_PROBE_BUDGET["total_remaining"] = max(0, cap - len(to_probe))
+    else:
+        p1_rem = max(0, int(_ASN_PROBE_BUDGET.get("p1_remaining") or 0))
+        other_rem = max(0, int(_ASN_PROBE_BUDGET.get("remaining") or 0))
+        to_probe_p1 = p1_ordered[:p1_rem]
+        to_probe_other = other_ordered[:other_rem]
+        to_probe = to_probe_p1 + to_probe_other
+        if to_probe_p1:
+            _ASN_PROBE_BUDGET["p1_remaining"] = max(0, p1_rem - len(to_probe_p1))
+        if to_probe_other:
+            _ASN_PROBE_BUDGET["remaining"] = max(0, other_rem - len(to_probe_other))
+
+    if to_probe:
+        probe_asn_map = resolve_asn_batch_online(
+            to_probe,
+            persist=persist,
+            cache_path=cache_path or _ip_cache_path(),
+        ) or {}
+
+        for p_ip in to_probe:
+            res_pair = probe_asn_map.get(p_ip)
+            p_asn = _extract_asn_code(res_pair[0] if res_pair else "", "") or ""
+            if p_asn:
+                p_isp = (res_pair[1] if res_pair and len(res_pair) > 1 else "") or ASN_TO_PROVIDER.get(p_asn, "")
+                existing_entry = ip_cache.get(p_ip) if isinstance(ip_cache.get(p_ip), dict) else {}
+                p_country = pop_online_country(p_ip) or existing_entry.get("country", "")
+                ip_cache[p_ip] = {
+                    "asn": p_asn,
+                    "isp": p_isp,
+                    "net_type": ASN_EXACT_NET_TYPE.get(p_asn) or classify_asn(p_asn, p_isp),
+                    "country": p_country,
+                }
+                resolved_map[p_ip] = (p_asn, p_isp)
+                dirty = True
+            else:
+                _SESSION_FAILED_IPS.add(p_ip)
+                if not resolve_authoritative_cache_asn(ip_cache, p_ip)[0]:
+                    existing_entry = dict(ip_cache.get(p_ip)) if isinstance(ip_cache.get(p_ip), dict) else {}
+                    existing_entry.setdefault("asn", "")
+                    existing_entry["probe_failed_at"] = now_ts
+                    ip_cache[p_ip] = existing_entry
+                    dirty = True
+
+        if resolved_map:
+            for row in all_rows:
+                ing_ip = str(row.get("ip") or "").strip()
+                if ing_ip in resolved_map:
+                    p_asn, p_isp = resolved_map[ing_ip]
+                    if "raw_asn" in row:
+                        row["raw_asn"] = p_asn
+                    row["isp"] = p_isp
+                    row["asn"] = format_asn_isp(p_asn, p_isp)
+                ex_ip = str(row.get("exit_ip") or "").strip()
+                if ex_ip in resolved_map:
+                    p_asn, p_isp = resolved_map[ex_ip]
+                    row["exit_asn"] = p_asn
+                    row["exit_isp"] = p_isp
+
+    if apply_hints:
+        for row in new_list:
+            _apply_row_hint_fallback(row)
+
+    return dirty, resolved_map
 
 
 def load_existing_proxies(
@@ -2083,6 +2334,11 @@ def save_and_notify(
     save_proxies_csv(list(final_proxies.values()), OUTPUT_PROXIES_CSV)
 
     # 2. 保存单条优选 IP（原子写入）
+    local_ip_cache = (
+        load_ip_cache(filepath=_ip_cache_path())
+        if (final_cf_ips or final_scan_ips or final_proxyips)
+        else {}
+    )
     sorted_cf_ips = sorted(
         final_cf_ips.values(),
         key=lambda item: item.get("first_seen", ""),
@@ -2093,6 +2349,12 @@ def save_and_notify(
         writer.writeheader()
         for row in sorted_cf_ips:
             row.setdefault("fail_count", 0)
+            apply_authoritative_ip_cache(
+                row,
+                row.get("ip", ""),
+                local_ip_cache,
+                update_raw_asn=("raw_asn" in row),
+            )
             writer.writerow(row)
     log.info("已保存单条优选IP文件: %s (%d 条全量累积记录)", OUTPUT_CF_FILE, len(sorted_cf_ips))
 
@@ -2108,26 +2370,16 @@ def save_and_notify(
     scan_ips_total = 0
     asn_groups_total = 0
     asn_groups = {}
-    local_ip_cache = load_ip_cache(filepath=_ip_cache_path()) if (final_scan_ips or final_proxyips) else {}
     if final_scan_ips is not None and (final_scan_ips or os.path.exists(OUTPUT_SCAN_FILE)):
         os.makedirs(OUTPUT_SCAN_DIR, exist_ok=True)
 
         asn_groups = defaultdict(list)
         for row in final_scan_ips.values():
             cur_ip = row.get("ip") or ""
-            c_asn = clean_asn(row.get("asn"), row.get("isp"))
 
-            # 1. 优先查本地 IP 缓存获取入口 IP 的真实 BGP 归属 (避免目标反代被误标为 Cloudflare、中转运营商或继承出站 ASN)
-            if cur_ip in local_ip_cache:
-                cached = local_ip_cache[cur_ip]
-                cached_code = clean_asn(cached.get("asn"), cached.get("isp"))
-                if cached_code and cached_code.upper() not in ("AS0", "AS_UNKNOWN", "UNKNOWN", "AS"):
-                    if not c_asn or c_asn.upper() in ("AS0", "AS_UNKNOWN", "UNKNOWN", "AS") or (cached_code != c_asn):
-                        cached_isp = cached.get("isp") or ASN_TO_PROVIDER.get(cached_code, "")
-                        row["raw_asn"] = cached_code
-                        row["asn"] = format_asn_isp(cached_code, cached_isp)
-                        row["isp"] = cached_isp
-                        c_asn = cached_code
+            # 1. 优先查本地 IP 缓存获取入口 IP 的真实 BGP 归属 (含非 Cloudflare 错标纠偏与大小写域名回退)
+            apply_authoritative_ip_cache(row, cur_ip, local_ip_cache, update_raw_asn=True)
+            c_asn = clean_asn(row.get("asn"), row.get("isp"))
 
             # 2. 仅在未命中本地缓存且自身 ASN 缺失时，才以实测出口 exit_asn 兜底
             if not c_asn or c_asn.upper() in ("AS0", "AS_UNKNOWN", "UNKNOWN", "AS"):
@@ -2194,6 +2446,12 @@ def save_and_notify(
                 row["exit_ip"] = v4_exits[0] if v4_exits else (v6_exits[0] if v6_exits else "")
                 row["exit_ipv6"] = v6_exits[0] if v6_exits else ""
 
+                apply_authoritative_ip_cache(
+                    row,
+                    row.get("ip", ""),
+                    local_ip_cache,
+                    update_raw_asn=("raw_asn" in row),
+                )
                 _, resolved_nt, exit_code, exit_isp = resolve_node_exit_and_net_type(row, local_ip_cache)
                 ing_code = _extract_asn_code(row.get("asn"), row.get("isp"))
                 ing_isp = str(row.get("isp") or "").strip()
@@ -2350,6 +2608,28 @@ def merge_and_save(
     if cf_dropped_counts:
         log.info("【CF 入口永久拒收】合并前拦截剔除 Cloudflare 入口节点: %s", cf_dropped_counts)
 
+    # 1.2 统一靶向在线反查：覆盖正文单条、附件缺失、OTC/DanFeng 未缓存节点及历史哨兵回收
+    newly_probe_rows = [
+        v
+        for d in (scraped_cf_ips, scraped_scan_ips, scraped_proxyips)
+        for v in d.values()
+        if isinstance(v, dict)
+    ]
+    hist_probe_rows = [
+        v
+        for d in (existing_cf_ips, existing_scan_ips, existing_proxyips)
+        for v in d.values()
+        if isinstance(v, dict)
+    ]
+    _, probed_asn_map = _targeted_asn_probe(
+        newly_probe_rows,
+        ip_cache,
+        existing_rows=hist_probe_rows,
+        cache_path=cache_path,
+        persist=False,
+        apply_hints=True,
+    )
+
     # 1.5 前置巡检并入库本次新增的未收录 ASN (必须在 classify_node_proxyip_or_scan 分流前完成，确保新 ASN 定性及时生效)
     from collections import Counter
     unrecorded_counts = Counter()
@@ -2388,6 +2668,12 @@ def merge_and_save(
         if isinstance(v, dict):
             ip_part = v.get("host") or v.get("egress_ip") or (k.split(":")[0] if ":" in k else "")
             _collect_unrecorded(_extract_asn_code(v.get("asn"), v.get("isp")), v.get("isp") or v.get("asn") or "", ip_part, v.get("net_type") or "")
+
+    scraped_unrecorded_codes = set(unrecorded_counts.keys())
+    for p_ip, (p_asn, p_isp) in probed_asn_map.items():
+        c_code = _extract_asn_code(p_asn, p_isp)
+        if c_code and c_code not in scraped_unrecorded_codes:
+            _collect_unrecorded(c_code, p_isp or p_asn, p_ip, "")
 
     unrecorded_asns = []
     for c, cnt in unrecorded_counts.most_common():
@@ -2700,6 +2986,10 @@ def merge_and_save(
         for _fk, _fv in _v.items():
             if _fv not in ("", None):
                 tgt[_fk] = _fv
+        if _extract_asn_code(tgt.get("asn"), tgt.get("isp")):
+            tgt.pop("probe_failed_at", None)
+    if final_ip_cache != (disk_final or {}):
+        save_ip_cache(final_ip_cache, filepath=cache_path)
     final_proxies = {k: v for k, v in final_proxies.items() if not is_cloudflare_node(v, final_ip_cache)}
     final_cf_ips = {k: v for k, v in final_cf_ips.items() if not is_cloudflare_node(v, final_ip_cache)}
     final_scan_ips = {k: v for k, v in cleaned_scan_ips.items() if not is_cloudflare_node(v, final_ip_cache)}
@@ -2755,6 +3045,7 @@ def merge_and_save(
 
 
 def run_web_scraper():
+    _reset_asn_probe_budget()
     log.info("=" * 50)
     log.info("模式: 【免登录 Web 抓取模式】（公开 Web 频道预览，无需 API ID / 会话密钥）")
     log.info("本次增量回溯: 最近 %d 天", FETCH_DAYS)
@@ -2868,6 +3159,7 @@ def run_web_scraper():
     )
 
 async def run_telethon():
+    _reset_asn_probe_budget()
     from telethon import TelegramClient
     from telethon.sessions import StringSession
     from telethon.errors import FloodWaitError
@@ -3093,88 +3385,20 @@ async def run_telethon():
                                                         }
                                                         ip_cache_dirty = True
 
-                                        # 增量靶向补全解耦后仍缺失独立 ASN 的入口/出口公网 IP（如出入口分离场景的未知入口 IP）
+                                        # 增量靶向补全解耦后仍缺失独立 ASN 的入口/出口公网 IP（仅 P1 新抓缺失项，P2 白名单复核延后至 merge_and_save 均衡执行）
                                         if active_doc_items:
-                                            missing_probe_ips: list[str] = []
-                                            seen_probe_ips: set[str] = set()
-                                            for _, cf_item in active_doc_items:
-                                                ing_ip = (cf_item.get("ip") or "").strip()
-                                                if is_valid_public_ip(ing_ip) and (
-                                                    not cf_item.get("raw_asn")
-                                                    or cf_item.get("raw_asn") in ("AS0", "0", "AS_UNKNOWN", "UNKNOWN")
-                                                ):
-                                                    cached_ing = ip_cache.get(ing_ip)
-                                                    if isinstance(cached_ing, dict) and cached_ing.get("asn"):
-                                                        c_asn = cached_ing["asn"]
-                                                        c_isp = cached_ing.get("isp") or ASN_TO_PROVIDER.get(c_asn, "")
-                                                        cf_item["raw_asn"] = c_asn
-                                                        cf_item["isp"] = c_isp
-                                                        cf_item["asn"] = format_asn_isp(c_asn, c_isp)
-                                                    elif ing_ip not in seen_probe_ips:
-                                                        seen_probe_ips.add(ing_ip)
-                                                        missing_probe_ips.append(ing_ip)
-
-                                                ex_ip = (cf_item.get("exit_ip") or "").strip()
-                                                if is_valid_public_ip(ex_ip) and (
-                                                    not cf_item.get("exit_asn")
-                                                    or cf_item.get("exit_asn") in ("AS0", "0", "AS_UNKNOWN", "UNKNOWN")
-                                                ):
-                                                    cached_ex = ip_cache.get(ex_ip)
-                                                    if isinstance(cached_ex, dict) and cached_ex.get("asn"):
-                                                        c_asn = cached_ex["asn"]
-                                                        c_isp = cached_ex.get("isp") or ASN_TO_PROVIDER.get(c_asn, "")
-                                                        cf_item["exit_asn"] = c_asn
-                                                        cf_item["exit_isp"] = c_isp
-                                                    elif ex_ip not in seen_probe_ips:
-                                                        seen_probe_ips.add(ex_ip)
-                                                        missing_probe_ips.append(ex_ip)
-
-                                            if missing_probe_ips:
-                                                doc_cache_path = _ip_cache_path()
-                                                probe_asn_map = await asyncio.to_thread(
-                                                    resolve_asn_batch_online,
-                                                    missing_probe_ips,
-                                                    persist=False,
-                                                    cache_path=doc_cache_path,
-                                                ) or {}
-                                                for p_ip, res_pair in probe_asn_map.items():
-                                                    if not res_pair or not res_pair[0]:
-                                                        continue
-                                                    p_asn = res_pair[0]
-                                                    p_isp = res_pair[1] or ASN_TO_PROVIDER.get(p_asn, "")
-                                                    existing_entry = ip_cache.get(p_ip) if isinstance(ip_cache.get(p_ip), dict) else {}
-                                                    p_country = pop_online_country(p_ip) or existing_entry.get("country", "")
-                                                    if not existing_entry.get("asn") or (p_country and not existing_entry.get("country")):
-                                                        ip_cache[p_ip] = {
-                                                            "asn": p_asn,
-                                                            "isp": p_isp,
-                                                            "net_type": ASN_EXACT_NET_TYPE.get(p_asn) or classify_asn(p_asn, p_isp),
-                                                            "country": p_country,
-                                                        }
-                                                        ip_cache_dirty = True
-
-                                                for _, cf_item in active_doc_items:
-                                                    ing_ip = (cf_item.get("ip") or "").strip()
-                                                    if ing_ip in probe_asn_map and (
-                                                        not cf_item.get("raw_asn")
-                                                        or cf_item.get("raw_asn") in ("AS0", "0", "AS_UNKNOWN", "UNKNOWN")
-                                                    ):
-                                                        p_asn, p_isp = probe_asn_map[ing_ip]
-                                                        if p_asn:
-                                                            p_isp = p_isp or ASN_TO_PROVIDER.get(p_asn, "")
-                                                            cf_item["raw_asn"] = p_asn
-                                                            cf_item["isp"] = p_isp
-                                                            cf_item["asn"] = format_asn_isp(p_asn, p_isp)
-                                                    ex_ip = (cf_item.get("exit_ip") or "").strip()
-                                                    if ex_ip in probe_asn_map and (
-                                                        not cf_item.get("exit_asn")
-                                                        or cf_item.get("exit_asn") in ("AS0", "0", "AS_UNKNOWN", "UNKNOWN")
-                                                    ):
-                                                        p_asn, p_isp = probe_asn_map[ex_ip]
-                                                        if p_asn:
-                                                            p_isp = p_isp or ASN_TO_PROVIDER.get(p_asn, "")
-                                                            cf_item["exit_asn"] = p_asn
-                                                            cf_item["exit_isp"] = p_isp
+                                            doc_cache_path = _ip_cache_path()
+                                            probe_dirty, _ = await asyncio.to_thread(
+                                                _targeted_asn_probe,
+                                                [it for _, it in active_doc_items],
+                                                ip_cache,
+                                                cache_path=doc_cache_path,
+                                                persist=False,
+                                                apply_hints=True,
+                                                include_whitelist=False,
+                                            )
+                                            if probe_dirty:
+                                                ip_cache_dirty = True
 
                                         doc_proxy_added = 0
                                         doc_scan_added = 0

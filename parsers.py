@@ -25,6 +25,7 @@ from providers import (
     is_valid_public_ip,
     load_ip_cache,
     normalize_timestamp,
+    resolve_authoritative_cache_asn,
     resolve_ip_asn,
 )
 
@@ -251,19 +252,22 @@ def resolve_and_clean_asn(
                 raw_isp = raw_asn
 
     cache = ip_cache
-    # 优先查验本地 IP 缓存：若当前 IP 已有确凿真实的 BGP ASN，且当前标记为空/未知/或误标为 Cloudflare (AS13335)，坚决以 IP 真实 ASN 为准
+    # 权威本地 IP 缓存：若 ip_cache 持有真实非占位 BGP ASN，且当前标记缺失/占位/与缓存冲突（含非 Cloudflare 错标），坚决以缓存为准
     if ip and ip not in ("AS_UNKNOWN", "unknown", "127.0.0.1"):
         try:
             if cache is None:
                 cache = load_ip_cache()
-            if ip in cache and cache[ip].get("asn"):
-                cached_asn = cache[ip]["asn"]
-                if cached_asn and cached_asn.upper() not in ("AS0", "AS_UNKNOWN", "UNKNOWN"):
-                    if not asn_clean or asn_clean in ("AS0", "AS_UNKNOWN", "UNKNOWN") or (asn_clean == "AS13335" and cached_asn != "AS13335"):
-                        asn_clean = cached_asn
-                        cached_isp = cache[ip].get("isp") or ASN_TO_PROVIDER.get(cached_asn, "")
-                        if cached_isp:
-                            raw_isp = cached_isp
+            cached_asn, cached_isp = resolve_authoritative_cache_asn(cache, ip)
+            if cached_asn:
+                if (
+                    not asn_clean
+                    or asn_clean in ("AS0", "AS_UNKNOWN", "UNKNOWN")
+                    or cached_asn != asn_clean
+                ):
+                    asn_clean = cached_asn
+                    raw_isp = cached_isp
+                elif cached_isp and not raw_isp:
+                    raw_isp = cached_isp
         except Exception:
             pass
 
@@ -457,9 +461,12 @@ def parse_cf_csv_content(
 
                 if local_cache is None:
                     local_cache = load_ip_cache()
-                row_asn, row_isp = resolve_and_clean_asn(raw_ip, fn_asn, fn_isp, ip_cache=local_cache)
+                # Step 2: fn_asn / fn_isp 降级为无冲突 hint，解析阶段不写入 raw_asn / isp，避免阻断后续在线反查
+                row_asn, row_isp = resolve_and_clean_asn(raw_ip, "", "", ip_cache=local_cache)
+                if not row_asn:
+                    row_isp = ""
 
-                results.append({
+                row_item = {
                     "ip": raw_ip,
                     "port": str(port),
                     "tls": "true" if port in (443, 8443, 2053, 2083, 2087, 2096) else "false",
@@ -468,14 +475,19 @@ def parse_cf_csv_content(
                     "colo": "",
                     "cf_location": "",
                     "isp": row_isp,
-                    "asn": format_asn_isp(row_asn, row_isp),
+                    "asn": format_asn_isp(row_asn, row_isp) if row_asn else "",
                     "raw_asn": row_asn,
                     "first_seen": fn_time,
                     "channel": default_channel,
                     "fail_count": 0,
                     "exit_ip": "",
                     "exit_ipv6": "",
-                })
+                }
+                if not row_asn and fn_asn:
+                    row_item["asn_hint"] = fn_asn
+                    if fn_isp:
+                        row_item["isp_hint"] = fn_isp
+                results.append(row_item)
             return results
 
         reader = csv.DictReader(lines, delimiter=delimiter)
@@ -666,26 +678,27 @@ def parse_cf_csv_content(
 
             raw_asn = row.get(field_map.get("asn", ""), "").replace("`", "").strip()
             if not raw_asn or raw_asn in ("-", "0", "AS0", "AS_UNKNOWN", "UNKNOWN"):
-                raw_asn = fn_asn
+                raw_asn = ""
             elif raw_asn.isdigit():
                 num = int(raw_asn)
-                raw_asn = f"AS{num}" if num > 0 else fn_asn
+                raw_asn = f"AS{num}" if num > 0 else ""
 
             raw_isp = row.get(field_map.get("isp", ""), "").replace("`", "").strip()
             if not raw_isp or raw_isp in ("-", "UNKNOWN", "AS_UNKNOWN"):
-                raw_isp = fn_isp
+                raw_isp = ""
 
             if local_cache is None:
                 local_cache = load_ip_cache()
             asn_val, raw_isp = resolve_and_clean_asn(raw_ip, raw_asn, raw_isp, ip_cache=local_cache)
-            # 仅当入口 ASN 完全缺失且本地 IP 缓存未收录时，才允许使用 exit_asn 兜底
+            # 仅当入口 ASN 完全缺失且本地 IP 缓存未收录时，才允许使用 exit_asn 兜底；
+            # 文件名 fn_asn / fn_isp 绝不写入 raw_asn / isp，仅作 asn_hint / isp_hint 留待在线反查失败后兜底
             if (not asn_val or asn_val in ("AS0", "AS_UNKNOWN", "UNKNOWN")) and raw_exit_asn:
                 asn_val, raw_isp = resolve_and_clean_asn(raw_ip, raw_exit_asn, raw_exit_isp or raw_isp, ip_cache=local_cache)
 
             raw_time = row.get(field_map.get("time", ""), "").strip()
             first_seen = normalize_timestamp(raw_time, fn_time)
 
-            results.append({
+            row_item = {
                 "ip": raw_ip,
                 "port": str(port),
                 "tls": tls,
@@ -694,7 +707,7 @@ def parse_cf_csv_content(
                 "colo": colo,
                 "cf_location": cf_location,
                 "isp": raw_isp,
-                "asn": format_asn_isp(asn_val, raw_isp),
+                "asn": format_asn_isp(asn_val, raw_isp) if asn_val else "",
                 "raw_asn": asn_val,
                 "first_seen": first_seen,
                 "channel": row_channel,
@@ -703,7 +716,12 @@ def parse_cf_csv_content(
                 "exit_ipv6": exit_ipv6,
                 "exit_asn": raw_exit_asn,
                 "exit_isp": raw_exit_isp,
-            })
+            }
+            if not asn_val and fn_asn and not (exit_ip and exit_ip != raw_ip):
+                row_item["asn_hint"] = fn_asn
+                if fn_isp:
+                    row_item["isp_hint"] = fn_isp
+            results.append(row_item)
     except Exception as e:
         log.warning("解析 CSV 优选/ProxyIP 数据异常: %s", e)
 
@@ -958,18 +976,9 @@ def parse_otc_scan_content(
             if not ingress_isp_val and clean_asn_code and clean_asn_code in ASN_TO_PROVIDER:
                 ingress_isp_val = ASN_TO_PROVIDER[clean_asn_code]
         else:
-            # 同出口或单 IP 场景：fn_asn 降级为无冲突 hint（仅当行内无 ASN 且独立反查未命中时采用）
+            # 同出口或单 IP 场景：fn_asn 降级为仅记录在 asn_hint 中的无冲突 hint（仅在线反查失败或预算耗尽后兜底）
             if not asn or asn in ("AS0", "AS_UNKNOWN", "UNKNOWN"):
-                probe_asn_code, probe_isp_val = resolve_and_clean_asn(ip, "", isp, ip_cache=local_cache)
-                if probe_asn_code:
-                    clean_asn_code, ingress_isp_val = probe_asn_code, probe_isp_val
-                elif fn_asn:
-                    asn = fn_asn
-                    if not isp and asn in ASN_TO_PROVIDER:
-                        isp = ASN_TO_PROVIDER[asn]
-                    clean_asn_code, ingress_isp_val = resolve_and_clean_asn(ip, asn, isp, ip_cache=local_cache)
-                else:
-                    clean_asn_code, ingress_isp_val = probe_asn_code, probe_isp_val
+                clean_asn_code, ingress_isp_val = resolve_and_clean_asn(ip, "", isp, ip_cache=local_cache)
             else:
                 if not isp and asn in ASN_TO_PROVIDER:
                     isp = ASN_TO_PROVIDER[asn]
@@ -979,7 +988,7 @@ def parse_otc_scan_content(
 
         tls = "true" if port in (443, 8443, 2053, 2083, 2087, 2096) else "false"
 
-        results.append({
+        row_item = {
             "ip": ip,
             "port": str(port),
             "tls": tls,
@@ -997,7 +1006,13 @@ def parse_otc_scan_content(
             "exit_ipv6": exit_ip if is_valid_ipv6(exit_ip) else "",
             "exit_asn": exit_asn_code,
             "exit_isp": exit_isp_val,
-        })
+        }
+        if not has_separate_exit and not clean_asn_code and fn_asn:
+            row_item["asn_hint"] = fn_asn
+            hint_isp = ASN_TO_PROVIDER.get(fn_asn, "")
+            if hint_isp:
+                row_item["isp_hint"] = hint_isp
+        results.append(row_item)
     return results
 
 

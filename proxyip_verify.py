@@ -52,6 +52,7 @@ from providers import (
     classify_asn,
     _extract_asn_code,
     resolve_node_exit_and_net_type,
+    apply_authoritative_ip_cache,
     merge_demoted_into_scan_ips,
     load_ip_cache,
     is_cloudflare_asn_or_isp,
@@ -445,6 +446,7 @@ def save_proxyip(
 
     rows.sort(key=_sort_key)
 
+    local_ip_cache = load_ip_cache(filepath=_ip_cache_path())
     for row in rows:
         cand_exits = extract_ips([row.get("exit_ip"), row.get("exit_ipv6")])
         v4_exits = [cip for cip in cand_exits if is_valid_ipv4(cip)]
@@ -452,7 +454,8 @@ def save_proxyip(
         row["exit_ip"] = v4_exits[0] if v4_exits else (v6_exits[0] if v6_exits else "")
         row["exit_ipv6"] = v6_exits[0] if v6_exits else ""
 
-        _, resolved_nt, exit_code, exit_isp = resolve_node_exit_and_net_type(row)
+        apply_authoritative_ip_cache(row, row.get("ip", ""), local_ip_cache)
+        _, resolved_nt, exit_code, exit_isp = resolve_node_exit_and_net_type(row, local_ip_cache)
         ing_code = _extract_asn_code(row.get("asn"), row.get("isp"))
         ing_isp = str(row.get("isp") or "").strip()
 

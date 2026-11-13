@@ -3582,6 +3582,115 @@ def _lookup_ip_cache_entry(cache: dict, *keys: str) -> dict | None:
     return None
 
 
+_PLACEHOLDER_ASN_TOKENS = frozenset({"AS0", "AS_UNKNOWN", "UNKNOWN", "AS"})
+
+
+def resolve_authoritative_cache_asn(cache: dict | None, *keys: str) -> tuple[str, str]:
+    """
+    从 ip_cache 按候选键提取权威非占位 BGP ASN 与 ISP：
+    - 复用 `_lookup_ip_cache_entry`（含域名小写回退）
+    - 过滤空值与 AS0/AS_UNKNOWN/UNKNOWN/AS 占位哨兵
+    - 返回 `(cached_code, cached_isp)`，未命中则返回 `("", "")`
+    """
+    if not isinstance(cache, dict) or not cache:
+        return "", ""
+    entry = _lookup_ip_cache_entry(cache, *keys)
+    if not isinstance(entry, dict):
+        return "", ""
+    cached_code = _extract_asn_code(entry.get("asn"), entry.get("isp")) or ""
+    if not cached_code or cached_code.upper() in _PLACEHOLDER_ASN_TOKENS:
+        return "", ""
+    cached_isp = (
+        str(entry.get("isp") or "").strip()
+        or ASN_TO_PROVIDER.get(cached_code, "")
+        or ASN_DATABASE_ASN_TO_ISP.get(cached_code, "")
+    )
+    return cached_code, cached_isp
+
+
+def _override_row_pair_from_cache(
+    row: dict,
+    cache: dict,
+    key: str,
+    asn_field: str,
+    isp_field: str,
+    *,
+    raw_asn_field: str = "",
+    require_cf_cache: bool = False,
+) -> tuple[bool, str]:
+    """用权威 ip_cache 纠偏指定行内的一对 ASN/ISP 字段；未命中缓存时保持原值不变。"""
+    cur_isp = str(row.get(isp_field) or "").strip()
+    cur_code = _extract_asn_code(row.get(asn_field), cur_isp) or ""
+    cached_code, cached_isp = resolve_authoritative_cache_asn(cache, key)
+    if not cached_code:
+        return False, cur_code
+    if require_cf_cache and not is_cloudflare_asn_or_isp(cached_code, cached_isp):
+        return False, cur_code
+    if not cur_code or cur_code.upper() in _PLACEHOLDER_ASN_TOKENS or cached_code != cur_code:
+        row[isp_field] = cached_isp
+        row[asn_field] = format_asn_isp(cached_code, cached_isp)
+        if raw_asn_field:
+            row[raw_asn_field] = cached_code
+        return True, cached_code
+    if cached_isp and not cur_isp:
+        row[isp_field] = cached_isp
+        row[asn_field] = format_asn_isp(cur_code, cached_isp)
+        if raw_asn_field and not str(row.get(raw_asn_field) or "").strip():
+            row[raw_asn_field] = cur_code
+        return True, cur_code
+    return False, cur_code
+
+
+def apply_authoritative_ip_cache(
+    row: dict,
+    ip: str,
+    cache: dict | None,
+    *,
+    update_raw_asn: bool = False,
+) -> tuple[bool, str]:
+    """
+    权威 `ip_cache` 入/出口 ASN 纠偏：
+    若缓存持有真实非占位 ASN（对 Cloudflare 网段 exit_ip 仅采信 Cloudflare 权威缓存），
+    且行内入/出口 ASN 缺失、为占位符或与缓存不一致（含错标），无条件以缓存为准覆写
+    `row["asn"]`/`row["isp"]`（以及 `row["exit_asn"]`/`row["exit_isp"]`，可选同步 `row["raw_asn"]`）。
+    返回 `(changed, effective_ingress_code)`。
+    """
+    if not isinstance(row, dict):
+        return False, ""
+    if not isinstance(cache, dict) or not cache:
+        return False, _extract_asn_code(row.get("asn"), row.get("isp")) or ""
+
+    ing_key = str(ip or "").strip()
+    ing_changed, ing_code = (
+        _override_row_pair_from_cache(
+            row,
+            cache,
+            ing_key,
+            "asn",
+            "isp",
+            raw_asn_field="raw_asn" if update_raw_asn else "",
+        )
+        if ing_key
+        else (False, _extract_asn_code(row.get("asn"), row.get("isp")) or "")
+    )
+
+    ex_changed = False
+    cand_exits = extract_ips([row.get("exit_ip"), row.get("exit_ipv6")])
+    v4_exits = [cip for cip in cand_exits if is_valid_ipv4(cip)]
+    v6_exits = [cip for cip in cand_exits if is_valid_ipv6(cip)]
+    primary_exit = v4_exits[0] if v4_exits else (v6_exits[0] if v6_exits else "")
+    if primary_exit:
+        ex_changed, _ = _override_row_pair_from_cache(
+            row,
+            cache,
+            primary_exit,
+            "exit_asn",
+            "exit_isp",
+            require_cf_cache=is_cloudflare_ip(primary_exit),
+        )
+    return (ing_changed or ex_changed), ing_code
+
+
 def rescue_mislabeled_cloudflare_rows(
     rows: list[dict],
     ip_cache: dict | None = None,
@@ -3713,19 +3822,25 @@ def resolve_node_exit_and_net_type(
                 raw_exit_isp = ASN_TO_PROVIDER.get("AS13335", "Cloudflare")
 
     cache_exit_nt = ""
-    if primary_exit and not exit_code and ip_cache:
-        for ep in (exit_v4, exit_v6):
-            if ep and ep in ip_cache and isinstance(ip_cache[ep], dict):
-                ent = ip_cache[ep]
-                c_code = _extract_asn_code(ent.get("asn"), ent.get("isp"))
-                if c_code:
-                    exit_code = c_code
-                    if not raw_exit_isp:
-                        raw_exit_isp = str(ent.get("isp") or "").strip()
-                    break
-                ent_nt = str(ent.get("net_type") or "").strip().lower()
-                if not cache_exit_nt and ent_nt in VALID_NET_TYPES:
-                    cache_exit_nt = ent_nt
+    if primary_exit and ip_cache:
+        ex_is_cf_ip = any(is_cloudflare_ip(ep) for ep in (exit_v4, exit_v6) if ep)
+        cached_ex_code, cached_ex_isp = resolve_authoritative_cache_asn(ip_cache, exit_v4, exit_v6)
+        if cached_ex_code and (
+            not ex_is_cf_ip or is_cloudflare_asn_or_isp(cached_ex_code, cached_ex_isp)
+        ):
+            if not exit_code or cached_ex_code != exit_code:
+                exit_code = cached_ex_code
+                raw_exit_isp = cached_ex_isp
+            elif cached_ex_isp and not raw_exit_isp:
+                raw_exit_isp = cached_ex_isp
+        if not exit_code:
+            for ep in (exit_v4, exit_v6):
+                if ep and ep in ip_cache and isinstance(ip_cache[ep], dict):
+                    ent = ip_cache[ep]
+                    ent_nt = str(ent.get("net_type") or "").strip().lower()
+                    if ent_nt in VALID_NET_TYPES:
+                        cache_exit_nt = ent_nt
+                        break
 
     if primary_exit and not exit_code:
         if primary_exit == ip and ing_code:
@@ -4974,14 +5089,9 @@ def calibrate_all_datasets(
                     changed_proxyip += 1
 
                 row_ip = str(r.get("ip") or "").strip()
-                ing_code_pre = _extract_asn_code(r.get("asn"), r.get("isp"))
-                if row_ip and row_ip in cache and isinstance(cache[row_ip], dict):
-                    c_code = _extract_asn_code(cache[row_ip].get("asn"), cache[row_ip].get("isp"))
-                    c_isp = str(cache[row_ip].get("isp") or "").strip() or ASN_TO_PROVIDER.get(c_code, "")
-                    if c_code and (not ing_code_pre or (is_cloudflare_asn_or_isp(ing_code_pre, r.get("isp", "")) and not is_cloudflare_asn_or_isp(c_code, c_isp))):
-                        r["asn"] = format_asn_isp(c_code, c_isp)
-                        r["isp"] = c_isp
-                        changed_proxyip += 1
+                changed_asn, _ = apply_authoritative_ip_cache(r, row_ip, cache)
+                if changed_asn:
+                    changed_proxyip += 1
 
                 if is_cloudflare_node(r, cache):
                     dropped_cf_proxyip += 1
@@ -5079,12 +5189,16 @@ def calibrate_all_datasets(
             )
             clean_cf_rows: list[dict] = []
             dropped_cf_ips = 0
+            cf_asn_fixed = rescued_cf
             for r in cf_rows_raw:
+                changed_cf_asn, _ = apply_authoritative_ip_cache(r, str(r.get("ip") or "").strip(), cache)
+                if changed_cf_asn:
+                    cf_asn_fixed += 1
                 if is_cloudflare_node(r, cache):
                     dropped_cf_ips += 1
                     continue
                 clean_cf_rows.append(r)
-            if dropped_cf_ips > 0 or rescued_cf > 0:
+            if dropped_cf_ips > 0 or cf_asn_fixed > 0:
                 with atomic_writer(eff_cf_csv, encoding="utf-8-sig", newline="") as f:
                     writer = csv.DictWriter(f, fieldnames=CF_BASE_CSV_FIELDS, extrasaction="ignore")
                     writer.writeheader()
@@ -5122,14 +5236,9 @@ def calibrate_all_datasets(
             scan_asn_fixed = rescued_scan
             for r in scan_rows_raw:
                 ip = str(r.get("ip") or "").strip()
-                ing_code = _extract_asn_code(r.get("asn"), r.get("isp"))
-                if ip and ip in cache and isinstance(cache[ip], dict):
-                    c_code = _extract_asn_code(cache[ip].get("asn"), cache[ip].get("isp"))
-                    c_isp = str(cache[ip].get("isp") or "").strip() or ASN_TO_PROVIDER.get(c_code, "")
-                    if c_code and (not ing_code or (is_cloudflare_asn_or_isp(ing_code, r.get("isp", "")) and not is_cloudflare_asn_or_isp(c_code, c_isp))):
-                        r["asn"] = format_asn_isp(c_code, c_isp)
-                        r["isp"] = c_isp
-                        scan_asn_fixed += 1
+                changed_asn, _ = apply_authoritative_ip_cache(r, ip, cache)
+                if changed_asn:
+                    scan_asn_fixed += 1
                 if is_cloudflare_node(r, cache):
                     dropped_cf_scan += 1
                     continue

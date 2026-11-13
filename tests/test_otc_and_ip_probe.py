@@ -1,18 +1,25 @@
 import asyncio
+import contextlib
+import csv
 import json
 import os
 import re
 import sys
 import tempfile
+import time
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
+import cf_verify
 import parsers
 import providers
+import proxyip_verify
+import tg_fetch
 
 
 def extract_asn_num(asn_text: str) -> str:
@@ -78,9 +85,9 @@ class TestOtcScanParsing(unittest.TestCase):
         self.assertEqual(items[0]["colo"], "")
 
     def test_exit_decoupling_and_fn_asn_hint_downgrade(self):
-        # 1) 出入口不同且入口未缓存：入口 ASN 留空待后续增量反查，fn_asn 绝不填入口/出口
-        # 2) 出入口相同（无独立出口）且缓存已有 AS4134 时，fn_asn AS216211 不覆盖冲突缓存
-        # 3) 纯 IP 行无行内 ASN 且无缓存时，fn_asn AS216211 作为无冲突 hint 生效
+        # 1) 出入口不同且入口未缓存：入口 ASN 留空待后续增量反查，fn_asn 绝不填入口/出口/hint
+        # 2) 出入口相同（无独立出口）且缓存已有 AS4134 时，fn_asn AS216211 不覆盖冲突缓存且不生成 hint
+        # 3) 纯 IP 行无行内 ASN 且无缓存时，fn_asn AS216211 仅降级存入 asn_hint，解析期不预填 raw_asn/asn
         text = (
             "198.51.100.30:443,US,AS139659,ExitOrg,SJC (美国),203.0.113.40,IPv4\n"
             "198.51.100.31:443,12ms\n"
@@ -100,12 +107,16 @@ class TestOtcScanParsing(unittest.TestCase):
         uncached_ing, conflict_cached, uncached_single = items
         self.assertEqual(uncached_ing["raw_asn"], "")
         self.assertEqual(uncached_ing["asn"], "")
+        self.assertEqual(uncached_ing.get("asn_hint", ""), "")
         self.assertEqual(extract_asn_num(uncached_ing["exit_asn"]), "139659")
 
         self.assertEqual(extract_asn_num(conflict_cached["raw_asn"]), "4134")
         self.assertNotEqual(extract_asn_num(conflict_cached["raw_asn"]), "216211")
+        self.assertEqual(conflict_cached.get("asn_hint", ""), "")
 
-        self.assertEqual(extract_asn_num(uncached_single["raw_asn"]), "216211")
+        self.assertEqual(uncached_single["raw_asn"], "")
+        self.assertEqual(uncached_single["asn"], "")
+        self.assertEqual(uncached_single.get("asn_hint"), "AS216211")
 
 
 class TestIpProbeProxyRotation(unittest.TestCase):
@@ -246,6 +257,604 @@ class TestIpProbeProxyRotation(unittest.TestCase):
         self.assertEqual(extract_asn_num(res["9.9.9.9"][0]), "24940")
         self.assertEqual(saved_cache["8.8.4.4"]["country"], "US")
         self.assertEqual(saved_cache["9.9.9.9"]["country"], "DE")
+
+
+@contextlib.contextmanager
+def _isolated_tg_fetch_dir(tmpdir: str):
+    """将 tg_fetch 全量路径常量与副作用隔离到临时目录，杜绝测试污染真实 data/ 或发送网络通知。"""
+    stack = contextlib.ExitStack()
+    try:
+        stack.enter_context(patch.object(tg_fetch, "DATA_DIR", tmpdir))
+        stack.enter_context(patch.object(tg_fetch, "OUTPUT_PROXY_FILE", os.path.join(tmpdir, "proxies.txt")))
+        stack.enter_context(patch.object(tg_fetch, "OUTPUT_PROXIES_CSV", os.path.join(tmpdir, "proxies.csv")))
+        stack.enter_context(patch.object(tg_fetch, "OUTPUT_PROXIES_DIR", os.path.join(tmpdir, "proxies")))
+        stack.enter_context(patch.object(tg_fetch, "OUTPUT_CF_FILE", os.path.join(tmpdir, "cf_ips.csv")))
+        stack.enter_context(patch.object(tg_fetch, "OUTPUT_CF_TXT", os.path.join(tmpdir, "cf_ips.txt")))
+        stack.enter_context(patch.object(tg_fetch, "OUTPUT_SCAN_FILE", os.path.join(tmpdir, "scan_ips.csv")))
+        stack.enter_context(patch.object(tg_fetch, "OUTPUT_SCAN_TXT", os.path.join(tmpdir, "scan_ips.txt")))
+        stack.enter_context(patch.object(tg_fetch, "OUTPUT_SCAN_DIR", os.path.join(tmpdir, "scan_ips")))
+        stack.enter_context(patch.object(tg_fetch, "OUTPUT_PROXYIP_FILE", os.path.join(tmpdir, "proxyip.csv")))
+        stack.enter_context(patch.object(tg_fetch, "OUTPUT_PROXYIP_TXT", os.path.join(tmpdir, "proxyip.txt")))
+        stack.enter_context(patch.object(tg_fetch, "OUTPUT_PROXYIP_JSON", os.path.join(tmpdir, "proxyip.json")))
+        stack.enter_context(patch.object(tg_fetch, "OUTPUT_PROXYIP_DIR", os.path.join(tmpdir, "proxyip")))
+        stack.enter_context(patch("tg_fetch.send_tg_message"))
+        yield stack
+    finally:
+        stack.close()
+
+
+def _read_csv_rows(path: str) -> list[dict]:
+    with open(path, "r", encoding="utf-8-sig", newline="") as f:
+        return list(csv.DictReader(f))
+
+
+class TestFnHintAndAuthoritativeCacheOverride(unittest.TestCase):
+    def test_csv_fn_asn_and_cloud_filename_downgraded_and_cache_overrides_non_cf_mislabel(self):
+        fake_cache = {
+            "45.33.10.2": {"asn": "AS45102", "isp": "Alibaba", "net_type": "datacenter", "country": "SG"},
+            "myproxy.example.com": {"asn": "AS4766", "isp": "Korea Telecom", "net_type": "isp", "country": "KR"},
+        }
+
+        # 1) 无表头 CSV + 云厂商文件名 Aliyun.csv：未缓存 IP 不预填 raw_asn/asn/isp，仅存入 asn_hint/isp_hint
+        headerless_rows = parsers.parse_cf_csv_content(
+            "45.33.10.1,443,15ms\n45.33.10.2,8443,20ms\n",
+            filename="Aliyun.csv",
+            default_channel="@danfeng_chat",
+            ip_cache=fake_cache,
+        )
+        self.assertEqual(len(headerless_rows), 2)
+        uncached_h, cached_h = headerless_rows
+        self.assertEqual(uncached_h["raw_asn"], "")
+        self.assertEqual(uncached_h["asn"], "")
+        self.assertEqual(uncached_h["isp"], "")
+        self.assertEqual(uncached_h.get("asn_hint"), "AS45102")
+        self.assertEqual(uncached_h.get("isp_hint"), "Alibaba Cloud")
+        self.assertEqual(extract_asn_num(cached_h["raw_asn"]), "45102")
+        self.assertEqual(cached_h.get("asn_hint", ""), "")
+
+        # 2) 有表头 DanFeng CSV：行内非 CF 错标 AS24940 必须被缓存 AS45102 压过；未缓存行不吃文件名 AS132203；域名大小写回退命中
+        dict_csv = (
+            "IP,Port,ASN,ISP\n"
+            "45.33.10.1,443,,\n"
+            "45.33.10.2,443,AS24940,Hetzner Online GmbH\n"
+            "MyProxy.Example.COM,443,AS24940,Hetzner Online GmbH\n"
+        )
+        dict_rows = parsers.parse_cf_csv_content(
+            dict_csv,
+            filename="AS132203_Tencent_20260906_190653.csv",
+            default_channel="@danfeng_chat",
+            ip_cache=fake_cache,
+        )
+        self.assertEqual(len(dict_rows), 3)
+        uncached_d, mislabeled_d, mixed_dom_d = dict_rows
+        self.assertEqual(uncached_d["raw_asn"], "")
+        self.assertEqual(uncached_d["asn"], "")
+        self.assertEqual(uncached_d.get("asn_hint"), "AS132203")
+        self.assertEqual(extract_asn_num(mislabeled_d["raw_asn"]), "45102")
+        self.assertEqual(extract_asn_num(mixed_dom_d["raw_asn"]), "4766")
+
+    def test_save_paths_enforce_authoritative_ip_cache_and_preserve_as_unknown_sentinel(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cache_path = os.path.join(tmpdir, "ip_cache.json")
+            cache_data = {
+                "45.33.20.1": {"asn": "AS45102", "isp": "Alibaba", "net_type": "datacenter", "country": "SG"},
+                "45.33.20.2": {"asn": "AS4766", "isp": "Korea Telecom", "net_type": "isp", "country": "KR"},
+                "host.example.com": {"asn": "AS4766", "isp": "Korea Telecom", "net_type": "isp", "country": "KR"},
+            }
+            providers.save_ip_cache(cache_data, filepath=cache_path)
+
+            # A. tg_fetch.save_and_notify 三条 CSV（cf_ips / scan_ips / proxyip）
+            final_cf = {
+                "45.33.20.1:443": {
+                    "ip": "45.33.20.1", "port": "443", "tls": "true",
+                    "asn": "AS24940 (Hetzner)", "isp": "Hetzner", "first_seen": "2026-09-01 00:00:00",
+                },
+            }
+            final_scan = {
+                "45.33.20.1:8443": {
+                    "ip": "45.33.20.1", "port": "8443", "tls": "true",
+                    "asn": "AS24940 (Hetzner)", "isp": "Hetzner", "first_seen": "2026-09-01 00:00:00",
+                },
+                "45.33.20.99:443": {
+                    "ip": "45.33.20.99", "port": "443", "tls": "true",
+                    "asn": "", "isp": "", "first_seen": "2026-09-01 00:00:00",
+                },
+            }
+            final_proxyip = {
+                "Host.Example.COM:443": {
+                    "ip": "Host.Example.COM", "port": "443", "tls": "true",
+                    "asn": "AS24940 (Hetzner)", "isp": "Hetzner", "first_seen": "2026-09-01 00:00:00",
+                },
+            }
+
+            with _isolated_tg_fetch_dir(tmpdir):
+                tg_fetch.save_and_notify(
+                    final_proxies={},
+                    final_cf_ips=final_cf,
+                    final_scan_ips=final_scan,
+                    final_proxyips=final_proxyip,
+                )
+                cf_saved = _read_csv_rows(tg_fetch.OUTPUT_CF_FILE)
+                scan_saved = {r["ip"]: r for r in _read_csv_rows(tg_fetch.OUTPUT_SCAN_FILE)}
+                proxyip_saved = _read_csv_rows(tg_fetch.OUTPUT_PROXYIP_FILE)
+
+            self.assertEqual(extract_asn_num(cf_saved[0]["asn"]), "45102")
+            self.assertEqual(extract_asn_num(scan_saved["45.33.20.1"]["asn"]), "45102")
+            self.assertEqual(scan_saved["45.33.20.99"]["asn"], "AS_UNKNOWN")
+            self.assertEqual(extract_asn_num(proxyip_saved[0]["asn"]), "4766")
+
+            # B. proxyip_verify.save_proxyip：写入前纠偏非 CF 错标，且先于 exit/net_type 解析
+            pv_csv = os.path.join(tmpdir, "pv.csv")
+            pv_txt = os.path.join(tmpdir, "pv.txt")
+            pv_dir = os.path.join(tmpdir, "pv_dir")
+            pv_json = os.path.join(tmpdir, "pv.json")
+            with patch.object(proxyip_verify, "DATA_DIR", tmpdir):
+                proxyip_verify.save_proxyip(
+                    [{
+                        "ip": "45.33.20.2", "port": "443", "tls": "true",
+                        "asn": "AS24940 (Hetzner)", "isp": "Hetzner",
+                        "net_type": "datacenter", "fail_count": 0,
+                        "first_seen": "2026-09-01 00:00:00",
+                    }],
+                    csv_path=pv_csv,
+                    txt_path=pv_txt,
+                    dir_path=pv_dir,
+                    json_path=pv_json,
+                )
+            pv_rows = _read_csv_rows(pv_csv)
+            self.assertEqual(extract_asn_num(pv_rows[0]["asn"]), "4766")
+            self.assertEqual(pv_rows[0]["net_type"], "isp")
+
+            # C. cf_verify._save_scan_track：对 AS_UNKNOWN 与非 CF 错标都能用缓存覆写，未缓存保留 AS_UNKNOWN 哨兵
+            cfv_cf_csv = os.path.join(tmpdir, "cfv_cf.csv")
+            cfv_scan_csv = os.path.join(tmpdir, "cfv_scan.csv")
+            cfv_scan_txt = os.path.join(tmpdir, "cfv_scan.txt")
+            cfv_scan_dir = os.path.join(tmpdir, "cfv_scan_dir")
+            os.makedirs(cfv_scan_dir, exist_ok=True)
+            for p, fields, rows in [
+                (
+                    cfv_cf_csv,
+                    providers.CF_BASE_CSV_FIELDS,
+                    [{"ip": "45.33.20.1", "port": "443", "asn": "AS24940 (Hetzner)", "isp": "Hetzner"}],
+                ),
+                (
+                    cfv_scan_csv,
+                    providers.SCAN_CSV_FIELDS,
+                    [
+                        {"ip": "45.33.20.1", "port": "443", "asn": "AS24940 (Hetzner)", "isp": "Hetzner"},
+                        {"ip": "45.33.20.2", "port": "443", "asn": "AS_UNKNOWN", "isp": ""},
+                        {"ip": "45.33.20.99", "port": "443", "asn": "AS_UNKNOWN", "isp": ""},
+                    ],
+                ),
+            ]:
+                with open(p, "w", encoding="utf-8-sig", newline="") as f:
+                    w = csv.DictWriter(f, fieldnames=fields, extrasaction="ignore")
+                    w.writeheader()
+                    for r in rows:
+                        w.writerow(r)
+
+            async def _fake_verify_all(rows, **kwargs):
+                for r in rows:
+                    r["fail_count"] = 0
+                    r["_invalid"] = False
+
+            args = SimpleNamespace(
+                concurrency=4, max_fails=3, timeout=1.0, http_timeout=1.0,
+                no_notify=True, dry_run=False, diag_output="",
+                check_endpoint="", check_token="", check_concurrency=2,
+                no_enrich_exits=True,
+            )
+            with patch.object(cf_verify, "DATA_DIR", tmpdir), \
+                 patch.object(cf_verify, "CF_CSV", cfv_cf_csv), \
+                 patch.object(cf_verify, "CF_TXT", os.path.join(tmpdir, "cfv_cf.txt")), \
+                 patch.object(cf_verify, "SCAN_CSV", cfv_scan_csv), \
+                 patch.object(cf_verify, "SCAN_TXT", cfv_scan_txt), \
+                 patch.object(cf_verify, "SCAN_DIR", cfv_scan_dir), \
+                 patch("cf_verify.verify_all", side_effect=_fake_verify_all), \
+                 patch("cf_verify.rescue_mislabeled_cloudflare_rows", return_value=(cache_data, 0)), \
+                 patch("cf_verify.calibrate_all_datasets", return_value={}), \
+                 patch("cf_verify.load_tombstone", return_value={}), \
+                 patch("cf_verify.record_tombstone"):
+                asyncio.run(cf_verify.async_main(args))
+
+            cfv_cf_saved = _read_csv_rows(cfv_cf_csv)
+            cfv_saved = {r["ip"]: r for r in _read_csv_rows(cfv_scan_csv)}
+            self.assertEqual(extract_asn_num(cfv_cf_saved[0]["asn"]), "45102")
+            self.assertEqual(extract_asn_num(cfv_saved["45.33.20.1"]["asn"]), "45102")
+            self.assertEqual(extract_asn_num(cfv_saved["45.33.20.2"]["asn"]), "4766")
+            self.assertEqual(cfv_saved["45.33.20.99"]["asn"], "AS_UNKNOWN")
+
+            # D. calibrate_all_datasets：补写一个非 CF 错标 scan 行后也能校准
+            cal_scan_csv = os.path.join(tmpdir, "cal_scan.csv")
+            with open(cal_scan_csv, "w", encoding="utf-8-sig", newline="") as f:
+                w = csv.DictWriter(f, fieldnames=providers.SCAN_CSV_FIELDS, extrasaction="ignore")
+                w.writeheader()
+                w.writerow({"ip": "45.33.20.1", "port": "443", "asn": "AS24940 (Hetzner)", "isp": "Hetzner"})
+                w.writerow({"ip": "45.33.20.99", "port": "443", "asn": "AS_UNKNOWN", "isp": ""})
+            providers.calibrate_all_datasets(
+                proxies_dir="", proxies_csv_path="", proxyip_csv_path="", proxyip_dir="",
+                ip_cache_path=cache_path, scan_csv_path=cal_scan_csv,
+                scan_txt_path="", scan_dir_path="",
+            )
+            cal_saved = {r["ip"]: r for r in _read_csv_rows(cal_scan_csv)}
+            self.assertEqual(extract_asn_num(cal_saved["45.33.20.1"]["asn"]), "45102")
+            self.assertEqual(cal_saved["45.33.20.99"]["asn"], "AS_UNKNOWN")
+
+
+class TestTargetedAsnProbeEngine(unittest.TestCase):
+    def setUp(self):
+        tg_fetch._reset_asn_probe_budget()
+
+    def tearDown(self):
+        tg_fetch._reset_asn_probe_budget()
+
+    def test_priority_order_failed_last_public_ip_filter_and_session_dedup(self):
+        ip_cache = {
+            # 曾失败过的 P3 IP：必须排在同一层级 P3 内无失败记录 IP 之后
+            "45.33.30.32": {"asn": "", "probe_failed_at": 1700000000},
+        }
+        newly = [
+            # P1: 新抓取无 ASN（非白名单频道，含合法 exit_ip 同样缺 ASN）；外加域名和 TEST-NET/私网噪声必须跳过
+            {"ip": "45.33.30.10", "port": "443", "asn": "", "raw_asn": "", "isp": "", "channel": "@other_chan", "exit_ip": "45.33.30.11", "exit_asn": ""},
+            {"ip": "cf-anycast.example.com", "port": "443", "asn": "", "raw_asn": "", "isp": "", "channel": "@other_chan"},
+            {"ip": "198.51.100.5", "port": "443", "asn": "", "raw_asn": "", "isp": "", "channel": "@other_chan"},
+            {"ip": "10.0.0.1", "port": "443", "asn": "", "raw_asn": "", "isp": "", "channel": "@other_chan"},
+            # P2: 新抓取白名单频道有标未缓存
+            {"ip": "45.33.30.20", "port": "443", "asn": "AS24940 (Hetzner)", "raw_asn": "AS24940", "isp": "Hetzner", "channel": "@otcjlq"},
+            # 非白名单且已有标：绝不进 P2
+            {"ip": "45.33.30.90", "port": "443", "asn": "AS24940 (Hetzner)", "raw_asn": "AS24940", "isp": "Hetzner", "channel": "@other_chan"},
+        ]
+        existing = [
+            # P3 failed first in input order, fresh second -> sorting must put 45.33.30.31 before 45.33.30.32
+            {"ip": "45.33.30.32", "port": "443", "asn": "AS_UNKNOWN", "isp": "", "channel": "@other_chan"},
+            {"ip": "45.33.30.31", "port": "443", "asn": "AS_UNKNOWN", "isp": "", "channel": "@other_chan"},
+            # P4: 历史白名单频道有标未缓存
+            {"ip": "45.33.30.40", "port": "443", "asn": "AS24940 (Hetzner)", "raw_asn": "AS24940", "isp": "Hetzner", "channel": "@danfeng2"},
+        ]
+
+        queried_batches: list[list[str]] = []
+
+        def _fake_resolve(targets, persist=True, cache_path="", **kwargs):
+            queried_batches.append(list(targets))
+            res = {}
+            for ip in targets:
+                if ip == "45.33.30.20":
+                    # 故意让白名单 P2 失败，验证既不抹掉既有标签，也不在本轮二次重复探测
+                    continue
+                res[ip] = ("AS45102", "Alibaba")
+            return res
+
+        with patch("tg_fetch.resolve_asn_batch_online", side_effect=_fake_resolve):
+            dirty, resolved = tg_fetch._targeted_asn_probe(
+                newly,
+                ip_cache,
+                existing_rows=existing,
+                persist=False,
+                apply_hints=True,
+            )
+            # 同轮二次调用：45.33.30.20 已在 _SESSION_FAILED_IPS 中，绝不再触发网络查询
+            tg_fetch._targeted_asn_probe(
+                newly,
+                ip_cache,
+                existing_rows=existing,
+                persist=False,
+                apply_hints=True,
+            )
+
+        self.assertTrue(dirty)
+        self.assertEqual(len(queried_batches), 1)
+        self.assertEqual(
+            queried_batches[0],
+            ["45.33.30.10", "45.33.30.11", "45.33.30.20", "45.33.30.31", "45.33.30.32", "45.33.30.40"],
+        )
+        # 白名单 45.33.30.20 探测失败：保留原 AS24940 标签并写入负缓存时间戳
+        self.assertEqual(extract_asn_num(newly[4]["raw_asn"]), "24940")
+        self.assertEqual(ip_cache["45.33.30.20"]["asn"], "")
+        self.assertIsInstance(ip_cache["45.33.30.20"]["probe_failed_at"], int)
+        self.assertEqual(extract_asn_num(resolved["45.33.30.10"][0]), "45102")
+
+    def test_hint_fallback_only_after_probe_failure_or_budget_zero(self):
+        ip_cache: dict[str, dict] = {}
+        rows = [
+            {"ip": "45.33.31.1", "port": "443", "asn": "", "raw_asn": "", "isp": "", "channel": "@danfeng_chat", "asn_hint": "AS45102", "isp_hint": "Alibaba"},
+            {"ip": "45.33.31.2", "port": "443", "asn": "", "raw_asn": "", "isp": "", "channel": "@danfeng_chat", "asn_hint": "AS45102", "isp_hint": "Alibaba"},
+            {"ip": "45.33.31.3", "port": "443", "asn": "", "raw_asn": "", "isp": "", "channel": "@danfeng_chat", "asn_hint": "AS45102", "isp_hint": "Alibaba"},
+            {"ip": "45.33.31.4", "port": "443", "asn": "", "raw_asn": "", "isp": "", "exit_ip": "45.33.31.9", "exit_asn": "AS139659", "channel": "@otcjlq"},
+        ]
+
+        tg_fetch._reset_asn_probe_budget(2)
+
+        def _fake_resolve(targets, **kwargs):
+            # IP-1 成功返回 AS132203；IP-2 失败；IP-3 超出预算不被查询
+            return {"45.33.31.1": ("AS132203", "Tencent")}
+
+        queried: list[list[str]] = []
+        with patch("tg_fetch.resolve_asn_batch_online", side_effect=lambda t, **kw: (queried.append(list(t)), _fake_resolve(t, **kw))[1]):
+            tg_fetch._targeted_asn_probe(rows, ip_cache, persist=False, apply_hints=True)
+
+        self.assertEqual(len(queried), 1)
+        self.assertEqual(len(queried[0]), 2)
+        # IP-1 实测覆盖 hint
+        self.assertEqual(extract_asn_num(rows[0]["raw_asn"]), "132203")
+        # IP-2 探测失败后消费 hint
+        self.assertEqual(extract_asn_num(rows[1]["raw_asn"]), "45102")
+        # IP-3 预算耗尽后消费 hint
+        self.assertEqual(extract_asn_num(rows[2]["raw_asn"]), "45102")
+        # 预算耗尽后再调用一次：剩余 0 预算，零网络请求
+        with patch("tg_fetch.resolve_asn_batch_online", side_effect=AssertionError("budget=0 must not trigger network")):
+            tg_fetch._targeted_asn_probe(
+                [{"ip": "45.33.31.5", "port": "443", "asn": "", "raw_asn": "", "isp": "", "asn_hint": "AS216211"}],
+                ip_cache,
+                persist=False,
+                apply_hints=True,
+            )
+
+    def test_merge_and_save_flushes_ip_cache_and_collects_newly_discovered_unrecorded_asns(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp_cache_path = os.path.join(tmpdir, "ip_cache.json")
+            # 历史缓存里带有 probe_failed_at（探测成功后合并时应清除该过时字段）
+            providers.save_ip_cache(
+                {"45.33.40.2": {"asn": "", "probe_failed_at": 1700000000}},
+                filepath=tmp_cache_path,
+            )
+
+            existing_scan = {
+                "45.33.40.2:443": {
+                    "ip": "45.33.40.2", "port": "443", "tls": "true",
+                    "asn": "AS_UNKNOWN", "isp": "", "channel": "@other_chan",
+                    "first_seen": "2026-09-01 00:00:00",
+                },
+            }
+            scraped_scan = {
+                "45.33.40.1:443": {
+                    "ip": "45.33.40.1", "port": "443", "tls": "true",
+                    "asn": "", "raw_asn": "", "isp": "", "channel": "@danfeng_chat",
+                    "first_seen": "2026-09-02 00:00:00",
+                },
+            }
+
+            captured_enriched: list[dict] = []
+            saved_cache_calls: list[str] = []
+            orig_tg_save_cache = tg_fetch.save_ip_cache
+
+            def _spy_tg_save_cache(cache, filepath="", compact=True):
+                saved_cache_calls.append(filepath)
+                return orig_tg_save_cache(cache, filepath=filepath, compact=compact)
+
+            def _fake_resolve(targets, **kwargs):
+                res = {}
+                for t in targets:
+                    if t == "45.33.40.1":
+                        res[t] = ("AS45102", "Alibaba")
+                    elif t == "45.33.40.2":
+                        res[t] = ("AS219393", "UnrecordedNewNet")
+                return res
+
+            with _isolated_tg_fetch_dir(tmpdir), \
+                 patch("tg_fetch.load_tombstone", return_value={}), \
+                 patch("tg_fetch.auto_enrich_and_save_asns", side_effect=lambda items, **kw: (captured_enriched.extend(items), 0)[1]), \
+                 patch("tg_fetch.get_session_enriched_asns", return_value=[]), \
+                 patch("tg_fetch.resolve_asn_batch_online", side_effect=_fake_resolve), \
+                 patch("providers.resolve_asn_batch_online", side_effect=_fake_resolve), \
+                 patch("tg_fetch.save_ip_cache", side_effect=_spy_tg_save_cache), \
+                 patch("tg_fetch.save_and_notify"):
+                tg_fetch.merge_and_save(
+                    existing_proxies={},
+                    scraped_proxies={},
+                    existing_cf_ips={},
+                    scraped_cf_ips={},
+                    existing_scan_ips=existing_scan,
+                    scraped_scan_ips=scraped_scan,
+                    existing_proxyips={},
+                    scraped_proxyips={},
+                    edt_unrecorded_asns=[],
+                )
+
+            disk_after = providers.load_ip_cache(filepath=tmp_cache_path)
+            self.assertGreaterEqual(len(saved_cache_calls), 1)
+            self.assertEqual(extract_asn_num(disk_after["45.33.40.1"]["asn"]), "45102")
+            self.assertEqual(extract_asn_num(disk_after["45.33.40.2"]["asn"]), "219393")
+            self.assertNotIn("probe_failed_at", disk_after["45.33.40.2"])
+            enriched_codes = {item.get("asn") for item in captured_enriched}
+            self.assertIn("AS219393", enriched_codes)
+
+    def test_recent_probe_failure_cooldown_skipped_and_expired_retried(self):
+        now_ts = int(time.time())
+        ip_cache = {
+            "45.33.50.1": {"asn": "", "probe_failed_at": now_ts - 86400},
+            "45.33.50.2": {"asn": "", "probe_failed_at": now_ts - 8 * 86400},
+            "45.33.50.3": {"asn": "", "probe_failed_at": now_ts - 2 * 86400},
+            "45.33.50.4": {"asn": "", "probe_failed_at": now_ts - 3 * 86400},
+        }
+        newly = [
+            {
+                "ip": "45.33.50.1", "port": "443", "asn": "", "raw_asn": "", "isp": "",
+                "channel": "@danfeng_chat", "asn_hint": "AS45102", "isp_hint": "Alibaba",
+            },
+            {
+                "ip": "45.33.50.3", "port": "443", "asn": "", "raw_asn": "", "isp": "",
+                "channel": "@other_chan",
+            },
+        ]
+        existing = [
+            {
+                "ip": "45.33.50.2", "port": "443", "asn": "AS_UNKNOWN", "isp": "",
+                "channel": "@other_chan", "exit_ip": "45.33.50.4", "exit_asn": "",
+            },
+        ]
+        queried: list[list[str]] = []
+
+        def _fake_resolve(targets, **kwargs):
+            queried.append(list(targets))
+            return {t: ("AS132203", "Tencent") for t in targets}
+
+        with patch("tg_fetch.resolve_asn_batch_online", side_effect=_fake_resolve):
+            tg_fetch._targeted_asn_probe(
+                newly,
+                ip_cache,
+                existing_rows=existing,
+                persist=False,
+                apply_hints=True,
+            )
+
+        self.assertEqual(queried, [["45.33.50.2"]])
+        # 冷却期内被跳过的新抓行仍按兜底逻辑保留/消费 asn_hint，无 hint 则维持空串不强填
+        self.assertEqual(extract_asn_num(newly[0]["raw_asn"]), "45102")
+        self.assertEqual(newly[1]["raw_asn"], "")
+        # 过期失败项复查成功后写回有效 ASN
+        self.assertEqual(extract_asn_num(existing[0]["asn"]), "132203")
+        # 冷却期内的 exit_ip 未被探测且仍保持空 exit_asn
+        self.assertEqual(existing[0]["exit_asn"], "")
+
+    def test_p1_budget_isolated_from_whitelist_and_historical_pool(self):
+        tg_fetch._reset_asn_probe_budget(limit=2, p1_limit=2)
+        ip_cache: dict[str, dict] = {}
+        attachment_rows = [
+            {"ip": "45.33.60.1", "port": "443", "asn": "", "raw_asn": "", "isp": "", "channel": "@danfeng_chat"},
+            {"ip": "45.33.60.2", "port": "443", "asn": "", "raw_asn": "", "isp": "", "channel": "@danfeng_chat"},
+            {"ip": "45.33.60.3", "port": "443", "asn": "", "raw_asn": "", "isp": "", "channel": "@danfeng_chat"},
+            {"ip": "45.33.60.10", "port": "443", "asn": "AS24940 (Hetzner)", "raw_asn": "AS24940", "isp": "Hetzner", "channel": "@danfeng_chat"},
+        ]
+        merge_new = [
+            {"ip": "45.33.60.11", "port": "443", "asn": "AS24940 (Hetzner)", "raw_asn": "AS24940", "isp": "Hetzner", "channel": "@otcjlq"},
+        ]
+        merge_existing = [
+            {"ip": "45.33.60.20", "port": "443", "asn": "AS_UNKNOWN", "isp": "", "channel": "@other_chan"},
+            {"ip": "45.33.60.30", "port": "443", "asn": "AS24940 (Hetzner)", "isp": "Hetzner", "channel": "@otcjlq"},
+        ]
+        queried: list[list[str]] = []
+
+        def _fake_resolve(targets, **kwargs):
+            queried.append(list(targets))
+            return {t: ("AS45102", "Alibaba") for t in targets}
+
+        with patch("tg_fetch.resolve_asn_batch_online", side_effect=_fake_resolve):
+            tg_fetch._targeted_asn_probe(
+                attachment_rows,
+                ip_cache,
+                persist=False,
+                apply_hints=True,
+                include_whitelist=False,
+            )
+            tg_fetch._targeted_asn_probe(
+                merge_new,
+                ip_cache,
+                existing_rows=merge_existing,
+                persist=False,
+                apply_hints=True,
+                include_whitelist=True,
+            )
+
+        self.assertEqual(queried[0], ["45.33.60.1", "45.33.60.2"])
+        self.assertEqual(queried[1], ["45.33.60.11", "45.33.60.20"])
+
+    def test_apply_authoritative_ip_cache_overrides_exit_asn_and_calibrates_cf_ips(self):
+        cache = {
+            "212.135.215.10": {"asn": "AS216211", "isp": "Cyberverse", "net_type": "datacenter", "country": "JP"},
+            "2403:27c0:c03:1::2e": {"asn": "AS4515", "isp": "PCCW", "net_type": "isp", "country": "HK"},
+            "61.172.182.19": {"asn": "AS4811", "isp": "China Telecom", "net_type": "isp", "country": "CN"},
+            "154.36.136.50": {"asn": "AS979", "isp": "NetLab", "net_type": "isp", "country": "US"},
+            "154.36.136.99": {"asn": "AS16276", "isp": "OVH", "net_type": "datacenter", "country": "FR"},
+            "2a09:bac5:661b:28::4:35e": {"asn": "AS13335", "isp": "Cloudflare", "net_type": "datacenter", "country": "US"},
+        }
+        cf_warp_row = {
+            "ip": "212.135.215.10",
+            "asn": "AS13335 Cloudflare",
+            "isp": "Cloudflare",
+            "exit_ip": "2a09:bac5::1",
+            "exit_ipv6": "2a09:bac5::1",
+            "exit_asn": "AS13335 Cloudflare",
+            "exit_isp": "Cloudflare",
+        }
+        changed, _ = providers.apply_authoritative_ip_cache(cf_warp_row, "212.135.215.10", cache)
+        self.assertTrue(changed)
+        self.assertEqual(extract_asn_num(cf_warp_row["asn"]), "216211")
+        self.assertEqual(extract_asn_num(cf_warp_row["exit_asn"]), "13335")
+
+        cf_exit_healed = {
+            "ip": "23.83.226.116",
+            "asn": "AS25820 BandwagonHost",
+            "isp": "BandwagonHost",
+            "exit_ip": "2a09:bac5:661b:28::4:35e",
+            "exit_asn": "AS25820 BandwagonHost",
+            "exit_isp": "BandwagonHost",
+        }
+        changed_cf_exit, _ = providers.apply_authoritative_ip_cache(cf_exit_healed, "23.83.226.116", cache)
+        self.assertTrue(changed_cf_exit)
+        self.assertEqual(extract_asn_num(cf_exit_healed["exit_asn"]), "13335")
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            ip_cache_path = os.path.join(tmpdir, "ip_cache.json")
+            cf_csv = os.path.join(tmpdir, "cf_ips.csv")
+            cf_txt = os.path.join(tmpdir, "cf_ips.txt")
+            scan_csv = os.path.join(tmpdir, "scan_ips.csv")
+            scan_txt = os.path.join(tmpdir, "scan_ips.txt")
+            scan_dir = os.path.join(tmpdir, "scan_ips")
+            proxyip_csv = os.path.join(tmpdir, "proxyip.csv")
+            proxyip_txt = os.path.join(tmpdir, "proxyip.txt")
+            proxyip_json = os.path.join(tmpdir, "proxyip.json")
+            proxyip_dir = os.path.join(tmpdir, "proxyip")
+            proxies_csv = os.path.join(tmpdir, "proxies.csv")
+            proxies_txt = os.path.join(tmpdir, "proxies.txt")
+            proxies_dir = os.path.join(tmpdir, "proxies")
+
+            providers.save_ip_cache(cache, filepath=ip_cache_path)
+            with open(cf_csv, "w", encoding="utf-8-sig", newline="") as f:
+                w = csv.DictWriter(f, fieldnames=providers.CF_BASE_CSV_FIELDS)
+                w.writeheader()
+                w.writerow({"ip": "61.172.182.19", "port": "443", "tls": "true", "asn": "AS21859 Zenlayer", "isp": "Zenlayer", "channel": "@otcfxq"})
+            with open(scan_csv, "w", encoding="utf-8-sig", newline="") as f:
+                w = csv.DictWriter(f, fieldnames=providers.SCAN_CSV_FIELDS)
+                w.writeheader()
+                w.writerow({
+                    "ip": "212.135.215.10", "port": "443", "tls": "true",
+                    "asn": "AS216211 Cyberverse", "isp": "Cyberverse",
+                    "exit_ip": "2403:27c0:c03:1::2e", "exit_asn": "AS137897 Wrong", "exit_isp": "Wrong",
+                    "channel": "@otcjlq",
+                })
+            with open(proxyip_csv, "w", encoding="utf-8-sig", newline="") as f:
+                w = csv.DictWriter(f, fieldnames=providers.PROXYIP_CSV_FIELDS)
+                w.writeheader()
+                w.writerow({
+                    "ip": "154.36.136.50", "port": "443", "tls": "true",
+                    "asn": "AS174 Cogent", "isp": "Cogent", "net_type": "isp",
+                    "exit_ip": "154.36.136.99", "exit_asn": "AS979 NetLab", "exit_isp": "NetLab",
+                    "channel": "@otcjlq",
+                })
+
+            with patch("providers.load_tombstone", return_value={}), \
+                 patch("providers.prune_tombstone", return_value=0), \
+                 patch("providers.prune_ip_cache", return_value=0):
+                providers.calibrate_all_datasets(
+                    proxies_dir=proxies_dir,
+                    proxies_csv_path=proxies_csv,
+                    proxies_txt_path=proxies_txt,
+                    proxyip_csv_path=proxyip_csv,
+                    proxyip_dir=proxyip_dir,
+                    ip_cache_path=ip_cache_path,
+                    proxyip_txt_path=proxyip_txt,
+                    proxyip_json_path=proxyip_json,
+                    scan_csv_path=scan_csv,
+                    scan_txt_path=scan_txt,
+                    scan_dir_path=scan_dir,
+                    cf_csv_path=cf_csv,
+                    cf_txt_path=cf_txt,
+                )
+
+            with open(cf_csv, "r", encoding="utf-8-sig") as f:
+                cf_rows = list(csv.DictReader(f))
+            with open(scan_csv, "r", encoding="utf-8-sig") as f:
+                scan_rows = {r["ip"]: r for r in csv.DictReader(f)}
+            with open(proxyip_csv, "r", encoding="utf-8-sig") as f:
+                proxy_rows = list(csv.DictReader(f))
+
+            self.assertEqual(extract_asn_num(cf_rows[0]["asn"]), "4811")
+            self.assertEqual(extract_asn_num(scan_rows["212.135.215.10"]["exit_asn"]), "4515")
+            # 154.36.136.50 修正出口 exit_ip=154.36.136.99 (AS16276 datacenter) 后被降级移入 scan_ips
+            self.assertEqual(proxy_rows, [])
+            self.assertIn("154.36.136.50", scan_rows)
+            self.assertEqual(extract_asn_num(scan_rows["154.36.136.50"]["asn"]), "979")
+            self.assertEqual(extract_asn_num(scan_rows["154.36.136.50"]["exit_asn"]), "16276")
 
 
 if __name__ == "__main__":

@@ -44,28 +44,6 @@
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "193.160.96.234:443",
-    "ip": "193.160.96.234",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2a0b:b7c4:1:15f6::1",
-    "clientIps": [
-      "2a0b:b7c4:1:15f6::1"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2a0b:b7c4:1:15f6::1",
-    "dual_stack": false,
-    "country": "NL",
-    "country_name": "荷兰",
-    "country_cn": "荷兰",
-    "country_emoji": "🇳🇱",
-    "asn": "57717",
-    "asOrganization": "FiberXpress BV",
-    "isp": "FiberXpress BV",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
-  },
-  {
     "proxy": "85.223.6.92:443",
     "ip": "85.223.6.92",
     "port": 443,
@@ -106,28 +84,6 @@
     "asn": "149020",
     "asOrganization": "WebHorizon Internet Services",
     "isp": "WebHorizon Internet Services",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "62.105.221.38:443",
-    "ip": "62.105.221.38",
-    "port": 443,
-    "tls": true,
-    "clientIp": "62.105.221.38",
-    "clientIps": [
-      "62.105.221.38"
-    ],
-    "clientIpv4": "62.105.221.38",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "NL",
-    "country_name": "荷兰",
-    "country_cn": "荷兰",
-    "country_emoji": "🇳🇱",
-    "asn": "3257",
-    "asOrganization": "GTT Communications Inc.",
-    "isp": "GTT Communications Inc.",
     "net_type": "isp",
     "source": "@danfeng_chat"
   },
@@ -176,28 +132,6 @@
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "154.59.111.152:2053",
-    "ip": "154.59.111.152",
-    "port": 2053,
-    "tls": true,
-    "clientIp": "154.59.111.152",
-    "clientIps": [
-      "154.59.111.152"
-    ],
-    "clientIpv4": "154.59.111.152",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "NL",
-    "country_name": "荷兰",
-    "country_cn": "荷兰",
-    "country_emoji": "🇳🇱",
-    "asn": "174",
-    "asOrganization": "Cogent Communications LLC",
-    "isp": "Cogent Communications LLC",
-    "net_type": "isp",
-    "source": "@otcjlq"
-  },
-  {
     "proxy": "81.206.228.118:443",
     "ip": "81.206.228.118",
     "port": 443,
@@ -238,50 +172,6 @@
     "asn": "33915",
     "asOrganization": "Vodafone Libertel B.V.",
     "isp": "Vodafone Libertel B.V.",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
-  },
-  {
-    "proxy": "193.160.96.239:443",
-    "ip": "193.160.96.239",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2a0b:b7c4:1:33d9::1",
-    "clientIps": [
-      "2a0b:b7c4:1:33d9::1"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2a0b:b7c4:1:33d9::1",
-    "dual_stack": false,
-    "country": "NL",
-    "country_name": "荷兰",
-    "country_cn": "荷兰",
-    "country_emoji": "🇳🇱",
-    "asn": "57717",
-    "asOrganization": "FiberXpress BV",
-    "isp": "FiberXpress BV",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
-  },
-  {
-    "proxy": "193.160.96.159:443",
-    "ip": "193.160.96.159",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2a0b:b7c4:1:81d5::1",
-    "clientIps": [
-      "2a0b:b7c4:1:81d5::1"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2a0b:b7c4:1:81d5::1",
-    "dual_stack": false,
-    "country": "NL",
-    "country_name": "荷兰",
-    "country_cn": "荷兰",
-    "country_emoji": "🇳🇱",
-    "asn": "57717",
-    "asOrganization": "FiberXpress BV",
-    "isp": "FiberXpress BV",
     "net_type": "isp",
     "source": "@cmliussss_all"
   },
@@ -352,28 +242,6 @@
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "193.160.96.232:443",
-    "ip": "193.160.96.232",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2a0b:b7c4:1:4fc7::1",
-    "clientIps": [
-      "2a0b:b7c4:1:4fc7::1"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2a0b:b7c4:1:4fc7::1",
-    "dual_stack": false,
-    "country": "NL",
-    "country_name": "荷兰",
-    "country_cn": "荷兰",
-    "country_emoji": "🇳🇱",
-    "asn": "57717",
-    "asOrganization": "FiberXpress BV",
-    "isp": "FiberXpress BV",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
-  },
-  {
     "proxy": "46.46.182.21:443",
     "ip": "46.46.182.21",
     "port": 443,
@@ -438,28 +306,6 @@
     "isp": "RETN Limited",
     "net_type": "isp",
     "source": "@danfeng2"
-  },
-  {
-    "proxy": "31.59.194.90:443",
-    "ip": "31.59.194.90",
-    "port": 443,
-    "tls": true,
-    "clientIp": "31.59.194.90",
-    "clientIps": [
-      "31.59.194.90"
-    ],
-    "clientIpv4": "31.59.194.90",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "NL",
-    "country_name": "荷兰",
-    "country_cn": "荷兰",
-    "country_emoji": "🇳🇱",
-    "asn": "2914",
-    "asOrganization": "NTT America, Inc.",
-    "isp": "NTT America, Inc.",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
   },
   {
     "proxy": "46.46.176.121:8443",

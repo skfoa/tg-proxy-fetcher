@@ -1,71 +1,5 @@
 [
   {
-    "proxy": "2.26.191.221:443",
-    "ip": "2.26.191.221",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2.26.191.203",
-    "clientIps": [
-      "2.26.191.203"
-    ],
-    "clientIpv4": "2.26.191.203",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "FI",
-    "country_name": "芬兰",
-    "country_cn": "芬兰",
-    "country_emoji": "🇫🇮",
-    "asn": "9304",
-    "asOrganization": "HGC Global Communications Limited",
-    "isp": "HGC Global Communications Limited",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "2.26.191.203:443",
-    "ip": "2.26.191.203",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2.26.191.203",
-    "clientIps": [
-      "2.26.191.203"
-    ],
-    "clientIpv4": "2.26.191.203",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "FI",
-    "country_name": "芬兰",
-    "country_cn": "芬兰",
-    "country_emoji": "🇫🇮",
-    "asn": "9304",
-    "asOrganization": "HGC Global Communications Limited",
-    "isp": "HGC Global Communications Limited",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "2.26.191.224:443",
-    "ip": "2.26.191.224",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2.26.191.203",
-    "clientIps": [
-      "2.26.191.203"
-    ],
-    "clientIpv4": "2.26.191.203",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "FI",
-    "country_name": "芬兰",
-    "country_cn": "芬兰",
-    "country_emoji": "🇫🇮",
-    "asn": "9304",
-    "asOrganization": "HGC Global Communications Limited",
-    "isp": "HGC Global Communications Limited",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "45.67.202.118:8443",
     "ip": "45.67.202.118",
     "port": 8443,
@@ -108,27 +42,5 @@
     "isp": "DNA Oyj",
     "net_type": "isp",
     "source": "@cmliussss_all"
-  },
-  {
-    "proxy": "2.26.191.225:443",
-    "ip": "2.26.191.225",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2.26.191.203",
-    "clientIps": [
-      "2.26.191.203"
-    ],
-    "clientIpv4": "2.26.191.203",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "FI",
-    "country_name": "芬兰",
-    "country_cn": "芬兰",
-    "country_emoji": "🇫🇮",
-    "asn": "9304",
-    "asOrganization": "HGC Global Communications Limited",
-    "isp": "HGC Global Communications Limited",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
   }
 ]

@@ -76,6 +76,7 @@ from providers import (
     is_valid_ipv4,
     is_valid_ipv6,
     resolve_node_exit_and_net_type,
+    apply_authoritative_ip_cache,
     inspect_csv_state,
     is_cloudflare_asn_or_isp,
     is_cloudflare_node,
@@ -879,6 +880,7 @@ async def enrich_scan_ips_exits(
             if unrec_map:
                 auto_enrich_and_save_asns(list(unrec_map.values()))
 
+            promo_ip_cache = load_ip_cache(filepath=_ip_cache_path()) if probed_records else {}
             for row, res in probed_records:
                 ip = (row.get("ip") or "").strip()
                 port = safe_int(row.get("port"), 0)
@@ -886,6 +888,7 @@ async def enrich_scan_ips_exits(
                 exit_isp = str(res.get("exit_isp") or "").strip()
                 exit_nt = classify_asn(exit_asn, exit_isp) if exit_asn else (res.get("net_type") or "datacenter")
                 if exit_nt in ("isp", "business", "education", "government"):
+                    apply_authoritative_ip_cache(row, ip, promo_ip_cache)
                     ing_code = _extract_asn_code(row.get("asn"), row.get("isp"))
                     ing_isp = str(row.get("isp") or "").strip()
                     eff_ing_asn = format_asn_isp(ing_code or exit_asn, ing_isp or exit_isp)
@@ -1131,6 +1134,9 @@ async def async_main(args):
 
     # ================= 1. 校验单条优选 IP (cf_ips) =================
     def _save_cf_track(survivors):
+        local_cf_cache = load_ip_cache(filepath=_ip_cache_path())
+        for row in survivors:
+            apply_authoritative_ip_cache(row, row.get("ip", ""), local_cf_cache)
         # 稳定双重排序：先按 first_seen 降序（最新获取优先），再按 (fail_count, delay_ms) 升序（质量优先）
         survivors.sort(key=lambda x: x.get("first_seen", ""), reverse=True)
         survivors.sort(key=_cf_sort_key)
@@ -1144,17 +1150,8 @@ async def async_main(args):
         local_ip_cache = load_ip_cache(filepath=_ip_cache_path())
         for row in survivors:
             cur_ip = row.get("ip") or ""
+            apply_authoritative_ip_cache(row, cur_ip, local_ip_cache, update_raw_asn=True)
             asn_clean = clean_asn(row.get("asn", ""), row.get("isp", ""))
-            if cur_ip in local_ip_cache:
-                cached = local_ip_cache[cur_ip]
-                cached_code = clean_asn(cached.get("asn"), cached.get("isp"))
-                if cached_code and cached_code.upper() not in ("AS0", "AS_UNKNOWN", "UNKNOWN", "AS"):
-                    if not asn_clean or (is_cloudflare_asn_or_isp(asn_clean, row.get("isp", "")) and not is_cloudflare_asn_or_isp(cached_code, cached.get("isp", ""))):
-                        cached_isp = cached.get("isp") or ASN_TO_PROVIDER.get(cached_code, "")
-                        row["raw_asn"] = cached_code
-                        row["asn"] = format_asn_isp(cached_code, cached_isp)
-                        row["isp"] = cached_isp
-                        asn_clean = cached_code
 
             if asn_clean in ASN_TO_PROVIDER:
                 std_isp = ASN_TO_PROVIDER[asn_clean]

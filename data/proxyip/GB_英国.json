@@ -132,28 +132,6 @@
     "source": "@otcjlq"
   },
   {
-    "proxy": "82.152.197.58:443",
-    "ip": "82.152.197.58",
-    "port": 443,
-    "tls": true,
-    "clientIp": "82.152.197.58",
-    "clientIps": [
-      "82.152.197.58"
-    ],
-    "clientIpv4": "82.152.197.58",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "GB",
-    "country_name": "英国",
-    "country_cn": "英国",
-    "country_emoji": "🇬🇧",
-    "asn": "8851",
-    "asOrganization": "GCI Network Solutions Limited",
-    "isp": "GCI Network Solutions Limited",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "194.147.16.230:80",
     "ip": "194.147.16.230",
     "port": 80,

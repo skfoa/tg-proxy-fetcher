@@ -154,28 +154,6 @@
     "source": "@danfeng2"
   },
   {
-    "proxy": "154.36.174.221:443",
-    "ip": "154.36.174.221",
-    "port": 443,
-    "tls": true,
-    "clientIp": "154.36.174.221",
-    "clientIps": [
-      "154.36.174.221"
-    ],
-    "clientIpv4": "154.36.174.221",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "HK",
-    "country_name": "香港",
-    "country_cn": "香港",
-    "country_emoji": "🇭🇰",
-    "asn": "979",
-    "asOrganization": "PSINet Inc.",
-    "isp": "PSINet Inc.",
-    "net_type": "business",
-    "source": "@otcjlq"
-  },
-  {
     "proxy": "23.175.201.171:2087",
     "ip": "23.175.201.171",
     "port": 2087,
@@ -261,28 +239,6 @@
     "asOrganization": "Bage Cloud",
     "isp": "Bage Cloud",
     "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "38.22.88.162:443",
-    "ip": "38.22.88.162",
-    "port": 443,
-    "tls": true,
-    "clientIp": "38.22.88.162",
-    "clientIps": [
-      "38.22.88.162"
-    ],
-    "clientIpv4": "38.22.88.162",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "HK",
-    "country_name": "香港",
-    "country_cn": "香港",
-    "country_emoji": "🇭🇰",
-    "asn": "979",
-    "asOrganization": "NetLab Global",
-    "isp": "NetLab Global",
-    "net_type": "business",
     "source": "@danfeng_chat"
   },
   {
@@ -1012,28 +968,6 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "154.64.244.112:443",
-    "ip": "154.64.244.112",
-    "port": 443,
-    "tls": true,
-    "clientIp": "154.64.244.112",
-    "clientIps": [
-      "154.64.244.112"
-    ],
-    "clientIpv4": "154.64.244.112",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "HK",
-    "country_name": "香港",
-    "country_cn": "香港",
-    "country_emoji": "🇭🇰",
-    "asn": "979",
-    "asOrganization": "NetLab Global",
-    "isp": "NetLab Global",
-    "net_type": "business",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "118.141.196.216:443",
     "ip": "118.141.196.216",
     "port": 443,
@@ -1119,28 +1053,6 @@
     "asOrganization": "Imcloud Technology",
     "isp": "Imcloud Technology",
     "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "64.90.7.51:443",
-    "ip": "64.90.7.51",
-    "port": 443,
-    "tls": true,
-    "clientIp": "64.90.7.51",
-    "clientIps": [
-      "64.90.7.51"
-    ],
-    "clientIpv4": "64.90.7.51",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "HK",
-    "country_name": "香港",
-    "country_cn": "香港",
-    "country_emoji": "🇭🇰",
-    "asn": "979",
-    "asOrganization": "NetLab Global",
-    "isp": "NetLab Global",
-    "net_type": "business",
     "source": "@danfeng_chat"
   },
   {
@@ -1252,28 +1164,6 @@
     "isp": "Imcloud Technology",
     "net_type": "isp",
     "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "64.90.24.26:443",
-    "ip": "64.90.24.26",
-    "port": 443,
-    "tls": true,
-    "clientIp": "64.90.24.26",
-    "clientIps": [
-      "64.90.24.26"
-    ],
-    "clientIpv4": "64.90.24.26",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "HK",
-    "country_name": "香港",
-    "country_cn": "香港",
-    "country_emoji": "🇭🇰",
-    "asn": "979",
-    "asOrganization": "NetLab Global",
-    "isp": "NetLab Global",
-    "net_type": "business",
-    "source": "@otcjlq"
   },
   {
     "proxy": "219.76.13.181:443",
@@ -2486,28 +2376,6 @@
     "source": "@otcjlq"
   },
   {
-    "proxy": "154.21.203.45:8443",
-    "ip": "154.21.203.45",
-    "port": 8443,
-    "tls": true,
-    "clientIp": "154.21.203.45",
-    "clientIps": [
-      "154.21.203.45"
-    ],
-    "clientIpv4": "154.21.203.45",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "HK",
-    "country_name": "香港",
-    "country_cn": "香港",
-    "country_emoji": "🇭🇰",
-    "asn": "979",
-    "asOrganization": "NetLab",
-    "isp": "NetLab",
-    "net_type": "business",
-    "source": "@otcjlq"
-  },
-  {
     "proxy": "154.44.24.183:10086",
     "ip": "154.44.24.183",
     "port": 10086,
@@ -2860,28 +2728,6 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "38.22.94.182:443",
-    "ip": "38.22.94.182",
-    "port": 443,
-    "tls": true,
-    "clientIp": "38.22.94.182",
-    "clientIps": [
-      "38.22.94.182"
-    ],
-    "clientIpv4": "38.22.94.182",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "HK",
-    "country_name": "香港",
-    "country_cn": "香港",
-    "country_emoji": "🇭🇰",
-    "asn": "979",
-    "asOrganization": "NetLab Global",
-    "isp": "NetLab Global",
-    "net_type": "business",
-    "source": "@otcjlq"
-  },
-  {
     "proxy": "154.44.27.72:25055",
     "ip": "154.44.27.72",
     "port": 25055,
@@ -2944,50 +2790,6 @@
     "asn": "133201",
     "asOrganization": "ABCDE GROUP",
     "isp": "ABCDE GROUP",
-    "net_type": "business",
-    "source": "@otcjlq"
-  },
-  {
-    "proxy": "64.90.5.14:443",
-    "ip": "64.90.5.14",
-    "port": 443,
-    "tls": true,
-    "clientIp": "64.90.5.14",
-    "clientIps": [
-      "64.90.5.14"
-    ],
-    "clientIpv4": "64.90.5.14",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "HK",
-    "country_name": "香港",
-    "country_cn": "香港",
-    "country_emoji": "🇭🇰",
-    "asn": "979",
-    "asOrganization": "NetLab Global",
-    "isp": "NetLab Global",
-    "net_type": "business",
-    "source": "@otcjlq"
-  },
-  {
-    "proxy": "64.90.7.42:443",
-    "ip": "64.90.7.42",
-    "port": 443,
-    "tls": true,
-    "clientIp": "64.90.7.42",
-    "clientIps": [
-      "64.90.7.42"
-    ],
-    "clientIpv4": "64.90.7.42",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "HK",
-    "country_name": "香港",
-    "country_cn": "香港",
-    "country_emoji": "🇭🇰",
-    "asn": "979",
-    "asOrganization": "NetLab Global",
-    "isp": "NetLab Global",
     "net_type": "business",
     "source": "@otcjlq"
   },
@@ -3122,27 +2924,5 @@
     "isp": "Bage Cloud",
     "net_type": "isp",
     "source": "@cmliussss_all"
-  },
-  {
-    "proxy": "38.22.93.183:443",
-    "ip": "38.22.93.183",
-    "port": 443,
-    "tls": true,
-    "clientIp": "38.22.93.183",
-    "clientIps": [
-      "38.22.93.183"
-    ],
-    "clientIpv4": "38.22.93.183",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "HK",
-    "country_name": "香港",
-    "country_cn": "香港",
-    "country_emoji": "🇭🇰",
-    "asn": "979",
-    "asOrganization": "NetLab Global",
-    "isp": "NetLab Global",
-    "net_type": "business",
-    "source": "@otcjlq"
   }
 ]
