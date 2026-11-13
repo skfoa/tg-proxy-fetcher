@@ -156,11 +156,10 @@ RE_HTTP_502 = re.compile(rb"^HTTP/\d\.\d\s+502\b")
 RE_CL_ZERO = re.compile(rb"(?im)^content-length:\s*0\b")
 RE_THIRD_PARTY_SERVER = re.compile(rb"(?im)^server:\s*(nginx|apache|caddy|openresty|envoy|iis|tengine|lighttpd)")
 
-# 确定性硬伤致命状态（端口明确拒绝关闭、空响应断连、脏数据等），当场判死淘汰进墓地
-# 注：tls_error (保护第三方自建反代)、status_502 (源站抖动)、connect_timeout (跨国丢包) 等严格排除在外，充分享受 3 次缓冲容错！
+# 确定性硬伤致命状态（端口明确拒绝关闭、非 CF 异构 CDN 伪节点、脏数据等），当场判死淘汰进墓地
+# 注：tls_error (保护第三方自建反代)、empty_response (CA TLS 已通过后的边缘限流断连)、status_502、connect_timeout、conn_reset、net_error 等严格排除在外，充分享受 3 次缓冲容错！
 FATAL_FAIL_STATUSES = {
-    "conn_error",       # 对端端口关闭 (Connection Refused) / 主机不可达，TCP 直接被拒
-    "empty_response",   # 建立连接后一发请求即断开 (假服务/死连接)
+    "conn_error",       # 对端端口明确拒绝 (ConnectionRefusedError)
     "invalid_row",      # 格式损坏的脏数据行
     "non_cf_cdn",       # 异构 CDN 伪节点 (Fastly/Akamai 等，报文特征明确排他)
 }
@@ -202,8 +201,12 @@ async def probe_ip(
         return False, 0, "connect_timeout"
     except (ssl.SSLError, ssl.CertificateError):
         return False, 0, "tls_error"
-    except (ConnectionRefusedError, OSError):
+    except ConnectionRefusedError:
         return False, 0, "conn_error"
+    except (ConnectionResetError, ConnectionAbortedError, BrokenPipeError):
+        return False, 0, "conn_reset"
+    except OSError as e:
+        return False, 0, f"net_error_{type(e).__name__}"
     except Exception as e:
         return False, 0, f"connect_failed_{type(e).__name__}"
 
@@ -282,8 +285,8 @@ async def verify_all(
     对传入的所有优选 IP 节点无差别执行阶段一与阶段二探测。
     无论端口与元数据如何，全部执行 TLS 握手与 301 重定向鉴真。
     原地更新 fail_count 与 delay_ms，并汇总失败原因分布。
-    对确定性致命硬故障 (conn_error / empty_response / invalid_row) 当场拉满淘汰阈值，
-    对软性抖动 (status_502 / connect_timeout) 及第三方反代 TLS 异常 (tls_error) 保留 3 次缓冲机会。
+    对确定性致命硬故障 (conn_error / non_cf_cdn / invalid_row) 当场拉满淘汰阈值，
+    对软性抖动 (status_502 / connect_timeout / conn_reset / net_error / empty_response) 及 TLS 异常保留 3 次缓冲机会。
     """
     if not rows:
         return rows

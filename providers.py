@@ -2403,6 +2403,8 @@ async def read_full_response(
     while len(resp_bytes) < max_bytes:
         remaining = deadline - time.monotonic()
         if remaining <= 0:
+            if not resp_bytes:
+                raise asyncio.TimeoutError()
             break
         chunk = await asyncio.wait_for(
             reader.read(min(1024, max_bytes - len(resp_bytes))),

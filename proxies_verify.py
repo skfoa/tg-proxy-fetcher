@@ -118,18 +118,18 @@ PROBE_PORT = 80
 
 TIMEOUT = 3.0
 HTTP_TIMEOUT = 2.5
-HTTP_PROBE_TIMEOUT = 2.0
-HTTP_MAX_LATENCY_MS = 2500
+HTTP_PROBE_TIMEOUT = 2.5
+HTTP_MAX_LATENCY_MS = 3500
 SSTP_TIMEOUT = 8.0
 SSTP_READ_TIMEOUT = 4.0
 CONCURRENCY = 300
 MAX_FAILS = 3
-HTTP_MAX_FAILS = 1
+HTTP_MAX_FAILS = 2
 
-# 致命硬故障状态集：对端端口关闭 (Connection Refused)、主机不可达、协议错配或鉴权永久失败
+# 致命硬故障状态集：对端端口关闭 (Connection Refused)、协议错配或鉴权永久失败
 # 遇此错误直接判死淘汰（fail_count 达到淘汰阈值并登记至墓地冷却库），不进入缓冲期
 FATAL_FAIL_STATUSES = {
-    "conn_err",               # 端口关闭 (Connection Refused) / 主机不可达 / DNS 解析失败
+    "conn_err",               # 端口明确关闭 (ConnectionRefusedError)
     "bad_handshake",          # 协议头不匹配 (非目标代理协议)
     "no_acceptable_auth",     # 认证方式协商失败 (0xFF)
     "auth_required_missing",  # 代理需要账密认证但未提供
@@ -460,6 +460,44 @@ def is_ip_literal(host: str) -> bool:
         return False
 
 
+def _classify_socket_error(exc: Exception) -> str:
+    """区分真实端口拒绝与瞬时网络/DNS/TLS重置，避免将软抖动误判为 conn_err/tls_err 致命故障"""
+    if isinstance(exc, asyncio.TimeoutError):
+        return "timeout"
+    if isinstance(exc, ssl.SSLEOFError):
+        return "conn_reset"
+    if isinstance(exc, (ssl.SSLError, ssl.CertificateError)):
+        return "tls_err"
+    if isinstance(exc, ConnectionRefusedError):
+        return "conn_err"
+    if isinstance(exc, (ConnectionResetError, ConnectionAbortedError, BrokenPipeError)):
+        return "conn_reset"
+    if isinstance(exc, socket.gaierror):
+        return "dns_err"
+    if isinstance(exc, OSError):
+        return "net_err"
+    return "fail"
+
+
+async def _run_worker_local_fallback(
+    cf_res: dict,
+    local_probe_fn,
+    fallback_sem: asyncio.Semaphore | None = None,
+) -> tuple[bool, int, str, str, str, str]:
+    """Worker 探测失败时在本地信号量约束下执行原生直连复核，避免 Worker 兼容限制/边缘拦截误杀正常节点"""
+    if fallback_sem is not None:
+        async with fallback_sem:
+            is_alive, delay_ms, status, colo, country, egress_ip = await local_probe_fn()
+    else:
+        is_alive, delay_ms, status, colo, country, egress_ip = await local_probe_fn()
+
+    if is_alive:
+        return True, delay_ms, status, colo, country, egress_ip
+    if cf_res.get("network_error") and status not in FATAL_FAIL_STATUSES:
+        return False, 0, "worker_unreachable", "", "", ""
+    return False, delay_ms, status, colo, country, egress_ip
+
+
 async def probe_socks5(
     host: str,
     port: int,
@@ -572,17 +610,10 @@ async def probe_socks5(
         if RE_HTTP_200.search(first_line) and colo:
             return True, lat, "alive", colo, country, egress_ip
         return False, lat, "http_fail", "", "", ""
-    except asyncio.TimeoutError:
-        return False, 0, "timeout", "", "", ""
-    except ConnectionRefusedError:
-        log.debug("SOCKS5 节点端口拒绝连接 [%s:%s]", host, port)
-        return False, 0, "conn_err", "", "", ""
-    except (ConnectionResetError, BrokenPipeError) as e:
-        log.debug("SOCKS5 节点重置/断开 [%s:%s]: %s", host, port, e)
-        return False, 0, "conn_reset", "", "", ""
-    except (socket.gaierror, OSError) as e:
-        log.debug("SOCKS5 节点网络/DNS异常 [%s:%s]: %s", host, port, e)
-        return False, 0, "conn_err", "", "", ""
+    except (asyncio.TimeoutError, OSError) as e:
+        err_status = _classify_socket_error(e)
+        log.debug("SOCKS5 节点连接/传输异常 [%s:%s] (%s): %s", host, port, err_status, e)
+        return False, 0, err_status, "", "", ""
     except Exception as e:
         log.debug("SOCKS5 节点未知探测异常 [%s:%s]: %s", host, port, e)
         return False, 0, "fail", "", "", ""
@@ -663,17 +694,10 @@ async def probe_http(
             status = "auth_fail" if (user and pwd) else "auth_required_missing"
             return False, lat, status, "", "", ""
         return False, lat, "http_fail", "", "", ""
-    except asyncio.TimeoutError:
-        return False, 0, "timeout", "", "", ""
-    except ConnectionRefusedError:
-        log.debug("HTTP 节点端口拒绝连接 [%s:%s]", host, port)
-        return False, 0, "conn_err", "", "", ""
-    except (ConnectionResetError, BrokenPipeError) as e:
-        log.debug("HTTP 节点重置/断开 [%s:%s]: %s", host, port, e)
-        return False, 0, "conn_reset", "", "", ""
-    except (socket.gaierror, OSError) as e:
-        log.debug("HTTP 节点网络/DNS异常 [%s:%s]: %s", host, port, e)
-        return False, 0, "conn_err", "", "", ""
+    except (asyncio.TimeoutError, OSError) as e:
+        err_status = _classify_socket_error(e)
+        log.debug("HTTP 节点连接/传输异常 [%s:%s] (%s): %s", host, port, err_status, e)
+        return False, 0, err_status, "", "", ""
     except Exception as e:
         log.debug("HTTP 节点未知探测异常 [%s:%s]: %s", host, port, e)
         return False, 0, "fail", "", "", ""
@@ -765,18 +789,15 @@ async def probe_https(
             # 建立 TLS 连接超时，对端不可达，直接返回避免进入阶段 2 造成二次超时叠加
             stage1_err_status = "timeout"
     except ssl.SSLError as e:
-        log.debug("HTTPS 节点 TLS 握手异常 [%s:%s]: %s", host, port, e)
-        stage1_err_status = "tls_err"
-    except ConnectionRefusedError:
-        log.debug("HTTPS 节点端口拒绝连接 [%s:%s]", host, port)
-        stage1_err_status = "conn_err"
-    except (ConnectionResetError, BrokenPipeError) as e:
-        log.debug("HTTPS 节点重置/断开 [%s:%s]: %s", host, port, e)
-        if not connected:
-            stage1_err_status = "conn_reset"
-    except (socket.gaierror, OSError) as e:
-        log.debug("HTTPS 节点网络/DNS异常 [%s:%s]: %s", host, port, e)
-        stage1_err_status = "conn_err"
+        err_status = _classify_socket_error(e)
+        log.debug("HTTPS 节点 TLS 握手异常 [%s:%s] (%s): %s", host, port, err_status, e)
+        if err_status == "tls_err" or not connected:
+            stage1_err_status = err_status
+    except OSError as e:
+        err_status = _classify_socket_error(e)
+        log.debug("HTTPS 节点连接/传输异常 [%s:%s] (%s): %s", host, port, err_status, e)
+        if err_status == "conn_err" or not connected:
+            stage1_err_status = err_status
     except Exception as e:
         log.debug("HTTPS 绝对 URI 探测异常 [%s:%s]: %s", host, port, e)
     finally:
@@ -864,21 +885,13 @@ async def probe_https(
             return True, lat, "alive", colo, country, egress_ip
 
         lat = max(1, int((time.monotonic() - t0_connect) * 1000))
+        if not trace_resp:
+            return False, lat, "conn_reset", "", "", ""
         return False, lat, "http_connect_no_colo", "", "", ""
-    except asyncio.TimeoutError:
-        return False, 0, "timeout", "", "", ""
-    except ssl.SSLError as e:
-        log.debug("HTTPS 节点 TLS 握手异常 [%s:%s]: %s", host, port, e)
-        return False, 0, "tls_err", "", "", ""
-    except ConnectionRefusedError:
-        log.debug("HTTPS 节点端口拒绝连接 [%s:%s]", host, port)
-        return False, 0, "conn_err", "", "", ""
-    except (ConnectionResetError, BrokenPipeError) as e:
-        log.debug("HTTPS 节点重置/断开 [%s:%s]: %s", host, port, e)
-        return False, 0, "conn_reset", "", "", ""
-    except (socket.gaierror, OSError) as e:
-        log.debug("HTTPS 节点网络/DNS异常 [%s:%s]: %s", host, port, e)
-        return False, 0, "conn_err", "", "", ""
+    except (asyncio.TimeoutError, OSError) as e:
+        err_status = _classify_socket_error(e)
+        log.debug("HTTPS 节点 CONNECT 阶段连接/TLS异常 [%s:%s] (%s): %s", host, port, err_status, e)
+        return False, 0, err_status, "", "", ""
     except Exception as e:
         log.debug("HTTPS 节点未知探测异常 [%s:%s]: %s", host, port, e)
         return False, 0, "fail", "", "", ""
@@ -935,17 +948,10 @@ async def probe_turn(
                 return True, lat, "alive", "-", "", connect_host
             return False, lat, "stun_not_turn", "", "", ""
         return False, lat, "stun_fail", "", "", ""
-    except asyncio.TimeoutError:
-        return False, 0, "timeout", "", "", ""
-    except ConnectionRefusedError:
-        log.debug("TURN 节点端口拒绝连接 [%s:%s]", host, port)
-        return False, 0, "conn_err", "", "", ""
-    except (ConnectionResetError, BrokenPipeError) as e:
-        log.debug("TURN 节点重置/断开 [%s:%s]: %s", host, port, e)
-        return False, 0, "conn_reset", "", "", ""
-    except (socket.gaierror, OSError) as e:
-        log.debug("TURN 节点网络/DNS异常 [%s:%s]: %s", host, port, e)
-        return False, 0, "conn_err", "", "", ""
+    except (asyncio.TimeoutError, OSError) as e:
+        err_status = _classify_socket_error(e)
+        log.debug("TURN 节点连接/TLS异常 [%s:%s] (%s): %s", host, port, err_status, e)
+        return False, 0, err_status, "", "", ""
     except Exception as e:
         log.debug("TURN 节点未知探测异常 [%s:%s]: %s", host, port, e)
         return False, 0, "fail", "", "", ""
@@ -1010,20 +1016,10 @@ async def probe_sstp(
         if re.search(r"\b200\b", first_line):
             return True, lat, "alive", "-", "", connect_host
         return False, lat, "sstp_fail", "", "", ""
-    except asyncio.TimeoutError:
-        return False, 0, "timeout", "", "", ""
-    except ssl.SSLError as e:
-        log.debug("SSTP 节点 TLS 握手异常 [%s:%s]: %s", host, port, e)
-        return False, 0, "tls_err", "", "", ""
-    except ConnectionRefusedError:
-        log.debug("SSTP 节点端口拒绝连接 [%s:%s]", host, port)
-        return False, 0, "conn_err", "", "", ""
-    except (ConnectionResetError, BrokenPipeError) as e:
-        log.debug("SSTP 节点重置/断开 [%s:%s]: %s", host, port, e)
-        return False, 0, "conn_reset", "", "", ""
-    except (socket.gaierror, OSError) as e:
-        log.debug("SSTP 节点网络/DNS异常 [%s:%s]: %s", host, port, e)
-        return False, 0, "conn_err", "", "", ""
+    except (asyncio.TimeoutError, OSError) as e:
+        err_status = _classify_socket_error(e)
+        log.debug("SSTP 节点连接/TLS异常 [%s:%s] (%s): %s", host, port, err_status, e)
+        return False, 0, err_status, "", "", ""
     except Exception as e:
         log.debug("SSTP 节点未知探测异常 [%s:%s]: %s", host, port, e)
         return False, 0, "fail", "", "", ""
@@ -1044,6 +1040,7 @@ async def probe_single(
     http_max_latency_ms: int = HTTP_MAX_LATENCY_MS,
     max_fails: int = MAX_FAILS,
     http_max_fails: int = HTTP_MAX_FAILS,
+    fallback_sem: asyncio.Semaphore | None = None,
 ) -> dict:
     """协议分流路由与执行"""
     proto = row.get("proto", "socks5").lower()
@@ -1064,7 +1061,10 @@ async def probe_single(
                 http_max_latency_ms=http_max_latency_ms,
                 max_fails=max_fails,
                 http_max_fails=http_max_fails,
+                fallback_sem=None,
             )
+
+    eff_fallback_sem = fallback_sem if fallback_sem is not None else sem
 
     host = row.get("host", "")
     port = safe_int(row.get("port"), 0)
@@ -1189,22 +1189,15 @@ async def probe_single(
                             },
                         }
             else:
-                if cf_res.get("network_error"):
-                    is_alive = False
-                    delay_ms = 0
-                    status = "worker_unreachable"
-                    colo = ""
-                    country = ""
-                    egress_ip = ""
-                else:
-                    err_msg = str(cf_res.get("error") or "https_worker_fail")
-                    log.debug("HTTPS 节点 [%s:%s] Worker 穿透探测失败: %s", host, port, err_msg)
-                    is_alive = False
-                    delay_ms = 0
-                    status = "timeout" if "timed out" in err_msg.lower() else "https_worker_fail"
-                    colo = ""
-                    country = ""
-                    egress_ip = ""
+                log.debug(
+                    "HTTPS 节点 [%s:%s] Worker 探测未通过 (%s)，自动降级回退本地原生探针复核",
+                    host, port, cf_res.get("error") or ("network_error" if cf_res.get("network_error") else "fail"),
+                )
+                is_alive, delay_ms, status, colo, country, egress_ip = await _run_worker_local_fallback(
+                    cf_res,
+                    lambda: probe_https(host, port, user, pwd, max(timeout, 7.0), http_timeout),
+                    fallback_sem=eff_fallback_sem,
+                )
     elif proto in ("turn", "turns"):
         is_alive, delay_ms, status, colo, country, egress_ip = await probe_turn(
             host, port, timeout, http_timeout, use_tls=(proto == "turns")
@@ -1268,25 +1261,17 @@ async def probe_single(
                             "c_code": country,
                         }
             else:
-                if cf_res.get("network_error"):
-                    # Worker 侧网络抖动或请求 Worker 自身超时，不应归罪节点；保持原状态，不递增 fail_count
-                    log.debug("SSTP 节点 [%s:%s] 遇到 Worker 侧网络抖动: %s", host, port, cf_res.get("error"))
-                    is_alive = False
-                    delay_ms = 0
-                    status = "worker_unreachable"
-                    colo = ""
-                    country = ""
-                    egress_ip = ""
-                else:
-                    # 节点在 Worker 端全隧道 PPP 协商失败（如连接被服务端关闭、隧道拨号超时）
-                    err_msg = cf_res.get("error", "sstp_vpn_fail")
-                    log.debug("SSTP 节点 [%s:%s] Worker 全隧道拨号失败: %s", host, port, err_msg)
-                    is_alive = False
-                    delay_ms = 0
-                    status = "sstp_vpn_fail"
-                    colo = ""
-                    country = ""
-                    egress_ip = ""
+                log.debug(
+                    "SSTP 节点 [%s:%s] Worker 探测未通过 (%s)，自动降级回退本地原生 SSTP 探针复核",
+                    host, port, cf_res.get("error") or ("network_error" if cf_res.get("network_error") else "fail"),
+                )
+                is_alive, delay_ms, status, colo, country, egress_ip = await _run_worker_local_fallback(
+                    cf_res,
+                    lambda: probe_sstp(host, port, sstp_timeout, max(http_timeout, SSTP_READ_TIMEOUT)),
+                    fallback_sem=eff_fallback_sem,
+                )
+                if is_alive and row.get("egress_ip"):
+                    egress_ip = row.get("egress_ip") or egress_ip
         else:
             # 未配置外部检测端点，执行本地轻量握手探测（无外部依赖）
             is_alive, delay_ms, status, colo, country, egress_ip = await probe_sstp(
@@ -1844,6 +1829,7 @@ async def async_main(args):
                     http_max_latency_ms=h_lat,
                     max_fails=args.max_fails,
                     http_max_fails=h_mf,
+                    fallback_sem=sem,
                 )
         else:
             async with sem:
@@ -2286,7 +2272,7 @@ def main():
         "--http-max-fails",
         type=int,
         default=HTTP_MAX_FAILS,
-        help=f"明文 HTTP 协议专属淘汰阈值 (默认 {HTTP_MAX_FAILS}，失败立即淘汰，杜绝低质僵尸节点积压占用资源)",
+        help=f"明文 HTTP 协议专属淘汰阈值 (默认 {HTTP_MAX_FAILS}，兼顾软抖动容错与快速淘汰)",
     )
     parser.add_argument("--strict", action="store_true", help="极致纯净模式 (只要失败 1 次立即剔除，等价于 --max-fails 1 --http-max-fails 1)")
     parser.add_argument("--timeout", type=float, default=TIMEOUT, help=f"单节点握手超时秒数 (默认 {TIMEOUT})")

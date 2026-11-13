@@ -269,14 +269,14 @@ with contextlib.suppress(Exception):
 
 
 # 确定性致命硬故障状态集：协议错配、非反代服务、SNI 域名拒绝或鉴真伪装
-# 遇此错误直接判死淘汰（fail_count 直接拉满至 max_fails 并移入墓地冷却库），不进入缓冲期
+# 注：tls_error / tls_eof / conn_reset / net_error_* 排除在外，保留 3 次缓冲容错；
+# 且对历史已实测存活的节点 (delay_ms > 0)，非 invalid_row 致命状态同样走 3 次缓冲，防止多租户或边缘瞬态抖动误杀。
 FATAL_FAIL_STATUSES = {
     "no_cf_header",    # 响应头无 Server: cloudflare（假节点、Captive Portal 登录弹窗或运营商劫持）
     "status_404",      # /cdn-cgi/trace 404（普通 Web 网站，未配置反代转发规则）
     "status_421",      # 421 Misdirected Request（SNI/Host 域名被反代明确拒绝）
     "status_400",      # 400 Bad Request（协议畸形或私有协议误录入）
     "non_cf_cdn",      # 异构 CDN 伪节点 (Fastly/Akamai 等，报文特征明确排他)
-    "tls_error",       # TLS 握手异常（纯明文 HTTP 端口或 SSL 协议不匹配）
     "empty_response",  # 建立连接后发送请求立即断开（死连接/假服务）
     "invalid_row",     # 数据行字段损坏或端口非法
 }
@@ -313,10 +313,16 @@ async def probe_proxyip(
         latency_ms = max(1, int((t1 - t0) * 1000))
     except asyncio.TimeoutError:
         return False, 0, "", "connect_timeout"
+    except ssl.SSLEOFError:
+        return False, 0, "", "tls_eof"
     except (ssl.SSLError, ssl.CertificateError):
         return False, 0, "", "tls_error"
-    except (ConnectionRefusedError, OSError):
+    except ConnectionRefusedError:
         return False, 0, "", "conn_error"
+    except (ConnectionResetError, ConnectionAbortedError, BrokenPipeError):
+        return False, 0, "", "conn_reset"
+    except OSError as e:
+        return False, 0, "", f"net_error_{type(e).__name__}"
     except Exception as e:
         return False, 0, "", f"connect_failed_{type(e).__name__}"
 
@@ -622,7 +628,8 @@ async def verify_proxyips(
                 row["colo"] = colo
             pass_count += 1
         else:
-            if reason in FATAL_FAIL_STATUSES:
+            was_verified = safe_int(row.get("delay_ms"), 0) > 0
+            if reason == "invalid_row" or (reason in FATAL_FAIL_STATUSES and not was_verified):
                 row["fail_count"] = max_fails
             else:
                 row["fail_count"] = fc + 1
