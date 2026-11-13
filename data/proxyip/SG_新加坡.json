@@ -176,6 +176,28 @@
     "source": "@danfeng_chat"
   },
   {
+    "proxy": "160.191.77.140:8443",
+    "ip": "160.191.77.140",
+    "port": 8443,
+    "tls": true,
+    "clientIp": "160.191.77.140",
+    "clientIps": [
+      "160.191.77.140"
+    ],
+    "clientIpv4": "160.191.77.140",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "SG",
+    "country_name": "新加坡",
+    "country_cn": "新加坡",
+    "country_emoji": "🇸🇬",
+    "asn": "149020",
+    "asOrganization": "WebHorizon Internet Services",
+    "isp": "WebHorizon Internet Services",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
+  },
+  {
     "proxy": "85.149.211.62:8443",
     "ip": "85.149.211.62",
     "port": 8443,
@@ -242,50 +264,6 @@
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "160.191.77.237:443",
-    "ip": "160.191.77.237",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2401:4520:10e2::a",
-    "clientIps": [
-      "2401:4520:10e2::a"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2401:4520:10e2::a",
-    "dual_stack": false,
-    "country": "SG",
-    "country_name": "新加坡",
-    "country_cn": "新加坡",
-    "country_emoji": "🇸🇬",
-    "asn": "149020",
-    "asOrganization": "WebHorizon Internet Services",
-    "isp": "WebHorizon Internet Services",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "43.173.1.153:8443",
-    "ip": "43.173.1.153",
-    "port": 8443,
-    "tls": true,
-    "clientIp": "2001:448a:2050:3a15:3647:d4ff:fed5:4a24",
-    "clientIps": [
-      "2001:448a:2050:3a15:3647:d4ff:fed5:4a24"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2001:448a:2050:3a15:3647:d4ff:fed5:4a24",
-    "dual_stack": false,
-    "country": "SG",
-    "country_name": "新加坡",
-    "country_cn": "新加坡",
-    "country_emoji": "🇸🇬",
-    "asn": "7713",
-    "asOrganization": "Telekomunikasi Indonesia",
-    "isp": "Telekomunikasi Indonesia",
-    "net_type": "isp",
-    "source": "@otcjlq"
-  },
-  {
     "proxy": "140.99.130.64:443",
     "ip": "140.99.130.64",
     "port": 443,
@@ -330,28 +308,6 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "58.27.117.24:443",
-    "ip": "58.27.117.24",
-    "port": 443,
-    "tls": true,
-    "clientIp": "58.27.117.24",
-    "clientIps": [
-      "58.27.117.24"
-    ],
-    "clientIpv4": "58.27.117.24",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "SG",
-    "country_name": "新加坡",
-    "country_cn": "新加坡",
-    "country_emoji": "🇸🇬",
-    "asn": "4788",
-    "asOrganization": "TM TECHNOLOGY SERVICES SDN. BHD.",
-    "isp": "TM TECHNOLOGY SERVICES SDN. BHD.",
-    "net_type": "isp",
-    "source": "@danfeng2"
-  },
-  {
     "proxy": "64.176.83.23:443",
     "ip": "64.176.83.23",
     "port": 443,
@@ -372,28 +328,6 @@
     "isp": "Coaxial Cable LLC",
     "net_type": "isp",
     "source": "@danfeng2"
-  },
-  {
-    "proxy": "103.153.131.67:443",
-    "ip": "103.153.131.67",
-    "port": 443,
-    "tls": true,
-    "clientIp": "103.153.131.67",
-    "clientIps": [
-      "103.153.131.67"
-    ],
-    "clientIpv4": "103.153.131.67",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "SG",
-    "country_name": "新加坡",
-    "country_cn": "新加坡",
-    "country_emoji": "🇸🇬",
-    "asn": "140463",
-    "asOrganization": "Sekolah Tinggi Teknologi Kedirgantaraan Yogyakarta",
-    "isp": "Sekolah Tinggi Teknologi Kedirgantaraan Yogyakarta",
-    "net_type": "education",
-    "source": "@danfeng_chat"
   },
   {
     "proxy": "103.240.198.31:33033",
@@ -528,28 +462,6 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "192.142.46.123:443",
-    "ip": "192.142.46.123",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2401:4520:1034::a",
-    "clientIps": [
-      "2401:4520:1034::a"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2401:4520:1034::a",
-    "dual_stack": false,
-    "country": "SG",
-    "country_name": "新加坡",
-    "country_cn": "新加坡",
-    "country_emoji": "🇸🇬",
-    "asn": "149020",
-    "asOrganization": "WEBHORIZON",
-    "isp": "WEBHORIZON",
-    "net_type": "isp",
-    "source": "@otcjlq"
-  },
-  {
     "proxy": "217.116.170.182:443",
     "ip": "217.116.170.182",
     "port": 443,
@@ -614,27 +526,5 @@
     "isp": "Coaxial Cable LLC",
     "net_type": "isp",
     "source": "@danfeng2"
-  },
-  {
-    "proxy": "160.22.16.203:443",
-    "ip": "160.22.16.203",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2400:e920:0:8::36",
-    "clientIps": [
-      "2400:e920:0:8::36"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2400:e920:0:8::36",
-    "dual_stack": false,
-    "country": "SG",
-    "country_name": "新加坡",
-    "country_cn": "新加坡",
-    "country_emoji": "🇸🇬",
-    "asn": "135905",
-    "asOrganization": "TOTHOST SOLUTIONS AND TECHNOLOGIES COMPANY LIMITED",
-    "isp": "TOTHOST SOLUTIONS AND TECHNOLOGIES COMPANY LIMITED",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
   }
 ]

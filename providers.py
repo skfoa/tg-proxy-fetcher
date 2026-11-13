@@ -865,6 +865,7 @@ _DEAD_IP_PROBE_PROXIES: set[str] = set()
 _IP_PROBE_STATE_LOCK = threading.Lock()
 _IP_PROBE_RR_COUNTER: int = 0
 _LAST_ONLINE_COUNTRIES: dict[str, str] = {}
+_LAST_ONLINE_CITIES: dict[str, str] = {}
 
 _DEFAULT_BROWSER_UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -1034,8 +1035,9 @@ def _fetch_url_via_proxy(
 
 
 def _record_online_country(ip: str, country_code: str) -> None:
-    """记录在线单点或批量反查顺带获取的国家码，供增量写回 ip_cache 复用。"""
-    cc = (country_code or "").strip().upper()
+    """记录在线单点或批量反查顺带获取的标准两位国家码，供增量写回 ip_cache 复用。"""
+    raw = (country_code or "").strip()
+    cc = get_country_code(raw) or (raw.upper() if len(raw) == 2 and raw.isalpha() and raw.upper() != "UN" else "")
     if ip and cc:
         with _IP_PROBE_STATE_LOCK:
             if len(_LAST_ONLINE_COUNTRIES) > 4096:
@@ -1049,6 +1051,24 @@ def pop_online_country(ip: str) -> str:
         return ""
     with _IP_PROBE_STATE_LOCK:
         return _LAST_ONLINE_COUNTRIES.pop(ip, "")
+
+
+def _record_online_city(ip: str, city: str) -> None:
+    """记录在线单点或批量反查顺带获取的城市名，供增量写回 ip_cache 复用。"""
+    clean_city = (city or "").strip()
+    if ip and clean_city:
+        with _IP_PROBE_STATE_LOCK:
+            if len(_LAST_ONLINE_CITIES) > 4096:
+                _LAST_ONLINE_CITIES.clear()
+            _LAST_ONLINE_CITIES[ip] = clean_city
+
+
+def pop_online_city(ip: str) -> str:
+    """提取并移除最近一次在线反查记录的城市名，不存在则返回空串。"""
+    if not ip:
+        return ""
+    with _IP_PROBE_STATE_LOCK:
+        return _LAST_ONLINE_CITIES.pop(ip, "")
 
 
 def resolve_asn_online(
@@ -1102,7 +1122,7 @@ def resolve_asn_online(
             return bad_proxy in _DEAD_IP_PROBE_PROXIES
 
     # 通道 1 (首选): ip-api.com (语义优先: 实际商业 isp > 组织机构 org > 路由技术别名 asname)
-    url_ipapi = f"http://ip-api.com/json/{ip}?fields=status,message,countryCode,as,asname,org,isp"
+    url_ipapi = f"http://ip-api.com/json/{ip}?fields=status,message,countryCode,city,as,asname,org,isp"
     for p in trials:
         if _is_proxy_unhealthy(p):
             continue
@@ -1128,6 +1148,7 @@ def resolve_asn_online(
                 )
                 if clean_asn:
                     _record_online_country(ip, data.get("countryCode") or "")
+                    _record_online_city(ip, data.get("city") or "")
                     break
             elif status_code == 200 and isinstance(data, dict) and "limit" in str(data.get("message") or "").lower():
                 _mark_dead_proxy_in(p, _DEAD_IP_PROBE_PROXIES, _IP_PROBE_STATE_LOCK)
@@ -1163,6 +1184,7 @@ def resolve_asn_online(
                     )
                     if clean_asn:
                         _record_online_country(ip, data.get("country_code") or "")
+                        _record_online_city(ip, data.get("city") or "")
                         break
             except Exception as e:
                 _mark_dead_proxy_in(p, _DEAD_IP_PROBE_PROXIES, _IP_PROBE_STATE_LOCK)
@@ -1191,6 +1213,7 @@ def resolve_asn_online(
                     )
                     if clean_asn:
                         _record_online_country(ip, data.get("country_code") or "")
+                        _record_online_city(ip, data.get("city") or "")
                         break
             except Exception as e:
                 _mark_dead_proxy_in(p, _DEAD_IP_PROBE_PROXIES, _IP_PROBE_STATE_LOCK)
@@ -1721,13 +1744,17 @@ def resolve_asn_batch_online(
                     asn = cache[resolved_ip]["asn"]
                     isp = cache[resolved_ip]["isp"]
                     results[clean_t] = (asn, isp)
-                    cache[clean_t] = {
+                    norm_cc = get_country_code(cache[resolved_ip].get("country", "")) or cache[resolved_ip].get("country", "")
+                    dom_entry = {
                         "asn": asn,
                         "isp": isp,
                         "net_type": cache[resolved_ip].get("net_type") or classify_asn(asn, isp),
-                        "country": cache[resolved_ip].get("country", ""),
+                        "country": norm_cc,
                         "resolved_ip": resolved_ip,
                     }
+                    if cache[resolved_ip].get("city"):
+                        dom_entry["city"] = cache[resolved_ip]["city"]
+                    cache[clean_t] = dom_entry
                     cache_modified = True
                 else:
                     ip_to_targets.setdefault(resolved_ip, []).append(clean_t)
@@ -1754,7 +1781,7 @@ def resolve_asn_batch_online(
         for i in range(0, len(pending_ips), max_chunk_size):
             chunk = pending_ips[i : i + max_chunk_size]
             payload = json.dumps([
-                {"query": ip, "fields": "status,message,query,countryCode,as,asname,org,isp"}
+                {"query": ip, "fields": "status,message,query,countryCode,city,as,asname,org,isp"}
                 for ip in chunk
             ]).encode("utf-8")
 
@@ -1807,7 +1834,9 @@ def resolve_asn_batch_online(
                                 raw_org = (item.get("org") or "").strip()
                                 raw_asname = (item.get("asname") or "").strip()
                                 raw_combined_isp = raw_isp or raw_org or raw_asname
-                                country_code = (item.get("countryCode") or "").strip().upper()
+                                raw_cc = (item.get("countryCode") or "").strip()
+                                country_code = get_country_code(raw_cc) or (raw_cc.upper() if len(raw_cc) == 2 and raw_cc.isalpha() and raw_cc.upper() != "UN" else "")
+                                city_name = str(item.get("city") or "").strip()
 
                                 clean_asn, clean_isp, ext_net_type = normalize_external_asn_info(
                                     raw_as, raw_combined_isp
@@ -1826,11 +1855,15 @@ def resolve_asn_batch_online(
                                         "net_type": n_type,
                                         "country": country_code,
                                     }
+                                    if city_name:
+                                        cache_entry["city"] = city_name
                                     cache[query_ip] = cache_entry
                                     cache_modified = True
                                     results[query_ip] = (clean_asn, clean_isp)
                                     if country_code:
                                         _record_online_country(query_ip, country_code)
+                                    if city_name:
+                                        _record_online_city(query_ip, city_name)
 
                                     for tgt in ip_to_targets.get(query_ip, []):
                                         results[tgt] = (clean_asn, clean_isp)
@@ -1868,7 +1901,9 @@ def resolve_asn_batch_online(
                         log.debug("单点 ASN 兜底解析 %s 异常: %s", ip, fe)
                         fallback_asn, fallback_isp = "", ""
                     if fallback_asn:
-                        fallback_country = pop_online_country(ip)
+                        raw_fc = pop_online_country(ip)
+                        fallback_country = get_country_code(raw_fc) or (raw_fc.upper() if len(raw_fc) == 2 and raw_fc.isalpha() else "")
+                        fallback_city = pop_online_city(ip)
                         results[ip] = (fallback_asn, fallback_isp)
                         n_type = ASN_EXACT_NET_TYPE.get(fallback_asn) or classify_asn(fallback_asn, fallback_isp)
                         cache_entry = {
@@ -1877,6 +1912,8 @@ def resolve_asn_batch_online(
                             "net_type": n_type,
                             "country": fallback_country,
                         }
+                        if fallback_city:
+                            cache_entry["city"] = fallback_city
                         cache[ip] = cache_entry
                         cache_modified = True
                         for tgt in ip_to_targets.get(ip, []):
@@ -3917,7 +3954,45 @@ def is_channel_or_user_source(source: str) -> bool:
     return s.lower() in ("user", "manual", "custom")
 
 
-def format_proxyip_json_item(r_dict: dict) -> dict:
+def _resolve_proxyip_country_info(r_dict: dict, ip_cache: dict | None = None) -> tuple[str, str, str]:
+    """解析 ProxyIP 真实出口归属地 (c_code, c_name, c_emoji)：优先出口显式 country/exit_location -> 出口 ip_cache -> cf_location/colo 兜底。"""
+    raw_country = str(r_dict.get("country") or "").strip()
+    if len(raw_country) == 2 and raw_country.upper() != "UN":
+        code = get_country_code(raw_country) or (raw_country.upper() if raw_country.isalpha() else "")
+        if code and len(code) == 2 and code.isalpha():
+            return code, COUNTRY_NAME_MAP.get(code, code), country_code_to_emoji(code)
+
+    exit_loc = str(r_dict.get("exit_location") or "").strip()
+    if exit_loc:
+        ex_name = extract_country(exit_loc, "")
+        ex_code = get_country_code(ex_name)
+        if ex_code and len(ex_code) == 2 and ex_code.isalpha():
+            c_u = ex_code.upper()
+            return c_u, COUNTRY_NAME_MAP.get(c_u, ex_name or c_u), country_code_to_emoji(c_u)
+
+    cand_exits = extract_ips([r_dict.get("exit_ip"), r_dict.get("exit_ipv6")])
+    if cand_exits:
+        cache_ref = ip_cache if isinstance(ip_cache, dict) else load_ip_cache()
+        if isinstance(cache_ref, dict) and cache_ref:
+            for ep in cand_exits:
+                ent = cache_ref.get(ep)
+                if isinstance(ent, dict):
+                    ep_code = get_country_code(str(ent.get("country") or ""))
+                    if ep_code and len(ep_code) == 2 and ep_code.isalpha():
+                        c_u = ep_code.upper()
+                        return c_u, COUNTRY_NAME_MAP.get(c_u, c_u), country_code_to_emoji(c_u)
+
+    country_name = extract_country(r_dict.get("cf_location"), r_dict.get("colo"))
+    code = get_country_code(country_name)
+    if code and len(code) == 2 and code.isalpha():
+        c_code = code.upper()
+        c_name = COUNTRY_NAME_MAP.get(c_code, country_name or c_code)
+        return c_code, c_name, country_code_to_emoji(c_code)
+
+    return "", "其他地区", "🌐"
+
+
+def format_proxyip_json_item(r_dict: dict, ip_cache: dict | None = None) -> dict:
     """
     转换为适配第三方调用、反代配置与前端订阅的标准化 ProxyIP JSON 字典对象：
     支持 proxy (ip:port), ip, port, tls, clientIp (出口真实 IP), country, country_name, country_cn, country_emoji, asn, asOrganization, isp, net_type, source 等全量凭据
@@ -3965,24 +4040,9 @@ def format_proxyip_json_item(r_dict: dict) -> dict:
     client_ips = unique_exit_ips if unique_exit_ips else ([client_ip] if client_ip else [])
     dual_stack = bool(client_ipv4 and client_ipv6)
 
-    raw_country = str(r_dict.get("country") or "").strip().upper()
-    if len(raw_country) == 2 and raw_country != "UN":
-        c_code = raw_country
-        c_name = COUNTRY_NAME_MAP.get(c_code, c_code)
-        c_emoji = country_code_to_emoji(c_code)
-    else:
-        country_name = extract_country(r_dict.get("cf_location"), r_dict.get("colo"))
-        code = get_country_code(country_name)
-        if code and len(code) == 2 and code.isalpha():
-            c_code = code.upper()
-            c_name = COUNTRY_NAME_MAP.get(c_code, country_name or c_code)
-            c_emoji = country_code_to_emoji(c_code)
-        else:
-            c_code = ""
-            c_name = "其他地区"
-            c_emoji = "🌐"
+    c_code, c_name, c_emoji = _resolve_proxyip_country_info(r_dict, ip_cache=ip_cache)
 
-    _, resolved_nt, exit_code, exit_isp = resolve_node_exit_and_net_type(r_dict)
+    _, resolved_nt, exit_code, exit_isp = resolve_node_exit_and_net_type(r_dict, ip_cache)
     eff_code = exit_code or _extract_asn_code(r_dict.get("asn"), r_dict.get("isp")) or ""
     clean_asn_num = eff_code[2:] if eff_code.upper().startswith("AS") else eff_code
 
@@ -4022,12 +4082,13 @@ def format_proxyip_json_item(r_dict: dict) -> dict:
     }
 
 
-def save_proxyip_json(rows: list, json_path: str = "data/proxyip.json") -> int:
+def save_proxyip_json(rows: list, json_path: str = "data/proxyip.json", ip_cache: dict | None = None) -> int:
     """
     保存全量反代 ProxyIP 标准化 JSON 文件（原子写入）。
     """
+    local_ip_cache = ip_cache if isinstance(ip_cache, dict) else load_ip_cache()
     json_list = [
-        format_proxyip_json_item(r)
+        format_proxyip_json_item(r, ip_cache=local_ip_cache)
         for r in rows
         if isinstance(r, dict) and (r.get("ip") or "").strip() and safe_int(r.get("port"), 0) > 0
     ]
@@ -4050,7 +4111,7 @@ def _resolve_proxyip_country_bucket(raw_country_label: str) -> tuple[str, str]:
     return "OTHER", "其他地区"
 
 
-def save_proxyip_by_country(rows: list, output_dir: str) -> int:
+def save_proxyip_by_country(rows: list, output_dir: str, ip_cache: dict | None = None) -> int:
     """
     将 ProxyIP 列表按国家/地区拆分输出为独立的纯文本与标准化 JSON 文件（如 US_美国.txt / US_美国.json）。
     同时自动提取高价值稀缺属性节点导出为独立专用清单（如 【ISP_运营商原生宽带】.txt / .json 等）。
@@ -4063,16 +4124,17 @@ def save_proxyip_by_country(rows: list, output_dir: str) -> int:
         return 0
 
     os.makedirs(output_dir, exist_ok=True)
+    local_ip_cache = ip_cache if isinstance(ip_cache, dict) else load_ip_cache()
     groups: dict[tuple[str, str], list] = {}
     type_groups: dict[str, list] = {}
 
     for r in rows:
-        raw_country = extract_country(r.get("cf_location"), r.get("colo"))
-        bucket = _resolve_proxyip_country_bucket(raw_country)
+        c_code, c_name, _ = _resolve_proxyip_country_info(r, ip_cache=local_ip_cache)
+        bucket = _resolve_proxyip_country_bucket(c_code or c_name)
         groups.setdefault(bucket, []).append(r)
 
         # 始终依据出口真实 ASN 与权威研判实时校准网络类型，确保分流分类一致
-        _, nt, _, _ = resolve_node_exit_and_net_type(r)
+        _, nt, _, _ = resolve_node_exit_and_net_type(r, local_ip_cache)
         r["net_type"] = nt
         if nt in SPECIAL_NET_TYPE_FILES:
             type_groups.setdefault(nt, []).append(r)
@@ -4095,7 +4157,7 @@ def save_proxyip_by_country(rows: list, output_dir: str) -> int:
         atomic_write_text(os.path.join(output_dir, txt_fname), "".join(lines))
         active_files.add(txt_fname)
 
-        json_items = [format_proxyip_json_item(r) for r in valid_members]
+        json_items = [format_proxyip_json_item(r, ip_cache=local_ip_cache) for r in valid_members]
         atomic_write_json(os.path.join(output_dir, json_fname), json_items)
         active_files.add(json_fname)
 
@@ -4113,7 +4175,7 @@ def save_proxyip_by_country(rows: list, output_dir: str) -> int:
         active_files.add(fname)
 
         json_fname = fname[:-4] + ".json"
-        json_items = [format_proxyip_json_item(r) for r in valid_members]
+        json_items = [format_proxyip_json_item(r, ip_cache=local_ip_cache) for r in valid_members]
         atomic_write_json(os.path.join(output_dir, json_fname), json_items)
         active_files.add(json_fname)
 
@@ -4854,12 +4916,13 @@ def merge_demoted_into_scan_ips(
                 "exit_ip": eff_exit_ip,
                 "exit_asn": eff_exit_asn,
                 "exit_isp": ex_isp,
-                "exit_location": str(dr.get("exit_location") or dr.get("cf_location") or ""),
+                "exit_location": str(dr.get("exit_location") or (dr.get("cf_location") if eff_exit_ip else "") or ""),
             }
             merged_cnt += 1
         else:
             ex_row = scan_map[k]
             updated = False
+            demoted_ex_loc = str(dr.get("exit_location") or (dr.get("cf_location") if eff_exit_ip else "") or "")
             for mk, mv in (
                 ("colo", dr.get("colo")),
                 ("cf_location", dr.get("cf_location")),
@@ -4868,6 +4931,7 @@ def merge_demoted_into_scan_ips(
                 ("exit_ip", eff_exit_ip),
                 ("exit_asn", eff_exit_asn),
                 ("exit_isp", ex_isp),
+                ("exit_location", demoted_ex_loc),
             ):
                 if mv and not str(ex_row.get(mk) or "").strip():
                     ex_row[mk] = mv
@@ -4885,6 +4949,44 @@ def merge_demoted_into_scan_ips(
         log.info("【机房归池闭环】已将 %d 条机房属性节点从 ProxyIP 池安全移入 %s (同步清理 CF 入口 %d 条)", merged_cnt, scan_csv_path, cf_purged_existing)
 
     return merged_cnt
+
+
+def resolve_exit_geo_calibration(
+    cur_loc: str,
+    exit_ip: str,
+    ip_cache: dict | None,
+) -> str | None:
+    """
+    依据干净 ip_cache 中的真实出口 GeoIP 校验并生成校准后的地理位置字符串（如 'City · CC'）。
+    仅当现有位置缺失、国家与出口真实国家冲突、尾部二位代码错配或 ASCII 'OldCity · CC' 的城市变更时返回新值；否则返回 None。
+    """
+    if not exit_ip or not isinstance(ip_cache, dict):
+        return None
+    ent = ip_cache.get(exit_ip)
+    if not isinstance(ent, dict):
+        return None
+    ex_cc = get_country_code(str(ent.get("country") or ""))
+    if not ex_cc:
+        return None
+    ex_city = str(ent.get("city") or "").strip()
+    target_loc = f"{ex_city} · {ex_cc}" if ex_city else COUNTRY_NAME_MAP.get(ex_cc, ex_cc)
+
+    cur = str(cur_loc or "").strip()
+    if not cur:
+        return target_loc
+
+    cur_cc = get_country_code(extract_country(cur, ""))
+    parts = [p.strip() for p in cur.split("·") if p.strip()]
+    tail = parts[-1] if parts else ""
+    tail_cc = get_country_code(tail) if (len(tail) == 2 and tail.isascii() and tail.isalpha()) else ""
+
+    if cur_cc != ex_cc:
+        return target_loc
+    if tail_cc and tail_cc != ex_cc:
+        return target_loc
+    if ex_city and tail_cc == ex_cc and cur != f"{ex_city} · {ex_cc}":
+        return target_loc
+    return None
 
 
 def calibrate_all_datasets(
@@ -4976,6 +5078,12 @@ def calibrate_all_datasets(
                     correct_nt = classify_asn(asn, isp)
                     if correct_nt and info.get("net_type") != correct_nt:
                         info["net_type"] = correct_nt
+                        updated_cache += 1
+                raw_cc = str(info.get("country") or "").strip()
+                if raw_cc:
+                    norm_cc = get_country_code(raw_cc)
+                    if norm_cc and norm_cc != raw_cc:
+                        info["country"] = norm_cc
                         updated_cache += 1
             if updated_cache > 0:
                 save_ip_cache(cache, filepath=ip_cache_path, compact=True)
@@ -5135,6 +5243,12 @@ def calibrate_all_datasets(
                     r["exit_asn"] = ""
                     r["exit_isp"] = ""
 
+                loc_ip = new_exit_ip or new_exit_v6 or row_ip
+                cal_cf_loc = resolve_exit_geo_calibration(r.get("cf_location", ""), loc_ip, cache)
+                if cal_cf_loc and r.get("cf_location") != cal_cf_loc:
+                    r["cf_location"] = cal_cf_loc
+                    changed_proxyip += 1
+
                 if correct_nt and r.get("net_type") != correct_nt:
                     r["net_type"] = correct_nt
                     changed_proxyip += 1
@@ -5169,11 +5283,11 @@ def calibrate_all_datasets(
                 if proxyip_txt_path:
                     atomic_write_text(proxyip_txt_path, format_proxyip_txt(clean_proxyip_rows))
                 if proxyip_json_path:
-                    save_proxyip_json(clean_proxyip_rows, json_path=proxyip_json_path)
+                    save_proxyip_json(clean_proxyip_rows, json_path=proxyip_json_path, ip_cache=cache)
                 stats["proxyip_csv_updated"] = changed_proxyip + len(dc_demoted_rows)
 
             if proxyip_dir:
-                written_files = save_proxyip_by_country(clean_proxyip_rows, output_dir=proxyip_dir)
+                written_files = save_proxyip_by_country(clean_proxyip_rows, output_dir=proxyip_dir, ip_cache=cache)
                 stats["proxyip_files_written"] = written_files
                 log.info("【全量校准】已校准 proxyip.csv (保留非机房 %d 条, 移出机房 %d 条, 属性更新 %d 条)，并在 %s/ 生成 %d 个分流文件", len(clean_proxyip_rows), len(dc_demoted_rows), changed_proxyip, proxyip_dir, written_files)
         except Exception as e:
@@ -5249,6 +5363,27 @@ def calibrate_all_datasets(
                 if is_cloudflare_node(r, cache):
                     dropped_cf_scan += 1
                     continue
+                cand_exits = extract_ips([r.get("exit_ip"), r.get("exit_ipv6")])
+                v4_exits = [cip for cip in cand_exits if is_valid_ipv4(cip)]
+                v6_exits = [cip for cip in cand_exits if is_valid_ipv6(cip)]
+                primary_ex = v4_exits[0] if v4_exits else (v6_exits[0] if v6_exits else "")
+                ex_code = _extract_asn_code(r.get("exit_asn"), r.get("exit_isp"))
+                if ex_code:
+                    ex_isp = str(r.get("exit_isp") or "").strip()
+                    if not ex_isp:
+                        ex_isp = ASN_TO_PROVIDER.get(ex_code) or ASN_DATABASE_ASN_TO_ISP.get(ex_code) or ""
+                        if ex_isp:
+                            r["exit_isp"] = ex_isp
+                            scan_asn_fixed += 1
+                    fmt_ex_asn = format_asn_isp(ex_code, ex_isp)
+                    if fmt_ex_asn != (r.get("exit_asn") or ""):
+                        r["exit_asn"] = fmt_ex_asn
+                        scan_asn_fixed += 1
+                if primary_ex:
+                    cal_ex_loc = resolve_exit_geo_calibration(r.get("exit_location", ""), primary_ex, cache)
+                    if cal_ex_loc and r.get("exit_location") != cal_ex_loc:
+                        r["exit_location"] = cal_ex_loc
+                        scan_asn_fixed += 1
                 r["fail_count"] = safe_int(r.get("fail_count"), 0)
                 clean_scan_rows.append(r)
 

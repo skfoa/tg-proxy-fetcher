@@ -81,6 +81,9 @@ from providers import (
     is_cloudflare_asn_or_isp,
     is_cloudflare_node,
     rescue_mislabeled_cloudflare_rows,
+    extract_country,
+    get_country_code,
+    resolve_exit_geo_calibration,
 )
 from proxyip_verify import (
     load_proxyip_csv,
@@ -856,13 +859,12 @@ async def enrich_scan_ips_exits(
                 if safe_int(row.get("delay_ms"), 0) <= 0 and safe_int(res.get("delay_ms"), 0) > 0:
                     row["delay_ms"] = safe_int(res.get("delay_ms"), 0)
 
-                city = res.get("city") or ""
-                country = res.get("country") or ""
+                city = str(res.get("city") or "").strip()
+                raw_country = str(res.get("country") or "").strip()
+                country = get_country_code(raw_country) or raw_country
                 loc_parts = [p for p in (city, country) if p]
                 if loc_parts and not row.get("exit_location"):
                     row["exit_location"] = " · ".join(loc_parts)
-                if loc_parts and not row.get("cf_location"):
-                    row["cf_location"] = " · ".join(loc_parts)
 
                 probed_records.append((row, res))
 
@@ -903,7 +905,7 @@ async def enrich_scan_ips_exits(
                         "delay_ms": safe_int(row.get("delay_ms"), 0),
                         "speed_kbs": str(row.get("speed_kbs") or ""),
                         "colo": res.get("colo") or row.get("colo", ""),
-                        "cf_location": row.get("cf_location") or row.get("exit_location", ""),
+                        "cf_location": row.get("exit_location") or row.get("cf_location", ""),
                         "asn": eff_ing_asn,
                         "isp": ing_isp or exit_isp,
                         "first_seen": row.get("first_seen") or now_bjt,
@@ -914,6 +916,7 @@ async def enrich_scan_ips_exits(
                         "exit_ipv6": res.get("exit_ipv6", ""),
                         "exit_asn": eff_exit_asn,
                         "exit_isp": exit_isp,
+                        "exit_location": row.get("exit_location", ""),
                     })
     finally:
         executor.shutdown(wait=False, cancel_futures=True)
@@ -953,9 +956,12 @@ async def enrich_scan_ips_exits(
                     if not ex.get("exit_ipv6") and pr.get("exit_ipv6"):
                         ex["exit_ipv6"] = pr["exit_ipv6"]
                         updated = True
-                    if not ex.get("cf_location") and pr.get("cf_location"):
-                        ex["cf_location"] = pr["cf_location"]
-                        updated = True
+                    if pr.get("cf_location"):
+                        pr_cc = get_country_code(extract_country(pr.get("cf_location"), ""))
+                        ex_cc = get_country_code(extract_country(ex.get("cf_location"), "")) if ex.get("cf_location") else ""
+                        if (not ex.get("cf_location")) or (pr_cc and ex_cc != pr_cc):
+                            ex["cf_location"] = pr["cf_location"]
+                            updated = True
                     if pr.get("exit_asn") and (not ex.get("exit_asn") or ex.get("net_type") != pr.get("net_type")):
                         ex["exit_asn"] = pr["exit_asn"]
                         if pr.get("exit_isp"):
@@ -1167,6 +1173,14 @@ async def async_main(args):
                 row["exit_asn"] = format_asn_isp(exit_code, exit_isp)
                 if exit_isp and not row.get("exit_isp"):
                     row["exit_isp"] = exit_isp
+            cand_exits = extract_ips([row.get("exit_ip"), row.get("exit_ipv6")])
+            v4_exits = [cip for cip in cand_exits if is_valid_ipv4(cip)]
+            v6_exits = [cip for cip in cand_exits if is_valid_ipv6(cip)]
+            primary_ex = v4_exits[0] if v4_exits else (v6_exits[0] if v6_exits else "")
+            if primary_ex:
+                cal_ex_loc = resolve_exit_geo_calibration(row.get("exit_location", ""), primary_ex, local_ip_cache)
+                if cal_ex_loc:
+                    row["exit_location"] = cal_ex_loc
             group_asn = asn_clean if (asn_clean and not is_cloudflare_asn_or_isp(asn_clean, row.get("isp", ""))) else "AS_UNKNOWN"
             asn_groups[group_asn].append(row)
 

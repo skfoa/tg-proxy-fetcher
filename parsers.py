@@ -21,6 +21,7 @@ from providers import (
     KNOWN_CLOUD_PROVIDERS,
     ASN_TO_PROVIDER,
     SORTED_CLOUD_PROVIDER_KEYS,
+    _extract_asn_code,
     format_asn_isp,
     is_valid_public_ip,
     load_ip_cache,
@@ -689,11 +690,30 @@ def parse_cf_csv_content(
 
             if local_cache is None:
                 local_cache = load_ip_cache()
-            asn_val, raw_isp = resolve_and_clean_asn(raw_ip, raw_asn, raw_isp, ip_cache=local_cache)
-            # 仅当入口 ASN 完全缺失且本地 IP 缓存未收录时，才允许使用 exit_asn 兜底；
-            # 文件名 fn_asn / fn_isp 绝不写入 raw_asn / isp，仅作 asn_hint / isp_hint 留待在线反查失败后兜底
-            if (not asn_val or asn_val in ("AS0", "AS_UNKNOWN", "UNKNOWN")) and raw_exit_asn:
-                asn_val, raw_isp = resolve_and_clean_asn(raw_ip, raw_exit_asn, raw_exit_isp or raw_isp, ip_cache=local_cache)
+            has_separate_exit = bool(exit_ip and is_valid_ip(exit_ip) and exit_ip != raw_ip)
+            ex_asn_code = _extract_asn_code(raw_exit_asn, raw_exit_isp)
+            if has_separate_exit:
+                # 出入口严格解耦：存在独立 exit_ip 时，绝不用 exit_asn 污染入口；
+                # 若入口未缓存且行内 asn 与 exit_asn 相同（疑似出口反写污染），置空交由后续在线反查独立验证
+                cached_ing_code, _ = resolve_authoritative_cache_asn(local_cache, raw_ip)
+                ing_asn_code = _extract_asn_code(raw_asn, raw_isp)
+                if (not cached_ing_code) and ing_asn_code and ex_asn_code and ing_asn_code == ex_asn_code:
+                    asn_val, raw_isp = resolve_and_clean_asn(raw_ip, "", "", ip_cache=local_cache)
+                else:
+                    asn_val, raw_isp = resolve_and_clean_asn(raw_ip, raw_asn, raw_isp, ip_cache=local_cache)
+                resolved_ex_code, resolved_ex_isp = resolve_and_clean_asn(
+                    exit_ip, raw_exit_asn, raw_exit_isp, ip_cache=local_cache
+                )
+                if resolved_ex_code:
+                    raw_exit_asn = resolved_ex_code
+                    if not raw_exit_isp:
+                        raw_exit_isp = resolved_ex_isp
+            else:
+                asn_val, raw_isp = resolve_and_clean_asn(raw_ip, raw_asn, raw_isp, ip_cache=local_cache)
+                # 仅同出口/单 IP 场景且入口 ASN 缺失时，才允许使用 exit_asn 兜底；
+                # 文件名 fn_asn / fn_isp 绝不写入 raw_asn / isp，仅作 asn_hint / isp_hint 留待在线反查失败后兜底
+                if (not asn_val or asn_val in ("AS0", "AS_UNKNOWN", "UNKNOWN")) and raw_exit_asn:
+                    asn_val, raw_isp = resolve_and_clean_asn(raw_ip, raw_exit_asn, raw_exit_isp or raw_isp, ip_cache=local_cache)
 
             raw_time = row.get(field_map.get("time", ""), "").strip()
             first_seen = normalize_timestamp(raw_time, fn_time)

@@ -86,6 +86,9 @@ from providers import (
     get_session_enriched_asns,
     is_channel_or_user_source,
     COUNTRY_NAME_MAP,
+    extract_country,
+    get_country_code,
+    resolve_exit_geo_calibration,
     doh_query_dns_records,
     is_valid_public_ip,
     extract_node_host,
@@ -97,6 +100,7 @@ from providers import (
     resolve_authoritative_cache_asn,
     apply_authoritative_ip_cache,
     pop_online_country,
+    pop_online_city,
 )
 from parsers import (
     extract_proxies,
@@ -568,13 +572,24 @@ def _targeted_asn_probe(
             is_wl = include_whitelist and (ch in VERIFY_LABELED_CHANNELS)
 
             ing_ip = str(row.get("ip") or "").strip()
-            _enqueue_ip(ing_ip, is_wl, not _extract_row_ingress_code(row), missing_q, whitelist_q)
-
             ex_ip = str(row.get("exit_ip") or "").strip()
+            ing_code = _extract_row_ingress_code(row)
+            ex_code = _extract_asn_code(row.get("exit_asn"), row.get("exit_isp"))
+            suspect_cross = bool(
+                ex_ip
+                and ing_ip
+                and ex_ip != ing_ip
+                and ing_code
+                and ex_code
+                and ing_code == ex_code
+                and not resolve_authoritative_cache_asn(ip_cache, ing_ip)[0]
+            )
+            _enqueue_ip(ing_ip, is_wl, (not ing_code) or suspect_cross, missing_q, whitelist_q)
+
             _enqueue_ip(
                 ex_ip,
                 is_wl,
-                not _extract_asn_code(row.get("exit_asn"), row.get("exit_isp")),
+                not ex_code,
                 missing_q,
                 whitelist_q,
             )
@@ -619,13 +634,18 @@ def _targeted_asn_probe(
             if p_asn:
                 p_isp = (res_pair[1] if res_pair and len(res_pair) > 1 else "") or ASN_TO_PROVIDER.get(p_asn, "")
                 existing_entry = ip_cache.get(p_ip) if isinstance(ip_cache.get(p_ip), dict) else {}
-                p_country = pop_online_country(p_ip) or existing_entry.get("country", "")
-                ip_cache[p_ip] = {
+                raw_p_country = pop_online_country(p_ip) or existing_entry.get("country", "")
+                p_country = get_country_code(raw_p_country) or existing_entry.get("country", "")
+                p_city = pop_online_city(p_ip) or existing_entry.get("city", "")
+                new_entry = {
                     "asn": p_asn,
                     "isp": p_isp,
                     "net_type": ASN_EXACT_NET_TYPE.get(p_asn) or classify_asn(p_asn, p_isp),
                     "country": p_country,
                 }
+                if p_city:
+                    new_entry["city"] = p_city
+                ip_cache[p_ip] = new_entry
                 resolved_map[p_ip] = (p_asn, p_isp)
                 dirty = True
             else:
@@ -2980,8 +3000,11 @@ def merge_and_save(
             cleaned_proxyips[k] = v
 
     for k, v in scan_to_proxy.items():
-        if not v.get("cf_location") and v.get("exit_location"):
-            v["cf_location"] = v["exit_location"]
+        if v.get("exit_location"):
+            ex_cc = get_country_code(extract_country(v.get("exit_location"), ""))
+            cf_cc = get_country_code(extract_country(v.get("cf_location"), ""))
+            if not v.get("cf_location") or (ex_cc and cf_cc != ex_cc):
+                v["cf_location"] = v["exit_location"]
         if k not in cleaned_proxyips:
             cleaned_proxyips[k] = v
         else:
@@ -3379,15 +3402,20 @@ async def run_telethon():
                                                         cf_item["exit_ipv6"] = probe_res["exit_ipv6"]
                                                     if not cf_item.get("colo") and probe_res.get("colo"):
                                                         cf_item["colo"] = probe_res["colo"]
-                                                    loc_parts = [p for p in (probe_res.get("city", ""), probe_res.get("country", "")) if p]
-                                                    if loc_parts and not cf_item.get("cf_location"):
-                                                        cf_item["cf_location"] = " · ".join(loc_parts)
-                                                    if probe_res.get("net_type") and not cf_item.get("net_type"):
-                                                        cf_item["net_type"] = probe_res["net_type"]
                                                     p_exit_asn = probe_res.get("exit_asn") or ""
                                                     p_exit_isp = probe_res.get("exit_isp") or ""
                                                     exit_is_cf = is_cloudflare_asn_or_isp(p_exit_asn, p_exit_isp)
                                                     same_ingress_exit = (not p_exit_ip) or (p_exit_ip == cf_item.get("ip"))
+                                                    p_city = str(probe_res.get("city") or "").strip()
+                                                    p_country = get_country_code(probe_res.get("country") or "") or str(probe_res.get("country") or "").strip()
+                                                    loc_parts = [p for p in (p_city, p_country) if p]
+                                                    if loc_parts:
+                                                        if not cf_item.get("exit_location"):
+                                                            cf_item["exit_location"] = " · ".join(loc_parts)
+                                                        if same_ingress_exit and not cf_item.get("cf_location"):
+                                                            cf_item["cf_location"] = " · ".join(loc_parts)
+                                                    if probe_res.get("net_type") and not cf_item.get("net_type"):
+                                                        cf_item["net_type"] = probe_res["net_type"]
                                                     if p_exit_asn:
                                                         cf_item["exit_asn"] = format_asn_isp(p_exit_asn, p_exit_isp)
                                                         if same_ingress_exit and (not exit_is_cf) and (
@@ -3401,13 +3429,16 @@ async def run_telethon():
                                                         if same_ingress_exit and (not exit_is_cf) and (not cf_item.get("isp")):
                                                             cf_item["isp"] = p_exit_isp
                                                     if p_exit_ip and p_exit_asn and (is_valid_ipv4(p_exit_ip) or is_valid_ipv6(p_exit_ip)):
-                                                        ip_cache[p_exit_ip] = {
+                                                        new_cache_entry = {
                                                             "asn": p_exit_asn,
                                                             "isp": p_exit_isp or ASN_TO_PROVIDER.get(p_exit_asn, ""),
                                                             "net_type": probe_res.get("net_type") or classify_asn(p_exit_asn, p_exit_isp),
-                                                            "country": probe_res.get("country") or "",
+                                                            "country": p_country,
                                                             "resolved_ip": p_exit_ip,
                                                         }
+                                                        if p_city:
+                                                            new_cache_entry["city"] = p_city
+                                                        ip_cache[p_exit_ip] = new_cache_entry
                                                         ip_cache_dirty = True
 
                                         # 增量靶向补全解耦后仍缺失独立 ASN 的入口/出口公网 IP（仅 P1 新抓缺失项，P2 白名单复核延后至 merge_and_save 均衡执行）

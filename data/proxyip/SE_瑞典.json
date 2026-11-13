@@ -44,28 +44,6 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "46.32.68.184:443",
-    "ip": "46.32.68.184",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2001:470:27:175::2",
-    "clientIps": [
-      "2001:470:27:175::2"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2001:470:27:175::2",
-    "dual_stack": false,
-    "country": "SE",
-    "country_name": "瑞典",
-    "country_cn": "瑞典",
-    "country_emoji": "🇸🇪",
-    "asn": "6939",
-    "asOrganization": "Hurricane Electric LLC",
-    "isp": "Hurricane Electric LLC",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "171.25.158.112:443",
     "ip": "171.25.158.112",
     "port": 443,
@@ -84,28 +62,6 @@
     "asn": "35100",
     "asOrganization": "Vaxjo NET C2IP",
     "isp": "Vaxjo NET C2IP",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "185.82.196.48:443",
-    "ip": "185.82.196.48",
-    "port": 443,
-    "tls": true,
-    "clientIp": "185.82.196.48",
-    "clientIps": [
-      "185.82.196.48"
-    ],
-    "clientIpv4": "185.82.196.48",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "SE",
-    "country_name": "瑞典",
-    "country_cn": "瑞典",
-    "country_emoji": "🇸🇪",
-    "asn": "12737",
-    "asOrganization": "Maxima, LLC",
-    "isp": "Maxima, LLC",
     "net_type": "isp",
     "source": "@danfeng_chat"
   }

@@ -836,6 +836,28 @@
     "source": "@danfeng_chat"
   },
   {
+    "proxy": "220.130.58.228:443",
+    "ip": "220.130.58.228",
+    "port": 443,
+    "tls": true,
+    "clientIp": "220.130.58.228",
+    "clientIps": [
+      "220.130.58.228"
+    ],
+    "clientIpv4": "220.130.58.228",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "TW",
+    "country_name": "台湾",
+    "country_cn": "台湾",
+    "country_emoji": "🇹🇼",
+    "asn": "3462",
+    "asOrganization": "Chunghwa Telecom HiNet",
+    "isp": "Chunghwa Telecom HiNet",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
+  },
+  {
     "proxy": "211.72.119.198:37555",
     "ip": "211.72.119.198",
     "port": 37555,
@@ -1340,6 +1362,28 @@
     "isp": "Chunghwa Telecom HiNet",
     "net_type": "isp",
     "source": "@manual_import"
+  },
+  {
+    "proxy": "220.135.234.132:443",
+    "ip": "220.135.234.132",
+    "port": 443,
+    "tls": true,
+    "clientIp": "220.135.234.132",
+    "clientIps": [
+      "220.135.234.132"
+    ],
+    "clientIpv4": "220.135.234.132",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "TW",
+    "country_name": "台湾",
+    "country_cn": "台湾",
+    "country_emoji": "🇹🇼",
+    "asn": "3462",
+    "asOrganization": "Chunghwa Telecom HiNet",
+    "isp": "Chunghwa Telecom HiNet",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
   },
   {
     "proxy": "154.23.243.146:8443",

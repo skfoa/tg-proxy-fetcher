@@ -352,6 +352,28 @@
     "source": "@danfeng2"
   },
   {
+    "proxy": "212.135.40.24:443",
+    "ip": "212.135.40.24",
+    "port": 443,
+    "tls": true,
+    "clientIp": "212.135.40.24",
+    "clientIps": [
+      "212.135.40.24"
+    ],
+    "clientIpv4": "212.135.40.24",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "GB",
+    "country_name": "英国",
+    "country_cn": "英国",
+    "country_emoji": "🇬🇧",
+    "asn": "48266",
+    "asOrganization": "Catixs Ltd",
+    "isp": "Catixs Ltd",
+    "net_type": "isp",
+    "source": "@otcjlq"
+  },
+  {
     "proxy": "90.255.235.254:8443",
     "ip": "90.255.235.254",
     "port": 8443,
@@ -460,6 +482,28 @@
     "isp": "GTT Communications",
     "net_type": "isp",
     "source": "@danfeng_chat"
+  },
+  {
+    "proxy": "212.135.42.240:443",
+    "ip": "212.135.42.240",
+    "port": 443,
+    "tls": true,
+    "clientIp": "212.135.42.240",
+    "clientIps": [
+      "212.135.42.240"
+    ],
+    "clientIpv4": "212.135.42.240",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "GB",
+    "country_name": "英国",
+    "country_cn": "英国",
+    "country_emoji": "🇬🇧",
+    "asn": "48266",
+    "asOrganization": "Catixs Ltd",
+    "isp": "Catixs Ltd",
+    "net_type": "isp",
+    "source": "@otcjlq"
   },
   {
     "proxy": "91.148.229.94:443",

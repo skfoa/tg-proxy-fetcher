@@ -88,28 +88,6 @@
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "160.191.77.140:8443",
-    "ip": "160.191.77.140",
-    "port": 8443,
-    "tls": true,
-    "clientIp": "160.191.77.140",
-    "clientIps": [
-      "160.191.77.140"
-    ],
-    "clientIpv4": "160.191.77.140",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "FR",
-    "country_name": "法国",
-    "country_cn": "法国",
-    "country_emoji": "🇫🇷",
-    "asn": "149020",
-    "asOrganization": "WebHorizon Internet Services",
-    "isp": "WebHorizon Internet Services",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "82.126.161.49:443",
     "ip": "82.126.161.49",
     "port": 443,

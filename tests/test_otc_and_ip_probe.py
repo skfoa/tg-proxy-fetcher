@@ -965,6 +965,129 @@ class TestTargetedAsnProbeEngine(unittest.TestCase):
         self.assertEqual(scraped_out["198.51.100.20:443"]["exit_asn"], "")
         self.assertNotIn("198.51.100.30:443", scraped_out)
 
+    def test_parse_cf_csv_content_decouples_cross_exit_ingress_asn(self):
+        fake_cache = {
+            "45.33.10.3": {"asn": "AS45102", "isp": "Alibaba Cloud", "net_type": "datacenter", "country": "SG"},
+            "203.0.113.88": {"asn": "AS63949", "isp": "Akamai Connected Cloud", "net_type": "datacenter", "country": "US"},
+        }
+        csv_text = (
+            "IP,Port,ASN,ISP,ExitIP,ExitASN,ExitISP\n"
+            "198.51.100.51,443,,,203.0.113.88,AS63949,Akamai\n"
+            "198.51.100.52,443,AS63949,Akamai,203.0.113.88,AS63949,Akamai\n"
+            "45.33.10.3,443,AS63949,Akamai,203.0.113.88,AS63949,Akamai\n"
+            "198.51.100.54,443,,,198.51.100.54,AS63949,Akamai\n"
+        )
+        rows = parsers.parse_cf_csv_content(csv_text, filename="scan.csv", ip_cache=fake_cache)
+        self.assertEqual(len(rows), 4)
+        missing_ing, spoofed_ing, cached_ing, same_exit = rows
+        self.assertEqual(missing_ing["raw_asn"], "")
+        self.assertEqual(spoofed_ing["raw_asn"], "")
+        self.assertEqual(extract_asn_num(cached_ing["raw_asn"]), "45102")
+        self.assertEqual(extract_asn_num(same_exit["raw_asn"]), "63949")
+
+    def test_targeted_asn_probe_reenqueues_suspect_cross_exit_and_saves_city(self):
+        import tg_fetch
+
+        rows = [
+            {
+                "ip": "45.33.90.61",
+                "port": "443",
+                "asn": "AS63949 (Akamai Connected Cloud)",
+                "isp": "Akamai Connected Cloud",
+                "raw_asn": "AS63949",
+                "exit_ip": "45.33.91.61",
+                "exit_asn": "AS63949 (Akamai Connected Cloud)",
+                "exit_isp": "Akamai Connected Cloud",
+                "channel": "@other_chan",
+            }
+        ]
+        ip_cache: dict = {
+            "45.33.91.61": {"asn": "AS63949", "isp": "Akamai Connected Cloud", "net_type": "datacenter", "country": "US"},
+        }
+
+        def _fake_batch(targets, persist=True, cache_path="", **kwargs):
+            for tip in targets:
+                providers._record_online_country(tip, "UK")
+                providers._record_online_city(tip, "London")
+            return {tip: ("AS9009", "M247 Europe SRL") for tip in targets}
+
+        tg_fetch._SESSION_FAILED_IPS.discard("45.33.90.61")
+        with patch("tg_fetch.resolve_asn_batch_online", side_effect=_fake_batch):
+            tg_fetch._reset_asn_probe_budget(limit=10, p1_limit=10)
+            dirty, resolved = tg_fetch._targeted_asn_probe(rows, ip_cache, persist=False, apply_hints=False)
+
+        self.assertTrue(dirty)
+        self.assertEqual(list(resolved.keys()), ["45.33.90.61"])
+        self.assertEqual(ip_cache["45.33.90.61"]["country"], "GB")
+        self.assertEqual(ip_cache["45.33.90.61"]["city"], "London")
+        self.assertEqual(extract_asn_num(rows[0]["raw_asn"]), "9009")
+
+    def test_calibrate_all_datasets_normalizes_country_and_syncs_locations(self):
+        import csv
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cache_path = os.path.join(tmpdir, "ip_cache.json")
+            providers.save_ip_cache({
+                "45.33.30.1": {"asn": "AS4766", "isp": "Korea Telecom", "net_type": "isp", "country": "uk", "city": "London"},
+                "203.0.113.70": {"asn": "AS24940", "isp": "Hetzner", "net_type": "datacenter", "country": "DE", "city": "Frankfurt"},
+                "45.33.30.2": {"asn": "AS45102", "isp": "Alibaba Cloud", "net_type": "datacenter", "country": "SG", "city": "Singapore"},
+            }, filepath=cache_path)
+
+            proxyip_csv = os.path.join(tmpdir, "proxyip.csv")
+            proxyip_txt = os.path.join(tmpdir, "proxyip.txt")
+            proxyip_json = os.path.join(tmpdir, "proxyip.json")
+            proxyip_dir = os.path.join(tmpdir, "proxyip")
+            with open(proxyip_csv, "w", encoding="utf-8-sig", newline="") as f:
+                w = csv.DictWriter(f, fieldnames=providers.PROXYIP_CSV_FIELDS)
+                w.writeheader()
+                w.writerow({
+                    "ip": "45.33.30.1", "port": "443", "tls": "true", "delay_ms": "100",
+                    "speed_kbs": "", "colo": "FRA", "cf_location": "Frankfurt · DE",
+                    "asn": "AS4766 (Korea Telecom)", "isp": "Korea Telecom",
+                    "first_seen": "2026-10-01 00:00:00", "channel": "@test", "fail_count": "0",
+                    "net_type": "isp", "exit_ip": "45.33.30.1", "exit_ipv6": "",
+                    "exit_asn": "AS4766 (Korea Telecom)", "exit_isp": "Korea Telecom",
+                })
+
+            scan_csv = os.path.join(tmpdir, "scan_ips.csv")
+            scan_txt = os.path.join(tmpdir, "scan_ips.txt")
+            scan_dir = os.path.join(tmpdir, "scan_ips")
+            with open(scan_csv, "w", encoding="utf-8-sig", newline="") as f:
+                w = csv.DictWriter(f, fieldnames=providers.SCAN_CSV_FIELDS)
+                w.writeheader()
+                w.writerow({
+                    "ip": "45.33.30.2", "port": "443", "tls": "true", "delay_ms": "100",
+                    "speed_kbs": "", "colo": "SIN", "cf_location": "Singapore · SG",
+                    "asn": "AS45102 (Alibaba Cloud)", "isp": "Alibaba Cloud",
+                    "first_seen": "2026-10-01 00:00:00", "channel": "@test", "fail_count": "0",
+                    "exit_ip": "203.0.113.70", "exit_asn": "", "exit_isp": "", "exit_location": "Tokyo · JP",
+                })
+
+            providers.calibrate_all_datasets(
+                proxies_csv_path=os.path.join(tmpdir, "proxies.csv"),
+                proxyip_csv_path=proxyip_csv,
+                proxyip_txt_path=proxyip_txt,
+                proxyip_json_path=proxyip_json,
+                proxyip_dir=proxyip_dir,
+                scan_csv_path=scan_csv,
+                scan_txt_path=scan_txt,
+                scan_dir_path=scan_dir,
+                ip_cache_path=cache_path,
+            )
+
+            norm_cache = providers.load_ip_cache(filepath=cache_path)
+            self.assertEqual(norm_cache["45.33.30.1"]["country"], "GB")
+
+            with open(proxyip_csv, "r", encoding="utf-8-sig") as f:
+                p_rows = list(csv.DictReader(f))
+            self.assertEqual(p_rows[0]["cf_location"], "London · GB")
+            self.assertTrue(os.path.isfile(os.path.join(proxyip_dir, "GB_英国.txt")))
+
+            with open(scan_csv, "r", encoding="utf-8-sig") as f:
+                s_rows = list(csv.DictReader(f))
+            self.assertEqual(extract_asn_num(s_rows[0]["exit_asn"]), "24940")
+            self.assertEqual(s_rows[0]["exit_location"], "Frankfurt · DE")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -198,6 +198,28 @@
     "source": "@cmliussss_all"
   },
   {
+    "proxy": "194.36.85.113:443",
+    "ip": "194.36.85.113",
+    "port": 443,
+    "tls": true,
+    "clientIp": "194.36.85.113",
+    "clientIps": [
+      "194.36.85.113"
+    ],
+    "clientIpv4": "194.36.85.113",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "TR",
+    "country_name": "土耳其",
+    "country_cn": "土耳其",
+    "country_emoji": "🇹🇷",
+    "asn": "209604",
+    "asOrganization": "2E TELEKOMUNIKASYON LTD STI",
+    "isp": "2E TELEKOMUNIKASYON LTD STI",
+    "net_type": "isp",
+    "source": "@otcjlq"
+  },
+  {
     "proxy": "158.94.216.137:443",
     "ip": "158.94.216.137",
     "port": 443,
@@ -220,6 +242,72 @@
     "source": "@danfeng_chat"
   },
   {
+    "proxy": "93.115.10.148:443",
+    "ip": "93.115.10.148",
+    "port": 443,
+    "tls": true,
+    "clientIp": "93.115.10.148",
+    "clientIps": [
+      "93.115.10.148"
+    ],
+    "clientIpv4": "93.115.10.148",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "TR",
+    "country_name": "土耳其",
+    "country_cn": "土耳其",
+    "country_emoji": "🇹🇷",
+    "asn": "209604",
+    "asOrganization": "2E TELEKOMUNIKASYON LTD STI",
+    "isp": "2E TELEKOMUNIKASYON LTD STI",
+    "net_type": "isp",
+    "source": "@otcjlq"
+  },
+  {
+    "proxy": "185.200.36.36:443",
+    "ip": "185.200.36.36",
+    "port": 443,
+    "tls": true,
+    "clientIp": "185.200.36.36",
+    "clientIps": [
+      "185.200.36.36"
+    ],
+    "clientIpv4": "185.200.36.36",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "TR",
+    "country_name": "土耳其",
+    "country_cn": "土耳其",
+    "country_emoji": "🇹🇷",
+    "asn": "202561",
+    "asOrganization": "High Speed Telekomunikasyon ve Hab. Hiz. Ltd. Sti.",
+    "isp": "High Speed Telekomunikasyon ve Hab. Hiz. Ltd. Sti.",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
+  },
+  {
+    "proxy": "185.255.93.189:443",
+    "ip": "185.255.93.189",
+    "port": 443,
+    "tls": true,
+    "clientIp": "185.255.93.189",
+    "clientIps": [
+      "185.255.93.189"
+    ],
+    "clientIpv4": "185.255.93.189",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "TR",
+    "country_name": "土耳其",
+    "country_cn": "土耳其",
+    "country_emoji": "🇹🇷",
+    "asn": "209604",
+    "asOrganization": "2E TELEKOMUNIKASYON LTD STI",
+    "isp": "2E TELEKOMUNIKASYON LTD STI",
+    "net_type": "isp",
+    "source": "@otcjlq"
+  },
+  {
     "proxy": "185.93.70.106:443",
     "ip": "185.93.70.106",
     "port": 443,
@@ -229,6 +317,50 @@
       "185.93.70.106"
     ],
     "clientIpv4": "185.93.70.106",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "TR",
+    "country_name": "土耳其",
+    "country_cn": "土耳其",
+    "country_emoji": "🇹🇷",
+    "asn": "209604",
+    "asOrganization": "2E TELEKOMUNIKASYON LTD STI",
+    "isp": "2E TELEKOMUNIKASYON LTD STI",
+    "net_type": "isp",
+    "source": "@otcjlq"
+  },
+  {
+    "proxy": "185.93.70.173:443",
+    "ip": "185.93.70.173",
+    "port": 443,
+    "tls": true,
+    "clientIp": "185.93.70.173",
+    "clientIps": [
+      "185.93.70.173"
+    ],
+    "clientIpv4": "185.93.70.173",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "TR",
+    "country_name": "土耳其",
+    "country_cn": "土耳其",
+    "country_emoji": "🇹🇷",
+    "asn": "209604",
+    "asOrganization": "2E TELEKOMUNIKASYON LTD STI",
+    "isp": "2E TELEKOMUNIKASYON LTD STI",
+    "net_type": "isp",
+    "source": "@otcjlq"
+  },
+  {
+    "proxy": "89.45.45.144:443",
+    "ip": "89.45.45.144",
+    "port": 443,
+    "tls": true,
+    "clientIp": "89.45.45.144",
+    "clientIps": [
+      "89.45.45.144"
+    ],
+    "clientIpv4": "89.45.45.144",
     "clientIpv6": "",
     "dual_stack": false,
     "country": "TR",

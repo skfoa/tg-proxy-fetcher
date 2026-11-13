@@ -3179,7 +3179,17 @@
     "JINX CO., LIMITED": "AS140096",
     "\"Russian company\" LLC": "AS15493",
     "WireShield LTD": "AS216394",
-    "Information Network, LLC": "AS48416"
+    "Information Network, LLC": "AS48416",
+    "Hyonix": "AS399114",
+    "Lucy Hochkamp": "AS200827",
+    "Stability for Integrated Server Hosting Ltd": "AS212042",
+    "SOCIETE NATIONALE DES TELECOMMUNICATIONS (Tunisie Telecom)": "AS327934",
+    "Gateway Communications": "AS31713",
+    "Standart AG, LLC": "AS49549",
+    "Cisco Webex LLC": "AS13445",
+    "Serghei Samoilov": "AS199417",
+    "FlexNetworks": "AS394352",
+    "www.abstation.net": "AS30938"
   },
   "asn_to_isp": {
     "AS10001": "Mics Network Corporation",
@@ -6267,7 +6277,20 @@
     "AS140096": "JINX CO., LIMITED",
     "AS15493": "\"Russian company\" LLC",
     "AS216394": "WireShield LTD",
-    "AS48416": "Information Network, LLC"
+    "AS48416": "Information Network, LLC",
+    "AS399114": "Hyonix",
+    "AS200827": "Lucy Hochkamp",
+    "AS212042": "Stability for Integrated Server Hosting Ltd",
+    "AS49434": "FBW NETWORKS SAS",
+    "AS57858": "Angelnet Limited",
+    "AS327934": "SOCIETE NATIONALE DES TELECOMMUNICATIONS (Tunisie Telecom)",
+    "AS31713": "Gateway Communications",
+    "AS49549": "Standart AG, LLC",
+    "AS134176": "Cloudie Limited",
+    "AS13445": "Cisco Webex LLC",
+    "AS199417": "Serghei Samoilov",
+    "AS394352": "FlexNetworks",
+    "AS30938": "www.abstation.net"
   },
   "asn_to_net_type": {
     "AS10001": "isp",
@@ -10348,6 +10371,19 @@
     "AS140096": "datacenter",
     "AS15493": "isp",
     "AS216394": "datacenter",
-    "AS48416": "isp"
+    "AS48416": "isp",
+    "AS399114": "datacenter",
+    "AS200827": "isp",
+    "AS212042": "datacenter",
+    "AS49434": "datacenter",
+    "AS57858": "datacenter",
+    "AS327934": "isp",
+    "AS31713": "isp",
+    "AS49549": "datacenter",
+    "AS134176": "datacenter",
+    "AS13445": "datacenter",
+    "AS199417": "business",
+    "AS394352": "isp",
+    "AS30938": "datacenter"
   }
 }

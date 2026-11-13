@@ -84,6 +84,8 @@ from providers import (
     is_valid_ipv4,
     is_valid_ipv6,
     inspect_csv_state,
+    get_country_code,
+    extract_country,
 )
 
 # 确保本地 .env 加载
@@ -505,10 +507,10 @@ def save_proxyip(
         log.info("已按质检状态分层保存 %s: %d 条记录", txt_path, len(rows))
 
     if json_path:
-        save_proxyip_json(rows, json_path=json_path)
+        save_proxyip_json(rows, json_path=json_path, ip_cache=local_ip_cache)
 
     if dir_path:
-        split_cnt = save_proxyip_by_country(rows, dir_path)
+        split_cnt = save_proxyip_by_country(rows, dir_path, ip_cache=local_ip_cache)
         log.info("已在 %s/ 目录下生成 %d 个独立国家/地区分流文件 (.txt/.json)", dir_path, split_cnt)
 
 
@@ -598,9 +600,15 @@ async def verify_proxyips(
                         row["exit_ip"] = exit_ip
                     if exit_ipv6:
                         row["exit_ipv6"] = exit_ipv6
-                    loc_parts = [p for p in (profile.get("city", ""), profile.get("country", "")) if p]
-                    if loc_parts and not str(row.get("cf_location") or "").strip():
-                        row["cf_location"] = " · ".join(loc_parts)
+                    p_city = str(profile.get("city") or "").strip()
+                    raw_p_country = str(profile.get("country") or "").strip()
+                    p_cc = get_country_code(raw_p_country) or raw_p_country
+                    loc_parts = [p for p in (p_city, p_cc) if p]
+                    if loc_parts:
+                        cur_cf_loc = str(row.get("cf_location") or "").strip()
+                        cur_cc = get_country_code(extract_country(cur_cf_loc, "")) if cur_cf_loc else ""
+                        if (not cur_cf_loc) or (p_cc and len(p_cc) == 2 and cur_cc != p_cc):
+                            row["cf_location"] = " · ".join(loc_parts)
                     if exit_asn:
                         row["exit_asn"] = format_asn_isp(exit_asn, exit_isp)
                         row["exit_isp"] = exit_isp

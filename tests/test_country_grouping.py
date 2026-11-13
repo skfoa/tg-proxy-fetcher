@@ -239,6 +239,65 @@ class TestCountryGrouping(unittest.TestCase):
         self.assertEqual(valid_item["country_cn"], "德国")
         self.assertEqual(valid_item["country_emoji"], "🇩🇪")
 
+    def test_proxyip_json_and_grouping_prioritize_exit_location_and_cache(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            row_with_exit_loc = {
+                "ip": "198.51.100.10",
+                "port": "443",
+                "tls": "true",
+                "colo": "FRA",
+                "cf_location": "Frankfurt · DE",
+                "exit_ip": "203.0.113.5",
+                "exit_location": "Tokyo · JP",
+                "asn": "AS13335",
+                "exit_asn": "AS2516 (KDDI CORPORATION)",
+                "exit_isp": "KDDI CORPORATION",
+            }
+            item1 = providers.format_proxyip_json_item(row_with_exit_loc, ip_cache={})
+            self.assertEqual(item1["country"], "JP")
+            self.assertEqual(item1["country_name"], "日本")
+
+            fake_cache = {
+                "203.0.113.5": {
+                    "asn": "AS1136",
+                    "isp": "KPN",
+                    "net_type": "isp",
+                    "country": "NL",
+                    "city": "Amsterdam",
+                }
+            }
+            row_cache_exit = {
+                "ip": "198.51.100.11",
+                "port": "443",
+                "tls": "true",
+                "colo": "FRA",
+                "cf_location": "Frankfurt · DE",
+                "exit_ip": "203.0.113.5",
+                "exit_asn": "AS1136 (KPN)",
+                "exit_isp": "KPN",
+            }
+            item2 = providers.format_proxyip_json_item(row_cache_exit, ip_cache=fake_cache)
+            self.assertEqual(item2["country"], "NL")
+            self.assertEqual(item2["country_name"], "荷兰")
+
+            with patch("providers.load_ip_cache", return_value=fake_cache):
+                providers.save_proxyip_by_country([row_cache_exit], tmpdir)
+            self.assertTrue(os.path.isfile(os.path.join(tmpdir, "NL_荷兰.txt")))
+            self.assertFalse(os.path.isfile(os.path.join(tmpdir, "DE_德国.txt")))
+
+    def test_resolve_exit_geo_calibration_updates_mismatch_and_city(self):
+        cache = {
+            "203.0.113.9": {"country": "NL", "city": "Amsterdam"},
+            "203.0.113.10": {"country": "US", "city": "Los Angeles"},
+            "203.0.113.11": {"country": "JP"},
+        }
+        self.assertEqual(providers.resolve_exit_geo_calibration("", "203.0.113.9", cache), "Amsterdam · NL")
+        self.assertEqual(providers.resolve_exit_geo_calibration("Frankfurt · DE", "203.0.113.9", cache), "Amsterdam · NL")
+        self.assertEqual(providers.resolve_exit_geo_calibration("Ashburn · GB", "203.0.113.10", cache), "Los Angeles · US")
+        self.assertEqual(providers.resolve_exit_geo_calibration("Dallas · US", "203.0.113.10", cache), "Los Angeles · US")
+        self.assertIsNone(providers.resolve_exit_geo_calibration("美国 · 洛杉矶", "203.0.113.10", cache))
+        self.assertIsNone(providers.resolve_exit_geo_calibration("Tokyo · JP", "203.0.113.11", cache))
+
 
 if __name__ == "__main__":
     unittest.main()

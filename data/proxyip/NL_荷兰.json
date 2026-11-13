@@ -44,50 +44,6 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "45.142.105.15:8443",
-    "ip": "45.142.105.15",
-    "port": 8443,
-    "tls": true,
-    "clientIp": "2401:4520:206b::a",
-    "clientIps": [
-      "2401:4520:206b::a"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2401:4520:206b::a",
-    "dual_stack": false,
-    "country": "NL",
-    "country_name": "荷兰",
-    "country_cn": "荷兰",
-    "country_emoji": "🇳🇱",
-    "asn": "149020",
-    "asOrganization": "WebHorizon Internet Services",
-    "isp": "WebHorizon Internet Services",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "185.70.186.60:8443",
-    "ip": "185.70.186.60",
-    "port": 8443,
-    "tls": true,
-    "clientIp": "2001:470:1f15:262::3",
-    "clientIps": [
-      "2001:470:1f15:262::3"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2001:470:1f15:262::3",
-    "dual_stack": false,
-    "country": "NL",
-    "country_name": "荷兰",
-    "country_cn": "荷兰",
-    "country_emoji": "🇳🇱",
-    "asn": "6939",
-    "asOrganization": "Hurricane Electric LLC",
-    "isp": "Hurricane Electric LLC",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
-  },
-  {
     "proxy": "37.230.131.120:443",
     "ip": "37.230.131.120",
     "port": 443,

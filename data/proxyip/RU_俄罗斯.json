@@ -1,5 +1,27 @@
 [
   {
+    "proxy": "185.70.186.60:8443",
+    "ip": "185.70.186.60",
+    "port": 8443,
+    "tls": true,
+    "clientIp": "2001:470:1f15:262::3",
+    "clientIps": [
+      "2001:470:1f15:262::3"
+    ],
+    "clientIpv4": "",
+    "clientIpv6": "2001:470:1f15:262::3",
+    "dual_stack": false,
+    "country": "RU",
+    "country_name": "俄罗斯",
+    "country_cn": "俄罗斯",
+    "country_emoji": "🇷🇺",
+    "asn": "6939",
+    "asOrganization": "Hurricane Electric LLC",
+    "isp": "Hurricane Electric LLC",
+    "net_type": "isp",
+    "source": "@cmliussss_all"
+  },
+  {
     "proxy": "213.5.31.68:443",
     "ip": "213.5.31.68",
     "port": 443,
@@ -286,6 +308,28 @@
     "source": "@danfeng2"
   },
   {
+    "proxy": "147.45.113.224:8443",
+    "ip": "147.45.113.224",
+    "port": 8443,
+    "tls": true,
+    "clientIp": "147.45.113.224",
+    "clientIps": [
+      "147.45.113.224"
+    ],
+    "clientIpv4": "147.45.113.224",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "RU",
+    "country_name": "俄罗斯",
+    "country_cn": "俄罗斯",
+    "country_emoji": "🇷🇺",
+    "asn": "41925",
+    "asOrganization": "Limited Liability Company Izet Telecom Ural",
+    "isp": "Limited Liability Company Izet Telecom Ural",
+    "net_type": "isp",
+    "source": "@otcjlq"
+  },
+  {
     "proxy": "194.28.31.154:443",
     "ip": "194.28.31.154",
     "port": 443,
@@ -436,6 +480,28 @@
     "asn": "12389",
     "asOrganization": "Primorye NET",
     "isp": "Primorye NET",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
+  },
+  {
+    "proxy": "185.82.196.48:443",
+    "ip": "185.82.196.48",
+    "port": 443,
+    "tls": true,
+    "clientIp": "185.82.196.48",
+    "clientIps": [
+      "185.82.196.48"
+    ],
+    "clientIpv4": "185.82.196.48",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "RU",
+    "country_name": "俄罗斯",
+    "country_cn": "俄罗斯",
+    "country_emoji": "🇷🇺",
+    "asn": "12737",
+    "asOrganization": "Maxima, LLC",
+    "isp": "Maxima, LLC",
     "net_type": "isp",
     "source": "@danfeng_chat"
   },

@@ -22,6 +22,50 @@
     "source": "@cmliussss_all"
   },
   {
+    "proxy": "43.173.1.153:8443",
+    "ip": "43.173.1.153",
+    "port": 8443,
+    "tls": true,
+    "clientIp": "2001:448a:2050:3a15:3647:d4ff:fed5:4a24",
+    "clientIps": [
+      "2001:448a:2050:3a15:3647:d4ff:fed5:4a24"
+    ],
+    "clientIpv4": "",
+    "clientIpv6": "2001:448a:2050:3a15:3647:d4ff:fed5:4a24",
+    "dual_stack": false,
+    "country": "ID",
+    "country_name": "印度尼西亚",
+    "country_cn": "印度尼西亚",
+    "country_emoji": "🇮🇩",
+    "asn": "7713",
+    "asOrganization": "Telekomunikasi Indonesia",
+    "isp": "Telekomunikasi Indonesia",
+    "net_type": "isp",
+    "source": "@otcjlq"
+  },
+  {
+    "proxy": "103.153.131.67:443",
+    "ip": "103.153.131.67",
+    "port": 443,
+    "tls": true,
+    "clientIp": "103.153.131.67",
+    "clientIps": [
+      "103.153.131.67"
+    ],
+    "clientIpv4": "103.153.131.67",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "ID",
+    "country_name": "印度尼西亚",
+    "country_cn": "印度尼西亚",
+    "country_emoji": "🇮🇩",
+    "asn": "140463",
+    "asOrganization": "Sekolah Tinggi Teknologi Kedirgantaraan Yogyakarta",
+    "isp": "Sekolah Tinggi Teknologi Kedirgantaraan Yogyakarta",
+    "net_type": "education",
+    "source": "@danfeng_chat"
+  },
+  {
     "proxy": "43.229.254.71:443",
     "ip": "43.229.254.71",
     "port": 443,
