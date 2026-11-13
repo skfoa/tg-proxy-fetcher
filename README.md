@@ -35,8 +35,9 @@
 - **📁 智能 ASN 分组与命名**：
   - **DanFeng 测速**：CSV 内部无 ASN 列时自动从文件名（如 `AS45102_CNNICALIBABACNNETAP_*.csv`）解析归类。
   - **OTC 优选扫描**：单 ASN 文件以文件名目标 ASN 为准；混合扫描文件（如 `OTC_SCAN_YX_杂.txt`）自动逐行提取具体 ASN 与 ISP 拆分归类。
-- **🔬 报文特征级质检识别与 Cloudflare 入口永久拒收**：质检引擎深入分析响应报文底层特征，并在全链路执行入口鉴真隔离：
+- **🔬 报文特征级质检识别、权威缓存防回退与 Cloudflare 入口永久拒收**：质检引擎深入分析响应报文底层特征，并在全链路执行入口鉴真与入/出口纠偏隔离：
   - **永久拒收 Cloudflare 自身入口，保留第三方 VPS + WARP 出站**：在抓取、加载、四阶段质检与全量校准中，通过官方 CIDR、`ip_cache` 与在线 BGP 纠偏（`rescue_mislabeled_cloudflare_rows`）永久剔除 Cloudflare 自身入口节点（直接移除、不入墓地）；对仅因 WARP 出站被上游误标为 `AS13335` 的第三方节点，先做在线 BGP 反查纠偏后再裁决，避免误删；
+  - **入/出口权威 `ip_cache` 防回退纠偏 + 上游标签降级兜底**：在 `parsers`、`tg_fetch`、`proxyip_verify`、`cf_verify` 及 `--calibrate` 分流裁决前，统一调用 `apply_authoritative_ip_cache` 以非占位 `ip_cache` 同时覆写入口 `asn`/`isp` 与出口 `exit_asn`/`exit_isp`（Cloudflare CIDR 网段 `exit_ip` 仅采信同源 CF 缓存防反向污染）；对上游未获文件名权威锚定或来源可疑的文本 ASN 仅降级暂存为 `asn_hint`，经双池定量在线反查（`P1` 新入库 6,000 配额与 `P2-P4` 存量/次优先 2,000 配额隔离，配合 7 天失败冷却与活跃代理轮换熔断）后再决定兜底分流，防止脏标签次日污染回退；
   - **识别第三方反代 1034 边缘受限响应**：针对第三方优选 IP / ProxyIP 穿透访问 Cloudflare 目标站点时返回 403 但包含官方 `Server: cloudflare` 与 `CF-RAY` 的响应提取三字机房代码（`colo`），不放行 Cloudflare 自身入口 IP；
   - **识别并剔除异构 CDN 伪节点 (`non_cf_cdn`)**：准确识别并剔除混入的 Fastly、Akamai 等非 Cloudflare 伪造节点，保证优选节点池纯净度。
 - **📊 通用代理质检可观测性与分流策略**：`proxies_verify.py` 引入失败原因分布统计（细分 `connect_timeout`、`tls_error`、`http_status_xxx` 等）与协议明细汇总日志；实行精细化分协议淘汰机制（明文 HTTP 专属严格阈值 `--http-max-fails 1`，其他高可用协议维持缓冲容错），并支持 `--strict` 极致纯净模式。
@@ -47,8 +48,8 @@
 - **⚡ 全量 SSL 上下文单例复用**：质检引擎全面复用全局单例 SSL 证书上下文（`INSECURE_SSL_CTX` 与 `SSL_CTX`），杜绝每次高并发探测协程重复同步读取操作系统 CA 根证书（消除 ~26ms 阻塞开销），事件循环并发吞吐能力彻底释放。
 - **🛡️ 全链路原子安全写入（Windows 锁冲突免疫）**：封装统一的 `atomic_writer` 及 `atomic_write_*` 工具套件，规范执行「写盘 ➔ 显式关闭句柄 ➔ `os.replace` 原子替换」生命周期，彻底根治 Windows 平台 `PermissionError: [WinError 32]` 文件占用锁冲突；异常崩溃时自动清理 `.tmp` 脏文件。
 - **🧩 双轨质检管道归一化**：`cf_verify.py` 将单条优选与机房扫描优选合流为 `_verify_and_persist` 高阶流水线协程，统一驱动探测并发、存活/淘汰统计、墓地冷却隔离与双重稳定质量排序（`first_seen` 降序 + `(fail_count, delay_ms)` 升序），消除 100+ 行重复样板代码，保证质检规则永久 100% 同步。
-- **🚀 解析器模块性能跃升**：`parsers.py` 预编译 13+ 项高频正则；抽象统一测速转换 `parse_speed_to_kbs`，全量支持各类单复数与带宽单位，启发式适配 CloudflareST / DanFeng 无单位输出（`< 50` 自动判定为 MB/s）；抽象 `resolve_and_clean_asn`，一键归一 4 处数据源的 ASN 提取与补全。
-- **🧠 双向索引 ASN 离线知识库与 BGP 字典体系**：引入 `data/asn_database.json` 维持 2,600+ 条双向索引字典（`isp_to_asn` 2,690+ 条与 `asn_to_isp` 2,590+ 条）以及 3,580+ 条自治系统网络分类基准表（`asn_to_net_type`），配合权威 SSOT 字典与三级分层分类架构（L0 权威云厂商与人工纠偏覆写 + Cloudflare 全网段 CIDR 锁定 ➔ L1 3,580+ 精准 ASN 字典 ➔ L2 启发式词根规则与机房兜底）实现解析归一化；运行时支持动态增量自愈维护与持久化；内置防污染保护（保留权威标准命名不被第三方脏标签篡改）与两级查表机制（精准查表 + 边界安全词根匹配），兼顾解析性能与自治系统归属；支持多品牌别名保留（如 `AS63023 Ipxo LLC (GTHost)`）与幂等处理。
+- **🚀 解析器模块性能跃升与入/出口解耦**：`parsers.py` 预编译 13+ 项高频正则；抽象统一测速转换 `parse_speed_to_kbs`，全量支持各类单复数与带宽单位，启发式适配 CloudflareST / DanFeng 无单位输出（`< 50` 自动判定为 MB/s）；支持 OTC 分离式入/出口独立解析与权威 `ip_cache` 前置校验，将不可信文本 ASN 降级为 `asn_hint` 避免污染真实画像。
+- **🧠 双向索引 ASN 离线知识库与 BGP 字典体系**：引入 `data/asn_database.json` 维持 3,170+ 条正向与 3,080+ 条反向双向索引字典（`isp_to_asn` 3,170+ 条与 `asn_to_isp` 3,080+ 条）以及 4,070+ 条自治系统网络分类基准表（`asn_to_net_type`），配合权威 SSOT 字典与三级分层分类架构（L0 权威云厂商与人工纠偏覆写 + Cloudflare 全网段 CIDR 锁定 ➔ L1 4,070+ 精准 ASN 字典 ➔ L2 启发式词根规则与机房兜底）实现解析归一化；运行时支持活跃代理轮换并发反查、动态增量自愈维护与持久化；内置防污染保护（保留权威标准命名不被第三方脏标签篡改）与两级查表机制（精准查表 + 边界安全词根匹配），兼顾解析性能与自治系统归属；支持多品牌别名保留（如 `AS63023 Ipxo LLC (GTHost)`）与幂等处理。
 - **🔄 反代池与扫描池双向动态流转与终态校准闭环**：全面打通 `data/proxyip.*` 与 `data/scan_ips.*` 的双向流转——对反代池中检出的数据中心机房或 Cloudflare WARP 出口节点执行**零容忍自动降级分流**至扫描优选池；对扫描优选池中经外部探针实测确认为非机房（原生家宽 `isp` / 商业专线 `business` / 教育 `education` / 政务 `government`）且非 Cloudflare 出口的优质节点执行**自动晋升收录**至反代池，并在流水线末端通过 `calibrate_all_datasets()` 完成全库零交叉重叠一致性校准。
 - **💡 未收录 ASN 动态发现与自适应预警**：增量抓取遇外部新自治系统时，自动比对内置权威对照库；若发现未收录 ASN，将在 Telegram 卡片中提示并展示待确认明细，提示管理员按需确认并补充入库；若无未知 ASN 则自动隐藏。
 - **📱 动态双状态 Telegram 运行卡片**：首行支持「🟢 发现新增 + 🗑️ 剔除死节点」双状态动态呈现，底栏包含细分引擎淘汰明细 `[代理 X, 反代 Y, 扫描 Z]`，锁屏即知变动。
@@ -90,12 +91,12 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 
 | 模块文件 | 定位与职责 |
 | :--- | :--- |
-| **`tg_fetch.py`** | **数据抓取与合并核心**：实现免登录 Web 爬虫与 Telethon API 双模抓取，跨文件全局唯一去重合并保存至 `data/`，并在入库阶段联动执行反代机房降级分流与扫描池原生家宽晋升。 |
-| **`parsers.py`** | **文本提取与数据格式解析模块**：预编译 13+ 项高频正则，实现通用代理提取、单条优选卡片解析、测速附件与扫描清单解析；抽象 `parse_speed_to_kbs`（全单位自适应换算）与 `resolve_and_clean_asn`（ASN/ISP 提取反查归一），解耦数据提取与底层网络探测。 |
-| **`providers.py`** | **公共规范、安全落盘与网络分类中心**：全系统单一真相源（SSOT）。维护云厂商与关键 ASN 映射表、三级分层网络分类引擎（`resolve_node_exit_and_net_type`：L0 权威覆写与 Cloudflare CIDR 锁定 + L1 精准字典 + L2 词根规则）；加载维护 `data/asn_database.json` 离线知识库与 `data/ip_cache.json` 画像缓存；提供全量数据集一致性校准（`--calibrate`）、静态自检（`--validate`）、Windows-Safe 原子写入套件（`atomic_writer`）、8192 桶哈希分段锁与墓地黑名单冷却管理。 |
+| **`tg_fetch.py`** | **数据抓取与合并核心**：实现免登录 Web 爬虫与 Telethon API 双模抓取；在抓取与入库阶段执行双池定量在线反查（`_targeted_asn_probe` 隔离 `P1` 与 `P2-P4` 配额 + 7 天失败冷却）、全链路 `apply_authoritative_ip_cache` 防回退纠偏、跨文件全局唯一去重合并，并在 `merge_and_save` 末尾统一原子落盘 `ip_cache.json` 与联动分流晋升/降级。 |
+| **`parsers.py`** | **文本提取与数据格式解析模块**：预编译 13+ 项高频正则，实现通用代理提取、单条优选卡片解析、测速附件与 OTC/DanFeng 扫描清单解析；抽象 `parse_speed_to_kbs` 与 `resolve_and_clean_asn`，支持分离式入/出口独立解析、前置权威 `ip_cache` 纠偏与不可信文本标签降级为 `asn_hint`。 |
+| **`providers.py`** | **公共规范、安全落盘与网络分类中心**：全系统单一真相源（SSOT）。维护云厂商与关键 ASN 映射表、`apply_authoritative_ip_cache` 入/出口权威纠偏、在线 BGP 探测活跃代理跨桶轮换熔断（`_build_proxy_trials`）与三级分层网络分类引擎（`resolve_node_exit_and_net_type`）；加载维护 `data/asn_database.json` 与 `data/ip_cache.json`；提供全量数据集一致性校准（`--calibrate`）、静态自检（`--validate`）、Windows-Safe 原子写入套件（`atomic_writer`）、8192 桶哈希分段锁与墓地黑名单冷却管理。 |
 | **`proxies_verify.py`** | **多协议通用代理质检引擎**：全局单例 SSL 上下文复用；基于 RFC 1928、RFC 5389 (STUN/TURN Binding)、HTTP CONNECT 穿透及 MS-SSTP 隧道状态握手检验，支持配置自建 CF Worker 探测真实出口 IP。 |
-| **`proxyip_verify.py`** | **反代 ProxyIP 质检引擎**：抗分包/防截断（Header/Body 隔离），结合外部鉴真端点与本地 `/cdn-cgi/trace` 验证反代真实穿透能力，自动将检出的机房/WARP 出口节点降级分流至 `scan_ips.csv`，并按质检状态分层导出分国与网络属性纯净列表。 |
-| **`cf_verify.py`** | **全量优选 IP 鉴真、家宽晋升与最终卡片推送**：双轨归一化流水线驱动（`_verify_and_persist`）；基于 `ip:port` 精细化分段锁调度与全局单例 SSL 上下文，执行 TLS 官方证书鉴真 + HTTP 301 重定向抗截断精准校验；联动外部探针补全 `scan_ips` 出口画像并将原生非机房节点自动晋升至 `proxyip.csv`；执行终态校准闭环并推送统一 TG 统计卡片。 |
+| **`proxyip_verify.py`** | **反代 ProxyIP 穿透质检引擎**：抗分包/防截断（Header/Body 隔离），结合外部鉴真端点与本地 `/cdn-cgi/trace` 验证反代真实穿透能力，写盘分流前先以本地 `ip_cache` 执行权威入/出口纠偏并将 `ip_cache` 传入裁决引擎，自动将检出的机房/WARP 出口节点降级分流至 `scan_ips.csv`，按质检状态分层导出分国（含 `OTHER_其他地区`）与网络属性纯净列表。 |
+| **`cf_verify.py`** | **全量优选 IP 鉴真、家宽晋升与最终卡片推送**：双轨归一化流水线驱动（`_verify_and_persist`）；基于 `ip:port` 精细化分段锁调度与全局单例 SSL 上下文，执行 TLS 官方证书鉴真 + HTTP 301 重定向抗截断精准校验；联动外部探针补全 `scan_ips` 出口画像并将原生非机房节点自动晋升至 `proxyip.csv`；持久化前执行权威 `ip_cache` 纠偏并自动调用终态校准闭环，最后推送统一 TG 统计卡片。 |
 | **`gen_session.py`** | **Telethon Session 辅助生成器**：本地运行快速交互登录 Telegram 并输出 Session 字符串，供 GitHub Actions 免交互调用。 |
 
 ---
@@ -124,7 +125,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | **`data/proxyip/【...】.txt` / `.json`** | 稀缺网络属性独立反代列表与 JSON（原生宽带/商业/教育/政务，ASN 粗筛） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip/【ISP_运营商原生宽带】.json` 等 |
 | **`data/proxyip/domains.txt`** | 反代 ProxyIP 人工维护动态域名清单（DoH `A` 默认 `443` + `TXT` 严格 `IP:端口` 增量发现） | 人工维护输入（重建保留） | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip/domains.txt` |
 | **`data/proxyip.csv`** | 反代 ProxyIP 详细数据表（17 字段出入口双维度解耦，含 `net_type` 网络分类、`exit_ip` 真实出站落地 IP、`exit_ipv6` 出口 IPv6、`exit_asn` 出口 ASN 与 `exit_isp` 出口运营商） | 需官方 API 模式 | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/proxyip.csv` |
-| **`data/asn_database.json`** | 内置离线 ASN 知识库（收录 2,600+ 条双向索引映射与 3,580+ 条网络分类基准；遇到新 ASN 时自动在线查询增量同步） | 运行时增量维护（由 CI 自动提交） | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/asn_database.json` |
+| **`data/asn_database.json`** | 内置离线 ASN 知识库（收录 3,170+ 条正向与 3,080+ 条反向双向索引映射、4,070+ 条网络分类基准；遇到新 ASN 时自动在线查询增量同步） | 运行时增量维护（由 CI 自动提交） | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/asn_database.json` |
 | **`data/tombstone.json`** | 质检死节点冷却库（7 天隔离冷却与生命周期闭环防回流，仅登记连续失败达标的死节点，机房拒收节点不进墓地） | 全模式支持（质检引擎运行触发） | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/tombstone.json` |
 | **`data/ip_cache.json`** | 持久化 IP 物理画像知识库（严格对齐 ipinfo.io 五大标准，规范化纯净 ASN 字典，动态活跃集修剪） | 运行时增量维护（由 CI 自动提交） | `https://raw.githubusercontent.com/skfoa/tg-proxy-fetcher/main/data/ip_cache.json` |
 
@@ -197,11 +198,11 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 * **与单条日常 IP 物理隔离**：独立收录来自测速扫描附件（如 OTC 的 `OTC_SCAN_YX_*.txt`、DanFeng 的 `AS*.csv` 与云厂商测速 `Aliyun.csv`/`Tencent.csv`/`DMIT.csv`/`Akile.csv` 等常见云厂商及 VPS）。
 * **智能归类与解析规则**：
   1. **DanFeng 命名规范（`AS{ASN}_{ISP}_{DATE}_{TIME}.csv`）**：
-     - DanFeng 导出的 CSV 文件内部只有 `IP地址,端口,TLS,数据中心,地区,城市,网络延迟`，**内部无 ASN 与 ISP 列**。
-     - 脚本原生支持从**文件名**中直接读取权威目标 ASN、服务商名称及测速时间，并自动规范化。
+     - DanFeng 导出的 CSV 文件内部只有 `IP地址,端口,TLS,数据中心,地区,城市,网络延迟`，**内部无 ASN 与 ISP 列**；仅以文件名中的目标 `AS{编号}` 作为权威锚点。
+     - 若文件名仅含云厂商名、或含表头 CSV 内的文本 ASN 未获文件名权威锚定，解析期先降级为 `asn_hint`，经权威 `ip_cache` 纠偏与双池定量在线反查后再决定是否兜底消费，彻底避免脏标签污染。
   2. **OTC 扫描文件（`OTC_SCAN_YX_*.txt`）**：
      - **文件名含目标 ASN 时**（如 `OTC_SCAN_YX_AS210644.txt`）：全文件节点以文件名中的目标 ASN 为准，避免扫描端本地过时 GeoIP 离线库误标老旧上游历史 AS。
-     - **文件名无目标 ASN 时**（如混合扫描文件 `OTC_SCAN_YX_杂.txt`）：自动逐行读取探测每条具体的实际 ASN 与 ISP，分别归入对应机房组。
+     - **文件名无目标 ASN 时**（如混合扫描文件 `OTC_SCAN_YX_杂.txt`）：对分离式入/出口字段分别独立提取，文本标签仅暂存为 `asn_hint`，优先通过权威 `ip_cache` 校验与批量在线 BGP 反查确权后逐条归入对应机房组，禁止反向覆盖已核实的入/出口 ASN。
 * **跨文件去重与时效刷新**：
   - **主键去重**：无论新老文件，均以 `IP:端口` 为全局主键，避免在产物中出现重复 IP 行。
   - **时效覆盖**：新文件中的最新延迟、更新时间与配置自动覆盖刷新老旧数据。
@@ -230,18 +231,18 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 * **技术实现与边界说明（三级分层分类体系）**：
   - **执行逻辑（由 `resolve_node_exit_and_net_type` 统一驱动）**：
     1. **Tier 0（权威云厂商与人工纠偏最高优覆写 + Cloudflare CIDR 锁定）**：优先核验 `MANUAL_OVERRIDE_NET_TYPES`、`AUTHORITATIVE_CLOUD_NET_TYPES` 与 Cloudflare 全网段 CIDR（`is_cloudflare_ip`），对 AWS、Google Cloud、Azure、Oracle、Cloudflare WARP 以及伪装为 ISP 的机房 ASN（如 AS27284 等）强制锁定为 `datacenter`；
-    2. **Tier 1（内置精准对照，Fast-path Lookup）**：智能提取 AS 编号，与 `ASN_EXACT_NET_TYPE`（3,580+ 条精准自治系统分类字典，涵盖电信 CN2 AS4809、联通 9929 AS9929、移动 CMIN2 AS58807 以及 HKT、HKBN、Comcast、Chunghwa Telecom 等）及 `ip_cache` 硬件级 `is_hosting` 标记比对，快速判定网络类型；
+    2. **Tier 1（内置精准对照，Fast-path Lookup）**：智能提取 AS 编号，与 `ASN_EXACT_NET_TYPE`（4,070+ 条精准自治系统分类字典，涵盖电信 CN2 AS4809、联通 9929 AS9929、移动 CMIN2 AS58807 以及 HKT、HKBN、Comcast、Chunghwa Telecom 等）及 `ip_cache` 硬件级 `is_hosting` 标记比对，快速判定网络类型；
     3. **Tier 2（启发式词根规则智能匹配，Pattern Fallback）**：针对对照表中未收录的冷门/新出现 ASN，或上游仅提供文本名称的数据行，自动进入词根模式识别（优先识别教育与政务网，排除 `host`/`cloud`/`vps`/`datacenter` 等机房关键词，随后识别商业专线与运营商原生宽带）；
     4. **Tier 3（降级兜底，Default Fallback）**：未命中的节点稳妥归入 `datacenter` 机房，避免泛化误分类。
   - **网络分类对照基准**：
-    代码内置与 `asn_database.json` 合并维护 3,580+ 条独立自治系统的网络分类基准表（`ASN_EXACT_NET_TYPE`，与 2,600+ 条双向索引字典独立分工），覆盖主流电信运营商、企业专线与机房；遇到未收录的冷门自治系统时，分类引擎会自动进入启发式词根识别与机房兜底；且在 `tg_fetch.py` 增量抓取到未收录新自治系统时，会自动在线解析入库并在 Telegram 卡片中提示归属确认。
+    代码内置与 `asn_database.json` 合并维护 4,070+ 条独立自治系统的网络分类基准表（`ASN_EXACT_NET_TYPE`，与 3,170+ 条正向 / 3,080+ 条反向双向索引字典独立分工），覆盖主流电信运营商、企业专线与机房；遇到未收录的冷门自治系统时，分类引擎会自动进入启发式词根识别与机房兜底；且在 `tg_fetch.py` 增量抓取到未收录新自治系统时，会自动在线解析入库并在 Telegram 卡片中提示归属确认。
   - **挑选定位与后续筛选（粗筛候选池）**：
     本项目中的 ISP 及特殊网络归属主要作为**第一阶段的「ASN 粗筛」**。其核心作用是从海量混合扫描池中，通过自治系统属性快速甄别出潜在的民用宽带资产并剔除托管机房。这批导出的特殊列表本质上是**经过自治系统分类后的粗筛候选池**，使用者后续可根据具体应用需求，将粗筛出的节点**继续进行深入的连通性与穿透检测筛选**。
   - **客观界限**：
     由于 Tier 1 / Tier 2 顶级电信运营商（如 HKT, SK Broadband, Comcast, Charter 等）名下的自治系统（ASN）属于综合广播，同一个自治系统内部通常既广播给普通居民家庭宽带，也广播给本地商户静态专线，甚至包含部分自建机房。因此，**在不调用商业付费 IP 库的前提下，本机制依据的是自治系统（ASN）广播属性筛选（排除已知托管机房），无法保证属于居民家庭光纤。**
   - **风控特性参考**：
     非机房 ASN 在部分网站的 IP 风险评分中通常被定性为 ISP 或 Business，相比机房 Hosting IP 较少被直接标记为代理，但在实际使用中效果仍取决于目标站点的风控策略与节点当前状态。
-* **结构化数据**：`data/proxyip.csv` 与 `data/proxies.csv` 均包含 `net_type` 字段（取值严格对齐 ipinfo.io 业界权威五大标准：`datacenter`、`isp`、`business`、`education`、`government`），保留网络属性画像，基于内置 1,800+ 条网络分类字典快速定性。
+* **结构化数据**：`data/proxyip.csv` 与 `data/proxies.csv` 均包含 `net_type` 字段（取值严格对齐 ipinfo.io 业界权威五大标准：`datacenter`、`isp`、`business`、`education`、`government`），保留网络属性画像，基于内置 4,070+ 条网络分类字典快速定性。
 
 ### 5. 数据表通用字段说明
 * 采用 `UTF-8-SIG` 编码，Windows Excel 直接双击打开不乱码。
@@ -262,9 +263,9 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `cf_location` | 字符串 | Cloudflare 接入地理位置 | `亚太 · 香港` |
 | `asn` | 字符串 | **【核心规范】** 『ASN 编号 + 服务商名称』一体化直观标签 | `AS400618 Prime Security Corp.` |
 | `isp` | 字符串 | 自治系统所属运营商 / 托管商组织名称 | `Prime Security Corp.` |
+| `fail_count` | 整数 | 连续探测失败次数（默认 0，连续失败 ≥ 3 次自动淘汰剔除） | `0` |
 | `first_seen` | 时间字符串 | 首次收录时间（以第一次抓取入库为准，永久不变） | `2026-09-13 18:00:33` |
 | `channel` | 字符串 | 来源频道 | `@danfeng_chat` / `@otcjlq` |
-| `fail_count` | 整数 | 连续探测失败次数（默认 0，连续失败 ≥ 3 次自动淘汰剔除） | `0` |
 
 #### ② 扫描测速反代数据表（`data/scan_ips.csv`，出入口双维度）
 *共 16 个字段，彻底解耦【入口物理网络】与【真实出口落地】：*
@@ -280,9 +281,9 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `cf_location` | 字符串 | Cloudflare 入口接入位置 | `北美洲 · 圣何塞 · 美国` |
 | `asn` | 字符串 | **【入口物理网络】** 入口 IP 的 BGP 广播自治系统 | `AS174 Cogent Communications, LLC` |
 | `isp` | 字符串 | 入口物理运营商 / 托管商组织名称 | `Cogent Communications, LLC` |
+| `fail_count` | 整数 | 连续探测失败次数 | `0` |
 | `first_seen` | 时间字符串 | 首次收录时间 | `2026-10-18 21:50:14` |
 | `channel` | 字符串 | 来源频道 | `@danfeng_chat` |
-| `fail_count` | 整数 | 连续探测失败次数 | `0` |
 | `exit_ip` | 字符串 | **【真实出口落地】** 穿透测试测出的出站落地真实 IP（未测通则为空） | `192.241.216.172` |
 | `exit_asn` | 字符串 | **【真实出口网络】** 最终出站访问目标时的落地 ASN | `AS14061 DigitalOcean, LLC` |
 | `exit_isp` | 字符串 | 最终出站落地的托管商组织名称 | `DigitalOcean, LLC` |
@@ -302,9 +303,9 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `cf_location` | 字符串 | 落地地理位置 | `中国 · 香港特别行政区` |
 | `asn` | 字符串 | **【核心规范】** 『ASN 编号 + 服务商名称』一体化直观标签 | `AS9269 HKBN Hong Kong Broadband` |
 | `isp` | 字符串 | 自治系统组织 / 运营商组织全称 | `HKBN Hong Kong Broadband` |
+| `fail_count` | 整数 | 连续探测失败次数（连续失败 ≥ 3 次永久物理删除） | `0` |
 | `first_seen` | 时间字符串 | 首次收录时间（以第一次抓取入库为准，永久不变） | `2026-09-19 18:00:00` |
 | `channel` | 字符串 | 来源频道或附件源 | `@danfeng_chat` |
-| `fail_count` | 整数 | 连续探测失败次数（连续失败 ≥ 3 次永久物理删除） | `0` |
 | `net_type` | 字符串 | **【核心属性】** 网络类型归属（仅收录非机房原生资产） | `isp` |
 | `exit_ip` | 字符串 | **【真实出站落地】** 穿透测试测出的出站落地真实 IP（双栈时为 IPv4 出口，仅 IPv6 时继承 IPv6 以向下兼容旧解析器，未测通则为空） | `192.241.216.172` |
 | `exit_ipv6` | 字符串 | **【IPv6 出口落地】** 穿透测试测出的 IPv6 出站落地真实 IP（无 IPv6 出口或未测通则为空） | `2602:f988:210:c4f::7f4` |
@@ -345,13 +346,18 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | 字段 | 类型 | 说明 | 示例 |
 | :--- | :--- | :--- | :--- |
 | `proxy` | 字符串 | 节点连接串（ProxyIP 为 `ip:port`，通用代理为完整 URL） | `218.157.145.120:443` 或 `socks5://...` |
+| `protocol` | 字符串 | 协议类型（仅 `data/proxies/*.json` 包含） | `socks5`、`http`、`turn`、`sstp` |
+| `ip` | 字符串 | 节点入口 IP 地址或域名 | `218.157.145.120` |
+| `port` | 整数 | 服务端口 | `443` |
+| `tls` | 布尔值 | 是否开启 TLS（仅 `data/proxyip*.json` 包含） | `true` |
 | `clientIp` | 字符串 | **【主要出口 IP】** 单一出口 IP 字符串（向下兼容旧版前端与解析器；双栈时优先填入 IPv4，无 IPv4 时填入 IPv6） | `192.241.216.172` |
 | `clientIps` | 字符串数组 | **【全量出口列表】** 穿透测试出的所有真实出口 IP 数组（去重有序排列，含 IPv4 与 IPv6） | `["192.241.216.172", "2602:f988:210:c4f::7f4"]` |
 | `clientIpv4` | 字符串 | **【IPv4 出口落地】** 穿透测试出的 IPv4 出站落地 IP（若无则为空串 `""`） | `192.241.216.172` |
 | `clientIpv6` | 字符串 | **【IPv6 出口落地】** 穿透测试出的 IPv6 出站落地 IP（若无则为空串 `""`） | `2602:f988:210:c4f::7f4` |
 | `dual_stack` | 布尔值 | **【双栈路由能力】** 是否同时具备 IPv4 与 IPv6 双出口能力（`true`/`false`） | `true` |
-| `country` | 字符串 | ISO 3166-1 alpha-2 两位大写国家代码 | `US`、`HK` |
+| `country` | 字符串 | ISO 3166-1 alpha-2 两位大写国家代码（`OTHER_其他地区` 中为 `""`） | `US`、`HK` |
 | `country_name` | 字符串 | 国家/地区中文名称 | `美国`、`香港` |
+| `country_cn` | 字符串 | 国家/地区中文名称别名字段（与 `country_name` 同步提供以兼容多前端解析） | `美国`、`香港` |
 | `country_emoji` | 字符串 | 国家/地区国旗 Emoji 标识符 | `🇺🇸`、`🇭🇰` |
 | `asn` | 字符串 / 整数 | 自治系统纯数字编号 | `9269` |
 | `asOrganization` | 字符串 | 自治系统组织 / 运营商全称 | `HKBN Hong Kong Broadband` |
@@ -399,7 +405,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 
 #### ⑤ 本项目的数据展示规范
 * **`format_asn_isp()` 一体化直观标签与别名保留**：输出为 `AS{编号} {服务商}` 结构，使在查看 CSV 表格、订阅列表文件名（如 `data/scan_ips/AS906_DMIT.txt`）以及 Telegram 统计卡片时既能看清编号也能辨识品牌。对于多租户品牌（如 GTHost 租用 Ipxo LLC 广播），规范保留别名为 `AS63023 Ipxo LLC (GTHost)`，具备幂等性避免嵌套。
-* **`asn_database.json` 双向索引与网络分类知识库**：维持 2,600+ 条服务商双向索引字典（`isp_to_asn` 2,690+ 条 / `asn_to_isp` 2,590+ 条）及 3,580+ 条网络分类基准表（`asn_to_net_type` 3,580+ 条），配合权威字典对 `asn` 列实现一体化直观归类，并在抓取阶段支持自动在线解析与增量持久化回写。
+* **`asn_database.json` 双向索引与网络分类知识库**：维持 3,170+ 条正向与 3,080+ 条反向服务商双向索引字典（`isp_to_asn` 3,170+ 条 / `asn_to_isp` 3,080+ 条）及 4,070+ 条网络分类基准表（`asn_to_net_type` 4,070+ 条），配合权威字典对 `asn` 列实现一体化直观归类，并在抓取阶段支持自动在线解析与增量持久化回写。
 
 ---
 
@@ -443,8 +449,10 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
   * **源头拦截**：`tg_fetch.py` 在加载本地历史、抓取正文消息及解析附件时比对墓地记录，过滤已淘汰的失效节点，避免因频道历史回溯重复抓取入库。
 
 #### ⑤ 双向索引与网络分类知识库（`data/asn_database.json`）
-* **双向索引与网络分类分层维护**：维护 2,600+ 条权威服务商双向索引（`isp_to_asn` 2,690+ 条 / `asn_to_isp` 2,590+ 条）以及 3,580+ 条独立自治系统网络分类基准表（`asn_to_net_type` 3,580+ 条），优先通过本地离线数据与云厂商特征词库匹配，零外部网络查询开销。
-* **自动增量维护与持久化**：抓取阶段若遇到未收录新 ASN，系统自动通过并发在线查询进行自愈式补全，自动落盘写入 `data/asn_database.json` 并由 GitHub Actions 自动 commit 推送回仓库，保持知识库长期自适应演进。
+* **双向索引与网络分类分层维护**：维护 3,170+ 条正向与 3,080+ 条反向权威服务商双向索引（`isp_to_asn` 3,170+ 条 / `asn_to_isp` 3,080+ 条）以及 4,070+ 条独立自治系统网络分类基准表（`asn_to_net_type` 4,070+ 条），优先通过本地离线数据与云厂商特征词库匹配，零外部网络查询开销。
+* **自动增量维护与权威防回退持久化**：
+  - 抓取阶段若遇未收录新 ASN 或未入库 IP，由 `_targeted_asn_probe` 执行双池限额反查（`P1` 新入库 6,000 配额与 `P2-P4` 存量/次优先 2,000 配额隔离 + 7 天失败冷却 `probe_failed_at`），经活跃代理池跨桶轮换与失活熔断（`_build_proxy_trials`）完成并发反查后统一落盘 `data/ip_cache.json` 与 `data/asn_database.json`。
+  - 所有数据源加载、分流裁决与保存前均由 `apply_authoritative_ip_cache` 以 `ip_cache` 权威覆写入/出口 ASN（CF CIDR `exit_ip` 仅采信 CF 缓存），防止次日增量重抓被上游脏文本反向污染回退。
 * **防覆盖与安全隔离**：
   * **权威名称防污染**：反查出的 ASN 若已收录于本地权威字典，保留规范化标准名称；针对多租户/分销品牌（如 Claw Cloud 复用阿里云 `AS45102`），保留别名为 `AS45102 Alibaba Cloud (Claw Cloud)`。
   * **两级查表匹配**：第一级执行精准哈希匹配，避免将含 IDC 字符串的名称误判为具体 ASN；第二级仅对权威别名执行词界匹配。
@@ -499,7 +507,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `SUB_URLS` | 外部通用订阅源 URL 列表（逗号/换行分隔） | 内置公共订阅镜像（留空默认） | 可选 | 配置外部公开订阅链接（用于拓展 SSTP 等节点）；如需**彻底禁用外部订阅**，设置为 `off`、`none` 或 `false` 即可；亦可填入自定义订阅链接 |
 | `EDT_MIRRORS` | 外部代理源镜像加速前缀列表（逗号/空格分隔） | 留空（自动竞速多组内置镜像源） | 可选 | 配置自定义加速镜像域名或前缀。**系统采用多源并发竞速机制**：所有候选源并发请求，最快有效返回者率先采用，防止单源超时阻塞；若需彻底禁用外部镜像拉取，设为 `off` 即可 |
 | `EDT_URLS` | 自定义代理完整 JSON URL 列表（逗号/空格分隔） | 留空（由镜像自动推导） | 可选 | 直接传入多个完整的 proxy json 链接（支持同时混合 https/http/socks5，系统自动按文件名路由），进入并发竞速池 |
-| `EDT_BASE_URL` | 自建 Worker/CDN 代理基址（支持单个或多个，逗号分隔） | 留空（由镜像自动推导） | 可选 | 用于自建反代加速服务（如 `https://my-proxy.workers.dev/data`），系统自动拼接 `{base}/{proto}.json` 并参与竞速 |
+| `EDT_BASE_URL` / `EDT_BASE_URLS` | 自建 Worker/CDN 代理基址（支持单个或多个，逗号分隔） | 留空（由镜像自动推导） | 可选 | 用于自建反代加速服务（如 `https://my-proxy.workers.dev/data`），自动拼接 `{base}/{proto}.json` 并参与竞速；注：默认 `fetch.yml` 未透传该变量，主要供本地或自定义部署脚本使用（GitHub Actions 建议使用 `EDT_MIRRORS` 或 `EDT_URLS`） |
 | `EDT_HTTPS_URLS` | 专属 HTTPS 代理完整 JSON 候选列表（逗号分隔） | 留空（由镜像自动推导） | 可选 | 高级自定义：直接指定抓取非机房 HTTPS 代理的完整 JSON 地址列表（支持多源并发竞速，协议级最高优先级） |
 | `EDT_HTTP_URLS` | 专属 HTTP 代理完整 JSON 候选列表（逗号分隔） | 留空（由镜像自动推导） | 可选 | 高级自定义：直接指定抓取非机房 HTTP 代理的完整 JSON 地址列表（支持多源并发竞速，协议级最高优先级） |
 | `EDT_SOCKS5_URLS` | 专属 SOCKS5 代理完整 JSON 候选列表（逗号分隔） | 留空（由镜像自动推导） | 可选 | 高级自定义：直接指定抓取非机房 SOCKS5 代理的完整 JSON 地址列表（支持多源并发竞速，协议级最高优先级） |
@@ -535,7 +543,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `--check-concurrency` | `proxyip_verify.py` / `cf_verify.py` | `32` | `32` | Check ProxyIP 外部穿透鉴真并发线程数 (默认读取环境变量 `CHECK_CONCURRENCY`，并发多线程调度不盲等) |
 | `--no-enrich-exits` | `cf_verify.py` | 关闭 | 关闭 | 禁用扫描优选 IP 存活节点的出口画像探测与非机房反代晋升 |
 | `--validate` | `providers.py` | CI 自动运行 | - | 静态门禁预检：校验 ASN 数据库结构完整性、字段合法性与代码内置映射一致性 |
-| `--calibrate` | `providers.py` | CI 终态校准 | - | 全量数据一致性终态校准：重新校准分类、分流机房反代至扫描池、更新分协议与分国列表 |
+| `--calibrate` | `providers.py` | 由 `cf_verify.py` 末端内置自动调用 | - | 全量数据一致性终态校准：同步以权威 `ip_cache` 纠偏 `cf_ips.csv`、`scan_ips.csv` 与 `proxyip.csv` 的入/出口并剔除 CF 入口、重新计算分类、分流机房反代至扫描池、更新分协议与分国列表；也可单独手动执行 |
 | `--no-notify` | 校验脚本 | 流水线静默 | 关闭 | 不单独推送各引擎卡片，由流水线终点聚合为四合一卡片 |
 | `DEFER_NOTIFY` | `tg_fetch.py` | `1` | `0` | 延迟 Telegram 推送标记，确保四合一卡片聚合完整 |
 
