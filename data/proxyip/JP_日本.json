@@ -242,28 +242,6 @@
     "source": "@otcjlq"
   },
   {
-    "proxy": "82.22.26.212:443",
-    "ip": "82.22.26.212",
-    "port": 443,
-    "tls": true,
-    "clientIp": "82.22.26.212",
-    "clientIps": [
-      "82.22.26.212"
-    ],
-    "clientIpv4": "82.22.26.212",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "206069",
-    "asOrganization": "Cornseed Limited",
-    "isp": "Cornseed Limited",
-    "net_type": "isp",
-    "source": "@danfeng2"
-  },
-  {
     "proxy": "209.146.123.99:443",
     "ip": "209.146.123.99",
     "port": 443,
@@ -482,28 +460,6 @@
     "isp": "Starry Network",
     "net_type": "isp",
     "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "64.204.48.68:443",
-    "ip": "64.204.48.68",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2a14:7586:6109:1::21a",
-    "clientIps": [
-      "2a14:7586:6109:1::21a"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2a14:7586:6109:1::21a",
-    "dual_stack": false,
-    "country": "JP",
-    "country_name": "日本",
-    "country_cn": "日本",
-    "country_emoji": "🇯🇵",
-    "asn": "206069",
-    "asOrganization": "Cornseed Limited",
-    "isp": "Cornseed Limited",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
   },
   {
     "proxy": "103.27.186.200:443",

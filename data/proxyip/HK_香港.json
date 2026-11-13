@@ -352,28 +352,6 @@
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "103.246.219.241:443",
-    "ip": "103.246.219.241",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2404:a3c0:6:5a:5868:93ff:fe00:470",
-    "clientIps": [
-      "2404:a3c0:6:5a:5868:93ff:fe00:470"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2404:a3c0:6:5a:5868:93ff:fe00:470",
-    "dual_stack": false,
-    "country": "HK",
-    "country_name": "香港",
-    "country_cn": "香港",
-    "country_emoji": "🇭🇰",
-    "asn": "134823",
-    "asOrganization": "Imcloud Technology",
-    "isp": "Imcloud Technology",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "38.175.192.95:443",
     "ip": "38.175.192.95",
     "port": 443,
@@ -546,28 +524,6 @@
     "asn": "4760",
     "asOrganization": "HKT",
     "isp": "HKT",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "103.158.228.155:443",
-    "ip": "103.158.228.155",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2404:a3c0:6:5a:5868:93ff:fe00:470",
-    "clientIps": [
-      "2404:a3c0:6:5a:5868:93ff:fe00:470"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2404:a3c0:6:5a:5868:93ff:fe00:470",
-    "dual_stack": false,
-    "country": "HK",
-    "country_name": "香港",
-    "country_cn": "香港",
-    "country_emoji": "🇭🇰",
-    "asn": "134823",
-    "asOrganization": "Imcloud Technology",
-    "isp": "Imcloud Technology",
     "net_type": "isp",
     "source": "@danfeng_chat"
   },
@@ -836,28 +792,6 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "103.246.219.55:443",
-    "ip": "103.246.219.55",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2404:a3c0:6:5a:5868:93ff:fe00:470",
-    "clientIps": [
-      "2404:a3c0:6:5a:5868:93ff:fe00:470"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2404:a3c0:6:5a:5868:93ff:fe00:470",
-    "dual_stack": false,
-    "country": "HK",
-    "country_name": "香港",
-    "country_cn": "香港",
-    "country_emoji": "🇭🇰",
-    "asn": "134823",
-    "asOrganization": "Imcloud Technology",
-    "isp": "Imcloud Technology",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "116.49.234.130:443",
     "ip": "116.49.234.130",
     "port": 443,
@@ -1034,72 +968,6 @@
     "source": "@otcjlq"
   },
   {
-    "proxy": "202.148.220.242:443",
-    "ip": "202.148.220.242",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2404:a3c0:6:5a:5868:93ff:fe00:470",
-    "clientIps": [
-      "2404:a3c0:6:5a:5868:93ff:fe00:470"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2404:a3c0:6:5a:5868:93ff:fe00:470",
-    "dual_stack": false,
-    "country": "HK",
-    "country_name": "香港",
-    "country_cn": "香港",
-    "country_emoji": "🇭🇰",
-    "asn": "134823",
-    "asOrganization": "Imcloud Technology",
-    "isp": "Imcloud Technology",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "202.148.221.168:443",
-    "ip": "202.148.221.168",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2404:a3c0:6:5a:5868:93ff:fe00:470",
-    "clientIps": [
-      "2404:a3c0:6:5a:5868:93ff:fe00:470"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2404:a3c0:6:5a:5868:93ff:fe00:470",
-    "dual_stack": false,
-    "country": "HK",
-    "country_name": "香港",
-    "country_cn": "香港",
-    "country_emoji": "🇭🇰",
-    "asn": "134823",
-    "asOrganization": "Imcloud Technology",
-    "isp": "Imcloud Technology",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "202.153.4.53:443",
-    "ip": "202.153.4.53",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2404:a3c0:6:5a:5868:93ff:fe00:470",
-    "clientIps": [
-      "2404:a3c0:6:5a:5868:93ff:fe00:470"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2404:a3c0:6:5a:5868:93ff:fe00:470",
-    "dual_stack": false,
-    "country": "HK",
-    "country_name": "香港",
-    "country_cn": "香港",
-    "country_emoji": "🇭🇰",
-    "asn": "134823",
-    "asOrganization": "Imcloud Technology",
-    "isp": "Imcloud Technology",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "103.190.232.171:443",
     "ip": "103.190.232.171",
     "port": 443,
@@ -1140,28 +1008,6 @@
     "asn": "62711",
     "asOrganization": "Maxwell Telecom",
     "isp": "Maxwell Telecom",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "202.148.220.228:443",
-    "ip": "202.148.220.228",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2404:a3c0:6:5a:5868:93ff:fe00:470",
-    "clientIps": [
-      "2404:a3c0:6:5a:5868:93ff:fe00:470"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2404:a3c0:6:5a:5868:93ff:fe00:470",
-    "dual_stack": false,
-    "country": "HK",
-    "country_name": "香港",
-    "country_cn": "香港",
-    "country_emoji": "🇭🇰",
-    "asn": "134823",
-    "asOrganization": "Imcloud Technology",
-    "isp": "Imcloud Technology",
     "net_type": "isp",
     "source": "@danfeng_chat"
   },
@@ -1650,28 +1496,6 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "187.79.192.182:8443",
-    "ip": "187.79.192.182",
-    "port": 8443,
-    "tls": true,
-    "clientIp": "2404:a3c0:6:5a:5868:93ff:fe00:1189",
-    "clientIps": [
-      "2404:a3c0:6:5a:5868:93ff:fe00:1189"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2404:a3c0:6:5a:5868:93ff:fe00:1189",
-    "dual_stack": false,
-    "country": "HK",
-    "country_name": "香港",
-    "country_cn": "香港",
-    "country_emoji": "🇭🇰",
-    "asn": "134823",
-    "asOrganization": "Imcloud Technology",
-    "isp": "Imcloud Technology",
-    "net_type": "isp",
-    "source": "@otcjlq"
-  },
-  {
     "proxy": "14.225.205.39:443",
     "ip": "14.225.205.39",
     "port": 443,
@@ -1822,28 +1646,6 @@
     "asn": "135905",
     "asOrganization": "Vietnam Posts and Telecommunications Group",
     "isp": "Vietnam Posts and Telecommunications Group",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "202.148.220.180:443",
-    "ip": "202.148.220.180",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2404:a3c0:6:5a:5868:93ff:fe00:470",
-    "clientIps": [
-      "2404:a3c0:6:5a:5868:93ff:fe00:470"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2404:a3c0:6:5a:5868:93ff:fe00:470",
-    "dual_stack": false,
-    "country": "HK",
-    "country_name": "香港",
-    "country_cn": "香港",
-    "country_emoji": "🇭🇰",
-    "asn": "134823",
-    "asOrganization": "Imcloud Technology",
-    "isp": "Imcloud Technology",
     "net_type": "isp",
     "source": "@danfeng_chat"
   },
@@ -2288,28 +2090,6 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "103.137.22.95:443",
-    "ip": "103.137.22.95",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2404:a3c0:6:5a:5868:93ff:fe00:95c",
-    "clientIps": [
-      "2404:a3c0:6:5a:5868:93ff:fe00:95c"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2404:a3c0:6:5a:5868:93ff:fe00:95c",
-    "dual_stack": false,
-    "country": "HK",
-    "country_name": "香港",
-    "country_cn": "香港",
-    "country_emoji": "🇭🇰",
-    "asn": "134823",
-    "asOrganization": "Imcloud Technology",
-    "isp": "Imcloud Technology",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "219.76.13.169:443",
     "ip": "219.76.13.169",
     "port": 443,
@@ -2464,50 +2244,6 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "202.148.220.163:443",
-    "ip": "202.148.220.163",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2404:a3c0:6:5a:5868:93ff:fe00:470",
-    "clientIps": [
-      "2404:a3c0:6:5a:5868:93ff:fe00:470"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2404:a3c0:6:5a:5868:93ff:fe00:470",
-    "dual_stack": false,
-    "country": "HK",
-    "country_name": "香港",
-    "country_cn": "香港",
-    "country_emoji": "🇭🇰",
-    "asn": "134823",
-    "asOrganization": "Imcloud Technology",
-    "isp": "Imcloud Technology",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "202.148.220.176:443",
-    "ip": "202.148.220.176",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2404:a3c0:6:5a:5868:93ff:fe00:958",
-    "clientIps": [
-      "2404:a3c0:6:5a:5868:93ff:fe00:958"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2404:a3c0:6:5a:5868:93ff:fe00:958",
-    "dual_stack": false,
-    "country": "HK",
-    "country_name": "香港",
-    "country_cn": "香港",
-    "country_emoji": "🇭🇰",
-    "asn": "134823",
-    "asOrganization": "Imcloud Technology",
-    "isp": "Imcloud Technology",
-    "net_type": "isp",
-    "source": "@otcjlq"
-  },
-  {
     "proxy": "14.225.205.95:443",
     "ip": "14.225.205.95",
     "port": 443,
@@ -2658,28 +2394,6 @@
     "asn": "9304",
     "asOrganization": "HGC Global Communications Limited",
     "isp": "HGC Global Communications Limited",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "202.148.221.80:443",
-    "ip": "202.148.221.80",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2404:a3c0:6:5a:5868:93ff:fe00:470",
-    "clientIps": [
-      "2404:a3c0:6:5a:5868:93ff:fe00:470"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2404:a3c0:6:5a:5868:93ff:fe00:470",
-    "dual_stack": false,
-    "country": "HK",
-    "country_name": "香港",
-    "country_cn": "香港",
-    "country_emoji": "🇭🇰",
-    "asn": "134823",
-    "asOrganization": "Imcloud Technology",
-    "isp": "Imcloud Technology",
     "net_type": "isp",
     "source": "@danfeng_chat"
   },

@@ -856,6 +856,115 @@ class TestTargetedAsnProbeEngine(unittest.TestCase):
             self.assertEqual(extract_asn_num(scan_rows["154.36.136.50"]["asn"]), "979")
             self.assertEqual(extract_asn_num(scan_rows["154.36.136.50"]["exit_asn"]), "16276")
 
+    def test_manual_datacenter_overrides_and_separate_exit_profile_guards(self):
+        # 1. 已确证 IDC/Hosting ASN 必须稳定归类为 datacenter
+        for dc_asn in ("AS206069", "AS134823", "AS131151", "AS38042"):
+            self.assertEqual(providers.classify_asn(dc_asn), "datacenter", f"{dc_asn} must be datacenter")
+        self.assertIn("@cmliussss_all", tg_fetch.VERIFY_LABELED_CHANNELS)
+
+        # 2. 双跳异址时 _has_complete_profile 不得被入口 ASN 掩盖，且旧版 15 列迁移不复制入口 ASN 到异址出口
+        self.assertFalse(
+            proxyip_verify._has_complete_profile(
+                {
+                    "ip": "64.90.21.49",
+                    "port": "52840",
+                    "asn": "AS979 NetLab",
+                    "isp": "NetLab",
+                    "exit_ip": "103.117.151.225",
+                    "exit_ipv6": "",
+                    "exit_asn": "",
+                    "exit_isp": "",
+                },
+                ip_cache={},
+            )
+        )
+        self.assertTrue(
+            proxyip_verify._has_complete_profile(
+                {
+                    "ip": "64.90.21.49",
+                    "port": "52840",
+                    "asn": "AS979 NetLab",
+                    "isp": "NetLab",
+                    "exit_ip": "103.117.151.225",
+                    "exit_ipv6": "",
+                    "exit_asn": "",
+                    "exit_isp": "",
+                },
+                ip_cache={"103.117.151.225": {"asn": "AS56309", "isp": "ReadyIDC", "net_type": "datacenter"}},
+            )
+        )
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            legacy_csv = os.path.join(tmpdir, "legacy_proxyip.csv")
+            legacy_fields = [c for c in proxyip_verify.CSV_FIELDS if c not in ("exit_asn", "exit_isp")]
+            with open(legacy_csv, "w", encoding="utf-8-sig", newline="") as f:
+                w = csv.DictWriter(f, fieldnames=legacy_fields)
+                w.writeheader()
+                w.writerow({
+                    "ip": "64.90.21.49", "port": "52840", "tls": "true",
+                    "asn": "AS979 NetLab", "isp": "NetLab", "net_type": "business",
+                    "exit_ip": "103.117.151.225", "exit_ipv6": "",
+                })
+                w.writerow({
+                    "ip": "198.51.100.10", "port": "443", "tls": "true",
+                    "asn": "AS979 NetLab", "isp": "NetLab", "net_type": "business",
+                    "exit_ip": "198.51.100.10", "exit_ipv6": "",
+                })
+            with patch("proxyip_verify.load_tombstone", return_value={}):
+                loaded = proxyip_verify.load_proxyip_csv(legacy_csv)
+            by_port = {r["port"]: r for r in loaded}
+            self.assertEqual(by_port["52840"].get("exit_asn", ""), "")
+            self.assertEqual(extract_asn_num(by_port["443"].get("exit_asn", "")), "979")
+
+        # 3. fetch_zip_proxyips 不得将入口 ASN 强行写入异址 exit_asn，且命中缓存机房入口/出口应直接剔除
+        fake_feed = [
+            {
+                "ip": "140.115.53.51", "port": 443,
+                "meta": {
+                    "asn": 18420,
+                    "asOrganization": "National Central University",
+                    "clientIps": ["2a0e:b107:1954:5300::1"],
+                    "colo": "TPE",
+                },
+            },
+            {
+                "ip": "198.51.100.20", "port": 443,
+                "meta": {
+                    "asn": 979,
+                    "asOrganization": "NetLab",
+                    "clientIps": ["198.51.100.99"],
+                    "colo": "HKG",
+                },
+            },
+            {
+                "ip": "198.51.100.30", "port": 443,
+                "meta": {
+                    "asn": 979,
+                    "asOrganization": "NetLab",
+                    "clientIps": ["2a14:7586:6109:1::21a"],
+                    "colo": "NRT",
+                },
+            },
+        ]
+        scraped_out: dict[str, dict] = {}
+        fake_cache = {
+            "2a14:7586:6109:1::21a": {"asn": "AS206069", "isp": "Cornseed Limited", "net_type": "datacenter"},
+        }
+        with patch("tg_fetch.fetch_web_page", return_value=json.dumps(fake_feed)):
+            added, _ = tg_fetch.fetch_zip_proxyips(
+                ["https://example.invalid/all.json"],
+                proxy="",
+                tombstone={},
+                scraped_proxyips=scraped_out,
+                ip_cache=fake_cache,
+            )
+        self.assertEqual(added, 2)
+        self.assertIn("140.115.53.51:443", scraped_out)
+        self.assertEqual(scraped_out["140.115.53.51:443"]["exit_asn"], "")
+        self.assertIn("198.51.100.20:443", scraped_out)
+        self.assertEqual(scraped_out["198.51.100.20:443"]["exit_asn"], "")
+        self.assertNotIn("198.51.100.30:443", scraped_out)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,27 +1,5 @@
 [
   {
-    "proxy": "64.90.21.49:52840",
-    "ip": "64.90.21.49",
-    "port": 52840,
-    "tls": true,
-    "clientIp": "103.117.151.225",
-    "clientIps": [
-      "103.117.151.225"
-    ],
-    "clientIpv4": "103.117.151.225",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "TH",
-    "country_name": "泰国",
-    "country_cn": "泰国",
-    "country_emoji": "🇹🇭",
-    "asn": "979",
-    "asOrganization": "NetLab",
-    "isp": "NetLab",
-    "net_type": "business",
-    "source": "@danfeng2"
-  },
-  {
     "proxy": "101.108.49.121:443",
     "ip": "101.108.49.121",
     "port": 443,

@@ -220,28 +220,6 @@
     "source": "@danfeng2"
   },
   {
-    "proxy": "195.19.150.177:443",
-    "ip": "195.19.150.177",
-    "port": 443,
-    "tls": true,
-    "clientIp": "31.56.185.151",
-    "clientIps": [
-      "31.56.185.151"
-    ],
-    "clientIpv4": "31.56.185.151",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "RU",
-    "country_name": "俄罗斯",
-    "country_cn": "俄罗斯",
-    "country_emoji": "🇷🇺",
-    "asn": "200513",
-    "asOrganization": "Service Terminal Media LLC",
-    "isp": "Service Terminal Media LLC",
-    "net_type": "isp",
-    "source": "@danfeng2"
-  },
-  {
     "proxy": "37.195.173.161:443",
     "ip": "37.195.173.161",
     "port": 443,

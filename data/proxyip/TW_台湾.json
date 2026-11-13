@@ -748,28 +748,6 @@
     "source": "@manual_import"
   },
   {
-    "proxy": "103.137.22.71:443",
-    "ip": "103.137.22.71",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2404:a3c0:6:5a:5868:93ff:fe00:592",
-    "clientIps": [
-      "2404:a3c0:6:5a:5868:93ff:fe00:592"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2404:a3c0:6:5a:5868:93ff:fe00:592",
-    "dual_stack": false,
-    "country": "TW",
-    "country_name": "台湾",
-    "country_cn": "台湾",
-    "country_emoji": "🇹🇼",
-    "asn": "134823",
-    "asOrganization": "Imcloud Technology",
-    "isp": "Imcloud Technology",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
-  },
-  {
     "proxy": "61.216.113.194:443",
     "ip": "61.216.113.194",
     "port": 443,
@@ -812,28 +790,6 @@
     "isp": "Chunghwa Telecom HiNet",
     "net_type": "isp",
     "source": "@manual_import"
-  },
-  {
-    "proxy": "140.115.53.51:443",
-    "ip": "140.115.53.51",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2a0e:b107:1954:5300:b93:3459:af45:28d8",
-    "clientIps": [
-      "2a0e:b107:1954:5300:b93:3459:af45:28d8"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2a0e:b107:1954:5300:b93:3459:af45:28d8",
-    "dual_stack": false,
-    "country": "TW",
-    "country_name": "台湾",
-    "country_cn": "台湾",
-    "country_emoji": "🇹🇼",
-    "asn": "18420",
-    "asOrganization": "T-NCU.EDU.TW",
-    "isp": "T-NCU.EDU.TW",
-    "net_type": "education",
-    "source": "@cmliussss_all"
   },
   {
     "proxy": "103.115.109.227:39738",
@@ -1274,28 +1230,6 @@
     "isp": "Chunghwa Telecom HiNet",
     "net_type": "isp",
     "source": "@manual_import"
-  },
-  {
-    "proxy": "103.137.22.71:8443",
-    "ip": "103.137.22.71",
-    "port": 8443,
-    "tls": true,
-    "clientIp": "2404:a3c0:6:5a:5868:93ff:fe00:592",
-    "clientIps": [
-      "2404:a3c0:6:5a:5868:93ff:fe00:592"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2404:a3c0:6:5a:5868:93ff:fe00:592",
-    "dual_stack": false,
-    "country": "TW",
-    "country_name": "台湾",
-    "country_cn": "台湾",
-    "country_emoji": "🇹🇼",
-    "asn": "134823",
-    "asOrganization": "Imcloud Technology",
-    "isp": "Imcloud Technology",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
   },
   {
     "proxy": "125.229.205.26:443",

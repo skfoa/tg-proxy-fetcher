@@ -334,8 +334,13 @@ MANUAL_OVERRIDE_NET_TYPES: dict[str, str] = {
     "AS135130": "isp",        # Anik Computer & Networking (aniknetwork.net, 孟加拉民用宽带ISP)
     "AS197275": "isp",        # Link Telecom NN Ltd. (lt-nn.net, 俄罗斯下诺夫哥罗德电信运营商)
     "AS16814": "isp",         # NSS S.A. (IPLAN Telecomunicaciones, iplan.com.ar, 阿根廷主流光纤运营商)
-    "AS206069": "isp",        # Cornseed Limited (ipinfo: ISP)
     "AS397540": "isp",        # Windscribe Limited (ipinfo: ISP)
+
+    # 以下为人工/实测确证机房与主机商纠偏（绕开上游误标为 ISP）
+    "AS206069": "datacenter",  # Cornseed Limited (实测 IDC/Hosting，如 82.22.26.212 / 64.204.48.68)
+    "AS134823": "datacenter",  # Sky Digital Co., Ltd. / Imcloud Technology (SDCL-AS-AP, 实测 TW IDC 机房)
+    "AS131151": "datacenter",  # Imcloud Technology Co., Ltd. (IMCLOUD, 实测 IDC 机房)
+    "AS38042": "datacenter",   # Sky Digital Co., Ltd. (SDCL, 实测 IDC 机房)
     "AS35540": "isp",         # OVH SAS / OVH Telecom (ovhcloud.com, 法国电信与宽带接入网)
     "AS17621": "isp",         # China Unicom Shanghai network (中国联通上海网络)
     "AS25341": "isp",         # NPF ROI LLC (cstnet.ru, 俄罗斯宽带ISP)

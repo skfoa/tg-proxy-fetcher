@@ -52,6 +52,7 @@ from providers import (
     classify_asn,
     _extract_asn_code,
     resolve_node_exit_and_net_type,
+    resolve_authoritative_cache_asn,
     apply_authoritative_ip_cache,
     merge_demoted_into_scan_ips,
     load_ip_cache,
@@ -234,12 +235,20 @@ def _has_complete_profile(row: dict, ip_cache: dict | None = None) -> bool:
     """
     判断节点是否已具备完整可信的真实出口画像（决定是否免调外部 Worker，直接走本地高并发探针）：
     1. 具备合法的 IPv4 或 IPv6 出口地址（过滤 '0' 等无效残留）；
-    2. 具备已收录于权威库的真实出口 ASN（由 exit_asn、单跳 asn 或旧版 15 列迁移提供）。
+    2. 具备已收录于权威库的真实出口 ASN（由 exit_asn、单跳 asn 或旧版 15 列迁移提供）；
+    3. 出入口异址时，不得仅靠入口 ASN 占位跳过核验（须在 ip_cache 或显式 exit_asn 中有记录）。
     """
     cand_exits = extract_ips([row.get("exit_ip"), row.get("exit_ipv6")])
     has_valid_exit = any(is_valid_ipv4(cip) or is_valid_ipv6(cip) for cip in cand_exits)
     if not has_valid_exit:
         return False
+    row_ip = str(row.get("ip") or "").strip()
+    has_separate_exit = any(cip != row_ip for cip in cand_exits if cip)
+    if has_separate_exit:
+        cached_ex_code, _ = resolve_authoritative_cache_asn(ip_cache, *cand_exits)
+        explicit_ex_code = _extract_asn_code(row.get("exit_asn"), row.get("exit_isp"))
+        if not cached_ex_code and not explicit_ex_code:
+            return False
     _, _, exit_code, _ = resolve_node_exit_and_net_type(row, ip_cache)
     if not exit_code:
         return False
@@ -412,7 +421,8 @@ def load_proxyip_csv(path: str) -> list:
             if not has_exit_asn_col and (r["exit_ip"] or r["exit_ipv6"]):
                 ing_code = _extract_asn_code(r.get("asn"), r.get("isp"))
                 ing_isp = str(r.get("isp") or "").strip()
-                if ing_code and (r["exit_ip"] == ip or classify_asn(ing_code, ing_isp) != "datacenter"):
+                is_single_hop = (not r["exit_ip"] or r["exit_ip"] == ip) and (not r["exit_ipv6"] or r["exit_ipv6"] == ip)
+                if ing_code and is_single_hop:
                     r["exit_asn"] = format_asn_isp(ing_code, ing_isp)
                     r["exit_isp"] = ing_isp
             rows.append(r)

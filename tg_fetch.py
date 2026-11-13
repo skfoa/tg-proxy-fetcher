@@ -410,7 +410,7 @@ def classify_node_proxyip_or_scan(item: dict, ip_cache: dict) -> tuple[bool, str
     return is_p, eff_nt
 
 
-VERIFY_LABELED_CHANNELS = frozenset({"@otcjlq", "@danfeng_chat", "@danfeng2"})
+VERIFY_LABELED_CHANNELS = frozenset({"@otcjlq", "@danfeng_chat", "@danfeng2", "@cmliussss_all"})
 _ASN_PROBE_BUDGET_DEFAULT = 2000
 _ASN_PROBE_P1_BUDGET_DEFAULT = 6000
 _ASN_PROBE_RETRY_COOLDOWN = 7 * 86400  # 与墓地 7 天周期对齐：近期反查失败节点冷却期内不再重复探测
@@ -1411,6 +1411,7 @@ def fetch_zip_proxyips(
     tombstone: dict[str, int],
     scraped_proxyips: dict[str, dict],
     timeout: float = 30.0,
+    ip_cache: dict[str, dict] | None = None,
 ) -> tuple[int, list[dict]]:
     """
     拉取外部 ProxyIP 在线归档聚合源 (如 all.json)，
@@ -1484,6 +1485,7 @@ def fetch_zip_proxyips(
     total_added = 0
     dc_filtered = 0
     unrecorded_asns_map: dict[str, dict] = {}
+    local_ip_cache = ip_cache if isinstance(ip_cache, dict) else load_ip_cache()
 
     # 预先收集候选节点中未收录的 ASN 并执行批量在线探针定性入库，避免新 ASN 因默认安全降级为 datacenter 而被提前误滤
     pre_enrich_map: dict[str, dict] = {}
@@ -1570,6 +1572,11 @@ def fetch_zip_proxyips(
         raw_isp = str(meta.get("asOrganization") or meta.get("isp") or item.get("asOrganization") or item.get("isp") or "").strip()
         asn_code = _extract_asn_code(raw_asn, raw_isp)
 
+        cached_ing_code, cached_ing_isp = resolve_authoritative_cache_asn(local_ip_cache, ip)
+        if cached_ing_code:
+            asn_code = cached_ing_code
+            raw_isp = cached_ing_isp or raw_isp
+
         # 优先采用本地权威对照表（含刚通过 IPinfo 探针入库的官方标准 ISP），自动补全或修正上游偏差的 asOrganization
         if asn_code and asn_code in ASN_TO_PROVIDER and ASN_TO_PROVIDER[asn_code]:
             raw_isp = ASN_TO_PROVIDER[asn_code]
@@ -1579,6 +1586,24 @@ def fetch_zip_proxyips(
         if net_type == "datacenter" or is_cloudflare_ingress(ip, asn_code, raw_isp):
             dc_filtered += 1
             continue
+
+        has_separate_exit = bool((exit_ip and exit_ip != ip) or (exit_ipv6 and exit_ipv6 != ip))
+        sep_exit_asn = ""
+        sep_exit_isp = ""
+        eff_net_type = net_type
+        if has_separate_exit:
+            if (exit_ip and is_cloudflare_ingress(exit_ip, "", "")) or (exit_ipv6 and is_cloudflare_ingress(exit_ipv6, "", "")):
+                dc_filtered += 1
+                continue
+            cached_ex_code, cached_ex_isp = resolve_authoritative_cache_asn(local_ip_cache, exit_ip, exit_ipv6)
+            if cached_ex_code:
+                eff_exit_nt = classify_asn(cached_ex_code, cached_ex_isp)
+                if eff_exit_nt == "datacenter" or is_cloudflare_asn_or_isp(cached_ex_code, cached_ex_isp):
+                    dc_filtered += 1
+                    continue
+                sep_exit_asn = format_asn_isp(cached_ex_code, cached_ex_isp)
+                sep_exit_isp = cached_ex_isp
+                eff_net_type = eff_exit_nt
 
         colo_obj = meta.get("colo")
         if isinstance(colo_obj, dict):
@@ -1619,12 +1644,12 @@ def fetch_zip_proxyips(
                 "raw_asn": asn_code,
                 "exit_ip": exit_ip,
                 "exit_ipv6": exit_ipv6,
-                "exit_asn": formatted_asn if (exit_ip or exit_ipv6) else "",
-                "exit_isp": raw_isp if (exit_ip or exit_ipv6) else "",
+                "exit_asn": sep_exit_asn if has_separate_exit else (formatted_asn if (exit_ip or exit_ipv6) else ""),
+                "exit_isp": sep_exit_isp if has_separate_exit else (raw_isp if (exit_ip or exit_ipv6) else ""),
                 "first_seen": now_bjt,
                 "channel": "@cmliussss_all",
                 "fail_count": 0,
-                "net_type": net_type,
+                "net_type": eff_net_type,
             }
 
             if key not in scraped_proxyips:
