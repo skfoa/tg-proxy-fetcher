@@ -22,6 +22,28 @@
     "source": "@danfeng_chat"
   },
   {
+    "proxy": "89.128.206.51:443",
+    "ip": "89.128.206.51",
+    "port": 443,
+    "tls": true,
+    "clientIp": "89.128.206.51",
+    "clientIps": [
+      "89.128.206.51"
+    ],
+    "clientIpv4": "89.128.206.51",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "ES",
+    "country_name": "西班牙",
+    "country_cn": "西班牙",
+    "country_emoji": "🇪🇸",
+    "asn": "12479",
+    "asOrganization": "YIF Network",
+    "isp": "YIF Network",
+    "net_type": "isp",
+    "source": "@cmliussss_all"
+  },
+  {
     "proxy": "79.112.138.33:443",
     "ip": "79.112.138.33",
     "port": 443,
@@ -40,28 +62,6 @@
     "asn": "57269",
     "asOrganization": "DIGI Spain Telecom IPv6",
     "isp": "DIGI Spain Telecom IPv6",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
-  },
-  {
-    "proxy": "89.128.206.51:443",
-    "ip": "89.128.206.51",
-    "port": 443,
-    "tls": true,
-    "clientIp": "89.128.206.51",
-    "clientIps": [
-      "89.128.206.51"
-    ],
-    "clientIpv4": "89.128.206.51",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "ES",
-    "country_name": "西班牙",
-    "country_cn": "西班牙",
-    "country_emoji": "🇪🇸",
-    "asn": "12479",
-    "asOrganization": "Ya.com Internet Factory",
-    "isp": "Ya.com Internet Factory",
     "net_type": "isp",
     "source": "@cmliussss_all"
   }

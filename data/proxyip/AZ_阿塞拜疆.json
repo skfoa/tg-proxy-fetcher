@@ -16,8 +16,8 @@
     "country_cn": "阿塞拜疆",
     "country_emoji": "🇦🇿",
     "asn": "29049",
-    "asOrganization": "Leased IPv4 Blocks",
-    "isp": "Leased IPv4 Blocks",
+    "asOrganization": "Delta Telecom",
+    "isp": "Delta Telecom",
     "net_type": "isp",
     "source": "@cmliussss_all"
   },
@@ -26,20 +26,20 @@
     "ip": "185.135.231.175",
     "port": 8443,
     "tls": true,
-    "clientIp": "31.171.101.236",
+    "clientIp": "205.252.135.210",
     "clientIps": [
-      "31.171.101.236"
+      "205.252.135.210"
     ],
-    "clientIpv4": "31.171.101.236",
+    "clientIpv4": "205.252.135.210",
     "clientIpv6": "",
     "dual_stack": false,
     "country": "AZ",
     "country_name": "阿塞拜疆",
     "country_cn": "阿塞拜疆",
     "country_emoji": "🇦🇿",
-    "asn": "29049",
-    "asOrganization": "Leased IPv4 Blocks",
-    "isp": "Leased IPv4 Blocks",
+    "asn": "3491",
+    "asOrganization": "PCCW Global (HK) Ltd.",
+    "isp": "PCCW Global (HK) Ltd.",
     "net_type": "isp",
     "source": "@cmliussss_all"
   }

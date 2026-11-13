@@ -1,49 +1,5 @@
 [
   {
-    "proxy": "89.45.45.58:443",
-    "ip": "89.45.45.58",
-    "port": 443,
-    "tls": true,
-    "clientIp": "89.45.45.58",
-    "clientIps": [
-      "89.45.45.58"
-    ],
-    "clientIpv4": "89.45.45.58",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "TR",
-    "country_name": "土耳其",
-    "country_cn": "土耳其",
-    "country_emoji": "🇹🇷",
-    "asn": "209604",
-    "asOrganization": "2E Telekomunikasyon LTD. STI.",
-    "isp": "2E Telekomunikasyon LTD. STI.",
-    "net_type": "isp",
-    "source": "@otcjlq"
-  },
-  {
-    "proxy": "45.74.158.105:443",
-    "ip": "45.74.158.105",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2a01:f900:11:118::1",
-    "clientIps": [
-      "2a01:f900:11:118::1"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2a01:f900:11:118::1",
-    "dual_stack": false,
-    "country": "TR",
-    "country_name": "土耳其",
-    "country_cn": "土耳其",
-    "country_emoji": "🇹🇷",
-    "asn": "44620",
-    "asOrganization": "Netlen Internet Hizmetleri Ltd. Sti.",
-    "isp": "Netlen Internet Hizmetleri Ltd. Sti.",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
-  },
-  {
     "proxy": "158.94.216.82:443",
     "ip": "158.94.216.82",
     "port": 443,
@@ -110,6 +66,50 @@
     "source": "@danfeng_chat"
   },
   {
+    "proxy": "84.247.20.107:443",
+    "ip": "84.247.20.107",
+    "port": 443,
+    "tls": true,
+    "clientIp": "84.247.20.107",
+    "clientIps": [
+      "84.247.20.107"
+    ],
+    "clientIpv4": "84.247.20.107",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "TR",
+    "country_name": "土耳其",
+    "country_cn": "土耳其",
+    "country_emoji": "🇹🇷",
+    "asn": "51559",
+    "asOrganization": "Lunarnaut",
+    "isp": "Lunarnaut",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
+  },
+  {
+    "proxy": "185.123.100.109:443",
+    "ip": "185.123.100.109",
+    "port": 443,
+    "tls": true,
+    "clientIp": "185.123.100.109",
+    "clientIps": [
+      "185.123.100.109"
+    ],
+    "clientIpv4": "185.123.100.109",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "TR",
+    "country_name": "土耳其",
+    "country_cn": "土耳其",
+    "country_emoji": "🇹🇷",
+    "asn": "206991",
+    "asOrganization": "Iksir Internet Hizmetleri A.S.",
+    "isp": "Iksir Internet Hizmetleri A.S.",
+    "net_type": "isp",
+    "source": "@danfeng2"
+  },
+  {
     "proxy": "158.94.216.125:8443",
     "ip": "158.94.216.125",
     "port": 8443,
@@ -120,6 +120,50 @@
     ],
     "clientIpv4": "",
     "clientIpv6": "2a01:f900:11:238::1",
+    "dual_stack": false,
+    "country": "TR",
+    "country_name": "土耳其",
+    "country_cn": "土耳其",
+    "country_emoji": "🇹🇷",
+    "asn": "44620",
+    "asOrganization": "Netlen Internet Hizmetleri Ltd. Sti.",
+    "isp": "Netlen Internet Hizmetleri Ltd. Sti.",
+    "net_type": "isp",
+    "source": "@cmliussss_all"
+  },
+  {
+    "proxy": "89.45.45.58:443",
+    "ip": "89.45.45.58",
+    "port": 443,
+    "tls": true,
+    "clientIp": "89.45.45.58",
+    "clientIps": [
+      "89.45.45.58"
+    ],
+    "clientIpv4": "89.45.45.58",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "TR",
+    "country_name": "土耳其",
+    "country_cn": "土耳其",
+    "country_emoji": "🇹🇷",
+    "asn": "209604",
+    "asOrganization": "2E TELEKOMUNIKASYON LTD STI",
+    "isp": "2E TELEKOMUNIKASYON LTD STI",
+    "net_type": "isp",
+    "source": "@otcjlq"
+  },
+  {
+    "proxy": "158.94.216.100:443",
+    "ip": "158.94.216.100",
+    "port": 443,
+    "tls": true,
+    "clientIp": "158.94.216.100",
+    "clientIps": [
+      "158.94.216.100"
+    ],
+    "clientIpv4": "158.94.216.100",
+    "clientIpv6": "",
     "dual_stack": false,
     "country": "TR",
     "country_name": "土耳其",
@@ -154,16 +198,16 @@
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "158.94.216.100:443",
-    "ip": "158.94.216.100",
+    "proxy": "158.94.216.137:443",
+    "ip": "158.94.216.137",
     "port": 443,
     "tls": true,
-    "clientIp": "158.94.216.100",
+    "clientIp": "2a01:f900:11:198::1",
     "clientIps": [
-      "158.94.216.100"
+      "2a01:f900:11:198::1"
     ],
-    "clientIpv4": "158.94.216.100",
-    "clientIpv6": "",
+    "clientIpv4": "",
+    "clientIpv6": "2a01:f900:11:198::1",
     "dual_stack": false,
     "country": "TR",
     "country_name": "土耳其",
@@ -172,28 +216,6 @@
     "asn": "44620",
     "asOrganization": "Netlen Internet Hizmetleri Ltd. Sti.",
     "isp": "Netlen Internet Hizmetleri Ltd. Sti.",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
-  },
-  {
-    "proxy": "84.247.20.107:443",
-    "ip": "84.247.20.107",
-    "port": 443,
-    "tls": true,
-    "clientIp": "84.247.20.107",
-    "clientIps": [
-      "84.247.20.107"
-    ],
-    "clientIpv4": "84.247.20.107",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "TR",
-    "country_name": "土耳其",
-    "country_cn": "土耳其",
-    "country_emoji": "🇹🇷",
-    "asn": "51559",
-    "asOrganization": "Lunarnaut",
-    "isp": "Lunarnaut",
     "net_type": "isp",
     "source": "@danfeng_chat"
   },
@@ -214,37 +236,37 @@
     "country_cn": "土耳其",
     "country_emoji": "🇹🇷",
     "asn": "209604",
-    "asOrganization": "--------- Domain Cloud and Dedicated Hosting Provider --------",
-    "isp": "--------- Domain Cloud and Dedicated Hosting Provider --------",
+    "asOrganization": "2E TELEKOMUNIKASYON LTD STI",
+    "isp": "2E TELEKOMUNIKASYON LTD STI",
     "net_type": "isp",
     "source": "@otcjlq"
   },
   {
-    "proxy": "185.123.100.109:443",
-    "ip": "185.123.100.109",
-    "port": 443,
+    "proxy": "84.51.54.101:2053",
+    "ip": "84.51.54.101",
+    "port": 2053,
     "tls": true,
-    "clientIp": "185.123.100.109",
+    "clientIp": "84.51.54.101",
     "clientIps": [
-      "185.123.100.109"
+      "84.51.54.101"
     ],
-    "clientIpv4": "185.123.100.109",
+    "clientIpv4": "84.51.54.101",
     "clientIpv6": "",
     "dual_stack": false,
     "country": "TR",
     "country_name": "土耳其",
     "country_cn": "土耳其",
     "country_emoji": "🇹🇷",
-    "asn": "206991",
-    "asOrganization": "Iksir Internet Hizmetleri A.S.",
-    "isp": "Iksir Internet Hizmetleri A.S.",
+    "asn": "34984",
+    "asOrganization": "Superonline Iletisim Hizmetleri A.S.",
+    "isp": "Superonline Iletisim Hizmetleri A.S.",
     "net_type": "isp",
-    "source": "@danfeng2"
+    "source": "@cmliussss_all"
   },
   {
-    "proxy": "84.51.54.101:2053",
+    "proxy": "84.51.54.101:8443",
     "ip": "84.51.54.101",
-    "port": 2053,
+    "port": 8443,
     "tls": true,
     "clientIp": "84.51.54.101",
     "clientIps": [
@@ -286,16 +308,16 @@
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "158.94.216.137:443",
-    "ip": "158.94.216.137",
+    "proxy": "45.74.158.105:443",
+    "ip": "45.74.158.105",
     "port": 443,
     "tls": true,
-    "clientIp": "2a01:f900:11:198::1",
+    "clientIp": "2a01:f900:11:118::1",
     "clientIps": [
-      "2a01:f900:11:198::1"
+      "2a01:f900:11:118::1"
     ],
     "clientIpv4": "",
-    "clientIpv6": "2a01:f900:11:198::1",
+    "clientIpv6": "2a01:f900:11:118::1",
     "dual_stack": false,
     "country": "TR",
     "country_name": "土耳其",
@@ -304,28 +326,6 @@
     "asn": "44620",
     "asOrganization": "Netlen Internet Hizmetleri Ltd. Sti.",
     "isp": "Netlen Internet Hizmetleri Ltd. Sti.",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "84.51.54.101:8443",
-    "ip": "84.51.54.101",
-    "port": 8443,
-    "tls": true,
-    "clientIp": "84.51.54.101",
-    "clientIps": [
-      "84.51.54.101"
-    ],
-    "clientIpv4": "84.51.54.101",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "TR",
-    "country_name": "土耳其",
-    "country_cn": "土耳其",
-    "country_emoji": "🇹🇷",
-    "asn": "34984",
-    "asOrganization": "Superonline Iletisim Hizmetleri A.S.",
-    "isp": "Superonline Iletisim Hizmetleri A.S.",
     "net_type": "isp",
     "source": "@cmliussss_all"
   }
