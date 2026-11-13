@@ -110,6 +110,28 @@
     "source": "@otcjlq"
   },
   {
+    "proxy": "217.116.170.165:443",
+    "ip": "217.116.170.165",
+    "port": 443,
+    "tls": true,
+    "clientIp": "2a14:7dc0:102:1344::935",
+    "clientIps": [
+      "2a14:7dc0:102:1344::935"
+    ],
+    "clientIpv4": "",
+    "clientIpv6": "2a14:7dc0:102:1344::935",
+    "dual_stack": false,
+    "country": "SG",
+    "country_name": "新加坡",
+    "country_cn": "新加坡",
+    "country_emoji": "🇸🇬",
+    "asn": "209699",
+    "asOrganization": "Coaxial Cable LLC",
+    "isp": "Coaxial Cable LLC",
+    "net_type": "isp",
+    "source": "@manual_import"
+  },
+  {
     "proxy": "8.222.84.103:443",
     "ip": "8.222.84.103",
     "port": 443,

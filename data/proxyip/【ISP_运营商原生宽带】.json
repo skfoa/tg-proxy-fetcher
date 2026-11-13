@@ -1914,6 +1914,28 @@
     "source": "@otcjlq"
   },
   {
+    "proxy": "104.52.226.83:443",
+    "ip": "104.52.226.83",
+    "port": 443,
+    "tls": true,
+    "clientIp": "2600:1700:5a62:20:21d9:9e84:b515:9838",
+    "clientIps": [
+      "2600:1700:5a62:20:21d9:9e84:b515:9838"
+    ],
+    "clientIpv4": "",
+    "clientIpv6": "2600:1700:5a62:20:21d9:9e84:b515:9838",
+    "dual_stack": false,
+    "country": "US",
+    "country_name": "美国",
+    "country_cn": "美国",
+    "country_emoji": "🇺🇸",
+    "asn": "7018",
+    "asOrganization": "AT&T Enterprises, LLC",
+    "isp": "AT&T Enterprises, LLC",
+    "net_type": "isp",
+    "source": "@manual_import"
+  },
+  {
     "proxy": "192.220.11.193:443",
     "ip": "192.220.11.193",
     "port": 443,
@@ -7083,6 +7105,28 @@
     "isp": "Bage Cloud",
     "net_type": "isp",
     "source": "@otcjlq"
+  },
+  {
+    "proxy": "24.150.16.183:8443",
+    "ip": "24.150.16.183",
+    "port": 8443,
+    "tls": true,
+    "clientIp": "2001:1970:565c:f800::9f2f",
+    "clientIps": [
+      "2001:1970:565c:f800::9f2f"
+    ],
+    "clientIpv4": "",
+    "clientIpv6": "2001:1970:565c:f800::9f2f",
+    "dual_stack": false,
+    "country": "CA",
+    "country_name": "加拿大",
+    "country_cn": "加拿大",
+    "country_emoji": "🇨🇦",
+    "asn": "7992",
+    "asOrganization": "Cogeco Connexion Inc.",
+    "isp": "Cogeco Connexion Inc.",
+    "net_type": "isp",
+    "source": "@manual_import"
   },
   {
     "proxy": "199.241.32.166:443",
@@ -12871,6 +12915,28 @@
     "source": "@danfeng2"
   },
   {
+    "proxy": "217.116.170.165:443",
+    "ip": "217.116.170.165",
+    "port": 443,
+    "tls": true,
+    "clientIp": "2a14:7dc0:102:1344::935",
+    "clientIps": [
+      "2a14:7dc0:102:1344::935"
+    ],
+    "clientIpv4": "",
+    "clientIpv6": "2a14:7dc0:102:1344::935",
+    "dual_stack": false,
+    "country": "SG",
+    "country_name": "新加坡",
+    "country_cn": "新加坡",
+    "country_emoji": "🇸🇬",
+    "asn": "209699",
+    "asOrganization": "Coaxial Cable LLC",
+    "isp": "Coaxial Cable LLC",
+    "net_type": "isp",
+    "source": "@manual_import"
+  },
+  {
     "proxy": "211.72.119.198:33951",
     "ip": "211.72.119.198",
     "port": 33951,
@@ -14499,6 +14565,28 @@
     "source": "@danfeng_chat"
   },
   {
+    "proxy": "124.244.55.157:443",
+    "ip": "124.244.55.157",
+    "port": 443,
+    "tls": true,
+    "clientIp": "124.244.55.157",
+    "clientIps": [
+      "124.244.55.157"
+    ],
+    "clientIpv4": "124.244.55.157",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "HK",
+    "country_name": "香港",
+    "country_cn": "香港",
+    "country_emoji": "🇭🇰",
+    "asn": "9269",
+    "asOrganization": "Hong Kong Broadband Network Ltd.",
+    "isp": "Hong Kong Broadband Network Ltd.",
+    "net_type": "isp",
+    "source": "@manual_import"
+  },
+  {
     "proxy": "93.85.236.9:443",
     "ip": "93.85.236.9",
     "port": 443,
@@ -14849,6 +14937,28 @@
     "isp": "HGC Global Communications Limited",
     "net_type": "isp",
     "source": "@danfeng2"
+  },
+  {
+    "proxy": "195.211.36.60:443",
+    "ip": "195.211.36.60",
+    "port": 443,
+    "tls": true,
+    "clientIp": "195.211.36.60",
+    "clientIps": [
+      "195.211.36.60"
+    ],
+    "clientIpv4": "195.211.36.60",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "RU",
+    "country_name": "俄罗斯",
+    "country_cn": "俄罗斯",
+    "country_emoji": "🇷🇺",
+    "asn": "52163",
+    "asOrganization": "Optima Communications, LLC",
+    "isp": "Optima Communications, LLC",
+    "net_type": "isp",
+    "source": "@manual_import"
   },
   {
     "proxy": "209.33.171.208:8443",
@@ -18965,6 +19075,28 @@
     "source": "@danfeng_chat"
   },
   {
+    "proxy": "143.110.188.241:443",
+    "ip": "143.110.188.241",
+    "port": 443,
+    "tls": true,
+    "clientIp": "157.20.27.201",
+    "clientIps": [
+      "157.20.27.201"
+    ],
+    "clientIpv4": "157.20.27.201",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "IN",
+    "country_name": "印度",
+    "country_cn": "印度",
+    "country_emoji": "🇮🇳",
+    "asn": "58678",
+    "asOrganization": "Intech Online Private Limited",
+    "isp": "Intech Online Private Limited",
+    "net_type": "isp",
+    "source": "@manual_import"
+  },
+  {
     "proxy": "109.248.18.226:443",
     "ip": "109.248.18.226",
     "port": 443,
@@ -21713,6 +21845,28 @@
     "isp": "Host Telecom Ltd",
     "net_type": "isp",
     "source": "@otcjlq"
+  },
+  {
+    "proxy": "212.19.22.181:8443",
+    "ip": "212.19.22.181",
+    "port": 8443,
+    "tls": true,
+    "clientIp": "2001:470:1f15:123e:8000::4",
+    "clientIps": [
+      "2001:470:1f15:123e:8000::4"
+    ],
+    "clientIpv4": "",
+    "clientIpv6": "2001:470:1f15:123e:8000::4",
+    "dual_stack": false,
+    "country": "RU",
+    "country_name": "俄罗斯",
+    "country_cn": "俄罗斯",
+    "country_emoji": "🇷🇺",
+    "asn": "6939",
+    "asOrganization": "Hurricane Electric LLC",
+    "isp": "Hurricane Electric LLC",
+    "net_type": "isp",
+    "source": "@manual_import"
   },
   {
     "proxy": "123.111.169.70:443",

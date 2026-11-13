@@ -198,6 +198,28 @@
     "source": "@cmliussss_all"
   },
   {
+    "proxy": "24.150.16.183:8443",
+    "ip": "24.150.16.183",
+    "port": 8443,
+    "tls": true,
+    "clientIp": "2001:1970:565c:f800::9f2f",
+    "clientIps": [
+      "2001:1970:565c:f800::9f2f"
+    ],
+    "clientIpv4": "",
+    "clientIpv6": "2001:1970:565c:f800::9f2f",
+    "dual_stack": false,
+    "country": "CA",
+    "country_name": "加拿大",
+    "country_cn": "加拿大",
+    "country_emoji": "🇨🇦",
+    "asn": "7992",
+    "asOrganization": "Cogeco Connexion Inc.",
+    "isp": "Cogeco Connexion Inc.",
+    "net_type": "isp",
+    "source": "@manual_import"
+  },
+  {
     "proxy": "23.17.17.215:443",
     "ip": "23.17.17.215",
     "port": 443,

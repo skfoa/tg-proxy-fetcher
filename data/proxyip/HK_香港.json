@@ -1320,6 +1320,28 @@
     "source": "@danfeng2"
   },
   {
+    "proxy": "124.244.55.157:443",
+    "ip": "124.244.55.157",
+    "port": 443,
+    "tls": true,
+    "clientIp": "124.244.55.157",
+    "clientIps": [
+      "124.244.55.157"
+    ],
+    "clientIpv4": "124.244.55.157",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "HK",
+    "country_name": "香港",
+    "country_cn": "香港",
+    "country_emoji": "🇭🇰",
+    "asn": "9269",
+    "asOrganization": "Hong Kong Broadband Network Ltd.",
+    "isp": "Hong Kong Broadband Network Ltd.",
+    "net_type": "isp",
+    "source": "@manual_import"
+  },
+  {
     "proxy": "182.255.35.158:443",
     "ip": "182.255.35.158",
     "port": 443,

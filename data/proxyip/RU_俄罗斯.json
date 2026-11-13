@@ -198,6 +198,28 @@
     "source": "@danfeng2"
   },
   {
+    "proxy": "195.211.36.60:443",
+    "ip": "195.211.36.60",
+    "port": 443,
+    "tls": true,
+    "clientIp": "195.211.36.60",
+    "clientIps": [
+      "195.211.36.60"
+    ],
+    "clientIpv4": "195.211.36.60",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "RU",
+    "country_name": "俄罗斯",
+    "country_cn": "俄罗斯",
+    "country_emoji": "🇷🇺",
+    "asn": "52163",
+    "asOrganization": "Optima Communications, LLC",
+    "isp": "Optima Communications, LLC",
+    "net_type": "isp",
+    "source": "@manual_import"
+  },
+  {
     "proxy": "178.208.156.194:2053",
     "ip": "178.208.156.194",
     "port": 2053,
@@ -548,5 +570,27 @@
     "isp": "Hurricane Electric LLC",
     "net_type": "isp",
     "source": "@user"
+  },
+  {
+    "proxy": "212.19.22.181:8443",
+    "ip": "212.19.22.181",
+    "port": 8443,
+    "tls": true,
+    "clientIp": "2001:470:1f15:123e:8000::4",
+    "clientIps": [
+      "2001:470:1f15:123e:8000::4"
+    ],
+    "clientIpv4": "",
+    "clientIpv6": "2001:470:1f15:123e:8000::4",
+    "dual_stack": false,
+    "country": "RU",
+    "country_name": "俄罗斯",
+    "country_cn": "俄罗斯",
+    "country_emoji": "🇷🇺",
+    "asn": "6939",
+    "asOrganization": "Hurricane Electric LLC",
+    "isp": "Hurricane Electric LLC",
+    "net_type": "isp",
+    "source": "@manual_import"
   }
 ]

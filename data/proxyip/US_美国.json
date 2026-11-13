@@ -2926,6 +2926,28 @@
     "source": "@otcjlq"
   },
   {
+    "proxy": "104.52.226.83:443",
+    "ip": "104.52.226.83",
+    "port": 443,
+    "tls": true,
+    "clientIp": "2600:1700:5a62:20:21d9:9e84:b515:9838",
+    "clientIps": [
+      "2600:1700:5a62:20:21d9:9e84:b515:9838"
+    ],
+    "clientIpv4": "",
+    "clientIpv6": "2600:1700:5a62:20:21d9:9e84:b515:9838",
+    "dual_stack": false,
+    "country": "US",
+    "country_name": "美国",
+    "country_cn": "美国",
+    "country_emoji": "🇺🇸",
+    "asn": "7018",
+    "asOrganization": "AT&T Enterprises, LLC",
+    "isp": "AT&T Enterprises, LLC",
+    "net_type": "isp",
+    "source": "@manual_import"
+  },
+  {
     "proxy": "154.29.150.164:2053",
     "ip": "154.29.150.164",
     "port": 2053,
