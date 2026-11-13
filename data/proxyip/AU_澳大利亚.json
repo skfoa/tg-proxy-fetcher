@@ -22,26 +22,26 @@
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "206.168.133.66:443",
-    "ip": "206.168.133.66",
+    "proxy": "202.27.229.7:443",
+    "ip": "202.27.229.7",
     "port": 443,
     "tls": true,
-    "clientIp": "206.168.133.66",
+    "clientIp": "2406:3400:388:300::1e",
     "clientIps": [
-      "206.168.133.66"
+      "2406:3400:388:300::1e"
     ],
-    "clientIpv4": "206.168.133.66",
-    "clientIpv6": "",
+    "clientIpv4": "",
+    "clientIpv6": "2406:3400:388:300::1e",
     "dual_stack": false,
     "country": "AU",
     "country_name": "澳大利亚",
     "country_cn": "澳大利亚",
     "country_emoji": "🇦🇺",
-    "asn": "142064",
-    "asOrganization": "VergeTel",
-    "isp": "VergeTel",
+    "asn": "10143",
+    "asOrganization": "Exetel Pty Ltd",
+    "isp": "Exetel Pty Ltd",
     "net_type": "isp",
-    "source": "@danfeng_chat"
+    "source": "@cmliussss_all"
   },
   {
     "proxy": "58.96.64.83:443",
@@ -88,25 +88,25 @@
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "202.27.229.7:443",
-    "ip": "202.27.229.7",
+    "proxy": "206.168.133.66:443",
+    "ip": "206.168.133.66",
     "port": 443,
     "tls": true,
-    "clientIp": "2406:3400:388:300::1e",
+    "clientIp": "206.168.133.66",
     "clientIps": [
-      "2406:3400:388:300::1e"
+      "206.168.133.66"
     ],
-    "clientIpv4": "",
-    "clientIpv6": "2406:3400:388:300::1e",
+    "clientIpv4": "206.168.133.66",
+    "clientIpv6": "",
     "dual_stack": false,
     "country": "AU",
     "country_name": "澳大利亚",
     "country_cn": "澳大利亚",
     "country_emoji": "🇦🇺",
-    "asn": "10143",
-    "asOrganization": "Exetel Pty Ltd",
-    "isp": "Exetel Pty Ltd",
+    "asn": "142064",
+    "asOrganization": "VergeTel",
+    "isp": "VergeTel",
     "net_type": "isp",
-    "source": "@cmliussss_all"
+    "source": "@danfeng_chat"
   }
 ]

@@ -22,8 +22,8 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "169.244.242.250:8443",
-    "ip": "169.244.242.250",
+    "proxy": "169.244.242.249:8443",
+    "ip": "169.244.242.249",
     "port": 8443,
     "tls": true,
     "clientIp": "169.244.243.245",
@@ -44,8 +44,8 @@
     "source": "@danfeng2"
   },
   {
-    "proxy": "169.244.242.244:8443",
-    "ip": "169.244.242.244",
+    "proxy": "169.244.242.250:8443",
+    "ip": "169.244.242.250",
     "port": 8443,
     "tls": true,
     "clientIp": "169.244.243.245",
@@ -88,30 +88,8 @@
     "source": "@danfeng2"
   },
   {
-    "proxy": "169.244.242.249:8443",
-    "ip": "169.244.242.249",
-    "port": 8443,
-    "tls": true,
-    "clientIp": "169.244.243.245",
-    "clientIps": [
-      "169.244.243.245"
-    ],
-    "clientIpv4": "169.244.243.245",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "US",
-    "country_name": "美国",
-    "country_cn": "美国",
-    "country_emoji": "🇺🇸",
-    "asn": "557",
-    "asOrganization": "University of Maine System",
-    "isp": "University of Maine System",
-    "net_type": "education",
-    "source": "@danfeng2"
-  },
-  {
-    "proxy": "169.244.243.245:8443",
-    "ip": "169.244.243.245",
+    "proxy": "169.244.242.240:8443",
+    "ip": "169.244.242.240",
     "port": 8443,
     "tls": true,
     "clientIp": "169.244.243.245",
@@ -154,8 +132,30 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "169.244.242.240:8443",
-    "ip": "169.244.242.240",
+    "proxy": "169.244.243.245:8443",
+    "ip": "169.244.243.245",
+    "port": 8443,
+    "tls": true,
+    "clientIp": "169.244.243.245",
+    "clientIps": [
+      "169.244.243.245"
+    ],
+    "clientIpv4": "169.244.243.245",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "US",
+    "country_name": "美国",
+    "country_cn": "美国",
+    "country_emoji": "🇺🇸",
+    "asn": "557",
+    "asOrganization": "University of Maine System",
+    "isp": "University of Maine System",
+    "net_type": "education",
+    "source": "@danfeng2"
+  },
+  {
+    "proxy": "169.244.242.244:8443",
+    "ip": "169.244.242.244",
     "port": 8443,
     "tls": true,
     "clientIp": "169.244.243.245",

@@ -3168,7 +3168,14 @@
     "Net Gate Telecom S.R.L.": "AS208185",
     "Zhilian Technology CO., LTD.": "AS214432",
     "Bocchi Network LLC": "AS218613",
-    "GRUPO CG LIMITADA": "AS270014"
+    "GRUPO CG LIMITADA": "AS270014",
+    "GZ REMITTANCE (CHINA) INDUSTRY LIMITED": "AS216411",
+    "HostHatch Korea": "AS155029",
+    "Lancom Ltd.": "AS35816",
+    "NOS COMUNICACOES, S.A.": "AS2860",
+    "Cores Networks EOOD": "AS35654",
+    "NextHop Pty Ltd": "AS9507",
+    "San-in Cable Vision CO.,LTD": "AS23786"
   },
   "asn_to_isp": {
     "AS10001": "Mics Network Corporation",
@@ -6243,7 +6250,16 @@
     "AS214432": "Zhilian Technology CO., LTD.",
     "AS218613": "Bocchi Network LLC",
     "AS31400": "firstcolo GmbH",
-    "AS270014": "GRUPO CG LIMITADA"
+    "AS270014": "GRUPO CG LIMITADA",
+    "AS216411": "GZ REMITTANCE (CHINA) INDUSTRY LIMITED",
+    "AS155029": "HostHatch Korea",
+    "AS35816": "Lancom Ltd.",
+    "AS2860": "NOS COMUNICACOES, S.A.",
+    "AS16202": "Tele Columbus AG",
+    "AS17573": "SK Broadband Co Ltd",
+    "AS35654": "Cores Networks EOOD",
+    "AS9507": "NextHop Pty Ltd",
+    "AS23786": "San-in Cable Vision CO.,LTD"
   },
   "asn_to_net_type": {
     "AS10001": "isp",
@@ -10311,6 +10327,15 @@
     "AS214432": "datacenter",
     "AS218613": "datacenter",
     "AS31400": "datacenter",
-    "AS270014": "datacenter"
+    "AS270014": "datacenter",
+    "AS216411": "datacenter",
+    "AS155029": "datacenter",
+    "AS35816": "datacenter",
+    "AS2860": "isp",
+    "AS16202": "isp",
+    "AS17573": "isp",
+    "AS35654": "isp",
+    "AS9507": "isp",
+    "AS23786": "isp"
   }
 }

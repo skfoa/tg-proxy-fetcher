@@ -22,28 +22,6 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "45.229.134.144:443",
-    "ip": "45.229.134.144",
-    "port": 443,
-    "tls": true,
-    "clientIp": "45.229.134.144",
-    "clientIps": [
-      "45.229.134.144"
-    ],
-    "clientIpv4": "45.229.134.144",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "BR",
-    "country_name": "巴西",
-    "country_cn": "巴西",
-    "country_emoji": "🇧🇷",
-    "asn": "271273",
-    "asOrganization": "NET FORT Telecom",
-    "isp": "NET FORT Telecom",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "201.16.130.6:443",
     "ip": "201.16.130.6",
     "port": 443,
@@ -108,5 +86,27 @@
     "isp": "V.tal",
     "net_type": "isp",
     "source": "@danfeng2"
+  },
+  {
+    "proxy": "45.229.134.144:443",
+    "ip": "45.229.134.144",
+    "port": 443,
+    "tls": true,
+    "clientIp": "45.229.134.144",
+    "clientIps": [
+      "45.229.134.144"
+    ],
+    "clientIpv4": "45.229.134.144",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "BR",
+    "country_name": "巴西",
+    "country_cn": "巴西",
+    "country_emoji": "🇧🇷",
+    "asn": "271273",
+    "asOrganization": "NET FORT Telecom",
+    "isp": "NET FORT Telecom",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
   }
 ]

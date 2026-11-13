@@ -22,28 +22,6 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "120.89.46.123:443",
-    "ip": "120.89.46.123",
-    "port": 443,
-    "tls": true,
-    "clientIp": "120.89.46.123",
-    "clientIps": [
-      "120.89.46.123"
-    ],
-    "clientIpv4": "120.89.46.123",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "PH",
-    "country_name": "菲律宾",
-    "country_cn": "菲律宾",
-    "country_emoji": "🇵🇭",
-    "asn": "9658",
-    "asOrganization": "Eastern Telecoms Phils., Inc.",
-    "isp": "Eastern Telecoms Phils., Inc.",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "64.81.73.243:443",
     "ip": "64.81.73.243",
     "port": 443,
@@ -66,25 +44,25 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "111.125.75.92:443",
-    "ip": "111.125.75.92",
+    "proxy": "120.89.46.123:443",
+    "ip": "120.89.46.123",
     "port": 443,
     "tls": true,
-    "clientIp": "111.125.75.92",
+    "clientIp": "120.89.46.123",
     "clientIps": [
-      "111.125.75.92"
+      "120.89.46.123"
     ],
-    "clientIpv4": "111.125.75.92",
+    "clientIpv4": "120.89.46.123",
     "clientIpv6": "",
     "dual_stack": false,
     "country": "PH",
     "country_name": "菲律宾",
     "country_cn": "菲律宾",
     "country_emoji": "🇵🇭",
-    "asn": "17639",
-    "asOrganization": "Converge-ict Solution Inc",
-    "isp": "Converge-ict Solution Inc",
+    "asn": "9658",
+    "asOrganization": "Eastern Telecoms Phils., Inc.",
+    "isp": "Eastern Telecoms Phils., Inc.",
     "net_type": "isp",
-    "source": "@cmliussss_all"
+    "source": "@danfeng_chat"
   }
 ]

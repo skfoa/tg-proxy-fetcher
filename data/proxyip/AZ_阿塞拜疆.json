@@ -22,25 +22,25 @@
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "62.60.188.40:2053",
-    "ip": "62.60.188.40",
-    "port": 2053,
+    "proxy": "185.135.231.175:8443",
+    "ip": "185.135.231.175",
+    "port": 8443,
     "tls": true,
-    "clientIp": "2a00:15c9:0:4::46",
+    "clientIp": "31.171.101.236",
     "clientIps": [
-      "2a00:15c9:0:4::46"
+      "31.171.101.236"
     ],
-    "clientIpv4": "",
-    "clientIpv6": "2a00:15c9:0:4::46",
+    "clientIpv4": "31.171.101.236",
+    "clientIpv6": "",
     "dual_stack": false,
     "country": "AZ",
     "country_name": "阿塞拜疆",
     "country_cn": "阿塞拜疆",
     "country_emoji": "🇦🇿",
-    "asn": "42337",
-    "asOrganization": "Respina Networks & Beyond PJSC",
-    "isp": "Respina Networks & Beyond PJSC",
+    "asn": "29049",
+    "asOrganization": "Leased IPv4 Blocks",
+    "isp": "Leased IPv4 Blocks",
     "net_type": "isp",
-    "source": "@otcjlq"
+    "source": "@cmliussss_all"
   }
 ]
