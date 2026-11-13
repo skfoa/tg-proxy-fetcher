@@ -3175,7 +3175,11 @@
     "NOS COMUNICACOES, S.A.": "AS2860",
     "Cores Networks EOOD": "AS35654",
     "NextHop Pty Ltd": "AS9507",
-    "San-in Cable Vision CO.,LTD": "AS23786"
+    "San-in Cable Vision CO.,LTD": "AS23786",
+    "JINX CO., LIMITED": "AS140096",
+    "\"Russian company\" LLC": "AS15493",
+    "WireShield LTD": "AS216394",
+    "Information Network, LLC": "AS48416"
   },
   "asn_to_isp": {
     "AS10001": "Mics Network Corporation",
@@ -6259,7 +6263,11 @@
     "AS17573": "SK Broadband Co Ltd",
     "AS35654": "Cores Networks EOOD",
     "AS9507": "NextHop Pty Ltd",
-    "AS23786": "San-in Cable Vision CO.,LTD"
+    "AS23786": "San-in Cable Vision CO.,LTD",
+    "AS140096": "JINX CO., LIMITED",
+    "AS15493": "\"Russian company\" LLC",
+    "AS216394": "WireShield LTD",
+    "AS48416": "Information Network, LLC"
   },
   "asn_to_net_type": {
     "AS10001": "isp",
@@ -10336,6 +10344,10 @@
     "AS17573": "isp",
     "AS35654": "isp",
     "AS9507": "isp",
-    "AS23786": "isp"
+    "AS23786": "isp",
+    "AS140096": "datacenter",
+    "AS15493": "isp",
+    "AS216394": "datacenter",
+    "AS48416": "isp"
   }
 }

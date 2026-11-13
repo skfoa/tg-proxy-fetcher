@@ -20,7 +20,7 @@
 142.188.90.91,443,true,92,0,YYZ,北美洲 · 加拿大 · Willowdale,AS577 Bell Canada,Bell Canada,0,2026-11-11 14:31:01,@cmliussss_all,isp,142.188.90.91,,AS577 Bell Canada,Bell Canada
 64.81.29.49,443,true,93,,LAX,北美洲 · 美国 · 洛杉矶,AS3257 GTT Communications,GTT Communications Inc.,0,2026-11-11 09:33:14,@otcjlq,isp,64.81.29.49,,AS3257 GTT Communications,GTT Communications
 216.36.86.162,443,true,93,,LAX,北美洲 · 美国 · 洛杉矶,AS3257 GTT Communications,GTT Communications Inc.,0,2026-10-18 21:49:02,@danfeng_chat,isp,216.36.86.162,,AS3257 GTT Communications,GTT Communications
-198.23.150.223,443,true,94,0,EWR,北美洲 · 美国 · New York City,AS6939 Hurricane Electric LLC,Hurricane Electric LLC,0,2026-11-11 14:31:01,@cmliussss_all,isp,2001:470:1f06:36::2,2001:470:1f06:36::2,AS6939 Hurricane Electric LLC,Hurricane Electric LLC
+198.23.150.223,443,true,94,0,EWR,北美洲 · 美国 · New York City,AS36352 HostPapa,HostPapa,0,2026-11-11 14:31:01,@cmliussss_all,isp,2001:470:1f06:36::2,2001:470:1f06:36::2,AS6939 Hurricane Electric LLC,Hurricane Electric LLC
 68.43.17.231,443,true,94,,DTW,Sterling Heights · US,"AS7922 Comcast Cable Communications, LLC","Comcast Cable Communications, LLC",0,2026-10-18 21:51:53,@danfeng_chat,isp,2601:410:8700:e4f0:ded8:7cff:fe27:dd67,2601:410:8700:e4f0:ded8:7cff:fe27:dd67,"AS7922 Comcast Cable Communications, LLC","Comcast Cable Communications, LLC"
 216.36.86.179,443,true,94,,LAX,Los Angeles · US,AS3257 GTT Communications,GTT Communications,0,2026-10-18 21:49:02,@danfeng_chat,isp,216.36.86.179,,AS3257 GTT Communications,GTT Communications
 216.36.82.4,443,true,94,,LAX,Los Angeles · US,AS3257 GTT Communications,GTT Communications,0,2026-10-18 21:49:02,@danfeng_chat,isp,216.36.82.4,,AS3257 GTT Communications,GTT Communications
@@ -191,7 +191,7 @@
 64.81.29.112,443,true,124,,LAX,北美洲 · 美国 · 洛杉矶,AS3257 GTT Communications,GTT Communications Inc.,0,2026-11-11 09:33:14,@otcjlq,isp,64.81.29.112,,AS3257 GTT Communications,GTT Communications
 38.92.14.119,443,true,124,,SJC,北美洲 · 美国 · 洛杉矶,AS979 NetLab,NetLab Global,0,2026-11-11 09:33:14,@otcjlq,business,38.92.14.119,,AS979 NetLab,NetLab
 72.249.207.87,13069,true,124,11364,SJC,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,72.249.207.87,,AS979 NetLab,NetLab
-38.58.58.173,27515,true,124,7175,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,38.34.6.102,,AS979 NetLab,NetLab
+38.58.58.173,27515,true,124,7175,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.34.6.102,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 216.36.82.45,443,true,125,,LAX,北美洲 · 美国 · 洛杉矶,AS3257 GTT Communications,GTT Communications Inc.,0,2026-11-11 21:51:44,@danfeng_chat,isp,216.36.82.45,,AS3257 GTT Communications,GTT Communications
 167.253.96.90,443,true,125,,PHX,北美洲 · 美国 · 洛杉矶,AS63150 Bage Cloud,BAGE CLOUD LLC,0,2026-11-11 09:33:38,@otcjlq,isp,2602:f988:92:57c::871,2602:f988:92:57c::871,AS63150 Bage Cloud,Bage Cloud
 192.204.33.233,443,true,125,,LAX,北美洲 · 美国 · 洛杉矶,"AS2914 NTT America, Inc.","NTT America, Inc.",0,2026-11-11 09:33:14,@otcjlq,isp,192.204.33.233,,"AS2914 NTT America, Inc.","NTT America, Inc."
@@ -211,7 +211,7 @@
 216.36.105.72,443,true,127,,LAX,北美洲 · 美国 · 洛杉矶,AS3257 GTT Communications (Private Customer),Private Customer,0,2026-10-18 21:49:02,@danfeng_chat,isp,216.36.105.72,,AS3257 GTT Communications (Private Customer),Private Customer
 216.195.213.127,1891,true,127,20533,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,216.195.213.75,,AS979 NetLab,NetLab
 216.195.213.78,1891,true,127,43871,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,216.195.213.75,,AS979 NetLab,NetLab
-72.249.207.62,6323,true,127,5559,SJC,California · Los Angeles · 美国,AS3257 GTT Communications,GTT Communications Inc.,0,2026-09-06 16:44:44,@danfeng2,isp,70.39.176.101,,AS3257 GTT Communications,GTT Communications Inc.
+72.249.207.62,6323,true,127,5559,SJC,California · Los Angeles · 美国,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,70.39.176.101,,AS3257 GTT Communications,GTT Communications Inc.
 64.81.35.27,443,true,128,,SJC,北美洲 · 美国 · 洛杉矶,AS3257 GTT Communications,GTT Communications Inc.,0,2026-11-11 21:53:19,@danfeng_chat,isp,64.81.35.27,,AS3257 GTT Communications,GTT Communications
 23.246.166.98,443,true,128,,SJC,北美洲 · 美国 · 洛杉矶,AS54286 TAIPEI101 NETWORK LLC,TAIPEI101 NETWORK LLC,0,2026-11-11 21:51:55,@danfeng_chat,isp,2602:faa8:784:147::a,2602:faa8:784:147::a,AS54286 TAIPEI101 NETWORK LLC,TAIPEI101 NETWORK LLC
 154.44.14.214,443,true,128,,LAX,北美洲 · 美国 · 洛杉矶,AS979 NetLab,NetLab Global,0,2026-11-11 21:49:33,@danfeng_chat,business,154.44.14.214,,AS979 NetLab,NetLab
@@ -289,7 +289,7 @@
 154.41.80.178,443,true,140,,LAX,Los Angeles · US,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",0,2026-10-18 21:44:36,@danfeng_chat,isp,154.41.80.178,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 38.92.14.48,12791,true,140,1932,SJC,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,38.92.14.48,,AS979 NetLab,NetLab
 216.195.213.87,1891,true,140,38916,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,216.195.213.75,,AS979 NetLab,NetLab
-23.254.177.219,443,true,141,,LAX,北美洲 · 美国 · 洛杉矶,"AS2914 NTT America, Inc.","NTT America, Inc.",0,2026-11-11 21:51:55,@danfeng_chat,isp,50.3.64.21,,"AS2914 NTT America, Inc.","NTT America, Inc."
+23.254.177.219,443,true,141,,LAX,北美洲 · 美国 · 洛杉矶,AS36352 HostPapa,HostPapa,0,2026-11-11 21:51:55,@danfeng_chat,isp,50.3.64.21,,"AS2914 NTT America, Inc.","NTT America, Inc."
 154.29.144.70,443,true,141,,LAX,北美洲 · 美国 · 洛杉矶,AS979 NetLab,NetLab Global,0,2026-11-11 21:49:32,@danfeng_chat,business,154.29.144.70,,AS979 NetLab,NetLab
 154.44.21.182,8443,true,141,,SJC,北美洲 · 美国 · 洛杉矶,AS979 NetLab,NetLab Global,0,2026-11-11 09:33:14,@otcjlq,business,154.44.21.182,,AS979 NetLab,NetLab
 38.207.163.224,443,true,141,,SJC,北美洲 · 美国 · 洛杉矶,AS979 NetLab,NetLab Global,0,2026-11-11 09:33:14,@otcjlq,business,38.207.163.224,,AS979 NetLab,NetLab
@@ -305,9 +305,9 @@
 216.36.82.151,443,true,144,,LAX,北美洲 · 美国 · 洛杉矶,AS3257 GTT Communications,GTT Communications Inc.,0,2026-10-18 21:49:02,@danfeng_chat,isp,216.36.82.151,,AS3257 GTT Communications,GTT Communications
 23.144.20.184,22940,true,144,44158,SJC,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,23.144.20.184,,AS979 NetLab,NetLab
 154.9.224.175,443,true,145,,SJC,北美洲 · 美国 · 洛杉矶,AS979 NetLab,NetLab Global,0,2026-11-11 09:33:14,@otcjlq,business,154.9.224.175,,AS979 NetLab,NetLab
-50.21.23.3,443,true,145,,YUL,Montréal · CA,AS5769 Videotron Ltee,Videotron Ltee,0,2026-10-18 21:51:07,@danfeng_chat,isp,147.253.143.98,,AS5769 Videotron Ltee,Videotron Ltee
+50.21.23.3,443,true,145,,YUL,Montréal · CA,AS21949 Beanfield Technologies Inc.,Beanfield Technologies Inc.,0,2026-10-18 21:51:07,@danfeng_chat,isp,147.253.143.98,,AS5769 Videotron Ltee,Videotron Ltee
 154.29.150.164,8443,true,145,,LAX,北美洲 · 美国 · 洛杉矶,AS979 NetLab,NetLab Global,0,2026-10-18 21:44:35,@danfeng_chat,business,154.29.150.164,,AS979 NetLab,NetLab
-38.58.58.173,50792,true,145,7139,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,38.34.6.143,,AS979 NetLab,NetLab
+38.58.58.173,50792,true,145,7139,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.34.6.143,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 181.36.229.212,2096,true,146,0,SDQ,北美洲 · 多明尼加 · La Romana,AS28118 ALTICE DOMINICANA S.A.,ALTICE DOMINICANA S.A.,0,2026-11-11 14:31:01,@cmliussss_all,isp,181.36.229.211,,AS28118 ALTICE DOMINICANA S.A.,ALTICE DOMINICANA S.A.
 192.220.45.49,443,true,146,,SJC,美国-洛杉矶,"AS2914 NTT America, Inc. (NTT America Inc.)",NTT America Inc.,0,2026-11-11 09:33:14,@otcjlq,isp,192.220.45.49,,"AS2914 NTT America, Inc. (NTT America Inc.)",NTT America Inc.
 64.98.217.88,443,true,146,,LAX,Los Angeles · US,AS32133 Ting Fiber Inc.,Ting Fiber Inc.,0,2026-10-18 21:51:44,@danfeng_chat,isp,64.98.217.88,,AS32133 Ting Fiber Inc.,Ting Fiber Inc.
@@ -320,7 +320,7 @@
 154.9.234.137,26668,true,147,30508,SJC,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,154.9.234.137,,AS979 NetLab,NetLab
 38.150.33.163,17173,true,147,33818,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,38.150.33.163,,AS979 NetLab,NetLab
 154.44.4.31,443,true,148,,SJC,北美洲 · 美国 · 洛杉矶,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",0,2026-11-11 21:49:33,@danfeng_chat,isp,154.44.4.31,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
-23.246.167.8,443,true,148,,SJC,北美洲 · 美国 · 圣何塞,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",0,2026-11-11 14:31:01,@cmliussss_all,isp,2600:1700:443:580f:a::755f,2600:1700:443:580f:a::755f,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC"
+23.246.167.8,443,true,148,,SJC,北美洲 · 美国 · 圣何塞,AS54286 TAIPEI101 NETWORK LLC,TAIPEI101 NETWORK LLC,0,2026-11-11 14:31:01,@cmliussss_all,isp,2600:1700:443:580f:a::755f,2600:1700:443:580f:a::755f,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC"
 38.244.42.161,443,true,149,,SJC,美国-洛杉矶,"AS174 Cogent Communications, LLC (NetLab)",NetLab,0,2026-11-11 09:33:14,@otcjlq,isp,38.244.42.161,,"AS174 Cogent Communications, LLC (NetLab)",NetLab
 38.244.25.136,443,true,149,,LAX,美国-洛杉矶,"AS174 Cogent Communications, LLC (NetLab)",NetLab,0,2026-11-11 09:33:14,@otcjlq,isp,38.244.25.136,,"AS174 Cogent Communications, LLC (NetLab)",NetLab
 192.204.45.15,443,true,149,,LAX,北美洲 · 美国 · 洛杉矶,"AS2914 NTT America, Inc.","NTT America, Inc.",0,2026-11-11 09:33:14,@otcjlq,isp,192.204.45.15,,"AS2914 NTT America, Inc.","NTT America, Inc."
@@ -335,7 +335,7 @@
 216.36.82.180,443,true,151,,LAX,Los Angeles · US,AS3257 GTT Communications,GTT Communications,0,2026-10-18 21:49:02,@danfeng_chat,isp,216.36.82.180,,AS3257 GTT Communications,GTT Communications
 154.12.50.186,30820,true,151,10773,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,154.12.50.186,,AS979 NetLab,NetLab
 38.182.100.191,443,true,151,,SLC,北美洲 · 美国 · 盐湖城,AS152179 Global Communication Network,GLOBAL COMMUNICATION NETWORK LIMITED,0,2026-07-24 22:19:58,@danfeng2,isp,38.182.100.191,,AS152179 Global Communication Network,Global Communication Network
-38.34.13.33,8443,true,152,,SJC,北美洲 · 美国 · 洛杉矶,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",0,2026-11-11 21:52:21,@danfeng_chat,isp,2600:1700:3a90:c620:be24:11ff:feba:3d58,2600:1700:3a90:c620:be24:11ff:feba:3d58,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC"
+38.34.13.33,8443,true,152,,SJC,北美洲 · 美国 · 洛杉矶,AS979 NetLab,NetLab,0,2026-11-11 21:52:21,@danfeng_chat,isp,2600:1700:3a90:c620:be24:11ff:feba:3d58,2600:1700:3a90:c620:be24:11ff:feba:3d58,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC"
 166.0.19.221,443,true,152,,SLC,北美洲 · 美国 · 盐湖城,AS63150 Bage Cloud,Bage Cloud,0,2026-11-11 21:49:59,@danfeng_chat,isp,166.0.19.221,,AS63150 Bage Cloud,Bage Cloud
 64.83.29.232,443,true,152,,SJC,美国-洛杉矶,AS979 NetLab,NetLab Global,0,2026-11-11 09:33:14,@otcjlq,business,64.83.29.232,,AS979 NetLab,NetLab Global
 38.244.24.45,443,true,152,,SJC,美国-洛杉矶,"AS174 Cogent Communications, LLC (NetLab)",NetLab,0,2026-11-11 09:33:14,@otcjlq,isp,38.244.24.45,,"AS174 Cogent Communications, LLC (NetLab)",NetLab
@@ -344,9 +344,9 @@
 67.200.126.215,8443,true,153,,LAX,北美洲 · 美国 · 洛杉矶,AS11404 Wave Broadband,Wave Broadband,0,2026-11-11 21:53:22,@danfeng_chat,isp,67.200.126.215,,AS11404 Wave Broadband,Wave Broadband
 38.207.187.65,443,true,153,,LAX,北美洲 · 美国 · 洛杉矶,AS979 NetLab,NetLab Global,0,2026-11-11 21:52:20,@danfeng_chat,business,38.207.187.65,,AS979 NetLab,NetLab
 64.83.31.114,443,true,153,,SJC,美国-洛杉矶,AS979 NetLab,NetLab Global,0,2026-11-11 09:33:14,@otcjlq,business,64.83.31.114,,AS979 NetLab,NetLab Global
-23.147.120.188,443,true,154,,ORD,北美洲 · 美国 · 芝加哥,AS6200 University of Illinois Chicago,University of Illinois Chicago,0,2026-11-11 21:51:53,@danfeng_chat,education,131.193.45.254,,AS6200 University of Illinois Chicago,University of Illinois Chicago
+23.147.120.188,443,true,154,,ORD,北美洲 · 美国 · 芝加哥,AS54286 TAIPEI101 NETWORK LLC,TAIPEI101 NETWORK LLC,0,2026-11-11 21:51:53,@danfeng_chat,education,131.193.45.254,,AS6200 University of Illinois Chicago,University of Illinois Chicago
 154.9.241.127,8443,true,154,,SJC,美国-洛杉矶,AS979 NetLab,NetLab,0,2026-11-11 09:33:14,@otcjlq,business,154.9.241.127,,AS979 NetLab,NetLab
-23.246.166.82,8443,true,155,,SJC,北美洲 · 美国 · 圣何塞,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",0,2026-11-11 21:51:55,@danfeng_chat,isp,2600:1700:443:580e:abcd:915d:f56d:9d06,2600:1700:443:580e:abcd:915d:f56d:9d06,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC"
+23.246.166.82,8443,true,155,,SJC,北美洲 · 美国 · 圣何塞,AS54286 TAIPEI101 NETWORK LLC,TAIPEI101 NETWORK LLC,0,2026-11-11 21:51:55,@danfeng_chat,isp,2600:1700:443:580e:abcd:915d:f56d:9d06,2600:1700:443:580e:abcd:915d:f56d:9d06,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC"
 38.244.1.85,443,true,155,,LAX,美国-洛杉矶,"AS174 Cogent Communications, LLC (NetLab)",NetLab,0,2026-11-11 09:33:14,@otcjlq,isp,38.244.1.85,,"AS174 Cogent Communications, LLC (NetLab)",NetLab
 192.220.10.88,443,true,155,,SJC,北美洲 · 美国 · 洛杉矶,"AS2914 NTT America, Inc.","NTT America, Inc.",0,2026-11-11 09:33:14,@otcjlq,isp,192.220.10.88,,"AS2914 NTT America, Inc.","NTT America, Inc."
 192.220.99.140,8443,true,155,,SJC,北美洲 · 美国 · 洛杉矶,"AS2914 NTT America, Inc.","NTT America, Inc.",0,2026-11-11 09:33:14,@otcjlq,isp,192.220.99.140,,"AS2914 NTT America, Inc.","NTT America, Inc."
@@ -357,17 +357,17 @@
 154.40.40.236,443,true,157,,LAX,北美洲 · 美国 · 洛杉矶,AS979 NetLab,NetLab Global,0,2026-11-11 09:33:14,@otcjlq,business,154.40.40.236,,AS979 NetLab,NetLab
 38.71.118.2,443,true,158,,LAX,Los Angeles · US,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",0,2026-10-18 21:50:14,@danfeng_chat,isp,38.71.118.2,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 38.45.66.14,443,true,158,,IAD,Durham · US,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",0,2026-10-18 21:50:11,@danfeng_chat,isp,38.45.66.14,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
-132.226.80.130,443,true,159,,LAS,北美洲 · 美国 · 洛杉矶,AS6939 Hurricane Electric LLC,Hurricane Electric LLC,0,2026-11-11 21:48:39,@danfeng_chat,isp,2001:470:1f18:32c::2,2001:470:1f18:32c::2,AS6939 Hurricane Electric LLC,Hurricane Electric LLC
+132.226.80.130,443,true,159,,LAS,北美洲 · 美国 · 洛杉矶,AS31898 Oracle Cloud,Oracle Cloud,0,2026-11-11 21:48:39,@danfeng_chat,isp,2001:470:1f18:32c::2,2001:470:1f18:32c::2,AS6939 Hurricane Electric LLC,Hurricane Electric LLC
 154.36.137.248,443,true,159,,SJC,北美洲 · 美国 · 洛杉矶,AS979 NetLab,NetLab,0,2026-11-11 09:33:14,@otcjlq,business,154.36.137.248,,AS979 NetLab,NetLab
 72.249.207.87,32876,true,159,11274,SJC,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,72.249.207.87,,AS979 NetLab,NetLab
 149.7.2.79,443,true,160,0,SJC,北美洲 · 美国 · Los Angeles,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",0,2026-11-11 14:31:01,@cmliussss_all,isp,2001:550:a10::18a,2001:550:a10::18a,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
-23.246.166.3,443,true,161,,SJC,北美洲 · 美国 · 圣何塞,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",0,2026-11-11 21:51:55,@danfeng_chat,isp,2600:1700:443:580e:abcd:a0e6:3006:64bd,2600:1700:443:580e:abcd:a0e6:3006:64bd,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC"
+23.246.166.3,443,true,161,,SJC,北美洲 · 美国 · 圣何塞,AS54286 TAIPEI101 NETWORK LLC,TAIPEI101 NETWORK LLC,0,2026-11-11 21:51:55,@danfeng_chat,isp,2600:1700:443:580e:abcd:a0e6:3006:64bd,2600:1700:443:580e:abcd:a0e6:3006:64bd,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC"
 64.81.29.70,443,true,161,,LAX,北美洲 · 美国 · 洛杉矶,AS3257 GTT Communications,GTT Communications Inc.,0,2026-11-11 09:33:14,@otcjlq,isp,64.81.29.70,,AS3257 GTT Communications,GTT Communications
 64.83.22.125,443,true,161,,LAX,北美洲 · 美国 · 洛杉矶,AS979 NetLab,NetLab,0,2026-10-18 21:51:44,@danfeng_chat,isp,157.238.163.196,,"AS2914 NTT America, Inc.","NTT America, Inc."
 216.36.86.36,443,true,161,,LAX,北美洲 · 美国 · 洛杉矶,AS3257 GTT Communications,GTT Communications Inc.,0,2026-10-18 21:49:02,@danfeng_chat,isp,216.36.86.36,,AS3257 GTT Communications,GTT Communications
 38.207.171.113,16466,true,161,21872,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,38.207.171.113,,AS979 NetLab,NetLab
-23.246.166.14,443,true,162,,SJC,北美洲 · 美国 · 圣何塞,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",0,2026-11-11 21:51:55,@danfeng_chat,isp,2600:1700:443:580e:abcd:c5fe:5eae:bc3d,2600:1700:443:580e:abcd:c5fe:5eae:bc3d,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC"
-107.173.10.15,443,true,162,,LAS,北美洲 · 美国 · 洛杉矶,AS6939 Hurricane Electric LLC,Hurricane Electric LLC,0,2026-10-18 21:42:24,@danfeng_chat,isp,2001:470:c:15c::2,2001:470:c:15c::2,AS6939 Hurricane Electric LLC,Hurricane Electric LLC
+23.246.166.14,443,true,162,,SJC,北美洲 · 美国 · 圣何塞,AS54286 TAIPEI101 NETWORK LLC,TAIPEI101 NETWORK LLC,0,2026-11-11 21:51:55,@danfeng_chat,isp,2600:1700:443:580e:abcd:c5fe:5eae:bc3d,2600:1700:443:580e:abcd:c5fe:5eae:bc3d,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC"
+107.173.10.15,443,true,162,,LAS,北美洲 · 美国 · 洛杉矶,AS36352 HostPapa,HostPapa,0,2026-10-18 21:42:24,@danfeng_chat,isp,2001:470:c:15c::2,2001:470:c:15c::2,AS6939 Hurricane Electric LLC,Hurricane Electric LLC
 216.195.213.113,1891,true,162,28620,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,216.195.213.75,,AS979 NetLab,NetLab
 192.220.22.11,8443,true,163,,LAX,北美洲 · 美国 · 洛杉矶,"AS2914 NTT America, Inc.","NTT America, Inc.",0,2026-11-11 21:50:59,@danfeng_chat,isp,192.220.22.11,,"AS2914 NTT America, Inc.","NTT America, Inc."
 108.226.69.58,443,true,164,,ATL,Alpharetta · US,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",0,2026-10-18 21:42:29,@danfeng_chat,isp,108.226.69.58,,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC"
@@ -376,7 +376,7 @@
 154.64.224.210,18598,true,165,3387,SJC,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,154.64.224.210,,AS979 NetLab,NetLab
 216.36.121.136,443,true,166,,LAX,Los Angeles · US,AS3257 GTT Communications,GTT Communications,0,2026-10-18 21:49:02,@danfeng_chat,isp,216.36.121.136,,AS3257 GTT Communications,GTT Communications
 64.81.29.214,443,true,167,,LAX,北美洲 · 美国 · 洛杉矶,AS3257 GTT Communications,GTT Communications Inc.,0,2026-11-11 09:33:14,@otcjlq,isp,64.81.29.214,,AS3257 GTT Communications,GTT Communications
-38.58.58.173,59613,true,167,7122,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,38.34.6.226,,AS979 NetLab,NetLab
+38.58.58.173,59613,true,167,7122,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.34.6.226,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 38.150.34.78,8443,true,168,,LAX,美国-洛杉矶,"AS174 Cogent Communications, LLC (NetLab)",NetLab,0,2026-11-11 09:33:14,@otcjlq,isp,38.150.34.78,,"AS174 Cogent Communications, LLC (NetLab)",NetLab
 64.178.113.159,443,true,169,,LAS,北美洲 · 美国 · 洛杉矶,AS400951 Akari Networks LLC,Akari Networks LLC,0,2026-11-11 21:53:14,@danfeng_chat,isp,64.178.113.159,,AS400951 Akari Networks LLC,Akari Networks LLC
 154.44.22.207,443,true,169,,LAX,北美洲 · 美国 · 洛杉矶,AS979 NetLab,NetLab Global,0,2026-11-11 21:49:33,@danfeng_chat,business,154.44.22.207,,AS979 NetLab,NetLab
@@ -386,7 +386,7 @@
 64.49.28.173,2053,true,170,,PHX,El Segundo · US,AS54286 TAIPEI101 NETWORK LLC,TAIPEI101 NETWORK LLC,0,2026-10-18 21:51:43,@danfeng_chat,isp,64.49.28.173,,AS54286 TAIPEI101 NETWORK LLC,TAIPEI101 NETWORK LLC
 23.246.165.219,443,true,170,,IAD,Raleigh · US,AS402629 Taipei101 Mobile,Taipei101 Mobile,0,2026-10-18 21:49:26,@danfeng_chat,business,2602:faa8:8:d9::a,2602:faa8:8:d9::a,AS402629 Taipei101 Mobile,Taipei101 Mobile
 72.89.201.11,30776,unknown,170,,EWR,New York City · US,AS701 Verizon Business,Verizon Business,0,2026-08-29 15:50:24,@danfeng2,isp,2600:4041:7993:8400:e61e:d06b:6d86:30fb,2600:4041:7993:8400:e61e:d06b:6d86:30fb,AS701 Verizon Business,Verizon Business
-66.212.16.246,443,true,171,,SJC,北美洲 · 美国 · 圣何塞,AS6939 Hurricane Electric LLC,Hurricane Electric LLC,0,2026-11-11 21:53:20,@danfeng_chat,isp,2001:470:67:2fb:216:3eff:fee2:bbad,2001:470:67:2fb:216:3eff:fee2:bbad,AS6939 Hurricane Electric LLC,Hurricane Electric LLC
+66.212.16.246,443,true,171,,SJC,北美洲 · 美国 · 圣何塞,AS36352 HostPapa,HostPapa,0,2026-11-11 21:53:20,@danfeng_chat,isp,2001:470:67:2fb:216:3eff:fee2:bbad,2001:470:67:2fb:216:3eff:fee2:bbad,AS6939 Hurricane Electric LLC,Hurricane Electric LLC
 64.81.118.117,443,true,171,,SJC,北美洲 · 美国 · 洛杉矶,AS3257 GTT Communications,GTT Communications Inc.,0,2026-11-11 21:53:18,@danfeng_chat,isp,64.81.118.117,,AS3257 GTT Communications,GTT Communications
 189.24.122.18,443,true,171,,LAS,美国-洛杉矶,AS400951 Akari Networks LLC (AKARI-US),AKARI-US,0,2026-11-11 09:33:14,@otcjlq,isp,189.24.122.18,,AS400951 Akari Networks LLC (AKARI-US),AKARI-US
 38.47.116.252,8443,true,171,,SJC,北美洲 · 美国 · 洛杉矶,AS979 NetLab,NetLab Global,0,2026-11-11 09:33:14,@otcjlq,business,38.47.116.252,,AS979 NetLab,NetLab
@@ -441,7 +441,7 @@
 51.241.130.183,443,true,185,,LHR,欧洲 · 英国 · 伦敦,AS63150 Bage Cloud,BAGE CLOUD LLC,0,2026-11-11 09:33:38,@otcjlq,isp,2a12:bec4:1871:d9c::116,2a12:bec4:1871:d9c::116,AS63150 Bage Cloud,Bage Cloud
 72.249.207.87,21209,true,185,9792,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,72.249.207.87,,AS979 NetLab,NetLab
 154.44.4.180,41489,true,185,22145,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,154.44.4.180,,AS979 NetLab,NetLab
-156.232.13.254,443,true,186,0,SJC,北美洲 · 美国 · Fremont,AS6939 Hurricane Electric LLC,Hurricane Electric LLC,0,2026-11-11 14:31:01,@cmliussss_all,isp,2001:470:66:1b::2,2001:470:66:1b::2,AS6939 Hurricane Electric LLC,Hurricane Electric LLC
+156.232.13.254,443,true,186,0,SJC,北美洲 · 美国 · Fremont,AS138152 YISU CLOUD LTD,YISU CLOUD LTD,0,2026-11-11 14:31:01,@cmliussss_all,isp,2001:470:66:1b::2,2001:470:66:1b::2,AS6939 Hurricane Electric LLC,Hurricane Electric LLC
 154.9.251.109,21916,true,186,22215,SJC,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,154.9.251.109,,AS979 NetLab,NetLab
 154.12.35.120,443,true,187,,LAX,北美洲 · 美国 · 洛杉矶,AS979 NetLab,NetLab Global,0,2026-11-11 21:49:26,@danfeng_chat,business,154.12.35.120,,AS979 NetLab,NetLab
 154.12.35.19,443,true,187,,LAX,北美洲 · 美国 · 洛杉矶,AS979 NetLab,NetLab Global,0,2026-11-11 21:49:26,@danfeng_chat,business,154.12.35.19,,AS979 NetLab,NetLab
@@ -465,11 +465,11 @@
 38.47.114.59,443,true,199,,SJC,北美洲 · 美国 · 洛杉矶,AS979 NetLab,NetLab Global,0,2026-11-11 21:52:21,@danfeng_chat,business,38.47.114.59,,AS979 NetLab,NetLab
 23.144.124.76,443,true,199,,SJC,北美洲 · 美国 · 洛杉矶,AS979 NetLab,NetLab Global,0,2026-11-11 09:33:14,@otcjlq,business,23.144.124.76,,AS979 NetLab,NetLab
 192.220.49.109,8443,true,199,,SJC,Los Angeles · US,"AS2914 NTT America, Inc.","NTT America, Inc.",0,2026-10-18 21:47:17,@danfeng_chat,isp,192.220.49.109,,"AS2914 NTT America, Inc.","NTT America, Inc."
-154.21.194.156,13567,true,200,7217,SJC,Los Angeles · US,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",0,2026-09-06 16:44:44,@danfeng2,isp,38.34.1.25,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
+154.21.194.156,13567,true,200,7217,SJC,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.34.1.25,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 199.241.32.139,8443,true,202,,SEA,北美洲 · 美国 · 西雅图,AS63150 Bage Cloud,BAGE CLOUD LLC,0,2026-11-11 21:51:20,@danfeng_chat,isp,2602:f988:91:c1c::8ae,2602:f988:91:c1c::8ae,AS63150 Bage Cloud,Bage Cloud
 181.36.229.212,2053,true,202,0,SDQ,北美洲 · 多明尼加 · La Romana,AS28118 ALTICE DOMINICANA S.A.,ALTICE DOMINICANA S.A.,0,2026-11-11 14:31:01,@cmliussss_all,isp,181.36.229.211,,AS28118 ALTICE DOMINICANA S.A.,ALTICE DOMINICANA S.A.
 172.252.125.72,443,true,202,,SJC,美国-洛杉矶,AS209604 2E TELEKOMUNIKASYON LTD STI,2E TELEKOMUNIKASYON LTD STI,0,2026-11-11 09:34:19,@otcjlq,isp,172.252.125.72,,AS209604 2E TELEKOMUNIKASYON LTD STI,2E TELEKOMUNIKASYON LTD STI
-154.44.1.165,57708,true,203,7184,SJC,Los Angeles · US,"AS2914 NTT America, Inc.","NTT America, Inc.",0,2026-09-06 16:44:44,@danfeng2,isp,216.167.121.82,,"AS2914 NTT America, Inc.","NTT America, Inc."
+154.44.1.165,57708,true,203,7184,SJC,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,216.167.121.82,,"AS2914 NTT America, Inc.","NTT America, Inc."
 199.241.32.166,443,true,205,,SEA,北美洲 · 美国 · 盐湖城,AS63150 Bage Cloud,BAGE CLOUD LLC,0,2026-11-11 21:51:20,@danfeng_chat,isp,2602:f988:91:602::626,2602:f988:91:602::626,AS63150 Bage Cloud,Bage Cloud
 172.98.217.171,443,true,206,,LAX,Santa Clara · US,"AS396097 Sail Internet, Inc.","Sail Internet, Inc.",0,2026-09-16 08:22:30,@danfeng2,isp,172.98.217.171,,"AS396097 Sail Internet, Inc.","Sail Internet, Inc."
 216.167.124.185,443,true,207,,SJC,北美洲 · 美国 · 洛杉矶,"AS2914 NTT America, Inc.","NTT America, Inc.",0,2026-11-11 21:51:40,@danfeng_chat,isp,216.167.124.185,,"AS2914 NTT America, Inc.","NTT America, Inc."
@@ -503,13 +503,13 @@
 90.255.235.254,8443,true,225,0,LHR,欧洲 · 英国 · London,AS5378 Vodafone Limited,Vodafone Limited,0,2026-11-11 14:31:01,@cmliussss_all,isp,2a0a:ef40:1b4d:cb01:ea40:f2ff:fe49:97,2a0a:ef40:1b4d:cb01:ea40:f2ff:fe49:97,AS5378 Vodafone Limited,Vodafone Limited
 159.253.123.106,443,true,225,,LHR,欧洲 · 英国 · 伦敦,AS211389 Briant Broadband Limited,Briant Broadband Limited,0,2026-10-18 21:45:10,@danfeng_chat,isp,220.158.196.174,,AS211389 Briant Broadband Limited,Briant Broadband Limited
 189.24.110.20,8443,true,227,,FRA,欧洲 · 德国 · 法兰克福,AS979 NetLab,NetLab Global,0,2026-11-11 09:33:14,@otcjlq,business,189.24.110.20,,AS979 NetLab,NetLab
-34.221.216.166,443,true,227,,SEA,Federal Way · US,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",0,2026-10-18 21:50:00,@danfeng_chat,isp,38.229.171.65,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
+34.221.216.166,443,true,227,,SEA,Federal Way · US,AS16509 Amazon AWS,Amazon AWS,0,2026-10-18 21:50:00,@danfeng_chat,isp,38.229.171.65,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 89.106.78.140,8443,true,227,,HAM,Bremen · DE,AS47277 ComputeBox Hosting,ComputeBox Hosting,0,2026-07-27 18:58:28,@danfeng2,isp,89.106.78.140,,AS47277 ComputeBox Hosting,ComputeBox Hosting
 189.24.114.219,8443,true,228,,FRA,欧洲 · 德国 · 法兰克福,AS979 NetLab,NetLab Global,0,2026-11-11 21:50:56,@danfeng_chat,business,189.24.114.219,,AS979 NetLab,NetLab
 188.214.35.66,443,true,228,0,PRG,欧洲 · 捷克 · Prague,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",0,2026-11-11 14:31:01,@cmliussss_all,isp,2a03:f80:420:cf23::1,2a03:f80:420:cf23::1,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 51.241.140.56,443,true,228,,LHR,欧洲 · 英国 · 伦敦,AS63150 Bage Cloud,BAGE CLOUD LLC,0,2026-11-11 09:33:38,@otcjlq,isp,2a12:bec4:1872:57c::5da,2a12:bec4:1872:57c::5da,AS63150 Bage Cloud,Bage Cloud
 212.135.42.240,443,true,228,,BRU,欧洲 · 比利时 · 布鲁塞尔,AS48266 Catixs Ltd,Catixs Ltd,0,2026-11-11 09:33:36,@otcjlq,isp,212.135.42.240,,AS48266 Catixs Ltd,Catixs Ltd
-23.246.166.24,443,true,229,,SJC,北美洲 · 美国 · 圣何塞,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",0,2026-11-11 21:51:55,@danfeng_chat,isp,2600:1700:443:580e:abcd:e618:6e5b:d2c5,2600:1700:443:580e:abcd:e618:6e5b:d2c5,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC"
+23.246.166.24,443,true,229,,SJC,北美洲 · 美国 · 圣何塞,AS54286 TAIPEI101 NETWORK LLC,TAIPEI101 NETWORK LLC,0,2026-11-11 21:51:55,@danfeng_chat,isp,2600:1700:443:580e:abcd:e618:6e5b:d2c5,2600:1700:443:580e:abcd:e618:6e5b:d2c5,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC"
 216.167.95.125,8443,true,229,,SJC,北美洲 · 美国 · 洛杉矶,AS979 NetLab,NetLab,0,2026-11-11 21:51:41,@danfeng_chat,business,216.167.95.125,,AS979 NetLab,NetLab
 166.0.19.120,443,true,229,,SEA,北美洲 · 美国 · 盐湖城,AS63150 Bage Cloud,BAGE CLOUD LLC,0,2026-11-11 09:33:38,@otcjlq,isp,2602:f988:91:608::bec,2602:f988:91:608::bec,AS63150 Bage Cloud,Bage Cloud
 85.223.6.92,443,true,229,,AMS,Almelo · NL,AS50266 Odido Netherlands B.V.,Odido Netherlands B.V.,0,2026-10-18 21:52:36,@danfeng_chat,isp,85.223.6.92,,AS50266 Odido Netherlands B.V.,Odido Netherlands B.V.
@@ -608,7 +608,7 @@
 216.36.104.115,8443,true,287,,LAX,北美洲 · 美国 · 洛杉矶,AS3257 GTT Communications,GTT Communications Inc.,0,2026-10-18 21:49:02,@danfeng_chat,isp,216.36.104.115,,AS3257 GTT Communications,GTT Communications
 85.189.120.41,443,true,288,,MAN,欧洲 · 英国 · 曼彻斯特,AS3257 GTT Communications,GTT Communications Inc.,0,2026-11-11 09:33:14,@otcjlq,isp,85.189.120.41,,AS3257 GTT Communications,GTT Communications
 154.46.31.21,443,true,288,,OTP,Bucharest · RO,AS43376 Dotro Telecom Srl,Dotro Telecom Srl,0,2026-09-16 08:20:46,@danfeng2,isp,2a0b:8800:580::9b,2a0b:8800:580::9b,AS43376 Dotro Telecom Srl,Dotro Telecom Srl
-72.249.207.137,4271,true,288,9444,SJC,Los Angeles · US,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",0,2026-09-06 16:44:44,@danfeng2,isp,38.244.26.41,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
+72.249.207.137,4271,true,288,9444,SJC,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.244.26.41,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 154.36.136.50,443,true,289,,LAX,北美洲 · 美国 · 洛杉矶,AS979 NetLab,NetLab,0,2026-11-11 09:33:14,@otcjlq,business,154.36.136.50,,AS979 NetLab,NetLab
 38.246.237.218,443,true,289,,SJC,美国-洛杉矶,"AS174 Cogent Communications, LLC (NetLab)",NetLab,0,2026-11-11 09:33:14,@otcjlq,isp,38.246.237.218,,"AS174 Cogent Communications, LLC (NetLab)",NetLab
 216.195.213.97,1891,true,289,26217,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,216.195.213.75,,AS979 NetLab,NetLab
@@ -665,7 +665,7 @@
 157.238.208.34,443,true,306,,LAX,Los Angeles · US,"AS2914 NTT America, Inc.","NTT America, Inc.",0,2026-10-18 21:45:03,@danfeng_chat,isp,157.238.208.34,,"AS2914 NTT America, Inc.","NTT America, Inc."
 79.112.138.33,443,true,307,0,BCN,欧洲 · 西班牙 · A Coruña,AS57269 DIGI Spain Telecom IPv6,DIGI Spain Telecom IPv6,0,2026-11-11 14:31:01,@cmliussss_all,isp,2a0c:5a86:960d:df00:edbd:ad3:eab5:9d24,2a0c:5a86:960d:df00:edbd:ad3:eab5:9d24,AS57269 DIGI Spain Telecom IPv6,DIGI Spain Telecom IPv6
 202.144.194.20,443,true,307,,NRT,亚洲 · 印度 · 金奈,AS55799 IPTELECOM Global,IPTELECOM Global,0,2026-11-11 09:33:39,@otcjlq,isp,2402:c480:3001:1504:1c00:ff:fe00:687,2402:c480:3001:1504:1c00:ff:fe00:687,AS63916 IPTELECOM Global,IPTELECOM Global
-45.74.158.105,443,true,307,0,IST,亚洲 · 土耳其 · Istanbul,AS44620 Netlen Internet Hizmetleri Ltd. Sti.,Netlen Internet Hizmetleri Ltd. Sti.,0,2026-11-02 14:11:42,@cmliussss_all,isp,2a01:f900:11:118::1,2a01:f900:11:118::1,AS44620 Netlen Internet Hizmetleri Ltd. Sti.,Netlen Internet Hizmetleri Ltd. Sti.
+45.74.158.105,443,true,307,0,IST,亚洲 · 土耳其 · Istanbul,AS216394 WireShield LTD,WireShield LTD,0,2026-11-02 14:11:42,@cmliussss_all,isp,2a01:f900:11:118::1,2a01:f900:11:118::1,AS44620 Netlen Internet Hizmetleri Ltd. Sti.,Netlen Internet Hizmetleri Ltd. Sti.
 188.190.24.84,443,true,307,,LJU,Zagreb · HR,AS25467 Akton d.o.o.,Akton d.o.o.,0,2026-10-18 21:47:04,@danfeng_chat,isp,2a03:f80:385:794d::1,2a03:f80:385:794d::1,AS25467 Akton d.o.o.,Akton d.o.o.
 103.27.186.236,8443,true,308,,NRT,亚洲 · 印度 · 金奈,AS134835 Starry Network,Starry Network Limited,0,2026-11-11 21:48:00,@danfeng_chat,isp,2403:ad80:89:4c00:14:0:247:baa4,2403:ad80:89:4c00:14:0:247:baa4,AS134835 Starry Network,Starry Network
 103.85.27.46,52783,false,308,,NRT,Tokyo · JP,AS134835 Starry Network,Starry Network,0,2026-07-27 18:39:29,@danfeng2,isp,2401:e9e0:4000::20b,2401:e9e0:4000::20b,AS134835 Starry Network,Starry Network
@@ -694,7 +694,7 @@
 154.12.52.214,443,true,317,,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-10-18 21:44:15,@danfeng_chat,business,154.12.52.214,,AS979 NetLab,NetLab
 128.121.31.218,587,true,317,,LAX,Los Angeles · US,"AS2914 NTT America, Inc.","NTT America, Inc.",0,2026-10-18 21:42:40,@danfeng_chat,isp,128.121.31.89,,"AS2914 NTT America, Inc.","NTT America, Inc."
 216.36.124.193,8443,true,318,,SJC,北美洲 · 美国 · 洛杉矶,AS3257 GTT Communications,GTT Communications Inc.,0,2026-11-11 21:51:44,@danfeng_chat,isp,216.36.124.193,,AS3257 GTT Communications,GTT Communications
-185.218.5.95,443,true,318,,SEA,北美洲 · 美国 · 西雅图,AS21743 Atlas Networks Corporation,Atlas Networks Corporation,0,2026-11-11 21:50:40,@danfeng_chat,isp,104.254.211.29,,AS21743 Atlas Networks Corporation,Atlas Networks Corporation
+185.218.5.95,443,true,318,,SEA,北美洲 · 美国 · 西雅图,AS60024 Hk Cedoc Limited,Hk Cedoc Limited,0,2026-11-11 21:50:40,@danfeng_chat,isp,104.254.211.29,,AS21743 Atlas Networks Corporation,Atlas Networks Corporation
 103.204.174.110,443,true,318,,NRT,亚洲 · 日本 · 东京,AS134835 Starry Network,Starry Network Limited,0,2026-11-11 21:47:57,@danfeng_chat,isp,2403:ad80:89:4c00:15:0:5865:955c,2403:ad80:89:4c00:15:0:5865:955c,AS134835 Starry Network,Starry Network
 126.217.78.118,443,true,318,0,NRT,亚洲 · 日本 · Tokyo,AS17676 SoftBank Corp.,SoftBank Corp.,0,2026-11-11 14:31:01,@cmliussss_all,isp,2400:2410:2140:1100:b5fa:21b4:f902:40aa,2400:2410:2140:1100:b5fa:21b4:f902:40aa,AS17676 SoftBank Corp.,SoftBank Corp.
 185.93.70.173,443,true,318,,SOF,保加利亚-索非亚,AS209604 2E TELEKOMUNIKASYON LTD STI (--------- Domain Cloud and Dedicated Hosting Provider --------),--------- Domain Cloud and Dedicated Hosting Provider --------,0,2026-11-11 09:34:19,@otcjlq,isp,185.93.70.173,,AS209604 2E TELEKOMUNIKASYON LTD STI (--------- Domain Cloud and Dedicated Hosting Provider --------),--------- Domain Cloud and Dedicated Hosting Provider --------
@@ -762,7 +762,7 @@
 178.160.230.83,443,true,335,,EVN,Yerevan · AM,AS12297 Telecom Armenia OJSC,Telecom Armenia OJSC,0,2026-09-16 08:22:48,@danfeng2,isp,178.160.230.83,,AS12297 Telecom Armenia OJSC,Telecom Armenia OJSC
 209.33.171.76,443,true,336,,NRT,亚洲 · 日本 · 东京,AS63150 Bage Cloud,BAGE CLOUD LLC,0,2026-11-11 09:33:38,@otcjlq,isp,2401:a660:1002:bc4::e18,2401:a660:1002:bc4::e18,AS63150 Bage Cloud,Bage Cloud
 38.127.121.254,443,true,336,,LAX,Pasadena · US,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",0,2026-10-18 21:50:07,@danfeng_chat,isp,38.127.121.254,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
-146.190.62.106,443,true,337,,DFW,北美洲 · 美国 · 洛杉矶,AS22773 Cox Communications Inc.,Cox Communications Inc.,0,2026-11-11 21:49:11,@danfeng_chat,isp,2600:8800:2b8a:8f00:24be:7b79:a7e3:dd86,2600:8800:2b8a:8f00:24be:7b79:a7e3:dd86,AS22773 Cox Communications Inc.,Cox Communications Inc.
+146.190.62.106,443,true,337,,DFW,北美洲 · 美国 · 洛杉矶,AS14061 DigitalOcean,DigitalOcean,0,2026-11-11 21:49:11,@danfeng_chat,isp,2600:8800:2b8a:8f00:24be:7b79:a7e3:dd86,2600:8800:2b8a:8f00:24be:7b79:a7e3:dd86,AS22773 Cox Communications Inc.,Cox Communications Inc.
 51.171.219.44,443,true,337,,DUB,Cabra · IE,AS5466 Eircom Limited,Eircom Limited,0,2026-10-18 21:51:08,@danfeng_chat,isp,51.171.219.44,,AS5466 Eircom Limited,Eircom Limited
 154.9.250.178,15495,true,337,21780,SJC,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,154.9.250.178,,AS979 NetLab,NetLab
 38.58.108.15,443,true,338,0,SJC,北美洲 · 美国 · Los Angeles,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",0,2026-11-11 14:31:01,@cmliussss_all,isp,2001:550:a20::120,2001:550:a20::120,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
@@ -772,7 +772,7 @@
 209.33.173.70,443,true,339,,NRT,亚洲 · 日本 · 东京,AS63150 Bage Cloud,BAGE CLOUD LLC,0,2026-11-11 09:33:38,@otcjlq,isp,2602:fd6f:1f:5e4::12a,2602:fd6f:1f:5e4::12a,AS63150 Bage Cloud,Bage Cloud
 139.64.132.117,443,true,339,,PDX,Portland · US,AS26388 FIBERFI,FIBERFI,0,2026-10-18 21:43:16,@danfeng_chat,isp,2606:6680:25:1::2c42:ca02,2606:6680:25:1::2c42:ca02,AS26388 FIBERFI,FIBERFI
 154.21.195.212,16000,true,339,6077,SJC,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,154.21.195.212,,AS979 NetLab,NetLab
-161.114.14.119,443,true,340,,LAX,北美洲 · 美国 · 洛杉矶,AS11404 Wave Broadband,Wave Broadband,0,2026-11-11 21:49:46,@danfeng_chat,isp,67.200.126.160,,AS11404 Wave Broadband,Wave Broadband
+161.114.14.119,443,true,340,,LAX,北美洲 · 美国 · 洛杉矶,AS206300 YUNYOO LTD,YUNYOO LTD,0,2026-11-11 21:49:46,@danfeng_chat,isp,67.200.126.160,,AS11404 Wave Broadband,Wave Broadband
 139.94.131.191,443,true,340,,ORD,Albuquerque · US,AS35847 Ezee Fiber,Ezee Fiber,0,2026-10-18 21:43:17,@danfeng_chat,isp,2606:a300:902d:8026:eaff:1eff:fed0:2e70,2606:a300:902d:8026:eaff:1eff:fed0:2e70,AS35847 Ezee Fiber,Ezee Fiber
 209.33.173.7,8443,true,340,,NRT,亚洲 · 日本 · 东京,AS63150 Bage Cloud,BAGE CLOUD LLC,0,2026-07-27 18:48:52,@danfeng2,isp,209.33.173.7,,AS63150 Bage Cloud,Bage Cloud
 82.181.193.246,443,true,341,0,HEL,欧洲 · 芬兰 · Espoo,AS16086 DNA Oyj,DNA Oyj,0,2026-11-11 14:31:01,@cmliussss_all,isp,2001:14ba:442b:d800::199,2001:14ba:442b:d800::199,AS16086 DNA Oyj,DNA Oyj
@@ -787,7 +787,7 @@
 24.86.138.211,443,true,344,0,YVR,北美洲 · 加拿大 · Langley,AS6327 Shaw Communications,Shaw Communications,0,2026-11-11 14:31:01,@cmliussss_all,isp,2604:3d08:8b7e:7880::9dd9,2604:3d08:8b7e:7880::9dd9,AS6327 Shaw Communications,Shaw Communications
 217.155.15.119,443,true,344,,LHR,Rochdale · GB,AS13037 Zen Internet Ltd,Zen Internet Ltd,0,2026-07-24 22:12:16,@danfeng2,isp,217.155.15.119,,AS13037 Zen Internet Ltd,Zen Internet Ltd
 23.141.204.235,443,true,345,,LAX,北美洲 · 美国 · 洛杉矶,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",0,2026-11-11 21:51:52,@danfeng_chat,isp,23.141.204.235,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
-166.0.17.160,443,true,345,,DFW,北美洲 · 美国 · 洛杉矶,"AS26042 FiberState, LLC","FiberState, LLC",0,2026-11-11 21:49:59,@danfeng_chat,isp,2602:f988:210:16c::60f,2602:f988:210:16c::60f,AS63150 Bage Cloud,Bage Cloud
+166.0.17.160,443,true,345,,DFW,北美洲 · 美国 · 洛杉矶,AS63150 Bage Cloud,Bage Cloud,0,2026-11-11 21:49:59,@danfeng_chat,isp,2602:f988:210:16c::60f,2602:f988:210:16c::60f,AS63150 Bage Cloud,Bage Cloud
 51.241.130.137,2083,true,346,,LHR,英国-伦敦,AS63150 Bage Cloud,Bage Cloud,0,2026-11-11 09:33:38,@otcjlq,isp,2602:f988:82:f42::446,2602:f988:82:f42::446,AS63150 Bage Cloud,BAGE CLOUD LLC
 154.44.16.237,443,true,346,,SJC,美国-洛杉矶,"AS174 Cogent Communications, LLC (NetLab)",NetLab,0,2026-11-11 09:33:14,@otcjlq,isp,154.44.16.237,,"AS174 Cogent Communications, LLC (NetLab)",NetLab
 155.117.19.23,443,true,346,,SLC,北美洲 · 美国 · 洛杉矶,AS63150 Bage Cloud,Bage Cloud,0,2026-10-18 21:44:53,@danfeng_chat,isp,155.117.19.23,,AS63150 Bage Cloud,Bage Cloud
@@ -821,7 +821,7 @@
 61.124.1.167,443,true,367,,NRT,亚洲 · 日本 · 东京,AS2497 Internet Initiative Japan Inc.,Internet Initiative Japan Inc.,0,2026-10-18 21:51:29,@danfeng_chat,isp,61.124.1.167,,AS2497 Internet Initiative Japan Inc.,Internet Initiative Japan Inc.
 212.7.7.155,8443,true,368,0,TLL,欧洲 · 爱沙尼亚 · Tallinn,AS8728 AS INFONET,AS INFONET,0,2026-11-11 14:31:01,@cmliussss_all,isp,2001:1b28:9:12:72:162:15:25,2001:1b28:9:12:72:162:15:25,AS8728 AS INFONET,AS INFONET
 1.232.40.93,39738,true,368,,ICN,Seoul · KR,AS9318 SK Broadband,SK Broadband,0,2026-10-18 21:42:38,@danfeng_chat,isp,1.232.40.93,,AS9318 SK Broadband,SK Broadband
-185.70.186.60,8443,true,369,0,AMS,欧洲 · 荷兰 · Amsterdam,AS6939 Hurricane Electric LLC,Hurricane Electric LLC,0,2026-11-11 14:31:01,@cmliussss_all,isp,2001:470:1f15:262::3,2001:470:1f15:262::3,AS6939 Hurricane Electric LLC,Hurricane Electric LLC
+185.70.186.60,8443,true,369,0,AMS,欧洲 · 荷兰 · Amsterdam,AS57043 Hostkey B.V.,Hostkey B.V.,0,2026-11-11 14:31:01,@cmliussss_all,isp,2001:470:1f15:262::3,2001:470:1f15:262::3,AS6939 Hurricane Electric LLC,Hurricane Electric LLC
 103.219.194.151,443,true,369,,HKG,亚洲 · 香港,AS63150 Bage Cloud,BAGE CLOUD LLC,0,2026-11-11 09:33:38,@otcjlq,isp,2a14:4900:2207:fab::ef4,2a14:4900:2207:fab::ef4,AS63150 Bage Cloud,Bage Cloud
 211.72.119.198,21034,true,369,,KHH,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,0,2026-11-10 17:56:26,@manual_import,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 154.64.247.96,10027,true,369,364,HKG,Hong Kong · HK,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,154.64.247.96,,AS979 NetLab,NetLab
@@ -875,14 +875,14 @@
 211.72.119.198,24395,true,380,,KHH,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,0,2026-11-10 17:56:26,@manual_import,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 219.76.13.166,443,true,381,,HKG,亚洲 · 香港,AS4760 HKT,HKT Limited,0,2026-11-11 14:31:01,@cmliussss_all,isp,219.76.13.166,,AS4760 HKT,HKT
 103.219.195.65,443,true,381,,HKG,亚洲 · 香港,AS63150 Bage Cloud,BAGE CLOUD LLC,0,2026-11-11 09:33:38,@otcjlq,isp,2a14:4900:2208:969::d59,2a14:4900:2208:969::d59,AS63150 Bage Cloud,Bage Cloud
-195.68.145.155,443,true,381,,HEL,Moscow · RU,AS8359 MTS PJSC,MTS PJSC,0,2026-10-18 21:47:48,@danfeng_chat,isp,2a03:6505:2000:e::2,2a03:6505:2000:e::2,AS8359 MTS PJSC,MTS PJSC
+195.68.145.155,443,true,381,,HEL,Moscow · RU,"AS3216 PJSC ""Vimpelcom""","PJSC ""Vimpelcom""",0,2026-10-18 21:47:48,@danfeng_chat,isp,2a03:6505:2000:e::2,2a03:6505:2000:e::2,AS8359 MTS PJSC,MTS PJSC
 211.72.119.198,13059,true,382,,KHH,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,0,2026-11-10 17:56:26,@manual_import,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
-61.216.113.196,443,true,383,,KHH,亚洲 · 台湾 · 高雄市,AS24165 UNION BROADBAND NETWORK,UNION BROADBAND NETWORK,0,2026-10-18 21:51:29,@danfeng_chat,isp,2407:4b00:6c03:d6e:20c:29ff:fe1c:7b23,2407:4b00:6c03:d6e:20c:29ff:fe1c:7b23,AS24165 UNION BROADBAND NETWORK,UNION BROADBAND NETWORK
+61.216.113.196,443,true,383,,KHH,亚洲 · 台湾 · 高雄市,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,0,2026-10-18 21:51:29,@danfeng_chat,isp,2407:4b00:6c03:d6e:20c:29ff:fe1c:7b23,2407:4b00:6c03:d6e:20c:29ff:fe1c:7b23,AS24165 UNION BROADBAND NETWORK,UNION BROADBAND NETWORK
 154.64.247.96,10008,true,383,1359,HKG,Hong Kong · HK,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,154.64.247.96,,AS979 NetLab,NetLab
 154.44.24.160,30184,true,383,4414,HKG,Hong Kong · HK,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,154.44.24.160,,AS979 NetLab,NetLab
 219.76.13.164,443,true,384,,HKG,亚洲 · 香港,AS4760 HKT,HKT Limited,0,2026-11-11 21:51:49,@danfeng_chat,isp,219.76.13.164,,AS4760 HKT,HKT
 103.68.223.105,8443,true,384,,NRT,亚洲 · 印度 · 金奈,AS63916 IPTELECOM Global,IPTELECOM Global,0,2026-11-11 09:33:39,@otcjlq,isp,2402:c480:3001:1504:1c00:a5ff:fe00:922,2402:c480:3001:1504:1c00:a5ff:fe00:922,AS63916 IPTELECOM Global,IPTELECOM Global
-8.222.84.103,443,true,384,41032,SIN,亚洲 · 新加坡,AS7473 Singapore Telecommunications Ltd,Singapore Telecommunications Ltd,0,2026-10-19 19:46:20,@danfeng_chat,isp,203.208.188.171,,AS7473 Singapore Telecommunications (SINGTEL Internet Exchange),Singapore Telecommunications (SINGTEL Internet Exchange)
+8.222.84.103,443,true,384,41032,SIN,亚洲 · 新加坡,AS45102 Alibaba Cloud,Alibaba Cloud,0,2026-10-19 19:46:20,@danfeng_chat,isp,203.208.188.171,,AS7473 Singapore Telecommunications (SINGTEL Internet Exchange),Singapore Telecommunications (SINGTEL Internet Exchange)
 87.255.80.36,443,true,384,,KIV,Chisinau · MD,AS15836 ARAX-IMPEX SRL,ARAX-IMPEX SRL,0,2026-10-18 21:52:42,@danfeng_chat,isp,87.255.80.36,,AS15836 ARAX-IMPEX SRL,ARAX-IMPEX SRL
 154.64.247.96,10018,true,384,1316,HKG,亚太 · 香港,AS979 NetLab,NetLab Global,0,2026-09-06 16:44:44,@danfeng2,business,154.64.247.96,,AS979 NetLab,NetLab
 64.83.46.148,443,true,385,,NRT,日本-东京,AS979 NetLab,NetLab Global,0,2026-11-11 09:33:14,@otcjlq,business,64.83.46.148,,AS979 NetLab,NetLab Global
@@ -903,7 +903,7 @@
 14.137.247.36,33307,true,388,8798,NRT,Tokyo · JP,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,14.137.247.36,,AS979 NetLab,NetLab
 58.235.60.124,10443,true,389,,ICN,Busan · KR,AS9318 SK Broadband,SK Broadband,0,2026-10-18 21:51:29,@danfeng_chat,isp,58.235.60.124,,AS9318 SK Broadband,SK Broadband
 154.36.183.110,443,true,390,,NRT,日本-东京,AS979 NetLab (PSINet Inc.),PSINet Inc.,0,2026-11-11 09:33:14,@otcjlq,business,154.36.183.110,,AS979 NetLab (PSINet Inc.),PSINet Inc.
-61.216.113.194,443,true,390,,KHH,Kaohsiung · TW,AS24165 UNION BROADBAND NETWORK,UNION BROADBAND NETWORK,0,2026-10-18 21:51:29,@danfeng_chat,isp,2407:4b00:6c03:d6e:20c:29ff:fed8:1086,2407:4b00:6c03:d6e:20c:29ff:fed8:1086,AS24165 UNION BROADBAND NETWORK,UNION BROADBAND NETWORK
+61.216.113.194,443,true,390,,KHH,Kaohsiung · TW,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,0,2026-10-18 21:51:29,@danfeng_chat,isp,2407:4b00:6c03:d6e:20c:29ff:fed8:1086,2407:4b00:6c03:d6e:20c:29ff:fed8:1086,AS24165 UNION BROADBAND NETWORK,UNION BROADBAND NETWORK
 185.123.100.109,443,true,391,,SOF,Istanbul · TR,AS206991 Iksir Internet Hizmetleri A.S.,Iksir Internet Hizmetleri A.S.,0,2026-09-16 08:23:17,@danfeng2,isp,185.123.100.109,,AS206991 Iksir Internet Hizmetleri A.S.,Iksir Internet Hizmetleri A.S.
 219.76.13.170,443,true,392,,HKG,亚洲 · 香港,AS4760 HKT,HKT Limited,0,2026-11-11 21:51:49,@danfeng_chat,isp,219.76.13.170,,AS4760 HKT,HKT
 209.33.144.168,443,true,393,,NRT,亚洲 · 日本 · 东京,AS63150 Bage Cloud,BAGE CLOUD LLC,0,2026-11-11 09:33:38,@otcjlq,isp,2602:f988:9a:a07::388,2602:f988:9a:a07::388,AS63150 Bage Cloud,Bage Cloud
@@ -917,9 +917,9 @@
 185.241.40.79,10443,true,395,,HKG,Hong Kong · HK,AS63150 Bage Cloud,Bage Cloud,0,2026-10-18 21:46:51,@danfeng_chat,isp,2a14:4900:2206:ba7::789,2a14:4900:2206:ba7::789,AS63150 Bage Cloud,Bage Cloud
 64.83.32.122,14614,true,395,210,NRT,Tokyo · JP,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,64.83.32.122,,AS979 NetLab,NetLab
 93.171.199.242,443,true,395,,FRA,Vidnoye · RU,AS61308 PVONET LTD,PVONET LTD,0,2026-07-24 22:45:23,@danfeng2,isp,93.171.199.242,,AS61308 PVONET LTD,PVONET LTD
-46.46.182.21,443,true,396,,AMS,欧洲 · 荷兰 · 阿姆斯特丹,AS9002 RETN Limited,RETN Limited,0,2026-10-18 21:51:02,@danfeng_chat,isp,89.19.36.90,,AS9002 RETN Limited,RETN Limited
+46.46.182.21,443,true,396,,AMS,欧洲 · 荷兰 · 阿姆斯特丹,AS29470 JSC RetnNet,JSC RetnNet,0,2026-10-18 21:51:02,@danfeng_chat,isp,89.19.36.90,,AS9002 RETN Limited,RETN Limited
 116.49.234.130,443,true,397,,HKG,亚洲 · 香港,AS4760 HKT,HKT Limited,0,2026-11-11 21:48:24,@danfeng_chat,isp,116.49.234.130,,AS4760 HKT,HKT
-8.222.70.238,443,true,397,,SIN,亚洲 · 新加坡,AS7473 Singapore Telecommunications Ltd,Singapore Telecommunications Ltd,0,2026-10-18 21:52:21,@danfeng_chat,isp,203.208.188.171,,AS7473 Singapore Telecommunications (SINGTEL Internet Exchange),Singapore Telecommunications (SINGTEL Internet Exchange)
+8.222.70.238,443,true,397,,SIN,亚洲 · 新加坡,AS45102 Alibaba Cloud,Alibaba Cloud,0,2026-10-18 21:52:21,@danfeng_chat,isp,203.208.188.171,,AS7473 Singapore Telecommunications (SINGTEL Internet Exchange),Singapore Telecommunications (SINGTEL Internet Exchange)
 42.3.137.207,2083,true,397,,HKG,Hong Kong · HK,AS4760 HKT,HKT,0,2026-10-02 00:20:25,@danfeng_chat,isp,42.3.137.207,,AS4760 HKT,HKT
 211.72.119.198,37555,true,399,,KHH,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,0,2026-11-10 17:56:26,@manual_import,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 202.27.229.7,443,true,400,0,MEL,大洋洲 · 澳大利亚 · Melbourne,AS10143 Exetel Pty Ltd,Exetel Pty Ltd,0,2026-11-11 14:31:01,@cmliussss_all,isp,2406:3400:388:300::1e,2406:3400:388:300::1e,AS10143 Exetel Pty Ltd,Exetel Pty Ltd
@@ -929,12 +929,12 @@
 103.85.25.226,8443,true,403,,NRT,日本-东京,AS134835 Starry Network,Starry Network,0,2026-11-11 09:33:41,@otcjlq,isp,2401:e9e0:4000::e2,2401:e9e0:4000::e2,AS134835 Starry Network (Hongkong Wen Jing Network Limited),Hongkong Wen Jing Network Limited
 154.36.155.12,443,true,403,,NRT,亚洲 · 日本 · 东京,AS979 NetLab,NetLab Global,0,2026-11-11 09:33:14,@otcjlq,business,154.36.155.12,,AS979 NetLab,NetLab
 212.69.100.20,443,true,403,,FRA,Moscow · RU,AS25159 PJSC MegaFon,PJSC MegaFon,0,2026-10-18 21:48:53,@danfeng_chat,isp,212.69.100.20,,AS25159 PJSC MegaFon,PJSC MegaFon
-192.243.116.15,443,true,404,,EWR,New York City · US,AS701 Verizon Business,Verizon Business,0,2026-10-18 21:47:18,@danfeng_chat,isp,2600:4041:5982:a00::1ca,2600:4041:5982:a00::1ca,AS701 Verizon Business,Verizon Business
+192.243.116.15,443,true,404,,EWR,New York City · US,AS25820 BandwagonHost,BandwagonHost,0,2026-10-18 21:47:18,@danfeng_chat,isp,2600:4041:5982:a00::1ca,2600:4041:5982:a00::1ca,AS701 Verizon Business,Verizon Business
 84.51.54.101,2053,true,405,0,AMS,亚洲 · 土耳其 · Istanbul,AS34984 Superonline Iletisim Hizmetleri A.S.,Superonline Iletisim Hizmetleri A.S.,0,2026-11-11 14:31:01,@cmliussss_all,isp,84.51.54.101,,AS34984 Superonline Iletisim Hizmetleri A.S.,Superonline Iletisim Hizmetleri A.S.
 157.20.27.35,443,true,406,,BOM,亚洲 · 印度 · 孟买,AS58678 Intech Online Private Limited,Intech Online Private Limited,0,2026-11-11 14:31:01,@cmliussss_all,isp,2602:fa08:50:4500::a,2602:fa08:50:4500::a,AS149020 WebHorizon Internet Services,WebHorizon Internet Services
 77.93.90.94,443,true,407,,SIN,新加坡-新加坡,AS63150 Bage Cloud,Bage Cloud,0,2026-11-11 09:33:38,@otcjlq,isp,2a14:7dc0:203:a55::28d,2a14:7dc0:203:a55::28d,AS63150 Bage Cloud,Bage Cloud LLC
 154.36.154.29,443,true,407,,NRT,亚洲 · 日本 · 东京,AS979 NetLab,NetLab Global,0,2026-11-11 09:33:14,@otcjlq,business,154.36.154.29,,AS979 NetLab,NetLab
-182.255.35.158,443,true,408,,HKG,亚洲 · 香港,AS4760 HKT,HKT Limited,0,2026-11-11 21:50:31,@danfeng_chat,isp,219.76.131.102,,AS4760 HKT,HKT
+182.255.35.158,443,true,408,,HKG,亚洲 · 香港,"AS140096 JINX CO., LIMITED","JINX CO., LIMITED",0,2026-11-11 21:50:31,@danfeng_chat,isp,219.76.131.102,,AS4760 HKT,HKT
 85.149.211.62,8443,true,408,,SIN,亚洲 · 新加坡,AS63150 Bage Cloud,BAGE CLOUD LLC,0,2026-10-18 21:52:33,@danfeng_chat,isp,85.149.211.62,,AS63150 Bage Cloud,Bage Cloud
 157.20.27.130,8443,true,409,,BOM,亚洲 · 印度 · 孟买,AS58678 Intech Online Private Limited,Intech Online Private Limited,0,2026-11-11 14:31:01,@cmliussss_all,isp,157.20.27.130,,AS58678 Intech Online Private Limited,Intech Online Private Limited
 95.171.21.193,443,true,410,,FRA,Moscow · RU,AS48822 Universum bit Ltd.,Universum bit Ltd.,0,2026-10-18 21:53:18,@danfeng_chat,isp,95.171.21.193,,AS48822 Universum bit Ltd.,Universum bit Ltd.
@@ -969,9 +969,9 @@
 78.135.77.192,443,true,425,0,IST,亚洲 · 土耳其 · Istanbul,AS44620 Netlen Internet Hizmetleri Ltd. Sti.,Netlen Internet Hizmetleri Ltd. Sti.,0,2026-11-11 14:31:01,@cmliussss_all,isp,2a01:f900:10:719::1,2a01:f900:10:719::1,AS44620 Netlen Internet Hizmetleri Ltd. Sti.,Netlen Internet Hizmetleri Ltd. Sti.
 94.43.238.112,2087,true,425,0,TBS,亚洲 · 格鲁吉亚 · Dighomi,AS35805 SILKNET BROADBAND,SILKNET BROADBAND,0,2026-11-11 14:31:01,@cmliussss_all,isp,94.43.238.112,,AS35805 SILKNET BROADBAND,SILKNET BROADBAND
 77.93.89.167,443,true,425,,SIN,亚洲 · 新加坡,AS63150 Bage Cloud,BAGE CLOUD LLC,0,2026-11-11 09:33:38,@otcjlq,isp,2a14:7dc0:202:9::ebd,2a14:7dc0:202:9::ebd,AS63150 Bage Cloud,Bage Cloud
-46.32.68.184,443,true,426,,ARN,Stockholm · SE,AS6939 Hurricane Electric LLC,Hurricane Electric LLC,0,2026-10-18 21:50:58,@danfeng_chat,isp,2001:470:27:175::2,2001:470:27:175::2,AS6939 Hurricane Electric LLC,Hurricane Electric LLC
-93.95.97.23,443,true,427,,FRA,Warsaw · PL,AS6939 Hurricane Electric LLC,Hurricane Electric LLC,0,2026-09-16 08:36:30,@danfeng2,isp,2001:470:70:888::2,2001:470:70:888::2,AS6939 Hurricane Electric LLC,Hurricane Electric LLC
-140.99.130.64,443,true,429,,SIN,亚洲 · 新加坡,AS212895 Johannes Ernst,Johannes Ernst,0,2026-11-11 21:48:53,@danfeng_chat,isp,2a11:6c7:f07:91::68,2a11:6c7:f07:91::68,AS212895 Johannes Ernst,Johannes Ernst
+46.32.68.184,443,true,426,,ARN,Stockholm · SE,"AS48416 Information Network, LLC","Information Network, LLC",0,2026-10-18 21:50:58,@danfeng_chat,isp,2001:470:27:175::2,2001:470:27:175::2,AS6939 Hurricane Electric LLC,Hurricane Electric LLC
+93.95.97.23,443,true,427,,FRA,Warsaw · PL,AS48347 JSC Mediasoft ekspert,JSC Mediasoft ekspert,0,2026-09-16 08:36:30,@danfeng2,isp,2001:470:70:888::2,2001:470:70:888::2,AS6939 Hurricane Electric LLC,Hurricane Electric LLC
+140.99.130.64,443,true,429,,SIN,亚洲 · 新加坡,AS212238 Datacamp Limited,Datacamp Limited,0,2026-11-11 21:48:53,@danfeng_chat,isp,2a11:6c7:f07:91::68,2a11:6c7:f07:91::68,AS212895 Johannes Ernst,Johannes Ernst
 45.38.190.39,443,true,430,0,FRA,欧洲 · 德国 · Limburg an der Lahn,AS209604 2E TELEKOMUNIKASYON LTD STI,2E TELEKOMUNIKASYON LTD STI,0,2026-11-11 14:31:01,@cmliussss_all,isp,45.38.190.39,,AS209604 2E TELEKOMUNIKASYON LTD STI,2E TELEKOMUNIKASYON LTD STI
 220.255.72.168,3306,true,430,30976,SIN,Singapore · SG,AS9506 Singtel Fibre Broadband,Singtel Fibre Broadband,0,2026-10-19 19:50:06,@danfeng_chat,isp,220.255.72.168,,AS9506 Singtel Fibre Broadband,Singtel Fibre Broadband
 158.94.216.137,443,true,430,,IST,Istanbul · TR,AS44620 Netlen Internet Hizmetleri Ltd. Sti.,Netlen Internet Hizmetleri Ltd. Sti.,0,2026-10-18 21:45:07,@danfeng_chat,isp,2a01:f900:11:198::1,2a01:f900:11:198::1,AS44620 Netlen Internet Hizmetleri Ltd. Sti.,Netlen Internet Hizmetleri Ltd. Sti.
@@ -989,7 +989,7 @@
 176.118.214.216,443,true,441,,DME,RU,AS60042 OnTelecom LLC,OnTelecom LLC,0,2026-10-25 18:30:49,@user,isp,176.118.214.216,,AS60042 OnTelecom LLC,OnTelecom LLC
 37.186.84.197,443,true,441,,EVN,Abovyan · AM,AS49800 GNC-Alfa CJSC,GNC-Alfa CJSC,0,2026-10-18 21:50:06,@danfeng_chat,isp,37.186.84.197,,AS49800 GNC-Alfa CJSC,GNC-Alfa CJSC
 185.200.36.36,443,true,441,,SOF,欧洲 · 保加利亚 · 索菲亚,AS202561 High Speed Telekomunikasyon ve Hab. Hiz. Ltd. Sti.,High Speed Telekomunikasyon ve Hab. Hiz. Ltd. Sti.,0,2026-10-18 21:46:40,@danfeng_chat,isp,185.200.36.36,,AS202561 High Speed Telekomunikasyon ve Hab. Hiz. Ltd. Sti.,High Speed Telekomunikasyon ve Hab. Hiz. Ltd. Sti.
-95.139.90.83,443,true,441,,NQZ,Astana · KZ,AS9198 JSC Kazakhtelecom,JSC Kazakhtelecom,0,2026-09-16 08:36:46,@danfeng2,isp,2.135.146.129,,AS9198 JSC Kazakhtelecom,JSC Kazakhtelecom
+95.139.90.83,443,true,441,,NQZ,Astana · KZ,AS8359 MTS PJSC,MTS PJSC,0,2026-09-16 08:36:46,@danfeng2,isp,2.135.146.129,,AS9198 JSC Kazakhtelecom,JSC Kazakhtelecom
 23.175.201.28,443,true,442,,HKG,亚洲 · 香港,AS62711 Maxwell Telecom,Maxwell Telecom LLC,0,2026-11-11 21:51:53,@danfeng_chat,isp,23.175.201.28,,AS62711 Maxwell Telecom,Maxwell Telecom
 103.27.187.43,443,true,442,,NRT,亚洲 · 印度 · 金奈,AS134835 Starry Network,Starry Network Limited,0,2026-11-11 14:31:01,@cmliussss_all,isp,2403:ad80:89:4c00:15:0:834b:dbe5,2403:ad80:89:4c00:15:0:834b:dbe5,AS134835 Starry Network,Starry Network
 93.115.10.148,443,true,442,,SOF,保加利亚-索非亚,AS209604 2E TELEKOMUNIKASYON LTD STI,2E TELEKOMUNIKASYON LTD STI,0,2026-11-11 09:34:19,@otcjlq,isp,93.115.10.148,,AS209604 2E TELEKOMUNIKASYON LTD STI,2E TELEKOMUNIKASYON LTD STI
@@ -1007,7 +1007,7 @@
 219.76.13.181,443,true,451,,HKG,亚洲 · 香港,AS4760 HKT,HKT Limited,0,2026-11-11 14:31:01,@cmliussss_all,isp,219.76.13.181,,AS4760 HKT,HKT
 85.209.231.43,443,true,451,0,WAW,欧洲 · 立陶宛 · Vilnius,AS15440 UAB Baltnetos komunikacijos,UAB Baltnetos komunikacijos,0,2026-11-11 14:31:01,@cmliussss_all,isp,85.209.231.43,,AS15440 UAB Baltnetos komunikacijos,UAB Baltnetos komunikacijos
 211.72.119.198,26868,true,452,,KHH,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,0,2026-11-10 17:56:26,@manual_import,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
-91.148.225.77,443,true,452,,CDG,Paris · FR,AS5511 Orange,Orange,0,2026-10-18 21:52:59,@danfeng_chat,isp,212.180.47.146,,AS5511 Orange,Orange
+91.148.225.77,443,true,452,,CDG,Paris · FR,AS34343 Eweka Internet Services B.V.,Eweka Internet Services B.V.,0,2026-10-18 21:52:59,@danfeng_chat,isp,212.180.47.146,,AS5511 Orange,Orange
 83.99.190.32,443,true,452,,RIX,Riga · LV,AS24651 Jsc Balticom,Jsc Balticom,0,2026-10-18 21:52:29,@danfeng_chat,isp,83.99.190.32,,AS24651 Jsc Balticom,Jsc Balticom
 82.126.161.49,443,true,453,0,CDG,欧洲 · 法国 · Bruges,AS3215 Orange,Orange,0,2026-11-11 14:31:01,@cmliussss_all,isp,2a01:cb19:765:6500:f082:f79f:9631:fdbf,2a01:cb19:765:6500:f082:f79f:9631:fdbf,AS3215 Orange,Orange
 46.199.75.118,443,true,453,,MRS,Nicosia · CY,AS6866 Cyprus Telecommunications Authority,Cyprus Telecommunications Authority,0,2026-10-18 21:50:56,@danfeng_chat,isp,46.199.75.113,,AS6866 Cyprus Telecommunications Authority,Cyprus Telecommunications Authority
@@ -1018,7 +1018,7 @@
 43.229.254.182,443,true,459,,CGK,亚洲 · 印度尼西亚 · 雅加达,AS23679 PT. Media Antar Nusa,PT. Media Antar Nusa,0,2026-11-11 14:31:01,@cmliussss_all,isp,2401:2900:108::116,2401:2900:108::116,AS23679 PT. Media Antar Nusa,PT. Media Antar Nusa
 147.45.113.224,8443,true,459,,ARN,德国-法兰克福,AS41925 Limited Liability Company Izet Telecom Ural (Def-Group LLC),Def-Group LLC,0,2026-11-11 09:20:16,@otcjlq,isp,147.45.113.224,,AS41925 Limited Liability Company Izet Telecom Ural (Def-Group LLC),Def-Group LLC
 211.72.119.198,35108,true,459,,KHH,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,0,2026-11-10 17:56:26,@manual_import,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
-64.176.83.23,443,true,459,,SIN,Singapore · SG,AS209699 Coaxial Cable LLC,Coaxial Cable LLC,0,2026-09-16 08:33:05,@danfeng2,isp,2a14:7dc0:101:107a::bed3,2a14:7dc0:101:107a::bed3,AS209699 Coaxial Cable LLC,Coaxial Cable LLC
+64.176.83.23,443,true,459,,SIN,Singapore · SG,AS20473 Vultr,Vultr,0,2026-09-16 08:33:05,@danfeng2,isp,2a14:7dc0:101:107a::bed3,2a14:7dc0:101:107a::bed3,AS209699 Coaxial Cable LLC,Coaxial Cable LLC
 78.30.132.13,443,true,460,,BEG,Sombor · RS,AS8771 YUnet International d.o.o.,YUnet International d.o.o.,0,2026-10-18 21:52:09,@danfeng_chat,isp,78.30.132.13,,AS8771 YUnet International d.o.o.,YUnet International d.o.o.
 211.72.119.198,21267,true,461,,KHH,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,0,2026-11-10 17:56:26,@manual_import,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 43.229.254.71,443,true,462,,CGK,亚洲 · 印度尼西亚 · 雅加达,AS23679 PT. Media Antar Nusa,PT. Media Antar Nusa,0,2026-11-11 14:31:01,@cmliussss_all,isp,2401:2900:108::135,2401:2900:108::135,AS23679 PT. Media Antar Nusa,PT. Media Antar Nusa
@@ -1028,7 +1028,7 @@
 103.27.186.228,443,true,463,,NRT,亚洲 · 日本 · 东京,AS134835 Starry Network,Starry Network Limited,0,2026-11-11 09:33:41,@otcjlq,isp,2403:ad80:89:4c00:15:0:f358:d15b,2403:ad80:89:4c00:15:0:f358:d15b,AS134835 Starry Network,Starry Network
 94.207.46.38,443,true,464,,DXB,Dubai · AE,AS57187 Emirates Integrated Telecommunications Company PJSC,Emirates Integrated Telecommunications Company PJSC,0,2026-10-18 21:53:15,@danfeng_chat,isp,94.207.46.38,,AS57187 Emirates Integrated Telecommunications Company PJSC,Emirates Integrated Telecommunications Company PJSC
 61.124.15.230,8443,true,465,,NRT,亚洲 · 日本 · 东京,AS2497 Internet Initiative Japan Inc.,Internet Initiative Japan Inc.,0,2026-11-11 21:53:10,@danfeng_chat,isp,61.124.15.230,,AS2497 Internet Initiative Japan Inc.,Internet Initiative Japan Inc.
-91.148.229.96,443,true,466,,ZRH,Milan · IT,AS3356 Level 3 Communications,Level 3 Communications,0,2026-10-18 21:52:59,@danfeng_chat,isp,82.27.244.50,,AS3356 Level 3 Communications,Level 3 Communications
+91.148.229.96,443,true,466,,ZRH,Milan · IT,AS34343 Eweka Internet Services B.V.,Eweka Internet Services B.V.,0,2026-10-18 21:52:59,@danfeng_chat,isp,82.27.244.50,,AS3356 Level 3 Communications,Level 3 Communications
 14.137.235.190,443,true,468,,NRT,亚洲 · 印度 · 金奈,AS2497 Internet Initiative Japan Inc.,Internet Initiative Japan Inc.,0,2026-11-11 21:48:55,@danfeng_chat,isp,2401:ce20:c:1558:1567:34c2:1f00:bc9c,2401:ce20:c:1558:1567:34c2:1f00:bc9c,AS2497 Internet Initiative Japan Inc.,Internet Initiative Japan Inc.
 211.72.119.198,15233,true,469,,KHH,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,0,2026-11-10 17:56:26,@manual_import,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 103.27.187.132,443,true,470,,NRT,亚洲 · 印度 · 金奈,AS134835 Starry Network,Starry Network Limited,0,2026-11-11 09:33:41,@otcjlq,isp,2403:ad80:89:4c00:15:0:4efa:9cbf,2403:ad80:89:4c00:15:0:4efa:9cbf,AS134835 Starry Network,Starry Network
@@ -1038,8 +1038,8 @@
 211.72.119.198,20037,true,473,,KHH,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,0,2026-11-10 17:56:26,@manual_import,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 211.72.119.198,11551,true,473,,KHH,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,0,2026-11-10 17:56:26,@manual_import,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 49.128.202.140,443,true,473,,ICN,Seoul · KR,AS9318 SK Broadband,SK Broadband,0,2026-10-18 21:51:05,@danfeng_chat,isp,49.128.202.140,,AS9318 SK Broadband,SK Broadband
-208.75.135.216,443,true,476,,HKG,亚洲 · 澳门 · 氹仔,AS4609 Companhia de Telecomunicacoes de Macau SARL,Companhia de Telecomunicacoes de Macau SARL,0,2026-11-11 21:51:31,@danfeng_chat,isp,60.246.72.42,,AS4609 Companhia de Telecomunicacoes de Macau SARL,Companhia de Telecomunicacoes de Macau SARL
-45.88.43.85,443,true,477,,NRT,亚洲 · 日本 · 东京,AS2516 KDDI CORPORATION,KDDI CORPORATION,0,2026-11-11 21:52:46,@danfeng_chat,isp,240b:10:8e00:7400:be24:11ff:fe57:fb8c,240b:10:8e00:7400:be24:11ff:fe57:fb8c,AS2516 KDDI CORPORATION,KDDI CORPORATION
+208.75.135.216,443,true,476,,HKG,亚洲 · 澳门 · 氹仔,AS151338 PoloNetwork,PoloNetwork,0,2026-11-11 21:51:31,@danfeng_chat,isp,60.246.72.42,,AS4609 Companhia de Telecomunicacoes de Macau SARL,Companhia de Telecomunicacoes de Macau SARL
+45.88.43.85,443,true,477,,NRT,亚洲 · 日本 · 东京,AS212238 Datacamp Limited,Datacamp Limited,0,2026-11-11 21:52:46,@danfeng_chat,isp,240b:10:8e00:7400:be24:11ff:fe57:fb8c,240b:10:8e00:7400:be24:11ff:fe57:fb8c,AS2516 KDDI CORPORATION,KDDI CORPORATION
 211.72.119.198,18551,true,478,,KHH,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,0,2026-11-10 17:56:26,@manual_import,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 209.33.167.188,443,true,481,,HKG,亚洲 · 香港,AS63150 Bage Cloud,BAGE CLOUD LLC,0,2026-11-11 21:51:32,@danfeng_chat,isp,2a14:4900:2202:568::fb1,2a14:4900:2202:568::fb1,AS63150 Bage Cloud,Bage Cloud
 103.154.159.211,443,true,481,,DAC,孟加拉国-达卡,AS131464 The 1 Web Solution,The 1 Web Solution,0,2026-11-11 09:33:39,@otcjlq,isp,103.154.159.211,,AS131464 The 1 Web Solution,The 1 Web Solution
@@ -1071,7 +1071,7 @@
 125.229.205.26,443,true,496,,SIN,Tainan · TW,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,0,2026-09-16 08:17:48,@danfeng2,isp,2001:b011:e006:8917:24f4:5ba7:90ef:df37,2001:b011:e006:8917:24f4:5ba7:90ef:df37,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 14.225.207.246,443,true,497,,HKG,亚洲 · 香港,AS135905 VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,0,2026-11-11 21:48:57,@danfeng_chat,isp,14.225.207.246,,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group
 103.190.232.213,8443,true,497,,HKG,亚洲 · 香港,AS48266 Catixs Ltd,Catixs Ltd,0,2026-11-11 09:33:20,@otcjlq,isp,103.190.232.213,,AS48266 Catixs Ltd,Catixs Ltd
-46.46.182.20,443,true,497,,AMS,Amsterdam · NL,AS9002 RETN Limited,RETN Limited,0,2026-09-16 08:31:51,@danfeng2,isp,89.19.36.90,,AS9002 RETN Limited,RETN Limited
+46.46.182.20,443,true,497,,AMS,Amsterdam · NL,AS29470 JSC RetnNet,JSC RetnNet,0,2026-09-16 08:31:51,@danfeng2,isp,89.19.36.90,,AS9002 RETN Limited,RETN Limited
 42.3.137.207,443,true,497,,HKG,Hong Kong · HK,AS4760 HKT,HKT,0,2026-09-16 08:30:22,@danfeng2,isp,42.3.137.207,,AS4760 HKT,HKT
 38.22.94.79,33879,true,498,3778,HKG,Hong Kong · HK,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,38.22.94.79,,AS979 NetLab,NetLab
 14.225.206.83,443,true,500,,HKG,亚洲 · 香港,AS135905 VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,0,2026-11-11 21:48:56,@danfeng_chat,isp,14.225.206.83,,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group
@@ -1097,28 +1097,28 @@
 14.225.204.21,443,true,519,,HKG,亚洲 · 香港,AS135905 VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,0,2026-11-11 21:48:56,@danfeng_chat,isp,14.225.204.21,,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group
 14.225.206.145,443,true,519,,HKG,亚洲 · 香港,AS135905 VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,0,2026-11-11 21:48:56,@danfeng_chat,isp,14.225.206.145,,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group
 103.153.131.67,443,true,519,,SIN,亚洲 · 新加坡,AS140463 Sekolah Tinggi Teknologi Kedirgantaraan Yogyakarta,Sekolah Tinggi Teknologi Kedirgantaraan Yogyakarta,0,2026-10-18 21:42:05,@danfeng_chat,education,103.153.131.67,,AS140463 Sekolah Tinggi Teknologi Kedirgantaraan Yogyakarta,Sekolah Tinggi Teknologi Kedirgantaraan Yogyakarta
-177.5.54.92,443,true,521,,NRT,亚洲 · 日本 · 东京,AS17676 SoftBank Corp.,SoftBank Corp.,0,2026-11-11 21:50:20,@danfeng_chat,isp,60.157.112.73,,AS17676 SoftBank Corp.,SoftBank Corp.
+177.5.54.92,443,true,521,,NRT,亚洲 · 日本 · 东京,AS400618 Prime Security,Prime Security,0,2026-11-11 21:50:20,@danfeng_chat,isp,60.157.112.73,,AS17676 SoftBank Corp.,SoftBank Corp.
 212.2.227.187,443,true,521,0,WAW,亚洲 · 吉尔吉斯斯坦 · Bishkek,AS48271 Cjsc telecommunications Company dun,Cjsc telecommunications Company dun,0,2026-11-11 14:31:01,@cmliussss_all,isp,212.2.227.187,,AS48271 Cjsc telecommunications Company dun,Cjsc telecommunications Company dun
 27.147.158.196,443,true,525,,DAC,亚洲 · 孟加拉国 · 达卡,AS23688 Link3 Technologies Ltd.,Link3 Technologies Ltd.,0,2026-11-11 21:52:00,@danfeng_chat,isp,27.147.130.170,,AS23688 Link3 Technologies Ltd.,Link3 Technologies Ltd.
 154.36.187.104,443,true,527,,NRT,亚洲 · 印度 · 金奈,AS979 NetLab,NetLab Global,0,2026-11-11 21:49:32,@danfeng_chat,business,154.36.187.104,,AS979 NetLab,NetLab
-139.59.63.21,443,true,527,,BOM,亚洲 · 印度 · 孟买,AS58678 Intech Online Private Limited,Intech Online Private Limited,0,2026-11-11 21:48:50,@danfeng_chat,isp,157.20.27.201,,AS58678 Intech Online Private Limited,Intech Online Private Limited
-101.52.222.253,443,true,528,,HKG,Hong Kong · HK,AS58453 China Mobile CMI,China Mobile CMI,0,2026-09-16 08:16:45,@danfeng2,isp,223.119.70.6,,AS58453 China Mobile CMI,China Mobile CMI
-161.248.31.4,443,true,529,,HKG,亚洲 · 香港,AS135905 VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,0,2026-11-11 21:49:47,@danfeng_chat,isp,2400:e920:0:11::c,2400:e920:0:11::c,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group
+139.59.63.21,443,true,527,,BOM,亚洲 · 印度 · 孟买,AS14061 DigitalOcean,DigitalOcean,0,2026-11-11 21:48:50,@danfeng_chat,isp,157.20.27.201,,AS58678 Intech Online Private Limited,Intech Online Private Limited
+101.52.222.253,443,true,528,,HKG,Hong Kong · HK,AS4811 China Telecom,China Telecom,0,2026-09-16 08:16:45,@danfeng2,isp,223.119.70.6,,AS58453 China Mobile CMI,China Mobile CMI
+161.248.31.4,443,true,529,,HKG,亚洲 · 香港,AS45899 VNPT Corp,VNPT Corp,0,2026-11-11 21:49:47,@danfeng_chat,isp,2400:e920:0:11::c,2400:e920:0:11::c,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group
 222.255.214.167,443,true,530,,HKG,亚洲 · 香港,AS45899 VNPT Corp,VNPT Corp,0,2026-11-11 21:51:50,@danfeng_chat,isp,222.255.214.167,,AS45899 VNPT Corp,VNPT Corp
-91.148.229.94,443,true,532,,LHR,London · GB,AS2856 British Telecommunications Limited,British Telecommunications Limited,0,2026-10-18 21:52:59,@danfeng_chat,isp,151.240.186.212,,AS2856 British Telecommunications Limited,British Telecommunications Limited
+91.148.229.94,443,true,532,,LHR,London · GB,AS34343 Eweka Internet Services B.V.,Eweka Internet Services B.V.,0,2026-10-18 21:52:59,@danfeng_chat,isp,151.240.186.212,,AS2856 British Telecommunications Limited,British Telecommunications Limited
 125.20.69.45,443,true,534,,DEL,Gurugram · IN,AS9498 Bharti Airtel Ltd.,Bharti Airtel Ltd.,0,2026-10-18 21:42:39,@danfeng_chat,isp,125.20.69.42,,AS9498 Bharti Airtel Ltd.,Bharti Airtel Ltd.
-103.15.91.63,443,true,538,,HKG,亚洲 · 日本 · 大阪,AS135905 VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,0,2026-11-11 21:47:56,@danfeng_chat,isp,2400:e920:0:7::cb,2400:e920:0:7::cb,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group
+103.15.91.63,443,true,538,,HKG,亚洲 · 日本 · 大阪,AS45899 VNPT Corp,VNPT Corp,0,2026-11-11 21:47:56,@danfeng_chat,isp,2400:e920:0:7::cb,2400:e920:0:7::cb,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group
 113.177.121.42,8443,true,539,,HKG,亚洲 · 香港,AS45899 VNPT Corp,VNPT Corp,0,2026-11-11 21:48:22,@danfeng_chat,isp,113.177.121.42,,AS45899 VNPT Corp,VNPT Corp
 157.20.27.253,8443,true,542,,BOM,亚洲 · 印度 · 孟买,AS58678 Intech Online Private Limited,Intech Online Private Limited,0,2026-11-11 21:49:38,@danfeng_chat,isp,2602:fa08:50:4100::a,2602:fa08:50:4100::a,AS149020 WebHorizon Internet Services,WebHorizon Internet Services
 109.248.18.169,443,true,543,0,AKX,亚洲 · 哈萨克斯坦 · Pavlodar,AS215670 LLP Internet Company First Page,LLP Internet Company First Page,0,2026-11-11 14:31:01,@cmliussss_all,isp,2001:146a:0:113c::1,2001:146a:0:113c::1,AS215670 LLP Internet Company First Page,LLP Internet Company First Page
 166.88.77.241,443,true,544,,HKG,中国-香港,AS149440 Evoxt,Evoxt,0,2026-11-11 09:33:48,@otcjlq,isp,2400:e920:0:7::c9,2400:e920:0:7::c9,AS135905 TOTHOST SOLUTIONS AND TECHNOLOGIES COMPANY LIMITED,TOTHOST SOLUTIONS AND TECHNOLOGIES COMPANY LIMITED
 109.248.18.176,8443,true,545,0,AKX,亚洲 · 哈萨克斯坦 · Pavlodar,AS215670 LLP Internet Company First Page,LLP Internet Company First Page,0,2026-11-11 14:31:01,@cmliussss_all,isp,2001:146a:0:11c2::1,2001:146a:0:11c2::1,AS215670 LLP Internet Company First Page,LLP Internet Company First Page
 209.33.144.208,443,true,547,,NRT,亚洲 · 日本 · 东京,AS63150 Bage Cloud,BAGE CLOUD LLC,0,2026-11-11 21:51:32,@danfeng_chat,isp,209.33.144.208,,AS63150 Bage Cloud,Bage Cloud
-103.15.90.133,443,true,547,,HKG,亚洲 · 香港,AS135905 VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,0,2026-11-11 21:47:56,@danfeng_chat,isp,2400:e920:0:6::53,2400:e920:0:6::53,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group
+103.15.90.133,443,true,547,,HKG,亚洲 · 香港,AS45899 VNPT Corp,VNPT Corp,0,2026-11-11 21:47:56,@danfeng_chat,isp,2400:e920:0:6::53,2400:e920:0:6::53,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group
 109.248.18.226,443,true,548,0,AKX,亚洲 · 哈萨克斯坦 · Pavlodar,AS215670 LLP Internet Company First Page,LLP Internet Company First Page,0,2026-11-11 14:31:01,@cmliussss_all,isp,2001:146a:0:1169::1,2001:146a:0:1169::1,AS215670 LLP Internet Company First Page,LLP Internet Company First Page
 109.248.18.40,443,true,548,,AKX,Pavlodar · KZ,AS215670 LLP Internet Company First Page,LLP Internet Company First Page,0,2026-09-16 08:17:39,@danfeng2,isp,2001:146a:0:108e::1,2001:146a:0:108e::1,AS215670 LLP Internet Company First Page,LLP Internet Company First Page
 103.159.170.124,443,true,549,,DAC,亚洲 · 孟加拉国 · 达卡,AS141448 A S ONLINE,A S ONLINE,0,2026-11-11 21:47:56,@danfeng_chat,isp,103.159.170.124,,AS141448 A S ONLINE,A S ONLINE
-143.42.66.91,443,true,549,,SIN,亚洲 · 新加坡,AS18106 Viewqwest Pte Ltd,Viewqwest Pte Ltd,0,2026-11-11 14:31:01,@cmliussss_all,isp,202.55.67.194,,AS18106 Viewqwest Pte Ltd,Viewqwest Pte Ltd
+143.42.66.91,443,true,549,,SIN,亚洲 · 新加坡,AS63949 Linode Akamai,Linode Akamai,0,2026-11-11 14:31:01,@cmliussss_all,isp,202.55.67.194,,AS18106 Viewqwest Pte Ltd,Viewqwest Pte Ltd
 165.101.114.172,443,true,553,,HKG,Hanoi · 越南,AS135905 AI APPLICATION SOFTWARE COMPANY LIMITED,AI APPLICATION SOFTWARE COMPANY LIMITED,0,2026-09-16 08:21:36,@danfeng2,isp,165.101.114.172,,AS135905 AI APPLICATION SOFTWARE COMPANY LIMITED,AI APPLICATION SOFTWARE COMPANY LIMITED
 109.248.18.151,443,true,555,0,AKX,亚洲 · 哈萨克斯坦 · Pavlodar,AS215670 LLP Internet Company First Page,LLP Internet Company First Page,0,2026-11-11 14:31:01,@cmliussss_all,isp,2001:146a:0:1131::1,2001:146a:0:1131::1,AS215670 LLP Internet Company First Page,LLP Internet Company First Page
 103.115.252.46,443,true,555,,DAC,孟加拉国-达卡,AS137868 Star Internet Service,Star Internet Service,0,2026-11-11 09:33:44,@otcjlq,isp,103.115.253.253,,AS137868 Star Internet Service,Star Internet Service
@@ -1128,13 +1128,13 @@
 211.72.119.198,15622,true,561,,KHH,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,0,2026-11-10 17:56:26,@manual_import,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 64.83.36.18,443,true,563,,NRT,亚洲 · 日本 · 东京,AS979 NetLab,NetLab Global,0,2026-11-11 21:53:19,@danfeng_chat,business,64.83.36.18,,AS979 NetLab,NetLab
 109.248.18.226,8443,true,565,0,AKX,亚洲 · 哈萨克斯坦 · Pavlodar,AS215670 LLP Internet Company First Page,LLP Internet Company First Page,0,2026-11-11 14:31:01,@cmliussss_all,isp,2001:146a:0:1169::1,2001:146a:0:1169::1,AS215670 LLP Internet Company First Page,LLP Internet Company First Page
-103.240.198.31,33033,true,565,9689,SIN,Singapore · SG,AS209699 Coaxial Cable LLC,Coaxial Cable LLC,0,2026-08-13 20:31:23,@danfeng2,isp,217.116.172.153,,AS209699 Coaxial Cable LLC,Coaxial Cable LLC
+103.240.198.31,33033,true,565,9689,SIN,Singapore · SG,AS42960 VHGLOBAL,VHGLOBAL,0,2026-08-13 20:31:23,@danfeng2,isp,217.116.172.153,,AS209699 Coaxial Cable LLC,Coaxial Cable LLC
 211.72.119.198,26102,true,566,,KHH,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,0,2026-11-10 17:56:26,@manual_import,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 116.118.8.67,443,true,566,,SIN,Nhà Bè · VN,AS7602 Sai gon Postel Corporation,Sai gon Postel Corporation,0,2026-10-18 21:42:36,@danfeng_chat,isp,116.118.8.67,,AS7602 Sai gon Postel Corporation,Sai gon Postel Corporation
 160.22.215.5,443,true,567,,DAC,Dhaka · BD,AS152928 AKBOR POWER NET,AKBOR POWER NET,0,2026-09-16 08:21:19,@danfeng2,isp,160.22.215.5,,AS152928 AKBOR POWER NET,AKBOR POWER NET
 114.204.40.185,443,true,570,,KIX,北美洲 · 美国 · 洛杉矶,AS9318 SK Broadband,SK Broadband Co Ltd,0,2026-10-18 21:42:36,@danfeng_chat,isp,114.204.40.185,,AS9318 SK Broadband,SK Broadband
 77.93.89.206,443,true,571,,SIN,新加坡-新加坡,AS63150 Bage Cloud,Bage Cloud,0,2026-11-11 09:33:38,@otcjlq,isp,2a14:7dc0:201:9ba::f93,2a14:7dc0:201:9ba::f93,AS63150 Bage Cloud,BAGE CLOUD LLC
-160.25.75.6,443,true,573,,HKG,亚洲 · 香港,AS135905 VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,0,2026-11-11 21:49:46,@danfeng_chat,isp,2400:e920:0:b:250:56ff:fe94:6979,2400:e920:0:b:250:56ff:fe94:6979,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group
+160.25.75.6,443,true,573,,HKG,亚洲 · 香港,AS45899 VNPT Corp,VNPT Corp,0,2026-11-11 21:49:46,@danfeng_chat,isp,2400:e920:0:b:250:56ff:fe94:6979,2400:e920:0:b:250:56ff:fe94:6979,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group
 103.219.115.241,443,true,573,,DAC,Dhaka · BD,AS38303 bKash Limited,bKash Limited,0,2026-10-18 21:42:10,@danfeng_chat,business,103.219.115.241,,AS38303 bKash Limited,bKash Limited
 109.248.18.145,443,true,574,0,AKX,亚洲 · 哈萨克斯坦 · Pavlodar,AS215670 LLP Internet Company First Page,LLP Internet Company First Page,0,2026-11-11 14:31:01,@cmliussss_all,isp,2001:146a:0:109a::1,2001:146a:0:109a::1,AS215670 LLP Internet Company First Page,LLP Internet Company First Page
 154.36.178.44,443,true,574,,SJC,北美洲 · 美国 · 圣何塞,AS979 NetLab,NetLab Global,0,2026-11-11 09:33:14,@otcjlq,business,154.36.178.44,,AS979 NetLab,NetLab
@@ -1149,7 +1149,7 @@
 14.225.205.241,443,true,593,,HKG,亚洲 · 香港,AS135905 VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,0,2026-11-11 21:48:56,@danfeng_chat,isp,14.225.205.241,,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group
 38.175.200.121,443,true,594,,SJC,北美洲 · 美国 · 西雅图,AS979 NetLab,NetLab Global,0,2026-11-11 21:52:19,@danfeng_chat,business,38.175.200.61,,AS979 NetLab,NetLab
 103.81.172.34,443,true,594,,DAC,亚洲 · 孟加拉国 · 达卡,AS38203 ADN Telecom Ltd.,ADN Telecom Ltd.,0,2026-10-18 21:42:12,@danfeng_chat,isp,103.81.172.34,,AS38203 ADN Telecom Ltd.,ADN Telecom Ltd.
-144.79.249.147,443,true,595,,DAC,亚洲 · 孟加拉国 · 达卡,AS152479 DELTA SOFTWARE AND COMMUNICATION LIMITED,DELTA SOFTWARE AND COMMUNICATION LIMITED,0,2026-11-11 21:49:06,@danfeng_chat,isp,103.124.110.107,,AS152479 Delta Software and Communication Limited,Delta Software and Communication Limited
+144.79.249.147,443,true,595,,DAC,亚洲 · 孟加拉国 · 达卡,AS150142 GOTMYHOST,GOTMYHOST,0,2026-11-11 21:49:06,@danfeng_chat,isp,103.124.110.107,,AS152479 Delta Software and Communication Limited,Delta Software and Communication Limited
 109.248.18.77,443,true,598,0,AKX,亚洲 · 哈萨克斯坦 · Pavlodar,AS215670 LLP Internet Company First Page,LLP Internet Company First Page,0,2026-11-11 14:31:01,@cmliussss_all,isp,2001:146a:0:10a5::1,2001:146a:0:10a5::1,AS215670 LLP Internet Company First Page,LLP Internet Company First Page
 103.130.112.251,443,true,598,,DEL,Dhaka · BD,AS138336 POTATO,POTATO,0,2026-10-18 21:42:04,@danfeng_chat,isp,103.130.112.251,,AS138336 POTATO,POTATO
 89.236.217.103,2053,true,599,0,WAW,Tashkent · UZ,AS39032 East Telecom Networks,East Telecom Networks,0,2026-10-13 14:49:53,@cmliussss_all,isp,89.236.217.103,,AS39032 East Telecom Networks,East Telecom Networks
@@ -1161,14 +1161,14 @@
 220.135.234.132,443,true,612,,SJC,北美洲 · 美国 · 圣何塞,AS3462 Chunghwa Telecom HiNet (Data Communication Business Group),Data Communication Business Group,0,2026-10-18 21:49:12,@danfeng_chat,isp,220.135.234.132,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 171.25.158.112,443,true,612,,ARN,Växjö · SE,AS35100 Vaxjo NET C2IP,Vaxjo NET C2IP,0,2026-10-18 21:45:51,@danfeng_chat,isp,171.25.158.112,,AS35100 Vaxjo NET C2IP,Vaxjo NET C2IP
 85.149.212.204,443,true,616,,SIN,亚洲 · 新加坡,AS63150 Bage Cloud,BAGE CLOUD LLC,0,2026-11-11 09:33:38,@otcjlq,isp,2a14:7dc0:202:ca1::254,2a14:7dc0:202:ca1::254,AS63150 Bage Cloud,Bage Cloud
-163.61.74.121,443,true,617,,HKG,亚洲 · 香港,AS135905 VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,0,2026-11-11 14:31:01,@cmliussss_all,isp,2400:e920:0:12::41,2400:e920:0:12::41,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group
+163.61.74.121,443,true,617,,HKG,亚洲 · 香港,AS45899 VNPT Corp,VNPT Corp,0,2026-11-11 14:31:01,@cmliussss_all,isp,2400:e920:0:12::41,2400:e920:0:12::41,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group
 118.39.0.173,443,true,620,,SEA,Changwon · KR,AS4766 Korea Telecom,Korea Telecom,0,2026-10-18 21:42:38,@danfeng_chat,isp,118.39.0.173,,AS4766 Korea Telecom,Korea Telecom
 109.248.18.21,8443,true,624,0,AKX,亚洲 · 哈萨克斯坦 · Pavlodar,AS215670 LLP Internet Company First Page,LLP Internet Company First Page,0,2026-11-11 14:31:01,@cmliussss_all,isp,2001:146a:0:101c::1,2001:146a:0:101c::1,AS215670 LLP Internet Company First Page,LLP Internet Company First Page
 103.185.250.210,443,true,625,,DAC,亚洲 · 孟加拉国 · 达卡,AS149770 L.J Broadband Network,L.J Broadband Network,0,2026-11-11 09:33:39,@otcjlq,isp,103.185.250.210,,AS149770 L.J Broadband Network,L.J Broadband Network
 103.210.56.70,443,true,632,,DAC,亚洲 · 孟加拉国 · 达卡,AS135130 Md. Wahid Murad T/A Anik Computer & Networking,Md. Wahid Murad T/A Anik Computer & Networking,0,2026-11-11 21:47:57,@danfeng_chat,isp,103.210.56.70,,AS135130 Md. Wahid Murad T/A Anik Computer & Networking,Md. Wahid Murad T/A Anik Computer & Networking
 154.64.247.251,10086,true,634,4057,HKG,Hong Kong · 香港,AS979 NetLab,NetLab Global,0,2026-09-06 16:44:44,@danfeng2,business,154.64.247.251,,AS979 NetLab,NetLab Global
-154.23.243.146,8443,true,636,,KHH,亚洲 · 台湾 · 高雄市,AS3462 Chunghwa Telecom HiNet (Data Communication Business Group),Data Communication Business Group,0,2026-11-11 21:49:31,@danfeng_chat,isp,2001:b011:c007:87d3:9de6:b05e:bd0:5cf9,2001:b011:c007:87d3:9de6:b05e:bd0:5cf9,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
-160.30.54.110,443,true,638,,HKG,亚洲 · 日本 · 大阪,AS135905 VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,0,2026-11-11 21:49:46,@danfeng_chat,isp,2400:e920:0:c::68,2400:e920:0:c::68,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group
+154.23.243.146,8443,true,636,,KHH,亚洲 · 台湾 · 高雄市,AS8796 Kurun Cloud,Kurun Cloud,0,2026-11-11 21:49:31,@danfeng_chat,isp,2001:b011:c007:87d3:9de6:b05e:bd0:5cf9,2001:b011:c007:87d3:9de6:b05e:bd0:5cf9,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+160.30.54.110,443,true,638,,HKG,亚洲 · 日本 · 大阪,AS45899 VNPT Corp,VNPT Corp,0,2026-11-11 21:49:46,@danfeng_chat,isp,2400:e920:0:c::68,2400:e920:0:c::68,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group
 154.37.154.46,8443,true,656,,LAX,美国-洛杉矶,AS979 NetLab,NetLab Global,0,2026-11-11 09:33:14,@otcjlq,business,154.37.154.46,,AS979 NetLab,NetLab Global
 121.128.161.235,10002,true,660,0,ICN,韩国,AS4766 Korea Telecom,Korea Telecom,0,2026-11-12 15:17:52,@kr.william.us.ci,isp,121.128.161.235,,AS4766 Korea Telecom,Korea Telecom
 178.208.156.194,8443,true,660,,DME,Khimki · RU,AS8732 JSC Comcor,JSC Comcor,0,2026-07-27 18:44:48,@danfeng2,isp,178.208.156.194,,AS8732 JSC Comcor,JSC Comcor
@@ -1180,13 +1180,13 @@
 64.90.21.49,58424,true,679,3269,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,216.167.20.248,,"AS2914 NTT America, Inc.","NTT America, Inc."
 203.69.23.30,443,true,683,0,TPE,台湾,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,0,2026-10-18 21:48:07,@danfeng_chat,isp,203.69.23.30,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 103.219.195.140,443,true,684,,HKG,亚洲 · 香港,AS63150 Bage Cloud,BAGE CLOUD LLC,0,2026-11-11 09:33:38,@otcjlq,isp,103.219.195.140,,AS63150 Bage Cloud,Bage Cloud
-64.90.22.47,58424,true,684,2234,LAX,Los Angeles · US,"AS2914 NTT America, Inc.","NTT America, Inc.",0,2026-09-06 16:44:44,@danfeng2,isp,216.167.20.248,,"AS2914 NTT America, Inc.","NTT America, Inc."
+64.90.22.47,58424,true,684,2234,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,216.167.20.248,,"AS2914 NTT America, Inc.","NTT America, Inc."
 123.111.169.70,8443,true,686,0,ICN,亚洲 · 韩国 · Seongnam-si,AS9318 SK Broadband,SK Broadband,0,2026-11-11 14:31:01,@cmliussss_all,isp,123.111.169.70,,AS9318 SK Broadband,SK Broadband
 95.46.1.22,2053,true,686,,FRA,RU,AS62366 Stolica Telecom Ltd.,Stolica Telecom Ltd.,0,2026-10-25 18:30:49,@user,isp,95.46.1.22,,AS62366 Stolica Telecom Ltd.,Stolica Telecom Ltd.
 115.1.222.80,443,true,686,,ICN,Goyang-si · KR,AS4766 Korea Telecom,Korea Telecom,0,2026-10-18 21:42:36,@danfeng_chat,isp,115.1.222.80,,AS4766 Korea Telecom,Korea Telecom
 94.43.238.112,2053,true,687,0,TBS,亚洲 · 格鲁吉亚 · Dighomi,AS35805 SILKNET BROADBAND,SILKNET BROADBAND,0,2026-11-11 14:31:01,@cmliussss_all,isp,94.43.238.112,,AS35805 SILKNET BROADBAND,SILKNET BROADBAND
 116.49.210.182,8443,true,689,,HKG,亚洲 · 香港,AS4760 HKT,HKT Limited,0,2026-11-11 21:48:24,@danfeng_chat,isp,2404:c804:3042:6101:be24:11ff:fe18:4eef,2404:c804:3042:6101:be24:11ff:fe18:4eef,AS4760 HKT,HKT
-64.90.9.96,59613,true,689,4876,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,38.34.6.226,,AS979 NetLab,NetLab
+64.90.9.96,59613,true,689,4876,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.34.6.226,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 154.44.31.112,58424,true,689,3613,LAS,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,216.167.20.248,,"AS2914 NTT America, Inc.","NTT America, Inc."
 202.61.87.73,443,true,690,,HKG,中国-香港,AS133201 ABCDE GROUP,ABCDE GROUP,0,2026-11-11 09:33:41,@otcjlq,business,202.61.87.73,,AS133201 ABCDE GROUP,ABCDE GROUP
 103.219.194.152,443,true,690,,HKG,亚洲 · 香港,AS63150 Bage Cloud,BAGE CLOUD LLC,0,2026-11-11 09:33:38,@otcjlq,isp,103.219.194.152,,AS63150 Bage Cloud,Bage Cloud
@@ -1202,7 +1202,7 @@
 45.88.90.76,2053,true,694,,ARN,波兰-华沙,AS41798 JSC Transtelecom (Big Data Host LLC),Big Data Host LLC,0,2026-11-11 09:33:20,@otcjlq,isp,45.88.90.76,,AS41798 JSC Transtelecom (Big Data Host LLC),Big Data Host LLC
 211.72.119.198,11432,true,694,,KHH,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,0,2026-11-10 17:56:26,@manual_import,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 154.44.24.183,10086,true,694,4190,HKG,Hong Kong · HK,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,154.44.24.183,,AS979 NetLab,NetLab
-154.44.31.112,13567,true,694,4871,SJC,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,38.34.1.25,,AS979 NetLab,NetLab
+154.44.31.112,13567,true,694,4871,SJC,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.34.1.25,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 70.39.206.127,26297,true,694,4026,HKG,Hong Kong · HK,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,70.39.206.127,,AS979 NetLab,NetLab
 125.59.42.101,443,true,695,,HKG,亚洲 · 香港,AS9908 HK Cable TV Ltd,HK Cable TV Ltd,0,2026-11-11 21:48:26,@danfeng_chat,isp,125.59.42.101,,AS9908 HK Cable TV Ltd,HK Cable TV Ltd
 211.72.119.198,22355,true,695,,KHH,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,0,2026-11-10 17:56:26,@manual_import,isp,211.72.119.198,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
@@ -1216,15 +1216,15 @@
 185.239.227.211,443,true,699,,SIN,亚洲 · 新加坡,AS134835 Starry Network,Starry Network Limited,0,2026-11-11 09:33:41,@otcjlq,isp,2403:ad80:a6:16::5217:277c,2403:ad80:a6:16::5217:277c,AS134835 Starry Network,Starry Network
 185.239.226.247,443,true,700,,SIN,亚洲 · 新加坡,AS134835 Starry Network,Starry Network Limited,0,2026-11-11 21:50:43,@danfeng_chat,isp,2403:ad80:a6:16::fe1a:b146,2403:ad80:a6:16::fe1a:b146,AS134835 Starry Network,Starry Network
 89.147.163.8,443,true,700,,MCT,Muscat · OM,AS204170 Awaser Oman,Awaser Oman,0,2026-10-18 21:52:50,@danfeng_chat,isp,89.147.163.8,,AS204170 Awaser Oman,Awaser Oman
-38.246.248.19,58424,true,700,5292,LAS,Los Angeles · US,"AS2914 NTT America, Inc.","NTT America, Inc.",0,2026-09-06 16:44:44,@danfeng2,isp,216.167.20.248,,"AS2914 NTT America, Inc.","NTT America, Inc."
-222.167.138.219,8443,true,701,,HKG,亚洲 · 香港,AS62711 Maxwell Telecom,Maxwell Telecom LLC,0,2026-11-11 21:51:49,@danfeng_chat,isp,23.175.201.98,,AS62711 Maxwell Telecom,Maxwell Telecom
-208.75.135.132,443,true,701,,HKG,亚洲 · 澳门 · 氹仔,AS4609 Companhia de Telecomunicacoes de Macau SARL,Companhia de Telecomunicacoes de Macau SARL,0,2026-11-11 21:51:31,@danfeng_chat,isp,60.246.72.42,,AS4609 Companhia de Telecomunicacoes de Macau SARL,Companhia de Telecomunicacoes de Macau SARL
-91.148.229.93,443,true,701,,ZRH,Zürich · CH,AS3356 Level 3 Communications,Level 3 Communications,0,2026-10-18 21:52:59,@danfeng_chat,isp,72.63.242.55,,AS3356 Level 3 Communications,Level 3 Communications
+38.246.248.19,58424,true,700,5292,LAS,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,216.167.20.248,,"AS2914 NTT America, Inc.","NTT America, Inc."
+222.167.138.219,8443,true,701,,HKG,亚洲 · 香港,AS9908 HK Cable TV Ltd,HK Cable TV Ltd,0,2026-11-11 21:51:49,@danfeng_chat,isp,23.175.201.98,,AS62711 Maxwell Telecom,Maxwell Telecom
+208.75.135.132,443,true,701,,HKG,亚洲 · 澳门 · 氹仔,AS151338 PoloNetwork,PoloNetwork,0,2026-11-11 21:51:31,@danfeng_chat,isp,60.246.72.42,,AS4609 Companhia de Telecomunicacoes de Macau SARL,Companhia de Telecomunicacoes de Macau SARL
+91.148.229.93,443,true,701,,ZRH,Zürich · CH,AS34343 Eweka Internet Services B.V.,Eweka Internet Services B.V.,0,2026-10-18 21:52:59,@danfeng_chat,isp,72.63.242.55,,AS3356 Level 3 Communications,Level 3 Communications
 94.41.22.102,443,true,702,,AMS,Ufa · RU,AS24955 JSC Ufanet,JSC Ufanet,0,2026-10-18 21:53:16,@danfeng_chat,isp,94.41.22.102,,AS24955 JSC Ufanet,JSC Ufanet
 43.173.1.153,8443,true,704,,SIN,亚洲 · 新加坡,AS132203 Tencent Cloud,Tencent Cloud,0,2026-11-11 09:33:40,@otcjlq,isp,2001:448a:2050:3a15:3647:d4ff:fed5:4a24,2001:448a:2050:3a15:3647:d4ff:fed5:4a24,AS7713 Telekomunikasi Indonesia,Telekomunikasi Indonesia
 80.227.252.11,8443,true,705,0,LHR,亚洲 · 阿拉伯联合酋长国 · Dubai,AS15802 Emirates Integrated Telecommunications Company PJSC,Emirates Integrated Telecommunications Company PJSC,0,2026-11-11 14:31:01,@cmliussss_all,isp,2a00:f2a:e1bf:ee10::1,2a00:f2a:e1bf:ee10::1,AS15802 Emirates Integrated Telecommunications Company PJSC,Emirates Integrated Telecommunications Company PJSC
 14.225.205.95,443,true,706,,HKG,亚洲 · 香港,AS135905 VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,0,2026-11-11 21:48:56,@danfeng_chat,isp,14.225.205.95,,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group
-61.91.54.186,443,true,706,,BKK,亚洲 · 泰国 · 曼谷,AS133481 AIS-Fibre (AIS Fibre),AIS Fibre,0,2026-10-18 21:51:29,@danfeng_chat,isp,49.0.67.36,,AS133481 AIS-Fibre (AIS Fibre),AIS Fibre
+61.91.54.186,443,true,706,,BKK,亚洲 · 泰国 · 曼谷,AS7470 True Internet Corporation CO. Ltd.,True Internet Corporation CO. Ltd.,0,2026-10-18 21:51:29,@danfeng_chat,isp,49.0.67.36,,AS133481 AIS-Fibre (AIS Fibre),AIS Fibre
 103.165.46.146,443,true,706,,ULN,Ulan Bator · MN,AS24496 NEXUS,NEXUS,0,2026-10-18 21:42:05,@danfeng_chat,isp,103.165.46.146,,AS24496 NEXUS,NEXUS
 14.225.207.70,443,true,707,,HKG,亚洲 · 香港,AS135905 VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,0,2026-11-11 21:48:57,@danfeng_chat,isp,14.225.207.70,,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group
 49.245.39.58,443,true,708,,SIN,亚洲 · 新加坡,AS4773 M1 LIMITED (MobileOne Ltd. Mobile/Internet Service Provider Singapore),MobileOne Ltd. Mobile/Internet Service Provider Singapore,0,2026-11-11 21:52:57,@danfeng_chat,isp,49.245.39.58,,AS4773 M1 LIMITED,M1 LIMITED
@@ -1232,79 +1232,79 @@
 27.254.216.110,443,true,708,,BKK,Bangkok · TH,AS9891 CS LOXINFO Public Company Limited.,CS LOXINFO Public Company Limited.,0,2026-10-18 21:49:33,@danfeng_chat,isp,27.254.216.110,,AS9891 CS LOXINFO Public Company Limited.,CS LOXINFO Public Company Limited.
 222.255.214.196,443,true,709,,HKG,亚洲 · 香港,AS45899 VNPT Corp,VNPT Corp,0,2026-11-11 21:51:50,@danfeng_chat,isp,222.255.214.196,,AS45899 VNPT Corp,VNPT Corp
 14.225.207.120,443,true,710,,HKG,亚洲 · 香港,AS135905 VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,0,2026-11-11 21:48:57,@danfeng_chat,isp,14.225.207.120,,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group
-77.242.105.81,443,true,710,,FRA,Moscow · RU,AS6939 Hurricane Electric LLC,Hurricane Electric LLC,0,2026-10-18 21:52:04,@danfeng_chat,isp,2001:470:530c:abcd::1:99,2001:470:530c:abcd::1:99,AS6939 Hurricane Electric LLC,Hurricane Electric LLC
+77.242.105.81,443,true,710,,FRA,Moscow · RU,"AS15493 ""Russian company"" LLC","""Russian company"" LLC",0,2026-10-18 21:52:04,@danfeng_chat,isp,2001:470:530c:abcd::1:99,2001:470:530c:abcd::1:99,AS6939 Hurricane Electric LLC,Hurricane Electric LLC
 61.77.229.182,443,true,711,,SEA,Seongnam-si · KR,AS4766 Korea Telecom,Korea Telecom,0,2026-10-18 21:51:29,@danfeng_chat,isp,61.77.229.182,,AS4766 Korea Telecom,Korea Telecom
 14.225.206.99,443,true,712,,HKG,亚洲 · 香港,AS135905 VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,0,2026-11-11 21:48:57,@danfeng_chat,isp,14.225.206.99,,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group
 14.225.204.135,443,true,712,,HKG,亚洲 · 香港,AS135905 VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,VIETNAM POSTS AND TELECOMMUNICATIONS GROUP,0,2026-11-11 21:48:56,@danfeng_chat,isp,14.225.204.135,,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group
 183.101.136.209,443,true,715,0,SEA,韩国,AS4766 Korea Telecom,Korea Telecom,0,2026-10-18 21:46:25,@danfeng_chat,isp,183.101.136.209,,AS4766 Korea Telecom,Korea Telecom
 103.235.162.101,443,true,715,,DAC,Comilla · BD,AS151501 KR Online,KR Online,0,2026-10-18 21:42:10,@danfeng_chat,isp,103.235.162.2,,AS151501 KR Online,KR Online
 95.188.72.67,443,true,716,,DME,Krasnoyarsk · RU,AS12389 Primorye NET,Primorye NET,0,2026-10-18 21:53:21,@danfeng_chat,isp,95.188.72.67,,AS12389 Primorye NET,Primorye NET
-163.53.246.67,443,true,718,,HKG,亚洲 · 香港,AS9304 HGC Global Communications Limited,HGC Global Communications Limited,0,2026-11-11 21:49:54,@danfeng_chat,isp,103.103.64.47,,AS9304 HGC Global Communications Limited,HGC Global Communications Limited
+163.53.246.67,443,true,718,,HKG,亚洲 · 香港,AS40065 CloudRadium,CloudRadium,0,2026-11-11 21:49:54,@danfeng_chat,isp,103.103.64.47,,AS9304 HGC Global Communications Limited,HGC Global Communications Limited
 185.217.87.7,443,true,720,,BEY,Zahlé · LB,AS204429 Smart City SARL,Smart City SARL,0,2026-09-16 08:23:49,@danfeng2,isp,185.217.87.7,,AS204429 Smart City SARL,Smart City SARL
-64.90.21.50,59613,true,723,2862,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,38.34.6.226,,AS979 NetLab,NetLab
+64.90.21.50,59613,true,723,2862,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.34.6.226,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 185.82.196.48,443,true,729,,HEL,欧洲 · 瑞典 · 斯德哥尔摩,"AS12737 KrasPromStroy, LLC (Maxima, LLC)","Maxima, LLC",0,2026-10-18 21:46:57,@danfeng_chat,isp,185.82.196.48,,"AS12737 KrasPromStroy, LLC (Maxima, LLC)","Maxima, LLC"
-154.36.163.51,50792,true,730,4408,LAX,Los Angeles · US,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",0,2026-09-06 16:44:44,@danfeng2,isp,38.34.6.143,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
+154.36.163.51,50792,true,730,4408,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.34.6.143,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 37.151.92.205,443,true,731,,NQZ,Astana · KZ,AS9198 JSC Kazakhtelecom,JSC Kazakhtelecom,0,2026-10-18 21:50:06,@danfeng_chat,isp,37.151.92.205,,AS9198 JSC Kazakhtelecom,JSC Kazakhtelecom
 38.246.249.234,50792,true,743,2808,LAX,北美洲 · 美国洛杉矶 · 香港,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.34.6.143,,"AS174 Cogent Communications, LLC (NetLab)",NetLab
-38.246.248.19,59613,true,746,5295,LAX,Los Angeles · US,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",0,2026-09-06 16:44:44,@danfeng2,isp,38.34.6.226,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
-38.246.248.19,50792,true,751,5001,LAX,Los Angeles · US,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",0,2026-09-06 16:44:44,@danfeng2,isp,38.34.6.143,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
-64.90.21.159,50792,true,754,1715,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,38.34.6.143,,AS979 NetLab,NetLab
+38.246.248.19,59613,true,746,5295,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.34.6.226,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
+38.246.248.19,50792,true,751,5001,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.34.6.143,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
+64.90.21.159,50792,true,754,1715,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.34.6.143,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 64.90.21.159,58424,true,760,3293,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,216.167.20.248,,"AS2914 NTT America, Inc.","NTT America, Inc."
 112.54.161.251,443,true,763,0,LHR,Shanghai · CN,AS24400 China Mobile Communications Corporation - shanghai company,China Mobile Communications Corporation - shanghai company,0,2026-10-13 14:49:53,@cmliussss_all,isp,112.54.161.251,,AS24400 China Mobile Communications Corporation - shanghai company,China Mobile Communications Corporation - shanghai company
-8.210.207.226,443,true,764,10596,HKG,亚洲 · 香港,AS9304 HGC Global Communications Limited,HGC Global Communications Limited,0,2026-10-19 19:46:25,@danfeng_chat,isp,103.103.64.47,,AS9304 HGC Global Communications Limited,HGC Global Communications Limited
+8.210.207.226,443,true,764,10596,HKG,亚洲 · 香港,AS45102 Alibaba Cloud,Alibaba Cloud,0,2026-10-19 19:46:25,@danfeng_chat,isp,103.103.64.47,,AS9304 HGC Global Communications Limited,HGC Global Communications Limited
 64.90.21.49,41455,true,764,3129,SJC,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.244.30.158,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 64.90.21.159,52808,true,765,2777,SJC,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.246.242.168,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 176.119.141.154,443,true,766,,BOS,美国-波士顿,AS57043 Hostkey B.V.,Hostkey B.V.,0,2026-11-11 09:33:31,@otcjlq,isp,185.186.60.250,,AS6282 Fiber Optical Network LLC (Atlantis Broadband LLC),Atlantis Broadband LLC
-103.222.33.59,443,true,768,,ORD,Chicago · US,"AS11179 Aryaka Networks, Inc.","Aryaka Networks, Inc.",0,2026-09-16 08:16:49,@danfeng2,business,159.100.192.239,,"AS11179 Aryaka Networks, Inc.","Aryaka Networks, Inc."
+103.222.33.59,443,true,768,,ORD,Chicago · US,AS4811 China Telecom,China Telecom,0,2026-09-16 08:16:49,@danfeng2,business,159.100.192.239,,"AS11179 Aryaka Networks, Inc.","Aryaka Networks, Inc."
 45.88.90.76,8443,true,771,,ARN,波兰-华沙,AS41798 JSC Transtelecom (Big Data Host LLC),Big Data Host LLC,0,2026-11-11 09:33:20,@otcjlq,isp,45.88.90.76,,AS41798 JSC Transtelecom (Big Data Host LLC),Big Data Host LLC
-38.246.248.19,27515,true,772,5376,LAX,Los Angeles · US,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",0,2026-09-06 16:44:44,@danfeng2,isp,38.34.6.102,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
-64.90.22.47,59613,true,777,2746,LAX,Los Angeles · US,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",0,2026-09-06 16:44:44,@danfeng2,isp,38.34.6.226,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
+38.246.248.19,27515,true,772,5376,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.34.6.102,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
+64.90.22.47,59613,true,777,2746,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.34.6.226,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 64.90.21.50,41455,true,780,3511,SJC,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.244.30.158,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 154.44.31.112,52808,true,782,5176,SJC,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.246.242.168,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
-154.36.163.51,13567,true,790,4256,SJC,Los Angeles · US,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",0,2026-09-06 16:44:44,@danfeng2,isp,38.34.1.25,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
+154.36.163.51,13567,true,790,4256,SJC,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.34.1.25,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 64.90.21.159,41455,true,793,3206,SJC,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.244.30.158,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
-154.36.163.51,59613,true,796,5162,LAX,Los Angeles · US,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",0,2026-09-06 16:44:44,@danfeng2,isp,38.34.6.226,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
-64.90.22.47,27515,true,809,2898,LAX,Los Angeles · US,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",0,2026-09-06 16:44:44,@danfeng2,isp,38.34.6.102,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
-154.44.31.112,59613,true,810,4567,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,38.34.6.226,,AS979 NetLab,NetLab
+154.36.163.51,59613,true,796,5162,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.34.6.226,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
+64.90.22.47,27515,true,809,2898,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.34.6.102,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
+154.44.31.112,59613,true,810,4567,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.34.6.226,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 64.90.9.96,41455,true,821,5024,SJC,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.244.30.158,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
-64.90.9.96,50792,true,824,196,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,38.34.6.143,,AS979 NetLab,NetLab
+64.90.9.96,50792,true,824,196,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.34.6.143,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 154.36.183.41,5128,true,825,6954,SJC,Tokyo · JP,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,154.36.183.41,,AS979 NetLab,NetLab
 120.89.46.123,443,true,829,,SIN,Taguig · PH,"AS9658 Eastern Telecoms Phils., Inc.","Eastern Telecoms Phils., Inc.",0,2026-10-18 21:42:38,@danfeng_chat,isp,120.89.46.123,,"AS9658 Eastern Telecoms Phils., Inc.","Eastern Telecoms Phils., Inc."
 130.0.234.142,443,true,830,,WAW,Dnipro · UA,AS44894 3NT Solutions,3NT Solutions,0,2026-10-18 21:42:46,@danfeng_chat,isp,130.0.234.142,,AS44894 3NT Solutions,3NT Solutions
 14.127.210.38,8443,true,845,0,LAX,Shenzhen · CN,AS4134 China Telecom,China Telecom,0,2026-10-13 14:49:53,@cmliussss_all,isp,14.127.210.38,,AS4134 China Telecom,China Telecom
 192.142.46.123,443,true,862,,SIN,新加坡-新加坡,"AS214036 Ultahost, Inc.","Ultahost, Inc.",0,2026-11-11 09:34:34,@otcjlq,isp,2401:4520:1034::a,2401:4520:1034::a,AS149020 WebHorizon Internet Services,WEBHORIZON
-64.90.21.50,50792,true,865,2556,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,38.34.6.143,,AS979 NetLab,NetLab
-64.90.9.96,27515,true,867,5200,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,38.34.6.102,,AS979 NetLab,NetLab
-38.246.249.234,27515,true,869,3322,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,38.34.6.102,,AS979 NetLab,NetLab
+64.90.21.50,50792,true,865,2556,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.34.6.143,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
+64.90.9.96,27515,true,867,5200,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.34.6.102,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
+38.246.249.234,27515,true,869,3322,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.34.6.102,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 155.103.116.109,443,true,875,,SJC,北美洲 · 美国 · 洛杉矶,AS979 NetLab,NetLab Global,0,2026-10-18 21:44:52,@danfeng_chat,business,155.103.116.109,,AS979 NetLab,NetLab
-43.129.242.54,4443,true,922,,SIN,亚洲 · 新加坡,AS4657 StarHub Ltd,StarHub Ltd,0,2026-11-11 21:52:26,@danfeng_chat,isp,202.156.27.201,,AS4657 StarHub Cable Vision Ltd,StarHub Cable Vision Ltd
+43.129.242.54,4443,true,922,,SIN,亚洲 · 新加坡,AS132203 Tencent Cloud,Tencent Cloud,0,2026-11-11 21:52:26,@danfeng_chat,isp,202.156.27.201,,AS4657 StarHub Cable Vision Ltd,StarHub Cable Vision Ltd
 64.90.21.49,52808,true,952,2883,SJC,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.246.242.168,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
-64.90.21.50,27515,true,953,2919,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,38.34.6.102,,AS979 NetLab,NetLab
+64.90.21.50,27515,true,953,2919,LAX,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,38.34.6.102,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 123.111.169.70,2053,true,957,0,ICN,亚洲 · 韩国 · Seongnam-si,AS9318 SK Broadband,SK Broadband,0,2026-11-11 14:31:01,@cmliussss_all,isp,123.111.169.70,,AS9318 SK Broadband,SK Broadband
 154.7.183.116,443,true,1012,,LAX,美国-洛杉矶,AS979 NetLab,NetLab Global,0,2026-11-11 09:33:14,@otcjlq,business,154.7.183.116,,AS979 NetLab,NetLab Global
-140.207.243.44,443,true,1018,,LHR,Shanghai · CN,AS24400 China Mobile Communications Corporation - shanghai company,China Mobile Communications Corporation - shanghai company,0,2026-10-18 21:43:17,@danfeng_chat,isp,112.54.161.251,,AS24400 China Mobile Communications Corporation - shanghai company,China Mobile Communications Corporation - shanghai company
-64.90.10.201,57708,true,1048,4834,SJC,Los Angeles · US,"AS2914 NTT America, Inc.","NTT America, Inc.",0,2026-09-06 16:44:44,@danfeng2,isp,216.167.121.82,,"AS2914 NTT America, Inc.","NTT America, Inc."
-64.90.10.44,57708,true,1054,4035,SJC,Los Angeles · US,"AS2914 NTT America, Inc.","NTT America, Inc.",0,2026-09-06 16:44:44,@danfeng2,isp,216.167.121.82,,"AS2914 NTT America, Inc.","NTT America, Inc."
+140.207.243.44,443,true,1018,,LHR,Shanghai · CN,AS17621 China Unicom Shanghai network,China Unicom Shanghai network,0,2026-10-18 21:43:17,@danfeng_chat,isp,112.54.161.251,,AS24400 China Mobile Communications Corporation - shanghai company,China Mobile Communications Corporation - shanghai company
+64.90.10.201,57708,true,1048,4834,SJC,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,216.167.121.82,,"AS2914 NTT America, Inc.","NTT America, Inc."
+64.90.10.44,57708,true,1054,4035,SJC,Los Angeles · US,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,isp,216.167.121.82,,"AS2914 NTT America, Inc.","NTT America, Inc."
 23.141.204.235,30034,true,1133,513,LAX,Los Angeles · US,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",0,2026-09-06 16:44:44,@danfeng2,isp,23.141.204.235,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
 77.93.90.3,8443,true,1218,,SIN,亚洲 · 新加坡,AS63150 Bage Cloud,BAGE CLOUD LLC,0,2026-10-18 21:52:05,@danfeng_chat,isp,77.93.90.3,,AS63150 Bage Cloud,Bage Cloud
 5.8.201.239,8443,true,1303,,AMS,RU,AS15774 TTK-Chita/BRAS1 in Hilok,TTK-Chita/BRAS1 in Hilok,0,2026-10-25 18:30:49,@user,isp,5.8.201.239,,AS15774 TTK-Chita/BRAS1 in Hilok,TTK-Chita/BRAS1 in Hilok
 123.111.169.70,443,true,1363,0,ICN,亚洲 · 韩国 · Seongnam-si,AS9318 SK Broadband,SK Broadband,0,2026-11-11 14:31:01,@cmliussss_all,isp,123.111.169.70,,AS9318 SK Broadband,SK Broadband
 123.111.169.70,2087,true,1409,0,ICN,Seoul · KR,AS9318 SK Broadband,SK Broadband,0,2026-10-13 12:28:11,@cmliussss_all,isp,123.111.169.70,,AS9318 SK Broadband,SK Broadband
 154.44.27.72,25055,true,1453,3078,HKG,Hong Kong · 香港,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,154.44.27.72,,AS979 NetLab,NetLab
-43.159.7.15,4505,true,1515,0,TPE,Taipei · TW,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,0,2026-10-19 19:49:34,@danfeng_chat,isp,111.243.103.188,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
-139.177.244.53,443,true,1558,,FRA,Guangzhou · CN,AS4134 China Telecom,China Telecom,0,2026-09-16 08:18:52,@danfeng2,isp,113.105.80.92,,AS4134 China Telecom,China Telecom
-95.31.35.170,443,true,1735,,ARN,Frankfurt am Main · DE,AS6939 Hurricane Electric LLC,Hurricane Electric LLC,0,2026-10-18 21:53:22,@danfeng_chat,isp,2001:470:1f0a:b23::2,2001:470:1f0a:b23::2,AS6939 Hurricane Electric LLC,Hurricane Electric LLC
+43.159.7.15,4505,true,1515,0,TPE,Taipei · TW,AS132203 Tencent Cloud,Tencent Cloud,0,2026-10-19 19:49:34,@danfeng_chat,isp,111.243.103.188,,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+139.177.244.53,443,true,1558,,FRA,Guangzhou · CN,AS396986 Bytedance Inc.,Bytedance Inc.,0,2026-09-16 08:18:52,@danfeng2,isp,113.105.80.92,,AS4134 China Telecom,China Telecom
+95.31.35.170,443,true,1735,,ARN,Frankfurt am Main · DE,AS8402 Dynamic IP Pool for Broadband Customers,Dynamic IP Pool for Broadband Customers,0,2026-10-18 21:53:22,@danfeng_chat,isp,2001:470:1f0a:b23::2,2001:470:1f0a:b23::2,AS6939 Hurricane Electric LLC,Hurricane Electric LLC
 170.168.34.37,8443,true,1882,0,WAW,亚洲 · 哈萨克斯坦 · Astana,AS41798 JSC Transtelecom,JSC Transtelecom,0,2026-11-09 14:38:59,@cmliussss_all,isp,170.168.34.37,,AS41798 JSC Transtelecom,JSC Transtelecom
 185.135.231.175,8443,true,2025,0,GYD,亚洲 · 阿塞拜疆 · Baku,AS50810 Mobin Net Communication Company (Private Joint Stock),Mobin Net Communication Company (Private Joint Stock),0,2026-11-11 14:31:01,@cmliussss_all,isp,31.171.101.236,,AS29049 Leased IPv4 Blocks,Leased IPv4 Blocks
 87.225.88.81,8443,true,2162,,AMS,RU,AS12389 Primorye NET,Primorye NET,0,2026-10-25 18:30:49,@user,isp,87.225.88.81,,AS12389 Primorye NET,Primorye NET
 38.246.245.19,443,true,2176,,LAX,北美洲 · 美国 · 洛杉矶,AS979 NetLab,NetLab Global,0,2026-11-11 21:52:20,@danfeng_chat,business,38.246.245.19,,AS979 NetLab,NetLab
 136.0.246.121,443,true,2822,,ICN,亚洲 · 韩国 · 首尔,AS9318 SK Broadband,SK Broadband Co Ltd,0,2026-10-18 21:43:04,@danfeng_chat,isp,136.0.246.121,,AS9318 SK Broadband,SK Broadband
-202.163.9.195,443,true,2930,,HKG,Guangzhou · CN,AS17623 China Unicom Guangdong province network,China Unicom Guangdong province network,0,2026-09-16 08:26:05,@danfeng2,isp,58.251.139.192,,AS17623 China Unicom Guangdong province network,China Unicom Guangdong province network
+202.163.9.195,443,true,2930,,HKG,Guangzhou · CN,AS1299 Arelion Sweden AB,Arelion Sweden AB,0,2026-09-16 08:26:05,@danfeng2,isp,58.251.139.192,,AS17623 China Unicom Guangdong province network,China Unicom Guangdong province network
 123.111.169.70,2083,true,3542,0,ICN,亚洲 · 韩国 · Seongnam-si,AS9318 SK Broadband,SK Broadband,0,2026-11-11 14:31:01,@cmliussss_all,isp,123.111.169.70,,AS9318 SK Broadband,SK Broadband
 155.117.19.12,443,true,3552,,DFW,美国-洛杉矶,AS63150 Bage Cloud,Bage Cloud,0,2026-11-11 09:33:38,@otcjlq,isp,2602:f988:210:4fe::62a,2602:f988:210:4fe::62a,AS63150 Bage Cloud,Bage Cloud LLC
 154.12.52.246,443,true,3886,,SJC,Los Angeles · US,AS979 NetLab,NetLab,0,2026-10-18 21:44:16,@danfeng_chat,business,154.12.52.246,,AS979 NetLab,NetLab
 42.2.203.247,8443,true,3,,HKG,亚洲 · 香港,AS4760 HKT,HKT Limited,1,2026-11-11 21:52:25,@danfeng_chat,isp,42.2.203.247,,AS4760 HKT,HKT
-149.104.5.95,443,true,4,,KHH,亚洲 · 台湾 · 高雄市,AS3462 Chunghwa Telecom HiNet (Data Communication Business Group),Data Communication Business Group,1,2026-11-11 21:49:16,@danfeng_chat,isp,2001:b011:c007:87d3:9de6:b05e:bd0:5cf9,2001:b011:c007:87d3:9de6:b05e:bd0:5cf9,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
+149.104.5.95,443,true,4,,KHH,亚洲 · 台湾 · 高雄市,AS42960 VHGLOBAL,VHGLOBAL,1,2026-11-11 21:49:16,@danfeng_chat,isp,2001:b011:c007:87d3:9de6:b05e:bd0:5cf9,2001:b011:c007:87d3:9de6:b05e:bd0:5cf9,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
 185.239.226.143,443,true,34,,SIN,亚洲 · 新加坡,AS134835 Starry Network,Starry Network Limited,1,2026-11-11 09:33:41,@otcjlq,isp,2403:ad80:a6:16::3e2d:f3ba,2403:ad80:a6:16::3e2d:f3ba,AS134835 Starry Network,Starry Network
 64.83.51.233,8443,true,48,,NRT,亚洲 · 日本 · 东京,AS979 NetLab,NetLab,1,2026-11-11 21:53:19,@danfeng_chat,business,64.83.51.233,,AS979 NetLab,NetLab
 111.250.37.24,443,true,51,,TPE,亚洲 · 台湾 · 台北,AS3462 Chunghwa Telecom HiNet (Data Communication Business Group),Data Communication Business Group,1,2026-11-11 21:48:22,@danfeng_chat,isp,2001:b011:3004:e0b:49ba:b2be:6ee8:37ff,2001:b011:3004:e0b:49ba:b2be:6ee8:37ff,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet
@@ -1344,7 +1344,7 @@
 109.248.247.86,443,true,667,0,AKX,亚洲 · 哈萨克斯坦 · Pavlodar,AS215670 LLP Internet Company First Page,LLP Internet Company First Page,1,2026-11-09 14:38:59,@cmliussss_all,isp,2001:146a:0:104b::1,2001:146a:0:104b::1,AS215670 LLP Internet Company First Page,LLP Internet Company First Page
 195.133.62.94,443,true,691,,WAW,Almaty · KZ,AS41798 JSC Transtelecom,JSC Transtelecom,1,2026-10-18 21:47:43,@danfeng_chat,isp,195.133.62.94,,AS41798 JSC Transtelecom,JSC Transtelecom
 72.42.156.219,443,true,742,,ANC,Fairbanks · US,AS8047 General Communication Inc,General Communication Inc,1,2026-10-18 21:51:55,@danfeng_chat,isp,72.42.156.219,,AS8047 General Communication Inc,General Communication Inc
-38.54.118.71,9443,true,772,,BKK,Bangkok · TH,AS133481 AIS-Fibre,AIS-Fibre,1,2026-10-18 21:50:12,@danfeng_chat,isp,27.130.229.167,,AS133481 AIS-Fibre,AIS-Fibre
+38.54.118.71,9443,true,772,,BKK,Bangkok · TH,AS154177 LIGHT NODE LIMITED,LIGHT NODE LIMITED,1,2026-10-18 21:50:12,@danfeng_chat,isp,27.130.229.167,,AS133481 AIS-Fibre,AIS-Fibre
 203.198.34.215,443,true,2,,HKG,亚洲 · 香港,AS4760 HKT,HKT Limited,2,2026-11-11 21:51:21,@danfeng_chat,isp,203.198.34.215,,AS4760 HKT,HKT
 203.198.34.215,8443,true,6,,HKG,亚洲 · 香港,AS4760 HKT,HKT Limited,2,2026-11-11 21:51:21,@danfeng_chat,isp,203.198.34.215,,AS4760 HKT,HKT
 209.33.174.167,443,true,50,,MAA,亚洲 · 印度 · 金奈,AS63150 Bage Cloud,BAGE CLOUD LLC,2,2026-11-11 09:33:38,@otcjlq,isp,2401:a660:1001:c2b::7ea,2401:a660:1001:c2b::7ea,AS63150 Bage Cloud,Bage Cloud
@@ -1353,13 +1353,13 @@
 175.29.23.169,443,true,59,,HKG,亚洲 · 香港,"AS137897 PAN-LIAN TECHNOLOGY CO., LIMITED","PAN-LIAN TECHNOLOGY CO., LIMITED",2,2026-11-11 21:50:19,@danfeng_chat,isp,2403:27c0:c03:1::34,2403:27c0:c03:1::34,AS4515 PCCW IMS Ltd (PCCW Business Internet Access),PCCW IMS Ltd (PCCW Business Internet Access)
 38.207.191.87,443,true,121,,LAX,美国-洛杉矶,AS979 NetLab (VMISS Inc.),VMISS Inc.,2,2026-11-11 09:33:14,@otcjlq,business,38.207.191.87,,AS979 NetLab (VMISS Inc.),VMISS Inc.
 179.255.184.13,443,true,129,,YYZ,加拿大-多伦多,AS214238 Host Telecom Ltd (IT Hostline Ltd),IT Hostline Ltd,2,2026-11-11 09:34:35,@otcjlq,isp,179.255.184.13,,AS214238 Host Telecom Ltd (IT Hostline Ltd),IT Hostline Ltd
-68.68.248.191,443,true,145,,LAX,北美洲 · 美国 · 洛杉矶,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",2,2026-11-11 21:53:23,@danfeng_chat,isp,38.134.116.59,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
-23.246.164.197,443,true,152,,SJC,北美洲 · 美国 · 圣何塞,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",2,2026-10-18 21:49:25,@danfeng_chat,isp,2600:1700:443:580e:abcd:dd88:d29f:a3a3,2600:1700:443:580e:abcd:dd88:d29f:a3a3,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC"
+68.68.248.191,443,true,145,,LAX,北美洲 · 美国 · 洛杉矶,AS1054 Zont LLC,Zont LLC,2,2026-11-11 21:53:23,@danfeng_chat,isp,38.134.116.59,,"AS174 Cogent Communications, LLC","Cogent Communications, LLC"
+23.246.164.197,443,true,152,,SJC,北美洲 · 美国 · 圣何塞,AS54286 TAIPEI101 NETWORK LLC,TAIPEI101 NETWORK LLC,2,2026-10-18 21:49:25,@danfeng_chat,isp,2600:1700:443:580e:abcd:dd88:d29f:a3a3,2600:1700:443:580e:abcd:dd88:d29f:a3a3,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC"
 38.58.57.214,443,true,154,,LAX,美国-洛杉矶,AS979 NetLab,NetLab,2,2026-11-11 09:33:14,@otcjlq,business,38.58.57.214,,AS979 NetLab,NetLab
 154.40.50.111,443,true,159,,LAX,美国-洛杉矶,AS979 NetLab,NetLab Global,2,2026-11-11 09:33:14,@otcjlq,business,154.40.50.111,,AS979 NetLab,NetLab Global
 192.204.61.177,443,true,184,,LAX,北美洲 · 美国 · 洛杉矶,"AS2914 NTT America, Inc.","NTT America, Inc.",2,2026-11-11 21:50:59,@danfeng_chat,isp,192.204.61.177,,"AS2914 NTT America, Inc.","NTT America, Inc."
 166.0.19.130,443,true,208,,SLC,北美洲 · 美国 · 盐湖城,AS63150 Bage Cloud,BAGE CLOUD LLC,2,2026-11-11 09:33:38,@otcjlq,isp,2602:f988:91:de7::503,2602:f988:91:de7::503,AS63150 Bage Cloud,Bage Cloud
-163.53.246.61,443,true,213,,HKG,亚洲 · 香港,AS9304 HGC Global Communications Limited,HGC Global Communications Limited,2,2026-10-18 21:45:27,@danfeng_chat,isp,103.103.64.47,,AS9304 HGC Global Communications Limited,HGC Global Communications Limited
+163.53.246.61,443,true,213,,HKG,亚洲 · 香港,AS40065 CloudRadium,CloudRadium,2,2026-10-18 21:45:27,@danfeng_chat,isp,103.103.64.47,,AS9304 HGC Global Communications Limited,HGC Global Communications Limited
 107.148.244.170,443,true,222,,EWR,北美洲 · 美国 · 纽瓦克,AS54600 PEG TECH INC,PEG TECH INC,2,2026-11-11 09:33:30,@otcjlq,isp,108.41.209.111,,AS701 Verizon Business,Verizon Business
 154.40.50.111,8443,true,248,,LAX,北美洲 · 美国 · 洛杉矶,AS979 NetLab,NetLab Global,2,2026-11-11 09:33:14,@otcjlq,business,154.40.50.111,,AS979 NetLab,NetLab
 103.27.187.102,443,true,275,,NRT,日本-东京,AS134835 Starry Network,Starry Network,2,2026-11-11 09:33:41,@otcjlq,isp,2403:ad80:89:4c00:14:0:b054:dd1b,2403:ad80:89:4c00:14:0:b054:dd1b,AS134835 Starry Network,Starry Network
@@ -1371,7 +1371,7 @@
 202.55.27.177,443,true,416,,NRT,Tokyo · JP,AS4809 China Telecom CN2 (China Telecom Global Limited),China Telecom Global Limited,2,2026-07-24 22:08:22,@danfeng2,business,202.51.9.63,,AS23661 CLARA ONLINE,CLARA ONLINE
 119.246.150.50,8443,true,462,,HKG,Tuen Mun · HK,AS9269 Hong Kong Broadband Network Ltd.,Hong Kong Broadband Network Ltd.,2,2026-07-27 18:40:10,@danfeng2,isp,119.246.150.50,,AS9269 Hong Kong Broadband Network Ltd.,Hong Kong Broadband Network Ltd.
 109.248.18.161,443,true,543,0,AKX,亚洲 · 哈萨克斯坦 · Pavlodar,AS215670 LLP Internet Company First Page,LLP Internet Company First Page,2,2026-11-11 14:31:01,@cmliussss_all,isp,2001:146a:0:1080::1,2001:146a:0:1080::1,AS215670 LLP Internet Company First Page,LLP Internet Company First Page
-160.22.16.203,443,true,558,,SIN,亚洲 · 新加坡,AS135905 TOTHOST SOLUTIONS AND TECHNOLOGIES COMPANY LIMITED,TOTHOST SOLUTIONS AND TECHNOLOGIES COMPANY LIMITED,2,2026-10-18 21:45:15,@danfeng_chat,isp,2400:e920:0:8::36,2400:e920:0:8::36,AS135905 TOTHOST SOLUTIONS AND TECHNOLOGIES COMPANY LIMITED,TOTHOST SOLUTIONS AND TECHNOLOGIES COMPANY LIMITED
+160.22.16.203,443,true,558,,SIN,亚洲 · 新加坡,AS45899 VNPT Corp,VNPT Corp,2,2026-10-18 21:45:15,@danfeng_chat,isp,2400:e920:0:8::36,2400:e920:0:8::36,AS135905 TOTHOST SOLUTIONS AND TECHNOLOGIES COMPANY LIMITED,TOTHOST SOLUTIONS AND TECHNOLOGIES COMPANY LIMITED
 91.212.166.141,443,true,617,,WAW,Astana · KZ,AS41798 JSC Transtelecom,JSC Transtelecom,2,2026-10-18 21:53:03,@danfeng_chat,isp,91.212.166.141,,AS41798 JSC Transtelecom,JSC Transtelecom
 154.44.0.214,21274,true,740,4033,LAX,California · Los Angeles · 美国,"AS979 NetLab (PSINet, Inc.)","PSINet, Inc.",2,2026-09-06 16:44:44,@danfeng2,business,154.44.0.214,,"AS979 NetLab (PSINet, Inc.)","PSINet, Inc."
 216.23.122.71,30706,true,1020,15,TPE,Taiwan · Taipei,AS205548 Zouter,Zouter,2,2026-08-13 20:31:20,@danfeng2,isp,1.162.134.184,,"AS3462 Chunghwa Telecom HiNet (Chunghwa Telecom Co., Ltd.)","Chunghwa Telecom Co., Ltd."
