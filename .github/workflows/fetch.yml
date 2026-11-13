@@ -7,9 +7,9 @@ on:
   workflow_dispatch: # 支持在 GitHub 页面手动点击触发运行
     inputs:
       fetch_days:
-        description: "回溯天数 (默认 3 天)"
+        description: "回溯天数 (留空优先读取 Repository Variable FETCH_DAYS，默认 3 天)"
         required: false
-        default: "3"
+        default: ""
       cf_check_endpoint:
         description: "SSTP 出口检测端点 URL (需自行部署 CF-Workers-CheckSocks5，仅对 proxies_verify 生效，留空则不执行外部检测)"
         required: false
@@ -74,6 +74,7 @@ jobs:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
           FETCH_DAYS: ${{ inputs.fetch_days || vars.FETCH_DAYS || '3' }}
+          FETCH_MAX_PAGES: ${{ vars.FETCH_MAX_PAGES || '35' }}
           PROXY: ${{ vars.PROXY }}
           PROXY_CHANNELS: ${{ vars.PROXY_CHANNELS }}
           CF_IP_CHANNELS: ${{ vars.CF_IP_CHANNELS }}
