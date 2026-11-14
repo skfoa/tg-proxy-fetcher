@@ -838,6 +838,8 @@ def load_existing_cf_ips(filepath: str = OUTPUT_CF_FILE, label: str = "优选 IP
         return existing
     tombstone = load_tombstone()
     ip_cache = load_ip_cache(filepath=_ip_cache_path())
+    tomb_skipped = 0
+    cf_skipped = 0
     try:
         with open(filepath, "r", encoding="utf-8-sig") as f:
             reader = csv.DictReader(f)
@@ -850,8 +852,10 @@ def load_existing_cf_ips(filepath: str = OUTPUT_CF_FILE, label: str = "优选 IP
                 if ip and port:
                     key = f"{ip}:{port}"
                     if is_tombstoned(key, tombstone):
+                        tomb_skipped += 1
                         continue
                     if is_cloudflare_node(row, ip_cache, trusts_asn_label=False):
+                        cf_skipped += 1
                         continue
                     row["fail_count"] = safe_int(row.get("fail_count"), 0)
                     row["first_seen"] = normalize_timestamp(str(row.get("first_seen") or row.get("tested_at") or ""))
@@ -879,7 +883,16 @@ def load_existing_cf_ips(filepath: str = OUTPUT_CF_FILE, label: str = "优选 IP
                             row["exit_asn"] = ""
                             row["exit_isp"] = ""
                     existing[key] = row
-        log.info("已加载本地已存%s记录: %d 条（历史有效记录全部保留）", label, len(existing))
+        if tomb_skipped or cf_skipped:
+            log.info(
+                "已加载本地已存%s记录: %d 条（跳过墓地冷却 %d 条, Cloudflare入口 %d 条；其余历史有效记录全部保留）",
+                label,
+                len(existing),
+                tomb_skipped,
+                cf_skipped,
+            )
+        else:
+            log.info("已加载本地已存%s记录: %d 条（历史有效记录全部保留）", label, len(existing))
     except Exception as e:
         log.error("读取已有%s文件 (%s) 失败，中止运行以保护存量数据: %s", label, filepath, e)
         raise
@@ -2572,6 +2585,58 @@ def save_and_notify(
     log.info("抓取、增量合并、保存与通知任务全部顺利完成！")
 
 
+def _summarize_pool_counts(
+    final_pool: dict,
+    own_existing: dict,
+    own_scraped: dict,
+    peer_existing: dict | None = None,
+    peer_scraped: dict | None = None,
+    peer_final: dict | None = None,
+) -> dict[str, int]:
+    """统计落盘前最终节点池的保留、新增、更新与跨池流转数，保证 kept + new + updated + moved_in == total。"""
+    peer_existing = peer_existing or {}
+    peer_scraped = peer_scraped or {}
+    peer_final = peer_final or {}
+    kept = 0
+    new = 0
+    updated = 0
+    moved_in = 0
+    for k in final_pool:
+        if k in own_existing:
+            if k in own_scraped or k in peer_scraped:
+                updated += 1
+            else:
+                kept += 1
+        elif k in peer_existing:
+            moved_in += 1
+        else:
+            new += 1
+    moved_out = sum(1 for k in own_existing if k not in final_pool and k in peer_final)
+    return {
+        "kept": kept,
+        "new": new,
+        "updated": updated,
+        "moved_in": moved_in,
+        "moved_out": moved_out,
+        "total": len(final_pool),
+    }
+
+
+def _format_merge_summary(label: str, unit: str, stats: dict[str, int]) -> str:
+    """格式化增量合并日志，显式体现跨池转入与转出以保证加和与全量总计一致。"""
+    parts = [
+        f"历史保留 {stats['kept']} {unit}",
+        f"本次新增 {stats['new']} {unit}",
+        f"本次更新 {stats['updated']} {unit}",
+    ]
+    if stats["moved_in"] > 0:
+        parts.append(f"跨池转入 {stats['moved_in']} {unit}")
+    msg = f"{label}增量合并: " + ", ".join(parts)
+    if stats["moved_out"] > 0:
+        msg += f" (另跨池转出 {stats['moved_out']} {unit})"
+    return f"{msg} -> 全量总计 {stats['total']} {unit}"
+
+
 def merge_and_save(
     existing_proxies: dict,
     scraped_proxies: dict,
@@ -2599,15 +2664,44 @@ def merge_and_save(
     if ip_cache is None:
         ip_cache = load_ip_cache(filepath=cache_path)
 
+    def _filter_pools(
+        pools: dict[str, dict],
+        drop_predicate,
+    ) -> tuple[dict[str, dict], dict[str, int]]:
+        filtered: dict[str, dict] = {}
+        dropped_counts: dict[str, int] = {}
+        for pool_name, pool in pools.items():
+            kept = {k: v for k, v in pool.items() if not drop_predicate(k, v)}
+            dropped = len(pool) - len(kept)
+            if dropped > 0:
+                dropped_counts[pool_name] = dropped
+            filtered[pool_name] = kept
+        return filtered, dropped_counts
+
     # 1. 过滤掉命中墓地的节点 (双重防御，杜绝死节点进入待存集合)
-    scraped_proxies = {k: v for k, v in scraped_proxies.items() if not is_tombstoned(k, tombstone)}
-    scraped_cf_ips = {k: v for k, v in scraped_cf_ips.items() if not is_tombstoned(k, tombstone)}
-    scraped_scan_ips = {k: v for k, v in scraped_scan_ips.items() if not is_tombstoned(k, tombstone)}
-    scraped_proxyips = {k: v for k, v in scraped_proxyips.items() if not is_tombstoned(k, tombstone)}
-    existing_proxies = {k: v for k, v in existing_proxies.items() if not is_tombstoned(k, tombstone)}
-    existing_cf_ips = {k: v for k, v in existing_cf_ips.items() if not is_tombstoned(k, tombstone)}
-    existing_scan_ips = {k: v for k, v in existing_scan_ips.items() if not is_tombstoned(k, tombstone)}
-    existing_proxyips = {k: v for k, v in existing_proxyips.items() if not is_tombstoned(k, tombstone)}
+    filtered_tomb, tomb_dropped_counts = _filter_pools(
+        {
+            "scraped_proxies": scraped_proxies,
+            "scraped_cf_ips": scraped_cf_ips,
+            "scraped_scan_ips": scraped_scan_ips,
+            "scraped_proxyips": scraped_proxyips,
+            "existing_proxies": existing_proxies,
+            "existing_cf_ips": existing_cf_ips,
+            "existing_scan_ips": existing_scan_ips,
+            "existing_proxyips": existing_proxyips,
+        },
+        lambda k, _v: is_tombstoned(k, tombstone),
+    )
+    scraped_proxies = filtered_tomb["scraped_proxies"]
+    scraped_cf_ips = filtered_tomb["scraped_cf_ips"]
+    scraped_scan_ips = filtered_tomb["scraped_scan_ips"]
+    scraped_proxyips = filtered_tomb["scraped_proxyips"]
+    existing_proxies = filtered_tomb["existing_proxies"]
+    existing_cf_ips = filtered_tomb["existing_cf_ips"]
+    existing_scan_ips = filtered_tomb["existing_scan_ips"]
+    existing_proxyips = filtered_tomb["existing_proxyips"]
+    if tomb_dropped_counts:
+        log.info("【墓地黑名单拦截】合并前过滤冷却期内死节点: %s", tomb_dropped_counts)
 
     # 1.1 纠正上游将第三方 VPS+WARP 出站误标为 Cloudflare (AS13335/Cloudflare London LLC) 的入口归属，随后全量拒收真实 Cloudflare 入口节点
     suspect_rows = [
@@ -2632,23 +2726,27 @@ def merge_and_save(
         cache_path=cache_path,
     )
 
-    cf_dropped_counts: dict[str, int] = {}
-
-    def _strip_cf_dict(pool: dict, pool_name: str) -> dict:
-        kept = {k: v for k, v in pool.items() if not is_cloudflare_node(v, ip_cache)}
-        dropped = len(pool) - len(kept)
-        if dropped > 0:
-            cf_dropped_counts[pool_name] = cf_dropped_counts.get(pool_name, 0) + dropped
-        return kept
-
-    scraped_proxies = _strip_cf_dict(scraped_proxies, "scraped_proxies")
-    scraped_cf_ips = _strip_cf_dict(scraped_cf_ips, "scraped_cf_ips")
-    scraped_scan_ips = _strip_cf_dict(scraped_scan_ips, "scraped_scan_ips")
-    scraped_proxyips = _strip_cf_dict(scraped_proxyips, "scraped_proxyips")
-    existing_proxies = _strip_cf_dict(existing_proxies, "existing_proxies")
-    existing_cf_ips = _strip_cf_dict(existing_cf_ips, "existing_cf_ips")
-    existing_scan_ips = _strip_cf_dict(existing_scan_ips, "existing_scan_ips")
-    existing_proxyips = _strip_cf_dict(existing_proxyips, "existing_proxyips")
+    filtered_cf, cf_dropped_counts = _filter_pools(
+        {
+            "scraped_proxies": scraped_proxies,
+            "scraped_cf_ips": scraped_cf_ips,
+            "scraped_scan_ips": scraped_scan_ips,
+            "scraped_proxyips": scraped_proxyips,
+            "existing_proxies": existing_proxies,
+            "existing_cf_ips": existing_cf_ips,
+            "existing_scan_ips": existing_scan_ips,
+            "existing_proxyips": existing_proxyips,
+        },
+        lambda _k, v: is_cloudflare_node(v, ip_cache),
+    )
+    scraped_proxies = filtered_cf["scraped_proxies"]
+    scraped_cf_ips = filtered_cf["scraped_cf_ips"]
+    scraped_scan_ips = filtered_cf["scraped_scan_ips"]
+    scraped_proxyips = filtered_cf["scraped_proxyips"]
+    existing_proxies = filtered_cf["existing_proxies"]
+    existing_cf_ips = filtered_cf["existing_cf_ips"]
+    existing_scan_ips = filtered_cf["existing_scan_ips"]
+    existing_proxyips = filtered_cf["existing_proxyips"]
     if cf_dropped_counts:
         log.info("【CF 入口永久拒收】合并前拦截剔除 Cloudflare 入口节点: %s", cf_dropped_counts)
 
@@ -2833,18 +2931,6 @@ def merge_and_save(
             else is_asn_recorded(_extract_asn_code(item.get("asn"), item.get("isp") or item.get("org")))
         )
     ] if total_enriched_count > 0 else []
-
-    new_proxy_cnt = sum(1 for k in scraped_proxies if k not in existing_proxies)
-    updated_proxy_cnt = sum(1 for k in scraped_proxies if k in existing_proxies)
-
-    new_cf_cnt = sum(1 for k in scraped_cf_ips if k not in existing_cf_ips)
-    updated_cf_cnt = sum(1 for k in scraped_cf_ips if k in existing_cf_ips)
-
-    new_scan_cnt = sum(1 for k in scraped_scan_ips if k not in existing_scan_ips and k not in existing_proxyips)
-    updated_scan_cnt = sum(1 for k in scraped_scan_ips if k in existing_scan_ips or k in existing_proxyips)
-
-    new_proxyip_cnt = sum(1 for k in scraped_proxyips if k not in existing_proxyips and k not in existing_scan_ips)
-    updated_proxyip_cnt = sum(1 for k in scraped_proxyips if k in existing_proxyips or k in existing_scan_ips)
 
     # 2. 合并：严格保护历史 fail_count 与元数据，防止被新抓取结果抹除为 0
     final_proxies = {}
@@ -3042,51 +3128,46 @@ def merge_and_save(
     final_scan_ips = {k: v for k, v in cleaned_scan_ips.items() if not is_cloudflare_node(v, final_ip_cache)}
     final_proxyips = {k: v for k, v in cleaned_proxyips.items() if not is_cloudflare_node(v, final_ip_cache)}
 
+    proxy_stats = _summarize_pool_counts(final_proxies, existing_proxies, scraped_proxies)
+    cf_stats = _summarize_pool_counts(final_cf_ips, existing_cf_ips, scraped_cf_ips)
+    scan_stats = _summarize_pool_counts(
+        final_scan_ips,
+        existing_scan_ips,
+        scraped_scan_ips,
+        peer_existing=existing_proxyips,
+        peer_scraped=scraped_proxyips,
+        peer_final=final_proxyips,
+    )
+    proxyip_stats = _summarize_pool_counts(
+        final_proxyips,
+        existing_proxyips,
+        scraped_proxyips,
+        peer_existing=existing_scan_ips,
+        peer_scraped=scraped_scan_ips,
+        peer_final=final_scan_ips,
+    )
+
     log.info("=" * 50)
-    log.info(
-        "代理节点增量合并: 历史保留 %d 个, 本次新增 %d 个, 本次更新 %d 个 -> 全量总计 %d 个",
-        len(existing_proxies) - updated_proxy_cnt,
-        new_proxy_cnt,
-        updated_proxy_cnt,
-        len(final_proxies),
-    )
-    log.info(
-        "单条优选 IP 增量合并: 历史保留 %d 条, 本次新增 %d 条, 本次更新 %d 条 -> 全量总计 %d 条",
-        len(existing_cf_ips) - updated_cf_cnt,
-        new_cf_cnt,
-        updated_cf_cnt,
-        len(final_cf_ips),
-    )
-    if final_scan_ips:
-        log.info(
-            "扫描优选 IP 增量合并: 历史保留 %d 条, 本次新增 %d 条, 本次更新 %d 条 -> 全量总计 %d 条",
-            len(existing_scan_ips) - updated_scan_cnt,
-            new_scan_cnt,
-            updated_scan_cnt,
-            len(final_scan_ips),
-        )
-    if final_proxyips:
-        log.info(
-            "反代 ProxyIP 增量合并: 历史保留 %d 条, 本次新增 %d 条, 本次更新 %d 条 -> 全量总计 %d 条",
-            len(existing_proxyips) - updated_proxyip_cnt,
-            new_proxyip_cnt,
-            updated_proxyip_cnt,
-            len(final_proxyips),
-        )
+    log.info(_format_merge_summary("代理节点", "个", proxy_stats))
+    log.info(_format_merge_summary("单条优选 IP ", "条", cf_stats))
+    if final_scan_ips or scan_stats["moved_out"] > 0:
+        log.info(_format_merge_summary("扫描优选 IP ", "条", scan_stats))
+    if final_proxyips or proxyip_stats["moved_out"] > 0:
+        log.info(_format_merge_summary("反代 ProxyIP ", "条", proxyip_stats))
 
     save_and_notify(
         final_proxies,
         final_cf_ips,
         final_scan_ips=final_scan_ips,
         final_proxyips=final_proxyips,
-        new_proxies_count=new_proxy_cnt,
-        updated_proxies_count=updated_proxy_cnt,
-        new_cf_count=new_cf_cnt,
-        updated_cf_count=updated_cf_cnt,
-        new_scan_count=new_scan_cnt,
-        updated_scan_count=updated_scan_cnt,
-        new_proxyips_count=new_proxyip_cnt,
-        updated_proxyips_count=updated_proxyip_cnt,
+        new_proxies_count=proxy_stats["new"],
+        updated_proxies_count=proxy_stats["updated"],
+        new_cf_count=cf_stats["new"],
+        updated_cf_count=cf_stats["updated"],
+        new_scan_count=scan_stats["new"],
+        updated_scan_count=scan_stats["updated"],
+        new_proxyips_count=proxyip_stats["new"],
+        updated_proxyips_count=proxyip_stats["updated"],
         unrecorded_asns=card_unrecorded,
     )
 

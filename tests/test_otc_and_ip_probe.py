@@ -1088,6 +1088,112 @@ class TestTargetedAsnProbeEngine(unittest.TestCase):
             self.assertEqual(extract_asn_num(s_rows[0]["exit_asn"]), "24940")
             self.assertEqual(s_rows[0]["exit_location"], "Frankfurt · DE")
 
+    def test_merge_and_save_counts_reflect_cross_pool_transfers_and_tombstone_logs(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp_cache_path = os.path.join(tmpdir, "ip_cache.json")
+            ip_cache = {
+                "198.51.100.1": {"asn": "AS25820", "isp": "IT7 Networks Inc", "net_type": "datacenter", "country": "US"},
+                "198.51.100.2": {"asn": "AS25820", "isp": "IT7 Networks Inc", "net_type": "datacenter", "country": "US"},
+                "198.51.100.3": {"asn": "AS25820", "isp": "IT7 Networks Inc", "net_type": "datacenter", "country": "US"},
+                "198.51.100.4": {"asn": "AS45102", "isp": "Alibaba Cloud", "net_type": "datacenter", "country": "SG"},
+                "198.51.100.5": {"asn": "AS45102", "isp": "Alibaba Cloud", "net_type": "datacenter", "country": "SG"},
+                "203.0.113.10": {"asn": "AS4766", "isp": "Korea Telecom", "net_type": "isp", "country": "KR", "city": "Seoul"},
+                "203.0.113.2": {"asn": "AS4766", "isp": "Korea Telecom", "net_type": "isp", "country": "KR"},
+                "203.0.113.3": {"asn": "AS4766", "isp": "Korea Telecom", "net_type": "isp", "country": "KR"},
+                "198.51.100.9": {"asn": "AS13335", "isp": "Cloudflare", "net_type": "datacenter", "country": "US"},
+            }
+            providers.save_ip_cache(ip_cache, filepath=tmp_cache_path)
+
+            existing_scan = {
+                "198.51.100.1:443": {"ip": "198.51.100.1", "port": "443", "asn": "AS25820", "isp": "IT7 Networks Inc", "channel": "@c"},
+                "198.51.100.2:443": {
+                    "ip": "198.51.100.2", "port": "443", "asn": "AS25820", "isp": "IT7 Networks Inc",
+                    "exit_ip": "203.0.113.10", "exit_asn": "AS4766", "exit_isp": "Korea Telecom",
+                    "exit_location": "Seoul · KR", "cf_location": "Los Angeles · US", "channel": "@c",
+                },
+                "198.51.100.5:443": {"ip": "198.51.100.5", "port": "443", "asn": "AS45102", "isp": "Alibaba Cloud", "channel": "@c"},
+                "198.51.100.9:443": {"ip": "198.51.100.9", "port": "443", "asn": "AS13335", "isp": "Cloudflare", "channel": "@c"},
+            }
+            scraped_scan = {
+                "198.51.100.4:443": {"ip": "198.51.100.4", "port": "443", "asn": "AS45102", "isp": "Alibaba Cloud", "channel": "@c"},
+                "198.51.100.5:443": {"ip": "198.51.100.5", "port": "443", "asn": "AS45102", "isp": "Alibaba Cloud", "channel": "@c"},
+            }
+            existing_proxyips = {
+                "203.0.113.2:443": {"ip": "203.0.113.2", "port": "443", "asn": "AS4766", "isp": "Korea Telecom", "channel": "@c"},
+                "198.51.100.3:443": {"ip": "198.51.100.3", "port": "443", "asn": "AS25820", "isp": "IT7 Networks Inc", "channel": "@c"},
+            }
+            scraped_proxyips = {
+                "203.0.113.3:443": {"ip": "203.0.113.3", "port": "443", "asn": "AS4766", "isp": "Korea Telecom", "channel": "@c"},
+                "198.51.100.88:443": {"ip": "198.51.100.88", "port": "443", "asn": "AS4766", "isp": "Korea Telecom", "channel": "@c"},
+            }
+
+            now_ts = int(time.time())
+            captured_calls: list[dict] = []
+
+            def _fake_save(final_proxies, final_cf_ips, final_scan_ips=None, final_proxyips=None, **kwargs):
+                captured_calls.append({
+                    "scan_len": len(final_scan_ips or {}),
+                    "proxyip_len": len(final_proxyips or {}),
+                    **kwargs,
+                })
+
+            with _isolated_tg_fetch_dir(tmpdir), \
+                 patch("tg_fetch.load_tombstone", return_value={"198.51.100.88:443": now_ts}), \
+                 patch("tg_fetch.auto_enrich_and_save_asns", return_value=0), \
+                 patch("tg_fetch.get_session_enriched_asns", return_value=[]), \
+                 patch("tg_fetch.resolve_asn_batch_online", side_effect=AssertionError("unexpected network call")), \
+                 patch("providers.resolve_asn_batch_online", side_effect=AssertionError("unexpected network call")), \
+                 patch("tg_fetch.save_and_notify", side_effect=_fake_save), \
+                 self.assertLogs(tg_fetch.log, level="INFO") as cm:
+                tg_fetch.merge_and_save(
+                    existing_proxies={},
+                    scraped_proxies={},
+                    existing_cf_ips={},
+                    scraped_cf_ips={},
+                    existing_scan_ips=existing_scan,
+                    scraped_scan_ips=scraped_scan,
+                    existing_proxyips=existing_proxyips,
+                    scraped_proxyips=scraped_proxyips,
+                    edt_unrecorded_asns=[],
+                )
+
+            logs = "\n".join(cm.output)
+            self.assertEqual(len(captured_calls), 1)
+            call_info = captured_calls[0]
+            self.assertEqual(call_info["scan_len"], 4)
+            self.assertEqual(call_info["proxyip_len"], 3)
+            self.assertEqual(call_info["new_scan_count"], 1)
+            self.assertEqual(call_info["updated_scan_count"], 1)
+            self.assertEqual(call_info["new_proxyips_count"], 1)
+            self.assertEqual(call_info["updated_proxyips_count"], 0)
+            self.assertIn("【墓地黑名单拦截】", logs)
+            self.assertIn("scraped_proxyips", logs)
+            self.assertIn("扫描优选 IP 增量合并: 历史保留 1 条, 本次新增 1 条, 本次更新 1 条, 跨池转入 1 条 (另跨池转出 1 条) -> 全量总计 4 条", logs)
+            self.assertIn("反代 ProxyIP 增量合并: 历史保留 1 条, 本次新增 1 条, 本次更新 0 条, 跨池转入 1 条 (另跨池转出 1 条) -> 全量总计 3 条", logs)
+
+    def test_load_existing_cf_ips_logs_skipped_tombstone_and_cloudflare_counts(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cf_csv = os.path.join(tmpdir, "cf_ips.csv")
+            with open(cf_csv, "w", encoding="utf-8-sig", newline="") as f:
+                w = csv.DictWriter(f, fieldnames=providers.CF_BASE_CSV_FIELDS)
+                w.writeheader()
+                w.writerow({"ip": "198.51.100.10", "port": "443", "tls": "true", "asn": "AS25820", "isp": "IT7 Networks Inc", "channel": "@c"})
+                w.writerow({"ip": "198.51.100.11", "port": "443", "tls": "true", "asn": "AS25820", "isp": "IT7 Networks Inc", "channel": "@c"})
+                w.writerow({"ip": "104.28.1.1", "port": "443", "tls": "true", "asn": "AS13335", "isp": "Cloudflare", "channel": "@c"})
+
+            now_ts = int(time.time())
+            ip_cache = {
+                "198.51.100.10": {"asn": "AS25820", "isp": "IT7 Networks Inc", "net_type": "datacenter", "country": "US"},
+                "104.28.1.1": {"asn": "AS13335", "isp": "Cloudflare, Inc.", "net_type": "datacenter", "country": "US"},
+            }
+            with patch("tg_fetch.load_tombstone", return_value={"198.51.100.11:443": now_ts}), \
+                 patch("tg_fetch.load_ip_cache", return_value=ip_cache), \
+                 self.assertLogs(tg_fetch.log, level="INFO") as cm:
+                loaded = tg_fetch.load_existing_cf_ips(cf_csv, label="单条优选 IP")
+
+            self.assertEqual(list(loaded.keys()), ["198.51.100.10:443"])
+            self.assertIn("已加载本地已存单条优选 IP记录: 1 条（跳过墓地冷却 1 条, Cloudflare入口 1 条", "\n".join(cm.output))
+
 
 if __name__ == "__main__":
     unittest.main()
