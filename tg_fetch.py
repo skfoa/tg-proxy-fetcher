@@ -88,7 +88,6 @@ from providers import (
     COUNTRY_NAME_MAP,
     extract_country,
     get_country_code,
-    resolve_exit_geo_calibration,
     doh_query_dns_records,
     is_valid_public_ip,
     extract_node_host,
