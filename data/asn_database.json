@@ -3189,7 +3189,19 @@
     "Cisco Webex LLC": "AS13445",
     "Serghei Samoilov": "AS199417",
     "FlexNetworks": "AS394352",
-    "www.abstation.net": "AS30938"
+    "www.abstation.net": "AS30938",
+    "Technical University of Gdansk, Academic Computer Center TASK": "AS5550",
+    "Synapse Network LTD": "AS29107",
+    "XeniaGroup SRL": "AS213791",
+    "TELCOM MIKROTIK PERU S.A.C.": "AS273000",
+    "Nettvox Private Limited": "AS150572",
+    "EXPERTOS EN TECNOLOGIA Y TELECOMUNICACIONES S.A.S": "AS273244",
+    "NEXTNET SAC": "AS271814",
+    "Windnet Pvt Ltd": "AS152516",
+    "TELECOMUNICACIONES FASTNET F.G 50, C.A.": "AS272048",
+    "PT Media Akses Data": "AS142342",
+    "Fanava Group": "AS41881",
+    "EMPRESAS MUNICIPALES DE CALI E.I.C.E. E.S.P.": "AS10299"
   },
   "asn_to_isp": {
     "AS10001": "Mics Network Corporation",
@@ -6290,7 +6302,19 @@
     "AS13445": "Cisco Webex LLC",
     "AS199417": "Serghei Samoilov",
     "AS394352": "FlexNetworks",
-    "AS30938": "www.abstation.net"
+    "AS30938": "www.abstation.net",
+    "AS5550": "Technical University of Gdansk, Academic Computer Center TASK",
+    "AS29107": "Synapse Network LTD",
+    "AS213791": "XeniaGroup SRL",
+    "AS273000": "TELCOM MIKROTIK PERU S.A.C.",
+    "AS150572": "Nettvox Private Limited",
+    "AS273244": "EXPERTOS EN TECNOLOGIA Y TELECOMUNICACIONES S.A.S",
+    "AS271814": "NEXTNET SAC",
+    "AS152516": "Windnet Pvt Ltd",
+    "AS272048": "TELECOMUNICACIONES FASTNET F.G 50, C.A.",
+    "AS142342": "PT Media Akses Data",
+    "AS41881": "Fanava Group",
+    "AS10299": "EMPRESAS MUNICIPALES DE CALI E.I.C.E. E.S.P."
   },
   "asn_to_net_type": {
     "AS10001": "isp",
@@ -10384,6 +10408,18 @@
     "AS13445": "datacenter",
     "AS199417": "business",
     "AS394352": "isp",
-    "AS30938": "datacenter"
+    "AS30938": "datacenter",
+    "AS5550": "education",
+    "AS29107": "isp",
+    "AS213791": "datacenter",
+    "AS273000": "isp",
+    "AS150572": "isp",
+    "AS273244": "isp",
+    "AS271814": "isp",
+    "AS152516": "isp",
+    "AS272048": "isp",
+    "AS142342": "isp",
+    "AS41881": "isp",
+    "AS10299": "isp"
   }
 }

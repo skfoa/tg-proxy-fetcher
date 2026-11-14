@@ -1,19 +1,594 @@
 ﻿url,proto,host,port,delay_ms,fail_count,status,colo,country,egress_ip,asn,isp,net_type,first_seen,source
-http://176.111.37.5:39811,http,176.111.37.5,39811,281,0,alive,ARN,SE,176.111.37.5,AS214743 Cogento Backbone Limited,Cogento Backbone Limited,isp,2026-10-25 14:07:00,EDT-Pages
-http://8.209.255.13:3128,http,8.209.255.13,3128,291,0,alive,NRT,JP,8.209.255.13,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
-http://78.186.146.140:3310,http,78.186.146.140,3310,325,0,alive,IST,TR,78.186.146.140,AS9121 TT ADSL-TTnet _static_aci,TT ADSL-TTnet _static_aci,isp,2026-11-04 14:35:03,EDT-Pages
-http://8.213.151.128:3128,http,8.213.151.128,3128,338,0,alive,ICN,KR,8.213.151.128,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
-http://185.195.254.72:5432,http,185.195.254.72,5432,343,0,alive,IST,TR,185.195.254.72,AS206119 Veganet Teknolojileri ve Hizmetleri LTD STI,Veganet Teknolojileri ve Hizmetleri LTD STI,isp,2026-10-09 22:46:01,EDT-Pages
-http://4.144.146.21:80,http,4.144.146.21,80,421,0,alive,SIN,SG,20.44.210.140,AS8075 Microsoft Azure,Microsoft Azure,datacenter,2026-10-19 12:45:55,@otcfxq
-http://45.186.6.104:3128,http,45.186.6.104,3128,479,0,alive,MIA,EC,45.186.6.104,AS269806 PEREZ TITO JULIO CESAR(FASTNETT),PEREZ TITO JULIO CESAR(FASTNETT),isp,2026-11-04 14:35:03,EDT-Pages
-http://103.133.26.73:3128,http,103.133.26.73,3128,525,0,alive,CGK,ID,103.178.42.17,AS138130 PT PHATRIA INTI PERSADA,PT PHATRIA INTI PERSADA,isp,2026-10-12 15:18:13,EDT-Pages
-http://176.111.37.216:39811,http,176.111.37.216,39811,540,0,alive,ARN,SE,176.111.37.216,AS214743 Cogento Backbone Limited,Cogento Backbone Limited,isp,2026-10-25 14:07:00,EDT-Pages
-http://45.189.57.114:3129,http,45.189.57.114,3129,627,0,alive,GYE,EC,45.189.57.114,AS269853 CBVISION S.A.,CBVISION S.A.,isp,2026-11-04 14:35:03,EDT-Pages
-http://102.244.78.61:8080,http,102.244.78.61,8080,733,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-11-09 14:39:00,EDT-Pages
-http://102.244.78.61:8089,http,102.244.78.61,8089,734,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-11-10 15:23:16,EDT-Pages
-http://102.244.78.61:8090,http,102.244.78.61,8090,764,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-11-10 15:23:16,EDT-Pages
-http://49.229.100.235:8080,http,49.229.100.235,8080,865,0,alive,BKK,TH,49.229.100.235,AS7470 True Broadband by True Online,True Broadband by True Online,isp,2026-11-07 14:03:05,EDT-Pages
-http://102.244.78.61:8082,http,102.244.78.61,8082,920,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-21 15:52:42,@otcfxq
-http://103.133.26.119:8080,http,103.133.26.119,8080,1122,0,alive,CGK,ID,202.65.229.44,AS45700 PT Global Telecom Utama,PT Global Telecom Utama,isp,2026-11-01 14:11:17,EDT-Pages
-http://36.147.78.166:443,http,36.147.78.166,443,1815,0,alive,LHR,CN,36.147.78.166,AS9808 China Mobile,China Mobile Communications Corporation,isp,2026-11-05 14:53:11,EDT-Pages
-http://189.51.168.164:999,http,189.51.168.164,999,2100,0,alive,MIA,MX,189.51.168.164,AS270111 Comunicación por Fibra SA de CV,Comunicación por Fibra SA de CV,isp,2026-11-12 15:18:03,EDT-Pages
+http://45.189.57.114:3129,http,45.189.57.114,3129,191,0,alive,GYE,EC,45.189.57.114,AS269853 CBVISION S.A.,CBVISION S.A.,isp,2026-11-04 14:35:03,EDT-Pages
+http://185.195.254.72:5432,http,185.195.254.72,5432,302,0,alive,IST,TR,185.195.254.72,AS206119 Veganet Teknolojileri ve Hizmetleri LTD STI,Veganet Teknolojileri ve Hizmetleri LTD STI,isp,2026-10-09 22:46:01,EDT-Pages
+http://8.209.255.13:3128,http,8.209.255.13,3128,344,0,alive,NRT,JP,8.209.255.13,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
+http://8.213.151.128:3128,http,8.213.151.128,3128,383,0,alive,ICN,KR,8.213.151.128,AS45102 Alibaba Cloud,Alibaba Cloud,datacenter,2026-10-19 12:45:55,@otcfxq
+http://176.111.37.216:39811,http,176.111.37.216,39811,391,0,alive,ARN,SE,176.111.37.216,AS214743 Cogento Backbone Limited,Cogento Backbone Limited,isp,2026-10-25 14:07:00,EDT-Pages
+http://16.28.29.244:14148,http,16.28.29.244,14148,452,0,alive,ORD,ZA,16.28.29.244,AS60729 Network for Tor-Exit traffic.,Network for Tor-Exit traffic.,education,2026-11-14 14:39:09,EDT-Pages
+http://45.186.6.104:3128,http,45.186.6.104,3128,454,0,alive,MIA,EC,45.186.6.104,AS269806 PEREZ TITO JULIO CESAR(FASTNETT),PEREZ TITO JULIO CESAR(FASTNETT),isp,2026-11-04 14:35:03,EDT-Pages
+http://4.144.146.21:80,http,4.144.146.21,80,454,0,alive,SIN,SG,20.44.210.140,AS8075 Microsoft Azure,Microsoft Azure,datacenter,2026-10-19 12:45:55,@otcfxq
+http://49.229.100.235:8080,http,49.229.100.235,8080,538,0,alive,BKK,TH,49.229.100.235,AS7470 True Broadband by True Online,True Broadband by True Online,isp,2026-11-07 14:03:05,EDT-Pages
+http://102.244.78.61:8085,http,102.244.78.61,8085,707,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-11-14 14:39:09,EDT-Pages
+http://102.244.78.61:8083,http,102.244.78.61,8083,715,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-11-14 14:39:09,EDT-Pages
+http://102.244.78.61:8081,http,102.244.78.61,8081,742,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-11-14 14:39:09,EDT-Pages
+http://102.244.78.61:8080,http,102.244.78.61,8080,759,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-11-09 14:39:00,EDT-Pages
+http://102.244.78.61:8082,http,102.244.78.61,8082,760,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-10-21 15:52:42,@otcfxq
+http://102.244.78.61:8089,http,102.244.78.61,8089,763,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-11-10 15:23:16,EDT-Pages
+http://78.186.146.140:3310,http,78.186.146.140,3310,897,0,alive,IST,TR,78.186.146.140,AS9121 TT ADSL-TTnet _static_aci,TT ADSL-TTnet _static_aci,isp,2026-11-04 14:35:03,EDT-Pages
+http://102.244.78.61:8090,http,102.244.78.61,8090,1244,0,alive,GIG,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-11-10 15:23:16,EDT-Pages
+http://112.198.128.171:8083,http,112.198.128.171,8083,1330,0,alive,CEB,PH,112.198.128.171,AS132199 GBB-MAKATI-IP-POOL,GBB-MAKATI-IP-POOL,isp,2026-11-14 14:39:09,EDT-Pages
+http://176.111.37.5:39811,http,176.111.37.5,39811,1406,0,alive,ARN,SE,176.111.37.5,AS214743 Cogento Backbone Limited,Cogento Backbone Limited,isp,2026-10-25 14:07:00,EDT-Pages
+http://8.242.153.173:999,http,8.242.153.173,999,1449,0,alive,BOG,CO,8.242.153.171,"AS3549 Level 3 Parent, LLC","Level 3 Parent, LLC",isp,2026-11-14 14:39:09,EDT-Pages
+http://162.4.96.221:8080,http,162.4.96.221,8080,1589,0,alive,CGK,ID,162.4.96.221,AS154669 PT Azvi Multi Teknologi,PT Azvi Multi Teknologi,isp,2026-11-14 14:39:09,EDT-Pages
+http://200.59.191.27:999,http,200.59.191.27,999,2118,0,alive,BOG,VE,154.59.56.73,"AS264778 Cogent Communications, LLC","Cogent Communications, LLC",isp,2026-11-14 14:39:09,EDT-Pages
+http://197.164.101.10:1981,http,197.164.101.10,1981,2230,0,alive,MRS,EG,197.164.101.10,AS24863 Link Egypt (Link.NET),Link Egypt (Link.NET),isp,2026-11-14 14:39:09,EDT-Pages
+http://45.174.242.145:999,http,45.174.242.145,999,2355,0,alive,DFW,MX,45.174.242.145,AS265583 SISTEMAS Y SOLUCIONES DE CAMPECHE SAS DE CV,SISTEMAS Y SOLUCIONES DE CAMPECHE SAS DE CV,isp,2026-11-14 14:39:09,EDT-Pages
+http://41.65.103.168:8080,http,41.65.103.168,8080,2546,0,alive,LHR,EG,41.65.103.168,AS36992 Ramsis Enterprise Customers Static IPs,Ramsis Enterprise Customers Static IPs,isp,2026-11-14 14:39:09,EDT-Pages
+http://1.10.248.195:80,http,1.10.248.195,80,3016,0,alive,BKK,TH,1.10.248.195,AS23969 Dynamic IP for ADSL Broadband Service,Dynamic IP for ADSL Broadband Service,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.18.78.228:1080,http,103.18.78.228,1080,3413,0,alive,CGK,ID,103.18.78.228,AS55701 PT Usaha Adi Sanggoro,PT Usaha Adi Sanggoro,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.133.26.73:3128,http,103.133.26.73,3128,525,1,timeout,CGK,ID,103.178.42.17,AS138130 PT PHATRIA INTI PERSADA,PT PHATRIA INTI PERSADA,isp,2026-10-12 15:18:13,EDT-Pages
+http://103.133.26.119:8080,http,103.133.26.119,8080,1122,1,timeout,CGK,ID,202.65.229.44,AS45700 PT Global Telecom Utama,PT Global Telecom Utama,isp,2026-11-01 14:11:17,EDT-Pages
+http://36.147.78.166:443,http,36.147.78.166,443,1815,1,timeout,LHR,CN,36.147.78.166,AS9808 China Mobile,China Mobile Communications Corporation,isp,2026-11-05 14:53:11,EDT-Pages
+http://189.51.168.164:999,http,189.51.168.164,999,2100,1,timeout,MIA,MX,189.51.168.164,AS270111 Comunicación por Fibra SA de CV,Comunicación por Fibra SA de CV,isp,2026-11-12 15:18:03,EDT-Pages
+http://103.48.70.200:82,http,103.48.70.200,82,0,1,timeout,,IN,103.48.71.54,AS136290 Country Online Services PVT LTD,Country Online Services PVT LTD,isp,2026-11-14 14:39:09,EDT-Pages
+http://206.135.47.108:999,http,206.135.47.108,999,0,1,timeout,,MX,206.135.47.106,AS28458 IENTC S DE RL DE CV,IENTC S DE RL DE CV,isp,2026-11-14 14:39:09,EDT-Pages
+http://111.68.26.237:8080,http,111.68.26.237,8080,0,1,timeout,,ID,111.68.26.237,AS55666 PT Media Sarana Data,PT Media Sarana Data,isp,2026-11-14 14:39:09,EDT-Pages
+http://148.244.144.194:8097,http,148.244.144.194,8097,0,1,timeout,,MX,148.244.144.198,"AS11172 Alestra, S. de R.L. de C.V.","Alestra, S. de R.L. de C.V.",isp,2026-11-14 14:39:09,EDT-Pages
+http://102.0.25.184:8080,http,102.0.25.184,8080,0,1,timeout,,KE,102.0.25.184,AS36926 Allocated to Airtel Kenya Mobile Broadband and Fixed internet,Allocated to Airtel Kenya Mobile Broadband and Fixed internet,isp,2026-11-14 14:39:09,EDT-Pages
+http://92.249.110.22:8080,http,92.249.110.22,8080,0,1,timeout,,UA,178.150.37.113,AS13188 CONTENT DELIVERY NETWORK LTD,CONTENT DELIVERY NETWORK LTD,isp,2026-11-14 14:39:09,EDT-Pages
+http://181.79.57.57:8080,http,181.79.57.57,8080,0,1,timeout,,CO,181.79.57.57,AS18747 IFX NETWORKS COLOMBIA,IFX NETWORKS COLOMBIA,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.208.103.35:8080,http,103.208.103.35,8080,0,1,timeout,,ID,103.208.103.35,AS134648 PT Tidar Lintas Nusa,PT Tidar Lintas Nusa,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.173.138.236:1111,http,103.173.138.236,1111,0,1,timeout,,ID,103.173.138.208,AS147078 PT Serayu Multi Connection,PT Serayu Multi Connection,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.166.11.26:2021,http,103.166.11.26,2021,0,1,timeout,,ID,103.166.11.26,AS139967 PT. Yasmin Amanah Media,PT. Yasmin Amanah Media,isp,2026-11-14 14:39:09,EDT-Pages
+http://1.20.101.22:8080,http,1.20.101.22,8080,0,1,timeout,,TH,1.20.101.22,AS23969 TOT Mobile Co LTD,TOT Mobile Co LTD,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.156.17.83:8818,http,103.156.17.83,8818,0,1,timeout,,ID,103.156.17.83,AS141077 RSTNET,RSTNET,isp,2026-11-14 14:39:09,EDT-Pages
+http://1.10.248.237:8080,http,1.10.248.237,8080,0,1,timeout,,TH,1.10.248.237,AS23969 Dynamic IP for ADSL Broadband Service,Dynamic IP for ADSL Broadband Service,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.130.70.253:83,http,103.130.70.253,83,0,1,timeout,,IN,103.130.70.242,AS134250 Siliguri Meghrekha Net Services Pvt. Ltd.,Siliguri Meghrekha Net Services Pvt. Ltd.,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.191.203.226:9992,http,38.191.203.226,9992,0,1,timeout,,CO,38.191.203.226,AS273134 TV&MAS S.A.S,TV&MAS S.A.S,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.39.51.157:1080,http,103.39.51.157,1080,0,1,timeout,,ID,103.39.51.157,AS63501 PT Mega Mentari Mandiri,PT Mega Mentari Mandiri,isp,2026-11-14 14:39:09,EDT-Pages
+http://45.189.57.114:3128,http,45.189.57.114,3128,0,1,timeout,,EC,45.189.57.114,AS269853 CBVISION S.A.,CBVISION S.A.,isp,2026-11-14 14:39:09,EDT-Pages
+http://43.245.249.22:7878,http,43.245.249.22,7878,0,1,timeout,,ID,43.245.249.22,AS131740 PT Smart Media Pratama,PT Smart Media Pratama,isp,2026-11-14 14:39:09,EDT-Pages
+http://180.191.235.152:8082,http,180.191.235.152,8082,0,1,timeout,,PH,180.191.235.152,AS4775 GBB-VISMIN-IP-POOL,GBB-VISMIN-IP-POOL,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.67.85.150:3127,http,103.67.85.150,3127,0,1,timeout,,ID,103.67.85.150,AS152004 PT Tujuh Fondasi Teknologi,PT Tujuh Fondasi Teknologi,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.18.77.90:8080,http,103.18.77.90,8080,0,1,timeout,,ID,103.18.77.90,AS55701 PT Usaha Adi Sanggoro,PT Usaha Adi Sanggoro,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.210.179.204:999,http,38.210.179.204,999,0,1,timeout,,MX,38.210.179.204,AS272405 Jair Lozano / Intercom Internet,Jair Lozano / Intercom Internet,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.156.17.139:8818,http,103.156.17.139,8818,0,1,timeout,,ID,103.156.17.139,AS141077 RSTNET,RSTNET,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.48.68.11:83,http,103.48.68.11,83,0,1,timeout,,IN,103.48.71.34,AS136290 Country Online Services PVT LTD,Country Online Services PVT LTD,isp,2026-11-14 14:39:09,EDT-Pages
+http://45.188.76.100:999,http,45.188.76.100,999,0,1,timeout,,MX,45.188.76.52,AS265608 ONT NETWORKS SA de CV,ONT NETWORKS SA de CV,isp,2026-11-14 14:39:09,EDT-Pages
+http://18.144.86.139:5137,http,18.144.86.139,5137,0,1,http_fail,,DE,185.220.101.149,AS60729 Network for Tor-Exit traffic.,Network for Tor-Exit traffic.,education,2026-11-14 14:39:09,EDT-Pages
+http://103.167.156.22:1080,http,103.167.156.22,1080,0,1,timeout,,ID,103.167.156.22,AS150554 PT Jaringan Tiang Indonesia Group,PT Jaringan Tiang Indonesia Group,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.189.117.82:1111,http,103.189.117.82,1111,0,1,timeout,,ID,103.189.117.82,AS149878 PT Lintas Data Prima,PT Lintas Data Prima,isp,2026-11-14 14:39:09,EDT-Pages
+http://43.252.238.138:8080,http,43.252.238.138,8080,0,1,timeout,,ID,43.252.238.138,AS55701 PT Usaha Adi Sanggoro,PT Usaha Adi Sanggoro,isp,2026-11-14 14:39:09,EDT-Pages
+http://45.198.11.165:8080,http,45.198.11.165,8080,0,1,timeout,,ID,45.198.10.130,AS142386 PT Jaringan Lintas Artha,PT Jaringan Lintas Artha,isp,2026-11-14 14:39:09,EDT-Pages
+http://180.148.210.77:8080,http,180.148.210.77,8080,0,1,timeout,,BD,180.148.208.30,AS45905 Stargate Communications Ltd.,Stargate Communications Ltd.,isp,2026-11-14 14:39:09,EDT-Pages
+http://179.60.219.72:999,http,179.60.219.72,999,0,1,timeout,,AR,179.60.219.64,AS52465 WNet Internet y Hosting,WNet Internet y Hosting,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.78.113.28:8080,http,103.78.113.28,8080,0,1,timeout,,ID,103.78.113.28,AS131111 MORATELINDONAP,MORATELINDONAP,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.175.236.180:8382,http,103.175.236.180,8382,0,1,timeout,,ID,103.175.236.180,AS147121 PT Marva Global Telekomunikasi,PT Marva Global Telekomunikasi,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.251.232.12:8090,http,103.251.232.12,8090,0,1,timeout,,BD,103.251.233.83,AS133034 Virtual American Companies (BD) Limited,Virtual American Companies (BD) Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.156.15.55:8080,http,103.156.15.55,8080,0,1,timeout,,ID,103.156.15.55,AS58821 PT Lintas Jaringan Indonesia,PT Lintas Jaringan Indonesia,isp,2026-11-14 14:39:09,EDT-Pages
+http://122.3.207.67:8089,http,122.3.207.67,8089,0,1,timeout,,PH,112.207.168.125,AS9299 Philippine Long Distance Telephone Company,Philippine Long Distance Telephone Company,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.224.150.82:999,http,38.224.150.82,999,0,1,timeout,,DO,38.224.150.86,"AS273864 Aaronka Dominicana, SRL","Aaronka Dominicana, SRL",isp,2026-11-14 14:39:09,EDT-Pages
+http://189.176.231.80:8080,http,189.176.231.80,8080,0,1,timeout,,MX,187.155.7.152,AS8151 UNINET,UNINET,isp,2026-11-14 14:39:09,EDT-Pages
+http://222.129.142.219:9000,http,222.129.142.219,9000,0,1,timeout,,CN,222.129.142.219,AS4808 China Unicom Beijing Province Network,China Unicom Beijing Province Network,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.178.176.9:8080,http,103.178.176.9,8080,0,1,timeout,,IN,161.248.176.2,AS153302 SNA INTERNET PRIVATE LIMITED,SNA INTERNET PRIVATE LIMITED,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.153.247.110:8080,http,103.153.247.110,8080,0,1,timeout,,ID,103.153.247.110,AS140475 PT. Quanta Tunas Abadi,PT. Quanta Tunas Abadi,isp,2026-11-14 14:39:09,EDT-Pages
+http://197.164.101.10:1976,http,197.164.101.10,1976,0,1,timeout,,EG,197.164.101.10,AS24863 Link Egypt (Link.NET),Link Egypt (Link.NET),isp,2026-11-14 14:39:09,EDT-Pages
+http://202.21.106.35:8080,http,202.21.106.35,8080,0,1,timeout,,MN,202.21.106.35,AS9484 MobiNet-Customer-133,MobiNet-Customer-133,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.48.71.34:83,http,103.48.71.34,83,0,1,timeout,,IN,103.48.71.34,AS136290 Country Online Services PVT LTD,Country Online Services PVT LTD,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.118.85.144:6321,http,103.118.85.144,6321,0,1,timeout,,BD,103.118.85.128,AS137961 Abuzz IT Limited,Abuzz IT Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://45.171.111.255:999,http,45.171.111.255,999,0,1,timeout,,EC,45.171.111.255,AS267778 LAGONET-TV CIA. LTDA.,LAGONET-TV CIA. LTDA.,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.12.204.33:8080,http,103.12.204.33,8080,0,1,timeout,,BD,103.12.204.33,AS150327 RBD SOFTWARE & TECHNOLOGY LIMITED,RBD SOFTWARE & TECHNOLOGY LIMITED,isp,2026-11-14 14:39:09,EDT-Pages
+http://182.52.113.101:80,http,182.52.113.101,80,0,1,timeout,,TH,182.52.113.101,AS23969 TOT Public Company Limited,TOT Public Company Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://151.158.133.157:8080,http,151.158.133.157,8080,0,1,timeout,,ID,151.158.133.157,AS134728 PT SANET MEDIA TEKNOLOGI,PT SANET MEDIA TEKNOLOGI,isp,2026-11-14 14:39:09,EDT-Pages
+http://188.132.150.149:8080,http,188.132.150.149,8080,0,1,timeout,,SY,188.132.150.149,AS216472 GUNEYDOGU TELEKOM INT. BIL. VE ILT. HIZ. TIC. LTD. STI.,GUNEYDOGU TELEKOM INT. BIL. VE ILT. HIZ. TIC. LTD. STI.,isp,2026-11-14 14:39:09,EDT-Pages
+http://176.88.166.176:8080,http,176.88.166.176,8080,0,1,timeout,,TR,176.88.166.176,AS34984 Superonline Iletisim Hizmetleri A.S.,Superonline Iletisim Hizmetleri A.S.,isp,2026-11-14 14:39:09,EDT-Pages
+http://203.150.128.108:8080,http,203.150.128.108,8080,0,1,timeout,,TH,203.150.128.108,AS4618 INEXT Broadband Company Limited,INEXT Broadband Company Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://182.52.113.85:8080,http,182.52.113.85,8080,0,1,timeout,,TH,182.52.113.85,AS23969 TOT Public Company Limited,TOT Public Company Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://185.196.182.22:8080,http,185.196.182.22,8080,0,1,timeout,,AL,185.196.182.22,AS206088 shqiponjaisp.al LLC,shqiponjaisp.al LLC,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.247.23.204:8080,http,103.247.23.204,8080,0,1,timeout,,ID,103.247.23.204,AS58485 WIFIAN ID,WIFIAN ID,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.225.40.143:465,http,38.225.40.143,465,0,1,timeout,,VE,161.22.32.194,AS267789 TOP COMUNICATIONS ESTEGIA C.A.,TOP COMUNICATIONS ESTEGIA C.A.,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.188.99.66:999,http,38.188.99.66,999,0,1,timeout,,VE,38.188.99.64,"AS272865 INVERSIONES SMARTBYTE, C.A.","INVERSIONES SMARTBYTE, C.A.",isp,2026-11-14 14:39:09,EDT-Pages
+http://45.184.103.171:999,http,45.184.103.171,999,0,1,timeout,,VE,45.184.103.190,"AS269771 PRINTER-NET-SERVICE, C.A.","PRINTER-NET-SERVICE, C.A.",isp,2026-11-14 14:39:09,EDT-Pages
+http://157.66.2.153:1111,http,157.66.2.153,1111,0,1,timeout,,ID,157.66.2.153,AS152440 PT Ashyla Karya Abadi,PT Ashyla Karya Abadi,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.135.48.30:8089,http,103.135.48.30,8089,0,1,timeout,,ID,103.135.48.30,AS38320 PT Ekakarya Graha Flora,PT Ekakarya Graha Flora,isp,2026-11-14 14:39:09,EDT-Pages
+http://197.248.18.97:8080,http,197.248.18.97,8080,0,1,timeout,,KE,197.248.18.97,AS37061 For Safaricom KENYA Enterprise Business Unit,For Safaricom KENYA Enterprise Business Unit,isp,2026-11-14 14:39:09,EDT-Pages
+http://80.191.46.62:1090,http,80.191.46.62,1090,0,1,timeout,,IR,80.191.46.61,AS58224 Telecommunication Company of Tehran,Telecommunication Company of Tehran,isp,2026-11-14 14:39:09,EDT-Pages
+http://201.4.65.190:8080,http,201.4.65.190,8080,0,1,timeout,,TR,201.4.65.190,AS216472 High Speed,High Speed,isp,2026-11-14 14:39:09,EDT-Pages
+http://177.234.217.89:999,http,177.234.217.89,999,0,1,timeout,,EC,177.234.217.83,AS52468 Ufinet Panama S.A.,Ufinet Panama S.A.,isp,2026-11-14 14:39:09,EDT-Pages
+http://191.241.187.16:45005,http,191.241.187.16,45005,0,1,timeout,,BR,191.241.187.16,AS263677 Netglória Serviços de Internet Ltda,Netglória Serviços de Internet Ltda,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.160.205.244:8181,http,103.160.205.244,8181,0,1,timeout,,ID,103.160.205.244,AS141595 PT Akbar Prima Media,PT Akbar Prima Media,isp,2026-11-14 14:39:09,EDT-Pages
+http://182.53.202.228:80,http,182.53.202.228,80,0,1,timeout,,TH,182.53.202.228,AS23969 TOT Public Company Limited,TOT Public Company Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://202.4.116.141:81,http,202.4.116.141,81,0,1,timeout,,BD,202.4.116.141,AS23956 Amber IT Limited,Amber IT Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://202.58.73.176:1111,http,202.58.73.176,1111,0,1,timeout,,ID,202.58.73.6,AS138886 PT Data Buana Nusantara,PT Data Buana Nusantara,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.171.255.60:8080,http,103.171.255.60,8080,0,1,timeout,,ID,103.171.255.60,AS142399 PT Zona Kolektif Indonesia,PT Zona Kolektif Indonesia,isp,2026-11-14 14:39:09,EDT-Pages
+http://200.126.94.179:999,http,200.126.94.179,999,0,1,timeout,,CL,200.126.94.179,AS14117 Telefonica del Sur S.A.,Telefonica del Sur S.A.,isp,2026-11-14 14:39:09,EDT-Pages
+http://140.227.61.201:3128,http,140.227.61.201,3128,0,1,timeout,,JP,140.227.61.201,"AS2514 NTT PC Communications, Inc.","NTT PC Communications, Inc.",isp,2026-11-14 14:39:09,EDT-Pages
+http://149.78.206.146:3600,http,149.78.206.146,3600,0,1,timeout,,BR,149.78.206.146,AS266436 INFORTEL COMUNICACOES LTDA,INFORTEL COMUNICACOES LTDA,isp,2026-11-14 14:39:09,EDT-Pages
+http://102.244.78.61:8084,http,102.244.78.61,8084,0,1,http_fail,,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.142.255.32:8080,http,103.142.255.32,8080,0,1,timeout,,ID,103.142.255.83,AS139381 PT.CITRA BERDIKARI NUSANTARA,PT.CITRA BERDIKARI NUSANTARA,isp,2026-11-14 14:39:09,EDT-Pages
+http://202.69.38.146:8080,http,202.69.38.146,8080,0,1,timeout,,PK,202.69.38.146,AS23750 Gerrys Information Technology Pvt Ltd,Gerrys Information Technology Pvt Ltd,isp,2026-11-14 14:39:09,EDT-Pages
+http://78.101.198.138:8080,http,78.101.198.138,8080,0,1,timeout,,QA,78.101.198.138,AS8781 HUAWEI-BRAS-ADSLPOOL,HUAWEI-BRAS-ADSLPOOL,isp,2026-11-14 14:39:09,EDT-Pages
+http://1.20.101.32:8080,http,1.20.101.32,8080,0,1,timeout,,TH,1.20.101.32,AS23969 TOT Mobile Co LTD,TOT Mobile Co LTD,isp,2026-11-14 14:39:09,EDT-Pages
+http://102.244.78.61:8088,http,102.244.78.61,8088,0,1,http_fail,,CM,102.244.78.57,AS36912 Orange Cameroun SA,Orange Cameroun SA,isp,2026-11-14 14:39:09,EDT-Pages
+http://196.251.221.38:8080,http,196.251.221.38,8080,0,1,timeout,,ZA,196.251.223.77,AS37403 Infogro DSL,Infogro DSL,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.184.62.10:8080,http,103.184.62.10,8080,0,1,timeout,,ID,103.184.62.10,AS149664 PT NKNET Data Media,PT NKNET Data Media,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.80.215.77:8080,http,103.80.215.77,8080,0,1,timeout,,ID,103.80.215.77,AS153092 PT Redi Revolusi Digital Solusi,PT Redi Revolusi Digital Solusi,isp,2026-11-14 14:39:09,EDT-Pages
+http://91.26.188.170:8080,http,91.26.188.170,8080,0,1,timeout,,DE,91.26.188.170,AS3320 Deutsche Telekom AG,Deutsche Telekom AG,isp,2026-11-14 14:39:09,EDT-Pages
+http://190.52.97.27:999,http,190.52.97.27,999,0,1,timeout,,VE,186.96.69.226,AS394684 Gold Data C.A.,Gold Data C.A.,isp,2026-11-14 14:39:09,EDT-Pages
+http://186.151.139.107:8080,http,186.151.139.107,8080,0,1,timeout,,GT,186.151.139.107,AS14754 SERCOM de Honduras,SERCOM de Honduras,isp,2026-11-14 14:39:09,EDT-Pages
+http://154.64.211.145:999,http,154.64.211.145,999,0,1,timeout,,PR,198.52.241.102,AS21559 Wireless Network,Wireless Network,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.224.164.196:999,http,38.224.164.196,999,0,1,timeout,,MX,38.224.165.198,AS270128 DANIEL RIVERA GONZALEZ,DANIEL RIVERA GONZALEZ,isp,2026-11-14 14:39:09,EDT-Pages
+http://113.203.237.210:8080,http,113.203.237.210,8080,0,1,timeout,,PK,58.65.211.24,AS9541 Broadband Services,Broadband Services,isp,2026-11-14 14:39:09,EDT-Pages
+http://45.198.32.207:8080,http,45.198.32.207,8080,0,1,timeout,,ID,45.198.32.207,AS138089 PT Global Media Data Prima,PT Global Media Data Prima,isp,2026-11-14 14:39:09,EDT-Pages
+http://1.10.185.111:443,http,1.10.185.111,443,0,1,timeout,,TH,1.10.185.111,AS23969 TOT Public Company Limited,TOT Public Company Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://160.191.56.1:8082,http,160.191.56.1,8082,0,1,timeout,,ID,160.191.56.1,AS153134 PT Anugerah Creative Nusantara,PT Anugerah Creative Nusantara,isp,2026-11-14 14:39:09,EDT-Pages
+http://14.207.199.94:8080,http,14.207.199.94,8080,0,1,timeout,,TH,103.185.147.199,AS149766 Y.U.T Corporate Company Limited,Y.U.T Corporate Company Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.156.15.105:1111,http,103.156.15.105,1111,0,1,timeout,,ID,103.156.15.105,AS58821 PT Lintas Jaringan Indonesia,PT Lintas Jaringan Indonesia,isp,2026-11-14 14:39:09,EDT-Pages
+http://91.204.190.140:81,http,91.204.190.140,81,0,1,timeout,,AM,91.204.190.140,AS42991 BioNet LLC,BioNet LLC,isp,2026-11-14 14:39:09,EDT-Pages
+http://180.191.231.123:9999,http,180.191.231.123,9999,0,1,timeout,,PH,139.135.78.150,AS139831 DITO TELECOMMUNITY CORP.,DITO TELECOMMUNITY CORP.,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.171.182.57:1111,http,103.171.182.57,1111,0,1,timeout,,ID,103.171.182.11,AS142375 PT Hayat Teknologi Informatika,PT Hayat Teknologi Informatika,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.251.232.65:8090,http,103.251.232.65,8090,0,1,timeout,,BD,103.251.233.81,AS133034 Virtual American Companies (BD) Limited,Virtual American Companies (BD) Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://180.190.84.213:8082,http,180.190.84.213,8082,0,1,timeout,,PH,180.190.84.213,AS4775 GBB-MAKATI-IP-POOL,GBB-MAKATI-IP-POOL,isp,2026-11-14 14:39:09,EDT-Pages
+http://181.78.94.157:999,http,181.78.94.157,999,0,1,timeout,,PY,45.150.85.255,AS52468 Ufinet Panama S.A.,Ufinet Panama S.A.,isp,2026-11-14 14:39:09,EDT-Pages
+http://167.99.3.26:6666,http,167.99.3.26,6666,0,1,conn_reset,,US,87.76.186.4,AS7029 Private Customer,Private Customer,isp,2026-11-14 14:39:09,EDT-Pages
+http://148.222.227.186:999,http,148.222.227.186,999,0,1,timeout,,PE,148.222.227.186,AS64155 EDGEUNO S.A.C.,EDGEUNO S.A.C.,isp,2026-11-14 14:39:09,EDT-Pages
+http://201.4.65.102:8080,http,201.4.65.102,8080,0,1,timeout,,TR,201.4.65.102,AS216472 High Speed,High Speed,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.162.54.157:8080,http,103.162.54.157,8080,0,1,timeout,,ID,103.162.54.157,AS141645 PT Pratama Asia Globalindo,PT Pratama Asia Globalindo,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.180.123.229:1080,http,103.180.123.229,1080,0,1,timeout,,ID,103.180.123.229,AS149360 PT Indo Telemedia Solusi,PT Indo Telemedia Solusi,isp,2026-11-14 14:39:09,EDT-Pages
+http://204.199.201.133:999,http,204.199.201.133,999,0,1,timeout,,MX,204.199.201.131,AS3549 CTL Mexico,CTL Mexico,isp,2026-11-14 14:39:09,EDT-Pages
+http://102.38.15.44:8080,http,102.38.15.44,8080,0,1,timeout,,LY,102.209.254.58,AS328539 Giga for Telecommunication and Technology Limited,Giga for Telecommunication and Technology Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.176.96.163:8082,http,103.176.96.163,8082,0,1,timeout,,ID,103.176.96.163,AS147131 PT Global Sarana Elektronika,PT Global Sarana Elektronika,isp,2026-11-14 14:39:09,EDT-Pages
+http://202.150.141.98:3128,http,202.150.141.98,3128,0,1,timeout,,ID,202.150.141.98,AS23949 PT. Comtronics Systems,PT. Comtronics Systems,isp,2026-11-14 14:39:09,EDT-Pages
+http://160.19.41.52:80,http,160.19.41.52,80,0,1,timeout,,IN,160.19.41.52,AS142461 ACTIVETELE COMMUNICATION,ACTIVETELE COMMUNICATION,isp,2026-11-14 14:39:09,EDT-Pages
+http://79.98.32.126:8080,http,79.98.32.126,8080,0,1,timeout,,SY,191.44.91.53,AS216472 IPbnb LLC,IPbnb LLC,isp,2026-11-14 14:39:09,EDT-Pages
+http://201.139.115.206:8080,http,201.139.115.206,8080,0,1,timeout,,MX,201.139.115.206,AS263114 Kiwi Networks,Kiwi Networks,isp,2026-11-14 14:39:09,EDT-Pages
+http://89.43.133.122:8080,http,89.43.133.122,8080,0,1,timeout,,TR,195.62.50.98,AS216472 High Speed,High Speed,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.48.68.126:82,http,103.48.68.126,82,0,1,timeout,,IN,103.48.68.126,AS136290 Country Online Services PVT LTD,Country Online Services PVT LTD,isp,2026-11-14 14:39:09,EDT-Pages
+http://160.19.18.121:8181,http,160.19.18.121,8181,0,1,timeout,,ID,160.19.18.121,AS149360 PT. SMART COMPUTER SERVICE,PT. SMART COMPUTER SERVICE,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.92.218.233:9514,http,103.92.218.233,9514,0,1,timeout,,BD,110.76.129.79,AS59362 CLIENT-UT-Zone-5,CLIENT-UT-Zone-5,isp,2026-11-14 14:39:09,EDT-Pages
+http://201.222.40.218:8080,http,201.222.40.218,8080,0,1,timeout,,CO,201.222.40.218,AS273080 AULAS DIGITALES DE COLOMBIA SAS,AULAS DIGITALES DE COLOMBIA SAS,isp,2026-11-14 14:39:09,EDT-Pages
+http://36.89.236.126:8080,http,36.89.236.126,8080,0,1,timeout,,ID,36.89.236.126,AS7713 PT Telekomunikasi Indonesia,PT Telekomunikasi Indonesia,isp,2026-11-14 14:39:09,EDT-Pages
+http://177.234.192.231:999,http,177.234.192.231,999,0,1,timeout,,EC,177.234.211.65,AS272954 VUELATECHNOLOGY S.A.S.,VUELATECHNOLOGY S.A.S.,isp,2026-11-14 14:39:09,EDT-Pages
+http://217.52.247.77:1981,http,217.52.247.77,1981,0,1,timeout,,EG,217.52.247.77,AS36992 Nile Online,Nile Online,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.156.222.1:8090,http,103.156.222.1,8090,0,1,timeout,,BD,103.156.223.7,AS141231 Freedom Online,Freedom Online,isp,2026-11-14 14:39:09,EDT-Pages
+http://193.178.203.140:8080,http,193.178.203.140,8080,0,1,timeout,,IR,193.178.203.140,AS44375 Asmanfaraz Sepahan Company P.J.S,Asmanfaraz Sepahan Company P.J.S,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.154.73.14:8080,http,103.154.73.14,8080,0,1,timeout,,ID,103.154.73.14,AS153943 PT Media Infrastruktur Teknik,PT Media Infrastruktur Teknik,isp,2026-11-14 14:39:09,EDT-Pages
+http://188.132.249.144:8080,http,188.132.249.144,8080,0,1,timeout,,SY,188.132.249.144,AS216472 Guneydogu Telekom int.bil. ve ilt. hiz. tic. ltd. sti.,Guneydogu Telekom int.bil. ve ilt. hiz. tic. ltd. sti.,isp,2026-11-14 14:39:09,EDT-Pages
+http://185.138.114.111:8080,http,185.138.114.111,8080,0,1,timeout,,IE,185.138.114.111,AS207044 Nuwave Communications Ltd,Nuwave Communications Ltd,isp,2026-11-14 14:39:09,EDT-Pages
+http://84.255.40.228:8998,http,84.255.40.228,8998,0,1,timeout,,MT,84.255.40.228,AS12709 Melita Limited,Melita Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.176.97.74:8082,http,103.176.97.74,8082,0,1,timeout,,ID,103.176.97.74,AS147131 PT Global Sarana Elektronika,PT Global Sarana Elektronika,isp,2026-11-14 14:39:09,EDT-Pages
+http://41.65.71.145:1981,http,41.65.71.145,1981,0,1,timeout,,EG,41.65.71.140,AS36992 Ramsis Enterprise Customers Static IPs,Ramsis Enterprise Customers Static IPs,isp,2026-11-14 14:39:09,EDT-Pages
+http://41.203.83.242:8080,http,41.203.83.242,8080,0,1,timeout,,NG,41.203.83.242,AS37148 GLO-1 SUBMARINE CABLE,GLO-1 SUBMARINE CABLE,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.7.18.119:999,http,38.7.18.119,999,0,1,timeout,,MX,38.7.18.119,AS28398 Victor alonzo chavez vega,Victor alonzo chavez vega,isp,2026-11-14 14:39:09,EDT-Pages
+http://113.192.30.27:7777,http,113.192.30.27,7777,0,1,timeout,,ID,113.192.30.27,AS149360 PT. HITECH SMART SERVICE,PT. HITECH SMART SERVICE,isp,2026-11-14 14:39:09,EDT-Pages
+http://123.121.134.141:8888,http,123.121.134.141,8888,0,1,timeout,,CN,123.121.134.141,AS4808 China Unicom Beijing Province Network,China Unicom Beijing Province Network,isp,2026-11-14 14:39:09,EDT-Pages
+http://157.15.0.152:7778,http,157.15.0.152,7778,0,1,timeout,,ID,157.15.0.158,AS152769 PT Gopal Network Solusindo,PT Gopal Network Solusindo,isp,2026-11-14 14:39:09,EDT-Pages
+http://45.167.125.62:999,http,45.167.125.62,999,0,1,timeout,,CO,45.167.125.62,AS269804 SEPCOM COMUNICACIONES SAS,SEPCOM COMUNICACIONES SAS,isp,2026-11-14 14:39:09,EDT-Pages
+http://1.20.178.251:8080,http,1.20.178.251,8080,0,1,timeout,,TH,1.20.178.251,AS23969 TOT Mobile Co LTD,TOT Mobile Co LTD,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.141.174.54:11411,http,103.141.174.54,11411,0,1,timeout,,BD,103.141.174.54,AS58689 Seabird Computer,Seabird Computer,isp,2026-11-14 14:39:09,EDT-Pages
+http://94.156.3.205:8080,http,94.156.3.205,8080,0,1,timeout,,BG,94.156.3.205,AS198228 Silistra Telecom Solutions Ltd.,Silistra Telecom Solutions Ltd.,isp,2026-11-14 14:39:09,EDT-Pages
+http://190.123.83.137:999,http,190.123.83.137,999,0,1,timeout,,AR,190.123.83.59,AS52444 Pogliotti & Pogliotti Construcciones S.A.,Pogliotti & Pogliotti Construcciones S.A.,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.168.148.129:8080,http,103.168.148.129,8080,0,1,timeout,,ID,103.168.148.129,AS142350 PT Skala Jaringan Indonesia,PT Skala Jaringan Indonesia,isp,2026-11-14 14:39:09,EDT-Pages
+http://181.78.73.117:8080,http,181.78.73.117,8080,0,1,timeout,,CO,181.78.73.117,AS52468 Ufinet Panama S.A.,Ufinet Panama S.A.,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.125.174.151:1111,http,103.125.174.151,1111,0,1,timeout,,ID,103.120.40.106,AS150494 PT Aceh Digital Fenam,PT Aceh Digital Fenam,isp,2026-11-14 14:39:09,EDT-Pages
+http://191.97.16.13:999,http,191.97.16.13,999,0,1,timeout,,VE,191.97.19.74,AS264844 WIFI SOLUTION,WIFI SOLUTION,isp,2026-11-14 14:39:09,EDT-Pages
+http://156.155.50.93:8080,http,156.155.50.93,8080,0,1,timeout,,ZA,156.155.50.93,AS37611 Axxess Networks,Axxess Networks,isp,2026-11-14 14:39:09,EDT-Pages
+http://82.22.54.135:5050,http,82.22.54.135,5050,0,1,timeout,,PH,82.22.54.135,AS153719 Queens link technology Inc.,Queens link technology Inc.,isp,2026-11-14 14:39:09,EDT-Pages
+http://201.4.65.24:8080,http,201.4.65.24,8080,0,1,timeout,,TR,201.7.31.170,AS216472 High Speed,High Speed,isp,2026-11-14 14:39:09,EDT-Pages
+http://167.250.141.73:8080,http,167.250.141.73,8080,0,1,timeout,,BR,167.250.141.73,AS265201 MEGANET SERVICOS DE COMUNICACAO E MULTIMIDIA LTDA,MEGANET SERVICOS DE COMUNICACAO E MULTIMIDIA LTDA,isp,2026-11-14 14:39:09,EDT-Pages
+http://24.119.238.146:10000,http,24.119.238.146,10000,0,1,timeout,,US,24.119.238.146,"AS11492 CABLE ONE, INC.","CABLE ONE, INC.",isp,2026-11-14 14:39:09,EDT-Pages
+http://182.52.113.84:443,http,182.52.113.84,443,0,1,timeout,,TH,182.52.113.84,AS23969 TOT Public Company Limited,TOT Public Company Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://101.255.209.249:3128,http,101.255.209.249,3128,0,1,timeout,,ID,101.255.209.249,AS38511 TCF-17328 BTS.NET,TCF-17328 BTS.NET,isp,2026-11-14 14:39:09,EDT-Pages
+http://92.249.168.82:8080,http,92.249.168.82,8080,0,1,timeout,,HU,92.249.168.82,AS20845 Digi Tavkozlesi Es Szolgaltato Kft.,Digi Tavkozlesi Es Szolgaltato Kft.,isp,2026-11-14 14:39:09,EDT-Pages
+http://222.127.206.145:8085,http,222.127.206.145,8085,0,1,timeout,,PH,124.107.110.76,AS9299 Philippine Long Distance Telephone Company,Philippine Long Distance Telephone Company,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.153.62.155:8080,http,103.153.62.155,8080,0,1,timeout,,ID,103.153.62.170,AS140457 PT Ikhlas Cipta Teknologi,PT Ikhlas Cipta Teknologi,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.120.175.243:9191,http,103.120.175.243,9191,0,1,timeout,,ID,103.120.175.243,AS63859 PT. Eka Mas Republik,PT. Eka Mas Republik,isp,2026-11-14 14:39:09,EDT-Pages
+http://180.148.25.78:8080,http,180.148.25.78,8080,0,1,timeout,,ID,180.148.25.78,AS154201 PT GIGA NETWORK INDONESIA,PT GIGA NETWORK INDONESIA,isp,2026-11-14 14:39:09,EDT-Pages
+http://160.22.207.180:8082,http,160.22.207.180,8082,0,1,timeout,,ID,160.22.206.102,AS152825 PT Teradata Bintang Selaras,PT Teradata Bintang Selaras,isp,2026-11-14 14:39:09,EDT-Pages
+http://182.176.164.41:8080,http,182.176.164.41,8080,0,1,timeout,,PK,182.185.204.136,AS17557 USF DSLAM South,USF DSLAM South,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.227.187.11:6090,http,103.227.187.11,6090,0,1,timeout,,ID,103.227.187.11,AS142370 PT Ard Management Group,PT Ard Management Group,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.120.76.252:8080,http,103.120.76.252,8080,0,1,timeout,,ID,103.120.76.0,AS150501 PT Haci Telekomunikasi Indonesia,PT Haci Telekomunikasi Indonesia,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.143.8.126:8089,http,103.143.8.126,8089,0,1,timeout,,IN,103.143.8.126,AS138296 Ankhnet Informations Pvt. Ltd.,Ankhnet Informations Pvt. Ltd.,isp,2026-11-14 14:39:09,EDT-Pages
+http://119.92.138.118:8088,http,119.92.138.118,8088,0,1,timeout,,PH,103.25.220.151,AS146954 IMJWANKLIK INTERNET COMMUNICATION SERVICES,IMJWANKLIK INTERNET COMMUNICATION SERVICES,isp,2026-11-14 14:39:09,EDT-Pages
+http://124.105.236.145:9090,http,124.105.236.145,9090,0,1,timeout,,PH,124.105.236.145,AS9299 Philippine Long Distance Telephone Company,Philippine Long Distance Telephone Company,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.168.211.172:80,http,103.168.211.172,80,0,1,timeout,,IN,114.142.167.66,AS135746 Cityline Networks Pvt Ltd,Cityline Networks Pvt Ltd,isp,2026-11-14 14:39:09,EDT-Pages
+http://114.250.195.77:8888,http,114.250.195.77,8888,0,1,timeout,,CN,2408:8207:1831:2bd0:349e:8fff:7bea:1ddf,AS4808 China Unicom Beijing Province Network,China Unicom Beijing Province Network,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.184.54.171:8080,http,103.184.54.171,8080,0,1,timeout,,ID,149.7.63.10,AS140401 PT Proxi Jaringan Nusantara,PT Proxi Jaringan Nusantara,isp,2026-11-14 14:39:09,EDT-Pages
+http://190.14.238.172:999,http,190.14.238.172,999,0,1,timeout,,CO,190.14.238.171,AS27951 ORGANIZACION ROA FLOR HUILA SA,ORGANIZACION ROA FLOR HUILA SA,isp,2026-11-14 14:39:09,EDT-Pages
+http://202.21.124.132:1011,http,202.21.124.132,1011,0,1,timeout,,MN,202.21.124.129,AS9484 MobiNet-Customer-133,MobiNet-Customer-133,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.72.171.218:3128,http,103.72.171.218,3128,0,1,timeout,,IN,103.72.171.218,AS133661 Netplus Broadband Services Private Limited,Netplus Broadband Services Private Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://163.223.78.163:8080,http,163.223.78.163,8080,0,1,timeout,,ID,163.223.78.163,AS153697 PT Big Network Indonesia,PT Big Network Indonesia,isp,2026-11-14 14:39:09,EDT-Pages
+http://114.249.225.156:8888,http,114.249.225.156,8888,0,1,timeout,,CN,2408:8207:1833:480:f95a:ef94:b8ef:9011,AS4808 China Unicom Beijing Province Network,China Unicom Beijing Province Network,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.154.53.67:1111,http,103.154.53.67,1111,0,1,timeout,,ID,103.154.53.67,AS140479 PT Inditech Global Network,PT Inditech Global Network,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.80.12.99:999,http,38.80.12.99,999,0,1,timeout,,DO,38.80.12.98,"AS274105 LINKZONE, S.R.L.","LINKZONE, S.R.L.",isp,2026-11-14 14:39:09,EDT-Pages
+http://170.239.18.157:1830,http,170.239.18.157,1830,0,1,timeout,,BR,170.239.18.90,AS266345 I B T,I B T,isp,2026-11-14 14:39:09,EDT-Pages
+http://102.212.152.2:8080,http,102.212.152.2,8080,0,1,timeout,,ZA,102.212.152.2,AS329229 Stellar Technology Solutions (Pty) Ltd,Stellar Technology Solutions (Pty) Ltd,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.162.63.74:8080,http,103.162.63.74,8080,0,1,timeout,,ID,103.162.63.70,AS141642 PT Ring Media Nusantara,PT Ring Media Nusantara,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.75.82.214:999,http,38.75.82.214,999,0,1,timeout,,DO,38.75.82.210,AS273217 Alcome Tech SRL.,Alcome Tech SRL.,isp,2026-11-14 14:39:09,EDT-Pages
+http://213.169.33.10:8001,http,213.169.33.10,8001,0,1,timeout,,BG,213.169.33.7,AS8717 A1 Bulgaria EAD,A1 Bulgaria EAD,isp,2026-11-14 14:39:09,EDT-Pages
+http://202.29.215.78:8080,http,202.29.215.78,8080,0,1,timeout,,TH,202.29.219.38,AS4621 Office of Info.Tech. Admin. for Educational Development,Office of Info.Tech. Admin. for Educational Development,education,2026-11-14 14:39:09,EDT-Pages
+http://182.253.40.25:8080,http,182.253.40.25,8080,0,1,timeout,,ID,182.253.40.25,AS17451 Biznet Postpaid,Biznet Postpaid,isp,2026-11-14 14:39:09,EDT-Pages
+http://125.209.80.146:8080,http,125.209.80.146,8080,0,1,timeout,,PK,125.209.80.146,AS9260 Multinet Pakistan Pvt. Ltd.,Multinet Pakistan Pvt. Ltd.,isp,2026-11-14 14:39:09,EDT-Pages
+http://109.224.242.26:8080,http,109.224.242.26,8080,0,1,timeout,,SY,109.224.242.26,AS216472 High Speed For Internet Services L.L.C,High Speed For Internet Services L.L.C,isp,2026-11-14 14:39:09,EDT-Pages
+http://79.98.32.73:8080,http,79.98.32.73,8080,0,1,timeout,,TR,79.98.32.73,AS216472 High Speed,High Speed,isp,2026-11-14 14:39:09,EDT-Pages
+http://175.100.35.103:8080,http,175.100.35.103,8080,0,1,timeout,,KH,175.100.35.103,AS38623 BUCT COMMUNICATION,BUCT COMMUNICATION,isp,2026-11-14 14:39:09,EDT-Pages
+http://151.241.86.129:999,http,151.241.86.129,999,0,1,timeout,,CL,151.241.86.134,AS274099 Vallenet SpA - Residential Broadband Internet Service Provider,Vallenet SpA - Residential Broadband Internet Service Provider,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.19.43.107:999,http,38.19.43.107,999,0,1,timeout,,CO,38.19.43.106,AS270075 SUPER REDES S.A.S,SUPER REDES S.A.S,isp,2026-11-14 14:39:09,EDT-Pages
+http://219.148.171.178:9445,http,219.148.171.178,9445,0,1,timeout,,CN,219.148.171.178,AS4134 China Telecom,China Telecom,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.43.158.7:8080,http,38.43.158.7,8080,0,1,timeout,,PE,38.137.200.114,AS273934 A & D FOR CABLE TELEVISION IN THE SOUTHERN PERU SAC,A & D FOR CABLE TELEVISION IN THE SOUTHERN PERU SAC,isp,2026-11-14 14:39:09,EDT-Pages
+http://182.95.79.172:3128,http,182.95.79.172,3128,0,1,timeout,,IN,182.95.79.172,AS9498 Bharti Airtel Ltd.,Bharti Airtel Ltd.,isp,2026-11-14 14:39:09,EDT-Pages
+http://157.20.229.225:8080,http,157.20.229.225,8080,0,1,timeout,,IN,43.225.213.50,AS59162 U.P. COMMUNICATION SERVICES PVT LTD,U.P. COMMUNICATION SERVICES PVT LTD,isp,2026-11-14 14:39:09,EDT-Pages
+http://1.10.248.240:80,http,1.10.248.240,80,0,1,timeout,,TH,1.10.248.240,AS23969 Dynamic IP for ADSL Broadband Service,Dynamic IP for ADSL Broadband Service,isp,2026-11-14 14:39:09,EDT-Pages
+http://190.188.131.87:8080,http,190.188.131.87,8080,0,1,timeout,,AR,190.188.131.87,AS7303 Telecom Argentina S.A.,Telecom Argentina S.A.,isp,2026-11-14 14:39:09,EDT-Pages
+http://45.4.200.67:999,http,45.4.200.67,999,0,1,timeout,,EC,45.4.200.66,AS263238 GEDATECU SA.,GEDATECU SA.,isp,2026-11-14 14:39:09,EDT-Pages
+http://202.47.188.187:8080,http,202.47.188.187,8080,0,1,timeout,,ID,202.47.188.184,AS45305 PT Ganera Infinity Network,PT Ganera Infinity Network,isp,2026-11-14 14:39:09,EDT-Pages
+http://160.19.16.29:8181,http,160.19.16.29,8181,0,1,timeout,,ID,160.19.16.10,AS152073 PT Media Balai Nusa,PT Media Balai Nusa,isp,2026-11-14 14:39:09,EDT-Pages
+http://213.169.33.3:8001,http,213.169.33.3,8001,0,1,timeout,,BG,213.169.33.7,AS8717 A1 Bulgaria EAD,A1 Bulgaria EAD,isp,2026-11-14 14:39:09,EDT-Pages
+http://160.22.206.154:8082,http,160.22.206.154,8082,0,1,timeout,,ID,160.22.206.223,AS152825 PT Teradata Bintang Selaras,PT Teradata Bintang Selaras,isp,2026-11-14 14:39:09,EDT-Pages
+http://45.234.101.120:8081,http,45.234.101.120,8081,0,1,timeout,,BR,45.234.101.123,AS61592 FORTLINK INTERNET CORPORATIVA,FORTLINK INTERNET CORPORATIVA,isp,2026-11-14 14:39:09,EDT-Pages
+http://149.86.206.27:8080,http,149.86.206.27,8080,0,1,timeout,,IT,149.86.206.27,AS60501 Sirius Technology SRL,Sirius Technology SRL,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.162.220.118:8080,http,103.162.220.118,8080,0,1,timeout,,ID,103.162.220.118,AS139952 CV Kiffa Teknologi,CV Kiffa Teknologi,isp,2026-11-14 14:39:09,EDT-Pages
+http://126.209.107.171:8082,http,126.209.107.171,8082,0,1,timeout,,PH,126.209.124.216,AS135607 Responsible Internet Sustainability Effort,Responsible Internet Sustainability Effort,isp,2026-11-14 14:39:09,EDT-Pages
+http://181.119.84.80:999,http,181.119.84.80,999,0,1,timeout,,CO,181.119.84.80,AS52468 Ufinet Panama S.A.,Ufinet Panama S.A.,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.46.214.205:8080,http,38.46.214.205,8080,0,1,timeout,,ID,38.46.214.205,AS55701 PT. Usaha Adi Sanggoro,PT. Usaha Adi Sanggoro,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.97.198.2:8080,http,103.97.198.2,8080,0,1,timeout,,ID,103.97.198.2,AS150915 PT Borneo Global Persada,PT Borneo Global Persada,isp,2026-11-14 14:39:09,EDT-Pages
+http://203.175.103.169:8080,http,203.175.103.169,8080,0,1,timeout,,ID,203.175.103.169,AS152014 PT. Mitra Kita Brilian,PT. Mitra Kita Brilian,isp,2026-11-14 14:39:09,EDT-Pages
+http://187.190.114.60:999,http,187.190.114.60,999,0,1,timeout,,MX,187.190.114.60,"AS22884 TOTAL PLAY TELECOMUNICACIONES, S.A.P.I. DE C.V.","TOTAL PLAY TELECOMUNICACIONES, S.A.P.I. DE C.V.",isp,2026-11-14 14:39:09,EDT-Pages
+http://103.137.158.112:84,http,103.137.158.112,84,0,1,timeout,,BD,103.137.158.217,AS138385 Chittagong Data Communication,Chittagong Data Communication,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.81.175.137:22311,http,103.81.175.137,22311,0,1,timeout,,BD,103.81.175.137,AS38203 ADN Telecom Ltd.,ADN Telecom Ltd.,isp,2026-11-14 14:39:09,EDT-Pages
+http://45.190.184.105:8080,http,45.190.184.105,8080,0,1,timeout,,HN,45.190.184.105,AS52468 Ufinet Panama S.A.,Ufinet Panama S.A.,isp,2026-11-14 14:39:09,EDT-Pages
+http://115.178.53.206:8080,http,115.178.53.206,8080,0,1,net_err,,ID,115.178.55.163,AS38783 Pt. Simaya Jejaring Mandiri,Pt. Simaya Jejaring Mandiri,isp,2026-11-14 14:39:09,EDT-Pages
+http://125.25.167.188:8080,http,125.25.167.188,8080,0,1,timeout,,TH,125.25.167.188,AS23969 TOT Public Company Limited Bangkok,TOT Public Company Limited Bangkok,isp,2026-11-14 14:39:09,EDT-Pages
+http://24.152.58.107:999,http,24.152.58.107,999,0,1,timeout,,CO,24.152.58.108,AS267823 ATENEA TELECOMUNICACIONES S.A.S,ATENEA TELECOMUNICACIONES S.A.S,isp,2026-11-14 14:39:09,EDT-Pages
+http://202.47.185.162:8080,http,202.47.185.162,8080,0,1,timeout,,ID,202.47.185.162,AS152032 PT Putra Garsel Interkoneksi,PT Putra Garsel Interkoneksi,isp,2026-11-14 14:39:09,EDT-Pages
+http://200.114.81.219:8080,http,200.114.81.219,8080,0,1,timeout,,AR,200.114.81.20,AS273088 SIGOT ALEXIS RAUL (SPEED INTERNET),SIGOT ALEXIS RAUL (SPEED INTERNET),isp,2026-11-14 14:39:09,EDT-Pages
+http://8.242.147.166:3128,http,8.242.147.166,3128,0,1,timeout,,CO,8.242.147.166,"AS3549 Level 3 Parent, LLC","Level 3 Parent, LLC",isp,2026-11-14 14:39:09,EDT-Pages
+http://181.119.84.134:8080,http,181.119.84.134,8080,0,1,timeout,,CO,38.224.54.66,AS272987 CABLE CAUCA COMUNICACIONES S.A.S.,CABLE CAUCA COMUNICACIONES S.A.S.,isp,2026-11-14 14:39:09,EDT-Pages
+http://157.15.116.75:8080,http,157.15.116.75,8080,0,1,timeout,,ID,157.15.116.67,AS152372 PT Trias Infra Sarana,PT Trias Infra Sarana,isp,2026-11-14 14:39:09,EDT-Pages
+http://163.223.78.125:8090,http,163.223.78.125,8090,0,1,timeout,,ID,163.223.78.125,AS153697 PT Big Network Indonesia,PT Big Network Indonesia,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.70.122.147:8080,http,103.70.122.147,8080,0,1,timeout,,ID,103.70.122.147,AS150980 PT Menara Digital Salama,PT Menara Digital Salama,isp,2026-11-14 14:39:09,EDT-Pages
+http://212.115.17.194:9090,http,212.115.17.194,9090,0,1,timeout,,TR,212.115.17.194,AS15924 Vodafone Net Iletisim Hizmetler AS,Vodafone Net Iletisim Hizmetler AS,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.177.235.194:83,http,103.177.235.194,83,0,1,timeout,,IN,103.177.235.194,AS141329 COASTAL LIVE CHANNEL,COASTAL LIVE CHANNEL,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.253.80.165:999,http,38.253.80.165,999,0,1,timeout,,PE,38.253.80.161,AS272106 CORPORACION TARAZONA CATV S.A.C.,CORPORACION TARAZONA CATV S.A.C.,isp,2026-11-14 14:39:09,EDT-Pages
+http://43.252.238.57:8080,http,43.252.238.57,8080,0,1,timeout,,ID,43.252.236.215,AS55701 PT Usaha Adi Sanggoro,PT Usaha Adi Sanggoro,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.154.231.123:8090,http,103.154.231.123,8090,0,1,timeout,,ID,103.154.231.123,AS136121 PT Digital Media Telematika,PT Digital Media Telematika,isp,2026-11-14 14:39:09,EDT-Pages
+http://201.165.162.53:999,http,201.165.162.53,999,0,1,timeout,,MX,201.165.162.53,"AS13999 Mega Cable, S.A. de C.V.","Mega Cable, S.A. de C.V.",isp,2026-11-14 14:39:09,EDT-Pages
+http://181.48.234.214:8080,http,181.48.234.214,8080,0,1,timeout,,CO,181.48.234.214,AS14080 Telmex Colombia S.A.,Telmex Colombia S.A.,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.166.9.50:3128,http,103.166.9.50,3128,0,1,timeout,,ID,103.166.9.50,AS141978 PT Akses Bersama Sedaya,PT Akses Bersama Sedaya,isp,2026-11-14 14:39:09,EDT-Pages
+http://182.52.113.74:80,http,182.52.113.74,80,0,1,timeout,,TH,182.52.113.74,AS23969 TOT Public Company Limited,TOT Public Company Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://91.203.242.66:222,http,91.203.242.66,222,0,1,timeout,,RU,91.203.242.66,AS47335 ABN LTD,ABN LTD,isp,2026-11-14 14:39:09,EDT-Pages
+http://80.64.142.192:8080,http,80.64.142.192,8080,0,1,timeout,,AT,80.64.142.192,AS24953 NETPLANET GmbH,NETPLANET GmbH,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.137.158.112:83,http,103.137.158.112,83,0,1,timeout,,BD,103.137.158.218,AS138385 Chittagong Data Communication,Chittagong Data Communication,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.106.218.173:8081,http,103.106.218.173,8081,0,1,timeout,,ID,103.106.218.173,AS137329 PT. ARTHA LINTAS DATA MANDIRI,PT. ARTHA LINTAS DATA MANDIRI,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.183.8.183:8080,http,103.183.8.183,8080,0,1,timeout,,ID,103.183.8.183,AS149404 PT Cepat Multi Data,PT Cepat Multi Data,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.153.62.31:8080,http,103.153.62.31,8080,0,1,timeout,,ID,103.153.62.31,AS140457 PT Ikhlas Cipta Teknologi,PT Ikhlas Cipta Teknologi,isp,2026-11-14 14:39:09,EDT-Pages
+http://123.121.113.161:8888,http,123.121.113.161,8888,0,1,timeout,,CN,123.121.113.161,AS4808 China Unicom Beijing Province Network,China Unicom Beijing Province Network,isp,2026-11-14 14:39:09,EDT-Pages
+http://45.133.107.128:81,http,45.133.107.128,81,0,1,timeout,,AM,45.133.107.238,AS216086 ART-NET LLC,ART-NET LLC,isp,2026-11-14 14:39:09,EDT-Pages
+http://78.154.10.164:3128,http,78.154.10.164,3128,0,1,timeout,,BG,78.154.10.164,AS8866 Vivacom Bulgaria EAD,Vivacom Bulgaria EAD,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.188.173.101:1080,http,103.188.173.101,1080,0,1,timeout,,ID,103.188.173.101,AS149736 PT Satria Digital Media,PT Satria Digital Media,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.173.140.131:1111,http,103.173.140.131,1111,0,1,timeout,,ID,103.173.140.177,AS58485 WIFIAN ID,WIFIAN ID,isp,2026-11-14 14:39:09,EDT-Pages
+http://110.76.144.119:8082,http,110.76.144.119,8082,0,1,timeout,,ID,110.76.144.119,AS140481 PT. Tonggak Teknologi Netikom,PT. Tonggak Teknologi Netikom,isp,2026-11-14 14:39:09,EDT-Pages
+http://93.118.120.60:8080,http,93.118.120.60,8080,0,1,slow_timeout,,IR,93.118.120.60,AS58224 Telecommunication Company of Tehran,Telecommunication Company of Tehran,isp,2026-11-14 14:39:09,EDT-Pages
+http://125.27.218.12:8080,http,125.27.218.12,8080,0,1,timeout,,TH,125.27.218.12,AS23974 Ministry of education,Ministry of education,government,2026-11-14 14:39:09,EDT-Pages
+http://103.154.146.74:8080,http,103.154.146.74,8080,0,1,timeout,,ID,103.154.146.74,AS131111 MORATELINDONAP,MORATELINDONAP,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.114.25.204:8088,http,103.114.25.204,8088,0,1,timeout,,NP,103.114.25.6,AS137580 Everest Wireless Network pvt. ltd,Everest Wireless Network pvt. ltd,isp,2026-11-14 14:39:09,EDT-Pages
+http://45.220.22.245:8080,http,45.220.22.245,8080,0,1,timeout,,ZA,45.220.22.245,AS327901 Level-7-Internet,Level-7-Internet,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.230.244.8:8090,http,103.230.244.8,8090,0,1,timeout,,BD,103.230.244.11,AS151484 KM NETWORK,KM NETWORK,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.103.250.115:8080,http,38.103.250.115,8080,0,1,timeout,,ID,38.103.250.115,AS152436 PT Erajaya Telco Indonesia / Eratel /Eratelindo,PT Erajaya Telco Indonesia / Eratel /Eratelindo,isp,2026-11-14 14:39:09,EDT-Pages
+http://45.164.151.150:999,http,45.164.151.150,999,0,1,timeout,,GT,45.164.151.150,"AS267713 JORGE MARIO, MENDOZA LUX (PUNTO-NET)","JORGE MARIO, MENDOZA LUX (PUNTO-NET)",isp,2026-11-14 14:39:09,EDT-Pages
+http://45.162.132.1:999,http,45.162.132.1,999,0,1,timeout,,CL,45.162.133.0,AS271843 LARA INGENIERIA EN TECNOLOGIA Y TELECOMUNICACIONES LIMITADA (SOLUCIONES INTERLAN),LARA INGENIERIA EN TECNOLOGIA Y TELECOMUNICACIONES LIMITADA (SOLUCIONES INTERLAN),isp,2026-11-14 14:39:09,EDT-Pages
+http://45.177.147.119:80,http,45.177.147.119,80,0,1,timeout,,AR,45.177.147.119,AS264732 NETLATIN S.R.L.,NETLATIN S.R.L.,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.183.146.135:8080,http,38.183.146.135,8080,0,1,timeout,,ID,38.183.146.135,AS140457 PT Ikhlas Cipta Teknologi,PT Ikhlas Cipta Teknologi,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.166.159.93:8080,http,103.166.159.93,8080,0,1,timeout,,ID,103.166.159.173,AS141955 PT Timor Lintas Nusantara,PT Timor Lintas Nusantara,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.210.119.155:1080,http,103.210.119.155,1080,0,1,timeout,,ID,103.210.119.155,AS64024 PT Yesi Media Utama,PT Yesi Media Utama,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.161.31.249:83,http,103.161.31.249,83,0,1,timeout,,IN,202.65.158.237,AS150008 Pioneer Elabs Ltd.,Pioneer Elabs Ltd.,isp,2026-11-14 14:39:09,EDT-Pages
+http://110.39.13.162:1,http,110.39.13.162,1,0,1,timeout,,PK,110.39.13.162,AS38264 Wateen Telecom Limited,Wateen Telecom Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://180.191.14.210:8081,http,180.191.14.210,8081,0,1,timeout,,PH,180.191.14.210,AS132199 GBB-SJN-IP-POOL,GBB-SJN-IP-POOL,isp,2026-11-14 14:39:09,EDT-Pages
+http://181.225.75.99:4040,http,181.225.75.99,4040,0,1,timeout,,CO,190.14.250.54,AS27951 CABLE Y TV YOPAL S.A.S INTERNET INALAMBRICO,CABLE Y TV YOPAL S.A.S INTERNET INALAMBRICO,isp,2026-11-14 14:39:09,EDT-Pages
+http://195.87.136.2:5331,http,195.87.136.2,5331,0,1,timeout,,TR,195.87.136.2,AS15924 Vodafone Net Iletisim Hizmetler AS,Vodafone Net Iletisim Hizmetler AS,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.179.252.221:8181,http,103.179.252.221,8181,0,1,timeout,,ID,103.179.252.142,AS149350 PT Pusaka Kreasi Mandiri,PT Pusaka Kreasi Mandiri,isp,2026-11-14 14:39:09,EDT-Pages
+http://157.20.42.1:8090,http,157.20.42.1,8090,0,1,timeout,,BD,157.20.42.3,AS152482 Jasam Traders,Jasam Traders,isp,2026-11-14 14:39:09,EDT-Pages
+http://187.102.219.64:999,http,187.102.219.64,999,0,1,timeout,,AR,187.102.219.64,AS270004 CRETTON LISANDRO MAXIMILIANO MISIOTECH,CRETTON LISANDRO MAXIMILIANO MISIOTECH,isp,2026-11-14 14:39:09,EDT-Pages
+http://101.255.120.77:8085,http,101.255.120.77,8085,0,1,timeout,,ID,101.255.120.77,AS38511 Risdata media (Pop Kalimulya Depok),Risdata media (Pop Kalimulya Depok),isp,2026-11-14 14:39:09,EDT-Pages
+http://45.174.176.9:8087,http,45.174.176.9,8087,0,1,timeout,,BR,45.174.177.10,AS268863 M & G TELECON LTDA,M & G TELECON LTDA,isp,2026-11-14 14:39:09,EDT-Pages
+http://203.81.81.226:8055,http,203.81.81.226,8055,0,1,timeout,,MM,203.81.81.226,AS9988 Myanma Posts and Telecommunications,Myanma Posts and Telecommunications,isp,2026-11-14 14:39:09,EDT-Pages
+http://206.135.12.150:999,http,206.135.12.150,999,0,1,timeout,,MX,206.135.12.150,AS28458 IENTC S de RL de CV,IENTC S de RL de CV,isp,2026-11-14 14:39:09,EDT-Pages
+http://116.204.166.203:8080,http,116.204.166.203,8080,0,1,timeout,,SY,116.204.166.203,AS216472 High Speed,High Speed,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.148.45.51:8080,http,103.148.45.51,8080,0,1,timeout,,ID,103.148.45.51,AS139982 PT Buana Visualnet Sentra,PT Buana Visualnet Sentra,isp,2026-11-14 14:39:09,EDT-Pages
+http://160.25.222.159:8080,http,160.25.222.159,8080,0,1,timeout,,ID,160.25.222.159,AS153087 PT Telemedia Prima Nusantara,PT Telemedia Prima Nusantara,isp,2026-11-14 14:39:09,EDT-Pages
+http://138.121.114.54:8080,http,138.121.114.54,8080,0,1,timeout,,AR,138.121.114.54,AS263791 REFSA TELECOMUNICACIONES,REFSA TELECOMUNICACIONES,isp,2026-11-14 14:39:09,EDT-Pages
+http://182.52.136.73:80,http,182.52.136.73,80,0,1,timeout,,TH,182.52.136.73,AS23969 TOT Public Company Limited,TOT Public Company Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.171.194.52:83,http,103.171.194.52,83,0,1,timeout,,IN,103.171.194.52,AS141329 COASTAL LIVE CHANNEL,COASTAL LIVE CHANNEL,isp,2026-11-14 14:39:09,EDT-Pages
+http://202.154.19.7:8080,http,202.154.19.7,8080,0,1,timeout,,ID,202.154.19.123,AS136121 PT Digital Media Telematika,PT Digital Media Telematika,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.95.23.130:8097,http,103.95.23.130,8097,0,1,timeout,,ID,103.95.23.130,AS150557 PT HASIBUAN TELEKOMUNIKASI INDONESIA,PT HASIBUAN TELEKOMUNIKASI INDONESIA,isp,2026-11-14 14:39:09,EDT-Pages
+http://181.78.198.7:8080,http,181.78.198.7,8080,0,1,timeout,,EC,181.78.198.7,AS52468 Ufinet Panama S.A.,Ufinet Panama S.A.,isp,2026-11-14 14:39:09,EDT-Pages
+http://24.152.58.22:999,http,24.152.58.22,999,0,1,timeout,,CO,24.152.58.22,AS267823 ATENEA TELECOMUNICACIONES S.A.S,ATENEA TELECOMUNICACIONES S.A.S,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.120.76.34:8085,http,103.120.76.34,8085,0,1,timeout,,ID,103.120.76.34,AS150501 PT Haci Telekomunikasi Indonesia,PT Haci Telekomunikasi Indonesia,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.167.229.147:8080,http,103.167.229.147,8080,0,1,timeout,,NP,103.167.229.147,AS140072 Fiberworld Communication Pvt.ltd,Fiberworld Communication Pvt.ltd,isp,2026-11-14 14:39:09,EDT-Pages
+http://45.174.243.232:999,http,45.174.243.232,999,0,1,timeout,,MX,45.174.243.232,AS265583 SISTEMAS Y SOLUCIONES DE CAMPECHE SAS DE CV,SISTEMAS Y SOLUCIONES DE CAMPECHE SAS DE CV,isp,2026-11-14 14:39:09,EDT-Pages
+http://154.59.56.74:999,http,154.59.56.74,999,0,1,timeout,,VE,154.59.56.73,"AS264778 Cogent Communications, LLC","Cogent Communications, LLC",isp,2026-11-14 14:39:09,EDT-Pages
+http://167.99.3.26:8585,http,167.99.3.26,8585,0,1,conn_reset,,VN,171.241.10.177,AS7552 Viettel Group,Viettel Group,isp,2026-11-14 14:39:09,EDT-Pages
+http://18.188.168.99:13762,http,18.188.168.99,13762,0,1,timeout,,US,185.220.101.99,AS60729 Network for Tor-Exit traffic.,Network for Tor-Exit traffic.,education,2026-11-14 14:39:09,EDT-Pages
+http://88.248.250.76:8080,http,88.248.250.76,8080,0,1,timeout,,TR,88.248.250.76,AS9121 TurkTelecom,TurkTelecom,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.247.83.248:8085,http,103.247.83.248,8085,0,1,timeout,,ID,103.247.83.254,AS151579 PT Multimedia Data Sentra,PT Multimedia Data Sentra,isp,2026-11-14 14:39:09,EDT-Pages
+http://175.106.15.189:8080,http,175.106.15.189,8080,0,1,timeout,,ID,175.106.15.186,AS46023 PT Quantum Tera Network,PT Quantum Tera Network,isp,2026-11-14 14:39:09,EDT-Pages
+http://198.15.30.101:8080,http,198.15.30.101,8080,0,1,timeout,,ID,198.15.30.101,AS154503 PT Trimafa Computindo Networking,PT Trimafa Computindo Networking,isp,2026-11-14 14:39:09,EDT-Pages
+http://222.167.236.73:8080,http,222.167.236.73,8080,0,1,timeout,,TR,222.167.236.73,AS216472 High Speed,High Speed,isp,2026-11-14 14:39:09,EDT-Pages
+http://182.52.136.59:8080,http,182.52.136.59,8080,0,1,timeout,,TH,182.52.136.59,AS23969 TOT Public Company Limited,TOT Public Company Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://1.20.101.25:80,http,1.20.101.25,80,0,1,timeout,,TH,1.20.101.25,AS23969 TOT Mobile Co LTD,TOT Mobile Co LTD,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.163.13.17:1111,http,103.163.13.17,1111,0,1,timeout,,ID,162.4.243.25,AS141889 PT Solusi Media Telekomunikasi,PT Solusi Media Telekomunikasi,isp,2026-11-14 14:39:09,EDT-Pages
+http://157.66.16.52:8080,http,157.66.16.52,8080,0,1,timeout,,ID,157.66.16.52,AS136089 PT Mitra Mandiri Network,PT Mitra Mandiri Network,isp,2026-11-14 14:39:09,EDT-Pages
+http://157.15.211.48:8080,http,157.15.211.48,8080,0,1,timeout,,ID,157.15.211.48,AS152393 PT Gaisar Teknologi Bersama,PT Gaisar Teknologi Bersama,isp,2026-11-14 14:39:09,EDT-Pages
+http://157.100.12.152:999,http,157.100.12.152,999,0,1,timeout,,EC,157.100.12.152,AS27947 ECUANET - CORPORACION ECUATORIANA DE INFORMACION,ECUANET - CORPORACION ECUATORIANA DE INFORMACION,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.247.23.244:1111,http,103.247.23.244,1111,0,1,timeout,,ID,103.247.23.244,AS58485 WIFIAN ID,WIFIAN ID,isp,2026-11-14 14:39:09,EDT-Pages
+http://175.184.236.12:1111,http,175.184.236.12,1111,0,1,timeout,,ID,175.184.236.12,AS152440 PT Ashyla Karya Abadi,PT Ashyla Karya Abadi,isp,2026-11-14 14:39:09,EDT-Pages
+http://180.191.143.185:8081,http,180.191.143.185,8081,0,1,timeout,,PH,180.191.143.101,AS4775 GBB-SJN-IP-POOL,GBB-SJN-IP-POOL,isp,2026-11-14 14:39:09,EDT-Pages
+http://102.0.25.8:8080,http,102.0.25.8,8080,0,1,timeout,,KE,102.0.25.8,AS36926 Allocated to Airtel Kenya Mobile Broadband and Fixed internet,Allocated to Airtel Kenya Mobile Broadband and Fixed internet,isp,2026-11-14 14:39:09,EDT-Pages
+http://45.227.195.121:8082,http,45.227.195.121,8082,0,1,timeout,,BR,45.227.195.121,AS28146 MHNET TELECOM,MHNET TELECOM,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.155.166.226:7850,http,103.155.166.226,7850,0,1,timeout,,ID,103.155.166.225,AS141064 PT Network Lintas Fiberindo,PT Network Lintas Fiberindo,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.126.87.175:53934,http,103.126.87.175,53934,0,1,timeout,,ID,103.126.87.175,AS138109 PT. Rasi Bintang Perkasa,PT. Rasi Bintang Perkasa,isp,2026-11-14 14:39:09,EDT-Pages
+http://58.254.153.146:17981,http,58.254.153.146,17981,0,1,http_fail,,CN,58.63.243.11,AS4134 China Telecom,China Telecom,isp,2026-11-14 14:39:09,EDT-Pages
+http://43.248.254.130:82,http,43.248.254.130,82,0,1,timeout,,BD,43.248.254.76,AS154269 Easy Net-Wifi,Easy Net-Wifi,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.49.166.117:83,http,103.49.166.117,83,0,1,timeout,,IN,103.171.55.10,AS137633 Gigaline Teleservices Opc Private Limited,Gigaline Teleservices Opc Private Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://149.86.142.224:8080,http,149.86.142.224,8080,0,1,timeout,,TR,149.86.142.224,AS208972 GIBIRNET ILETISIM HIZMETLERI SANAYI VE TICARET LIMITED SIRKETI,GIBIRNET ILETISIM HIZMETLERI SANAYI VE TICARET LIMITED SIRKETI,isp,2026-11-14 14:39:09,EDT-Pages
+http://45.65.224.125:999,http,45.65.224.125,999,0,1,timeout,,AR,45.65.224.125,AS266725 SOLUTION LAN S.A,SOLUTION LAN S.A,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.68.214.141:8080,http,103.68.214.141,8080,0,1,timeout,,ID,103.68.214.141,AS150517 PT Media Grasi Internet,PT Media Grasi Internet,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.191.208.42:999,http,38.191.208.42,999,0,1,timeout,,CO,38.191.208.42,"AS174 Cogent Communications, LLC","Cogent Communications, LLC",isp,2026-11-14 14:39:09,EDT-Pages
+http://103.80.99.164:8080,http,103.80.99.164,8080,0,1,timeout,,ID,157.10.89.18,AS152082 PT Infonusa Teknologi Telekomunikasi Nusantara,PT Infonusa Teknologi Telekomunikasi Nusantara,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.238.232.202:8080,http,103.238.232.202,8080,0,1,timeout,,ID,103.238.232.202,AS151540 PT Digital Netcom Solution,PT Digital Netcom Solution,isp,2026-11-14 14:39:09,EDT-Pages
+http://123.253.4.50:8080,http,123.253.4.50,8080,0,1,timeout,,ID,123.253.4.50,AS17995 Jl. Kapten Tendean No 12 B,Jl. Kapten Tendean No 12 B,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.48.71.58:84,http,103.48.71.58,84,0,1,timeout,,IN,103.48.71.58,AS136290 Country Online Services PVT LTD,Country Online Services PVT LTD,isp,2026-11-14 14:39:09,EDT-Pages
+http://114.141.54.2:8080,http,114.141.54.2,8080,0,1,timeout,,ID,114.141.54.2,AS38771 PT Cyberplus Media Pratama,PT Cyberplus Media Pratama,isp,2026-11-14 14:39:09,EDT-Pages
+http://203.175.103.139:8080,http,203.175.103.139,8080,0,1,timeout,,ID,203.175.103.139,AS152014 PT. Mitra Kita Brilian,PT. Mitra Kita Brilian,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.125.174.83:8080,http,103.125.174.83,8080,0,1,timeout,,ID,103.125.174.83,AS139415 PT Trinity Teknologi Nusantara,PT Trinity Teknologi Nusantara,isp,2026-11-14 14:39:09,EDT-Pages
+http://27.123.222.193:8080,http,27.123.222.193,8080,0,1,timeout,,ID,27.123.222.193,AS58369 PT. Fiber Networks Indonesia,PT. Fiber Networks Indonesia,isp,2026-11-14 14:39:09,EDT-Pages
+http://45.198.32.235:8085,http,45.198.32.235,8085,0,1,timeout,,ID,45.198.32.235,AS138089 PT Global Media Data Prima,PT Global Media Data Prima,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.48.68.83:83,http,103.48.68.83,83,0,1,timeout,,IN,103.48.71.186,AS136290 Country Online Services PVT LTD,Country Online Services PVT LTD,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.165.157.50:3125,http,103.165.157.50,3125,0,1,timeout,,ID,103.165.157.50,AS136873 CV Sampurno,CV Sampurno,isp,2026-11-14 14:39:09,EDT-Pages
+http://96.30.79.84:8081,http,96.30.79.84,8081,0,1,timeout,,TH,96.30.79.84,AS136393 Symphony Communication Plc.,Symphony Communication Plc.,isp,2026-11-14 14:39:09,EDT-Pages
+http://93.91.112.247:41258,http,93.91.112.247,41258,0,1,timeout,,RU,93.91.112.247,AS47562 Fast Link Ltd,Fast Link Ltd,isp,2026-11-14 14:39:09,EDT-Pages
+http://170.84.145.76:8088,http,170.84.145.76,8088,0,1,timeout,,BR,170.84.145.76,AS264997 Direct Telecom Ltda,Direct Telecom Ltda,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.156.57.135:9988,http,103.156.57.135,9988,0,1,timeout,,ID,202.47.65.175,AS141083 PT JETCOMS NETINDO,PT JETCOMS NETINDO,isp,2026-11-14 14:39:09,EDT-Pages
+http://101.0.6.154:8080,http,101.0.6.154,8080,0,1,timeout,,ID,101.0.4.30,AS55670 PT. Universal Broadband,PT. Universal Broadband,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.211.76.161:999,http,38.211.76.161,999,0,1,timeout,,CO,38.211.76.161,"AS270062 Cogent Communications, LLC","Cogent Communications, LLC",isp,2026-11-14 14:39:09,EDT-Pages
+http://45.198.11.9:9191,http,45.198.11.9,9191,0,1,timeout,,ID,45.198.11.9,AS142386 PT Jaringan Lintas Artha,PT Jaringan Lintas Artha,isp,2026-11-14 14:39:09,EDT-Pages
+http://180.211.93.111:8080,http,180.211.93.111,8080,0,1,timeout,,ID,36.84.18.62,AS7713,PT TELKOM INDONESIA STO Gambir 3rd Floor Jl. Medan Merdeka Selatan No. 12 Jakarta 10110,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.169.154.4:83,http,103.169.154.4,83,0,1,timeout,,IN,103.169.154.4,AS142490 SPEEDPULSE FIBERNET PVT LTD,SPEEDPULSE FIBERNET PVT LTD,isp,2026-11-14 14:39:09,EDT-Pages
+http://202.58.77.73:800,http,202.58.77.73,800,0,1,timeout,,ID,202.58.72.75,AS138886 PT Data Buana Nusantara,PT Data Buana Nusantara,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.48.68.218:83,http,103.48.68.218,83,0,1,timeout,,IN,103.48.68.218,AS136290 Country Online Services PVT LTD,Country Online Services PVT LTD,isp,2026-11-14 14:39:09,EDT-Pages
+http://170.254.228.90:999,http,170.254.228.90,999,0,1,timeout,,CO,170.254.228.90,AS27951 Media Commerce Partners S.A,Media Commerce Partners S.A,isp,2026-11-14 14:39:09,EDT-Pages
+http://82.213.29.53:19000,http,82.213.29.53,19000,0,1,conn_reset,,PS,213.6.68.29,AS12975 Palestine Telecommunications Company (PALTEL),Palestine Telecommunications Company (PALTEL),isp,2026-11-14 14:39:09,EDT-Pages
+http://38.159.63.8:999,http,38.159.63.8,999,0,1,timeout,,VE,38.159.63.8,AS269946 BOOM SOLUTIONS C.A.,BOOM SOLUTIONS C.A.,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.68.215.101:8181,http,103.68.215.101,8181,0,1,timeout,,ID,103.68.215.115,AS150517 PT Media Grasi Internet,PT Media Grasi Internet,isp,2026-11-14 14:39:09,EDT-Pages
+http://181.209.125.236:999,http,181.209.125.236,999,0,1,timeout,,AR,181.209.125.238,AS52361 Mamani Néstor Benigno,Mamani Néstor Benigno,isp,2026-11-14 14:39:09,EDT-Pages
+http://181.174.115.9:1994,http,181.174.115.9,1994,0,1,timeout,,GT,181.174.115.9,"AS23243 COMUNICACIONES CELULARES, S.A.","COMUNICACIONES CELULARES, S.A.",isp,2026-11-14 14:39:09,EDT-Pages
+http://210.16.85.42:8080,http,210.16.85.42,8080,0,1,timeout,,IN,210.16.85.42,AS134877 Sri Vari Network Private Limited,Sri Vari Network Private Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.54.171.46:8080,http,103.54.171.46,8080,0,1,timeout,,ID,103.54.171.46,AS141071 JDP - Lintas Data Asia,JDP - Lintas Data Asia,isp,2026-11-14 14:39:09,EDT-Pages
+http://45.7.67.158:999,http,45.7.67.158,999,0,1,timeout,,MX,45.7.67.132,AS270143 MAYSNET SA DE CV,MAYSNET SA DE CV,isp,2026-11-14 14:39:09,EDT-Pages
+http://123.119.177.72:8888,http,123.119.177.72,8888,0,1,timeout,,CN,2408:8207:1833:9df0:b13b:8e1:ebd3:5ff1,AS4808 China Unicom Beijing Province Network,China Unicom Beijing Province Network,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.234.35.166:8080,http,103.234.35.166,8080,0,1,timeout,,ID,103.234.35.166,AS151521 PT EXABIT GROUP NETWORK,PT EXABIT GROUP NETWORK,isp,2026-11-14 14:39:09,EDT-Pages
+http://154.18.255.121:1111,http,154.18.255.121,1111,0,1,timeout,,ID,154.18.255.121,AS142393 PT Media Solusi Sukses/ Shafanet,PT Media Solusi Sukses/ Shafanet,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.160.205.12:8081,http,103.160.205.12,8081,0,1,timeout,,ID,103.160.205.12,AS141595 PT Akbar Prima Media,PT Akbar Prima Media,isp,2026-11-14 14:39:09,EDT-Pages
+http://151.158.133.143:8080,http,151.158.133.143,8080,0,1,timeout,,ID,151.158.133.143,AS134728 PT SANET MEDIA TEKNOLOGI,PT SANET MEDIA TEKNOLOGI,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.176.96.84:8082,http,103.176.96.84,8082,0,1,timeout,,ID,103.176.96.84,AS147131 PT Global Sarana Elektronika,PT Global Sarana Elektronika,isp,2026-11-14 14:39:09,EDT-Pages
+http://14.172.88.126:8080,http,14.172.88.126,8080,0,1,timeout,,VN,14.172.88.126,AS45899 VNPT Corp,VNPT Corp,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.120.76.46:8080,http,103.120.76.46,8080,0,1,timeout,,ID,103.120.76.46,AS150501 PT Haci Telekomunikasi Indonesia,PT Haci Telekomunikasi Indonesia,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.31.235.251:8080,http,103.31.235.251,8080,0,1,timeout,,ID,103.31.235.251,AS55701 PT. Semut Data Indonesia,PT. Semut Data Indonesia,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.132.53.28:8080,http,103.132.53.28,8080,0,1,timeout,,ID,103.132.53.28,AS138123 PT. ADEAKSA INDO JAYATAMA,PT. ADEAKSA INDO JAYATAMA,isp,2026-11-14 14:39:09,EDT-Pages
+http://163.223.150.97:8080,http,163.223.150.97,8080,0,1,timeout,,ID,163.223.150.97,AS153774 PT MICROCYBER DATA INDONESIA,PT MICROCYBER DATA INDONESIA,isp,2026-11-14 14:39:09,EDT-Pages
+http://102.38.24.30:19000,http,102.38.24.30,19000,0,1,timeout,,LY,102.38.24.28,AS328539 Giga for Telecommunication and Technology Limited,Giga for Telecommunication and Technology Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.101.193.170:1111,http,103.101.193.170,1111,0,1,timeout,,ID,103.101.193.170,AS150468 PT Bintang Teknologi Sejahtera,PT Bintang Teknologi Sejahtera,isp,2026-11-14 14:39:09,EDT-Pages
+http://201.4.65.205:8080,http,201.4.65.205,8080,0,1,timeout,,SY,109.224.242.251,AS216472 High Speed For Internet Services L.L.C,High Speed For Internet Services L.L.C,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.226.242.71:8080,http,38.226.242.71,8080,0,1,timeout,,ID,38.226.242.71,AS152032 PT Putra Garsel Interkoneksi,PT Putra Garsel Interkoneksi,isp,2026-11-14 14:39:09,EDT-Pages
+http://79.52.108.2:8081,http,79.52.108.2,8081,0,1,timeout,,IT,79.52.108.2,AS3269 NAS DHCP Pool Pescara,NAS DHCP Pool Pescara,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.50.25.7:8888,http,103.50.25.7,8888,0,1,timeout,,ID,103.50.25.7,AS63869 PT MERAH PUTIH TELEMATIKA,PT MERAH PUTIH TELEMATIKA,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.39.51.160:80,http,103.39.51.160,80,0,1,timeout,,ID,103.39.51.160,AS63501 PT Mega Mentari Mandiri,PT Mega Mentari Mandiri,isp,2026-11-14 14:39:09,EDT-Pages
+http://102.135.142.234:12354,http,102.135.142.234,12354,0,1,timeout,,ZA,102.135.142.234,AS327907 Session Telecoms(PTY) Ltd,Session Telecoms(PTY) Ltd,isp,2026-11-14 14:39:09,EDT-Pages
+http://36.89.90.97:3128,http,36.89.90.97,3128,0,1,timeout,,ID,36.80.190.146,AS7713 PT TELKOM INDONESIA Menara Multimedia Lt.7 Jl. Kebon sirih No.12 JAKARTA,PT TELKOM INDONESIA Menara Multimedia Lt.7 Jl. Kebon sirih No.12 JAKARTA,isp,2026-11-14 14:39:09,EDT-Pages
+http://111.95.55.210:8080,http,111.95.55.210,8080,0,1,timeout,,ID,111.95.55.210,AS23700 Linknet-Fastnet ASN,Linknet-Fastnet ASN,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.176.96.50:8082,http,103.176.96.50,8082,0,1,timeout,,ID,165.99.160.194,AS147131 CV Global Sarana Elektronika,CV Global Sarana Elektronika,isp,2026-11-14 14:39:09,EDT-Pages
+http://3.21.247.154:35890,http,3.21.247.154,35890,0,1,timeout,,DE,185.220.101.103,AS60729 Network for Tor-Exit traffic.,Network for Tor-Exit traffic.,education,2026-11-14 14:39:09,EDT-Pages
+http://179.136.111.46:8080,http,179.136.111.46,8080,0,1,timeout,,BR,179.136.111.46,AS28573 Claro NXT Telecomunicacoes Ltda,Claro NXT Telecomunicacoes Ltda,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.242.104.150:8080,http,103.242.104.150,8080,0,1,timeout,,ID,103.242.104.150,AS58821 PT Lintas Jaringan Nusantara,PT Lintas Jaringan Nusantara,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.156.246.1:999,http,38.156.246.1,999,0,1,timeout,,DO,38.156.246.1,AS272868 SEQURE NETWORKS SRL,SEQURE NETWORKS SRL,isp,2026-11-14 14:39:09,EDT-Pages
+http://62.32.73.54:8080,http,62.32.73.54,8080,0,1,timeout,,RU,62.32.73.54,"AS8492 ""OBIT"" Ltd.","""OBIT"" Ltd.",isp,2026-11-14 14:39:09,EDT-Pages
+http://202.58.77.131:7777,http,202.58.77.131,7777,0,1,timeout,,ID,202.58.79.37,AS138886 PT Data Buana Nusantara,PT Data Buana Nusantara,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.75.96.70:8080,http,103.75.96.70,8080,0,1,timeout,,ID,103.75.96.70,AS131111 MORATELINDONAP,MORATELINDONAP,isp,2026-11-14 14:39:09,EDT-Pages
+http://125.25.167.199:80,http,125.25.167.199,80,0,1,timeout,,TH,125.25.167.199,AS23969 TOT Public Company Limited Bangkok,TOT Public Company Limited Bangkok,isp,2026-11-14 14:39:09,EDT-Pages
+http://202.154.19.63:8090,http,202.154.19.63,8090,0,1,timeout,,ID,202.154.19.63,AS136121 PT Digital Media Telematika,PT Digital Media Telematika,isp,2026-11-14 14:39:09,EDT-Pages
+http://36.95.245.7:8090,http,36.95.245.7,8090,0,1,timeout,,ID,36.95.245.7,AS7713 PT Telekomunikasi Indonesia,PT Telekomunikasi Indonesia,isp,2026-11-14 14:39:09,EDT-Pages
+http://163.227.149.135:8080,http,163.227.149.135,8080,0,1,timeout,,ID,163.227.149.135,AS153840 PT Andalas Solusi Network,PT Andalas Solusi Network,isp,2026-11-14 14:39:09,EDT-Pages
+http://163.223.116.209:8080,http,163.223.116.209,8080,0,1,timeout,,ID,163.223.116.209,AS153768 PT Signall Network Nusantara,PT Signall Network Nusantara,isp,2026-11-14 14:39:09,EDT-Pages
+http://202.84.39.103:8674,http,202.84.39.103,8674,0,1,timeout,,BD,202.84.39.98,AS9230 DHCP Pool # 2 for Broadband Home User,DHCP Pool # 2 for Broadband Home User,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.49.138.202:999,http,38.49.138.202,999,0,1,timeout,,MX,38.49.138.202,AS28458 IENTC S de RL de CV,IENTC S de RL de CV,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.131.19.42:8181,http,103.131.19.42,8181,0,1,timeout,,ID,45.198.32.83,AS138089 PT Global Media Data Prima,PT Global Media Data Prima,isp,2026-11-14 14:39:09,EDT-Pages
+http://45.167.124.133:999,http,45.167.124.133,999,0,1,timeout,,CO,45.167.124.133,AS269804 SEPCOM COMUNICACIONES SAS,SEPCOM COMUNICACIONES SAS,isp,2026-11-14 14:39:09,EDT-Pages
+http://110.232.78.195:8080,http,110.232.78.195,8080,0,1,timeout,,ID,110.232.78.195,AS23679 PT. Media Antar Nusa,PT. Media Antar Nusa,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.14.111.188:8080,http,103.14.111.188,8080,0,1,timeout,,ID,103.135.49.106,AS38320 PT Ekakarya Graha Flora,PT Ekakarya Graha Flora,isp,2026-11-14 14:39:09,EDT-Pages
+http://180.191.142.188:8080,http,180.191.142.188,8080,0,1,timeout,,PH,180.191.142.188,AS4775 GBB-SJN-IP-POOL,GBB-SJN-IP-POOL,isp,2026-11-14 14:39:09,EDT-Pages
+http://165.99.100.31:8080,http,165.99.100.31,8080,0,1,timeout,,ID,165.99.100.31,AS154266 PT TELEKOMUNIKASI INDO PRIMA,PT TELEKOMUNIKASI INDO PRIMA,isp,2026-11-14 14:39:09,EDT-Pages
+http://124.106.152.86:8081,http,124.106.152.86,8081,0,1,timeout,,PH,180.191.143.33,AS4775 GBB-SJN-IP-POOL,GBB-SJN-IP-POOL,isp,2026-11-14 14:39:09,EDT-Pages
+http://180.191.122.34:8082,http,180.191.122.34,8082,0,1,timeout,,PH,112.204.106.37,AS9299 Philippine Long Distance Telephone Company,Philippine Long Distance Telephone Company,isp,2026-11-14 14:39:09,EDT-Pages
+http://154.88.136.50:999,http,154.88.136.50,999,0,1,timeout,,DO,154.88.136.50,"AS64126 Dominican Telecom Prime, DTP, SRL","Dominican Telecom Prime, DTP, SRL",isp,2026-11-14 14:39:09,EDT-Pages
+http://163.223.150.129:8080,http,163.223.150.129,8080,0,1,timeout,,ID,163.223.150.97,AS153774 PT MICROCYBER DATA INDONESIA,PT MICROCYBER DATA INDONESIA,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.253.240.231:9191,http,38.253.240.231,9191,0,1,timeout,,ID,45.198.11.95,AS142386 PT Jaringan Lintas Artha,PT Jaringan Lintas Artha,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.191.204.25:999,http,38.191.204.25,999,0,1,timeout,,CO,38.191.204.20,AS273134 TV&MAS S.A.S,TV&MAS S.A.S,isp,2026-11-14 14:39:09,EDT-Pages
+http://170.80.200.246:999,http,170.80.200.246,999,0,1,timeout,,DO,170.80.200.246,"AS271819 RUDDY GONZALEZ DIGITAL MEDIA DOMINICANA, RGDIMAX, S.R.L","RUDDY GONZALEZ DIGITAL MEDIA DOMINICANA, RGDIMAX, S.R.L",isp,2026-11-14 14:39:09,EDT-Pages
+http://1.20.101.26:8080,http,1.20.101.26,8080,0,1,timeout,,TH,1.20.101.26,AS23969 TOT Mobile Co LTD,TOT Mobile Co LTD,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.49.140.226:999,http,38.49.140.226,999,0,1,timeout,,MX,38.49.140.226,AS28458 IENTC S de RL de CV,IENTC S de RL de CV,isp,2026-11-14 14:39:09,EDT-Pages
+http://185.200.37.66:8080,http,185.200.37.66,8080,0,1,timeout,,TR,185.200.37.66,AS202561 High Speed Telekomunikasyon ve Hab. Hiz. Ltd. Sti.,High Speed Telekomunikasyon ve Hab. Hiz. Ltd. Sti.,isp,2026-11-14 14:39:09,EDT-Pages
+http://181.209.125.189:999,http,181.209.125.189,999,0,1,timeout,,AR,181.209.125.186,AS52361 GLOBALWEB S.R.L.,GLOBALWEB S.R.L.,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.165.157.154:3125,http,103.165.157.154,3125,0,1,timeout,,ID,103.165.157.154,AS136873 CV Sampurno,CV Sampurno,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.24.215.165:8080,http,103.24.215.165,8080,0,1,timeout,,ID,103.24.215.165,AS132649 PT. Adau Putra Network,PT. Adau Putra Network,isp,2026-11-14 14:39:09,EDT-Pages
+http://49.0.79.138:8080,http,49.0.79.138,8080,0,1,timeout,,TH,49.0.79.138,AS133481 AIS-Fibre,AIS-Fibre,isp,2026-11-14 14:39:09,EDT-Pages
+http://82.67.105.31:8888,http,82.67.105.31,8888,0,1,timeout,,FR,82.67.105.31,AS12322 Free SAS,Free SAS,isp,2026-11-14 14:39:09,EDT-Pages
+http://187.190.58.152:8081,http,187.190.58.152,8081,0,1,timeout,,MX,187.190.58.152,"AS22884 TOTAL PLAY TELECOMUNICACIONES, S.A.P.I. DE C.V.","TOTAL PLAY TELECOMUNICACIONES, S.A.P.I. DE C.V.",isp,2026-11-14 14:39:09,EDT-Pages
+http://45.177.16.135:999,http,45.177.16.135,999,0,1,timeout,,PY,45.177.16.254,AS267885 Cross Connect Paraguay S.A.,Cross Connect Paraguay S.A.,isp,2026-11-14 14:39:09,EDT-Pages
+http://102.68.128.210:8080,http,102.68.128.210,8080,0,1,timeout,,LY,102.68.128.206,AS21003 Schlumberger Overseas S.A | C201560001114,Schlumberger Overseas S.A | C201560001114,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.124.136.70:8080,http,103.124.136.70,8080,0,1,timeout,,ID,103.124.136.70,AS138089 PT.Global Media Data Prima,PT.Global Media Data Prima,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.143.197.90:8080,http,103.143.197.90,8080,0,1,timeout,,ID,103.143.197.90,AS139409 PT JERNIH MULTI KOMUNIKASI,PT JERNIH MULTI KOMUNIKASI,isp,2026-11-14 14:39:09,EDT-Pages
+http://160.22.45.114:8080,http,160.22.45.114,8080,0,1,timeout,,ID,160.22.45.114,AS153067 Pt Celebes Multi Network,Pt Celebes Multi Network,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.163.80.108:8080,http,103.163.80.108,8080,0,1,timeout,,ID,103.163.80.108,AS141674 CV Amanda Network Grup,CV Amanda Network Grup,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.88.91.14:8080,http,103.88.91.14,8080,0,1,timeout,,ID,103.88.90.30,AS150222 PT Paket Switch Bersama,PT Paket Switch Bersama,isp,2026-11-14 14:39:09,EDT-Pages
+http://151.253.146.146:8080,http,151.253.146.146,8080,0,1,timeout,,AE,151.253.146.146,AS5384 Emirates Telecommunications Corporation,Emirates Telecommunications Corporation,isp,2026-11-14 14:39:09,EDT-Pages
+http://123.112.147.39:8888,http,123.112.147.39,8888,0,1,timeout,,CN,123.112.147.39,AS4808 China Unicom Beijing Province Network,China Unicom Beijing Province Network,isp,2026-11-14 14:39:09,EDT-Pages
+http://202.166.220.40:8080,http,202.166.220.40,8080,0,1,timeout,,NP,202.166.220.40,AS17501 Enterprise Pool,Enterprise Pool,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.151.246.22:8081,http,103.151.246.22,8081,0,1,timeout,,ID,103.151.246.22,AS140437 PT MEDIA MANAKARRA NET,PT MEDIA MANAKARRA NET,isp,2026-11-14 14:39:09,EDT-Pages
+http://216.243.112.30:3128,http,216.243.112.30,3128,0,1,timeout,,ID,216.243.112.30,AS142387 PT Integrasi Jaringan Ekosistem,PT Integrasi Jaringan Ekosistem,isp,2026-11-14 14:39:09,EDT-Pages
+http://95.38.63.255:3128,http,95.38.63.255,3128,0,1,timeout,,IR,185.145.186.114,AS43395 Pooya Parto Qeshm Cooperative Company,Pooya Parto Qeshm Cooperative Company,isp,2026-11-14 14:39:09,EDT-Pages
+http://49.151.176.241:8082,http,49.151.176.241,8082,0,1,timeout,,PH,49.151.181.208,AS9299 Philippine Long Distance Telephone Company,Philippine Long Distance Telephone Company,isp,2026-11-14 14:39:09,EDT-Pages
+http://181.233.161.50:999,http,181.233.161.50,999,0,1,timeout,,VE,38.137.232.140,AS263767 CORPORACION GALA IT C.A.,CORPORACION GALA IT C.A.,isp,2026-11-14 14:39:09,EDT-Pages
+http://222.127.53.72:8082,http,222.127.53.72,8082,0,1,timeout,,PH,180.191.100.135,AS4775 GBB-SJN-IP-POOL,GBB-SJN-IP-POOL,isp,2026-11-14 14:39:09,EDT-Pages
+http://45.65.226.169:999,http,45.65.226.169,999,0,1,timeout,,AR,45.65.226.169,AS266725 SOLUTION LAN S.A,SOLUTION LAN S.A,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.164.229.149:8080,http,103.164.229.149,8080,0,1,timeout,,ID,103.164.229.149,AS141917 PT Muria Data Utama,PT Muria Data Utama,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.48.69.25:83,http,103.48.69.25,83,0,1,timeout,,IN,103.48.69.98,AS136290 Country Online Services PVT LTD,Country Online Services PVT LTD,isp,2026-11-14 14:39:09,EDT-Pages
+http://118.179.87.190:81,http,118.179.87.190,81,0,1,timeout,,BD,202.4.116.141,AS23956 Amber IT Limited,Amber IT Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://176.88.191.237:8080,http,176.88.191.237,8080,0,1,timeout,,TR,176.88.191.237,AS34984 Superonline Iletisim Hizmetleri A.S.,Superonline Iletisim Hizmetleri A.S.,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.55.225.54:8080,http,103.55.225.54,8080,0,1,timeout,,ID,103.55.225.54,AS150482 PT Gapura Era Digital,PT Gapura Era Digital,isp,2026-11-14 14:39:09,EDT-Pages
+http://167.99.3.26:10809,http,167.99.3.26,10809,0,1,conn_reset,,VN,171.241.19.127,AS7552 Viettel Group,Viettel Group,isp,2026-11-14 14:39:09,EDT-Pages
+http://187.249.112.221:999,http,187.249.112.221,999,0,1,timeout,,MX,187.249.112.221,"AS32098 IP Matrix, S.A. de C.V.","IP Matrix, S.A. de C.V.",isp,2026-11-14 14:39:09,EDT-Pages
+http://213.6.249.37:19000,http,213.6.249.37,19000,0,1,timeout,,PS,188.161.40.207,AS12975 Palestine Telecommunications Company (PALTEL),Palestine Telecommunications Company (PALTEL),isp,2026-11-14 14:39:09,EDT-Pages
+http://85.117.56.104:8080,http,85.117.56.104,8080,0,1,timeout,,GE,85.117.56.104,AS20771 Caucasus Online Ltd.,Caucasus Online Ltd.,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.46.8.102:8080,http,103.46.8.102,8080,0,1,timeout,,ID,103.46.8.102,AS64300 PT Jaringanku Sarana Nusantara Malang,PT Jaringanku Sarana Nusantara Malang,isp,2026-11-14 14:39:09,EDT-Pages
+http://160.187.174.37:8080,http,160.187.174.37,8080,0,1,timeout,,ID,160.187.174.37,AS153135 PT Netindo Persada Nusantara,PT Netindo Persada Nusantara,isp,2026-11-14 14:39:09,EDT-Pages
+http://49.151.178.41:8082,http,49.151.178.41,8082,0,1,timeout,,PH,49.151.178.41,AS9299 Philippine Long Distance Telephone Company,Philippine Long Distance Telephone Company,isp,2026-11-14 14:39:09,EDT-Pages
+http://143.0.203.173:8080,http,143.0.203.173,8080,0,1,timeout,,BR,143.0.203.173,AS264001 GENESYSNET PROVEDOR DE INTERNET LTDA ME,GENESYSNET PROVEDOR DE INTERNET LTDA ME,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.175.202.182:8090,http,103.175.202.182,8090,0,1,timeout,,ID,103.175.202.182,AS147118 PT Ameera Mega Buana,PT Ameera Mega Buana,isp,2026-11-14 14:39:09,EDT-Pages
+http://85.117.56.85:8080,http,85.117.56.85,8080,0,1,timeout,,GE,85.117.56.85,AS20771 Caucasus Online Ltd.,Caucasus Online Ltd.,isp,2026-11-14 14:39:09,EDT-Pages
+http://190.97.227.9:999,http,190.97.227.9,999,0,1,timeout,,VE,190.97.227.10,AS263703 VIGINET C.A,VIGINET C.A,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.167.30.238:64999,http,103.167.30.238,64999,0,1,timeout,,ID,103.167.30.238,AS17995 PT iForte Global Internet,PT iForte Global Internet,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.50.25.40:8080,http,103.50.25.40,8080,0,1,timeout,,ID,103.50.25.40,AS63869 PT MERAH PUTIH TELEMATIKA,PT MERAH PUTIH TELEMATIKA,isp,2026-11-14 14:39:09,EDT-Pages
+http://124.105.86.222:8090,http,124.105.86.222,8090,0,1,timeout,,PH,124.105.86.222,AS9299 Philippine Long Distance Telephone Company,Philippine Long Distance Telephone Company,isp,2026-11-14 14:39:09,EDT-Pages
+http://162.4.219.145:8080,http,162.4.219.145,8080,0,1,timeout,,ID,162.4.219.145,AS151198 PT Nexzet Network Digital,PT Nexzet Network Digital,isp,2026-11-14 14:39:09,EDT-Pages
+http://206.135.66.86:999,http,206.135.66.86,999,0,1,timeout,,MX,94.125.136.248,AS272378 ESTEVEZ.JOR SERVICIOS S.A. de C.V.,ESTEVEZ.JOR SERVICIOS S.A. de C.V.,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.169.133.46:8080,http,103.169.133.46,8080,0,1,timeout,,ID,103.169.133.46,AS142341 PT Alfa Omega Interkoneksi,PT Alfa Omega Interkoneksi,isp,2026-11-14 14:39:09,EDT-Pages
+http://201.7.31.173:8080,http,201.7.31.173,8080,0,1,timeout,,TR,201.7.31.173,AS216472 High Speed,High Speed,isp,2026-11-14 14:39:09,EDT-Pages
+http://190.99.192.158:999,http,190.99.192.158,999,0,1,timeout,,CO,177.73.153.70,AS271870 VALLE TELECOMUNICACIONES SAS,VALLE TELECOMUNICACIONES SAS,isp,2026-11-14 14:39:09,EDT-Pages
+http://201.230.121.228:999,http,201.230.121.228,999,0,1,timeout,,PE,201.230.121.228,AS6147 PE-TDPERX12-LACNIC,PE-TDPERX12-LACNIC,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.231.236.217:8182,http,103.231.236.217,8182,0,1,timeout,,ID,103.231.236.217,AS150964 PT Level Indodata Teknologi,PT Level Indodata Teknologi,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.188.63.115:8081,http,38.188.63.115,8081,0,1,timeout,,ID,38.188.63.115,AS151006 PT Nesta Indo Media,PT Nesta Indo Media,isp,2026-11-14 14:39:09,EDT-Pages
+http://181.191.227.179:999,http,181.191.227.179,999,0,1,timeout,,VE,181.191.227.5,"AS271855 MANGO NETWORK, C. A. MANGONET, C. A,","MANGO NETWORK, C. A. MANGONET, C. A,",isp,2026-11-14 14:39:09,EDT-Pages
+http://180.180.175.11:8080,http,180.180.175.11,8080,0,1,timeout,,TH,180.180.175.11,AS23969 TOT Public Company Limited,TOT Public Company Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.153.149.59:8034,http,103.153.149.59,8034,0,1,timeout,,ID,163.61.225.61,AS64300 PT JARINGAN INTERNET TERPADU,PT JARINGAN INTERNET TERPADU,isp,2026-11-14 14:39:09,EDT-Pages
+http://160.19.41.43:80,http,160.19.41.43,80,0,1,timeout,,IN,49.206.197.31,"AS55577 Atria Convergence Technologies Ltd.,","Atria Convergence Technologies Ltd.,",isp,2026-11-14 14:39:09,EDT-Pages
+http://91.228.217.195:8989,http,91.228.217.195,8989,0,1,timeout,,UA,91.228.217.195,AS209907 FOP Saiv Igor Stepanovich,FOP Saiv Igor Stepanovich,isp,2026-11-14 14:39:09,EDT-Pages
+http://179.1.48.48:8080,http,179.1.48.48,8080,0,1,timeout,,CO,179.1.48.37,AS18678 INTERNEXA S.A. E.S.P,INTERNEXA S.A. E.S.P,isp,2026-11-14 14:39:09,EDT-Pages
+http://204.77.11.13:999,http,204.77.11.13,999,0,1,timeout,,PR,104.238.232.210,AS21559 Wireless Network,Wireless Network,isp,2026-11-14 14:39:09,EDT-Pages
+http://180.180.156.126:8080,http,180.180.156.126,8080,0,1,timeout,,TH,180.180.156.126,AS23969 TOT Public Company Limited,TOT Public Company Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://190.2.214.66:999,http,190.2.214.66,999,0,1,timeout,,CO,190.2.214.66,AS262186 TV AZTECA SUCURSAL COLOMBIA,TV AZTECA SUCURSAL COLOMBIA,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.82.246.27:6080,http,103.82.246.27,6080,0,1,timeout,,ID,103.82.246.27,AS142370 PT Aswatama Jaya Mandiri,PT Aswatama Jaya Mandiri,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.124.136.105:3127,http,103.124.136.105,3127,0,1,timeout,,ID,45.198.33.163,AS138089 PT Global Media Data Prima,PT Global Media Data Prima,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.7.195.108:999,http,38.7.195.108,999,0,1,timeout,,CL,151.241.86.134,AS274099 VALLENET SPA,VALLENET SPA,isp,2026-11-14 14:39:09,EDT-Pages
+http://175.100.23.121:8080,http,175.100.23.121,8080,0,1,timeout,,KH,175.100.23.121,AS38623 BUCT COMMUNICATION,BUCT COMMUNICATION,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.135.70.9:8080,http,103.135.70.9,8080,0,1,timeout,,IN,103.135.70.174,AS138788 Acushnet Communication Private Limited,Acushnet Communication Private Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.48.71.130:83,http,103.48.71.130,83,0,1,timeout,,IN,103.48.68.186,AS136290 Country Online Services PVT LTD,Country Online Services PVT LTD,isp,2026-11-14 14:39:09,EDT-Pages
+http://180.125.216.109:8118,http,180.125.216.109,8118,0,1,http_fail,,CN,180.125.216.109,AS4134 China Telecom,China Telecom,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.87.149.133:8080,http,103.87.149.133,8080,0,1,timeout,,ID,103.87.149.133,AS45305 PT Lintas Data Prima,PT Lintas Data Prima,isp,2026-11-14 14:39:09,EDT-Pages
+http://123.16.15.41:1452,http,123.16.15.41,1452,0,1,timeout,,VN,123.16.15.41,AS45899 VNPT Corp,VNPT Corp,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.191.204.27:999,http,38.191.204.27,999,0,1,timeout,,CO,38.191.204.28,AS273134 TV&MAS S.A.S,TV&MAS S.A.S,isp,2026-11-14 14:39:09,EDT-Pages
+http://45.233.67.226:999,http,45.233.67.226,999,0,1,timeout,,GT,45.233.64.2,AS266755 CONECTIVIDAD Y TECNOLOGIA S.A.,CONECTIVIDAD Y TECNOLOGIA S.A.,isp,2026-11-14 14:39:09,EDT-Pages
+http://13.126.183.60:2720,http,13.126.183.60,2720,0,1,timeout,,US,171.25.193.81,AS198093 DFRI,DFRI,isp,2026-11-14 14:39:09,EDT-Pages
+http://186.250.202.104:8080,http,186.250.202.104,8080,0,1,timeout,,BR,186.250.202.104,AS265911 G6 Internet,G6 Internet,isp,2026-11-14 14:39:09,EDT-Pages
+http://170.244.91.129:999,http,170.244.91.129,999,0,1,timeout,,VE,170.244.91.130,"AS274286 WELLCOMM TECNOLOGÍA, C.A.","WELLCOMM TECNOLOGÍA, C.A.",isp,2026-11-14 14:39:09,EDT-Pages
+http://116.101.54.121:8080,http,116.101.54.121,8080,0,1,timeout,,VN,116.101.54.121,AS7552 Viettel Group,Viettel Group,isp,2026-11-14 14:39:09,EDT-Pages
+http://144.79.241.243:3128,http,144.79.241.243,3128,0,1,timeout,,ID,144.79.241.243,AS142188 PT Aryaka Lintas Media,PT Aryaka Lintas Media,isp,2026-11-14 14:39:09,EDT-Pages
+http://182.253.42.232:2026,http,182.253.42.232,2026,0,1,timeout,,ID,182.253.42.232,AS38060 BIZNET,BIZNET,isp,2026-11-14 14:39:09,EDT-Pages
+http://163.223.150.82:8080,http,163.223.150.82,8080,0,1,timeout,,ID,163.223.150.19,AS153774 PT MICROCYBER DATA INDONESIA,PT MICROCYBER DATA INDONESIA,isp,2026-11-14 14:39:09,EDT-Pages
+http://124.83.118.156:8081,http,124.83.118.156,8081,0,1,timeout,,PH,180.191.20.160,AS132199 GBB-SJN-IP-POOL,GBB-SJN-IP-POOL,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.165.155.50:1111,http,103.165.155.50,1111,0,1,timeout,,ID,103.165.155.50,AS141921 PT Jaringan Keluarga Bersama,PT Jaringan Keluarga Bersama,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.193.145.1:8080,http,103.193.145.1,8080,0,1,timeout,,ID,103.193.145.1,AS58821 PT Jaringan Kabel Nusantara,PT Jaringan Kabel Nusantara,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.111.116.233:81,http,103.111.116.233,81,0,1,timeout,,BD,103.111.116.233,AS136426 Dinesh Gopi Virwani,Dinesh Gopi Virwani,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.193.144.91:8080,http,103.193.144.91,8080,0,1,timeout,,ID,103.193.144.91,AS58821 PT Jaringan Kabel Nusantara,PT Jaringan Kabel Nusantara,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.48.69.98:82,http,103.48.69.98,82,0,1,timeout,,IN,103.48.69.98,AS136290 Country Online Services PVT LTD,Country Online Services PVT LTD,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.25.220.10:8081,http,103.25.220.10,8081,0,1,timeout,,PH,103.25.220.117,AS146954 IMJWANKLIK INTERNET COMMUNICATION SERVICES,IMJWANKLIK INTERNET COMMUNICATION SERVICES,isp,2026-11-14 14:39:09,EDT-Pages
+http://117.18.16.47:1111,http,117.18.16.47,1111,0,1,timeout,,ID,117.18.16.47,AS152769 PT Gopal Network Solusindo,PT Gopal Network Solusindo,isp,2026-11-14 14:39:09,EDT-Pages
+http://186.180.20.18:8080,http,186.180.20.18,8080,0,1,timeout,,CO,186.180.20.18,AS13489 UNE EPM TELECOMUNICACIONES S.A.,UNE EPM TELECOMUNICACIONES S.A.,isp,2026-11-14 14:39:09,EDT-Pages
+http://188.132.249.103:8080,http,188.132.249.103,8080,0,1,timeout,,SY,188.132.249.103,AS216472 Guneydogu Telekom int.bil. ve ilt. hiz. tic. ltd. sti.,Guneydogu Telekom int.bil. ve ilt. hiz. tic. ltd. sti.,isp,2026-11-14 14:39:09,EDT-Pages
+http://110.34.1.178:7777,http,110.34.1.178,7777,0,1,timeout,,NP,110.34.1.178,AS4007 Subisu P2P IP Block,Subisu P2P IP Block,isp,2026-11-14 14:39:09,EDT-Pages
+http://176.115.146.232:8080,http,176.115.146.232,8080,0,1,timeout,,RU,176.115.146.232,AS197275 Link Telecom NN Ltd.,Link Telecom NN Ltd.,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.75.81.12:999,http,38.75.81.12,999,0,1,timeout,,DO,38.75.81.2,AS273217 Alcome Tech SRL.,Alcome Tech SRL.,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.51.220.197:999,http,38.51.220.197,999,0,1,timeout,,VE,38.51.220.223,AS269730 Tecnoven Services C.A.,Tecnoven Services C.A.,isp,2026-11-14 14:39:09,EDT-Pages
+http://46.197.137.173:8080,http,46.197.137.173,8080,0,1,timeout,,TR,46.197.137.173,AS47524 Turksat Services,Turksat Services,isp,2026-11-14 14:39:09,EDT-Pages
+http://209.14.108.56:999,http,209.14.108.56,999,0,1,timeout,,PE,209.14.108.61,AS272106 CORPORACION TARAZONA CATV S.A.C.,CORPORACION TARAZONA CATV S.A.C.,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.66.47.9:8080,http,103.66.47.9,8080,0,1,timeout,,ID,103.66.47.2,AS23694 PT Iconmedia Lintas Nusantara,PT Iconmedia Lintas Nusantara,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.180.119.107:8080,http,103.180.119.107,8080,0,1,timeout,,ID,103.180.119.107,AS149359 PT Persada Data Multimedia,PT Persada Data Multimedia,isp,2026-11-14 14:39:09,EDT-Pages
+http://124.6.143.5:8080,http,124.6.143.5,8080,0,1,timeout,,PH,124.6.148.130,AS4775 Globe Telecom/Innove Communication,Globe Telecom/Innove Communication,isp,2026-11-14 14:39:09,EDT-Pages
+http://167.99.3.26:9002,http,167.99.3.26,9002,0,1,conn_reset,,VN,171.236.193.240,AS7552 Viettel Group,Viettel Group,isp,2026-11-14 14:39:09,EDT-Pages
+http://167.99.3.26:11563,http,167.99.3.26,11563,0,1,conn_reset,,US,204.242.0.159,AS6079 RCN,RCN,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.147.134.79:8082,http,103.147.134.79,8082,0,1,timeout,,ID,103.147.134.79,AS139963 PT.MURNI MAKMUR ABADI,PT.MURNI MAKMUR ABADI,isp,2026-11-14 14:39:09,EDT-Pages
+http://181.188.238.195:999,http,181.188.238.195,999,0,1,timeout,,EC,181.188.238.193,"AS19114 TRACTO PARTES CIA, LTDA.","TRACTO PARTES CIA, LTDA.",isp,2026-11-14 14:39:09,EDT-Pages
+http://103.176.96.222:8082,http,103.176.96.222,8082,0,1,timeout,,ID,103.176.96.158,AS147131 PT Global Sarana Elektronika,PT Global Sarana Elektronika,isp,2026-11-14 14:39:09,EDT-Pages
+http://157.15.212.38:8080,http,157.15.212.38,8080,0,1,timeout,,ID,157.15.212.38,AS152406 PT Griya Akses Teknologi,PT Griya Akses Teknologi,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.46.214.243:1111,http,38.46.214.243,1111,0,1,timeout,,ID,38.46.214.243,AS55701 PT. Usaha Adi Sanggoro,PT. Usaha Adi Sanggoro,isp,2026-11-14 14:39:09,EDT-Pages
+http://113.192.31.7:8080,http,113.192.31.7,8080,0,1,timeout,,ID,113.192.31.7,AS149360 PT. HITECH SMART SERVICE,PT. HITECH SMART SERVICE,isp,2026-11-14 14:39:09,EDT-Pages
+http://61.19.30.194:8188,http,61.19.30.194,8188,0,1,timeout,,TH,61.19.30.194,AS9931 492 Changmai-Lumpang Road Muang changmai,492 Changmai-Lumpang Road Muang changmai,isp,2026-11-14 14:39:09,EDT-Pages
+http://168.194.34.196:9001,http,168.194.34.196,9001,0,1,timeout,,AR,168.194.34.196,AS264743 CORDOBA IP SRL,CORDOBA IP SRL,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.169.128.157:8080,http,103.169.128.157,8080,0,1,timeout,,ID,36.75.201.72,AS7713 PT TELKOM INDONESIA,PT TELKOM INDONESIA,isp,2026-11-14 14:39:09,EDT-Pages
+http://198.15.30.218:8080,http,198.15.30.218,8080,0,1,timeout,,ID,198.15.30.218,AS154503 PT Trimafa Computindo Networking,PT Trimafa Computindo Networking,isp,2026-11-14 14:39:09,EDT-Pages
+http://210.87.93.115:8080,http,210.87.93.115,8080,0,1,timeout,,ID,210.87.93.115,AS149360 PT. INDONET DATA BERSAMA,PT. INDONET DATA BERSAMA,isp,2026-11-14 14:39:09,EDT-Pages
+http://198.15.30.206:8080,http,198.15.30.206,8080,0,1,timeout,,ID,198.15.30.206,AS154503 PT Trimafa Computindo Networking,PT Trimafa Computindo Networking,isp,2026-11-14 14:39:09,EDT-Pages
+http://182.48.66.154:8080,http,182.48.66.154,8080,0,1,timeout,,BD,182.48.66.154,AS63969 Earth Telecommunication(Pvt.)Ltd.,Earth Telecommunication(Pvt.)Ltd.,isp,2026-11-14 14:39:09,EDT-Pages
+http://113.11.179.122:8080,http,113.11.179.122,8080,0,1,timeout,,ID,113.11.179.122,AS17451 Biznet Networks,Biznet Networks,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.154.152.62:8085,http,103.154.152.62,8085,0,1,timeout,,ID,103.154.152.62,AS131111 MORATELINDONAP,MORATELINDONAP,isp,2026-11-14 14:39:09,EDT-Pages
+http://212.252.71.20:8080,http,212.252.71.20,8080,0,1,timeout,,TR,212.252.71.20,AS34984 Superonline Iletisim Hizmetleri A.S.,Superonline Iletisim Hizmetleri A.S.,isp,2026-11-14 14:39:09,EDT-Pages
+http://13.239.253.213:2095,http,13.239.253.213,2095,0,1,timeout,,DE,185.220.101.4,AS60729 Network for Tor-Exit traffic.,Network for Tor-Exit traffic.,education,2026-11-14 14:39:09,EDT-Pages
+http://103.48.71.58:82,http,103.48.71.58,82,0,1,timeout,,IN,103.48.71.58,AS136290 Country Online Services PVT LTD,Country Online Services PVT LTD,isp,2026-11-14 14:39:09,EDT-Pages
+http://85.187.224.21:8080,http,85.187.224.21,8080,0,1,timeout,,BG,85.187.224.21,AS199173 TechnoLux Ltd.,TechnoLux Ltd.,isp,2026-11-14 14:39:09,EDT-Pages
+http://112.203.217.178:8082,http,112.203.217.178,8082,0,1,timeout,,PH,112.203.217.178,AS9299 Philippine Long Distance Telephone Company,Philippine Long Distance Telephone Company,isp,2026-11-14 14:39:09,EDT-Pages
+http://180.191.51.69:8082,http,180.191.51.69,8082,0,1,timeout,,PH,180.191.51.69,AS132199 GBB-SJN-IP-POOL,GBB-SJN-IP-POOL,isp,2026-11-14 14:39:09,EDT-Pages
+http://49.156.23.65:8082,http,49.156.23.65,8082,0,1,timeout,,ID,49.156.20.86,AS134630 PALAPANET,PALAPANET,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.48.71.54:84,http,103.48.71.54,84,0,1,timeout,,IN,103.48.71.54,AS136290 Country Online Services PVT LTD,Country Online Services PVT LTD,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.76.9.1:999,http,38.76.9.1,999,0,1,timeout,,VE,38.76.9.1,"AS274280 ACT NETWORK, C.A.","ACT NETWORK, C.A.",isp,2026-11-14 14:39:09,EDT-Pages
+http://38.252.213.240:999,http,38.252.213.240,999,0,1,timeout,,PE,179.63.6.240,AS272801 RED AMONES S.A.C.,RED AMONES S.A.C.,isp,2026-11-14 14:39:09,EDT-Pages
+http://185.225.42.81:8080,http,185.225.42.81,8080,0,1,timeout,,SY,185.225.42.81,AS29256 Syrian Telecommunication Private Closed Joint Stock Company,Syrian Telecommunication Private Closed Joint Stock Company,isp,2026-11-14 14:39:09,EDT-Pages
+http://186.67.94.10:999,http,186.67.94.10,999,0,1,timeout,,CL,186.67.94.10,AS27651 ENTEL CHILE S.A.,ENTEL CHILE S.A.,isp,2026-11-14 14:39:09,EDT-Pages
+http://36.66.242.118:8080,http,36.66.242.118,8080,0,1,timeout,,ID,36.66.242.118,AS7713 PT TELKOM INDONESIA Menara Multimedia Lt.7 Jl. Kebon sirih No.12 JAKARTA,PT TELKOM INDONESIA Menara Multimedia Lt.7 Jl. Kebon sirih No.12 JAKARTA,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.224.223.173:999,http,38.224.223.173,999,0,1,slow_timeout,,MX,38.224.223.173,AS28435 Tamayo telecom sa de CV,Tamayo telecom sa de CV,isp,2026-11-14 14:39:09,EDT-Pages
+http://45.118.35.169:8080,http,45.118.35.169,8080,0,1,timeout,,IN,45.118.35.169,AS134032 INFONET COMM ENTERPRISES,INFONET COMM ENTERPRISES,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.133.25.119:8080,http,103.133.25.119,8080,0,1,timeout,,ID,103.133.25.119,AS138130 PT PHATRIA INTI PERSADA,PT PHATRIA INTI PERSADA,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.134.1.14:8080,http,103.134.1.14,8080,0,1,timeout,,PK,103.134.1.14,AS138590 Prime Networks,Prime Networks,isp,2026-11-14 14:39:09,EDT-Pages
+http://192.42.85.6:8080,http,192.42.85.6,8080,0,1,timeout,,ID,192.42.85.6,AS139742 PT Ryndo Jaringan Nusantara,PT Ryndo Jaringan Nusantara,isp,2026-11-14 14:39:09,EDT-Pages
+http://167.99.3.26:7621,http,167.99.3.26,7621,0,1,conn_reset,,VN,171.241.19.127,AS7552 Viettel Group,Viettel Group,isp,2026-11-14 14:39:09,EDT-Pages
+http://126.209.107.170:8082,http,126.209.107.170,8082,0,1,timeout,,PH,126.209.124.217,AS135607 Responsible Internet Sustainability Effort,Responsible Internet Sustainability Effort,isp,2026-11-14 14:39:09,EDT-Pages
+http://102.68.128.212:8080,http,102.68.128.212,8080,0,1,timeout,,LY,102.68.128.195,AS21003 Alaafia Company,Alaafia Company,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.144.18.33:9000,http,103.144.18.33,9000,0,1,timeout,,ID,103.144.18.33,AS139418 PT Gasatek Bintang Nusantara,PT Gasatek Bintang Nusantara,isp,2026-11-14 14:39:09,EDT-Pages
+http://186.148.47.254:999,http,186.148.47.254,999,0,1,timeout,,CL,204.199.140.16,AS273237 INGBELL CHILE SPA,INGBELL CHILE SPA,isp,2026-11-14 14:39:09,EDT-Pages
+http://182.52.136.73:8080,http,182.52.136.73,8080,0,1,timeout,,TH,182.52.136.73,AS23969 TOT Public Company Limited,TOT Public Company Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.191.171.158:8080,http,103.191.171.158,8080,0,1,timeout,,ID,103.191.171.158,AS149933 PT Sahabat Manjur Grup,PT Sahabat Manjur Grup,isp,2026-11-14 14:39:09,EDT-Pages
+http://14.225.240.23:8562,http,14.225.240.23,8562,0,1,timeout,,VN,14.225.240.23,AS135905 Vietnam Posts and Telecommunications Group,Vietnam Posts and Telecommunications Group,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.76.138.46:999,http,38.76.138.46,999,0,1,timeout,,VE,38.76.138.46,AS263767 CORPORACION GALA IT C.A.,CORPORACION GALA IT C.A.,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.19.43.139:999,http,38.19.43.139,999,0,1,timeout,,CO,38.19.43.137,AS270075 SUPER REDES S.A.S,SUPER REDES S.A.S,isp,2026-11-14 14:39:09,EDT-Pages
+http://209.14.119.90:999,http,209.14.119.90,999,0,1,timeout,,CO,209.14.119.91,AS262186 Azteca Comunicaciones Colombia S. A. S.,Azteca Comunicaciones Colombia S. A. S.,isp,2026-11-14 14:39:09,EDT-Pages
+http://79.127.223.56:8070,http,79.127.223.56,8070,0,1,timeout,,US,24.162.137.126,AS11427 Charter Communications,Charter Communications,isp,2026-11-14 14:39:09,EDT-Pages
+http://190.60.48.138:999,http,190.60.48.138,999,0,1,timeout,,CO,206.62.161.177,AS61461 Cogent Communications,Cogent Communications,isp,2026-11-14 14:39:09,EDT-Pages
+http://181.209.106.74:8080,http,181.209.106.74,8080,0,1,timeout,,AR,181.209.106.74,AS52361 Bailon Santiago,Bailon Santiago,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.98.117.94:8080,http,103.98.117.94,8080,0,1,timeout,,ID,103.98.117.94,AS136820 PT. LISAR INTERNATIONAL NETWORKING,PT. LISAR INTERNATIONAL NETWORKING,isp,2026-11-14 14:39:09,EDT-Pages
+http://111.192.61.51:8888,http,111.192.61.51,8888,0,1,timeout,,CN,2408:8207:6084:360:7d6a:4a11:ec1d:5e6f,AS4808 China Unicom Beijing Province Network,China Unicom Beijing Province Network,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.244.107.150:8080,http,103.244.107.150,8080,0,1,timeout,,ID,103.244.107.150,AS151542 PT Sahabat Fiber Indonesia,PT Sahabat Fiber Indonesia,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.162.220.246:8085,http,103.162.220.246,8085,0,1,timeout,,ID,103.162.220.246,AS139952 CV Kiffa Teknologi,CV Kiffa Teknologi,isp,2026-11-14 14:39:09,EDT-Pages
+http://182.52.136.32:8080,http,182.52.136.32,8080,0,1,timeout,,TH,182.52.136.32,AS23969 TOT Public Company Limited,TOT Public Company Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://176.88.166.201:8080,http,176.88.166.201,8080,0,1,timeout,,TR,176.88.166.201,AS34984 Superonline Iletisim Hizmetleri A.S.,Superonline Iletisim Hizmetleri A.S.,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.156.16.67:8080,http,103.156.16.67,8080,0,1,timeout,,ID,103.156.16.67,AS141077 RSTNET,RSTNET,isp,2026-11-14 14:39:09,EDT-Pages
+http://43.249.227.186:84,http,43.249.227.186,84,0,1,timeout,,IN,43.249.227.186,AS150008 Pioneer Elabs Ltd.,Pioneer Elabs Ltd.,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.19.228.4:8080,http,103.19.228.4,8080,0,1,timeout,,ID,103.19.228.4,AS132668 PT Bali Towerindo Sentra,PT Bali Towerindo Sentra,isp,2026-11-14 14:39:09,EDT-Pages
+http://38.183.184.15:999,http,38.183.184.15,999,0,1,timeout,,VE,38.183.184.15,"AS273125 OIT SERVICIO DE DATOS, C.A.","OIT SERVICIO DE DATOS, C.A.",isp,2026-11-14 14:39:09,EDT-Pages
+http://167.99.3.26:5443,http,167.99.3.26,5443,0,1,conn_reset,,CA,104.218.193.31,"AS5650 Frontier Communications of America, Inc.","Frontier Communications of America, Inc.",isp,2026-11-14 14:39:09,EDT-Pages
+http://165.99.194.139:8080,http,165.99.194.139,8080,0,1,timeout,,ID,165.99.194.139,AS153986 PT Network Bumi Saridin,PT Network Bumi Saridin,isp,2026-11-14 14:39:09,EDT-Pages
+http://182.52.113.85:443,http,182.52.113.85,443,0,1,timeout,,TH,182.52.113.85,AS23969 TOT Public Company Limited,TOT Public Company Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://132.255.23.185:999,http,132.255.23.185,999,0,1,timeout,,CO,132.255.23.183,AS27951 ORIENTE TELECOMUNICACIONES DE COLOMBIA,ORIENTE TELECOMUNICACIONES DE COLOMBIA,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.1.50.117:3125,http,103.1.50.117,3125,0,1,timeout,,ID,103.1.50.117,AS142352 PT. PRATAMA HASTA UTAMA SOLUSINDO,PT. PRATAMA HASTA UTAMA SOLUSINDO,isp,2026-11-14 14:39:09,EDT-Pages
+http://16.52.81.236:13797,http,16.52.81.236,13797,0,1,http_fail,,US,80.67.167.81,AS2027 Milkywan Association,Milkywan Association,isp,2026-11-14 14:39:09,EDT-Pages
+http://177.234.226.83:1994,http,177.234.226.83,1994,0,1,timeout,,EC,177.234.226.83,AS52468 Ufinet Panama S.A.,Ufinet Panama S.A.,isp,2026-11-14 14:39:09,EDT-Pages
+http://45.4.202.147:999,http,45.4.202.147,999,0,1,timeout,,EC,193.30.14.7,AS263238 GEDATECU SA.,GEDATECU SA.,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.159.195.221:8080,http,103.159.195.221,8080,0,1,timeout,,ID,103.159.194.217,AS141145 PT Giga Digital Nusantara,PT Giga Digital Nusantara,isp,2026-11-14 14:39:09,EDT-Pages
+http://218.60.0.214:80,http,218.60.0.214,80,0,1,timeout,,CN,218.60.0.214,AS4837 China Unicom,China Unicom,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.191.196.211:8080,http,103.191.196.211,8080,0,1,timeout,,ID,103.191.196.211,AS149934 PT Pangkalan Lintas Data,PT Pangkalan Lintas Data,isp,2026-11-14 14:39:09,EDT-Pages
+http://204.199.139.75:999,http,204.199.139.75,999,0,1,timeout,,CL,204.199.139.75,AS273237 INGBELL CHILE SPA,INGBELL CHILE SPA,isp,2026-11-14 14:39:09,EDT-Pages
+http://49.48.42.80:8080,http,49.48.42.80,8080,0,1,timeout,,TH,49.48.42.80,AS45758 TRIPLETNET,TRIPLETNET,isp,2026-11-14 14:39:09,EDT-Pages
+http://160.19.19.148:8080,http,160.19.19.148,8080,0,1,timeout,,ID,160.19.19.148,AS149360 PT. SMART COMPUTER SERVICE,PT. SMART COMPUTER SERVICE,isp,2026-11-14 14:39:09,EDT-Pages
+http://177.93.48.140:999,http,177.93.48.140,999,0,1,timeout,,CO,201.46.124.96,AS262186 TV AZTECA SUCURSAL COLOMBIA,TV AZTECA SUCURSAL COLOMBIA,isp,2026-11-14 14:39:09,EDT-Pages
+http://45.234.101.122:8081,http,45.234.101.122,8081,0,1,timeout,,BR,45.234.101.123,AS61592 FORTLINK INTERNET CORPORATIVA,FORTLINK INTERNET CORPORATIVA,isp,2026-11-14 14:39:09,EDT-Pages
+http://115.127.181.114:6969,http,115.127.181.114,6969,0,1,timeout,,BD,115.127.181.114,AS24342 BRACNet Limited,BRACNet Limited,isp,2026-11-14 14:39:09,EDT-Pages
+http://203.175.102.169:3125,http,203.175.102.169,3125,0,1,timeout,,ID,203.83.37.64,AS63859 PT Garis Waktu Kita,PT Garis Waktu Kita,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.165.157.37:3125,http,103.165.157.37,3125,0,1,timeout,,ID,103.165.157.50,AS136873 CV Sampurno,CV Sampurno,isp,2026-11-14 14:39:09,EDT-Pages
+http://103.158.210.12:8090,http,103.158.210.12,8090,0,1,timeout,,ID,103.158.210.12,AS136121 PT Digital Media Telematika,PT Digital Media Telematika,isp,2026-11-14 14:39:09,EDT-Pages
