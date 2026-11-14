@@ -3201,7 +3201,9 @@
     "TELECOMUNICACIONES FASTNET F.G 50, C.A.": "AS272048",
     "PT Media Akses Data": "AS142342",
     "Fanava Group": "AS41881",
-    "EMPRESAS MUNICIPALES DE CALI E.I.C.E. E.S.P.": "AS10299"
+    "EMPRESAS MUNICIPALES DE CALI E.I.C.E. E.S.P.": "AS10299",
+    "kbro CO. Ltd.": "AS38841",
+    "DaDa Broadband LTD.": "AS18419"
   },
   "asn_to_isp": {
     "AS10001": "Mics Network Corporation",
@@ -6314,7 +6316,9 @@
     "AS272048": "TELECOMUNICACIONES FASTNET F.G 50, C.A.",
     "AS142342": "PT Media Akses Data",
     "AS41881": "Fanava Group",
-    "AS10299": "EMPRESAS MUNICIPALES DE CALI E.I.C.E. E.S.P."
+    "AS10299": "EMPRESAS MUNICIPALES DE CALI E.I.C.E. E.S.P.",
+    "AS38841": "kbro CO. Ltd.",
+    "AS18419": "DaDa Broadband LTD."
   },
   "asn_to_net_type": {
     "AS10001": "isp",
@@ -10420,6 +10424,8 @@
     "AS272048": "isp",
     "AS142342": "isp",
     "AS41881": "isp",
-    "AS10299": "isp"
+    "AS10299": "isp",
+    "AS38841": "isp",
+    "AS18419": "isp"
   }
 }

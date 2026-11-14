@@ -1266,6 +1266,38 @@
 155.117.19.12,443,true,3323,,LAX,美国-洛杉矶,"AS26042 FiberState, LLC","FiberState, LLC",0,2026-11-11 09:33:38,@otcjlq,isp,2602:f988:210:4fe::62a,2602:f988:210:4fe::62a,AS63150 Bage Cloud,Bage Cloud
 42.3.137.207,2053,true,3522,,HKG,Hong Kong · HK,AS4760 HKT,HKT,0,2026-10-02 00:20:25,@danfeng_chat,isp,42.3.137.207,,AS4760 HKT,HKT
 216.23.100.82,443,true,3922,,NRT,Tokyo · JP,AS209699 Coaxial Cable LLC,Coaxial Cable LLC,0,2026-07-24 22:11:51,@danfeng2,isp,2a14:7dc0:160:1049::77da,2a14:7dc0:160:1049::77da,AS209699 Coaxial Cable LLC,Coaxial Cable LLC
+114.26.142.232,8080,true,,,,Taichung · TW,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,0,2026-11-14 23:35:46,@manual_import,isp,,,,
+125.231.8.96,443,true,,,,Taichung · TW,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,0,2026-11-14 23:35:46,@manual_import,isp,,,,
+36.235.129.186,443,true,,,,Chang-hua · TW,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,0,2026-11-14 23:35:46,@manual_import,isp,,,,
+36.225.44.174,443,true,,,,Banqiao · TW,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,0,2026-11-14 23:35:46,@manual_import,isp,,,,
+61.216.113.195,38090,true,,,,Kaohsiung · TW,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,0,2026-11-14 23:35:46,@manual_import,isp,,,,
+114.26.185.127,2053,true,,,,Taichung · TW,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,0,2026-11-14 23:35:46,@manual_import,isp,,,,
+118.166.225.94,443,true,,,,Banqiao · TW,AS3462 Chunghwa Telecom HiNet,Chunghwa Telecom HiNet,0,2026-11-14 23:35:46,@manual_import,isp,,,,
+123.193.18.254,15917,true,,,,Taipei · TW,AS38841 kbro CO. Ltd.,kbro CO. Ltd.,0,2026-11-14 23:35:46,@manual_import,isp,,,,
+218.35.98.44,12250,true,,,,Tainan · TW,"AS7482 Far EasTone Telecommunication Co., Ltd.","Far EasTone Telecommunication Co., Ltd.",0,2026-11-14 23:35:46,@manual_import,isp,,,,
+218.35.98.44,15629,true,,,,Tainan · TW,"AS7482 Far EasTone Telecommunication Co., Ltd.","Far EasTone Telecommunication Co., Ltd.",0,2026-11-14 23:35:46,@manual_import,isp,,,,
+218.35.98.44,26817,true,,,,Tainan · TW,"AS7482 Far EasTone Telecommunication Co., Ltd.","Far EasTone Telecommunication Co., Ltd.",0,2026-11-14 23:35:46,@manual_import,isp,,,,
+218.35.207.89,31040,true,,,,Tainan · TW,"AS7482 Far EasTone Telecommunication Co., Ltd.","Far EasTone Telecommunication Co., Ltd.",0,2026-11-14 23:35:46,@manual_import,isp,,,,
+106.105.245.65,14265,true,,,,Taichung · TW,AS18049 NCICNET,NCICNET,0,2026-11-14 23:35:46,@manual_import,isp,,,,
+106.105.245.65,37272,true,,,,Taichung · TW,AS18049 NCICNET,NCICNET,0,2026-11-14 23:35:46,@manual_import,isp,,,,
+203.121.249.179,10470,true,,,,Banqiao · TW,AS18419 DaDa Broadband LTD.,DADA,0,2026-11-14 23:35:46,@manual_import,isp,,,,
+203.121.249.179,31449,true,,,,Banqiao · TW,AS18419 DaDa Broadband LTD.,DADA,0,2026-11-14 23:35:46,@manual_import,isp,,,,
+203.121.249.179,37314,true,,,,Banqiao · TW,AS18419 DaDa Broadband LTD.,DADA,0,2026-11-14 23:35:46,@manual_import,isp,,,,
+61.61.20.200,34189,true,,,,Taichung · TW,AS18049 KGT,KGT,0,2026-11-14 23:35:46,@manual_import,isp,,,,
+61.61.20.200,38464,true,,,,Taichung · TW,AS18049 KGT,KGT,0,2026-11-14 23:35:46,@manual_import,isp,,,,
+106.105.245.65,27010,true,,,,Taichung · TW,AS18049 NCICNET,NCICNET,0,2026-11-14 23:35:46,@manual_import,isp,,,,
+61.61.20.200,26249,true,,,,Taichung · TW,AS18049 KGT,KGT,0,2026-11-14 23:35:46,@manual_import,isp,,,,
+106.105.245.65,15877,true,,,,Taichung · TW,AS18049 NCICNET,NCICNET,0,2026-11-14 23:35:46,@manual_import,isp,,,,
+106.105.245.65,23956,true,,,,Taichung · TW,AS18049 NCICNET,NCICNET,0,2026-11-14 23:35:46,@manual_import,isp,,,,
+61.61.20.200,13759,true,,,,Taichung · TW,AS18049 KGT,KGT,0,2026-11-14 23:35:46,@manual_import,isp,,,,
+61.61.20.200,23368,true,,,,Taichung · TW,AS18049 KGT,KGT,0,2026-11-14 23:35:46,@manual_import,isp,,,,
+61.61.20.200,31067,true,,,,Taichung · TW,AS18049 KGT,KGT,0,2026-11-14 23:35:46,@manual_import,isp,,,,
+106.105.245.65,12644,true,,,,Taichung · TW,AS18049 NCICNET,NCICNET,0,2026-11-14 23:35:46,@manual_import,isp,,,,
+123.205.63.202,32151,true,,,,Nantou City · TW,AS18049 TINP,TINP,0,2026-11-14 23:35:46,@manual_import,isp,,,,
+123.205.63.202,34610,true,,,,Nantou City · TW,AS18049 TINP,TINP,0,2026-11-14 23:35:46,@manual_import,isp,,,,
+112.105.49.27,12571,true,,,,Shalu · TW,AS18049 TINP,TINP,0,2026-11-14 23:35:46,@manual_import,isp,,,,
+112.105.49.27,26719,true,,,,Shalu · TW,AS18049 TINP,TINP,0,2026-11-14 23:35:46,@manual_import,isp,,,,
+123.205.119.140,443,true,,,,Taichung · TW,AS18049 TINP,TINP,0,2026-11-14 23:35:46,@manual_import,isp,,,,
 192.220.24.230,443,true,27,,LAX,北美洲 · 美国 · 洛杉矶,"AS2914 NTT America, Inc.","NTT America, Inc.",1,2026-11-11 09:33:14,@otcjlq,isp,192.220.24.230,,"AS2914 NTT America, Inc.","NTT America, Inc."
 38.47.116.30,443,true,31,,LAX,美国-洛杉矶,AS979 NetLab (Private Customer),Private Customer,1,2026-11-11 09:33:14,@otcjlq,business,38.47.116.30,,AS979 NetLab,NetLab
 64.81.29.154,443,true,97,,LAX,北美洲 · 美国 · 洛杉矶,AS3257 GTT Communications,GTT Communications Inc.,1,2026-11-11 21:53:19,@danfeng_chat,isp,64.81.29.154,,AS3257 GTT Communications,GTT Communications
