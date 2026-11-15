@@ -3203,7 +3203,10 @@
     "Fanava Group": "AS41881",
     "EMPRESAS MUNICIPALES DE CALI E.I.C.E. E.S.P.": "AS10299",
     "kbro CO. Ltd.": "AS38841",
-    "DaDa Broadband LTD.": "AS18419"
+    "DaDa Broadband LTD.": "AS18419",
+    "Octopusnet LTD": "AS44724",
+    "BACKBONE AS of Nauka-Svyaz": "AS8641",
+    "SULAVI LTD": "AS219326"
   },
   "asn_to_isp": {
     "AS10001": "Mics Network Corporation",
@@ -6318,7 +6321,11 @@
     "AS41881": "Fanava Group",
     "AS10299": "EMPRESAS MUNICIPALES DE CALI E.I.C.E. E.S.P.",
     "AS38841": "kbro CO. Ltd.",
-    "AS18419": "DaDa Broadband LTD."
+    "AS18419": "DaDa Broadband LTD.",
+    "AS44724": "Octopusnet LTD",
+    "AS8641": "BACKBONE AS of Nauka-Svyaz",
+    "AS219326": "SULAVI LTD",
+    "AS9698": "LG HelloVision Corp."
   },
   "asn_to_net_type": {
     "AS10001": "isp",
@@ -10426,6 +10433,10 @@
     "AS41881": "isp",
     "AS10299": "isp",
     "AS38841": "isp",
-    "AS18419": "isp"
+    "AS18419": "isp",
+    "AS44724": "isp",
+    "AS8641": "isp",
+    "AS219326": "datacenter",
+    "AS9698": "isp"
   }
 }
