@@ -1,10 +1,10 @@
 name: Fetch Proxies and CF IPs
 
 on:
-  schedule:
-    # 每天北京时间 08:15（UTC 00:15）执行，位于 Cloudflare Workers 每日免费额度重置（北京时间 08:00 / UTC 00:00）之后，并微调 15 分钟避开整点排队
-    - cron: "15 0 * * *"
-  workflow_dispatch: # 支持在 GitHub 页面手动点击触发运行
+  # schedule:
+  #   # 每天北京时间 08:15（UTC 00:15）执行，已改由外部 Cloudflare Workers Cron Trigger 通过 workflow_dispatch 准时触发
+  #   - cron: "15 0 * * *"
+  workflow_dispatch: # 支持在 GitHub 页面手动点击或通过外部 API 定时触发运行
     inputs:
       fetch_days:
         description: "回溯天数 (留空优先读取 Repository Variable FETCH_DAYS，默认 3 天)"
