@@ -3206,7 +3206,9 @@
     "DaDa Broadband LTD.": "AS18419",
     "Octopusnet LTD": "AS44724",
     "BACKBONE AS of Nauka-Svyaz": "AS8641",
-    "SULAVI LTD": "AS219326"
+    "SULAVI LTD": "AS219326",
+    "UNIVERSIDADE DE SAO PAULO": "AS28571",
+    "Charter Communications LLC": "AS22516"
   },
   "asn_to_isp": {
     "AS10001": "Mics Network Corporation",
@@ -6325,7 +6327,9 @@
     "AS44724": "Octopusnet LTD",
     "AS8641": "BACKBONE AS of Nauka-Svyaz",
     "AS219326": "SULAVI LTD",
-    "AS9698": "LG HelloVision Corp."
+    "AS9698": "LG HelloVision Corp.",
+    "AS28571": "UNIVERSIDADE DE SAO PAULO",
+    "AS22516": "Charter Communications LLC"
   },
   "asn_to_net_type": {
     "AS10001": "isp",
@@ -10437,6 +10441,8 @@
     "AS44724": "isp",
     "AS8641": "isp",
     "AS219326": "datacenter",
-    "AS9698": "isp"
+    "AS9698": "isp",
+    "AS28571": "education",
+    "AS22516": "isp"
   }
 }
