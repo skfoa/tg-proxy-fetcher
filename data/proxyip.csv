@@ -1237,6 +1237,26 @@
 154.37.154.46,8443,true,2949,,LAX,美国-洛杉矶,AS979 NetLab,NetLab Global,0,2026-11-11 09:33:14,@otcjlq,business,154.37.154.46,,AS979 NetLab,NetLab
 162.192.190.225,443,true,3156,,LAX,El Monte · US,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",0,2026-10-18 21:45:23,@danfeng_chat,isp,2600:1700:3a90:c620:be24:11ff:fe91:959d,2600:1700:3a90:c620:be24:11ff:fe91:959d,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC"
 38.22.94.79,33879,true,3524,3778,HKG,Hong Kong · HK,AS979 NetLab,NetLab,0,2026-09-06 16:44:44,@danfeng2,business,38.22.94.79,,AS979 NetLab,NetLab
+175.181.176.131,16627,true,,,,Taipei · TW,AS4780 Digital United Inc.,Digital United Inc.,0,2026-11-16 19:23:05,@manual_import,isp,,,,
+175.181.176.131,18900,true,,,,Taipei · TW,AS4780 Digital United Inc.,Digital United Inc.,0,2026-11-16 19:23:05,@manual_import,isp,,,,
+175.181.176.131,32195,true,,,,Taipei · TW,AS4780 Digital United Inc.,Digital United Inc.,0,2026-11-16 19:23:05,@manual_import,isp,,,,
+175.181.176.131,38593,true,,,,Taipei · TW,AS4780 Digital United Inc.,Digital United Inc.,0,2026-11-16 19:23:05,@manual_import,isp,,,,
+175.182.183.216,34948,true,,,,Taichung · TW,AS4780 Digital United Inc.,Digital United Inc.,0,2026-11-16 19:23:05,@manual_import,isp,,,,
+42.0.117.17,12074,true,,,,Kaohsiung · TW,AS4780 NKCATV,NKCATV,0,2026-11-16 19:23:05,@manual_import,isp,,,,
+42.0.117.17,25291,true,,,,Kaohsiung · TW,AS4780 NKCATV,NKCATV,0,2026-11-16 19:23:05,@manual_import,isp,,,,
+42.0.117.17,28566,true,,,,Kaohsiung · TW,AS4780 NKCATV,NKCATV,0,2026-11-16 19:23:05,@manual_import,isp,,,,
+112.104.172.91,21982,true,,,,Tainan · TW,AS4780 Digital United Inc.,Digital United Inc.,0,2026-11-16 19:23:05,@manual_import,isp,,,,
+112.104.172.91,35187,true,,,,Tainan · TW,AS4780 Digital United Inc.,Digital United Inc.,0,2026-11-16 19:23:05,@manual_import,isp,,,,
+175.182.18.195,13797,true,,,,Kaohsiung · TW,AS4780 Digital United Inc.,Digital United Inc.,0,2026-11-16 19:23:05,@manual_import,isp,,,,
+175.182.18.195,14007,true,,,,Kaohsiung · TW,AS4780 Digital United Inc.,Digital United Inc.,0,2026-11-16 19:23:05,@manual_import,isp,,,,
+175.182.18.195,30201,true,,,,Kaohsiung · TW,AS4780 Digital United Inc.,Digital United Inc.,0,2026-11-16 19:23:05,@manual_import,isp,,,,
+175.182.18.195,36510,true,,,,Kaohsiung · TW,AS4780 Digital United Inc.,Digital United Inc.,0,2026-11-16 19:23:05,@manual_import,isp,,,,
+175.182.18.195,36543,true,,,,Kaohsiung · TW,AS4780 Digital United Inc.,Digital United Inc.,0,2026-11-16 19:23:05,@manual_import,isp,,,,
+220.229.55.198,25090,true,,,,Taipei · TW,AS4780 NCICNET,NCICNET,0,2026-11-16 19:23:05,@manual_import,isp,,,,
+175.182.35.165,28084,true,,,,Taichung · TW,AS4780 Digital United Inc.,Digital United Inc.,0,2026-11-16 19:23:05,@manual_import,isp,,,,
+61.64.90.114,21359,true,,,,Taipei · TW,AS18182 Sony Network Taiwan Limited,Sony Network Taiwan Limited,0,2026-11-16 19:23:05,@manual_import,isp,,,,
+27.105.40.143,11213,true,,,,Tainan · TW,AS18182 SONET,SONET,0,2026-11-16 19:23:05,@manual_import,isp,,,,
+27.105.40.143,29038,true,,,,Tainan · TW,AS18182 SONET,SONET,0,2026-11-16 19:23:05,@manual_import,isp,,,,
 179.255.184.10,443,true,50,,YYZ,加拿大-多伦多,AS214238 Host Telecom Ltd (IT Hostline Ltd),IT Hostline Ltd,1,2026-11-11 09:34:35,@otcjlq,isp,179.255.184.10,,AS214238 Host Telecom Ltd,Host Telecom Ltd
 142.188.90.91,443,true,74,0,YYZ,北美洲 · 加拿大 · Willowdale,AS577 Bell Canada,Bell Canada,1,2026-11-11 14:31:01,@cmliussss_all,isp,142.188.90.91,,AS577 Bell Canada,Bell Canada
 216.167.81.153,443,true,127,,LAX,美国-洛杉矶,"AS2914 NTT America, Inc. (NTT America Inc.)",NTT America Inc.,1,2026-11-11 09:33:14,@otcjlq,isp,216.167.81.153,,"AS2914 NTT America, Inc.","NTT America, Inc."
