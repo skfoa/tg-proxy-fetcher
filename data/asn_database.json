@@ -3208,7 +3208,10 @@
     "BACKBONE AS of Nauka-Svyaz": "AS8641",
     "SULAVI LTD": "AS219326",
     "UNIVERSIDADE DE SAO PAULO": "AS28571",
-    "Charter Communications LLC": "AS22516"
+    "Charter Communications LLC": "AS22516",
+    "Croatian Telecom Inc.": "AS5391",
+    "Skhron": "AS215467",
+    "Vocus Retail": "AS9443"
   },
   "asn_to_isp": {
     "AS10001": "Mics Network Corporation",
@@ -6329,7 +6332,12 @@
     "AS219326": "SULAVI LTD",
     "AS9698": "LG HelloVision Corp.",
     "AS28571": "UNIVERSIDADE DE SAO PAULO",
-    "AS22516": "Charter Communications LLC"
+    "AS22516": "Charter Communications LLC",
+    "AS18313": "LG HelloVision Corp.",
+    "AS139646": "HONG KONG LIGHTLAYER TECHNOLOGY CO., LIMITED",
+    "AS5391": "Croatian Telecom Inc.",
+    "AS215467": "Skhron",
+    "AS9443": "Vocus Retail"
   },
   "asn_to_net_type": {
     "AS10001": "isp",
@@ -10443,6 +10451,11 @@
     "AS219326": "datacenter",
     "AS9698": "isp",
     "AS28571": "education",
-    "AS22516": "isp"
+    "AS22516": "isp",
+    "AS18313": "isp",
+    "AS139646": "datacenter",
+    "AS5391": "isp",
+    "AS215467": "datacenter",
+    "AS9443": "isp"
   }
 }

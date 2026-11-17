@@ -108,27 +108,5 @@
     "isp": "SKN Subnet & Telecom",
     "net_type": "isp",
     "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "91.148.229.93:443",
-    "ip": "91.148.229.93",
-    "port": 443,
-    "tls": true,
-    "clientIp": "72.63.242.55",
-    "clientIps": [
-      "72.63.242.55"
-    ],
-    "clientIpv4": "72.63.242.55",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "CH",
-    "country_name": "瑞士",
-    "country_cn": "瑞士",
-    "country_emoji": "🇨🇭",
-    "asn": "3356",
-    "asOrganization": "Level 3 Communications",
-    "isp": "Level 3 Communications",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
   }
 ]
