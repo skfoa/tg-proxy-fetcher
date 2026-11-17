@@ -379,6 +379,7 @@ class TestDomainProxyIPAndCFIntegration(unittest.TestCase):
                 f.write("tw.william.us.ci\nall-tomb.example.com\nall-dc.example.com\ndoh-fail.example.com\nother.domain.invalid\n")
 
             with patch.object(tg_fetch, "PROXYIP_ZIP_URLS", []), \
+                 patch.object(tg_fetch, "PROXYIP_TEXT_URLS", []), \
                  patch.object(tg_fetch, "PROXYIP_DOMAINS_FILE", manifest), \
                  patch("tg_fetch.doh_query_dns_records", side_effect=_fake_query), \
                  self.assertLogs("tg-fetch", level="WARNING") as cm:
@@ -701,6 +702,187 @@ class TestDomainProxyIPAndCFIntegration(unittest.TestCase):
         self.assertEqual(kept["channel"], "@orig_channel")
         self.assertEqual(kept["exit_ip"], "183.101.136.209")
         self.assertIn("218.157.145.120:10912", captured["proxyips"])
+
+    def test_fetch_text_proxyips_filters_html_existing_cf_tombstone_and_dual_routes(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            ip_cache_file = os.path.join(tmpdir, "ip_cache.json")
+            with open(ip_cache_file, "w", encoding="utf-8") as f:
+                json.dump({}, f)
+
+            existing_proxyips = {
+                "42.98.74.174:443": {
+                    "ip": "42.98.74.174",
+                    "port": "443",
+                    "delay_ms": 446,
+                    "channel": "@danfeng_chat",
+                }
+            }
+            existing_scan_ips = {
+                "119.28.90.161:443": {
+                    "ip": "119.28.90.161",
+                    "port": "443",
+                    "delay_ms": 210,
+                    "channel": "@danfeng_chat",
+                }
+            }
+            scraped_proxyips = {}
+            scraped_scan_ips = {}
+            tombstone = {"43.130.240.100:443": 9999999999}
+            ip_cache = {
+                "42.200.166.201": {"asn": "AS4760", "isp": "HKT", "net_type": "isp", "country": "HK"},
+                "150.109.117.145": {"asn": "AS132203", "isp": "Tencent Cloud", "net_type": "datacenter", "country": "SG"},
+                "2407:4b00:6c03::1": {"asn": "AS24165", "isp": "UNION BROADBAND NETWORK", "net_type": "isp", "country": "TW"},
+            }
+
+            txt_ok = "\n".join([
+                "42.98.74.174:443#🇭🇰 香港 · 中環, HK 12 ms 优",
+                "119.28.90.161:443#existing scanip",
+                "43.130.240.100:443#tombstoned entry",
+                "104.16.1.1:443#cloudflare official",
+                "42.200.166.201:10470#🇭🇰 香港, HK 23 ms 优",
+                "150.109.117.145:8080#🇸🇬 新加坡 (SG) 37 ms",
+                "[2407:4b00:6c03::1]:8443#🇹🇼 台湾 IPv6 39 ms 优",
+                "61.222.202.153:443#fresh lookup needed",
+                "invalid-line-no-port",
+            ])
+
+            def _fake_fetch(url, proxy="", timeout=15):
+                if "all.txt" in url:
+                    return txt_ok
+                if "waf.example" in url:
+                    return "<!DOCTYPE html><html><title>Just a moment...</title>1.2.3.4:443</html>"
+                raise RuntimeError("connection timeout")
+
+            def _fake_resolve(targets, max_chunk_size=100, persist=True, db_path="", cache_path="", **kwargs):
+                disk = providers.load_ip_cache(filepath=cache_path)
+                for tgt in targets:
+                    if tgt == "61.222.202.153":
+                        disk[tgt] = {"asn": "AS3462", "isp": "Chunghwa Telecom HiNet", "net_type": "isp", "country": "TW"}
+                if persist and cache_path:
+                    providers.save_ip_cache(disk, filepath=cache_path)
+                return {t: (disk[t]["asn"], disk[t]["isp"]) for t in targets if t in disk}
+
+            with patch.object(tg_fetch, "DATA_DIR", tmpdir), \
+                 patch("tg_fetch.fetch_web_page", side_effect=_fake_fetch), \
+                 patch("tg_fetch.resolve_asn_batch_online", side_effect=_fake_resolve), \
+                 patch("tg_fetch.auto_enrich_and_save_asns", return_value=0):
+                p_cnt, s_cnt, unrec = tg_fetch.fetch_text_proxyips(
+                    [
+                        "https://776771.xyz/all.txt",
+                        "https://waf.example/bad.txt",
+                        "https://down.example/timeout.txt",
+                    ],
+                    proxy="",
+                    tombstone=tombstone,
+                    scraped_proxyips=scraped_proxyips,
+                    scraped_scan_ips=scraped_scan_ips,
+                    existing_proxyips=existing_proxyips,
+                    existing_scan_ips=existing_scan_ips,
+                    ip_cache=ip_cache,
+                )
+
+            self.assertEqual(p_cnt, 3)
+            self.assertEqual(s_cnt, 1)
+            self.assertEqual(unrec, [])
+            # Existing and blocked nodes must NOT be added/overwritten
+            self.assertNotIn("42.98.74.174:443", scraped_proxyips)
+            self.assertNotIn("119.28.90.161:443", scraped_scan_ips)
+            self.assertNotIn("43.130.240.100:443", scraped_proxyips)
+            self.assertNotIn("43.130.240.100:443", scraped_scan_ips)
+            self.assertNotIn("104.16.1.1:443", scraped_scan_ips)
+            self.assertNotIn("1.2.3.4:443", scraped_proxyips)
+            self.assertNotIn("1.2.3.4:443", scraped_scan_ips)
+            # Non-datacenter high-port & IPv6 routed to proxyips with tls="true"
+            hk_item = scraped_proxyips["42.200.166.201:10470"]
+            self.assertEqual(hk_item["channel"], "@776771.xyz")
+            self.assertEqual(hk_item["tls"], "true")
+            self.assertEqual(hk_item["net_type"], "isp")
+            self.assertEqual(hk_item["exit_ip"], "")
+            self.assertIn("2407:4b00:6c03::1:8443", scraped_proxyips)
+            self.assertIn("61.222.202.153:443", scraped_proxyips)
+            # ip_cache updated in place from online batch resolution
+            self.assertIn("61.222.202.153", ip_cache)
+            # Datacenter node routed to scan_ips with plain-http port tls="false"
+            dc_item = scraped_scan_ips["150.109.117.145:8080"]
+            self.assertEqual(dc_item["channel"], "@776771.xyz")
+            self.assertEqual(dc_item["tls"], "false")
+            self.assertEqual(dc_item["net_type"], "datacenter")
+
+    def test_merge_and_save_preserves_existing_scan_ips_metrics_and_channel(self):
+        existing_scan_ips = {
+            "119.28.90.161:443": {
+                "ip": "119.28.90.161",
+                "port": "443",
+                "tls": "true",
+                "delay_ms": 123,
+                "speed_kbs": 4500,
+                "colo": "HKG",
+                "cf_location": "香港",
+                "asn": "AS132203 Tencent Cloud",
+                "isp": "Tencent Cloud",
+                "fail_count": 1,
+                "first_seen": "2026-11-01 08:00:00",
+                "channel": "@danfeng_chat",
+                "exit_ip": "119.28.90.161",
+                "exit_asn": "AS132203 Tencent Cloud",
+                "exit_isp": "Tencent Cloud",
+            }
+        }
+        scraped_scan_ips = {
+            "119.28.90.161:443": {
+                "ip": "119.28.90.161",
+                "port": "443",
+                "tls": "unknown",
+                "delay_ms": 0,
+                "speed_kbs": 0,
+                "colo": "",
+                "cf_location": "",
+                "asn": "AS132203 Tencent Cloud",
+                "isp": "Tencent Cloud",
+                "fail_count": 0,
+                "first_seen": "2026-11-17 17:00:00",
+                "channel": "@776771.xyz",
+                "exit_ip": "",
+                "exit_asn": "",
+                "exit_isp": "",
+            }
+        }
+        ip_cache = {
+            "119.28.90.161": {"asn": "AS132203", "isp": "Tencent Cloud", "net_type": "datacenter", "country": "HK"}
+        }
+        captured = {}
+
+        def _fake_save(final_proxies, final_cf_ips, final_scan_ips=None, final_proxyips=None, **kwargs):
+            captured["scan_ips"] = final_scan_ips
+
+        with tempfile.TemporaryDirectory() as merge_tmpdir:
+            with patch.object(tg_fetch, "DATA_DIR", merge_tmpdir), \
+                 patch("providers.save_ip_cache", return_value=None), \
+                 patch("tg_fetch.load_tombstone", return_value={}), \
+                 patch("tg_fetch.auto_enrich_and_save_asns", return_value=0), \
+                 patch("tg_fetch.get_session_enriched_asns", return_value=[]), \
+                 patch("tg_fetch.save_and_notify", side_effect=_fake_save):
+                tg_fetch.merge_and_save(
+                    existing_proxies={},
+                    scraped_proxies={},
+                    existing_cf_ips={},
+                    scraped_cf_ips={},
+                    existing_scan_ips=existing_scan_ips,
+                    scraped_scan_ips=scraped_scan_ips,
+                    existing_proxyips={},
+                    scraped_proxyips={},
+                    edt_unrecorded_asns=[],
+                    ip_cache=ip_cache,
+                )
+
+        kept = captured["scan_ips"]["119.28.90.161:443"]
+        self.assertEqual(kept["fail_count"], 1)
+        self.assertEqual(kept["delay_ms"], 123)
+        self.assertEqual(kept["speed_kbs"], 4500)
+        self.assertEqual(kept["channel"], "@danfeng_chat")
+        self.assertEqual(kept["tls"], "true")
+        self.assertEqual(kept["colo"], "HKG")
+        self.assertEqual(kept["exit_ip"], "119.28.90.161")
 
 
 if __name__ == "__main__":

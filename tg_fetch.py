@@ -25,6 +25,7 @@ import shutil
 import logging
 import asyncio
 import subprocess
+import urllib.parse
 import urllib.request
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -299,13 +300,18 @@ DEFAULT_PROXIFLY_HTTPS_URLS = [
 ]
 
 
+def _parse_url_list_env(env_names: tuple[str, ...], default: list[str]) -> list[str]:
+    for name in env_names:
+        raw_val = (os.getenv(name) or "").strip()
+        if raw_val:
+            if raw_val.lower() in ("none", "off", "disable", "false", "0"):
+                return []
+            return [u.strip() for u in re.split(r"[,;\s]+", raw_val) if u.strip().startswith("http")]
+    return list(default)
+
+
 def _parse_proxifly_https_urls() -> list[str]:
-    raw_val = (os.getenv("PROXIFLY_HTTPS_URLS") or os.getenv("PROXIFLY_HTTPS_URL") or "").strip()
-    if raw_val:
-        if raw_val.lower() in ("none", "off", "disable", "false", "0"):
-            return []
-        return [u.strip() for u in re.split(r"[,;\s]+", raw_val) if u.strip().startswith("http")]
-    return list(DEFAULT_PROXIFLY_HTTPS_URLS)
+    return _parse_url_list_env(("PROXIFLY_HTTPS_URLS", "PROXIFLY_HTTPS_URL"), DEFAULT_PROXIFLY_HTTPS_URLS)
 
 
 PROXIFLY_HTTPS_URLS = _parse_proxifly_https_urls()
@@ -316,15 +322,21 @@ DEFAULT_PROXYIP_ZIP_URLS = [
 
 
 def _parse_proxyip_zip_urls() -> list[str]:
-    raw_val = (os.getenv("PROXYIP_ZIP_URLS") or os.getenv("PROXYIP_ZIP_URL") or "").strip()
-    if raw_val:
-        if raw_val.lower() in ("none", "off", "disable", "false", "0"):
-            return []
-        return [u.strip() for u in re.split(r"[,;\s]+", raw_val) if u.strip().startswith("http")]
-    return list(DEFAULT_PROXYIP_ZIP_URLS)
+    return _parse_url_list_env(("PROXYIP_ZIP_URLS", "PROXYIP_ZIP_URL"), DEFAULT_PROXYIP_ZIP_URLS)
 
 
 PROXYIP_ZIP_URLS = _parse_proxyip_zip_urls()
+
+DEFAULT_PROXYIP_TEXT_URLS = [
+    "https://776771.xyz/all.txt",
+]
+
+
+def _parse_proxyip_text_urls() -> list[str]:
+    return _parse_url_list_env(("PROXYIP_TEXT_URLS", "PROXYIP_TEXT_URL"), DEFAULT_PROXYIP_TEXT_URLS)
+
+
+PROXYIP_TEXT_URLS = _parse_proxyip_text_urls()
 
 DATA_DIR = "data"
 OUTPUT_PROXY_FILE = os.path.join(DATA_DIR, "proxies.txt")
@@ -347,6 +359,7 @@ PROXYIP_DOMAINS_FILE = os.path.join(OUTPUT_PROXYIP_DIR, "domains.txt")
 CF_IP_DIR = os.path.join(DATA_DIR, "cf_ips")
 CF_IP_DOMAINS_FILE = os.path.join(CF_IP_DIR, "domains.txt")
 CF_TLS_PORTS = frozenset({443, 8443, 2053, 2083, 2087, 2096})
+_PLAIN_HTTP_PORTS = frozenset({80, 8080, 8880, 2052, 2082, 2086, 2095})
 FETCH_STATS_FILE = os.path.join(DATA_DIR, ".fetch_stats.json")
 
 
@@ -1715,6 +1728,195 @@ def fetch_zip_proxyips(
     return total_added, list(unrecorded_asns_map.values())
 
 
+_HTML_OR_CHALLENGE_MARKERS = (
+    "<!doctype",
+    "<html",
+    "just a moment",
+    "challenge-platform",
+    "cf-error",
+    "access denied",
+    "enable javascript",
+)
+
+
+def _looks_like_html_or_challenge(raw_text: str) -> bool:
+    """识别 HTML 错误页、WAF Challenge 或 JSON 错误响应，防止将非纯文本页面误解析入池。"""
+    stripped = str(raw_text or "").lstrip()
+    if not stripped:
+        return True
+    head_lower = stripped[:4096].lower()
+    if head_lower.startswith(("<!doctype", "<html", "{", "[")):
+        return True
+    return any(marker in head_lower for marker in _HTML_OR_CHALLENGE_MARKERS)
+
+
+def _extract_plain_text_proxyip_endpoints(raw_text: str) -> list[tuple[str, int]] | None:
+    """
+    安全解析纯文本 ProxyIP/反代列表（支持 IPv4:Port、[IPv6]:Port 与 # 备注）；
+    若响应为空或疑似 HTML/WAF 拦截页，返回 None。
+    """
+    if _looks_like_html_or_challenge(raw_text):
+        return None
+    cleaned_lines: list[str] = []
+    for raw_line in raw_text.splitlines():
+        clean_line = raw_line.split("#", 1)[0].strip()
+        if clean_line:
+            cleaned_lines.append(clean_line)
+    if not cleaned_lines:
+        return []
+    return parse_proxyip_txt_endpoints(cleaned_lines, default_port=443, allow_bare_ip=False)
+
+
+def _channel_tag_for_url(url: str) -> str:
+    """从外部 HTTP 文本源 URL 生成简洁可溯源的 @host 来源标签。"""
+    try:
+        host = (urllib.parse.urlparse(str(url or "").strip()).hostname or "").strip().lower()
+    except Exception:
+        host = ""
+    return f"@{host}" if host else "@external_txt"
+
+
+def fetch_text_proxyips(
+    text_urls: list[str],
+    proxy: str,
+    tombstone: dict[str, int],
+    scraped_proxyips: dict[str, dict],
+    scraped_scan_ips: dict[str, dict],
+    existing_proxyips: dict | None = None,
+    existing_scan_ips: dict | None = None,
+    ip_cache: dict[str, dict] | None = None,
+    timeout: float = 15.0,
+) -> tuple[int, int, list[dict]]:
+    """
+    拉取外部纯文本 IP:Port ProxyIP/优选反代源，严格过滤 HTML/WAF 页、Cloudflare 入口、
+    墓地黑名单与已有/前置来源节点；仅对纯新增节点补全 ASN 画像并按非机房/机房双路分流。
+    返回: (新增非机房 ProxyIP 条数, 新增机房 ScanIP 条数, 未收录 ASN 列表)
+    """
+    if not text_urls:
+        return 0, 0, []
+
+    log.info("-" * 50)
+    log.info("开始拉取外部纯文本 ProxyIP 源: %d 个链接 (仅收纯新增并按属性双路分流)", len(text_urls))
+
+    existing_proxyips = existing_proxyips or {}
+    existing_scan_ips = existing_scan_ips or {}
+
+    candidate_endpoints: list[tuple[str, str, int]] = []
+    seen_keys: set[str] = set()
+    existing_skipped = 0
+    tomb_filtered = 0
+    cf_filtered = 0
+    failed_sources = 0
+
+    for url in text_urls:
+        try:
+            raw_text = fetch_web_page(url, proxy=proxy, timeout=int(timeout))
+        except Exception as e:
+            failed_sources += 1
+            log.warning("拉取外部文本 ProxyIP 源失败 (%s): %s", url, e)
+            continue
+
+        parsed_eps = _extract_plain_text_proxyip_endpoints(raw_text)
+        if parsed_eps is None:
+            failed_sources += 1
+            log.warning("外部文本 ProxyIP 源返回空响应或疑似 HTML/WAF 拦截页，已跳过: %s", url)
+            continue
+
+        src_tag = _channel_tag_for_url(url)
+        for ip_val, port_val in parsed_eps:
+            key = f"{ip_val}:{port_val}"
+            if key in seen_keys:
+                continue
+            seen_keys.add(key)
+
+            if (
+                key in existing_proxyips
+                or key in existing_scan_ips
+                or key in scraped_proxyips
+                or key in scraped_scan_ips
+            ):
+                existing_skipped += 1
+                continue
+            if is_cloudflare_ingress(ip_val, "", ""):
+                cf_filtered += 1
+                continue
+            if is_tombstoned(key, tombstone):
+                tomb_filtered += 1
+                continue
+
+            candidate_endpoints.append((src_tag, ip_val, port_val))
+
+    if not candidate_endpoints:
+        log.info(
+            "外部文本 ProxyIP 源提取完成: 无纯新增候选 (已有/重复跳过 %d, 墓地跳过 %d, CF 拦截 %d, 异常/HTML 源跳过 %d)",
+            existing_skipped,
+            tomb_filtered,
+            cf_filtered,
+            failed_sources,
+        )
+        return 0, 0, []
+
+    active_endpoints, local_cache, unrecorded_asns_map, extra_tomb = _prepare_domain_candidates(
+        candidate_endpoints, tombstone, ip_cache, proxy, pool_label="外部文本 ProxyIP"
+    )
+    tomb_filtered += extra_tomb
+
+    now_bjt = datetime.now(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S")
+    proxy_added = 0
+    scan_added = 0
+
+    for src_tag, ip_val, port_val in active_endpoints:
+        asn_code, raw_isp, formatted_asn, cf_location, net_type = _enrich_domain_endpoint_meta(ip_val, local_cache)
+        if is_cloudflare_ingress(ip_val, asn_code, raw_isp, ip_cache=local_cache):
+            cf_filtered += 1
+            continue
+
+        key = f"{ip_val}:{port_val}"
+        item = {
+            "ip": ip_val,
+            "port": str(port_val),
+            "tls": "false" if port_val in _PLAIN_HTTP_PORTS else "true",
+            "delay_ms": 0,
+            "speed_kbs": 0,
+            "colo": "",
+            "cf_location": cf_location,
+            "isp": raw_isp,
+            "asn": formatted_asn,
+            "raw_asn": asn_code,
+            "exit_ip": "",
+            "exit_ipv6": "",
+            "exit_asn": "",
+            "exit_isp": "",
+            "first_seen": now_bjt,
+            "channel": src_tag,
+            "fail_count": 0,
+            "net_type": net_type,
+        }
+        is_p, eff_nt = classify_node_proxyip_or_scan(item, local_cache)
+        item["net_type"] = eff_nt
+        _record_unrecorded_asn(unrecorded_asns_map, asn_code, raw_isp, ip_val, eff_nt)
+
+        if is_p:
+            if key not in scraped_proxyips:
+                scraped_proxyips[key] = item
+                proxy_added += 1
+        elif key not in scraped_scan_ips:
+            scraped_scan_ips[key] = item
+            scan_added += 1
+
+    log.info(
+        "外部文本 ProxyIP 源提取完成: 非机房 ProxyIP 新增 %d 条, 机房扫描优选新增 %d 条 (已有/重复跳过 %d, 墓地跳过 %d, CF 拦截 %d, 异常/HTML 源跳过 %d, 未收录 ASN %d)",
+        proxy_added,
+        scan_added,
+        existing_skipped,
+        tomb_filtered,
+        cf_filtered,
+        failed_sources,
+        len(unrecorded_asns_map),
+    )
+    return proxy_added, scan_added, list(unrecorded_asns_map.values())
+
+
 def load_domain_manifest(filepath: str) -> list[str]:
     """
     读取人工维护的域名清单文件（每行一个 domain 或 domain:port，忽略空行与 # 注释）。
@@ -2039,7 +2241,6 @@ def fetch_domain_proxyips(
         return 0, []
 
     now_bjt = datetime.now(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S")
-    plain_http_ports = {80, 8080, 8880, 2052, 2082, 2086, 2095}
     total_added = 0
     dc_filtered = 0
 
@@ -2053,7 +2254,7 @@ def fetch_domain_proxyips(
         proxyip_item = {
             "ip": ip_val,
             "port": str(port_val),
-            "tls": "false" if port_val in plain_http_ports else "true",
+            "tls": "false" if port_val in _PLAIN_HTTP_PORTS else "true",
             "delay_ms": 0,
             "speed_kbs": 0,
             "colo": "",
@@ -2199,6 +2400,18 @@ def collect_external_proxyips(
     unrec_all: list[dict] = []
     _, zip_unrec = fetch_zip_proxyips(PROXYIP_ZIP_URLS, proxy, tombstone, scraped_proxyips)
     unrec_all.extend(zip_unrec)
+
+    _, _, text_unrec = fetch_text_proxyips(
+        PROXYIP_TEXT_URLS,
+        proxy,
+        tombstone,
+        scraped_proxyips,
+        scraped_scan_ips,
+        existing_proxyips=existing_proxyips,
+        existing_scan_ips=existing_scan_ips,
+        ip_cache=ip_cache,
+    )
+    unrec_all.extend(text_unrec)
 
     expanded_domains: set[str] = set()
     domain_specs = load_domain_manifest(PROXYIP_DOMAINS_FILE)
@@ -2999,26 +3212,49 @@ def merge_and_save(
         else:
             final_cf_ips[k] = v
 
+    def _preserve_existing_ip_metrics(
+        v: dict,
+        ex: dict,
+        keep_keys: tuple[str, ...],
+        *,
+        prefer_existing_first_seen: bool = False,
+    ) -> None:
+        v["fail_count"] = ex.get("fail_count", 0)
+        ex_first = ex.get("first_seen") or ex.get("tested_at", "")
+        if prefer_existing_first_seen and ex_first:
+            v["first_seen"] = ex_first
+        elif not v.get("first_seen"):
+            v["first_seen"] = ex_first
+        if not _has_positive_metric(v.get("delay_ms")) and _has_positive_metric(ex.get("delay_ms")):
+            v["delay_ms"] = ex["delay_ms"]
+        if not _has_positive_metric(v.get("speed_kbs")) and _has_positive_metric(ex.get("speed_kbs")):
+            v["speed_kbs"] = ex["speed_kbs"]
+        if ex.get("channel"):
+            v["channel"] = ex["channel"]
+        if ex.get("tls") and ex.get("tls") != "unknown":
+            v["tls"] = ex["tls"]
+        for keep_k in keep_keys:
+            if not v.get(keep_k) and ex.get(keep_k):
+                v[keep_k] = ex[keep_k]
+
     final_scan_ips = dict(existing_scan_ips)
     for k, v in scraped_scan_ips.items():
         if k in final_scan_ips:
-            # 关键修复：保留已有扫描 IP 失败计数与已补全的非空出口画像字段，不被无出口附件的空串抹除
+            # 关键修复：保留已有扫描 IP 失败计数、延迟/速率/频道/TLS与已补全的非空出口画像字段
             ex_scan = final_scan_ips[k]
-            v["fail_count"] = ex_scan.get("fail_count", 0)
-            if not v.get("first_seen"):
-                v["first_seen"] = ex_scan.get("first_seen") or ex_scan.get("tested_at", "")
-            for keep_k in ("exit_ip", "exit_ipv6", "exit_asn", "exit_isp", "exit_location", "colo", "cf_location"):
-                if not v.get(keep_k) and ex_scan.get(keep_k):
-                    v[keep_k] = ex_scan[keep_k]
+            _preserve_existing_ip_metrics(
+                v,
+                ex_scan,
+                ("exit_ip", "exit_ipv6", "exit_asn", "exit_isp", "exit_location", "colo", "cf_location"),
+            )
             ex_scan.update(v)
         elif k in existing_proxyips:
             ex_p = existing_proxyips[k]
-            v["fail_count"] = ex_p.get("fail_count", 0)
-            if not v.get("first_seen"):
-                v["first_seen"] = ex_p.get("first_seen") or ex_p.get("tested_at", "")
-            for keep_k in ("exit_ip", "exit_ipv6", "exit_asn", "exit_isp", "colo", "cf_location"):
-                if not v.get(keep_k) and ex_p.get(keep_k):
-                    v[keep_k] = ex_p[keep_k]
+            _preserve_existing_ip_metrics(
+                v,
+                ex_p,
+                ("exit_ip", "exit_ipv6", "exit_asn", "exit_isp", "colo", "cf_location"),
+            )
             final_scan_ips[k] = v
         else:
             final_scan_ips[k] = v
@@ -3028,31 +3264,20 @@ def merge_and_save(
         if k in final_proxyips:
             # 关键修复：保留已有 ProxyIP 首次收录时间、延迟/速率/失败计数与已补全的非空画像字段
             ex_proxy = final_proxyips[k]
-            v["fail_count"] = ex_proxy.get("fail_count", 0)
-            if ex_proxy.get("first_seen") or ex_proxy.get("tested_at"):
-                v["first_seen"] = ex_proxy.get("first_seen") or ex_proxy.get("tested_at", "")
-            elif not v.get("first_seen"):
-                v["first_seen"] = ""
-            if safe_int(v.get("delay_ms"), 0) <= 0 and safe_int(ex_proxy.get("delay_ms"), 0) > 0:
-                v["delay_ms"] = ex_proxy["delay_ms"]
-            if safe_int(v.get("speed_kbs"), 0) <= 0 and safe_int(ex_proxy.get("speed_kbs"), 0) > 0:
-                v["speed_kbs"] = ex_proxy["speed_kbs"]
-            if ex_proxy.get("channel"):
-                v["channel"] = ex_proxy["channel"]
-            if ex_proxy.get("tls") and ex_proxy.get("tls") != "unknown":
-                v["tls"] = ex_proxy["tls"]
-            for keep_k in ("exit_ip", "exit_ipv6", "exit_asn", "exit_isp", "colo", "cf_location"):
-                if not v.get(keep_k) and ex_proxy.get(keep_k):
-                    v[keep_k] = ex_proxy[keep_k]
+            _preserve_existing_ip_metrics(
+                v,
+                ex_proxy,
+                ("exit_ip", "exit_ipv6", "exit_asn", "exit_isp", "colo", "cf_location"),
+                prefer_existing_first_seen=True,
+            )
             ex_proxy.update(v)
         elif k in existing_scan_ips:
             ex_s = existing_scan_ips[k]
-            v["fail_count"] = ex_s.get("fail_count", 0)
-            if not v.get("first_seen"):
-                v["first_seen"] = ex_s.get("first_seen") or ex_s.get("tested_at", "")
-            for keep_k in ("exit_ip", "exit_ipv6", "exit_asn", "exit_isp", "exit_location", "colo", "cf_location"):
-                if not v.get(keep_k) and ex_s.get(keep_k):
-                    v[keep_k] = ex_s[keep_k]
+            _preserve_existing_ip_metrics(
+                v,
+                ex_s,
+                ("exit_ip", "exit_ipv6", "exit_asn", "exit_isp", "exit_location", "colo", "cf_location"),
+            )
             final_proxyips[k] = v
         else:
             final_proxyips[k] = v
