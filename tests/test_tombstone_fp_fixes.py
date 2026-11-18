@@ -183,7 +183,7 @@ class TestProxyIpVerifyTransientErrors(unittest.IsolatedAsyncioTestCase):
 
 class TestProxiesVerifyTransientErrorsAndFallback(unittest.IsolatedAsyncioTestCase):
     def test_classify_socket_error_and_http_defaults(self):
-        self.assertEqual(proxies_verify.HTTP_MAX_FAILS, 2)
+        self.assertEqual(proxies_verify.HTTP_MAX_FAILS, 1)
         self.assertEqual(proxies_verify.HTTP_PROBE_TIMEOUT, 2.5)
         self.assertEqual(proxies_verify.HTTP_MAX_LATENCY_MS, 3500)
 

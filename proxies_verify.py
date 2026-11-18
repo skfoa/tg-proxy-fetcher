@@ -128,7 +128,7 @@ SSTP_TIMEOUT = 8.0
 SSTP_READ_TIMEOUT = 4.0
 CONCURRENCY = 300
 MAX_FAILS = 3
-HTTP_MAX_FAILS = 2
+HTTP_MAX_FAILS = 1
 
 # 致命硬故障状态集：对端端口关闭 (Connection Refused)、协议错配或鉴权永久失败
 # 遇此错误直接判死淘汰（fail_count 达到淘汰阈值并登记至墓地冷却库），不进入缓冲期
@@ -2748,7 +2748,7 @@ def main():
         "--http-max-fails",
         type=int,
         default=HTTP_MAX_FAILS,
-        help=f"明文 HTTP 协议专属淘汰阈值 (默认 {HTTP_MAX_FAILS}，兼顾软抖动容错与快速淘汰)",
+        help=f"明文 HTTP 协议专属淘汰阈值 (默认 {HTTP_MAX_FAILS}，失败即淘汰，杜绝低质僵尸节点积压占用资源)",
     )
     parser.add_argument("--strict", action="store_true", help="极致纯净模式 (只要失败 1 次立即剔除，等价于 --max-fails 1 --http-max-fails 1)")
     parser.add_argument("--timeout", type=float, default=TIMEOUT, help=f"单节点握手超时秒数 (默认 {TIMEOUT})")
