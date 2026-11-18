@@ -1,47 +1,69 @@
 [
   {
-    "proxy": "66.183.66.180:443",
-    "ip": "66.183.66.180",
+    "proxy": "24.84.0.55:443",
+    "ip": "24.84.0.55",
     "port": 443,
     "tls": true,
-    "clientIp": "2001:569:75a9:3a00:9657:a5ff:fed8:67a0",
+    "clientIp": "2604:3d08:8980:c77:6ca3:b705:b02f:6ed9",
     "clientIps": [
-      "2001:569:75a9:3a00:9657:a5ff:fed8:67a0"
+      "2604:3d08:8980:c77:6ca3:b705:b02f:6ed9"
     ],
     "clientIpv4": "",
-    "clientIpv6": "2001:569:75a9:3a00:9657:a5ff:fed8:67a0",
+    "clientIpv6": "2604:3d08:8980:c77:6ca3:b705:b02f:6ed9",
     "dual_stack": false,
     "country": "CA",
     "country_name": "加拿大",
     "country_cn": "加拿大",
     "country_emoji": "🇨🇦",
-    "asn": "852",
-    "asOrganization": "TELUS Communications Inc.",
-    "isp": "TELUS Communications Inc.",
+    "asn": "6327",
+    "asOrganization": "Shaw Communications",
+    "isp": "Shaw Communications",
     "net_type": "isp",
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "205.206.222.52:443",
-    "ip": "205.206.222.52",
+    "proxy": "24.86.138.211:443",
+    "ip": "24.86.138.211",
     "port": 443,
     "tls": true,
-    "clientIp": "205.206.222.52",
+    "clientIp": "2604:3d08:8b7e:7880::9dd9",
     "clientIps": [
-      "205.206.222.52"
+      "2604:3d08:8b7e:7880::9dd9"
     ],
-    "clientIpv4": "205.206.222.52",
-    "clientIpv6": "",
+    "clientIpv4": "",
+    "clientIpv6": "2604:3d08:8b7e:7880::9dd9",
     "dual_stack": false,
     "country": "CA",
     "country_name": "加拿大",
     "country_cn": "加拿大",
     "country_emoji": "🇨🇦",
-    "asn": "852",
-    "asOrganization": "TELUS Communications Inc.",
-    "isp": "TELUS Communications Inc.",
+    "asn": "6327",
+    "asOrganization": "Shaw Communications",
+    "isp": "Shaw Communications",
     "net_type": "isp",
-    "source": "@danfeng_chat"
+    "source": "@cmliussss_all"
+  },
+  {
+    "proxy": "24.84.0.55:8443",
+    "ip": "24.84.0.55",
+    "port": 8443,
+    "tls": true,
+    "clientIp": "2604:3d08:8980:c77:6ca3:b705:b02f:6ed9",
+    "clientIps": [
+      "2604:3d08:8980:c77:6ca3:b705:b02f:6ed9"
+    ],
+    "clientIpv4": "",
+    "clientIpv6": "2604:3d08:8980:c77:6ca3:b705:b02f:6ed9",
+    "dual_stack": false,
+    "country": "CA",
+    "country_name": "加拿大",
+    "country_cn": "加拿大",
+    "country_emoji": "🇨🇦",
+    "asn": "6327",
+    "asOrganization": "Shaw Communications",
+    "isp": "Shaw Communications",
+    "net_type": "isp",
+    "source": "@cmliussss_all"
   },
   {
     "proxy": "24.109.36.190:8443",
@@ -66,6 +88,28 @@
     "source": "@cmliussss_all"
   },
   {
+    "proxy": "174.4.69.68:443",
+    "ip": "174.4.69.68",
+    "port": 443,
+    "tls": true,
+    "clientIp": "2604:3d08:a185:6b00:f434:9bc9:d8ee:3c26",
+    "clientIps": [
+      "2604:3d08:a185:6b00:f434:9bc9:d8ee:3c26"
+    ],
+    "clientIpv4": "",
+    "clientIpv6": "2604:3d08:a185:6b00:f434:9bc9:d8ee:3c26",
+    "dual_stack": false,
+    "country": "CA",
+    "country_name": "加拿大",
+    "country_cn": "加拿大",
+    "country_emoji": "🇨🇦",
+    "asn": "6327",
+    "asOrganization": "Shaw Communications",
+    "isp": "Shaw Communications",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
+  },
+  {
     "proxy": "75.159.228.9:443",
     "ip": "75.159.228.9",
     "port": 443,
@@ -88,38 +132,60 @@
     "source": "@danfeng2"
   },
   {
-    "proxy": "24.84.0.55:8443",
-    "ip": "24.84.0.55",
+    "proxy": "24.150.16.183:8443",
+    "ip": "24.150.16.183",
     "port": 8443,
     "tls": true,
-    "clientIp": "2604:3d08:8980:c77:1433:f907:fb66:3c05",
+    "clientIp": "2001:1970:565c:f800::9f2f",
     "clientIps": [
-      "2604:3d08:8980:c77:1433:f907:fb66:3c05"
+      "2001:1970:565c:f800::9f2f"
     ],
     "clientIpv4": "",
-    "clientIpv6": "2604:3d08:8980:c77:1433:f907:fb66:3c05",
+    "clientIpv6": "2001:1970:565c:f800::9f2f",
     "dual_stack": false,
     "country": "CA",
     "country_name": "加拿大",
     "country_cn": "加拿大",
     "country_emoji": "🇨🇦",
-    "asn": "6327",
-    "asOrganization": "Shaw Communications",
-    "isp": "Shaw Communications",
+    "asn": "7992",
+    "asOrganization": "Cogeco Connexion Inc.",
+    "isp": "Cogeco Connexion Inc.",
     "net_type": "isp",
-    "source": "@cmliussss_all"
+    "source": "@manual_import"
   },
   {
-    "proxy": "99.229.67.145:443",
-    "ip": "99.229.67.145",
+    "proxy": "23.17.17.215:443",
+    "ip": "23.17.17.215",
     "port": 443,
     "tls": true,
-    "clientIp": "2607:fea8:3d1d:a000::966",
+    "clientIp": "23.17.17.215",
     "clientIps": [
-      "2607:fea8:3d1d:a000::966"
+      "23.17.17.215"
+    ],
+    "clientIpv4": "23.17.17.215",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "CA",
+    "country_name": "加拿大",
+    "country_cn": "加拿大",
+    "country_emoji": "🇨🇦",
+    "asn": "852",
+    "asOrganization": "TELUS Communications Inc.",
+    "isp": "TELUS Communications Inc.",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
+  },
+  {
+    "proxy": "99.240.65.254:443",
+    "ip": "99.240.65.254",
+    "port": 443,
+    "tls": true,
+    "clientIp": "2607:fea8:54df:edd0::66c1",
+    "clientIps": [
+      "2607:fea8:54df:edd0::66c1"
     ],
     "clientIpv4": "",
-    "clientIpv6": "2607:fea8:3d1d:a000::966",
+    "clientIpv6": "2607:fea8:54df:edd0::66c1",
     "dual_stack": false,
     "country": "CA",
     "country_name": "加拿大",
@@ -154,37 +220,15 @@
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "24.86.138.211:443",
-    "ip": "24.86.138.211",
+    "proxy": "205.206.222.52:443",
+    "ip": "205.206.222.52",
     "port": 443,
     "tls": true,
-    "clientIp": "2604:3d08:8b7e:7880::9dd9",
+    "clientIp": "205.206.222.52",
     "clientIps": [
-      "2604:3d08:8b7e:7880::9dd9"
+      "205.206.222.52"
     ],
-    "clientIpv4": "",
-    "clientIpv6": "2604:3d08:8b7e:7880::9dd9",
-    "dual_stack": false,
-    "country": "CA",
-    "country_name": "加拿大",
-    "country_cn": "加拿大",
-    "country_emoji": "🇨🇦",
-    "asn": "6327",
-    "asOrganization": "Shaw Communications",
-    "isp": "Shaw Communications",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
-  },
-  {
-    "proxy": "23.17.17.215:443",
-    "ip": "23.17.17.215",
-    "port": 443,
-    "tls": true,
-    "clientIp": "23.17.17.215",
-    "clientIps": [
-      "23.17.17.215"
-    ],
-    "clientIpv4": "23.17.17.215",
+    "clientIpv4": "205.206.222.52",
     "clientIpv6": "",
     "dual_stack": false,
     "country": "CA",
@@ -198,70 +242,48 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "174.4.69.68:443",
-    "ip": "174.4.69.68",
+    "proxy": "99.229.67.145:443",
+    "ip": "99.229.67.145",
     "port": 443,
     "tls": true,
-    "clientIp": "2604:3d08:a185:6b00:f434:9bc9:d8ee:3c26",
+    "clientIp": "2607:fea8:3d1d:a000::966",
     "clientIps": [
-      "2604:3d08:a185:6b00:f434:9bc9:d8ee:3c26"
+      "2607:fea8:3d1d:a000::966"
     ],
     "clientIpv4": "",
-    "clientIpv6": "2604:3d08:a185:6b00:f434:9bc9:d8ee:3c26",
+    "clientIpv6": "2607:fea8:3d1d:a000::966",
     "dual_stack": false,
     "country": "CA",
     "country_name": "加拿大",
     "country_cn": "加拿大",
     "country_emoji": "🇨🇦",
-    "asn": "6327",
-    "asOrganization": "Shaw Communications",
-    "isp": "Shaw Communications",
+    "asn": "812",
+    "asOrganization": "Rogers Communications Canada Inc.",
+    "isp": "Rogers Communications Canada Inc.",
     "net_type": "isp",
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "172.98.207.58:443",
-    "ip": "172.98.207.58",
+    "proxy": "66.183.66.180:443",
+    "ip": "66.183.66.180",
     "port": 443,
     "tls": true,
-    "clientIp": "172.98.207.6",
+    "clientIp": "2001:569:75a9:3a00:9657:a5ff:fed8:67a0",
     "clientIps": [
-      "172.98.207.6"
-    ],
-    "clientIpv4": "172.98.207.6",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "CA",
-    "country_name": "加拿大",
-    "country_cn": "加拿大",
-    "country_emoji": "🇨🇦",
-    "asn": "14453",
-    "asOrganization": "ADVANCED KNOWLEDGE NETWORKS",
-    "isp": "ADVANCED KNOWLEDGE NETWORKS",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
-  },
-  {
-    "proxy": "24.150.16.183:8443",
-    "ip": "24.150.16.183",
-    "port": 8443,
-    "tls": true,
-    "clientIp": "2001:1970:565c:f800::9f2f",
-    "clientIps": [
-      "2001:1970:565c:f800::9f2f"
+      "2001:569:75a9:3a00:9657:a5ff:fed8:67a0"
     ],
     "clientIpv4": "",
-    "clientIpv6": "2001:1970:565c:f800::9f2f",
+    "clientIpv6": "2001:569:75a9:3a00:9657:a5ff:fed8:67a0",
     "dual_stack": false,
     "country": "CA",
     "country_name": "加拿大",
     "country_cn": "加拿大",
     "country_emoji": "🇨🇦",
-    "asn": "7992",
-    "asOrganization": "Cogeco Connexion Inc.",
-    "isp": "Cogeco Connexion Inc.",
+    "asn": "852",
+    "asOrganization": "TELUS Communications Inc.",
+    "isp": "TELUS Communications Inc.",
     "net_type": "isp",
-    "source": "@manual_import"
+    "source": "@cmliussss_all"
   },
   {
     "proxy": "50.21.23.3:443",
@@ -286,90 +308,24 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "99.240.65.254:443",
-    "ip": "99.240.65.254",
+    "proxy": "172.98.207.58:443",
+    "ip": "172.98.207.58",
     "port": 443,
     "tls": true,
-    "clientIp": "2607:fea8:54df:edd0::66c1",
+    "clientIp": "172.98.207.6",
     "clientIps": [
-      "2607:fea8:54df:edd0::66c1"
+      "172.98.207.6"
     ],
-    "clientIpv4": "",
-    "clientIpv6": "2607:fea8:54df:edd0::66c1",
-    "dual_stack": false,
-    "country": "CA",
-    "country_name": "加拿大",
-    "country_cn": "加拿大",
-    "country_emoji": "🇨🇦",
-    "asn": "812",
-    "asOrganization": "Rogers Communications Canada Inc.",
-    "isp": "Rogers Communications Canada Inc.",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "24.84.0.55:443",
-    "ip": "24.84.0.55",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2604:3d08:8980:c77:1433:f907:fb66:3c05",
-    "clientIps": [
-      "2604:3d08:8980:c77:1433:f907:fb66:3c05"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2604:3d08:8980:c77:1433:f907:fb66:3c05",
-    "dual_stack": false,
-    "country": "CA",
-    "country_name": "加拿大",
-    "country_cn": "加拿大",
-    "country_emoji": "🇨🇦",
-    "asn": "6327",
-    "asOrganization": "Shaw Communications",
-    "isp": "Shaw Communications",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
-  },
-  {
-    "proxy": "179.255.184.10:443",
-    "ip": "179.255.184.10",
-    "port": 443,
-    "tls": true,
-    "clientIp": "179.255.184.10",
-    "clientIps": [
-      "179.255.184.10"
-    ],
-    "clientIpv4": "179.255.184.10",
+    "clientIpv4": "172.98.207.6",
     "clientIpv6": "",
     "dual_stack": false,
     "country": "CA",
     "country_name": "加拿大",
     "country_cn": "加拿大",
     "country_emoji": "🇨🇦",
-    "asn": "214238",
-    "asOrganization": "Host Telecom Ltd",
-    "isp": "Host Telecom Ltd",
-    "net_type": "isp",
-    "source": "@otcjlq"
-  },
-  {
-    "proxy": "142.188.90.91:443",
-    "ip": "142.188.90.91",
-    "port": 443,
-    "tls": true,
-    "clientIp": "142.188.90.91",
-    "clientIps": [
-      "142.188.90.91"
-    ],
-    "clientIpv4": "142.188.90.91",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "CA",
-    "country_name": "加拿大",
-    "country_cn": "加拿大",
-    "country_emoji": "🇨🇦",
-    "asn": "577",
-    "asOrganization": "Bell Canada",
-    "isp": "Bell Canada",
+    "asn": "14453",
+    "asOrganization": "ADVANCED KNOWLEDGE NETWORKS",
+    "isp": "ADVANCED KNOWLEDGE NETWORKS",
     "net_type": "isp",
     "source": "@cmliussss_all"
   }

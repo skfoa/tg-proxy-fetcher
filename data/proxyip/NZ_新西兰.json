@@ -22,28 +22,6 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "161.29.46.212:443",
-    "ip": "161.29.46.212",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2404:4408:67b5:1900::1",
-    "clientIps": [
-      "2404:4408:67b5:1900::1"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2404:4408:67b5:1900::1",
-    "dual_stack": false,
-    "country": "NZ",
-    "country_name": "新西兰",
-    "country_cn": "新西兰",
-    "country_emoji": "🇳🇿",
-    "asn": "9790",
-    "asOrganization": "Two Degrees Networks Limited",
-    "isp": "Two Degrees Networks Limited",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "121.74.188.227:443",
     "ip": "121.74.188.227",
     "port": 443,
@@ -86,6 +64,28 @@
     "isp": "InSPire Net Ltd",
     "net_type": "isp",
     "source": "@danfeng2"
+  },
+  {
+    "proxy": "161.29.46.212:443",
+    "ip": "161.29.46.212",
+    "port": 443,
+    "tls": true,
+    "clientIp": "2404:4408:67b5:1900::1",
+    "clientIps": [
+      "2404:4408:67b5:1900::1"
+    ],
+    "clientIpv4": "",
+    "clientIpv6": "2404:4408:67b5:1900::1",
+    "dual_stack": false,
+    "country": "NZ",
+    "country_name": "新西兰",
+    "country_cn": "新西兰",
+    "country_emoji": "🇳🇿",
+    "asn": "9790",
+    "asOrganization": "Two Degrees Networks Limited",
+    "isp": "Two Degrees Networks Limited",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
   },
   {
     "proxy": "160.30.240.162:443",
