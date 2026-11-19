@@ -1,27 +1,5 @@
 [
   {
-    "proxy": "179.255.190.11:8443",
-    "ip": "179.255.190.11",
-    "port": 8443,
-    "tls": true,
-    "clientIp": "179.255.190.11",
-    "clientIps": [
-      "179.255.190.11"
-    ],
-    "clientIpv4": "179.255.190.11",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "IT",
-    "country_name": "意大利",
-    "country_cn": "意大利",
-    "country_emoji": "🇮🇹",
-    "asn": "214238",
-    "asOrganization": "Host Telecom Ltd",
-    "isp": "Host Telecom Ltd",
-    "net_type": "isp",
-    "source": "@otcjlq"
-  },
-  {
     "proxy": "151.91.39.191:443",
     "ip": "151.91.39.191",
     "port": 443,
@@ -42,5 +20,27 @@
     "isp": "Stellantis Auto SAS",
     "net_type": "business",
     "source": "@danfeng2"
+  },
+  {
+    "proxy": "179.255.190.11:8443",
+    "ip": "179.255.190.11",
+    "port": 8443,
+    "tls": true,
+    "clientIp": "179.255.190.11",
+    "clientIps": [
+      "179.255.190.11"
+    ],
+    "clientIpv4": "179.255.190.11",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "IT",
+    "country_name": "意大利",
+    "country_cn": "意大利",
+    "country_emoji": "🇮🇹",
+    "asn": "214238",
+    "asOrganization": "Host Telecom Ltd",
+    "isp": "Host Telecom Ltd",
+    "net_type": "isp",
+    "source": "@otcjlq"
   }
 ]

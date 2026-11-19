@@ -1,27 +1,5 @@
 [
   {
-    "proxy": "101.108.49.121:443",
-    "ip": "101.108.49.121",
-    "port": 443,
-    "tls": true,
-    "clientIp": "101.108.49.121",
-    "clientIps": [
-      "101.108.49.121"
-    ],
-    "clientIpv4": "101.108.49.121",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "TH",
-    "country_name": "泰国",
-    "country_cn": "泰国",
-    "country_emoji": "🇹🇭",
-    "asn": "23974",
-    "asOrganization": "Ministry of education",
-    "isp": "Ministry of education",
-    "net_type": "government",
-    "source": "@cmliussss_all"
-  },
-  {
     "proxy": "61.91.54.186:443",
     "ip": "61.91.54.186",
     "port": 443,
@@ -64,6 +42,28 @@
     "isp": "CS LOXINFO Public Company Limited.",
     "net_type": "isp",
     "source": "@danfeng_chat"
+  },
+  {
+    "proxy": "101.108.49.121:443",
+    "ip": "101.108.49.121",
+    "port": 443,
+    "tls": true,
+    "clientIp": "101.108.49.121",
+    "clientIps": [
+      "101.108.49.121"
+    ],
+    "clientIpv4": "101.108.49.121",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "TH",
+    "country_name": "泰国",
+    "country_cn": "泰国",
+    "country_emoji": "🇹🇭",
+    "asn": "23974",
+    "asOrganization": "Ministry of education",
+    "isp": "Ministry of education",
+    "net_type": "government",
+    "source": "@cmliussss_all"
   },
   {
     "proxy": "38.54.118.71:9443",

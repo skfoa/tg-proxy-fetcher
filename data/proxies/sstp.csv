@@ -1,482 +1,485 @@
 ﻿url,proto,host,port,delay_ms,fail_count,status,colo,country,egress_ip,asn,isp,net_type,first_seen,source
-sstp://vpn:vpn@cetsssa.opengw.net:992,sstp,cetsssa.opengw.net,992,401,0,alive,-,MX,189.186.30.193,AS8151 UNINET,UNINET,isp,2026-10-04 17:03:41,vpngate
-sstp://vpn:vpn@vpn821731215.opengw.net:1483,sstp,vpn821731215.opengw.net,1483,567,0,alive,-,KR,119.197.200.143,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-04 14:35:03,vpngate
-sstp://vpn:vpn@vpn313985146.opengw.net:5555,sstp,vpn313985146.opengw.net,5555,672,0,alive,-,UA,31.43.129.131,AS48438 Corbina Telecom Llc.,Corbina Telecom Llc.,isp,2026-10-03 22:57:17,vpngate
-sstp://vpn:vpn@vpn584855640.opengw.net:1893,sstp,vpn584855640.opengw.net,1893,747,0,alive,-,US,174.85.114.42,AS22516 Charter Communications LLC,Charter Communications LLC,isp,2026-11-16 08:16:14,vpngate
-sstp://vpn:vpn@vpn202976802.opengw.net:5555,sstp,vpn202976802.opengw.net,5555,844,0,alive,-,RU,91.219.203.117,AS59533 KVARTAL,KVARTAL,isp,2026-11-14 14:39:09,vpngate
-sstp://vpn:vpn@vpn820407497.opengw.net:1258,sstp,vpn820407497.opengw.net,1258,894,0,alive,-,US,47.197.174.44,"AS5650 Frontier Communications of America, Inc.","Frontier Communications of America, Inc.",isp,2026-11-13 14:54:12,vpngate
-sstp://vpn:vpn@vpn500270442.opengw.net:1361,sstp,vpn500270442.opengw.net,1361,953,0,alive,-,JP,121.109.224.163,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-09 14:39:00,vpngate
-sstp://vpn:vpn@vpn246938806.opengw.net:1512,sstp,vpn246938806.opengw.net,1512,964,0,alive,-,JP,111.238.167.52,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-09 14:39:00,vpngate
-sstp://vpn:vpn@vpn980675302.opengw.net:1765,sstp,vpn980675302.opengw.net,1765,966,0,alive,-,JP,106.173.177.181,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-08 14:06:45,vpngate
-sstp://vpn:vpn@vpn945893058.opengw.net:1242,sstp,vpn945893058.opengw.net,1242,966,0,alive,-,JP,59.138.139.69,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-03 16:48:27,vpngate
-sstp://vpn:vpn@vpn443088592.opengw.net:1607,sstp,vpn443088592.opengw.net,1607,973,0,alive,-,JP,121.81.40.211,AS17511 OPTAGE Inc.,OPTAGE Inc.,isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn482501676.opengw.net:1282,sstp,vpn482501676.opengw.net,1282,987,0,alive,-,JP,126.171.39.147,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-13 14:54:12,vpngate
-sstp://vpn:vpn@vpn727298628.opengw.net:1941,sstp,vpn727298628.opengw.net,1941,987,0,alive,-,JP,60.73.70.60,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-15 14:38:37,vpngate
-sstp://vpn:vpn@vpn267143494.opengw.net:1512,sstp,vpn267143494.opengw.net,1512,988,0,alive,-,JP,123.48.6.30,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-11-07 14:03:05,vpngate
-sstp://vpn:vpn@vpn388072280.opengw.net:1336,sstp,vpn388072280.opengw.net,1336,988,0,alive,-,JP,111.96.156.52,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-13 14:54:12,vpngate
-sstp://vpn:vpn@vpn2070.opengw.net:5555,sstp,vpn2070.opengw.net,5555,990,0,alive,-,JP,60.57.56.254,AS17511 OPTAGE Inc.,OPTAGE Inc.,isp,2026-11-08 14:06:45,vpngate
-sstp://vpn:vpn@vpn880633907.opengw.net:1767,sstp,vpn880633907.opengw.net,1767,993,0,alive,-,JP,60.149.136.130,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-10 15:23:16,vpngate
-sstp://vpn:vpn@vpn681398325.opengw.net:1256,sstp,vpn681398325.opengw.net,1256,997,0,alive,-,JP,126.208.100.178,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-04 14:35:03,vpngate
-sstp://vpn:vpn@vpn975550277.opengw.net:1514,sstp,vpn975550277.opengw.net,1514,1002,0,alive,-,JP,180.198.167.80,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-11-08 14:06:45,vpngate
-sstp://vpn:vpn@vpn629557345.opengw.net:1486,sstp,vpn629557345.opengw.net,1486,1006,0,alive,-,JP,114.191.74.135,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn837693710.opengw.net:1460,sstp,vpn837693710.opengw.net,1460,1009,0,alive,-,JP,60.124.68.169,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn344602886.opengw.net:1566,sstp,vpn344602886.opengw.net,1566,1009,0,alive,-,JP,113.153.88.108,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-07 14:03:05,vpngate
-sstp://vpn:vpn@vpn692840237.opengw.net:1402,sstp,vpn692840237.opengw.net,1402,1015,0,alive,-,JP,126.208.66.140,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-14 14:39:09,vpngate
-sstp://vpn:vpn@vpn288376367.opengw.net:1616,sstp,vpn288376367.opengw.net,1616,1023,0,alive,-,KR,121.168.7.194,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn258365250.opengw.net:1332,sstp,vpn258365250.opengw.net,1332,1024,0,alive,-,KR,115.91.247.102,AS3786 LG DACOM Corporation,LG DACOM Corporation,isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn405907076.opengw.net:1387,sstp,vpn405907076.opengw.net,1387,1024,0,alive,-,KR,119.195.163.98,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn302973296.opengw.net:1333,sstp,vpn302973296.opengw.net,1333,1026,0,alive,-,KR,61.82.162.106,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-06 14:52:45,vpngate
-sstp://vpn:vpn@vpn514496438.opengw.net:995,sstp,vpn514496438.opengw.net,995,1028,0,alive,-,KR,1.236.29.27,AS9318 SK Broadband,SK Broadband,isp,2026-11-15 14:38:37,vpngate
-sstp://vpn:vpn@vpn679769325.opengw.net:1701,sstp,vpn679769325.opengw.net,1701,1028,0,alive,-,JP,183.77.92.122,"AS4685 ASAHI Net, Inc.","ASAHI Net, Inc.",isp,2026-11-16 08:16:14,vpngate
-sstp://vpn:vpn@vpn609211715.opengw.net:1679,sstp,vpn609211715.opengw.net,1679,1029,0,alive,-,KR,125.139.26.49,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn774482453.opengw.net:995,sstp,vpn774482453.opengw.net,995,1031,0,alive,-,KR,112.170.75.29,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-03 16:48:27,vpngate
-sstp://vpn:vpn@vpn516870736.opengw.net:1683,sstp,vpn516870736.opengw.net,1683,1035,0,alive,-,KR,219.241.10.189,AS9318 SK Broadband,SK Broadband,isp,2026-11-14 14:39:09,vpngate
-sstp://vpn:vpn@vpn305114740.opengw.net:995,sstp,vpn305114740.opengw.net,995,1049,0,alive,-,KR,121.187.145.165,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-13 14:49:54,vpngate
-sstp://vpn:vpn@vpn883939909.opengw.net:1677,sstp,vpn883939909.opengw.net,1677,1049,0,alive,-,KR,61.253.81.10,AS9318 SK Broadband,SK Broadband,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn711658835.opengw.net:995,sstp,vpn711658835.opengw.net,995,1057,0,alive,-,KR,175.199.198.101,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-15 12:44:41,vpngate
-sstp://vpn:vpn@vpn633946009.opengw.net:1353,sstp,vpn633946009.opengw.net,1353,1065,0,alive,-,KR,59.8.32.44,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-06 14:25:18,vpngate
-sstp://vpn:vpn@vpn718496341.opengw.net:1625,sstp,vpn718496341.opengw.net,1625,1065,0,alive,-,JP,110.135.224.143,"AS9824 JCOM Co., Ltd.","JCOM Co., Ltd.",isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn247081215.opengw.net:1752,sstp,vpn247081215.opengw.net,1752,1076,0,alive,-,RU,77.34.54.66,AS12389 Primorye NET,Primorye NET,isp,2026-11-12 15:18:03,vpngate
-sstp://vpn:vpn@snmarron.opengw.net:992,sstp,snmarron.opengw.net,992,1077,0,alive,-,FR,45.152.19.83,AS16347 ADISTA SAS,ADISTA SAS,isp,2026-10-13 14:49:54,vpngate
-sstp://vpn:vpn@vpn878602080.opengw.net:1707,sstp,vpn878602080.opengw.net,1707,1090,0,alive,-,RU,5.143.43.156,AS12389 Primorye NET,Primorye NET,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn705688819.opengw.net:995,sstp,vpn705688819.opengw.net,995,1215,0,alive,-,KR,141.223.28.225,AS3784 Pohang University of Science and Technology,Pohang University of Science and Technology,education,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn557835489.opengw.net:1717,sstp,vpn557835489.opengw.net,1717,1220,0,alive,-,KR,58.150.189.252,AS3786 LG DACOM Corporation,LG DACOM Corporation,isp,2026-10-16 12:36:06,vpngate
-sstp://vpn:vpn@vpn841003782.opengw.net:1798,sstp,vpn841003782.opengw.net,1798,1267,0,alive,-,MX,187.189.29.64,"AS17072 TOTAL PLAY TELECOMUNICACIONES, S.A.P.I. DE C.V.","TOTAL PLAY TELECOMUNICACIONES, S.A.P.I. DE C.V.",isp,2026-11-07 14:03:05,vpngate
-sstp://vpn:vpn@vpn853980609.opengw.net:1313,sstp,vpn853980609.opengw.net,1313,1287,0,alive,-,RU,212.164.8.132,AS12389 Primorye NET,Primorye NET,isp,2026-11-15 14:38:37,vpngate
-sstp://vpn:vpn@vpn625364486.opengw.net:1529,sstp,vpn625364486.opengw.net,1529,1287,0,alive,-,RU,178.185.24.224,AS12389 Primorye NET,Primorye NET,isp,2026-11-09 14:39:00,vpngate
-sstp://vpn:vpn@vpn968104007.opengw.net:1588,sstp,vpn968104007.opengw.net,1588,1296,0,alive,-,TH,49.48.204.214,AS138524 Triple T Broadband Public Company Limited,Triple T Broadband Public Company Limited,isp,2026-11-07 14:03:05,vpngate
-sstp://vpn:vpn@vpn353146232.opengw.net:1995,sstp,vpn353146232.opengw.net,1995,1302,0,alive,-,RU,212.164.214.213,AS12389 Primorye NET,Primorye NET,isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@wams.opengw.net:992,sstp,wams.opengw.net,992,1315,0,alive,-,AE,83.110.98.6,AS5384 Emirates Telecommunications Corporation,Emirates Telecommunications Corporation,isp,2026-11-14 14:39:09,vpngate
-sstp://vpn:vpn@vpn396939205.opengw.net:1797,sstp,vpn396939205.opengw.net,1797,1472,0,alive,-,CA,181.200.8.158,AS5769 Videotron Ltee,Videotron Ltee,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn212659618.opengw.net:1375,sstp,vpn212659618.opengw.net,1375,1524,0,alive,-,CA,50.67.176.122,AS6327 Shaw Communications,Shaw Communications,isp,2026-11-16 08:16:14,vpngate
-sstp://vpn:vpn@vpn603266989.opengw.net:1497,sstp,vpn603266989.opengw.net,1497,1542,0,alive,-,RU,185.112.224.250,AS50427 Orion Telecom LLC,Orion Telecom LLC,isp,2026-10-12 15:18:13,vpngate
-sstp://vpn:vpn@vpn823585109.opengw.net:1730,sstp,vpn823585109.opengw.net,1730,1654,0,alive,-,JP,122.211.190.167,AS17506 ARTERIA Networks Corporation,ARTERIA Networks Corporation,isp,2026-11-02 14:11:43,vpngate
-sstp://vpn:vpn@vpn491348575.opengw.net:1697,sstp,vpn491348575.opengw.net,1697,1683,0,alive,-,CA,184.68.30.115,AS6327 Shaw Communications,Shaw Communications,isp,2026-11-10 15:23:16,vpngate
-sstp://vpn:vpn@vpn650462492.opengw.net:1884,sstp,vpn650462492.opengw.net,1884,1911,0,alive,-,US,98.199.42.72,"AS7922 Comcast Cable Communications, LLC","Comcast Cable Communications, LLC",isp,2026-11-02 14:11:43,vpngate
-sstp://vpn:vpn@vpn225320874.opengw.net:1254,sstp,vpn225320874.opengw.net,1254,1984,0,alive,-,US,47.199.62.84,"AS5650 Frontier Communications of America, Inc.","Frontier Communications of America, Inc.",isp,2026-11-11 14:31:06,vpngate
-sstp://vpn:vpn@vpn201053993.opengw.net:1386,sstp,vpn201053993.opengw.net,1386,2020,0,alive,-,KR,121.161.33.240,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-04 14:35:03,vpngate
-sstp://vpn:vpn@vpn841038279.opengw.net:1287,sstp,vpn841038279.opengw.net,1287,2058,0,alive,-,JP,126.214.203.87,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-02 14:11:43,vpngate
-sstp://vpn:vpn@vpn927671187.opengw.net:1759,sstp,vpn927671187.opengw.net,1759,2097,0,alive,-,JP,153.208.144.244,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-02 14:11:43,vpngate
-sstp://vpn:vpn@vpn152857105.opengw.net:1924,sstp,vpn152857105.opengw.net,1924,2148,0,alive,-,JP,222.6.221.181,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn839240895.opengw.net:1806,sstp,vpn839240895.opengw.net,1806,2149,0,alive,-,JP,114.187.210.243,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-02 14:11:43,vpngate
-sstp://vpn:vpn@vpn782053489.opengw.net:1221,sstp,vpn782053489.opengw.net,1221,2267,0,alive,-,IN,183.82.144.243,"AS55577 Atria Convergence Technologies Ltd.,","Atria Convergence Technologies Ltd.,",isp,2026-11-13 14:54:12,vpngate
-sstp://vpn:vpn@vpn258563631.opengw.net:1423,sstp,vpn258563631.opengw.net,1423,2270,0,alive,-,JP,153.232.30.226,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn632205453.opengw.net:1771,sstp,vpn632205453.opengw.net,1771,2276,0,alive,-,JP,114.170.231.82,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-10-17 12:31:38,vpngate
-sstp://vpn:vpn@vpn102042272.opengw.net:1822,sstp,vpn102042272.opengw.net,1822,2292,0,alive,-,JP,14.132.71.245,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-11-12 15:18:03,vpngate
-sstp://vpn:vpn@vpn907463033.opengw.net:1327,sstp,vpn907463033.opengw.net,1327,2312,0,alive,-,JP,218.220.155.188,AS9617 SUTV,SUTV,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn794119202.opengw.net:1592,sstp,vpn794119202.opengw.net,1592,2326,0,alive,-,JP,150.31.30.238,AS2497 Internet Initiative Japan Inc.,Internet Initiative Japan Inc.,isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn644344996.opengw.net:1628,sstp,vpn644344996.opengw.net,1628,2368,0,alive,-,KR,222.111.8.2,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-21 15:52:42,vpngate
-sstp://vpn:vpn@vpn748539980.opengw.net:1717,sstp,vpn748539980.opengw.net,1717,2390,0,alive,-,JP,60.93.7.71,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-16 08:16:14,vpngate
-sstp://vpn:vpn@vpn777651061.opengw.net:1326,sstp,vpn777651061.opengw.net,1326,2412,0,alive,-,JP,118.159.28.138,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-03 14:55:56,vpngate
-sstp://vpn:vpn@vpn143703231.opengw.net:1372,sstp,vpn143703231.opengw.net,1372,2442,0,alive,-,JP,118.237.36.183,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-11-16 08:16:14,vpngate
-sstp://vpn:vpn@vpn526062445.opengw.net:1999,sstp,vpn526062445.opengw.net,1999,2453,0,alive,-,JP,60.143.120.123,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-11 14:31:06,vpngate
-sstp://vpn:vpn@vpn736504438.opengw.net:1834,sstp,vpn736504438.opengw.net,1834,2460,0,alive,-,JP,126.103.157.140,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-10-14 12:57:52,vpngate
-sstp://vpn:vpn@vpn358380061.opengw.net:1244,sstp,vpn358380061.opengw.net,1244,2463,0,alive,-,JP,118.154.9.31,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn971457718.opengw.net:1469,sstp,vpn971457718.opengw.net,1469,2473,0,alive,-,JP,124.219.150.206,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn926161461.opengw.net:1875,sstp,vpn926161461.opengw.net,1875,2473,0,alive,-,JP,126.26.167.160,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-15 14:38:37,vpngate
-sstp://vpn:vpn@vpn889393112.opengw.net:1900,sstp,vpn889393112.opengw.net,1900,2476,0,alive,-,JP,153.220.188.97,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-04 14:35:03,vpngate
-sstp://vpn:vpn@vpn129214879.opengw.net:1767,sstp,vpn129214879.opengw.net,1767,2478,0,alive,-,JP,59.138.218.10,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-12 15:18:03,vpngate
-sstp://vpn:vpn@vpn828952115.opengw.net:1725,sstp,vpn828952115.opengw.net,1725,2495,0,alive,-,KR,121.130.194.50,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-16 08:16:14,vpngate
-sstp://vpn:vpn@vpn267947139.opengw.net:1663,sstp,vpn267947139.opengw.net,1663,2496,0,alive,-,JP,124.98.173.228,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-10-13 14:49:54,vpngate
-sstp://vpn:vpn@vpn683539447.opengw.net:1549,sstp,vpn683539447.opengw.net,1549,2502,0,alive,-,JP,61.25.149.161,"AS9824 JCOM Co., Ltd.","JCOM Co., Ltd.",isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn584377130.opengw.net:1822,sstp,vpn584377130.opengw.net,1822,2505,0,alive,-,JP,14.14.148.93,"AS131933 TAMA Television Co., Ltd","TAMA Television Co., Ltd",isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn716187063.opengw.net:1632,sstp,vpn716187063.opengw.net,1632,2507,0,alive,-,JP,133.114.90.172,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn744032933.opengw.net:1360,sstp,vpn744032933.opengw.net,1360,2513,0,alive,-,JP,90.149.85.59,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-10-09 14:13:10,vpngate
-sstp://vpn:vpn@vpn108364887.opengw.net:1721,sstp,vpn108364887.opengw.net,1721,2517,0,alive,-,JP,126.117.128.210,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-08 14:06:45,vpngate
-sstp://vpn:vpn@vpn463711899.opengw.net:1551,sstp,vpn463711899.opengw.net,1551,2525,0,alive,-,JP,223.132.252.176,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-11-12 15:18:03,vpngate
-sstp://vpn:vpn@vpn933450169.opengw.net:1309,sstp,vpn933450169.opengw.net,1309,2526,0,alive,-,JP,106.153.7.87,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-18 12:38:28,vpngate
-sstp://vpn:vpn@vpn864577769.opengw.net:995,sstp,vpn864577769.opengw.net,995,2528,0,alive,-,KR,183.108.199.213,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-06 14:52:45,vpngate
-sstp://vpn:vpn@vpn610033625.opengw.net:995,sstp,vpn610033625.opengw.net,995,2537,0,alive,-,KR,183.102.149.48,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-03 22:57:17,vpngate
-sstp://vpn:vpn@vpn197759224.opengw.net:1664,sstp,vpn197759224.opengw.net,1664,2538,0,alive,-,JP,220.146.69.175,"AS4685 ASAHI Net, Inc.","ASAHI Net, Inc.",isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn433650989.opengw.net:1903,sstp,vpn433650989.opengw.net,1903,2539,0,alive,-,JP,114.19.166.236,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-08 14:06:45,vpngate
-sstp://vpn:vpn@vpn393913001.opengw.net:1288,sstp,vpn393913001.opengw.net,1288,2541,0,alive,-,JP,114.187.215.46,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-10-20 12:55:22,vpngate
-sstp://vpn:vpn@vpn795961097.opengw.net:1264,sstp,vpn795961097.opengw.net,1264,2542,0,alive,-,JP,133.202.41.75,AS2518 BIGLOBE Inc.,BIGLOBE Inc.,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn587057222.opengw.net:1817,sstp,vpn587057222.opengw.net,1817,2546,0,alive,-,JP,133.218.182.132,AS2497 Internet Initiative Japan Inc.,Internet Initiative Japan Inc.,isp,2026-10-18 12:38:28,vpngate
-sstp://vpn:vpn@vpn296418523.opengw.net:1714,sstp,vpn296418523.opengw.net,1714,2548,0,alive,-,KR,220.116.212.158,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-06 14:52:45,vpngate
-sstp://vpn:vpn@vpn318357590.opengw.net:1780,sstp,vpn318357590.opengw.net,1780,2556,0,alive,-,KR,125.128.18.93,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-03 16:48:27,vpngate
-sstp://vpn:vpn@vpn742486003.opengw.net:1427,sstp,vpn742486003.opengw.net,1427,2567,0,alive,-,KR,121.178.46.161,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-21 15:52:42,vpngate
-sstp://vpn:vpn@vpn254588575.opengw.net:1856,sstp,vpn254588575.opengw.net,1856,2568,0,alive,-,JP,159.28.242.14,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-10-21 15:52:42,vpngate
-sstp://vpn:vpn@vpn600793495.opengw.net:1506,sstp,vpn600793495.opengw.net,1506,2573,0,alive,-,JP,126.12.172.212,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-03 14:55:56,vpngate
-sstp://vpn:vpn@vpn544035541.opengw.net:1500,sstp,vpn544035541.opengw.net,1500,2586,0,alive,-,JP,220.153.201.3,"AS18081 Kintetsu Cable Network Co., Ltd.","Kintetsu Cable Network Co., Ltd.",isp,2026-10-04 23:17:15,vpngate
-sstp://vpn:vpn@vpn857468917.opengw.net:1535,sstp,vpn857468917.opengw.net,1535,2594,0,alive,-,JP,182.20.240.27,AS10010 TOKAI Communications Corporation,TOKAI Communications Corporation,isp,2026-11-15 14:38:37,vpngate
-sstp://vpn:vpn@vpn890613352.opengw.net:995,sstp,vpn890613352.opengw.net,995,2596,0,alive,-,KR,110.13.26.111,AS9318 SK Broadband,SK Broadband,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn532403382.opengw.net:1911,sstp,vpn532403382.opengw.net,1911,2604,0,alive,-,JP,223.133.218.118,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-11-12 15:18:03,vpngate
-sstp://vpn:vpn@vpn764143600.opengw.net:1488,sstp,vpn764143600.opengw.net,1488,2610,0,alive,-,JP,111.99.247.245,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-11 14:31:06,vpngate
-sstp://vpn:vpn@vpn883578965.opengw.net:1331,sstp,vpn883578965.opengw.net,1331,2612,0,alive,-,JP,126.169.67.75,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-04 14:35:03,vpngate
-sstp://vpn:vpn@vpn790592499.opengw.net:1866,sstp,vpn790592499.opengw.net,1866,2613,0,alive,-,JP,125.203.251.124,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-10-19 12:45:55,vpngate
-sstp://vpn:vpn@vpn960273320.opengw.net:1571,sstp,vpn960273320.opengw.net,1571,2617,0,alive,-,JP,125.196.144.134,AS2518 BIGLOBE Inc.,BIGLOBE Inc.,isp,2026-10-25T10:20:50Z,@user
-sstp://vpn:vpn@vpn389617472.opengw.net:1861,sstp,vpn389617472.opengw.net,1861,2621,0,alive,-,JP,126.24.178.180,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-08 14:06:45,vpngate
-sstp://vpn:vpn@vpn103557447.opengw.net:1950,sstp,vpn103557447.opengw.net,1950,2623,0,alive,-,MX,189.143.199.233,AS8151 UNINET,UNINET,isp,2026-11-04 14:35:03,vpngate
-sstp://vpn:vpn@vpn604676767.opengw.net:1463,sstp,vpn604676767.opengw.net,1463,2629,0,alive,-,JP,180.28.85.203,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-14 14:39:09,vpngate
-sstp://vpn:vpn@vpn630461743.opengw.net:1378,sstp,vpn630461743.opengw.net,1378,2630,0,alive,-,JP,223.133.135.144,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-11-05 14:53:11,vpngate
-sstp://vpn:vpn@vpn147580804.opengw.net:1234,sstp,vpn147580804.opengw.net,1234,2638,0,alive,-,JP,60.128.102.181,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-15 14:38:37,vpngate
-sstp://vpn:vpn@vpn827401311.opengw.net:1302,sstp,vpn827401311.opengw.net,1302,2638,0,alive,-,KR,114.207.150.81,AS9318 SK Broadband,SK Broadband,isp,2026-10-03 16:48:27,vpngate
-sstp://vpn:vpn@vpn137812529.opengw.net:1240,sstp,vpn137812529.opengw.net,1240,2640,0,alive,-,JP,218.228.192.151,AS17511 OPTAGE Inc.,OPTAGE Inc.,isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn521310356.opengw.net:995,sstp,vpn521310356.opengw.net,995,2640,0,alive,-,KR,211.174.64.187,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-07 14:03:05,vpngate
-sstp://vpn:vpn@vpn847902032.opengw.net:1914,sstp,vpn847902032.opengw.net,1914,2642,0,alive,-,JP,118.105.178.39,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-10-13 14:49:54,vpngate
-sstp://vpn:vpn@vpn946019409.opengw.net:1557,sstp,vpn946019409.opengw.net,1557,2647,0,alive,-,JP,126.130.164.3,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-10-15 12:44:41,vpngate
-sstp://vpn:vpn@vpn661982.opengw.net:7551,sstp,vpn661982.opengw.net,7551,2649,0,alive,-,JP,14.10.120.193,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-03 16:48:27,vpngate
-sstp://vpn:vpn@vpn184169581.opengw.net:1713,sstp,vpn184169581.opengw.net,1713,2650,0,alive,-,JP,61.46.101.187,AS9617 SUTV,SUTV,isp,2026-11-02 14:11:43,vpngate
-sstp://vpn:vpn@vpn104717671.opengw.net:1419,sstp,vpn104717671.opengw.net,1419,2653,0,alive,-,JP,36.13.6.150,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-17 12:31:38,vpngate
-sstp://vpn:vpn@vpn711674780.opengw.net:1603,sstp,vpn711674780.opengw.net,1603,2653,0,alive,-,JP,124.32.30.64,AS17506 ARTERIA Networks Corporation,ARTERIA Networks Corporation,isp,2026-11-14 14:39:09,vpngate
-sstp://vpn:vpn@vpn622613092.opengw.net:1496,sstp,vpn622613092.opengw.net,1496,2658,0,alive,-,JP,221.188.59.229,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-10 15:23:16,vpngate
-sstp://vpn:vpn@vpn232688011.opengw.net:1676,sstp,vpn232688011.opengw.net,1676,2658,0,alive,-,JP,222.226.230.206,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-15 14:38:37,vpngate
-sstp://vpn:vpn@vpn339013576.opengw.net:1397,sstp,vpn339013576.opengw.net,1397,2661,0,alive,-,JP,153.134.150.194,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-10-18 12:38:28,vpngate
-sstp://vpn:vpn@vpn561558391.opengw.net:1869,sstp,vpn561558391.opengw.net,1869,2661,0,alive,-,JP,175.135.210.151,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-05 14:53:11,vpngate
-sstp://vpn:vpn@vpn223114256.opengw.net:1210,sstp,vpn223114256.opengw.net,1210,2663,0,alive,-,JP,126.26.219.99,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-06 14:52:45,vpngate
-sstp://vpn:vpn@vpn673622597.opengw.net:1592,sstp,vpn673622597.opengw.net,1592,2666,0,alive,-,JP,60.121.223.189,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn282026883.opengw.net:1341,sstp,vpn282026883.opengw.net,1341,2675,0,alive,-,JP,124.18.72.151,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-11-02 14:11:43,vpngate
-sstp://vpn:vpn@vpn788502559.opengw.net:1908,sstp,vpn788502559.opengw.net,1908,2678,0,alive,-,JP,220.254.220.117,AS18268 Naganoken Kyodou Densan Co.Ltd.,Naganoken Kyodou Densan Co.Ltd.,isp,2026-10-07 14:04:24,vpngate
-sstp://vpn:vpn@vpn699884073.opengw.net:1556,sstp,vpn699884073.opengw.net,1556,2683,0,alive,-,JP,126.36.211.204,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-10-07 14:04:24,vpngate
-sstp://vpn:vpn@vpn579932260.opengw.net:1674,sstp,vpn579932260.opengw.net,1674,2684,0,alive,-,JP,114.164.96.126,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-07 14:03:05,vpngate
-sstp://vpn:vpn@vpn779820187.opengw.net:1227,sstp,vpn779820187.opengw.net,1227,2693,0,alive,-,JP,36.13.8.195,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-15 12:44:41,vpngate
-sstp://vpn:vpn@vpn975520107.opengw.net:1929,sstp,vpn975520107.opengw.net,1929,2696,0,alive,-,JP,112.71.228.133,AS17511 OPTAGE Inc.,OPTAGE Inc.,isp,2026-11-11 14:31:06,vpngate
-sstp://vpn:vpn@vpn657969707.opengw.net:1622,sstp,vpn657969707.opengw.net,1622,2698,0,alive,-,JP,150.31.134.129,AS2497 Internet Initiative Japan Inc.,Internet Initiative Japan Inc.,isp,2026-10-17 12:31:38,vpngate
-sstp://vpn:vpn@vpn857348997.opengw.net:1544,sstp,vpn857348997.opengw.net,1544,2720,0,alive,-,JP,59.135.18.252,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-07 14:03:05,vpngate
-sstp://vpn:vpn@vpn813516587.opengw.net:1534,sstp,vpn813516587.opengw.net,1534,2725,0,alive,-,JP,123.48.124.169,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-11-07 14:03:05,vpngate
-sstp://vpn:vpn@vpn451071809.opengw.net:1940,sstp,vpn451071809.opengw.net,1940,2730,0,alive,-,JP,115.36.117.14,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-10-08 14:09:40,vpngate
-sstp://vpn:vpn@vpn911251431.opengw.net:1661,sstp,vpn911251431.opengw.net,1661,2731,0,alive,-,JP,126.59.87.213,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-02 14:11:43,vpngate
-sstp://vpn:vpn@vpn179734162.opengw.net:1441,sstp,vpn179734162.opengw.net,1441,2740,0,alive,-,JP,124.18.175.178,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-11-10 15:23:16,vpngate
-sstp://vpn:vpn@vpn757848378.opengw.net:1362,sstp,vpn757848378.opengw.net,1362,2741,0,alive,-,JP,59.129.4.77,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-03 14:55:56,vpngate
-sstp://vpn:vpn@vpn836386663.opengw.net:1920,sstp,vpn836386663.opengw.net,1920,2742,0,alive,-,JP,153.208.131.192,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-13 14:54:12,vpngate
-sstp://vpn:vpn@vpn176028958.opengw.net:1756,sstp,vpn176028958.opengw.net,1756,2746,0,alive,-,JP,119.171.255.242,"AS9824 JCOM Co., Ltd.","JCOM Co., Ltd.",isp,2026-10-14 12:57:52,vpngate
-sstp://vpn:vpn@vpn523361413.opengw.net:1752,sstp,vpn523361413.opengw.net,1752,2750,0,alive,-,JP,111.99.247.245,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-11 14:31:06,vpngate
-sstp://vpn:vpn@vpn953960224.opengw.net:1223,sstp,vpn953960224.opengw.net,1223,2755,0,alive,-,JP,106.173.94.75,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-13 14:49:54,vpngate
-sstp://vpn:vpn@vpn754234555.opengw.net:1288,sstp,vpn754234555.opengw.net,1288,2756,0,alive,-,KR,58.120.113.176,AS9318 SK Broadband,SK Broadband,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn122916437.opengw.net:1558,sstp,vpn122916437.opengw.net,1558,2758,0,alive,-,JP,123.48.124.169,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-11-07 14:03:05,vpngate
-sstp://vpn:vpn@vpn223473667.opengw.net:1822,sstp,vpn223473667.opengw.net,1822,2761,0,alive,-,JP,60.140.80.223,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-10-08 14:09:40,vpngate
-sstp://vpn:vpn@vpn453085161.opengw.net:443,sstp,vpn453085161.opengw.net,443,2769,0,alive,-,JP,124.35.90.232,AS17506 ARTERIA Networks Corporation,ARTERIA Networks Corporation,isp,2026-11-14 14:39:09,vpngate
-sstp://vpn:vpn@vpn873142806.opengw.net:1601,sstp,vpn873142806.opengw.net,1601,2772,0,alive,-,JP,60.36.27.254,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-05 14:53:11,vpngate
-sstp://vpn:vpn@vpn810318235.opengw.net:1628,sstp,vpn810318235.opengw.net,1628,2777,0,alive,-,JP,124.209.182.165,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn678504843.opengw.net:1926,sstp,vpn678504843.opengw.net,1926,2778,0,alive,-,JP,219.104.84.18,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-11-12 15:18:03,vpngate
-sstp://vpn:vpn@vpn121310799.opengw.net:1519,sstp,vpn121310799.opengw.net,1519,2784,0,alive,-,JP,133.114.223.195,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-10-07 14:04:24,vpngate
-sstp://vpn:vpn@vpn750706241.opengw.net:1995,sstp,vpn750706241.opengw.net,1995,2788,0,alive,-,JP,118.104.101.56,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn825186256.opengw.net:1352,sstp,vpn825186256.opengw.net,1352,2799,0,alive,-,JP,14.101.10.239,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-08 14:09:40,vpngate
-sstp://vpn:vpn@vpn320780275.opengw.net:1754,sstp,vpn320780275.opengw.net,1754,2802,0,alive,-,JP,182.169.5.250,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn611290657.opengw.net:1555,sstp,vpn611290657.opengw.net,1555,2802,0,alive,-,JP,218.46.187.22,AS4725 SoftBank Corp.,SoftBank Corp.,isp,2026-11-09 14:39:00,vpngate
-sstp://vpn:vpn@vpn898866193.opengw.net:1446,sstp,vpn898866193.opengw.net,1446,2804,0,alive,-,KR,121.140.177.212,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-08 14:06:45,vpngate
-sstp://vpn:vpn@vpn916656683.opengw.net:1457,sstp,vpn916656683.opengw.net,1457,2804,0,alive,-,KR,222.120.166.120,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-09 14:39:00,vpngate
-sstp://vpn:vpn@vpn857724419.opengw.net:1833,sstp,vpn857724419.opengw.net,1833,2806,0,alive,-,JP,118.155.130.9,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn479781942.opengw.net:1539,sstp,vpn479781942.opengw.net,1539,2808,0,alive,-,JP,126.110.76.239,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn309937355.opengw.net:995,sstp,vpn309937355.opengw.net,995,2809,0,alive,-,KR,118.34.249.240,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-09 14:39:00,vpngate
-sstp://vpn:vpn@vpn582729051.opengw.net:1885,sstp,vpn582729051.opengw.net,1885,2813,0,alive,-,JP,210.203.247.119,"AS7679 QTnet, Inc.","QTnet, Inc.",isp,2026-10-19 12:45:55,vpngate
-sstp://vpn:vpn@vpn186876378.opengw.net:1645,sstp,vpn186876378.opengw.net,1645,2825,0,alive,-,KR,175.195.205.200,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-07 14:03:05,vpngate
-sstp://vpn:vpn@vpn617491321.opengw.net:1931,sstp,vpn617491321.opengw.net,1931,2827,0,alive,-,JP,220.220.169.115,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-14 14:39:09,vpngate
-sstp://vpn:vpn@vpn297018533.opengw.net:1534,sstp,vpn297018533.opengw.net,1534,2832,0,alive,-,JP,60.134.112.16,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-12 15:18:03,vpngate
-sstp://vpn:vpn@vpn565359082.opengw.net:1627,sstp,vpn565359082.opengw.net,1627,2834,0,alive,-,JP,126.216.249.148,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-10-13 14:49:54,vpngate
-sstp://vpn:vpn@vpn570604960.opengw.net:1868,sstp,vpn570604960.opengw.net,1868,2835,0,alive,-,JP,183.177.148.20,AS2519 ARTERIA Networks Corporation,ARTERIA Networks Corporation,isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn590702886.opengw.net:1250,sstp,vpn590702886.opengw.net,1250,2836,0,alive,-,JP,114.190.203.143,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-16 08:16:14,vpngate
-sstp://vpn:vpn@vpn265216273.opengw.net:1459,sstp,vpn265216273.opengw.net,1459,2847,0,alive,-,KR,118.37.33.91,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-19 12:45:55,vpngate
-sstp://vpn:vpn@vpn844197835.opengw.net:1411,sstp,vpn844197835.opengw.net,1411,2850,0,alive,-,JP,180.198.15.165,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn438625619.opengw.net:1843,sstp,vpn438625619.opengw.net,1843,2852,0,alive,-,JP,101.142.251.35,AS17511 OPTAGE Inc.,OPTAGE Inc.,isp,2026-11-08 14:06:45,vpngate
-sstp://vpn:vpn@vpn110060260.opengw.net:1571,sstp,vpn110060260.opengw.net,1571,2859,0,alive,-,JP,59.135.173.211,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-06 14:52:45,vpngate
-sstp://vpn:vpn@vpn326161661.opengw.net:995,sstp,vpn326161661.opengw.net,995,2862,0,alive,-,KR,128.134.220.216,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-14 14:39:09,vpngate
-sstp://vpn:vpn@vpn780884596.opengw.net:995,sstp,vpn780884596.opengw.net,995,2863,0,alive,-,KR,59.15.18.145,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-03 14:55:56,vpngate
-sstp://vpn:vpn@vpn271901051.opengw.net:995,sstp,vpn271901051.opengw.net,995,2867,0,alive,-,KR,112.172.66.114,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-14 14:39:09,vpngate
-sstp://vpn:vpn@vpn578034962.opengw.net:1702,sstp,vpn578034962.opengw.net,1702,2875,0,alive,-,JP,133.218.25.217,AS2497 Internet Initiative Japan Inc.,Internet Initiative Japan Inc.,isp,2026-11-13 14:54:12,vpngate
-sstp://vpn:vpn@vpn897910605.opengw.net:1290,sstp,vpn897910605.opengw.net,1290,2876,0,alive,-,JP,118.82.55.107,AS18278 Cable TV Corporation,Cable TV Corporation,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn176878445.opengw.net:1393,sstp,vpn176878445.opengw.net,1393,2876,0,alive,-,JP,60.71.4.56,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-15 14:38:37,vpngate
-sstp://vpn:vpn@vpn798802330.opengw.net:1933,sstp,vpn798802330.opengw.net,1933,2879,0,alive,-,KR,14.72.158.13,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn494800987.opengw.net:1390,sstp,vpn494800987.opengw.net,1390,2884,0,alive,-,JP,42.144.211.19,"AS9824 JCOM Co., Ltd.","JCOM Co., Ltd.",isp,2026-11-15 14:38:37,vpngate
-sstp://vpn:vpn@vpn671350283.opengw.net:1820,sstp,vpn671350283.opengw.net,1820,2886,0,alive,-,JP,153.208.144.244,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn291090802.opengw.net:1878,sstp,vpn291090802.opengw.net,1878,2886,0,alive,-,JP,124.18.62.103,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-10-06 14:25:18,vpngate
-sstp://vpn:vpn@vpn715953533.opengw.net:995,sstp,vpn715953533.opengw.net,995,2890,0,alive,-,KR,220.90.237.122,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-05 14:53:11,vpngate
-sstp://vpn:vpn@vpn825915245.opengw.net:1545,sstp,vpn825915245.opengw.net,1545,2891,0,alive,-,JP,60.35.135.188,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-09 14:39:00,vpngate
-sstp://vpn:vpn@vpn941986434.opengw.net:995,sstp,vpn941986434.opengw.net,995,2897,0,alive,-,KR,61.85.53.218,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-10 15:23:16,vpngate
-sstp://vpn:vpn@vpn499499703.opengw.net:995,sstp,vpn499499703.opengw.net,995,2900,0,alive,-,KR,220.81.202.11,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-09 14:13:10,vpngate
-sstp://vpn:vpn@vpn937509069.opengw.net:995,sstp,vpn937509069.opengw.net,995,2911,0,alive,-,KR,222.121.5.240,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-06 14:52:45,vpngate
-sstp://vpn:vpn@vpn693348819.opengw.net:1602,sstp,vpn693348819.opengw.net,1602,2917,0,alive,-,JP,115.38.22.45,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-11-16 08:16:14,vpngate
-sstp://vpn:vpn@vpn906340167.opengw.net:1701,sstp,vpn906340167.opengw.net,1701,2917,0,alive,-,KR,180.230.30.211,AS17858 LG POWERCOMM,LG POWERCOMM,isp,2026-10-03 22:57:17,vpngate
-sstp://vpn:vpn@vpn244093263.opengw.net:443,sstp,vpn244093263.opengw.net,443,2919,0,alive,-,KR,121.178.149.102,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-20 12:55:22,vpngate
-sstp://vpn:vpn@vpn802629635.opengw.net:1878,sstp,vpn802629635.opengw.net,1878,2922,0,alive,-,KR,112.223.241.142,AS3786 LG DACOM Corporation,LG DACOM Corporation,isp,2026-11-10 15:23:16,vpngate
-sstp://vpn:vpn@vpn641759273.opengw.net:1754,sstp,vpn641759273.opengw.net,1754,2923,0,alive,-,JP,113.154.3.100,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-08 14:06:45,vpngate
-sstp://vpn:vpn@vpn952825947.opengw.net:1419,sstp,vpn952825947.opengw.net,1419,2924,0,alive,-,KR,124.51.253.126,AS17858 LG POWERCOMM,LG POWERCOMM,isp,2026-11-08 14:06:45,vpngate
-sstp://vpn:vpn@vpn916638706.opengw.net:995,sstp,vpn916638706.opengw.net,995,2928,0,alive,-,KR,220.117.34.243,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-06 14:52:45,vpngate
-sstp://vpn:vpn@vpn549895847.opengw.net:995,sstp,vpn549895847.opengw.net,995,2930,0,alive,-,KR,218.146.184.184,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-13 14:54:12,vpngate
-sstp://vpn:vpn@vpn493435183.opengw.net:1808,sstp,vpn493435183.opengw.net,1808,2931,0,alive,-,KR,211.226.71.219,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-15 12:44:41,vpngate
-sstp://vpn:vpn@vpn661075949.opengw.net:1221,sstp,vpn661075949.opengw.net,1221,2933,0,alive,-,KR,221.143.128.247,AS9318 SK Broadband,SK Broadband,isp,2026-10-20 12:55:22,vpngate
-sstp://vpn:vpn@vpn122709402.opengw.net:995,sstp,vpn122709402.opengw.net,995,2935,0,alive,-,KR,211.226.34.183,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-12 15:18:13,vpngate
-sstp://vpn:vpn@vpn215697364.opengw.net:1663,sstp,vpn215697364.opengw.net,1663,2936,0,alive,-,KR,118.41.251.223,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-10 15:23:16,vpngate
-sstp://vpn:vpn@vpn260016517.opengw.net:1295,sstp,vpn260016517.opengw.net,1295,2938,0,alive,-,KR,121.186.186.97,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-14 14:39:09,vpngate
-sstp://vpn:vpn@vpn250920860.opengw.net:1895,sstp,vpn250920860.opengw.net,1895,2940,0,alive,-,JP,210.198.250.157,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-10 15:23:16,vpngate
-sstp://vpn:vpn@vpn154861873.opengw.net:995,sstp,vpn154861873.opengw.net,995,2943,0,alive,-,KR,183.107.123.109,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn641209777.opengw.net:1743,sstp,vpn641209777.opengw.net,1743,2943,0,alive,-,KR,121.146.152.111,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-14 14:39:09,vpngate
-sstp://vpn:vpn@vpn813440287.opengw.net:1604,sstp,vpn813440287.opengw.net,1604,2948,0,alive,-,KR,119.196.23.11,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-03 14:55:56,vpngate
-sstp://vpn:vpn@vpn893273760.opengw.net:1572,sstp,vpn893273760.opengw.net,1572,2954,0,alive,-,KR,14.47.236.43,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-04 14:35:03,vpngate
-sstp://vpn:vpn@vpn603234016.opengw.net:1768,sstp,vpn603234016.opengw.net,1768,2956,0,alive,-,JP,220.109.55.183,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-02 14:11:43,vpngate
-sstp://vpn:vpn@vpn953140495.opengw.net:995,sstp,vpn953140495.opengw.net,995,2959,0,alive,-,KR,175.195.189.138,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-04 14:35:03,vpngate
-sstp://vpn:vpn@vpn145309037.opengw.net:1921,sstp,vpn145309037.opengw.net,1921,2962,0,alive,-,KR,112.161.229.103,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-16 08:16:14,vpngate
-sstp://vpn:vpn@vpn419698713.opengw.net:995,sstp,vpn419698713.opengw.net,995,2963,0,alive,-,KR,59.19.145.249,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-04 23:17:15,vpngate
-sstp://vpn:vpn@vpn144440524.opengw.net:995,sstp,vpn144440524.opengw.net,995,2967,0,alive,-,KR,121.139.54.121,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-17 12:31:38,vpngate
-sstp://vpn:vpn@vpn765536599.opengw.net:1797,sstp,vpn765536599.opengw.net,1797,2968,0,alive,-,JP,133.209.68.63,AS2518 BIGLOBE Inc.,BIGLOBE Inc.,isp,2026-11-04 14:35:03,vpngate
-sstp://vpn:vpn@vpn631682929.opengw.net:1985,sstp,vpn631682929.opengw.net,1985,2969,0,alive,-,KR,175.199.129.108,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-03 14:55:56,vpngate
-sstp://vpn:vpn@vpn408435278.opengw.net:1418,sstp,vpn408435278.opengw.net,1418,2973,0,alive,-,KR,183.106.84.223,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-06 14:25:18,vpngate
-sstp://vpn:vpn@vpn602568162.opengw.net:1828,sstp,vpn602568162.opengw.net,1828,2974,0,alive,-,KR,49.165.136.156,AS17858 LG POWERCOMM,LG POWERCOMM,isp,2026-10-21 15:52:42,vpngate
-sstp://vpn:vpn@vpn162822314.opengw.net:1672,sstp,vpn162822314.opengw.net,1672,2977,0,alive,-,KR,211.245.102.129,AS9318 SK Broadband,SK Broadband,isp,2026-10-16 12:36:06,vpngate
-sstp://vpn:vpn@vpn755967672.opengw.net:1731,sstp,vpn755967672.opengw.net,1731,2977,0,alive,-,JP,203.133.220.104,"AS7524 ITEC HANKYU HANSHIN CO.,LTD.","ITEC HANKYU HANSHIN CO.,LTD.",isp,2026-10-03 16:48:27,vpngate
-sstp://vpn:vpn@vpn552924701.opengw.net:1323,sstp,vpn552924701.opengw.net,1323,2980,0,alive,-,KR,211.199.236.132,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn131652721.opengw.net:995,sstp,vpn131652721.opengw.net,995,2980,0,alive,-,KR,222.120.20.69,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-06 14:25:18,vpngate
-sstp://vpn:vpn@vpn137183472.opengw.net:1730,sstp,vpn137183472.opengw.net,1730,2981,0,alive,-,KR,121.130.89.23,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-12 15:18:03,vpngate
-sstp://vpn:vpn@vpn519275158.opengw.net:1448,sstp,vpn519275158.opengw.net,1448,2987,0,alive,-,KR,49.175.216.74,AS17858 LG POWERCOMM,LG POWERCOMM,isp,2026-10-21 15:52:42,vpngate
-sstp://vpn:vpn@vpn586484862.opengw.net:1212,sstp,vpn586484862.opengw.net,1212,2987,0,alive,-,KR,222.112.63.117,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-12 15:18:03,vpngate
-sstp://vpn:vpn@vpn210599978.opengw.net:995,sstp,vpn210599978.opengw.net,995,2989,0,alive,-,KR,220.89.214.125,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-04 17:03:41,vpngate
-sstp://vpn:vpn@vpn945367046.opengw.net:1857,sstp,vpn945367046.opengw.net,1857,2991,0,alive,-,JP,42.126.34.189,AS10010 TOKAI Communications Corporation,TOKAI Communications Corporation,isp,2026-10-20 12:55:22,vpngate
-sstp://vpn:vpn@vpn660300968.opengw.net:995,sstp,vpn660300968.opengw.net,995,2991,0,alive,-,KR,211.109.119.190,AS9318 SK Broadband,SK Broadband,isp,2026-11-14 14:39:09,vpngate
-sstp://vpn:vpn@vpn500645444.opengw.net:995,sstp,vpn500645444.opengw.net,995,2992,0,alive,-,KR,121.189.172.218,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-12 15:18:03,vpngate
-sstp://vpn:vpn@vpn354665789.opengw.net:1663,sstp,vpn354665789.opengw.net,1663,3001,0,alive,-,KR,125.139.168.226,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-09 14:39:00,vpngate
-sstp://vpn:vpn@vpn562631411.opengw.net:1791,sstp,vpn562631411.opengw.net,1791,3001,0,alive,-,KR,121.131.159.91,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-10 15:23:16,vpngate
-sstp://vpn:vpn@vpn758894710.opengw.net:1360,sstp,vpn758894710.opengw.net,1360,3002,0,alive,-,KR,221.152.104.67,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-16 08:16:14,vpngate
-sstp://vpn:vpn@vpn837518130.opengw.net:995,sstp,vpn837518130.opengw.net,995,3003,0,alive,-,KR,175.212.234.186,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn189346831.opengw.net:1737,sstp,vpn189346831.opengw.net,1737,3005,0,alive,-,KR,182.226.193.209,AS17858 LG POWERCOMM,LG POWERCOMM,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn805303633.opengw.net:1808,sstp,vpn805303633.opengw.net,1808,3005,0,alive,-,JP,92.202.89.138,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn314046814.opengw.net:1792,sstp,vpn314046814.opengw.net,1792,3005,0,alive,-,KR,221.151.149.159,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn725821956.opengw.net:995,sstp,vpn725821956.opengw.net,995,3008,0,alive,-,KR,210.126.37.242,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-15 14:38:37,vpngate
-sstp://vpn:vpn@vpn189811863.opengw.net:1781,sstp,vpn189811863.opengw.net,1781,3009,0,alive,-,KR,119.193.144.153,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-14 14:39:09,vpngate
-sstp://vpn:vpn@vpn964247477.opengw.net:1573,sstp,vpn964247477.opengw.net,1573,3011,0,alive,-,KR,121.134.136.164,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-03 14:55:56,vpngate
-sstp://vpn:vpn@vpn598832486.opengw.net:1918,sstp,vpn598832486.opengw.net,1918,3014,0,alive,-,KR,222.120.134.151,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-15 12:44:41,vpngate
-sstp://vpn:vpn@vpn384389733.opengw.net:995,sstp,vpn384389733.opengw.net,995,3015,0,alive,-,KR,211.38.219.118,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn245905369.opengw.net:1362,sstp,vpn245905369.opengw.net,1362,3021,0,alive,-,KR,180.211.26.133,AS45361 Ulsan Jung-Ang Broadcasting Network,Ulsan Jung-Ang Broadcasting Network,isp,2026-11-02 14:11:43,vpngate
-sstp://vpn:vpn@vpn966533712.opengw.net:1941,sstp,vpn966533712.opengw.net,1941,3027,0,alive,-,KR,59.6.114.202,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-03 22:57:17,vpngate
-sstp://vpn:vpn@vpn675037040.opengw.net:1205,sstp,vpn675037040.opengw.net,1205,3030,0,alive,-,JP,175.129.80.214,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-09 14:39:00,vpngate
-sstp://vpn:vpn@vpn855340230.opengw.net:1295,sstp,vpn855340230.opengw.net,1295,3032,0,alive,-,KR,210.178.97.55,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-11 14:31:06,vpngate
-sstp://vpn:vpn@vpn541474874.opengw.net:1929,sstp,vpn541474874.opengw.net,1929,3033,0,alive,-,KR,14.37.134.238,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-15 14:38:37,vpngate
-sstp://vpn:vpn@vpn195809939.opengw.net:1632,sstp,vpn195809939.opengw.net,1632,3037,0,alive,-,KR,221.165.229.38,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-03 14:55:56,vpngate
-sstp://vpn:vpn@vpn783575401.opengw.net:1414,sstp,vpn783575401.opengw.net,1414,3037,0,alive,-,KR,119.195.254.240,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-11 14:31:06,vpngate
-sstp://vpn:vpn@vpn933122006.opengw.net:995,sstp,vpn933122006.opengw.net,995,3037,0,alive,-,KR,121.159.68.26,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-18 12:38:28,vpngate
-sstp://vpn:vpn@vpn448129650.opengw.net:1625,sstp,vpn448129650.opengw.net,1625,3040,0,alive,-,KR,118.91.21.180,AS45374 CCS,CCS,isp,2026-11-02 14:11:43,vpngate
-sstp://vpn:vpn@vpn187374041.opengw.net:1665,sstp,vpn187374041.opengw.net,1665,3043,0,alive,-,KR,211.230.34.243,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-06 14:52:45,vpngate
-sstp://vpn:vpn@vpn886191021.opengw.net:1814,sstp,vpn886191021.opengw.net,1814,3046,0,alive,-,KR,211.104.71.136,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-11 14:31:06,vpngate
-sstp://vpn:vpn@vpn660186524.opengw.net:1915,sstp,vpn660186524.opengw.net,1915,3047,0,alive,-,KR,14.42.230.125,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-18 12:38:28,vpngate
-sstp://vpn:vpn@vpn812357243.opengw.net:1752,sstp,vpn812357243.opengw.net,1752,3048,0,alive,-,KR,222.99.195.19,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-07 14:03:05,vpngate
-sstp://vpn:vpn@vpn255201593.opengw.net:1338,sstp,vpn255201593.opengw.net,1338,3048,0,alive,-,KR,220.77.208.68,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-12 15:18:03,vpngate
-sstp://vpn:vpn@vpn964639149.opengw.net:1588,sstp,vpn964639149.opengw.net,1588,3050,0,alive,-,KR,210.222.46.145,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-04 14:35:03,vpngate
-sstp://vpn:vpn@vpn474602972.opengw.net:995,sstp,vpn474602972.opengw.net,995,3054,0,alive,-,KR,119.198.13.79,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-20 12:55:22,vpngate
-sstp://vpn:vpn@vpn833665549.opengw.net:1809,sstp,vpn833665549.opengw.net,1809,3061,0,alive,-,KR,183.105.2.201,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-13 14:54:12,vpngate
-sstp://vpn:vpn@vpn454958850.opengw.net:1799,sstp,vpn454958850.opengw.net,1799,3062,0,alive,-,JP,121.105.126.183,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-20 12:55:22,vpngate
-sstp://vpn:vpn@vpn811974197.opengw.net:1468,sstp,vpn811974197.opengw.net,1468,3064,0,alive,-,KR,210.113.225.149,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-16 08:16:14,vpngate
-sstp://vpn:vpn@vpn110532732.opengw.net:995,sstp,vpn110532732.opengw.net,995,3071,0,alive,-,KR,222.97.185.245,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-07 14:03:05,vpngate
-sstp://vpn:vpn@vpn983949836.opengw.net:1402,sstp,vpn983949836.opengw.net,1402,3075,0,alive,-,JP,113.154.84.113,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-04 17:03:41,vpngate
-sstp://vpn:vpn@vpn883356300.opengw.net:995,sstp,vpn883356300.opengw.net,995,3078,0,alive,-,KR,220.80.129.191,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-11 14:31:06,vpngate
-sstp://vpn:vpn@vpn819073110.opengw.net:1460,sstp,vpn819073110.opengw.net,1460,3078,0,alive,-,JP,175.129.177.154,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-15 14:38:37,vpngate
-sstp://vpn:vpn@vpn607155856.opengw.net:995,sstp,vpn607155856.opengw.net,995,3078,0,alive,-,KR,211.197.16.109,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-03 22:57:17,vpngate
-sstp://vpn:vpn@vpn635994349.opengw.net:1925,sstp,vpn635994349.opengw.net,1925,3079,0,alive,-,KR,125.129.121.114,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-21 15:52:42,vpngate
-sstp://vpn:vpn@vpn183424407.opengw.net:995,sstp,vpn183424407.opengw.net,995,3083,0,alive,-,KR,112.170.131.60,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-03 14:55:56,vpngate
-sstp://vpn:vpn@vpn436828976.opengw.net:995,sstp,vpn436828976.opengw.net,995,3091,0,alive,-,KR,14.33.160.103,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn591509589.opengw.net:1944,sstp,vpn591509589.opengw.net,1944,3094,0,alive,-,JP,113.154.67.10,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-06 14:52:45,vpngate
-sstp://vpn:vpn@vpn832583593.opengw.net:1749,sstp,vpn832583593.opengw.net,1749,3102,0,alive,-,JP,133.202.14.235,AS2518 BIGLOBE Inc.,BIGLOBE Inc.,isp,2026-10-18 12:38:28,vpngate
-sstp://vpn:vpn@vpn368704878.opengw.net:1511,sstp,vpn368704878.opengw.net,1511,3106,0,alive,-,KR,182.220.175.195,AS17858 LG POWERCOMM,LG POWERCOMM,isp,2026-10-17 12:31:38,vpngate
-sstp://vpn:vpn@vpn919430003.opengw.net:1384,sstp,vpn919430003.opengw.net,1384,3111,0,alive,-,KR,118.48.244.181,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-16 08:16:14,vpngate
-sstp://vpn:vpn@vpn211565425.opengw.net:995,sstp,vpn211565425.opengw.net,995,3117,0,alive,-,KR,14.51.240.168,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-10 15:23:16,vpngate
-sstp://vpn:vpn@vpn416596627.opengw.net:995,sstp,vpn416596627.opengw.net,995,3118,0,alive,-,KR,119.203.61.190,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn258326420.opengw.net:1662,sstp,vpn258326420.opengw.net,1662,3120,0,alive,-,KR,114.203.5.161,AS9318 SK Broadband,SK Broadband,isp,2026-11-16 08:16:14,vpngate
-sstp://vpn:vpn@vpn443102765.opengw.net:1700,sstp,vpn443102765.opengw.net,1700,3121,0,alive,-,KR,1.237.1.78,AS9318 SK Broadband,SK Broadband,isp,2026-11-12 15:18:03,vpngate
-sstp://vpn:vpn@vpn954065459.opengw.net:1954,sstp,vpn954065459.opengw.net,1954,3124,0,alive,-,KR,175.113.163.59,AS9318 SK Broadband,SK Broadband,isp,2026-11-08 14:06:45,vpngate
-sstp://vpn:vpn@vpn836042621.opengw.net:1294,sstp,vpn836042621.opengw.net,1294,3124,0,alive,-,JP,211.128.17.88,"AS17529 STARCAT Co., LTD.","STARCAT Co., LTD.",isp,2026-10-13 14:49:54,vpngate
-sstp://vpn:vpn@vpn480854733.opengw.net:1335,sstp,vpn480854733.opengw.net,1335,3126,0,alive,-,KR,39.115.216.44,AS9318 SK Broadband,SK Broadband,isp,2026-10-16 12:36:06,vpngate
-sstp://vpn:vpn@vpn196131915.opengw.net:995,sstp,vpn196131915.opengw.net,995,3127,0,alive,-,KR,125.188.5.153,AS17858 LG POWERCOMM,LG POWERCOMM,isp,2026-10-09 14:13:10,vpngate
-sstp://vpn:vpn@vpn824185996.opengw.net:1819,sstp,vpn824185996.opengw.net,1819,3130,0,alive,-,KR,118.34.210.174,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn835280998.opengw.net:995,sstp,vpn835280998.opengw.net,995,3135,0,alive,-,KR,123.199.109.248,AS10066 LG HelloVision Corp.,LG HelloVision Corp.,isp,2026-11-11 14:31:06,vpngate
-sstp://vpn:vpn@vpn222286321.opengw.net:1714,sstp,vpn222286321.opengw.net,1714,3135,0,alive,-,JP,113.154.137.98,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-04 14:35:03,vpngate
-sstp://vpn:vpn@vpn451666403.opengw.net:1928,sstp,vpn451666403.opengw.net,1928,3136,0,alive,-,KR,1.223.113.29,AS3786 LG DACOM Corporation,LG DACOM Corporation,isp,2026-10-15 12:44:41,vpngate
-sstp://vpn:vpn@vpn597695903.opengw.net:1347,sstp,vpn597695903.opengw.net,1347,3136,0,alive,-,KR,210.95.123.32,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-08 14:06:45,vpngate
-sstp://vpn:vpn@vpn311836490.opengw.net:1679,sstp,vpn311836490.opengw.net,1679,3140,0,alive,-,JP,210.167.90.232,AS7664 HARENET INC.,HARENET INC.,isp,2026-11-12 15:18:03,vpngate
-sstp://vpn:vpn@vpn398736484.opengw.net:1723,sstp,vpn398736484.opengw.net,1723,3143,0,alive,-,IT,45.89.183.66,AS28716 Retelit Digital Services S.p.A.,Retelit Digital Services S.p.A.,isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn402970398.opengw.net:1421,sstp,vpn402970398.opengw.net,1421,3153,0,alive,-,KR,211.179.204.251,AS9318 SK Broadband,SK Broadband,isp,2026-11-12 15:18:03,vpngate
-sstp://vpn:vpn@vpn801841079.opengw.net:1627,sstp,vpn801841079.opengw.net,1627,3155,0,alive,-,KR,221.162.216.59,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-13 14:54:12,vpngate
-sstp://vpn:vpn@vpn461782020.opengw.net:995,sstp,vpn461782020.opengw.net,995,3166,0,alive,-,KR,180.65.115.60,AS9318 SK Broadband,SK Broadband,isp,2026-11-04 14:35:03,vpngate
-sstp://vpn:vpn@vpn210064848.opengw.net:1784,sstp,vpn210064848.opengw.net,1784,3166,0,alive,-,KR,61.76.11.83,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-16 08:16:14,vpngate
-sstp://vpn:vpn@vpn239647879.opengw.net:1455,sstp,vpn239647879.opengw.net,1455,3168,0,alive,-,KR,106.244.202.130,AS3786 LG DACOM Corporation,LG DACOM Corporation,isp,2026-10-13 14:49:54,vpngate
-sstp://vpn:vpn@vpn198732322.opengw.net:1312,sstp,vpn198732322.opengw.net,1312,3169,0,alive,-,JP,153.132.115.193,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-16 08:16:14,vpngate
-sstp://vpn:vpn@vpn440254653.opengw.net:1665,sstp,vpn440254653.opengw.net,1665,3174,0,alive,-,JP,180.1.215.15,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-11 14:31:06,vpngate
-sstp://vpn:vpn@vpn917497474.opengw.net:1535,sstp,vpn917497474.opengw.net,1535,3185,0,alive,-,KR,120.29.134.202,AS10054 CMB Kwangju Broadcasting,CMB Kwangju Broadcasting,isp,2026-10-21 15:52:42,vpngate
-sstp://vpn:vpn@vpn897777296.opengw.net:995,sstp,vpn897777296.opengw.net,995,3199,0,alive,-,KR,116.33.58.13,AS17858 LG POWERCOMM,LG POWERCOMM,isp,2026-11-15 14:38:37,vpngate
-sstp://vpn:vpn@vpn226365648.opengw.net:1202,sstp,vpn226365648.opengw.net,1202,3203,0,alive,-,KR,175.214.151.148,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn521065574.opengw.net:995,sstp,vpn521065574.opengw.net,995,3207,0,alive,-,KR,112.167.64.3,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-13 14:54:12,vpngate
-sstp://vpn:vpn@vpn727893093.opengw.net:1292,sstp,vpn727893093.opengw.net,1292,3216,0,alive,-,KR,121.149.141.149,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-14 14:39:09,vpngate
-sstp://vpn:vpn@vpn217330954.opengw.net:1871,sstp,vpn217330954.opengw.net,1871,3226,0,alive,-,KR,27.117.225.40,AS9756 SK Broadband Co Ltd,SK Broadband Co Ltd,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn421902389.opengw.net:1602,sstp,vpn421902389.opengw.net,1602,3233,0,alive,-,KR,122.128.200.134,AS9757 CMB DONDAEMOON BROADCASTING,CMB DONDAEMOON BROADCASTING,isp,2026-10-16 12:36:06,vpngate
-sstp://vpn:vpn@vpn875209728.opengw.net:995,sstp,vpn875209728.opengw.net,995,3234,0,alive,-,KR,125.133.177.25,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-03 16:48:27,vpngate
-sstp://vpn:vpn@vpn414557377.opengw.net:1578,sstp,vpn414557377.opengw.net,1578,3236,0,alive,-,JP,157.65.79.59,"AS2514 NTT PC Communications, Inc.","NTT PC Communications, Inc.",isp,2026-11-09 14:39:00,vpngate
-sstp://vpn:vpn@vpn919107394.opengw.net:1984,sstp,vpn919107394.opengw.net,1984,3241,0,alive,-,KR,118.47.203.12,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn676945411.opengw.net:1236,sstp,vpn676945411.opengw.net,1236,3244,0,alive,-,KR,182.226.193.209,AS17858 LG POWERCOMM,LG POWERCOMM,isp,2026-11-09 14:39:00,vpngate
-sstp://vpn:vpn@vpn841245340.opengw.net:995,sstp,vpn841245340.opengw.net,995,3246,0,alive,-,KR,39.122.7.119,AS9318 SK Broadband,SK Broadband,isp,2026-10-14 12:57:52,vpngate
-sstp://vpn:vpn@vpn439439614.opengw.net:1882,sstp,vpn439439614.opengw.net,1882,3246,0,alive,-,TH,27.130.39.192,AS133481 AIS-Fibre,AIS-Fibre,isp,2026-11-09 14:39:00,vpngate
-sstp://vpn:vpn@vpn281352524.opengw.net:1821,sstp,vpn281352524.opengw.net,1821,3270,0,alive,-,KR,211.198.239.92,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-05 14:53:11,vpngate
-sstp://vpn:vpn@vpn759761201.opengw.net:1521,sstp,vpn759761201.opengw.net,1521,3285,0,alive,-,AU,125.253.56.120,AS38195 SUPERLOOP (AUSTRALIA) PTY LTD,SUPERLOOP (AUSTRALIA) PTY LTD,isp,2026-11-14 14:39:09,vpngate
-sstp://vpn:vpn@vpn564106646.opengw.net:1980,sstp,vpn564106646.opengw.net,1980,3295,0,alive,-,KR,123.143.79.29,AS3786 LG DACOM Corporation,LG DACOM Corporation,isp,2026-11-03 14:55:56,vpngate
-sstp://vpn:vpn@vpn456065584.opengw.net:1511,sstp,vpn456065584.opengw.net,1511,3304,0,alive,-,JP,114.180.104.207,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-10-14 12:57:52,vpngate
-sstp://vpn:vpn@vpn833698783.opengw.net:1306,sstp,vpn833698783.opengw.net,1306,3317,0,alive,-,KR,14.47.79.84,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-13 14:54:12,vpngate
-sstp://vpn:vpn@vpn957218909.opengw.net:1814,sstp,vpn957218909.opengw.net,1814,3327,0,alive,-,KR,123.248.163.147,AS9845 LG HelloVision Corp.,LG HelloVision Corp.,isp,2026-11-11 14:31:06,vpngate
-sstp://vpn:vpn@vpn579502788.opengw.net:1954,sstp,vpn579502788.opengw.net,1954,3328,0,alive,-,KR,211.216.167.19,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-14 14:39:09,vpngate
-sstp://vpn:vpn@vpn789825960.opengw.net:995,sstp,vpn789825960.opengw.net,995,3336,0,alive,-,KR,220.77.247.211,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-10 15:23:16,vpngate
-sstp://vpn:vpn@vpn269593454.opengw.net:1211,sstp,vpn269593454.opengw.net,1211,3344,0,alive,-,KR,1.214.177.206,AS3786 LG DACOM Corporation,LG DACOM Corporation,isp,2026-10-14 12:57:52,vpngate
-sstp://vpn:vpn@vpn417968628.opengw.net:1286,sstp,vpn417968628.opengw.net,1286,3357,0,alive,-,KR,121.142.104.60,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-14 12:57:52,vpngate
-sstp://vpn:vpn@vpn700189518.opengw.net:1843,sstp,vpn700189518.opengw.net,1843,3364,0,alive,-,JP,175.129.193.120,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-14 14:39:09,vpngate
-sstp://vpn:vpn@vpn290770797.opengw.net:1792,sstp,vpn290770797.opengw.net,1792,3371,0,alive,-,JP,218.46.185.46,AS4725 SoftBank Corp.,SoftBank Corp.,isp,2026-10-19 12:45:55,vpngate
-sstp://vpn:vpn@vpn933256250.opengw.net:1448,sstp,vpn933256250.opengw.net,1448,3382,0,alive,-,JP,111.97.197.128,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-14 12:57:52,vpngate
-sstp://vpn:vpn@vpn258242456.opengw.net:1659,sstp,vpn258242456.opengw.net,1659,3385,0,alive,-,JP,113.154.38.15,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn157099394.opengw.net:1949,sstp,vpn157099394.opengw.net,1949,3396,0,alive,-,KR,203.229.91.15,AS38095 SK Broadband Co Ltd,SK Broadband Co Ltd,isp,2026-11-11 14:31:06,vpngate
-sstp://vpn:vpn@vpn103948172.opengw.net:1785,sstp,vpn103948172.opengw.net,1785,3426,0,alive,-,AU,120.147.155.231,AS1221 Telstra Limited,Telstra Limited,isp,2026-10-03 16:48:27,vpngate
-sstp://vpn:vpn@vpn583764032.opengw.net:1464,sstp,vpn583764032.opengw.net,1464,3443,0,alive,-,JP,115.36.204.213,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn315315201.opengw.net:1215,sstp,vpn315315201.opengw.net,1215,3443,0,alive,-,KR,14.47.68.46,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-15 12:44:41,vpngate
-sstp://vpn:vpn@vpn986755484.opengw.net:1852,sstp,vpn986755484.opengw.net,1852,3465,0,alive,-,HK,58.152.29.26,AS4760 HKT,HKT,isp,2026-11-13 14:54:12,vpngate
-sstp://vpn:vpn@vpn799731089.opengw.net:995,sstp,vpn799731089.opengw.net,995,3480,0,alive,-,KR,121.152.63.103,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-08 14:09:40,vpngate
-sstp://vpn:vpn@vpn698373679.opengw.net:1911,sstp,vpn698373679.opengw.net,1911,3500,0,alive,-,KR,123.109.244.227,AS38097 SK Broadband Co Ltd,SK Broadband Co Ltd,isp,2026-10-20 12:55:22,vpngate
-sstp://vpn:vpn@vpn178239969.opengw.net:1634,sstp,vpn178239969.opengw.net,1634,3512,0,alive,-,VN,118.68.222.174,AS18403 FPT Telecom Company,FPT Telecom Company,isp,2026-11-12 15:18:03,vpngate
-sstp://vpn:vpn@intranet-bpkskaboki.opengw.net:443,sstp,intranet-bpkskaboki.opengw.net,443,3525,0,alive,-,ID,182.9.227.79,AS23693 PT. Telekomunikasi Selular,PT. Telekomunikasi Selular,isp,2026-11-06 14:52:45,vpngate
-sstp://vpn:vpn@vpn539804093.opengw.net:1974,sstp,vpn539804093.opengw.net,1974,3536,0,alive,-,LT,77.79.18.229,"AS25406 SPLIUS, UAB","SPLIUS, UAB",isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn817586559.opengw.net:1580,sstp,vpn817586559.opengw.net,1580,3593,0,alive,-,JP,153.200.131.48,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-06 14:52:45,vpngate
-sstp://vpn:vpn@vpn932007079.opengw.net:1293,sstp,vpn932007079.opengw.net,1293,3625,0,alive,-,JP,121.85.13.80,AS17511 OPTAGE Inc.,OPTAGE Inc.,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn922312929.opengw.net:1997,sstp,vpn922312929.opengw.net,1997,3639,0,alive,-,VN,42.119.246.3,AS18403 FPT Telecom Company,FPT Telecom Company,isp,2026-11-05 14:53:11,vpngate
-sstp://vpn:vpn@vpn480.opengw.net:5555,sstp,vpn480.opengw.net,5555,3653,0,alive,-,JP,110.163.140.56,"AS9605 NTT DOCOMO, INC.","NTT DOCOMO, INC.",isp,2026-10-13 14:49:54,vpngate
-sstp://vpn:vpn@vpn743566583.opengw.net:1775,sstp,vpn743566583.opengw.net,1775,3822,0,alive,-,VN,42.119.246.3,AS18403 FPT Telecom Company,FPT Telecom Company,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn141040696.opengw.net:1408,sstp,vpn141040696.opengw.net,1408,3855,0,alive,-,JP,183.177.159.21,AS2519 ARTERIA Networks Corporation,ARTERIA Networks Corporation,isp,2026-11-14 14:39:09,vpngate
-sstp://vpn:vpn@vpn771871278.opengw.net:1980,sstp,vpn771871278.opengw.net,1980,3856,0,alive,-,JP,113.148.121.15,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn279190265.opengw.net:1901,sstp,vpn279190265.opengw.net,1901,3864,0,alive,-,VN,118.68.222.174,AS18403 FPT Telecom Company,FPT Telecom Company,isp,2026-11-12 15:18:03,vpngate
-sstp://vpn:vpn@vpn301985052.opengw.net:1898,sstp,vpn301985052.opengw.net,1898,3910,0,alive,-,RU,5.189.68.165,AS12668 LLC KomTehCentr,LLC KomTehCentr,isp,2026-11-04 14:35:03,vpngate
-sstp://vpn:vpn@vpn864131273.opengw.net:995,sstp,vpn864131273.opengw.net,995,3971,0,alive,-,VN,42.114.29.158,AS18403 FPT Telecom Company,FPT Telecom Company,isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn535457630.opengw.net:1757,sstp,vpn535457630.opengw.net,1757,3998,0,alive,-,KR,49.174.213.183,AS17858 LG POWERCOMM,LG POWERCOMM,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn516642203.opengw.net:1548,sstp,vpn516642203.opengw.net,1548,4027,0,alive,-,VN,118.68.222.174,AS18403 FPT Telecom Company,FPT Telecom Company,isp,2026-11-12 15:18:03,vpngate
-sstp://vpn:vpn@vpn842914014.opengw.net:1329,sstp,vpn842914014.opengw.net,1329,4141,0,alive,-,VN,118.68.222.174,AS18403 FPT Telecom Company,FPT Telecom Company,isp,2026-11-12 15:18:03,vpngate
-sstp://vpn:vpn@vpn764427404.opengw.net:1716,sstp,vpn764427404.opengw.net,1716,4185,0,alive,-,VN,14.226.235.31,AS45899 VNPT Corp,VNPT Corp,isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn266997445.opengw.net:1544,sstp,vpn266997445.opengw.net,1544,4228,0,alive,-,RU,217.144.174.117,"AS12737 KrasPromStroy, LLC","KrasPromStroy, LLC",isp,2026-11-04 14:35:03,vpngate
-sstp://vpn:vpn@vpn659080135.opengw.net:1521,sstp,vpn659080135.opengw.net,1521,4340,0,alive,-,VN,42.113.239.68,AS18403 FPT Telecom Company,FPT Telecom Company,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn590567407.opengw.net:1853,sstp,vpn590567407.opengw.net,1853,4410,0,alive,-,RU,5.129.183.2,AS60119 Ediniy Operator Svyazi LLC,Ediniy Operator Svyazi LLC,isp,2026-11-05 14:53:11,vpngate
-sstp://vpn:vpn@vpn948645988.opengw.net:1350,sstp,vpn948645988.opengw.net,1350,4844,0,alive,-,TH,49.48.100.54,AS45758 TRIPLETNET,TRIPLETNET,isp,2026-11-16 08:16:14,vpngate
-sstp://vpn:vpn@vpn684766837.opengw.net:1857,sstp,vpn684766837.opengw.net,1857,4845,0,alive,-,RU,45.140.95.8,AS8749 JSC Redcom-Internet,JSC Redcom-Internet,isp,2026-10-04 17:03:41,vpngate
-sstp://vpn:vpn@vpn765941161.opengw.net:1271,sstp,vpn765941161.opengw.net,1271,4878,0,alive,-,AE,2.50.202.231,AS5384 Emirates Telecommunications Corporation,Emirates Telecommunications Corporation,isp,2026-11-06 14:52:45,vpngate
-sstp://vpn:vpn@vpn884521498.opengw.net:995,sstp,vpn884521498.opengw.net,995,4960,0,alive,-,KR,58.29.140.252,AS9316 DACOM-PUBNETPLUS,DACOM-PUBNETPLUS,isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn859630625.opengw.net:995,sstp,vpn859630625.opengw.net,995,5033,0,alive,-,KR,110.13.194.155,AS9318 SK Broadband,SK Broadband,isp,2026-11-04 14:35:03,vpngate
-sstp://vpn:vpn@vpn398848953.opengw.net:1482,sstp,vpn398848953.opengw.net,1482,5236,0,alive,-,RU,95.154.89.139,AS44724 Octopusnet LTD,Octopusnet LTD,isp,2026-11-15 14:38:37,vpngate
-sstp://vpn:vpn@vpn689600419.opengw.net:1456,sstp,vpn689600419.opengw.net,1456,5316,0,alive,-,RU,77.82.21.218,AS12389 Primorye NET,Primorye NET,isp,2026-11-11 14:31:06,vpngate
-sstp://vpn:vpn@vpn435819101.opengw.net:1845,sstp,vpn435819101.opengw.net,1845,5316,0,alive,-,US,47.141.29.68,"AS5650 Frontier Communications of America, Inc.","Frontier Communications of America, Inc.",isp,2026-11-16 08:16:14,vpngate
-sstp://vpn:vpn@vpn177976718.opengw.net:1280,sstp,vpn177976718.opengw.net,1280,5826,0,alive,-,RU,86.102.21.211,AS12389 Primorye NET,Primorye NET,isp,2026-11-14 14:39:09,vpngate
-sstp://vpn:vpn@vpn316272186.opengw.net:1600,sstp,vpn316272186.opengw.net,1600,6751,0,alive,-,KR,175.208.245.143,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-11 14:31:06,vpngate
-sstp://vpn:vpn@vpn650277207.opengw.net:1571,sstp,vpn650277207.opengw.net,1571,8110,0,alive,-,TH,171.5.32.100,AS45758 TRIPLETNET,TRIPLETNET,isp,2026-11-15 14:38:37,vpngate
-sstp://vpn:vpn@vpn392446430.opengw.net:1948,sstp,vpn392446430.opengw.net,1948,8456,0,alive,-,JP,118.154.64.54,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-11 14:31:06,vpngate
-sstp://vpn:vpn@vpn393724795.opengw.net:1643,sstp,vpn393724795.opengw.net,1643,8470,0,alive,-,IN,183.82.144.243,"AS55577 Atria Convergence Technologies Ltd.,","Atria Convergence Technologies Ltd.,",isp,2026-11-13 14:54:12,vpngate
-sstp://vpn:vpn@vpn127203103.opengw.net:1621,sstp,vpn127203103.opengw.net,1621,9679,0,alive,-,JP,121.86.102.139,AS17511 OPTAGE Inc.,OPTAGE Inc.,isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn517690502.opengw.net:1461,sstp,vpn517690502.opengw.net,1461,937,1,timeout,-,JP,118.156.174.68,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-03 16:48:27,vpngate
-sstp://vpn:vpn@vpn624984613.opengw.net:995,sstp,vpn624984613.opengw.net,995,998,1,timeout,-,KR,112.187.218.114,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-20 12:55:22,vpngate
-sstp://vpn:vpn@vpn536329081.opengw.net:1965,sstp,vpn536329081.opengw.net,1965,1019,1,timeout,-,RU,77.35.6.152,AS12389 Primorye NET,Primorye NET,isp,2026-11-05 14:53:11,vpngate
-sstp://vpn:vpn@vpn713264157.opengw.net:992,sstp,vpn713264157.opengw.net,992,1027,1,timeout,-,TW,140.111.148.17,AS1659 TANet,TANet,government,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn833326008.opengw.net:1414,sstp,vpn833326008.opengw.net,1414,1235,1,timeout,-,US,47.185.19.135,"AS5650 Frontier Communications of America, Inc.","Frontier Communications of America, Inc.",isp,2026-11-16 08:16:14,vpngate
-sstp://vpn:vpn@vpn239817646.opengw.net:1234,sstp,vpn239817646.opengw.net,1234,1318,1,timeout,-,US,192.184.165.20,AS46375 Sonic Telecom LLC,Sonic Telecom LLC,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn945009595.opengw.net:1921,sstp,vpn945009595.opengw.net,1921,2010,1,timeout,-,JP,218.221.203.127,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-11-08 14:06:45,vpngate
-sstp://vpn:vpn@vpn291007099.opengw.net:1522,sstp,vpn291007099.opengw.net,1522,2232,1,timeout,-,JP,60.138.254.38,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn718820171.opengw.net:1399,sstp,vpn718820171.opengw.net,1399,2263,1,timeout,-,JP,210.239.247.25,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-21 15:52:42,vpngate
-sstp://vpn:vpn@vpn988447200.opengw.net:995,sstp,vpn988447200.opengw.net,995,2295,1,timeout,-,KR,14.52.147.14,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-10 15:23:16,vpngate
-sstp://vpn:vpn@vpn306037816.opengw.net:1724,sstp,vpn306037816.opengw.net,1724,2416,1,timeout,-,JP,59.142.40.235,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-16 08:16:14,vpngate
-sstp://vpn:vpn@vpn575184406.opengw.net:1629,sstp,vpn575184406.opengw.net,1629,2696,1,timeout,-,JP,110.233.254.85,AS2518 BIGLOBE Inc.,BIGLOBE Inc.,isp,2026-10-09 14:13:10,vpngate
-sstp://vpn:vpn@vpn290313208.opengw.net:1997,sstp,vpn290313208.opengw.net,1997,2737,1,timeout,-,CA,142.198.116.23,AS577 Bell Canada,Bell Canada,isp,2026-11-02 14:11:43,vpngate
-sstp://vpn:vpn@vpn846477375.opengw.net:1657,sstp,vpn846477375.opengw.net,1657,2958,1,timeout,-,KR,61.41.230.185,AS17598 LG HelloVision Corp.,LG HelloVision Corp.,isp,2026-11-16 08:16:14,vpngate
-sstp://vpn:vpn@vpn385564263.opengw.net:995,sstp,vpn385564263.opengw.net,995,2972,1,timeout,-,KR,222.99.185.125,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-09 14:13:10,vpngate
-sstp://vpn:vpn@vpn102800483.opengw.net:1475,sstp,vpn102800483.opengw.net,1475,3031,1,timeout,-,JP,124.219.214.107,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-11-11 14:31:06,vpngate
-sstp://vpn:vpn@vpn181541485.opengw.net:1953,sstp,vpn181541485.opengw.net,1953,3049,1,timeout,-,JP,113.150.169.61,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn741602089.opengw.net:1210,sstp,vpn741602089.opengw.net,1210,3055,1,timeout,-,KR,221.138.46.130,AS9318 SK Broadband,SK Broadband,isp,2026-10-12 15:18:13,vpngate
-sstp://vpn:vpn@vpn627911050.opengw.net:1475,sstp,vpn627911050.opengw.net,1475,3058,1,timeout,-,JP,60.36.27.254,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-05 14:53:11,vpngate
-sstp://vpn:vpn@vpn121994191.opengw.net:1936,sstp,vpn121994191.opengw.net,1936,3072,1,timeout,-,JP,153.174.121.51,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-02 14:11:43,vpngate
-sstp://vpn:vpn@vpn461533097.opengw.net:1898,sstp,vpn461533097.opengw.net,1898,3149,1,timeout,-,JP,180.147.69.134,AS17511 OPTAGE Inc.,OPTAGE Inc.,isp,2026-11-12 15:18:03,vpngate
-sstp://vpn:vpn@vpn393802235.opengw.net:1908,sstp,vpn393802235.opengw.net,1908,3173,1,timeout,-,JP,14.132.45.94,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-11-04 14:35:03,vpngate
-sstp://vpn:vpn@vpn989367060.opengw.net:1531,sstp,vpn989367060.opengw.net,1531,3177,1,timeout,-,JP,106.177.117.146,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-10 15:23:16,vpngate
-sstp://vpn:vpn@vpn459624604.opengw.net:995,sstp,vpn459624604.opengw.net,995,3184,1,timeout,-,KR,211.38.57.123,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-12 21:49:55,vpngate
-sstp://vpn:vpn@vpn727003635.opengw.net:1528,sstp,vpn727003635.opengw.net,1528,3190,1,timeout,-,JP,126.208.99.9,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-11 14:31:06,vpngate
-sstp://vpn:vpn@vpn556509387.opengw.net:1412,sstp,vpn556509387.opengw.net,1412,3210,1,timeout,-,JP,216.153.126.191,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-10-12 21:49:55,vpngate
-sstp://vpn:vpn@vpn237755744.opengw.net:995,sstp,vpn237755744.opengw.net,995,3252,1,timeout,-,KR,121.136.194.77,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-03 14:55:56,vpngate
-sstp://vpn:vpn@vpn128832892.opengw.net:1416,sstp,vpn128832892.opengw.net,1416,3315,1,timeout,-,JP,125.14.139.245,"AS9824 JCOM Co., Ltd.","JCOM Co., Ltd.",isp,2026-10-16 12:36:06,vpngate
-sstp://vpn:vpn@vpn905373738.opengw.net:995,sstp,vpn905373738.opengw.net,995,3327,1,timeout,-,KR,14.53.209.4,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-16 08:16:14,vpngate
-sstp://vpn:vpn@vpn348580824.opengw.net:995,sstp,vpn348580824.opengw.net,995,3338,1,timeout,-,KR,112.168.206.160,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-03 16:48:27,vpngate
-sstp://vpn:vpn@vpn898436612.opengw.net:1507,sstp,vpn898436612.opengw.net,1507,3345,1,timeout,-,JP,126.60.198.88,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-14 14:39:09,vpngate
-sstp://vpn:vpn@vpn501671840.opengw.net:1285,sstp,vpn501671840.opengw.net,1285,3354,1,timeout,-,JP,119.83.242.105,AS10010 TOKAI Communications Corporation,TOKAI Communications Corporation,isp,2026-11-09 14:39:00,vpngate
-sstp://vpn:vpn@vpn495179031.opengw.net:1426,sstp,vpn495179031.opengw.net,1426,3389,1,timeout,-,JP,119.244.114.221,AS2518 BIGLOBE Inc.,BIGLOBE Inc.,isp,2026-10-15 12:44:41,vpngate
-sstp://vpn:vpn@vpn386579301.opengw.net:995,sstp,vpn386579301.opengw.net,995,3441,1,timeout,-,KR,211.215.238.48,AS9318 SK Broadband,SK Broadband,isp,2026-10-14 12:57:52,vpngate
-sstp://vpn:vpn@vpn607835809.opengw.net:1921,sstp,vpn607835809.opengw.net,1921,3448,1,timeout,-,RU,5.228.228.136,AS42610 Rostelecom,Rostelecom,isp,2026-10-15 12:44:41,vpngate
-sstp://vpn:vpn@vpn744397655.opengw.net:1870,sstp,vpn744397655.opengw.net,1870,3504,1,timeout,-,KR,115.1.70.190,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-16 08:16:14,vpngate
-sstp://vpn:vpn@vpn236138998.opengw.net:1381,sstp,vpn236138998.opengw.net,1381,3506,1,timeout,-,KR,169.211.222.152,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn922041785.opengw.net:1435,sstp,vpn922041785.opengw.net,1435,3524,1,timeout,-,KR,121.189.231.253,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-09 14:39:00,vpngate
-sstp://vpn:vpn@vpn420936778.opengw.net:995,sstp,vpn420936778.opengw.net,995,3543,1,timeout,-,KR,121.164.96.99,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-10 15:23:16,vpngate
-sstp://vpn:vpn@vpn372045572.opengw.net:1745,sstp,vpn372045572.opengw.net,1745,3590,1,timeout,-,RU,178.140.166.225,AS42610 Rostelecom,Rostelecom,isp,2026-11-14 14:39:09,vpngate
-sstp://vpn:vpn@vpn769681917.opengw.net:1491,sstp,vpn769681917.opengw.net,1491,3613,1,timeout,-,KR,14.51.43.58,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-15 14:38:37,vpngate
-sstp://vpn:vpn@vpn716362941.opengw.net:1854,sstp,vpn716362941.opengw.net,1854,3619,1,timeout,-,KR,114.30.156.221,AS38121 CJ Hello Co.,CJ Hello Co.,isp,2026-11-14 14:39:09,vpngate
-sstp://vpn:vpn@vpn978234813.opengw.net:995,sstp,vpn978234813.opengw.net,995,3634,1,timeout,-,KR,119.194.29.87,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn363831111.opengw.net:995,sstp,vpn363831111.opengw.net,995,3646,1,timeout,-,KR,121.130.192.171,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-25T10:20:50Z,@user
-sstp://vpn:vpn@vpn113860481.opengw.net:1543,sstp,vpn113860481.opengw.net,1543,3648,1,timeout,-,KR,1.233.97.120,AS9318 SK Broadband,SK Broadband,isp,2026-11-13 14:54:12,vpngate
-sstp://vpn:vpn@vpn936512836.opengw.net:1675,sstp,vpn936512836.opengw.net,1675,3736,1,timeout,-,KR,61.85.153.157,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn169225991.opengw.net:995,sstp,vpn169225991.opengw.net,995,3748,1,timeout,-,KR,125.240.231.54,AS17858 LG POWERCOMM,LG POWERCOMM,isp,2026-10-19 12:45:55,vpngate
-sstp://vpn:vpn@vpn807573737.opengw.net:1463,sstp,vpn807573737.opengw.net,1463,3796,1,timeout,-,KR,124.111.152.70,AS9318 SK Broadband,SK Broadband,isp,2026-10-21 15:52:42,vpngate
-sstp://vpn:vpn@vpn769465211.opengw.net:1963,sstp,vpn769465211.opengw.net,1963,3839,1,timeout,-,RU,5.228.228.136,AS42610 Rostelecom,Rostelecom,isp,2026-10-15 12:44:41,vpngate
-sstp://vpn:vpn@vpn757870457.opengw.net:1947,sstp,vpn757870457.opengw.net,1947,3931,1,timeout,-,KR,112.187.148.146,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-03 16:48:27,vpngate
-sstp://vpn:vpn@vpn935459420.opengw.net:1348,sstp,vpn935459420.opengw.net,1348,3950,1,timeout,-,KR,110.47.181.90,AS18313 LG HelloVision Corp.,LG HelloVision Corp.,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn309430266.opengw.net:1394,sstp,vpn309430266.opengw.net,1394,3985,1,timeout,-,JP,153.174.22.211,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-11 14:31:06,vpngate
-sstp://vpn:vpn@vpn909561523.opengw.net:995,sstp,vpn909561523.opengw.net,995,4081,1,timeout,-,KR,183.99.93.231,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-08 14:06:45,vpngate
-sstp://vpn:vpn@vpn624472654.opengw.net:1588,sstp,vpn624472654.opengw.net,1588,4869,1,timeout,-,JP,220.147.184.189,AS2519 ARTERIA Networks Corporation,ARTERIA Networks Corporation,isp,2026-11-08 14:06:45,vpngate
-sstp://vpn:vpn@vpn146183221.opengw.net:1968,sstp,vpn146183221.opengw.net,1968,0,1,timeout,,JP,124.212.251.101,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn649873227.opengw.net:1308,sstp,vpn649873227.opengw.net,1308,0,1,timeout,,JP,118.156.193.249,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn905759677.opengw.net:1410,sstp,vpn905759677.opengw.net,1410,0,1,timeout,,RU,84.42.75.2,AS12389 Primorye NET,Primorye NET,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn574663119.opengw.net:1732,sstp,vpn574663119.opengw.net,1732,0,1,timeout,,JP,221.133.107.40,"AS17534 NSK Co., Ltd.","NSK Co., Ltd.",isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn199808214.opengw.net:995,sstp,vpn199808214.opengw.net,995,0,1,timeout,,KR,121.164.137.89,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn108955624.opengw.net:995,sstp,vpn108955624.opengw.net,995,0,1,timeout,,KR,221.144.197.155,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn210060972.opengw.net:995,sstp,vpn210060972.opengw.net,995,0,1,timeout,,KR,218.158.183.96,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn247592511.opengw.net:995,sstp,vpn247592511.opengw.net,995,0,1,timeout,,KR,220.124.170.12,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn842523171.opengw.net:995,sstp,vpn842523171.opengw.net,995,0,1,timeout,,KR,183.102.100.152,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn312735118.opengw.net:1635,sstp,vpn312735118.opengw.net,1635,0,1,timeout,,VN,42.114.63.9,AS18403 FPT Telecom Company,FPT Telecom Company,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn191172008.opengw.net:1382,sstp,vpn191172008.opengw.net,1382,0,1,timeout,,PL,79.186.33.196,AS5617 Orange Polska Spolka Akcyjna,Orange Polska Spolka Akcyjna,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn173014092.opengw.net:1951,sstp,vpn173014092.opengw.net,1951,0,1,timeout,,FR,2.11.82.14,AS3215 Orange,Orange,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn388638793.opengw.net:1809,sstp,vpn388638793.opengw.net,1809,0,1,timeout,,RU,178.64.251.93,AS12389 Primorye NET,Primorye NET,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn843011073.opengw.net:1764,sstp,vpn843011073.opengw.net,1764,0,1,timeout,,KR,118.222.85.212,AS9318 SK Broadband,SK Broadband,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn773202079.opengw.net:1602,sstp,vpn773202079.opengw.net,1602,0,1,timeout,,JP,126.114.183.30,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn611376333.opengw.net:1279,sstp,vpn611376333.opengw.net,1279,0,1,timeout,,JP,119.105.93.237,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn702836191.opengw.net:1927,sstp,vpn702836191.opengw.net,1927,0,1,timeout,,KR,210.104.211.222,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn637265506.opengw.net:1259,sstp,vpn637265506.opengw.net,1259,0,1,timeout,,RU,5.189.42.17,AS12668 LLC KomTehCentr,LLC KomTehCentr,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn744261671.opengw.net:995,sstp,vpn744261671.opengw.net,995,0,1,timeout,,RU,31.220.166.43,AS29072 Regional Digital Telecommunication Company LLC,Regional Digital Telecommunication Company LLC,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn587159885.opengw.net:1906,sstp,vpn587159885.opengw.net,1906,0,1,timeout,,JP,183.86.144.3,AS10010 TOKAI Communications Corporation,TOKAI Communications Corporation,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn171715362.opengw.net:1510,sstp,vpn171715362.opengw.net,1510,0,1,timeout,,KR,219.248.239.231,AS9318 SK Broadband,SK Broadband,isp,2026-11-18 08:16:22,vpngate
-sstp://vpn:vpn@vpn445617380.opengw.net:1841,sstp,vpn445617380.opengw.net,1841,677,2,timeout,-,US,47.153.119.84,"AS5650 Frontier Communications of America, Inc.","Frontier Communications of America, Inc.",isp,2026-11-02 14:11:43,vpngate
-sstp://vpn:vpn@vpn307486479.opengw.net:1897,sstp,vpn307486479.opengw.net,1897,1529,2,timeout,-,US,172.115.27.51,AS20001 Charter Communications,Charter Communications,isp,2026-11-15 14:38:37,vpngate
-sstp://vpn:vpn@vpn350126322.opengw.net:1865,sstp,vpn350126322.opengw.net,1865,2368,2,timeout,-,JP,153.200.187.212,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-02 14:11:43,vpngate
-sstp://vpn:vpn@vpn677195097.opengw.net:1903,sstp,vpn677195097.opengw.net,1903,2570,2,timeout,-,KR,121.160.178.247,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-16 08:16:14,vpngate
-sstp://vpn:vpn@vpn802423284.opengw.net:1404,sstp,vpn802423284.opengw.net,1404,2606,2,timeout,-,JP,118.105.254.152,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn405073805.opengw.net:443,sstp,vpn405073805.opengw.net,443,2621,2,timeout,-,KR,121.137.249.48,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-16 12:36:06,vpngate
-sstp://vpn:vpn@vpn670095336.opengw.net:1622,sstp,vpn670095336.opengw.net,1622,2623,2,timeout,-,JP,39.111.204.72,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-11-15 14:38:37,vpngate
-sstp://vpn:vpn@vpn616337766.opengw.net:1914,sstp,vpn616337766.opengw.net,1914,2711,2,timeout,-,JP,61.245.205.8,"AS23786 San-in Cable Vision CO.,LTD","San-in Cable Vision CO.,LTD",isp,2026-11-13 14:54:12,vpngate
-sstp://vpn:vpn@vpn190140048.opengw.net:1484,sstp,vpn190140048.opengw.net,1484,2734,2,timeout,-,JP,124.110.175.78,"AS9351 ZTV CO.,LTD","ZTV CO.,LTD",isp,2026-11-03 14:55:56,vpngate
-sstp://vpn:vpn@vpn350782353.opengw.net:1962,sstp,vpn350782353.opengw.net,1962,2874,2,timeout,-,JP,116.64.86.146,"AS9824 JCOM Co., Ltd.","JCOM Co., Ltd.",isp,2026-11-05 14:53:11,vpngate
-sstp://vpn:vpn@vpn247592511.opengw.net:1657,sstp,vpn247592511.opengw.net,1657,2881,2,timeout,-,KR,220.124.170.12,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-10 15:23:16,vpngate
-sstp://vpn:vpn@vpn644161234.opengw.net:1807,sstp,vpn644161234.opengw.net,1807,2918,2,timeout,-,JP,27.91.151.160,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn497910382.opengw.net:1213,sstp,vpn497910382.opengw.net,1213,2933,2,timeout,-,JP,175.129.117.170,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn805501458.opengw.net:995,sstp,vpn805501458.opengw.net,995,2961,2,timeout,-,KR,221.161.52.47,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-07 14:03:05,vpngate
-sstp://vpn:vpn@vpn644041734.opengw.net:1954,sstp,vpn644041734.opengw.net,1954,2985,2,timeout,-,JP,153.215.184.50,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-14 14:39:09,vpngate
-sstp://vpn:vpn@vpn358819052.opengw.net:995,sstp,vpn358819052.opengw.net,995,3038,2,timeout,-,KR,121.131.27.249,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-14 14:39:09,vpngate
-sstp://vpn:vpn@vpn462059193.opengw.net:1868,sstp,vpn462059193.opengw.net,1868,3080,2,timeout,-,KR,58.233.2.51,AS9318 SK Broadband,SK Broadband,isp,2026-10-19 12:45:55,vpngate
-sstp://vpn:vpn@vpn487120861.opengw.net:995,sstp,vpn487120861.opengw.net,995,3103,2,timeout,-,KR,175.208.215.144,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-12 21:49:55,vpngate
-sstp://vpn:vpn@vpn184908966.opengw.net:995,sstp,vpn184908966.opengw.net,995,3105,2,timeout,-,KR,220.116.150.229,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-16 08:16:14,vpngate
-sstp://vpn:vpn@vpn768864831.opengw.net:1762,sstp,vpn768864831.opengw.net,1762,3205,2,timeout,-,KR,115.22.223.14,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-14 14:39:09,vpngate
-sstp://vpn:vpn@vpn733995151.opengw.net:1241,sstp,vpn733995151.opengw.net,1241,3220,2,timeout,-,JP,165.100.185.11,AS2519 ARTERIA Networks Corporation,ARTERIA Networks Corporation,isp,2026-11-12 15:18:03,vpngate
-sstp://vpn:vpn@vpn973325414.opengw.net:1984,sstp,vpn973325414.opengw.net,1984,3279,2,timeout,-,KR,211.198.22.9,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-15 14:38:37,vpngate
-sstp://vpn:vpn@vpn447508279.opengw.net:1680,sstp,vpn447508279.opengw.net,1680,3341,2,timeout,-,KR,218.101.223.83,AS17864 SK Broadband Co Ltd,SK Broadband Co Ltd,isp,2026-11-16 08:16:14,vpngate
-sstp://vpn:vpn@vpn170723006.opengw.net:1941,sstp,vpn170723006.opengw.net,1941,3367,2,timeout,-,KR,61.41.136.244,AS3786 LG DACOM Corporation,LG DACOM Corporation,isp,2026-10-13 14:49:54,vpngate
-sstp://vpn:vpn@vpn486662942.opengw.net:1730,sstp,vpn486662942.opengw.net,1730,3543,2,timeout,-,JP,153.232.246.96,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-15 14:38:37,vpngate
-sstp://vpn:vpn@vpn730029551.opengw.net:995,sstp,vpn730029551.opengw.net,995,3557,2,timeout,-,KR,59.12.177.194,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-13 14:54:12,vpngate
-sstp://vpn:vpn@vpn285486729.opengw.net:1291,sstp,vpn285486729.opengw.net,1291,3678,2,timeout,-,JP,116.82.239.43,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-11-15 14:38:37,vpngate
-sstp://vpn:vpn@vpn942380032.opengw.net:1347,sstp,vpn942380032.opengw.net,1347,3786,2,timeout,-,JP,126.75.85.180,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-10-09 14:13:10,vpngate
-sstp://vpn:vpn@vpn794290368.opengw.net:1485,sstp,vpn794290368.opengw.net,1485,4074,2,timeout,-,VN,42.118.109.169,AS18403 FPT Telecom Company,FPT Telecom Company,isp,2026-11-04 14:35:03,vpngate
-sstp://vpn:vpn@vpn105394383.opengw.net:1618,sstp,vpn105394383.opengw.net,1618,4164,2,timeout,-,VN,42.118.109.169,AS18403 FPT Telecom Company,FPT Telecom Company,isp,2026-11-04 14:35:03,vpngate
-sstp://vpn:vpn@vpn624822550.opengw.net:1463,sstp,vpn624822550.opengw.net,1463,4296,2,timeout,-,RU,212.20.44.70,AS12389 Primorye NET,Primorye NET,isp,2026-10-01 00:00:00,vpngate
-sstp://vpn:vpn@vpn490224666.opengw.net:1331,sstp,vpn490224666.opengw.net,1331,4919,2,timeout,-,RU,62.106.107.1,"AS8439 AIST ISP, PPTP (physical persons)","AIST ISP, PPTP (physical persons)",isp,2026-11-16 08:16:14,vpngate
-sstp://vpn:vpn@vpn569190458.opengw.net:1513,sstp,vpn569190458.opengw.net,1513,5307,2,timeout,-,JP,125.205.75.182,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-05 14:53:11,vpngate
-sstp://vpn:vpn@vpn905823011.opengw.net:995,sstp,vpn905823011.opengw.net,995,7559,2,timeout,-,KR,121.133.123.215,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-03 14:55:56,vpngate
-sstp://vpn:vpn@vpn132621692.opengw.net:1533,sstp,vpn132621692.opengw.net,1533,0,2,timeout,,RU,92.37.153.29,AS12389 Primorye NET,Primorye NET,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn663500256.opengw.net:1965,sstp,vpn663500256.opengw.net,1965,0,2,timeout,,JP,180.196.186.246,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn658242458.opengw.net:1344,sstp,vpn658242458.opengw.net,1344,0,2,timeout,,HR,93.139.131.81,AS5391 Croatian Telecom Inc.,Croatian Telecom Inc.,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn725713502.opengw.net:1845,sstp,vpn725713502.opengw.net,1845,0,2,timeout,,KR,14.34.247.234,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn304425188.opengw.net:995,sstp,vpn304425188.opengw.net,995,0,2,timeout,,RU,37.140.25.234,AS8369 Intersvyaz-2 JSC,Intersvyaz-2 JSC,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn329380104.opengw.net:1771,sstp,vpn329380104.opengw.net,1771,0,2,timeout,,KR,125.131.224.62,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn153644369.opengw.net:995,sstp,vpn153644369.opengw.net,995,0,2,timeout,,KR,112.170.151.111,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn476640156.opengw.net:1617,sstp,vpn476640156.opengw.net,1617,0,2,timeout,,JP,222.148.77.207,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn913230858.opengw.net:1326,sstp,vpn913230858.opengw.net,1326,0,2,timeout,,RU,46.252.126.156,AS41727 CJSC ER-Telecom Holding Kirov branch,CJSC ER-Telecom Holding Kirov branch,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn574451610.opengw.net:1781,sstp,vpn574451610.opengw.net,1781,0,2,timeout,,JP,219.102.241.244,"AS2514 NTT PC Communications, Inc.","NTT PC Communications, Inc.",isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn103832537.opengw.net:1347,sstp,vpn103832537.opengw.net,1347,0,2,timeout,,RU,176.49.209.115,AS12389 Primorye NET,Primorye NET,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn696208175.opengw.net:1976,sstp,vpn696208175.opengw.net,1976,0,2,timeout,,JP,153.210.81.201,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn570001728.opengw.net:1475,sstp,vpn570001728.opengw.net,1475,0,2,timeout,,AU,112.141.32.72,AS9443 Vocus Retail,Vocus Retail,isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn700602141.opengw.net:995,sstp,vpn700602141.opengw.net,995,0,2,timeout,,US,45.21.51.211,"AS7018 AT&T Enterprises, LLC","AT&T Enterprises, LLC",isp,2026-11-17 08:16:24,vpngate
-sstp://vpn:vpn@vpn941078596.opengw.net:995,sstp,vpn941078596.opengw.net,995,0,2,timeout,,KR,110.9.169.153,AS9318 SK Broadband,SK Broadband,isp,2026-11-17 08:16:24,vpngate
+sstp://vpn:vpn@vpn632205453.opengw.net:1771,sstp,vpn632205453.opengw.net,1771,588,0,alive,-,JP,114.170.231.82,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-10-17 12:31:38,vpngate
+sstp://vpn:vpn@vpn821731215.opengw.net:1483,sstp,vpn821731215.opengw.net,1483,658,0,alive,-,KR,119.197.200.143,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-04 14:35:03,vpngate
+sstp://vpn:vpn@vpn827401311.opengw.net:1302,sstp,vpn827401311.opengw.net,1302,680,0,alive,-,KR,114.207.150.81,AS9318 SK Broadband,SK Broadband,isp,2026-10-03 16:48:27,vpngate
+sstp://vpn:vpn@vpn398848953.opengw.net:1482,sstp,vpn398848953.opengw.net,1482,792,0,alive,-,RU,95.154.89.139,AS44724 Octopusnet LTD,Octopusnet LTD,isp,2026-11-15 14:38:37,vpngate
+sstp://vpn:vpn@vpn396939205.opengw.net:1797,sstp,vpn396939205.opengw.net,1797,810,0,alive,-,CA,181.200.8.158,AS5769 Videotron Ltee,Videotron Ltee,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn820407497.opengw.net:1258,sstp,vpn820407497.opengw.net,1258,814,0,alive,-,US,47.197.174.44,"AS5650 Frontier Communications of America, Inc.","Frontier Communications of America, Inc.",isp,2026-11-13 14:54:12,vpngate
+sstp://vpn:vpn@vpn584855640.opengw.net:1893,sstp,vpn584855640.opengw.net,1893,850,0,alive,-,US,174.85.114.42,AS22516 Charter Communications LLC,Charter Communications LLC,isp,2026-11-16 08:16:14,vpngate
+sstp://vpn:vpn@vpn133034159.opengw.net:1276,sstp,vpn133034159.opengw.net,1276,1018,0,alive,-,JP,58.87.159.114,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@snmarron.opengw.net:992,sstp,snmarron.opengw.net,992,1042,0,alive,-,FR,45.152.19.83,AS16347 ADISTA SAS,ADISTA SAS,isp,2026-10-13 14:49:54,vpngate
+sstp://vpn:vpn@vpn634383280.opengw.net:1948,sstp,vpn634383280.opengw.net,1948,1044,0,alive,-,JP,150.249.117.150,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn443088592.opengw.net:1607,sstp,vpn443088592.opengw.net,1607,1044,0,alive,-,JP,121.81.40.211,AS17511 OPTAGE Inc.,OPTAGE Inc.,isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn600793495.opengw.net:1506,sstp,vpn600793495.opengw.net,1506,1051,0,alive,-,JP,126.12.172.212,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-03 14:55:56,vpngate
+sstp://vpn:vpn@vpn641759273.opengw.net:1754,sstp,vpn641759273.opengw.net,1754,1056,0,alive,-,JP,113.154.3.100,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-08 14:06:45,vpngate
+sstp://vpn:vpn@vpn389621244.opengw.net:1338,sstp,vpn389621244.opengw.net,1338,1062,0,alive,-,JP,124.219.147.24,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn2070.opengw.net:5555,sstp,vpn2070.opengw.net,5555,1066,0,alive,-,JP,60.57.56.254,AS17511 OPTAGE Inc.,OPTAGE Inc.,isp,2026-11-08 14:06:45,vpngate
+sstp://vpn:vpn@vpn673622597.opengw.net:1592,sstp,vpn673622597.opengw.net,1592,1070,0,alive,-,JP,60.121.223.189,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn629557345.opengw.net:1486,sstp,vpn629557345.opengw.net,1486,1070,0,alive,-,JP,114.191.74.135,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn583764032.opengw.net:1464,sstp,vpn583764032.opengw.net,1464,1073,0,alive,-,JP,115.36.204.213,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn681398325.opengw.net:1256,sstp,vpn681398325.opengw.net,1256,1078,0,alive,-,JP,126.208.100.178,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-04 14:35:03,vpngate
+sstp://vpn:vpn@vpn569190458.opengw.net:1513,sstp,vpn569190458.opengw.net,1513,1098,0,alive,-,JP,125.205.75.182,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-05 14:53:11,vpngate
+sstp://vpn:vpn@vpn841038279.opengw.net:1287,sstp,vpn841038279.opengw.net,1287,1099,0,alive,-,JP,126.214.203.87,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-02 14:11:43,vpngate
+sstp://vpn:vpn@vpn798802330.opengw.net:1933,sstp,vpn798802330.opengw.net,1933,1106,0,alive,-,KR,14.72.158.13,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-17 08:16:24,vpngate
+sstp://vpn:vpn@vpn679769325.opengw.net:1701,sstp,vpn679769325.opengw.net,1701,1106,0,alive,-,JP,183.77.92.122,"AS4685 ASAHI Net, Inc.","ASAHI Net, Inc.",isp,2026-11-16 08:16:14,vpngate
+sstp://vpn:vpn@vpn683811137.opengw.net:1703,sstp,vpn683811137.opengw.net,1703,1110,0,alive,-,KR,182.215.174.9,AS17858 LG POWERCOMM,LG POWERCOMM,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn157099394.opengw.net:1949,sstp,vpn157099394.opengw.net,1949,1114,0,alive,-,KR,203.229.91.15,AS38095 SK Broadband Co Ltd,SK Broadband Co Ltd,isp,2026-11-11 14:31:06,vpngate
+sstp://vpn:vpn@vpn145309037.opengw.net:1921,sstp,vpn145309037.opengw.net,1921,1116,0,alive,-,KR,112.161.229.103,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-16 08:16:14,vpngate
+sstp://vpn:vpn@vpn198732322.opengw.net:1312,sstp,vpn198732322.opengw.net,1312,1116,0,alive,-,JP,153.132.115.193,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-16 08:16:14,vpngate
+sstp://vpn:vpn@vpn917497474.opengw.net:1535,sstp,vpn917497474.opengw.net,1535,1120,0,alive,-,KR,120.29.134.202,AS10054 CMB Kwangju Broadcasting,CMB Kwangju Broadcasting,isp,2026-10-21 15:52:42,vpngate
+sstp://vpn:vpn@vpn813440287.opengw.net:1604,sstp,vpn813440287.opengw.net,1604,1121,0,alive,-,KR,119.196.23.11,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-03 14:55:56,vpngate
+sstp://vpn:vpn@vpn906340167.opengw.net:1701,sstp,vpn906340167.opengw.net,1701,1124,0,alive,-,KR,180.230.30.211,AS17858 LG POWERCOMM,LG POWERCOMM,isp,2026-10-03 22:57:17,vpngate
+sstp://vpn:vpn@vpn269593454.opengw.net:1211,sstp,vpn269593454.opengw.net,1211,1127,0,alive,-,KR,1.214.177.206,AS3786 LG DACOM Corporation,LG DACOM Corporation,isp,2026-10-14 12:57:52,vpngate
+sstp://vpn:vpn@vpn883939909.opengw.net:1677,sstp,vpn883939909.opengw.net,1677,1129,0,alive,-,KR,61.253.81.10,AS9318 SK Broadband,SK Broadband,isp,2026-11-17 08:16:24,vpngate
+sstp://vpn:vpn@vpn137183472.opengw.net:1730,sstp,vpn137183472.opengw.net,1730,1130,0,alive,-,KR,121.130.89.23,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-12 15:18:03,vpngate
+sstp://vpn:vpn@vpn758894710.opengw.net:1360,sstp,vpn758894710.opengw.net,1360,1134,0,alive,-,KR,221.152.104.67,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-16 08:16:14,vpngate
+sstp://vpn:vpn@vpn260016517.opengw.net:1295,sstp,vpn260016517.opengw.net,1295,1139,0,alive,-,KR,121.186.186.97,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-14 14:39:09,vpngate
+sstp://vpn:vpn@vpn521065574.opengw.net:995,sstp,vpn521065574.opengw.net,995,1145,0,alive,-,KR,112.167.64.3,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-13 14:54:12,vpngate
+sstp://vpn:vpn@vpn255201593.opengw.net:1338,sstp,vpn255201593.opengw.net,1338,1145,0,alive,-,KR,220.77.208.68,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-12 15:18:03,vpngate
+sstp://vpn:vpn@vpn197759224.opengw.net:1664,sstp,vpn197759224.opengw.net,1664,1155,0,alive,-,JP,220.146.69.175,"AS4685 ASAHI Net, Inc.","ASAHI Net, Inc.",isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn853980609.opengw.net:1313,sstp,vpn853980609.opengw.net,1313,1227,0,alive,-,RU,212.164.8.132,AS12389 Primorye NET,Primorye NET,isp,2026-11-15 14:38:37,vpngate
+sstp://vpn:vpn@wams.opengw.net:992,sstp,wams.opengw.net,992,1227,0,alive,-,AE,83.110.98.6,AS5384 Emirates Telecommunications Corporation,Emirates Telecommunications Corporation,isp,2026-11-14 14:39:09,vpngate
+sstp://vpn:vpn@vpn625364486.opengw.net:1529,sstp,vpn625364486.opengw.net,1529,1242,0,alive,-,RU,178.185.24.224,AS12389 Primorye NET,Primorye NET,isp,2026-11-09 14:39:00,vpngate
+sstp://vpn:vpn@vpn536329081.opengw.net:1965,sstp,vpn536329081.opengw.net,1965,1270,0,alive,-,RU,77.35.6.152,AS12389 Primorye NET,Primorye NET,isp,2026-11-05 14:53:11,vpngate
+sstp://vpn:vpn@vpn841003782.opengw.net:1798,sstp,vpn841003782.opengw.net,1798,1272,0,alive,-,MX,187.189.29.64,"AS17072 TOTAL PLAY TELECOMUNICACIONES, S.A.P.I. DE C.V.","TOTAL PLAY TELECOMUNICACIONES, S.A.P.I. DE C.V.",isp,2026-11-07 14:03:05,vpngate
+sstp://vpn:vpn@vpn353146232.opengw.net:1995,sstp,vpn353146232.opengw.net,1995,1277,0,alive,-,RU,212.164.214.213,AS12389 Primorye NET,Primorye NET,isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn247081215.opengw.net:1752,sstp,vpn247081215.opengw.net,1752,1281,0,alive,-,RU,77.34.54.66,AS12389 Primorye NET,Primorye NET,isp,2026-11-12 15:18:03,vpngate
+sstp://vpn:vpn@vpn689600419.opengw.net:1456,sstp,vpn689600419.opengw.net,1456,1287,0,alive,-,RU,77.82.21.218,AS12389 Primorye NET,Primorye NET,isp,2026-11-11 14:31:06,vpngate
+sstp://vpn:vpn@vpn864131273.opengw.net:995,sstp,vpn864131273.opengw.net,995,1287,0,alive,-,VN,42.114.29.158,AS18403 FPT Telecom Company,FPT Telecom Company,isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn705688819.opengw.net:995,sstp,vpn705688819.opengw.net,995,1315,0,alive,-,KR,141.223.28.225,AS3784 Pohang University of Science and Technology,Pohang University of Science and Technology,education,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn159950151.opengw.net:1898,sstp,vpn159950151.opengw.net,1898,1317,0,alive,-,RU,2.61.135.84,AS12389 Primorye NET,Primorye NET,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn603266989.opengw.net:1497,sstp,vpn603266989.opengw.net,1497,1452,0,alive,-,RU,185.112.224.250,AS50427 Orion Telecom LLC,Orion Telecom LLC,isp,2026-10-12 15:18:13,vpngate
+sstp://vpn:vpn@vpn491348575.opengw.net:1697,sstp,vpn491348575.opengw.net,1697,1822,0,alive,-,CA,184.68.30.115,AS6327 Shaw Communications,Shaw Communications,isp,2026-11-10 15:23:16,vpngate
+sstp://vpn:vpn@vpn486662942.opengw.net:1730,sstp,vpn486662942.opengw.net,1730,1842,0,alive,-,JP,153.232.246.96,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-15 14:38:37,vpngate
+sstp://vpn:vpn@vpn435819101.opengw.net:1845,sstp,vpn435819101.opengw.net,1845,1850,0,alive,-,US,47.141.29.68,"AS5650 Frontier Communications of America, Inc.","Frontier Communications of America, Inc.",isp,2026-11-16 08:16:14,vpngate
+sstp://vpn:vpn@cetsssa.opengw.net:992,sstp,cetsssa.opengw.net,992,1993,0,alive,-,MX,189.186.30.193,AS8151 UNINET,UNINET,isp,2026-10-04 17:03:41,vpngate
+sstp://vpn:vpn@vpn823585109.opengw.net:1730,sstp,vpn823585109.opengw.net,1730,2067,0,alive,-,JP,122.211.190.167,AS17506 ARTERIA Networks Corporation,ARTERIA Networks Corporation,isp,2026-11-02 14:11:43,vpngate
+sstp://vpn:vpn@vpn187938957.opengw.net:1362,sstp,vpn187938957.opengw.net,1362,2123,0,alive,-,JP,120.75.57.120,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn671698798.opengw.net:1377,sstp,vpn671698798.opengw.net,1377,2223,0,alive,-,RU,31.23.45.66,AS12389 Primorye NET,Primorye NET,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn291007099.opengw.net:1522,sstp,vpn291007099.opengw.net,1522,2370,0,alive,-,JP,126.62.85.167,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn650462492.opengw.net:1884,sstp,vpn650462492.opengw.net,1884,2384,0,alive,-,US,98.199.42.72,"AS7922 Comcast Cable Communications, LLC","Comcast Cable Communications, LLC",isp,2026-11-02 14:11:43,vpngate
+sstp://vpn:vpn@vpn358380061.opengw.net:1244,sstp,vpn358380061.opengw.net,1244,2391,0,alive,-,JP,118.154.9.31,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn794119202.opengw.net:1592,sstp,vpn794119202.opengw.net,1592,2467,0,alive,-,JP,125.30.10.69,AS2497 Internet Initiative Japan Inc.,Internet Initiative Japan Inc.,isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn644344996.opengw.net:1628,sstp,vpn644344996.opengw.net,1628,2488,0,alive,-,KR,222.111.8.2,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-21 15:52:42,vpngate
+sstp://vpn:vpn@vpn946019409.opengw.net:1557,sstp,vpn946019409.opengw.net,1557,2527,0,alive,-,JP,126.130.164.3,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-10-15 12:44:41,vpngate
+sstp://vpn:vpn@vpn254588575.opengw.net:1856,sstp,vpn254588575.opengw.net,1856,2548,0,alive,-,JP,159.28.242.14,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-10-21 15:52:42,vpngate
+sstp://vpn:vpn@vpn315315201.opengw.net:1215,sstp,vpn315315201.opengw.net,1215,2570,0,alive,-,KR,14.47.68.46,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-15 12:44:41,vpngate
+sstp://vpn:vpn@vpn683539447.opengw.net:1549,sstp,vpn683539447.opengw.net,1549,2593,0,alive,-,JP,61.25.149.161,"AS9824 JCOM Co., Ltd.","JCOM Co., Ltd.",isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn152857105.opengw.net:1924,sstp,vpn152857105.opengw.net,1924,2609,0,alive,-,JP,222.6.221.181,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn864577769.opengw.net:995,sstp,vpn864577769.opengw.net,995,2612,0,alive,-,KR,183.108.199.213,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-06 14:52:45,vpngate
+sstp://vpn:vpn@vpn945893058.opengw.net:1242,sstp,vpn945893058.opengw.net,1242,2616,0,alive,-,JP,59.138.139.69,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-03 16:48:27,vpngate
+sstp://vpn:vpn@vpn795961097.opengw.net:1264,sstp,vpn795961097.opengw.net,1264,2628,0,alive,-,JP,133.202.41.75,AS2518 BIGLOBE Inc.,BIGLOBE Inc.,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn960273320.opengw.net:1571,sstp,vpn960273320.opengw.net,1571,2646,0,alive,-,JP,125.196.144.134,AS2518 BIGLOBE Inc.,BIGLOBE Inc.,isp,2026-10-25T10:20:50Z,@user
+sstp://vpn:vpn@vpn699884073.opengw.net:1556,sstp,vpn699884073.opengw.net,1556,2666,0,alive,-,JP,126.36.211.204,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-10-07 14:04:24,vpngate
+sstp://vpn:vpn@vpn532403382.opengw.net:1911,sstp,vpn532403382.opengw.net,1911,2675,0,alive,-,JP,223.133.218.118,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-11-12 15:18:03,vpngate
+sstp://vpn:vpn@vpn889393112.opengw.net:1900,sstp,vpn889393112.opengw.net,1900,2698,0,alive,-,JP,153.220.188.97,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-04 14:35:03,vpngate
+sstp://vpn:vpn@vpn744032933.opengw.net:1360,sstp,vpn744032933.opengw.net,1360,2707,0,alive,-,JP,90.149.85.59,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-10-09 14:13:10,vpngate
+sstp://vpn:vpn@vpn348580824.opengw.net:995,sstp,vpn348580824.opengw.net,995,2715,0,alive,-,KR,112.168.206.160,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-03 16:48:27,vpngate
+sstp://vpn:vpn@vpn748539980.opengw.net:1717,sstp,vpn748539980.opengw.net,1717,2723,0,alive,-,JP,60.93.7.71,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-16 08:16:14,vpngate
+sstp://vpn:vpn@vpn296418523.opengw.net:1714,sstp,vpn296418523.opengw.net,1714,2750,0,alive,-,KR,220.116.212.158,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-06 14:52:45,vpngate
+sstp://vpn:vpn@vpn836042621.opengw.net:1294,sstp,vpn836042621.opengw.net,1294,2750,0,alive,-,JP,211.128.17.88,"AS17529 STARCAT Co., LTD.","STARCAT Co., LTD.",isp,2026-10-13 14:49:54,vpngate
+sstp://vpn:vpn@vpn610033625.opengw.net:995,sstp,vpn610033625.opengw.net,995,2785,0,alive,-,KR,183.102.149.48,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-03 22:57:17,vpngate
+sstp://vpn:vpn@vpn526062445.opengw.net:1999,sstp,vpn526062445.opengw.net,1999,2817,0,alive,-,JP,60.143.120.123,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-11 14:31:06,vpngate
+sstp://vpn:vpn@vpn716187063.opengw.net:1632,sstp,vpn716187063.opengw.net,1632,2829,0,alive,-,JP,133.114.90.172,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn463711899.opengw.net:1551,sstp,vpn463711899.opengw.net,1551,2833,0,alive,-,JP,223.132.252.176,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-11-12 15:18:03,vpngate
+sstp://vpn:vpn@vpn523361413.opengw.net:1752,sstp,vpn523361413.opengw.net,1752,2837,0,alive,-,JP,111.99.247.245,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-11 14:31:06,vpngate
+sstp://vpn:vpn@vpn250920860.opengw.net:1895,sstp,vpn250920860.opengw.net,1895,2840,0,alive,-,JP,210.198.250.157,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-10 15:23:16,vpngate
+sstp://vpn:vpn@vpn832583593.opengw.net:1749,sstp,vpn832583593.opengw.net,1749,2840,0,alive,-,JP,133.202.14.11,AS2518 BIGLOBE Inc.,BIGLOBE Inc.,isp,2026-10-18 12:38:28,vpngate
+sstp://vpn:vpn@vpn971457718.opengw.net:1469,sstp,vpn971457718.opengw.net,1469,2848,0,alive,-,JP,124.219.150.206,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-11-17 08:16:24,vpngate
+sstp://vpn:vpn@vpn499499703.opengw.net:995,sstp,vpn499499703.opengw.net,995,2849,0,alive,-,KR,220.81.202.11,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-09 14:13:10,vpngate
+sstp://vpn:vpn@vpn933450169.opengw.net:1309,sstp,vpn933450169.opengw.net,1309,2865,0,alive,-,JP,106.153.7.87,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-18 12:38:28,vpngate
+sstp://vpn:vpn@vpn764143600.opengw.net:1488,sstp,vpn764143600.opengw.net,1488,2887,0,alive,-,JP,111.99.247.245,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-11 14:31:06,vpngate
+sstp://vpn:vpn@vpn897910605.opengw.net:1290,sstp,vpn897910605.opengw.net,1290,2905,0,alive,-,JP,118.82.55.107,AS18278 Cable TV Corporation,Cable TV Corporation,isp,2026-11-17 08:16:24,vpngate
+sstp://vpn:vpn@vpn129214879.opengw.net:1767,sstp,vpn129214879.opengw.net,1767,2912,0,alive,-,JP,59.138.218.10,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-12 15:18:03,vpngate
+sstp://vpn:vpn@vpn727298628.opengw.net:1941,sstp,vpn727298628.opengw.net,1941,2934,0,alive,-,JP,60.73.70.60,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-15 14:38:37,vpngate
+sstp://vpn:vpn@vpn156555613.opengw.net:1386,sstp,vpn156555613.opengw.net,1386,2935,0,alive,-,JP,106.156.229.156,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn440254653.opengw.net:1665,sstp,vpn440254653.opengw.net,1665,2941,0,alive,-,JP,180.1.215.15,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-11 14:31:06,vpngate
+sstp://vpn:vpn@vpn306037816.opengw.net:1724,sstp,vpn306037816.opengw.net,1724,2947,0,alive,-,JP,59.142.40.235,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-16 08:16:14,vpngate
+sstp://vpn:vpn@vpn711674780.opengw.net:1603,sstp,vpn711674780.opengw.net,1603,2950,0,alive,-,JP,124.32.30.64,AS17506 ARTERIA Networks Corporation,ARTERIA Networks Corporation,isp,2026-11-14 14:39:09,vpngate
+sstp://vpn:vpn@vpn853382218.opengw.net:1554,sstp,vpn853382218.opengw.net,1554,2952,0,alive,-,JP,14.133.214.98,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn933122006.opengw.net:995,sstp,vpn933122006.opengw.net,995,2960,0,alive,-,KR,121.159.68.26,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-18 12:38:28,vpngate
+sstp://vpn:vpn@vpn661982.opengw.net:7551,sstp,vpn661982.opengw.net,7551,2963,0,alive,-,JP,14.10.120.193,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-03 16:48:27,vpngate
+sstp://vpn:vpn@vpn788502559.opengw.net:1908,sstp,vpn788502559.opengw.net,1908,2963,0,alive,-,JP,220.254.220.117,AS18268 Naganoken Kyodou Densan Co.Ltd.,Naganoken Kyodou Densan Co.Ltd.,isp,2026-10-07 14:04:24,vpngate
+sstp://vpn:vpn@vpn137812529.opengw.net:1240,sstp,vpn137812529.opengw.net,1240,2966,0,alive,-,JP,218.228.192.151,AS17511 OPTAGE Inc.,OPTAGE Inc.,isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn907463033.opengw.net:1327,sstp,vpn907463033.opengw.net,1327,2970,0,alive,-,JP,218.220.155.188,AS9617 SUTV,SUTV,isp,2026-11-17 08:16:24,vpngate
+sstp://vpn:vpn@vpn742486003.opengw.net:1427,sstp,vpn742486003.opengw.net,1427,2978,0,alive,-,KR,121.178.46.161,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-21 15:52:42,vpngate
+sstp://vpn:vpn@vpn419741630.opengw.net:1781,sstp,vpn419741630.opengw.net,1781,2979,0,alive,-,JP,150.9.101.140,"AS4685 ASAHI Net, Inc.","ASAHI Net, Inc.",isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn282026883.opengw.net:1341,sstp,vpn282026883.opengw.net,1341,2984,0,alive,-,JP,124.18.72.151,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-11-02 14:11:43,vpngate
+sstp://vpn:vpn@vpn480.opengw.net:5555,sstp,vpn480.opengw.net,5555,2999,0,alive,-,JP,110.163.142.88,"AS9605 NTT DOCOMO, INC.","NTT DOCOMO, INC.",isp,2026-10-13 14:49:54,vpngate
+sstp://vpn:vpn@vpn579932260.opengw.net:1674,sstp,vpn579932260.opengw.net,1674,3003,0,alive,-,JP,114.164.96.126,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-07 14:03:05,vpngate
+sstp://vpn:vpn@vpn736504438.opengw.net:1834,sstp,vpn736504438.opengw.net,1834,3006,0,alive,-,JP,126.103.157.140,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-10-14 12:57:52,vpngate
+sstp://vpn:vpn@vpn389617472.opengw.net:1861,sstp,vpn389617472.opengw.net,1861,3008,0,alive,-,JP,126.24.178.180,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-08 14:06:45,vpngate
+sstp://vpn:vpn@vpn189346831.opengw.net:1737,sstp,vpn189346831.opengw.net,1737,3012,0,alive,-,KR,182.226.193.209,AS17858 LG POWERCOMM,LG POWERCOMM,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn916638706.opengw.net:995,sstp,vpn916638706.opengw.net,995,3013,0,alive,-,KR,220.117.32.90,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-06 14:52:45,vpngate
+sstp://vpn:vpn@vpn839240895.opengw.net:1806,sstp,vpn839240895.opengw.net,1806,3022,0,alive,-,JP,114.187.210.243,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-02 14:11:43,vpngate
+sstp://vpn:vpn@vpn462059193.opengw.net:1868,sstp,vpn462059193.opengw.net,1868,3023,0,alive,-,KR,58.233.2.51,AS9318 SK Broadband,SK Broadband,isp,2026-10-19 12:45:55,vpngate
+sstp://vpn:vpn@vpn147580804.opengw.net:1234,sstp,vpn147580804.opengw.net,1234,3030,0,alive,-,JP,60.128.102.181,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-15 14:38:37,vpngate
+sstp://vpn:vpn@vpn313985146.opengw.net:5555,sstp,vpn313985146.opengw.net,5555,3044,0,alive,-,UA,31.43.129.131,AS48438 Corbina Telecom Llc.,Corbina Telecom Llc.,isp,2026-10-03 22:57:17,vpngate
+sstp://vpn:vpn@vpn541474874.opengw.net:1929,sstp,vpn541474874.opengw.net,1929,3046,0,alive,-,KR,14.37.134.238,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-15 14:38:37,vpngate
+sstp://vpn:vpn@vpn544035541.opengw.net:1500,sstp,vpn544035541.opengw.net,1500,3051,0,alive,-,JP,220.153.201.3,"AS18081 Kintetsu Cable Network Co., Ltd.","Kintetsu Cable Network Co., Ltd.",isp,2026-10-04 23:17:15,vpngate
+sstp://vpn:vpn@vpn201053993.opengw.net:1386,sstp,vpn201053993.opengw.net,1386,3059,0,alive,-,KR,121.161.33.240,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-04 14:35:03,vpngate
+sstp://vpn:vpn@vpn813516587.opengw.net:1534,sstp,vpn813516587.opengw.net,1534,3060,0,alive,-,JP,123.48.124.169,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-11-07 14:03:05,vpngate
+sstp://vpn:vpn@vpn288376367.opengw.net:1616,sstp,vpn288376367.opengw.net,1616,3063,0,alive,-,KR,121.168.7.194,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn953960224.opengw.net:1223,sstp,vpn953960224.opengw.net,1223,3063,0,alive,-,JP,106.173.94.75,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-13 14:49:54,vpngate
+sstp://vpn:vpn@vpn607155856.opengw.net:995,sstp,vpn607155856.opengw.net,995,3067,0,alive,-,KR,211.197.16.109,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-03 22:57:17,vpngate
+sstp://vpn:vpn@vpn537261568.opengw.net:1525,sstp,vpn537261568.opengw.net,1525,3082,0,alive,-,JP,220.147.116.46,AS2519 ARTERIA Networks Corporation,ARTERIA Networks Corporation,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn590702886.opengw.net:1250,sstp,vpn590702886.opengw.net,1250,3093,0,alive,-,JP,114.190.203.143,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-16 08:16:14,vpngate
+sstp://vpn:vpn@vpn754234555.opengw.net:1288,sstp,vpn754234555.opengw.net,1288,3094,0,alive,-,KR,58.120.113.176,AS9318 SK Broadband,SK Broadband,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn493435183.opengw.net:1808,sstp,vpn493435183.opengw.net,1808,3095,0,alive,-,KR,211.226.71.219,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-15 12:44:41,vpngate
+sstp://vpn:vpn@vpn584377130.opengw.net:1822,sstp,vpn584377130.opengw.net,1822,3099,0,alive,-,JP,14.14.148.93,"AS131933 TAMA Television Co., Ltd","TAMA Television Co., Ltd",isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn857348997.opengw.net:1544,sstp,vpn857348997.opengw.net,1544,3099,0,alive,-,JP,59.135.18.252,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-07 14:03:05,vpngate
+sstp://vpn:vpn@vpn771871278.opengw.net:1980,sstp,vpn771871278.opengw.net,1980,3102,0,alive,-,JP,113.148.121.15,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-17 08:16:24,vpngate
+sstp://vpn:vpn@vpn344602886.opengw.net:1566,sstp,vpn344602886.opengw.net,1566,3103,0,alive,-,JP,113.153.88.108,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-07 14:03:05,vpngate
+sstp://vpn:vpn@vpn819073110.opengw.net:1460,sstp,vpn819073110.opengw.net,1460,3103,0,alive,-,JP,175.129.177.154,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-15 14:38:37,vpngate
+sstp://vpn:vpn@vpn873142806.opengw.net:1601,sstp,vpn873142806.opengw.net,1601,3107,0,alive,-,JP,60.36.27.254,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-05 14:53:11,vpngate
+sstp://vpn:vpn@vpn578034962.opengw.net:1702,sstp,vpn578034962.opengw.net,1702,3108,0,alive,-,JP,133.218.25.217,AS2497 Internet Initiative Japan Inc.,Internet Initiative Japan Inc.,isp,2026-11-13 14:54:12,vpngate
+sstp://vpn:vpn@vpn844197835.opengw.net:1411,sstp,vpn844197835.opengw.net,1411,3115,0,alive,-,JP,118.106.186.89,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn341010937.opengw.net:1262,sstp,vpn341010937.opengw.net,1262,3118,0,alive,-,JP,222.5.66.192,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn110060260.opengw.net:1571,sstp,vpn110060260.opengw.net,1571,3131,0,alive,-,JP,59.135.173.211,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-06 14:52:45,vpngate
+sstp://vpn:vpn@vpn239647879.opengw.net:1455,sstp,vpn239647879.opengw.net,1455,3133,0,alive,-,KR,106.244.202.130,AS3786 LG DACOM Corporation,LG DACOM Corporation,isp,2026-10-13 14:49:54,vpngate
+sstp://vpn:vpn@vpn757848378.opengw.net:1362,sstp,vpn757848378.opengw.net,1362,3134,0,alive,-,JP,59.129.4.77,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-03 14:55:56,vpngate
+sstp://vpn:vpn@vpn555510505.opengw.net:1982,sstp,vpn555510505.opengw.net,1982,3134,0,alive,-,JP,60.95.184.243,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn857724419.opengw.net:1833,sstp,vpn857724419.opengw.net,1833,3138,0,alive,-,JP,118.155.130.9,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-17 08:16:24,vpngate
+sstp://vpn:vpn@vpn517690502.opengw.net:1461,sstp,vpn517690502.opengw.net,1461,3153,0,alive,-,JP,118.156.174.68,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-03 16:48:27,vpngate
+sstp://vpn:vpn@vpn609211715.opengw.net:1679,sstp,vpn609211715.opengw.net,1679,3155,0,alive,-,KR,125.139.26.49,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn802423284.opengw.net:1404,sstp,vpn802423284.opengw.net,1404,3159,0,alive,-,JP,118.105.254.152,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn305114740.opengw.net:995,sstp,vpn305114740.opengw.net,995,3163,0,alive,-,KR,121.187.145.165,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-13 14:49:54,vpngate
+sstp://vpn:vpn@vpn855340230.opengw.net:1295,sstp,vpn855340230.opengw.net,1295,3165,0,alive,-,KR,210.178.97.55,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-11 14:31:06,vpngate
+sstp://vpn:vpn@vpn817586559.opengw.net:1580,sstp,vpn817586559.opengw.net,1580,3165,0,alive,-,JP,153.200.131.48,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-06 14:52:45,vpngate
+sstp://vpn:vpn@vpn887613862.opengw.net:1524,sstp,vpn887613862.opengw.net,1524,3168,0,alive,-,KR,211.194.138.171,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn810318235.opengw.net:1628,sstp,vpn810318235.opengw.net,1628,3169,0,alive,-,JP,124.209.182.165,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-17 08:16:24,vpngate
+sstp://vpn:vpn@vpn676945411.opengw.net:1236,sstp,vpn676945411.opengw.net,1236,3170,0,alive,-,KR,182.226.193.209,AS17858 LG POWERCOMM,LG POWERCOMM,isp,2026-11-09 14:39:00,vpngate
+sstp://vpn:vpn@vpn170723006.opengw.net:1941,sstp,vpn170723006.opengw.net,1941,3171,0,alive,-,KR,61.41.136.244,AS3786 LG DACOM Corporation,LG DACOM Corporation,isp,2026-10-13 14:49:54,vpngate
+sstp://vpn:vpn@vpn385564263.opengw.net:995,sstp,vpn385564263.opengw.net,995,3177,0,alive,-,KR,210.97.97.111,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-09 14:13:10,vpngate
+sstp://vpn:vpn@vpn309937355.opengw.net:995,sstp,vpn309937355.opengw.net,995,3179,0,alive,-,KR,118.34.249.240,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-09 14:39:00,vpngate
+sstp://vpn:vpn@vpn927671187.opengw.net:1759,sstp,vpn927671187.opengw.net,1759,3180,0,alive,-,JP,180.36.142.19,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-02 14:11:43,vpngate
+sstp://vpn:vpn@vpn302973296.opengw.net:1333,sstp,vpn302973296.opengw.net,1333,3185,0,alive,-,KR,61.82.162.106,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-06 14:52:45,vpngate
+sstp://vpn:vpn@vpn479781942.opengw.net:1539,sstp,vpn479781942.opengw.net,1539,3186,0,alive,-,JP,126.110.76.239,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn215697364.opengw.net:1663,sstp,vpn215697364.opengw.net,1663,3190,0,alive,-,KR,118.41.251.223,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-10 15:23:16,vpngate
+sstp://vpn:vpn@vpn937509069.opengw.net:995,sstp,vpn937509069.opengw.net,995,3195,0,alive,-,KR,222.121.5.240,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-06 14:52:45,vpngate
+sstp://vpn:vpn@vpn602568162.opengw.net:1828,sstp,vpn602568162.opengw.net,1828,3198,0,alive,-,KR,49.165.136.156,AS17858 LG POWERCOMM,LG POWERCOMM,isp,2026-10-21 15:52:42,vpngate
+sstp://vpn:vpn@vpn617491321.opengw.net:1931,sstp,vpn617491321.opengw.net,1931,3201,0,alive,-,JP,220.220.169.115,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-14 14:39:09,vpngate
+sstp://vpn:vpn@vpn631682929.opengw.net:1985,sstp,vpn631682929.opengw.net,1985,3201,0,alive,-,KR,175.199.129.108,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-03 14:55:56,vpngate
+sstp://vpn:vpn@vpn954065459.opengw.net:1954,sstp,vpn954065459.opengw.net,1954,3202,0,alive,-,KR,175.113.163.59,AS9318 SK Broadband,SK Broadband,isp,2026-11-08 14:06:45,vpngate
+sstp://vpn:vpn@vpn210599978.opengw.net:995,sstp,vpn210599978.opengw.net,995,3204,0,alive,-,KR,220.89.214.125,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-04 17:03:41,vpngate
+sstp://vpn:vpn@vpn587535377.opengw.net:995,sstp,vpn587535377.opengw.net,995,3204,0,alive,-,KR,14.53.158.56,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn354665789.opengw.net:1663,sstp,vpn354665789.opengw.net,1663,3207,0,alive,-,KR,125.139.168.226,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-09 14:39:00,vpngate
+sstp://vpn:vpn@vpn474602972.opengw.net:995,sstp,vpn474602972.opengw.net,995,3211,0,alive,-,KR,119.198.13.79,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-20 12:55:22,vpngate
+sstp://vpn:vpn@vpn311836490.opengw.net:1679,sstp,vpn311836490.opengw.net,1679,3214,0,alive,-,JP,210.167.90.232,AS7664 HARENET INC.,HARENET INC.,isp,2026-11-12 15:18:03,vpngate
+sstp://vpn:vpn@vpn549895847.opengw.net:995,sstp,vpn549895847.opengw.net,995,3219,0,alive,-,KR,218.146.184.184,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-13 14:54:12,vpngate
+sstp://vpn:vpn@vpn196131915.opengw.net:995,sstp,vpn196131915.opengw.net,995,3221,0,alive,-,KR,125.188.5.153,AS17858 LG POWERCOMM,LG POWERCOMM,isp,2026-10-09 14:13:10,vpngate
+sstp://vpn:vpn@vpn416596627.opengw.net:995,sstp,vpn416596627.opengw.net,995,3222,0,alive,-,KR,119.203.61.190,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn540491747.opengw.net:1811,sstp,vpn540491747.opengw.net,1811,3230,0,alive,-,JP,39.110.50.237,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn500645444.opengw.net:995,sstp,vpn500645444.opengw.net,995,3236,0,alive,-,KR,121.189.172.218,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-12 15:18:03,vpngate
+sstp://vpn:vpn@vpn144440524.opengw.net:995,sstp,vpn144440524.opengw.net,995,3236,0,alive,-,KR,121.139.54.121,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-17 12:31:38,vpngate
+sstp://vpn:vpn@vpn368704878.opengw.net:1511,sstp,vpn368704878.opengw.net,1511,3239,0,alive,-,KR,182.220.175.195,AS17858 LG POWERCOMM,LG POWERCOMM,isp,2026-10-17 12:31:38,vpngate
+sstp://vpn:vpn@vpn154861873.opengw.net:995,sstp,vpn154861873.opengw.net,995,3254,0,alive,-,KR,183.107.123.109,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn883356300.opengw.net:995,sstp,vpn883356300.opengw.net,995,3256,0,alive,-,KR,220.80.129.191,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-11 14:31:06,vpngate
+sstp://vpn:vpn@vpn195809939.opengw.net:1632,sstp,vpn195809939.opengw.net,1632,3259,0,alive,-,KR,221.165.229.38,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-03 14:55:56,vpngate
+sstp://vpn:vpn@vpn587057222.opengw.net:1817,sstp,vpn587057222.opengw.net,1817,3259,0,alive,-,JP,133.218.182.132,AS2497 Internet Initiative Japan Inc.,Internet Initiative Japan Inc.,isp,2026-10-18 12:38:28,vpngate
+sstp://vpn:vpn@vpn565359082.opengw.net:1627,sstp,vpn565359082.opengw.net,1627,3265,0,alive,-,JP,126.216.249.148,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-10-13 14:49:54,vpngate
+sstp://vpn:vpn@vpn187374041.opengw.net:1665,sstp,vpn187374041.opengw.net,1665,3267,0,alive,-,KR,211.230.34.243,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-06 14:52:45,vpngate
+sstp://vpn:vpn@vpn678504843.opengw.net:1926,sstp,vpn678504843.opengw.net,1926,3273,0,alive,-,JP,219.104.84.18,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-11-12 15:18:03,vpngate
+sstp://vpn:vpn@vpn661075949.opengw.net:1221,sstp,vpn661075949.opengw.net,1221,3275,0,alive,-,KR,221.143.128.247,AS9318 SK Broadband,SK Broadband,isp,2026-10-20 12:55:22,vpngate
+sstp://vpn:vpn@vpn643142339.opengw.net:1205,sstp,vpn643142339.opengw.net,1205,3277,0,alive,-,KR,125.129.66.184,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn459624604.opengw.net:995,sstp,vpn459624604.opengw.net,995,3279,0,alive,-,KR,211.38.57.123,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn582729051.opengw.net:1885,sstp,vpn582729051.opengw.net,1885,3281,0,alive,-,JP,210.203.247.119,"AS7679 QTnet, Inc.","QTnet, Inc.",isp,2026-10-19 12:45:55,vpngate
+sstp://vpn:vpn@vpn936512836.opengw.net:1675,sstp,vpn936512836.opengw.net,1675,3284,0,alive,-,KR,61.85.153.157,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn833665549.opengw.net:1809,sstp,vpn833665549.opengw.net,1809,3284,0,alive,-,KR,183.105.2.201,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-13 14:54:12,vpngate
+sstp://vpn:vpn@vpn258563631.opengw.net:1423,sstp,vpn258563631.opengw.net,1423,3290,0,alive,-,JP,153.232.30.226,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn841245340.opengw.net:995,sstp,vpn841245340.opengw.net,995,3294,0,alive,-,KR,39.122.7.119,AS9318 SK Broadband,SK Broadband,isp,2026-10-14 12:57:52,vpngate
+sstp://vpn:vpn@vpn314046814.opengw.net:1792,sstp,vpn314046814.opengw.net,1792,3299,0,alive,-,KR,221.151.149.159,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn316272186.opengw.net:1600,sstp,vpn316272186.opengw.net,1600,3302,0,alive,-,KR,175.208.245.143,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-11 14:31:06,vpngate
+sstp://vpn:vpn@vpn110532732.opengw.net:995,sstp,vpn110532732.opengw.net,995,3312,0,alive,-,KR,222.97.185.245,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-07 14:03:05,vpngate
+sstp://vpn:vpn@vpn660300968.opengw.net:995,sstp,vpn660300968.opengw.net,995,3321,0,alive,-,KR,211.109.119.190,AS9318 SK Broadband,SK Broadband,isp,2026-11-14 14:39:09,vpngate
+sstp://vpn:vpn@vpn802629635.opengw.net:1878,sstp,vpn802629635.opengw.net,1878,3329,0,alive,-,KR,112.223.241.142,AS3786 LG DACOM Corporation,LG DACOM Corporation,isp,2026-11-10 15:23:16,vpngate
+sstp://vpn:vpn@vpn258326420.opengw.net:1662,sstp,vpn258326420.opengw.net,1662,3344,0,alive,-,KR,114.203.5.161,AS9318 SK Broadband,SK Broadband,isp,2026-11-16 08:16:14,vpngate
+sstp://vpn:vpn@vpn244093263.opengw.net:443,sstp,vpn244093263.opengw.net,443,3347,0,alive,-,KR,121.178.149.102,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-20 12:55:22,vpngate
+sstp://vpn:vpn@vpn592186041.opengw.net:1279,sstp,vpn592186041.opengw.net,1279,3348,0,alive,-,US,69.201.144.202,AS12271 Charter Communications Inc,Charter Communications Inc,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn905373738.opengw.net:995,sstp,vpn905373738.opengw.net,995,3362,0,alive,-,KR,14.53.209.4,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-16 08:16:14,vpngate
+sstp://vpn:vpn@vpn603234016.opengw.net:1768,sstp,vpn603234016.opengw.net,1768,3371,0,alive,-,JP,220.109.55.183,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-02 14:11:43,vpngate
+sstp://vpn:vpn@vpn744397655.opengw.net:1870,sstp,vpn744397655.opengw.net,1870,3375,0,alive,-,KR,121.132.40.39,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-16 08:16:14,vpngate
+sstp://vpn:vpn@vpn122709402.opengw.net:995,sstp,vpn122709402.opengw.net,995,3378,0,alive,-,KR,211.226.34.183,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-12 15:18:13,vpngate
+sstp://vpn:vpn@vpn783575401.opengw.net:1414,sstp,vpn783575401.opengw.net,1414,3378,0,alive,-,KR,119.195.254.240,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-11 14:31:06,vpngate
+sstp://vpn:vpn@vpn222286321.opengw.net:1714,sstp,vpn222286321.opengw.net,1714,3391,0,alive,-,JP,113.154.137.98,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-04 14:35:03,vpngate
+sstp://vpn:vpn@vpn919430003.opengw.net:1384,sstp,vpn919430003.opengw.net,1384,3393,0,alive,-,KR,118.48.244.181,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-16 08:16:14,vpngate
+sstp://vpn:vpn@vpn384389733.opengw.net:995,sstp,vpn384389733.opengw.net,995,3407,0,alive,-,KR,183.103.11.71,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-17 08:16:24,vpngate
+sstp://vpn:vpn@vpn670095336.opengw.net:1622,sstp,vpn670095336.opengw.net,1622,3412,0,alive,-,JP,39.111.204.72,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-11-15 14:38:37,vpngate
+sstp://vpn:vpn@vpn414557377.opengw.net:1578,sstp,vpn414557377.opengw.net,1578,3415,0,alive,-,JP,157.65.79.59,"AS2514 NTT PC Communications, Inc.","NTT PC Communications, Inc.",isp,2026-11-09 14:39:00,vpngate
+sstp://vpn:vpn@vpn718496341.opengw.net:1625,sstp,vpn718496341.opengw.net,1625,3417,0,alive,-,JP,110.135.224.143,"AS9824 JCOM Co., Ltd.","JCOM Co., Ltd.",isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@intranet-bpkskaboki.opengw.net:443,sstp,intranet-bpkskaboki.opengw.net,443,3418,0,alive,-,ID,182.9.226.8,AS23693 PT. Telekomunikasi Selular,PT. Telekomunikasi Selular,isp,2026-11-06 14:52:45,vpngate
+sstp://vpn:vpn@vpn495179031.opengw.net:1426,sstp,vpn495179031.opengw.net,1426,3422,0,alive,-,JP,119.244.114.221,AS2518 BIGLOBE Inc.,BIGLOBE Inc.,isp,2026-10-15 12:44:41,vpngate
+sstp://vpn:vpn@vpn456065584.opengw.net:1511,sstp,vpn456065584.opengw.net,1511,3425,0,alive,-,JP,114.180.104.207,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-10-14 12:57:52,vpngate
+sstp://vpn:vpn@vpn183424407.opengw.net:995,sstp,vpn183424407.opengw.net,995,3436,0,alive,-,KR,112.170.131.60,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-03 14:55:56,vpngate
+sstp://vpn:vpn@vpn176878445.opengw.net:1393,sstp,vpn176878445.opengw.net,1393,3450,0,alive,-,JP,60.71.4.56,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-15 14:38:37,vpngate
+sstp://vpn:vpn@vpn570604960.opengw.net:1868,sstp,vpn570604960.opengw.net,1868,3455,0,alive,-,JP,183.177.148.20,AS2519 ARTERIA Networks Corporation,ARTERIA Networks Corporation,isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn945367046.opengw.net:1857,sstp,vpn945367046.opengw.net,1857,3459,0,alive,-,JP,42.127.200.58,AS10010 TOKAI Communications Corporation,TOKAI Communications Corporation,isp,2026-10-20 12:55:22,vpngate
+sstp://vpn:vpn@vpn981697033.opengw.net:1254,sstp,vpn981697033.opengw.net,1254,3468,0,alive,-,JP,113.145.230.120,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn501671840.opengw.net:1285,sstp,vpn501671840.opengw.net,1285,3469,0,alive,-,JP,119.83.242.105,AS10010 TOKAI Communications Corporation,TOKAI Communications Corporation,isp,2026-11-09 14:39:00,vpngate
+sstp://vpn:vpn@vpn759761201.opengw.net:1521,sstp,vpn759761201.opengw.net,1521,3481,0,alive,-,AU,125.253.56.120,AS38195 SUPERLOOP (AUSTRALIA) PTY LTD,SUPERLOOP (AUSTRALIA) PTY LTD,isp,2026-11-14 14:39:09,vpngate
+sstp://vpn:vpn@vpn265216273.opengw.net:1459,sstp,vpn265216273.opengw.net,1459,3485,0,alive,-,KR,118.37.33.91,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-19 12:45:55,vpngate
+sstp://vpn:vpn@vpn439439614.opengw.net:1882,sstp,vpn439439614.opengw.net,1882,3508,0,alive,-,TH,27.130.39.192,AS133481 AIS-Fibre,AIS-Fibre,isp,2026-11-09 14:39:00,vpngate
+sstp://vpn:vpn@vpn718820171.opengw.net:1399,sstp,vpn718820171.opengw.net,1399,3511,0,alive,-,JP,210.239.247.25,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-21 15:52:42,vpngate
+sstp://vpn:vpn@vpn957218909.opengw.net:1814,sstp,vpn957218909.opengw.net,1814,3526,0,alive,-,KR,123.248.163.147,AS9845 LG HelloVision Corp.,LG HelloVision Corp.,isp,2026-11-11 14:31:06,vpngate
+sstp://vpn:vpn@vpn325993554.opengw.net:1607,sstp,vpn325993554.opengw.net,1607,3528,0,alive,-,KR,119.194.16.155,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn217330954.opengw.net:1871,sstp,vpn217330954.opengw.net,1871,3536,0,alive,-,KR,27.117.225.40,AS9756 SK Broadband Co Ltd,SK Broadband Co Ltd,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn512980585.opengw.net:1847,sstp,vpn512980585.opengw.net,1847,3553,0,alive,-,KR,121.145.217.199,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn989367060.opengw.net:1531,sstp,vpn989367060.opengw.net,1531,3561,0,alive,-,JP,106.177.117.146,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-10 15:23:16,vpngate
+sstp://vpn:vpn@vpn765536599.opengw.net:1797,sstp,vpn765536599.opengw.net,1797,3572,0,alive,-,JP,125.192.225.196,AS2518 BIGLOBE Inc.,BIGLOBE Inc.,isp,2026-11-04 14:35:03,vpngate
+sstp://vpn:vpn@vpn919107394.opengw.net:1984,sstp,vpn919107394.opengw.net,1984,3580,0,alive,-,KR,118.47.203.12,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-17 08:16:24,vpngate
+sstp://vpn:vpn@vpn983949836.opengw.net:1402,sstp,vpn983949836.opengw.net,1402,3599,0,alive,-,JP,113.154.84.113,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-04 17:03:41,vpngate
+sstp://vpn:vpn@vpn103948172.opengw.net:1785,sstp,vpn103948172.opengw.net,1785,3599,0,alive,-,AU,120.147.155.231,AS1221 Telstra Limited,Telstra Limited,isp,2026-10-03 16:48:27,vpngate
+sstp://vpn:vpn@vpn764427404.opengw.net:1716,sstp,vpn764427404.opengw.net,1716,3600,0,alive,-,VN,14.226.235.31,AS45899 VNPT Corp,VNPT Corp,isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn539804093.opengw.net:1974,sstp,vpn539804093.opengw.net,1974,3600,0,alive,-,LT,77.79.18.229,"AS25406 SPLIUS, UAB","SPLIUS, UAB",isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn451071809.opengw.net:1940,sstp,vpn451071809.opengw.net,1940,3603,0,alive,-,JP,115.36.117.14,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-10-08 14:09:40,vpngate
+sstp://vpn:vpn@vpn986755484.opengw.net:1852,sstp,vpn986755484.opengw.net,1852,3626,0,alive,-,HK,58.152.29.26,AS4760 HKT,HKT,isp,2026-11-13 14:54:12,vpngate
+sstp://vpn:vpn@vpn650277207.opengw.net:1571,sstp,vpn650277207.opengw.net,1571,3634,0,alive,-,TH,171.5.32.100,AS45758 TRIPLETNET,TRIPLETNET,isp,2026-11-15 14:38:37,vpngate
+sstp://vpn:vpn@vpn774482453.opengw.net:995,sstp,vpn774482453.opengw.net,995,3678,0,alive,-,KR,112.170.75.29,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-03 16:48:27,vpngate
+sstp://vpn:vpn@vpn893273760.opengw.net:1572,sstp,vpn893273760.opengw.net,1572,3690,0,alive,-,KR,14.47.236.43,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-04 14:35:03,vpngate
+sstp://vpn:vpn@vpn799731089.opengw.net:995,sstp,vpn799731089.opengw.net,995,3698,0,alive,-,KR,121.152.63.103,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-08 14:09:40,vpngate
+sstp://vpn:vpn@vpn290770797.opengw.net:1792,sstp,vpn290770797.opengw.net,1792,3719,0,alive,-,JP,143.90.77.225,AS4725 SoftBank Corp.,SoftBank Corp.,isp,2026-10-19 12:45:55,vpngate
+sstp://vpn:vpn@vpn561558391.opengw.net:1869,sstp,vpn561558391.opengw.net,1869,3719,0,alive,-,JP,175.135.210.151,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-05 14:53:11,vpngate
+sstp://vpn:vpn@vpn388072280.opengw.net:1336,sstp,vpn388072280.opengw.net,1336,3746,0,alive,-,JP,111.96.156.52,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-13 14:54:12,vpngate
+sstp://vpn:vpn@vpn801841079.opengw.net:1627,sstp,vpn801841079.opengw.net,1627,3754,0,alive,-,KR,221.162.216.59,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-13 14:54:12,vpngate
+sstp://vpn:vpn@vpn223473667.opengw.net:1822,sstp,vpn223473667.opengw.net,1822,3772,0,alive,-,JP,60.140.80.223,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-10-08 14:09:40,vpngate
+sstp://vpn:vpn@vpn514496438.opengw.net:995,sstp,vpn514496438.opengw.net,995,3780,0,alive,-,KR,1.236.29.27,AS9318 SK Broadband,SK Broadband,isp,2026-11-15 14:38:37,vpngate
+sstp://vpn:vpn@vpn641209777.opengw.net:1743,sstp,vpn641209777.opengw.net,1743,3790,0,alive,-,KR,121.146.152.111,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-14 14:39:09,vpngate
+sstp://vpn:vpn@vpn812357243.opengw.net:1752,sstp,vpn812357243.opengw.net,1752,3797,0,alive,-,KR,222.99.195.19,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-07 14:03:05,vpngate
+sstp://vpn:vpn@vpn393913001.opengw.net:1288,sstp,vpn393913001.opengw.net,1288,3802,0,alive,-,JP,114.187.215.46,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-10-20 12:55:22,vpngate
+sstp://vpn:vpn@vpn556067728.opengw.net:1510,sstp,vpn556067728.opengw.net,1510,3815,0,alive,-,JP,180.25.205.209,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn417968628.opengw.net:1286,sstp,vpn417968628.opengw.net,1286,3822,0,alive,-,KR,121.142.104.60,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-14 12:57:52,vpngate
+sstp://vpn:vpn@vpn607835809.opengw.net:1921,sstp,vpn607835809.opengw.net,1921,3835,0,alive,-,RU,5.228.228.136,AS42610 Rostelecom,Rostelecom,isp,2026-10-15 12:44:41,vpngate
+sstp://vpn:vpn@vpn557835489.opengw.net:1717,sstp,vpn557835489.opengw.net,1717,3856,0,alive,-,KR,58.150.189.252,AS3786 LG DACOM Corporation,LG DACOM Corporation,isp,2026-10-16 12:36:06,vpngate
+sstp://vpn:vpn@vpn379858910.opengw.net:1224,sstp,vpn379858910.opengw.net,1224,3861,0,alive,-,JP,126.115.253.212,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn258242456.opengw.net:1659,sstp,vpn258242456.opengw.net,1659,3871,0,alive,-,JP,113.154.38.15,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn339013576.opengw.net:1397,sstp,vpn339013576.opengw.net,1397,3874,0,alive,-,JP,153.134.150.194,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-10-18 12:38:28,vpngate
+sstp://vpn:vpn@vpn911251431.opengw.net:1661,sstp,vpn911251431.opengw.net,1661,3895,0,alive,-,JP,126.59.87.213,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-02 14:11:43,vpngate
+sstp://vpn:vpn@vpn398736484.opengw.net:1723,sstp,vpn398736484.opengw.net,1723,3909,0,alive,-,IT,45.89.183.66,AS28716 Retelit Digital Services S.p.A.,Retelit Digital Services S.p.A.,isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn611290657.opengw.net:1555,sstp,vpn611290657.opengw.net,1555,3930,0,alive,-,JP,218.46.187.22,AS4725 SoftBank Corp.,SoftBank Corp.,isp,2026-11-09 14:39:00,vpngate
+sstp://vpn:vpn@vpn453085161.opengw.net:443,sstp,vpn453085161.opengw.net,443,3999,0,alive,-,JP,124.35.90.232,AS17506 ARTERIA Networks Corporation,ARTERIA Networks Corporation,isp,2026-11-14 14:39:09,vpngate
+sstp://vpn:vpn@vpn743566583.opengw.net:1775,sstp,vpn743566583.opengw.net,1775,4068,0,alive,-,VN,113.23.97.200,AS18403 FPT Telecom Company,FPT Telecom Company,isp,2026-11-17 08:16:24,vpngate
+sstp://vpn:vpn@vpn893972689.opengw.net:1934,sstp,vpn893972689.opengw.net,1934,4081,0,alive,-,KR,121.186.118.191,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn279190265.opengw.net:1901,sstp,vpn279190265.opengw.net,1901,4095,0,alive,-,VN,118.68.222.174,AS18403 FPT Telecom Company,FPT Telecom Company,isp,2026-11-12 15:18:03,vpngate
+sstp://vpn:vpn@vpn562631411.opengw.net:1791,sstp,vpn562631411.opengw.net,1791,4108,0,alive,-,KR,121.131.159.91,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-10 15:23:16,vpngate
+sstp://vpn:vpn@vpn948645988.opengw.net:1350,sstp,vpn948645988.opengw.net,1350,4133,0,alive,-,TH,49.48.100.54,AS45758 TRIPLETNET,TRIPLETNET,isp,2026-11-16 08:16:14,vpngate
+sstp://vpn:vpn@vpn579453483.opengw.net:1730,sstp,vpn579453483.opengw.net,1730,4155,0,alive,-,JP,111.169.157.96,AS2518 BIGLOBE Inc.,BIGLOBE Inc.,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn974047537.opengw.net:995,sstp,vpn974047537.opengw.net,995,4160,0,alive,-,KR,175.212.24.234,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn835280998.opengw.net:995,sstp,vpn835280998.opengw.net,995,4162,0,alive,-,KR,123.199.109.248,AS10066 LG HelloVision Corp.,LG HelloVision Corp.,isp,2026-11-11 14:31:06,vpngate
+sstp://vpn:vpn@vpn833698783.opengw.net:1306,sstp,vpn833698783.opengw.net,1306,4195,0,alive,-,KR,14.47.79.84,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-13 14:54:12,vpngate
+sstp://vpn:vpn@vpn258365250.opengw.net:1332,sstp,vpn258365250.opengw.net,1332,4206,0,alive,-,KR,115.91.247.102,AS3786 LG DACOM Corporation,LG DACOM Corporation,isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn700189518.opengw.net:1843,sstp,vpn700189518.opengw.net,1843,4235,0,alive,-,JP,175.129.193.120,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-14 14:39:09,vpngate
+sstp://vpn:vpn@vpn825915245.opengw.net:1545,sstp,vpn825915245.opengw.net,1545,4262,0,alive,-,JP,60.35.135.188,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-09 14:39:00,vpngate
+sstp://vpn:vpn@vpn659080135.opengw.net:1521,sstp,vpn659080135.opengw.net,1521,4275,0,alive,-,VN,42.115.122.153,AS18403 FPT Telecom Company,FPT Telecom Company,isp,2026-11-17 08:16:24,vpngate
+sstp://vpn:vpn@vpn516642203.opengw.net:1548,sstp,vpn516642203.opengw.net,1548,4300,0,alive,-,VN,118.68.222.174,AS18403 FPT Telecom Company,FPT Telecom Company,isp,2026-11-12 15:18:03,vpngate
+sstp://vpn:vpn@vpn988447200.opengw.net:995,sstp,vpn988447200.opengw.net,995,4335,0,alive,-,KR,14.52.147.14,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-10 15:23:16,vpngate
+sstp://vpn:vpn@vpn727893093.opengw.net:1292,sstp,vpn727893093.opengw.net,1292,4358,0,alive,-,KR,121.149.141.149,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-14 14:39:09,vpngate
+sstp://vpn:vpn@vpn535457630.opengw.net:1757,sstp,vpn535457630.opengw.net,1757,4362,0,alive,-,KR,49.174.213.183,AS17858 LG POWERCOMM,LG POWERCOMM,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn482501676.opengw.net:1282,sstp,vpn482501676.opengw.net,1282,4392,0,alive,-,JP,126.171.39.147,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-13 14:54:12,vpngate
+sstp://vpn:vpn@vpn662317581.opengw.net:1817,sstp,vpn662317581.opengw.net,1817,4439,0,alive,-,JP,133.218.195.250,AS2497 Internet Initiative Japan Inc.,Internet Initiative Japan Inc.,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn405907076.opengw.net:1387,sstp,vpn405907076.opengw.net,1387,4448,0,alive,-,KR,119.195.163.98,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-17 08:16:24,vpngate
+sstp://vpn:vpn@vpn824185996.opengw.net:1819,sstp,vpn824185996.opengw.net,1819,4457,0,alive,-,KR,118.34.210.174,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn597695903.opengw.net:1347,sstp,vpn597695903.opengw.net,1347,4488,0,alive,-,KR,210.95.123.32,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-08 14:06:45,vpngate
+sstp://vpn:vpn@vpn421481264.opengw.net:1462,sstp,vpn421481264.opengw.net,1462,4551,0,alive,-,RU,37.112.182.131,AS50512 JSC ER-Telecom Holding Barnaul branch,JSC ER-Telecom Holding Barnaul branch,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn223114256.opengw.net:1210,sstp,vpn223114256.opengw.net,1210,4566,0,alive,-,JP,126.26.219.99,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-06 14:52:45,vpngate
+sstp://vpn:vpn@vpn922312929.opengw.net:1997,sstp,vpn922312929.opengw.net,1997,4595,0,alive,-,VN,113.23.97.200,AS18403 FPT Telecom Company,FPT Telecom Company,isp,2026-11-05 14:53:11,vpngate
+sstp://vpn:vpn@vpn266997445.opengw.net:1544,sstp,vpn266997445.opengw.net,1544,4617,0,alive,-,RU,217.144.174.117,"AS12737 KrasPromStroy, LLC","KrasPromStroy, LLC",isp,2026-11-04 14:35:03,vpngate
+sstp://vpn:vpn@vpn436828976.opengw.net:995,sstp,vpn436828976.opengw.net,995,4619,0,alive,-,KR,14.33.160.103,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn693348819.opengw.net:1602,sstp,vpn693348819.opengw.net,1602,4662,0,alive,-,JP,115.38.22.45,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-11-16 08:16:14,vpngate
+sstp://vpn:vpn@vpn812564070.opengw.net:1266,sstp,vpn812564070.opengw.net,1266,4680,0,alive,-,JP,219.112.171.47,AS10010 TOKAI Communications Corporation,TOKAI Communications Corporation,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn291090802.opengw.net:1878,sstp,vpn291090802.opengw.net,1878,4684,0,alive,-,JP,118.106.120.218,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-10-06 14:25:18,vpngate
+sstp://vpn:vpn@vpn267143494.opengw.net:1512,sstp,vpn267143494.opengw.net,1512,4708,0,alive,-,JP,123.48.6.30,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-11-07 14:03:05,vpngate
+sstp://vpn:vpn@vpn837518130.opengw.net:995,sstp,vpn837518130.opengw.net,995,4756,0,alive,-,KR,175.212.234.186,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-17 08:16:24,vpngate
+sstp://vpn:vpn@vpn898436612.opengw.net:1507,sstp,vpn898436612.opengw.net,1507,4783,0,alive,-,JP,126.60.198.88,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-14 14:39:09,vpngate
+sstp://vpn:vpn@vpn604676767.opengw.net:1463,sstp,vpn604676767.opengw.net,1463,4818,0,alive,-,JP,180.28.85.203,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-14 14:39:09,vpngate
+sstp://vpn:vpn@vpn104717671.opengw.net:1419,sstp,vpn104717671.opengw.net,1419,4838,0,alive,-,JP,36.13.6.150,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-17 12:31:38,vpngate
+sstp://vpn:vpn@vpn454958850.opengw.net:1799,sstp,vpn454958850.opengw.net,1799,4847,0,alive,-,JP,121.105.126.183,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-20 12:55:22,vpngate
+sstp://vpn:vpn@vpn880633907.opengw.net:1767,sstp,vpn880633907.opengw.net,1767,4853,0,alive,-,JP,60.149.136.130,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-10 15:23:16,vpngate
+sstp://vpn:vpn@vpn245905369.opengw.net:1362,sstp,vpn245905369.opengw.net,1362,4859,0,alive,-,KR,180.211.26.133,AS45361 Ulsan Jung-Ang Broadcasting Network,Ulsan Jung-Ang Broadcasting Network,isp,2026-11-02 14:11:43,vpngate
+sstp://vpn:vpn@vpn521310356.opengw.net:995,sstp,vpn521310356.opengw.net,995,4904,0,alive,-,KR,211.174.64.187,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-07 14:03:05,vpngate
+sstp://vpn:vpn@vpn966533712.opengw.net:1941,sstp,vpn966533712.opengw.net,1941,4992,0,alive,-,KR,59.6.114.202,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-03 22:57:17,vpngate
+sstp://vpn:vpn@vpn671350283.opengw.net:1820,sstp,vpn671350283.opengw.net,1820,5028,0,alive,-,JP,180.36.142.19,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-17 08:16:24,vpngate
+sstp://vpn:vpn@vpn127203103.opengw.net:1621,sstp,vpn127203103.opengw.net,1621,5037,0,alive,-,JP,180.144.156.188,AS17511 OPTAGE Inc.,OPTAGE Inc.,isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn522940692.opengw.net:1351,sstp,vpn522940692.opengw.net,1351,5037,0,alive,-,JP,219.100.26.85,"AS18134 JCOM Co., Ltd.","JCOM Co., Ltd.",isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn789825960.opengw.net:995,sstp,vpn789825960.opengw.net,995,5040,0,alive,-,KR,220.77.247.211,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-10 15:23:16,vpngate
+sstp://vpn:vpn@vpn281352524.opengw.net:1821,sstp,vpn281352524.opengw.net,1821,5104,0,alive,-,KR,211.198.239.92,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-05 14:53:11,vpngate
+sstp://vpn:vpn@vpn402970398.opengw.net:1421,sstp,vpn402970398.opengw.net,1421,5124,0,alive,-,KR,211.179.204.251,AS9318 SK Broadband,SK Broadband,isp,2026-11-12 15:18:03,vpngate
+sstp://vpn:vpn@vpn472255809.opengw.net:1630,sstp,vpn472255809.opengw.net,1630,5137,0,alive,-,US,184.189.126.134,AS22773 Cox Communications Inc.,Cox Communications Inc.,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn616337766.opengw.net:1914,sstp,vpn616337766.opengw.net,1914,5172,0,alive,-,JP,61.245.205.8,"AS23786 San-in Cable Vision CO.,LTD","San-in Cable Vision CO.,LTD",isp,2026-11-13 14:54:12,vpngate
+sstp://vpn:vpn@vpn480854733.opengw.net:1335,sstp,vpn480854733.opengw.net,1335,5192,0,alive,-,KR,39.115.216.44,AS9318 SK Broadband,SK Broadband,isp,2026-10-16 12:36:06,vpngate
+sstp://vpn:vpn@vpn875209728.opengw.net:995,sstp,vpn875209728.opengw.net,995,5212,0,alive,-,KR,125.133.177.25,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-03 16:48:27,vpngate
+sstp://vpn:vpn@vpn103557447.opengw.net:1950,sstp,vpn103557447.opengw.net,1950,5273,0,alive,-,MX,189.143.199.233,AS8151 UNINET,UNINET,isp,2026-11-04 14:35:03,vpngate
+sstp://vpn:vpn@vpn715953533.opengw.net:995,sstp,vpn715953533.opengw.net,995,5286,0,alive,-,KR,220.90.237.122,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-05 14:53:11,vpngate
+sstp://vpn:vpn@vpn790592499.opengw.net:1866,sstp,vpn790592499.opengw.net,1866,5298,0,alive,-,JP,125.203.251.124,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-10-19 12:45:55,vpngate
+sstp://vpn:vpn@vpn408435278.opengw.net:1418,sstp,vpn408435278.opengw.net,1418,5300,0,alive,-,KR,183.106.84.223,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-06 14:25:18,vpngate
+sstp://vpn:vpn@vpn675037040.opengw.net:1205,sstp,vpn675037040.opengw.net,1205,5301,0,alive,-,JP,175.129.80.214,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-09 14:39:00,vpngate
+sstp://vpn:vpn@vpn684766837.opengw.net:1857,sstp,vpn684766837.opengw.net,1857,5307,0,alive,-,RU,45.140.95.8,AS8749 JSC Redcom-Internet,JSC Redcom-Internet,isp,2026-10-04 17:03:41,vpngate
+sstp://vpn:vpn@vpn225320874.opengw.net:1254,sstp,vpn225320874.opengw.net,1254,5311,0,alive,-,US,47.199.62.84,"AS5650 Frontier Communications of America, Inc.","Frontier Communications of America, Inc.",isp,2026-11-11 14:31:06,vpngate
+sstp://vpn:vpn@vpn121310799.opengw.net:1519,sstp,vpn121310799.opengw.net,1519,5315,0,alive,-,JP,133.114.223.195,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-10-07 14:04:24,vpngate
+sstp://vpn:vpn@vpn162822314.opengw.net:1672,sstp,vpn162822314.opengw.net,1672,5341,0,alive,-,KR,211.245.102.129,AS9318 SK Broadband,SK Broadband,isp,2026-10-16 12:36:06,vpngate
+sstp://vpn:vpn@vpn372045572.opengw.net:1745,sstp,vpn372045572.opengw.net,1745,5361,0,alive,-,RU,178.140.166.225,AS42610 Rostelecom,Rostelecom,isp,2026-11-14 14:39:09,vpngate
+sstp://vpn:vpn@vpn190140048.opengw.net:1484,sstp,vpn190140048.opengw.net,1484,5364,0,alive,-,JP,124.110.175.78,"AS9351 ZTV CO.,LTD","ZTV CO.,LTD",isp,2026-11-03 14:55:56,vpngate
+sstp://vpn:vpn@vpn780884596.opengw.net:995,sstp,vpn780884596.opengw.net,995,5378,0,alive,-,KR,59.15.18.145,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-03 14:55:56,vpngate
+sstp://vpn:vpn@vpn461782020.opengw.net:995,sstp,vpn461782020.opengw.net,995,5489,0,alive,-,KR,180.65.115.60,AS9318 SK Broadband,SK Broadband,isp,2026-11-04 14:35:03,vpngate
+sstp://vpn:vpn@vpn210064848.opengw.net:1784,sstp,vpn210064848.opengw.net,1784,5595,0,alive,-,KR,61.76.11.83,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-16 08:16:14,vpngate
+sstp://vpn:vpn@vpn750706241.opengw.net:1995,sstp,vpn750706241.opengw.net,1995,5695,0,alive,-,JP,118.104.101.56,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn698373679.opengw.net:1911,sstp,vpn698373679.opengw.net,1911,5696,0,alive,-,KR,123.109.244.227,AS38097 SK Broadband Co Ltd,SK Broadband Co Ltd,isp,2026-10-20 12:55:22,vpngate
+sstp://vpn:vpn@vpn765941161.opengw.net:1271,sstp,vpn765941161.opengw.net,1271,5719,0,alive,-,AE,2.50.202.231,AS5384 Emirates Telecommunications Corporation,Emirates Telecommunications Corporation,isp,2026-11-06 14:52:45,vpngate
+sstp://vpn:vpn@vpn176028958.opengw.net:1756,sstp,vpn176028958.opengw.net,1756,5770,0,alive,-,JP,119.171.255.242,"AS9824 JCOM Co., Ltd.","JCOM Co., Ltd.",isp,2026-10-14 12:57:52,vpngate
+sstp://vpn:vpn@vpn400941616.opengw.net:1400,sstp,vpn400941616.opengw.net,1400,5776,0,alive,-,KR,211.215.35.109,AS9318 SK Broadband,SK Broadband,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn177976718.opengw.net:1280,sstp,vpn177976718.opengw.net,1280,5912,0,alive,-,RU,86.102.21.211,AS12389 Primorye NET,Primorye NET,isp,2026-11-14 14:39:09,vpngate
+sstp://vpn:vpn@vpn178239969.opengw.net:1634,sstp,vpn178239969.opengw.net,1634,5934,0,alive,-,VN,118.68.222.174,AS18403 FPT Telecom Company,FPT Telecom Company,isp,2026-11-12 15:18:03,vpngate
+sstp://vpn:vpn@vpn271901051.opengw.net:995,sstp,vpn271901051.opengw.net,995,5972,0,alive,-,KR,112.172.66.114,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-14 14:39:09,vpngate
+sstp://vpn:vpn@vpn857876262.opengw.net:995,sstp,vpn857876262.opengw.net,995,5983,0,alive,-,KR,221.144.247.197,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn909561523.opengw.net:995,sstp,vpn909561523.opengw.net,995,5990,0,alive,-,KR,183.100.246.50,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-08 14:06:45,vpngate
+sstp://vpn:vpn@vpn451666403.opengw.net:1928,sstp,vpn451666403.opengw.net,1928,6011,0,alive,-,KR,1.223.113.29,AS3786 LG DACOM Corporation,LG DACOM Corporation,isp,2026-10-15 12:44:41,vpngate
+sstp://vpn:vpn@vpn433650989.opengw.net:1903,sstp,vpn433650989.opengw.net,1903,6026,0,alive,-,JP,114.19.166.236,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-08 14:06:45,vpngate
+sstp://vpn:vpn@vpn448129650.opengw.net:1625,sstp,vpn448129650.opengw.net,1625,6029,0,alive,-,KR,118.91.21.180,AS45374 CCS,CCS,isp,2026-11-02 14:11:43,vpngate
+sstp://vpn:vpn@vpn143703231.opengw.net:1372,sstp,vpn143703231.opengw.net,1372,6050,0,alive,-,JP,118.237.36.183,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-11-16 08:16:14,vpngate
+sstp://vpn:vpn@vpn811974197.opengw.net:1468,sstp,vpn811974197.opengw.net,1468,6077,0,alive,-,KR,210.113.225.149,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-16 08:16:14,vpngate
+sstp://vpn:vpn@vpn226365648.opengw.net:1202,sstp,vpn226365648.opengw.net,1202,6256,0,alive,-,KR,175.214.151.148,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn741602089.opengw.net:1210,sstp,vpn741602089.opengw.net,1210,6273,0,alive,-,KR,221.138.46.130,AS9318 SK Broadband,SK Broadband,isp,2026-10-12 15:18:13,vpngate
+sstp://vpn:vpn@vpn630461743.opengw.net:1378,sstp,vpn630461743.opengw.net,1378,6316,0,alive,-,JP,223.133.135.144,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-11-05 14:53:11,vpngate
+sstp://vpn:vpn@vpn922041785.opengw.net:1435,sstp,vpn922041785.opengw.net,1435,6426,0,alive,-,KR,121.189.231.253,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-09 14:39:00,vpngate
+sstp://vpn:vpn@vpn660186524.opengw.net:1915,sstp,vpn660186524.opengw.net,1915,6506,0,alive,-,KR,14.42.230.125,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-18 12:38:28,vpngate
+sstp://vpn:vpn@vpn847902032.opengw.net:1914,sstp,vpn847902032.opengw.net,1914,6566,0,alive,-,JP,118.105.178.39,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-10-13 14:49:54,vpngate
+sstp://vpn:vpn@vpn932007079.opengw.net:1293,sstp,vpn932007079.opengw.net,1293,6576,0,alive,-,JP,121.85.13.80,AS17511 OPTAGE Inc.,OPTAGE Inc.,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn842914014.opengw.net:1329,sstp,vpn842914014.opengw.net,1329,6608,0,alive,-,VN,118.68.222.174,AS18403 FPT Telecom Company,FPT Telecom Company,isp,2026-11-12 15:18:03,vpngate
+sstp://vpn:vpn@vpn122916437.opengw.net:1558,sstp,vpn122916437.opengw.net,1558,6615,0,alive,-,JP,123.48.124.169,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-11-07 14:03:05,vpngate
+sstp://vpn:vpn@vpn591509589.opengw.net:1944,sstp,vpn591509589.opengw.net,1944,6677,0,alive,-,JP,113.154.67.10,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-06 14:52:45,vpngate
+sstp://vpn:vpn@vpn825186256.opengw.net:1352,sstp,vpn825186256.opengw.net,1352,6738,0,alive,-,JP,14.101.10.239,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-08 14:09:40,vpngate
+sstp://vpn:vpn@vpn128832892.opengw.net:1416,sstp,vpn128832892.opengw.net,1416,6807,0,alive,-,JP,125.14.139.245,"AS9824 JCOM Co., Ltd.","JCOM Co., Ltd.",isp,2026-10-16 12:36:06,vpngate
+sstp://vpn:vpn@vpn598832486.opengw.net:1918,sstp,vpn598832486.opengw.net,1918,7003,0,alive,-,KR,222.120.134.151,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-15 12:44:41,vpngate
+sstp://vpn:vpn@vpn267947139.opengw.net:1663,sstp,vpn267947139.opengw.net,1663,7131,0,alive,-,JP,124.98.173.228,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-10-13 14:49:54,vpngate
+sstp://vpn:vpn@vpn579502788.opengw.net:1954,sstp,vpn579502788.opengw.net,1954,7152,0,alive,-,KR,211.216.167.19,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-14 14:39:09,vpngate
+sstp://vpn:vpn@vpn964639149.opengw.net:1588,sstp,vpn964639149.opengw.net,1588,7410,0,alive,-,KR,210.222.46.145,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-04 14:35:03,vpngate
+sstp://vpn:vpn@vpn953140495.opengw.net:995,sstp,vpn953140495.opengw.net,995,7459,0,alive,-,KR,175.195.189.138,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-04 14:35:03,vpngate
+sstp://vpn:vpn@vpn350782353.opengw.net:1962,sstp,vpn350782353.opengw.net,1962,7464,0,alive,-,JP,116.64.86.146,"AS9824 JCOM Co., Ltd.","JCOM Co., Ltd.",isp,2026-11-05 14:53:11,vpngate
+sstp://vpn:vpn@vpn859630625.opengw.net:995,sstp,vpn859630625.opengw.net,995,7562,0,alive,-,KR,110.13.194.155,AS9318 SK Broadband,SK Broadband,isp,2026-11-04 14:35:03,vpngate
+sstp://vpn:vpn@vpn202976802.opengw.net:5555,sstp,vpn202976802.opengw.net,5555,8652,0,alive,-,RU,91.219.203.117,AS59533 KVARTAL,KVARTAL,isp,2026-11-14 14:39:09,vpngate
+sstp://vpn:vpn@vpn884521498.opengw.net:995,sstp,vpn884521498.opengw.net,995,12786,0,alive,-,KR,58.29.140.252,AS9316 DACOM-PUBNETPLUS,DACOM-PUBNETPLUS,isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn501052901.opengw.net:1255,sstp,vpn501052901.opengw.net,1255,14411,0,alive,-,JP,180.198.151.32,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn500270442.opengw.net:1361,sstp,vpn500270442.opengw.net,1361,953,1,timeout,-,JP,121.109.224.163,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-09 14:39:00,vpngate
+sstp://vpn:vpn@vpn246938806.opengw.net:1512,sstp,vpn246938806.opengw.net,1512,964,1,timeout,-,JP,111.238.167.52,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-09 14:39:00,vpngate
+sstp://vpn:vpn@vpn980675302.opengw.net:1765,sstp,vpn980675302.opengw.net,1765,966,1,timeout,-,JP,106.173.177.181,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-08 14:06:45,vpngate
+sstp://vpn:vpn@vpn975550277.opengw.net:1514,sstp,vpn975550277.opengw.net,1514,1002,1,timeout,-,JP,180.198.167.80,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-11-08 14:06:45,vpngate
+sstp://vpn:vpn@vpn837693710.opengw.net:1460,sstp,vpn837693710.opengw.net,1460,1009,1,timeout,-,JP,60.124.68.169,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn516870736.opengw.net:1683,sstp,vpn516870736.opengw.net,1683,1035,1,timeout,-,KR,219.241.10.189,AS9318 SK Broadband,SK Broadband,isp,2026-11-14 14:39:09,vpngate
+sstp://vpn:vpn@vpn711658835.opengw.net:995,sstp,vpn711658835.opengw.net,995,1057,1,timeout,-,KR,175.199.198.101,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-15 12:44:41,vpngate
+sstp://vpn:vpn@vpn633946009.opengw.net:1353,sstp,vpn633946009.opengw.net,1353,1065,1,timeout,-,KR,59.8.32.44,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-06 14:25:18,vpngate
+sstp://vpn:vpn@vpn878602080.opengw.net:1707,sstp,vpn878602080.opengw.net,1707,1090,1,timeout,-,RU,5.143.43.156,AS12389 Primorye NET,Primorye NET,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn212659618.opengw.net:1375,sstp,vpn212659618.opengw.net,1375,1524,1,timeout,-,CA,50.67.176.122,AS6327 Shaw Communications,Shaw Communications,isp,2026-11-16 08:16:14,vpngate
+sstp://vpn:vpn@vpn102042272.opengw.net:1822,sstp,vpn102042272.opengw.net,1822,2292,1,timeout,-,JP,14.132.71.245,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-11-12 15:18:03,vpngate
+sstp://vpn:vpn@vpn777651061.opengw.net:1326,sstp,vpn777651061.opengw.net,1326,2412,1,timeout,-,JP,118.159.28.138,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-03 14:55:56,vpngate
+sstp://vpn:vpn@vpn926161461.opengw.net:1875,sstp,vpn926161461.opengw.net,1875,2473,1,timeout,-,JP,126.26.167.160,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-15 14:38:37,vpngate
+sstp://vpn:vpn@vpn828952115.opengw.net:1725,sstp,vpn828952115.opengw.net,1725,2495,1,timeout,-,KR,121.130.194.50,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-16 08:16:14,vpngate
+sstp://vpn:vpn@vpn108364887.opengw.net:1721,sstp,vpn108364887.opengw.net,1721,2517,1,timeout,-,JP,126.117.128.210,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-08 14:06:45,vpngate
+sstp://vpn:vpn@vpn318357590.opengw.net:1780,sstp,vpn318357590.opengw.net,1780,2556,1,timeout,-,KR,125.128.18.93,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-03 16:48:27,vpngate
+sstp://vpn:vpn@vpn857468917.opengw.net:1535,sstp,vpn857468917.opengw.net,1535,2594,1,timeout,-,JP,182.20.240.27,AS10010 TOKAI Communications Corporation,TOKAI Communications Corporation,isp,2026-11-15 14:38:37,vpngate
+sstp://vpn:vpn@vpn890613352.opengw.net:995,sstp,vpn890613352.opengw.net,995,2596,1,timeout,-,KR,110.13.26.111,AS9318 SK Broadband,SK Broadband,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn883578965.opengw.net:1331,sstp,vpn883578965.opengw.net,1331,2612,1,timeout,-,JP,126.169.67.75,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-04 14:35:03,vpngate
+sstp://vpn:vpn@vpn184169581.opengw.net:1713,sstp,vpn184169581.opengw.net,1713,2650,1,timeout,-,JP,61.46.101.187,AS9617 SUTV,SUTV,isp,2026-11-02 14:11:43,vpngate
+sstp://vpn:vpn@vpn232688011.opengw.net:1676,sstp,vpn232688011.opengw.net,1676,2658,1,timeout,-,JP,222.226.230.206,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-15 14:38:37,vpngate
+sstp://vpn:vpn@vpn622613092.opengw.net:1496,sstp,vpn622613092.opengw.net,1496,2658,1,timeout,-,JP,221.188.59.229,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-10 15:23:16,vpngate
+sstp://vpn:vpn@vpn779820187.opengw.net:1227,sstp,vpn779820187.opengw.net,1227,2693,1,timeout,-,JP,36.13.8.195,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-15 12:44:41,vpngate
+sstp://vpn:vpn@vpn975520107.opengw.net:1929,sstp,vpn975520107.opengw.net,1929,2696,1,timeout,-,JP,112.71.228.133,AS17511 OPTAGE Inc.,OPTAGE Inc.,isp,2026-11-11 14:31:06,vpngate
+sstp://vpn:vpn@vpn657969707.opengw.net:1622,sstp,vpn657969707.opengw.net,1622,2698,1,timeout,-,JP,150.31.134.129,AS2497 Internet Initiative Japan Inc.,Internet Initiative Japan Inc.,isp,2026-10-17 12:31:38,vpngate
+sstp://vpn:vpn@vpn179734162.opengw.net:1441,sstp,vpn179734162.opengw.net,1441,2740,1,timeout,-,JP,124.18.175.178,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-11-10 15:23:16,vpngate
+sstp://vpn:vpn@vpn836386663.opengw.net:1920,sstp,vpn836386663.opengw.net,1920,2742,1,timeout,-,JP,153.208.131.192,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-13 14:54:12,vpngate
+sstp://vpn:vpn@vpn320780275.opengw.net:1754,sstp,vpn320780275.opengw.net,1754,2802,1,timeout,-,JP,182.169.5.250,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-11-17 08:16:24,vpngate
+sstp://vpn:vpn@vpn898866193.opengw.net:1446,sstp,vpn898866193.opengw.net,1446,2804,1,timeout,-,KR,121.140.177.212,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-08 14:06:45,vpngate
+sstp://vpn:vpn@vpn916656683.opengw.net:1457,sstp,vpn916656683.opengw.net,1457,2804,1,timeout,-,KR,222.120.166.120,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-09 14:39:00,vpngate
+sstp://vpn:vpn@vpn297018533.opengw.net:1534,sstp,vpn297018533.opengw.net,1534,2832,1,timeout,-,JP,60.134.112.16,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-12 15:18:03,vpngate
+sstp://vpn:vpn@vpn438625619.opengw.net:1843,sstp,vpn438625619.opengw.net,1843,2852,1,timeout,-,JP,101.142.251.35,AS17511 OPTAGE Inc.,OPTAGE Inc.,isp,2026-11-08 14:06:45,vpngate
+sstp://vpn:vpn@vpn326161661.opengw.net:995,sstp,vpn326161661.opengw.net,995,2862,1,timeout,-,KR,128.134.220.216,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-14 14:39:09,vpngate
+sstp://vpn:vpn@vpn494800987.opengw.net:1390,sstp,vpn494800987.opengw.net,1390,2884,1,timeout,-,JP,42.144.211.19,"AS9824 JCOM Co., Ltd.","JCOM Co., Ltd.",isp,2026-11-15 14:38:37,vpngate
+sstp://vpn:vpn@vpn941986434.opengw.net:995,sstp,vpn941986434.opengw.net,995,2897,1,timeout,-,KR,61.85.53.218,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-10 15:23:16,vpngate
+sstp://vpn:vpn@vpn952825947.opengw.net:1419,sstp,vpn952825947.opengw.net,1419,2924,1,timeout,-,KR,124.51.253.126,AS17858 LG POWERCOMM,LG POWERCOMM,isp,2026-11-08 14:06:45,vpngate
+sstp://vpn:vpn@vpn419698713.opengw.net:995,sstp,vpn419698713.opengw.net,995,2963,1,timeout,-,KR,59.19.145.249,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-04 23:17:15,vpngate
+sstp://vpn:vpn@vpn755967672.opengw.net:1731,sstp,vpn755967672.opengw.net,1731,2977,1,timeout,-,JP,203.133.220.104,"AS7524 ITEC HANKYU HANSHIN CO.,LTD.","ITEC HANKYU HANSHIN CO.,LTD.",isp,2026-10-03 16:48:27,vpngate
+sstp://vpn:vpn@vpn131652721.opengw.net:995,sstp,vpn131652721.opengw.net,995,2980,1,timeout,-,KR,222.120.20.69,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-06 14:25:18,vpngate
+sstp://vpn:vpn@vpn586484862.opengw.net:1212,sstp,vpn586484862.opengw.net,1212,2987,1,timeout,-,KR,222.112.63.117,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-12 15:18:03,vpngate
+sstp://vpn:vpn@vpn519275158.opengw.net:1448,sstp,vpn519275158.opengw.net,1448,2987,1,timeout,-,KR,49.175.216.74,AS17858 LG POWERCOMM,LG POWERCOMM,isp,2026-10-21 15:52:42,vpngate
+sstp://vpn:vpn@vpn805303633.opengw.net:1808,sstp,vpn805303633.opengw.net,1808,3005,1,timeout,-,JP,92.202.89.138,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-11-17 08:16:24,vpngate
+sstp://vpn:vpn@vpn725821956.opengw.net:995,sstp,vpn725821956.opengw.net,995,3008,1,timeout,-,KR,210.126.37.242,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-15 14:38:37,vpngate
+sstp://vpn:vpn@vpn189811863.opengw.net:1781,sstp,vpn189811863.opengw.net,1781,3009,1,timeout,-,KR,119.193.144.153,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-14 14:39:09,vpngate
+sstp://vpn:vpn@vpn964247477.opengw.net:1573,sstp,vpn964247477.opengw.net,1573,3011,1,timeout,-,KR,121.134.136.164,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-03 14:55:56,vpngate
+sstp://vpn:vpn@vpn886191021.opengw.net:1814,sstp,vpn886191021.opengw.net,1814,3046,1,timeout,-,KR,211.104.71.136,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-11 14:31:06,vpngate
+sstp://vpn:vpn@vpn635994349.opengw.net:1925,sstp,vpn635994349.opengw.net,1925,3079,1,timeout,-,KR,125.129.121.114,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-21 15:52:42,vpngate
+sstp://vpn:vpn@vpn211565425.opengw.net:995,sstp,vpn211565425.opengw.net,995,3117,1,timeout,-,KR,14.51.240.168,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-10 15:23:16,vpngate
+sstp://vpn:vpn@vpn443102765.opengw.net:1700,sstp,vpn443102765.opengw.net,1700,3121,1,timeout,-,KR,1.237.1.78,AS9318 SK Broadband,SK Broadband,isp,2026-11-12 15:18:03,vpngate
+sstp://vpn:vpn@vpn897777296.opengw.net:995,sstp,vpn897777296.opengw.net,995,3199,1,timeout,-,KR,116.33.58.13,AS17858 LG POWERCOMM,LG POWERCOMM,isp,2026-11-15 14:38:37,vpngate
+sstp://vpn:vpn@vpn421902389.opengw.net:1602,sstp,vpn421902389.opengw.net,1602,3233,1,timeout,-,KR,122.128.200.134,AS9757 CMB DONDAEMOON BROADCASTING,CMB DONDAEMOON BROADCASTING,isp,2026-10-16 12:36:06,vpngate
+sstp://vpn:vpn@vpn564106646.opengw.net:1980,sstp,vpn564106646.opengw.net,1980,3295,1,timeout,-,KR,123.143.79.29,AS3786 LG DACOM Corporation,LG DACOM Corporation,isp,2026-11-03 14:55:56,vpngate
+sstp://vpn:vpn@vpn933256250.opengw.net:1448,sstp,vpn933256250.opengw.net,1448,3382,1,timeout,-,JP,111.97.197.128,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-10-14 12:57:52,vpngate
+sstp://vpn:vpn@vpn141040696.opengw.net:1408,sstp,vpn141040696.opengw.net,1408,3855,1,timeout,-,JP,183.177.159.21,AS2519 ARTERIA Networks Corporation,ARTERIA Networks Corporation,isp,2026-11-14 14:39:09,vpngate
+sstp://vpn:vpn@vpn301985052.opengw.net:1898,sstp,vpn301985052.opengw.net,1898,3910,1,timeout,-,RU,5.189.68.165,AS12668 LLC KomTehCentr,LLC KomTehCentr,isp,2026-11-04 14:35:03,vpngate
+sstp://vpn:vpn@vpn590567407.opengw.net:1853,sstp,vpn590567407.opengw.net,1853,4410,1,timeout,-,RU,5.129.183.2,AS60119 Ediniy Operator Svyazi LLC,Ediniy Operator Svyazi LLC,isp,2026-11-05 14:53:11,vpngate
+sstp://vpn:vpn@vpn392446430.opengw.net:1948,sstp,vpn392446430.opengw.net,1948,8456,1,timeout,-,JP,118.154.64.54,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-11 14:31:06,vpngate
+sstp://vpn:vpn@vpn454053944.opengw.net:1849,sstp,vpn454053944.opengw.net,1849,0,1,timeout,,KR,119.64.168.108,AS17858 LG POWERCOMM,LG POWERCOMM,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn177976901.opengw.net:1354,sstp,vpn177976901.opengw.net,1354,0,1,timeout,,KR,61.79.9.176,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn837533025.opengw.net:1588,sstp,vpn837533025.opengw.net,1588,0,1,timeout,,BY,178.172.245.42,"AS59861 LLC ""Setevye Innovatsii""","LLC ""Setevye Innovatsii""",isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn679130016.opengw.net:995,sstp,vpn679130016.opengw.net,995,0,1,timeout,,KR,121.135.114.78,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn221668572.opengw.net:995,sstp,vpn221668572.opengw.net,995,0,1,timeout,,KR,58.233.80.160,AS9318 SK Broadband,SK Broadband,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn255636415.opengw.net:1452,sstp,vpn255636415.opengw.net,1452,0,1,timeout,,JP,175.129.113.227,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn400627339.opengw.net:995,sstp,vpn400627339.opengw.net,995,0,1,timeout,,KR,121.163.27.7,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn731341284.opengw.net:1991,sstp,vpn731341284.opengw.net,1991,0,1,timeout,,KR,220.126.211.10,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn986495248.opengw.net:1549,sstp,vpn986495248.opengw.net,1549,0,1,timeout,,JP,119.169.129.9,"AS9824 JCOM Co., Ltd.","JCOM Co., Ltd.",isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn647733840.opengw.net:1549,sstp,vpn647733840.opengw.net,1549,0,1,timeout,,JP,153.185.75.172,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn722292213.opengw.net:1365,sstp,vpn722292213.opengw.net,1365,0,1,timeout,,RU,92.37.227.168,AS12389 Primorye NET,Primorye NET,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn532160734.opengw.net:1327,sstp,vpn532160734.opengw.net,1327,0,1,timeout,,JP,153.176.78.15,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn400000498.opengw.net:1237,sstp,vpn400000498.opengw.net,1237,0,1,timeout,,JP,153.185.75.172,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn526841273.opengw.net:1466,sstp,vpn526841273.opengw.net,1466,0,1,timeout,,RU,95.54.58.76,AS12389 Primorye NET,Primorye NET,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn133246930.opengw.net:1642,sstp,vpn133246930.opengw.net,1642,0,1,timeout,,JP,114.190.129.217,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn726593323.opengw.net:1761,sstp,vpn726593323.opengw.net,1761,0,1,timeout,,KR,112.168.254.233,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-19 08:16:21,vpngate
+sstp://vpn:vpn@vpn624984613.opengw.net:995,sstp,vpn624984613.opengw.net,995,998,2,timeout,-,KR,112.187.218.114,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-20 12:55:22,vpngate
+sstp://vpn:vpn@vpn713264157.opengw.net:992,sstp,vpn713264157.opengw.net,992,1027,2,timeout,-,TW,140.111.148.17,AS1659 TANet,TANet,government,2026-11-17 08:16:24,vpngate
+sstp://vpn:vpn@vpn833326008.opengw.net:1414,sstp,vpn833326008.opengw.net,1414,1235,2,timeout,-,US,47.185.19.135,"AS5650 Frontier Communications of America, Inc.","Frontier Communications of America, Inc.",isp,2026-11-16 08:16:14,vpngate
+sstp://vpn:vpn@vpn239817646.opengw.net:1234,sstp,vpn239817646.opengw.net,1234,1318,2,timeout,-,US,192.184.165.20,AS46375 Sonic Telecom LLC,Sonic Telecom LLC,isp,2026-11-17 08:16:24,vpngate
+sstp://vpn:vpn@vpn945009595.opengw.net:1921,sstp,vpn945009595.opengw.net,1921,2010,2,timeout,-,JP,218.221.203.127,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-11-08 14:06:45,vpngate
+sstp://vpn:vpn@vpn575184406.opengw.net:1629,sstp,vpn575184406.opengw.net,1629,2696,2,timeout,-,JP,110.233.254.85,AS2518 BIGLOBE Inc.,BIGLOBE Inc.,isp,2026-10-09 14:13:10,vpngate
+sstp://vpn:vpn@vpn290313208.opengw.net:1997,sstp,vpn290313208.opengw.net,1997,2737,2,timeout,-,CA,142.198.116.23,AS577 Bell Canada,Bell Canada,isp,2026-11-02 14:11:43,vpngate
+sstp://vpn:vpn@vpn846477375.opengw.net:1657,sstp,vpn846477375.opengw.net,1657,2958,2,timeout,-,KR,61.41.230.185,AS17598 LG HelloVision Corp.,LG HelloVision Corp.,isp,2026-11-16 08:16:14,vpngate
+sstp://vpn:vpn@vpn102800483.opengw.net:1475,sstp,vpn102800483.opengw.net,1475,3031,2,timeout,-,JP,124.219.214.107,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-11-11 14:31:06,vpngate
+sstp://vpn:vpn@vpn181541485.opengw.net:1953,sstp,vpn181541485.opengw.net,1953,3049,2,timeout,-,JP,113.150.169.61,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-17 08:16:24,vpngate
+sstp://vpn:vpn@vpn627911050.opengw.net:1475,sstp,vpn627911050.opengw.net,1475,3058,2,timeout,-,JP,60.36.27.254,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-05 14:53:11,vpngate
+sstp://vpn:vpn@vpn121994191.opengw.net:1936,sstp,vpn121994191.opengw.net,1936,3072,2,timeout,-,JP,153.174.121.51,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-02 14:11:43,vpngate
+sstp://vpn:vpn@vpn461533097.opengw.net:1898,sstp,vpn461533097.opengw.net,1898,3149,2,timeout,-,JP,180.147.69.134,AS17511 OPTAGE Inc.,OPTAGE Inc.,isp,2026-11-12 15:18:03,vpngate
+sstp://vpn:vpn@vpn393802235.opengw.net:1908,sstp,vpn393802235.opengw.net,1908,3173,2,timeout,-,JP,14.132.45.94,"AS18126 Chubu Telecommunications Company, Inc.","Chubu Telecommunications Company, Inc.",isp,2026-11-04 14:35:03,vpngate
+sstp://vpn:vpn@vpn556509387.opengw.net:1412,sstp,vpn556509387.opengw.net,1412,3210,2,timeout,-,JP,216.153.126.191,AS2527 Sony Network Communications Inc.,Sony Network Communications Inc.,isp,2026-10-12 21:49:55,vpngate
+sstp://vpn:vpn@vpn237755744.opengw.net:995,sstp,vpn237755744.opengw.net,995,3252,2,timeout,-,KR,121.136.194.77,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-03 14:55:56,vpngate
+sstp://vpn:vpn@vpn386579301.opengw.net:995,sstp,vpn386579301.opengw.net,995,3441,2,timeout,-,KR,211.215.238.48,AS9318 SK Broadband,SK Broadband,isp,2026-10-14 12:57:52,vpngate
+sstp://vpn:vpn@vpn236138998.opengw.net:1381,sstp,vpn236138998.opengw.net,1381,3506,2,timeout,-,KR,169.211.222.152,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-17 08:16:24,vpngate
+sstp://vpn:vpn@vpn420936778.opengw.net:995,sstp,vpn420936778.opengw.net,995,3543,2,timeout,-,KR,121.164.96.99,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-10 15:23:16,vpngate
+sstp://vpn:vpn@vpn769681917.opengw.net:1491,sstp,vpn769681917.opengw.net,1491,3613,2,timeout,-,KR,14.51.43.58,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-15 14:38:37,vpngate
+sstp://vpn:vpn@vpn716362941.opengw.net:1854,sstp,vpn716362941.opengw.net,1854,3619,2,timeout,-,KR,114.30.156.221,AS38121 CJ Hello Co.,CJ Hello Co.,isp,2026-11-14 14:39:09,vpngate
+sstp://vpn:vpn@vpn978234813.opengw.net:995,sstp,vpn978234813.opengw.net,995,3634,2,timeout,-,KR,119.194.29.87,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-01 00:00:00,vpngate
+sstp://vpn:vpn@vpn363831111.opengw.net:995,sstp,vpn363831111.opengw.net,995,3646,2,timeout,-,KR,121.130.192.171,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-25T10:20:50Z,@user
+sstp://vpn:vpn@vpn113860481.opengw.net:1543,sstp,vpn113860481.opengw.net,1543,3648,2,timeout,-,KR,1.233.97.120,AS9318 SK Broadband,SK Broadband,isp,2026-11-13 14:54:12,vpngate
+sstp://vpn:vpn@vpn169225991.opengw.net:995,sstp,vpn169225991.opengw.net,995,3748,2,timeout,-,KR,125.240.231.54,AS17858 LG POWERCOMM,LG POWERCOMM,isp,2026-10-19 12:45:55,vpngate
+sstp://vpn:vpn@vpn807573737.opengw.net:1463,sstp,vpn807573737.opengw.net,1463,3796,2,timeout,-,KR,124.111.152.70,AS9318 SK Broadband,SK Broadband,isp,2026-10-21 15:52:42,vpngate
+sstp://vpn:vpn@vpn769465211.opengw.net:1963,sstp,vpn769465211.opengw.net,1963,3839,2,timeout,-,RU,5.228.228.136,AS42610 Rostelecom,Rostelecom,isp,2026-10-15 12:44:41,vpngate
+sstp://vpn:vpn@vpn757870457.opengw.net:1947,sstp,vpn757870457.opengw.net,1947,3931,2,timeout,-,KR,112.187.148.146,AS4766 Korea Telecom,Korea Telecom,isp,2026-10-03 16:48:27,vpngate
+sstp://vpn:vpn@vpn935459420.opengw.net:1348,sstp,vpn935459420.opengw.net,1348,3950,2,timeout,-,KR,110.47.181.90,AS18313 LG HelloVision Corp.,LG HelloVision Corp.,isp,2026-11-17 08:16:24,vpngate
+sstp://vpn:vpn@vpn309430266.opengw.net:1394,sstp,vpn309430266.opengw.net,1394,3985,2,timeout,-,JP,153.174.22.211,AS4713 NTT Communications Corporation,NTT Communications Corporation,isp,2026-11-11 14:31:06,vpngate
+sstp://vpn:vpn@vpn624472654.opengw.net:1588,sstp,vpn624472654.opengw.net,1588,4869,2,timeout,-,JP,220.147.184.189,AS2519 ARTERIA Networks Corporation,ARTERIA Networks Corporation,isp,2026-11-08 14:06:45,vpngate
+sstp://vpn:vpn@vpn108955624.opengw.net:995,sstp,vpn108955624.opengw.net,995,0,2,timeout,,KR,221.144.197.155,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn173014092.opengw.net:1951,sstp,vpn173014092.opengw.net,1951,0,2,timeout,,FR,2.11.82.14,AS3215 Orange,Orange,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn388638793.opengw.net:1809,sstp,vpn388638793.opengw.net,1809,0,2,timeout,,RU,178.64.251.93,AS12389 Primorye NET,Primorye NET,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn312735118.opengw.net:1635,sstp,vpn312735118.opengw.net,1635,0,2,timeout,,VN,42.114.63.9,AS18403 FPT Telecom Company,FPT Telecom Company,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn842523171.opengw.net:995,sstp,vpn842523171.opengw.net,995,0,2,timeout,,KR,183.102.100.152,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn191172008.opengw.net:1382,sstp,vpn191172008.opengw.net,1382,0,2,timeout,,PL,79.186.33.196,AS5617 Orange Polska Spolka Akcyjna,Orange Polska Spolka Akcyjna,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn210060972.opengw.net:995,sstp,vpn210060972.opengw.net,995,0,2,timeout,,KR,218.158.183.96,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn611376333.opengw.net:1279,sstp,vpn611376333.opengw.net,1279,0,2,timeout,,JP,119.105.93.237,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn649873227.opengw.net:1308,sstp,vpn649873227.opengw.net,1308,0,2,timeout,,JP,118.156.193.249,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn587159885.opengw.net:1906,sstp,vpn587159885.opengw.net,1906,0,2,timeout,,JP,183.86.144.3,AS10010 TOKAI Communications Corporation,TOKAI Communications Corporation,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn773202079.opengw.net:1602,sstp,vpn773202079.opengw.net,1602,0,2,timeout,,JP,126.114.183.30,AS17676 SoftBank Corp.,SoftBank Corp.,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn744261671.opengw.net:995,sstp,vpn744261671.opengw.net,995,0,2,timeout,,RU,31.220.166.43,AS29072 Regional Digital Telecommunication Company LLC,Regional Digital Telecommunication Company LLC,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn171715362.opengw.net:1510,sstp,vpn171715362.opengw.net,1510,0,2,timeout,,KR,219.248.239.231,AS9318 SK Broadband,SK Broadband,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn843011073.opengw.net:1764,sstp,vpn843011073.opengw.net,1764,0,2,timeout,,KR,118.222.85.212,AS9318 SK Broadband,SK Broadband,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn905759677.opengw.net:1410,sstp,vpn905759677.opengw.net,1410,0,2,timeout,,RU,84.42.75.2,AS12389 Primorye NET,Primorye NET,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn574663119.opengw.net:1732,sstp,vpn574663119.opengw.net,1732,0,2,timeout,,JP,221.133.107.40,"AS17534 NSK Co., Ltd.","NSK Co., Ltd.",isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn199808214.opengw.net:995,sstp,vpn199808214.opengw.net,995,0,2,timeout,,KR,121.164.137.89,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn247592511.opengw.net:995,sstp,vpn247592511.opengw.net,995,0,2,timeout,,KR,220.124.170.12,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn702836191.opengw.net:1927,sstp,vpn702836191.opengw.net,1927,0,2,timeout,,KR,210.104.211.222,AS4766 Korea Telecom,Korea Telecom,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn637265506.opengw.net:1259,sstp,vpn637265506.opengw.net,1259,0,2,timeout,,RU,5.189.42.17,AS12668 LLC KomTehCentr,LLC KomTehCentr,isp,2026-11-18 08:16:22,vpngate
+sstp://vpn:vpn@vpn146183221.opengw.net:1968,sstp,vpn146183221.opengw.net,1968,0,2,timeout,,JP,124.212.251.101,AS2516 KDDI CORPORATION,KDDI CORPORATION,isp,2026-11-18 08:16:22,vpngate
