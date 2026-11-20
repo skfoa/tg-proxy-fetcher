@@ -49,6 +49,10 @@
 38.244.63.211,443,true,86,,LAX,北美洲 · 美国 · 洛杉矶,AS1054 Zont LLC,Zont LLC,0,2026-11-11 21:52:20,@danfeng_chat,2602:f656:2::15ae,AS1054 Zont LLC,Zont LLC,Los Angeles · US
 216.40.86.98,2087,true,87,,LAX,California · Los Angeles · 美国,AS1054 Zont LLC,Zont LLC,0,2026-10-02 00:19:26,@danfeng_chat,216.40.86.98,AS1054 Zont LLC,Zont LLC,Los Angeles · US
 216.40.86.67,443,true,90,,LAX,北美洲 · 美国 · 洛杉矶,AS1054 Zont LLC,Zont LLC,0,2026-11-11 21:51:45,@danfeng_chat,2602:f656:2::801,AS1054 Zont LLC,Zont LLC,Los Angeles · US
+68.68.250.254,443,true,313,,LAX,北美洲 · 美国 · 洛杉矶,AS1054 Zont LLC,Zont LLC,0,2026-11-20 13:50:05,@user,,,,
+68.68.251.163,443,true,313,,LAX,北美洲 · 美国 · 洛杉矶,AS1054 Zont LLC,Zont LLC,0,2026-11-20 13:50:05,@user,,,,
+68.68.248.46,8443,true,327,,LAX,北美洲 · 美国 · 洛杉矶,AS1054 Zont LLC,Zont LLC,0,2026-11-20 13:50:05,@user,,,,
+68.68.251.70,443,true,344,,LAX,北美洲 · 美国 · 洛杉矶,AS1054 Zont LLC,Zont LLC,0,2026-11-20 13:50:05,@user,,,,
 38.180.12.197,443,true,154,,EWR,美国-纽瓦克,AS10929 eStruxture Data Centers Inc. (3NT SOLUTIONS LLP),3NT SOLUTIONS LLP,0,2026-11-11 09:33:32,@otcjlq,38.180.12.197,AS10929 eStruxture Data Centers Inc. (3NT SOLUTIONS LLP),3NT SOLUTIONS LLP,Montreal · CA
 38.180.12.213,443,true,175,,EWR,美国-纽瓦克,AS10929 eStruxture Data Centers Inc.,eStruxture Data Centers Inc.,0,2026-11-11 09:33:32,@otcjlq,38.180.12.197,AS10929 eStruxture Data Centers Inc. (3NT SOLUTIONS LLP),3NT SOLUTIONS LLP,Montreal · CA
 64.15.75.112,8443,true,182,,YUL,Quebec · Montréal · 加拿大,AS10929 eStruxture Data Centers Inc.,eStruxture Data Centers Inc.,0,2026-07-27 18:54:30,@danfeng2,64.15.75.112,AS10929 eStruxture Data Centers Inc.,eStruxture Data Centers Inc.,Laval · CA
@@ -10081,7 +10085,11 @@
 82.118.235.103,443,true,397,,SOF,欧洲 · 保加利亚 · 索菲亚,AS203380 DA International Group Ltd.,DA International Group Ltd.,0,2026-10-18 21:52:18,@danfeng_chat,2a01:8740:1:89d::385a,AS203380 DA International Group Ltd.,DA International Group Ltd.,Dobrich · BG
 194.110.87.16,443,true,399,,SOF,欧洲 · 保加利亚 · 索菲亚,AS203380 DA International Group Ltd.,DA International Group Ltd.,0,2026-10-18 21:47:31,@danfeng_chat,194.110.87.16,AS203380 DA International Group Ltd.,DA International Group Ltd.,Gotse Delchev · BG
 164.5.249.139,443,true,407,,SOF,保加利亚-索非亚,AS203380 DA International Group Ltd.,DA International Group Ltd.,0,2026-11-11 09:34:05,@otcjlq,2a01:8740:1:fab::7acb,AS203380 DA International Group Ltd. (Lir.bg EOOD),Lir.bg EOOD,Dobrich · BG
+68.68.253.75,443,true,515,,SOF,欧洲 · 保加利亚 · 索菲亚,AS203380 DA International Group Ltd.,DA International Group Ltd.,0,2026-11-20 13:50:05,@user,,,,
+68.68.253.96,443,true,515,,,,AS203380 DA International Group Ltd.,DA International Group Ltd.,0,2026-11-20 13:50:05,@user,,,,
 217.217.227.201,443,true,523,,SOF,欧洲 · 保加利亚 · 索菲亚,AS203380 DA International Group Ltd.,DA International Group Ltd.,0,2026-10-18 21:49:08,@danfeng_chat,217.217.227.201,AS203380 DA International Group Ltd.,DA International Group Ltd.,Sofia · BG
+68.68.253.171,443,true,578,,,,AS203380 DA International Group Ltd.,DA International Group Ltd.,0,2026-11-20 13:50:05,@user,,,,
+68.68.253.72,443,true,610,,SOF,欧洲 · 保加利亚 · 索菲亚,AS203380 DA International Group Ltd.,DA International Group Ltd.,0,2026-11-20 13:50:05,@user,,,,
 45.59.101.40,443,true,118,,SEA,美国-西雅图,AS203380 DA International Group Ltd.,DA International Group Ltd.,1,2026-11-11 09:34:05,@otcjlq,2602:fc16:5:38::724e,AS203380 DA International Group Ltd. (AlphaVPS LLC),AlphaVPS LLC,Seattle · US
 164.5.250.9,443,true,542,,FRA,德国-法兰克福,AS203380 DA International Group Ltd.,DA International Group Ltd.,2,2026-11-11 09:34:05,@otcjlq,2602:fc16:2:672::376e,AS203380 DA International Group Ltd. (AlphaVPS LLC),AlphaVPS LLC,Nuremberg · DE
 164.5.249.34,443,true,592,,SOF,保加利亚-索非亚,AS203380 DA International Group Ltd.,DA International Group Ltd.,2,2026-11-11 09:34:05,@otcjlq,2a01:8740:1:6bd::ace6,AS203380 DA International Group Ltd. (Lir.bg EOOD),Lir.bg EOOD,Dobrich · BG
