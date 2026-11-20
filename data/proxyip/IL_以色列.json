@@ -1,27 +1,5 @@
 [
   {
-    "proxy": "82.80.47.200:443",
-    "ip": "82.80.47.200",
-    "port": 443,
-    "tls": true,
-    "clientIp": "82.80.47.200",
-    "clientIps": [
-      "82.80.47.200"
-    ],
-    "clientIpv4": "82.80.47.200",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "IL",
-    "country_name": "以色列",
-    "country_cn": "以色列",
-    "country_emoji": "🇮🇱",
-    "asn": "8551",
-    "asOrganization": "Bezeq International Ltd.",
-    "isp": "Bezeq International Ltd.",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "82.166.137.24:443",
     "ip": "82.166.137.24",
     "port": 443,
@@ -42,5 +20,27 @@
     "isp": "Cellcom Fixed Line Communication L.P",
     "net_type": "isp",
     "source": "@danfeng2"
+  },
+  {
+    "proxy": "82.80.47.200:443",
+    "ip": "82.80.47.200",
+    "port": 443,
+    "tls": true,
+    "clientIp": "82.80.47.200",
+    "clientIps": [
+      "82.80.47.200"
+    ],
+    "clientIpv4": "82.80.47.200",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "IL",
+    "country_name": "以色列",
+    "country_cn": "以色列",
+    "country_emoji": "🇮🇱",
+    "asn": "8551",
+    "asOrganization": "Bezeq International Ltd.",
+    "isp": "Bezeq International Ltd.",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
   }
 ]
