@@ -137,9 +137,10 @@ CHECK_TOKEN = (
 CHECK_CONCURRENCY = safe_int(os.getenv("CHECK_CONCURRENCY"), 32)
 
 PROBE_HOST = "crypto.cloudflare.com"
-TIMEOUT = 3.0
-HTTP_TIMEOUT = 2.0
+TIMEOUT = 4.0
+HTTP_TIMEOUT = 3.0
 MAX_FAILS = 3
+EVICT_RETRY_CONCURRENCY = 200
 CSV_FIELDS = CF_BASE_CSV_FIELDS
 
 # 复用全局 SSL 证书上下文，避免重复加载系统 CA 证书
@@ -283,13 +284,15 @@ async def verify_all(
     timeout: float = TIMEOUT,
     http_timeout: float = HTTP_TIMEOUT,
     max_fails: int = MAX_FAILS,
+    retry_evicting: bool = True,
 ) -> list:
     """
     对传入的所有优选 IP 节点无差别执行阶段一与阶段二探测。
     无论端口与元数据如何，全部执行 TLS 握手与 301 重定向鉴真。
     原地更新 fail_count 与 delay_ms，并汇总失败原因分布。
     对确定性致命硬故障 (conn_error / non_cf_cdn / invalid_row) 当场拉满淘汰阈值，
-    对软性抖动 (status_502 / connect_timeout / conn_reset / net_error / empty_response) 及 TLS 异常保留 3 次缓冲机会。
+    对软性抖动 (status_502 / connect_timeout / conn_reset / net_error / empty_response) 及 TLS 异常保留 3 次缓冲机会；
+    并在首轮并发高峰结束后，对即将触发物理淘汰 (fail_count >= max_fails) 的软失败节点补测 1 次以降低跨洋抖动误杀。
     """
     if not rows:
         return rows
@@ -349,6 +352,49 @@ async def verify_all(
 
     tasks = [_check(rows[i]) for i in indices]
     await asyncio.gather(*tasks)
+
+    # 临门复测：首轮高并发完全结束后，仅对即将淘汰的软失败节点补测 1 次（不放宽鉴真标准、不复测硬故障）
+    if retry_evicting:
+        retry_candidates = [
+            r for r in rows
+            if not r.get("_invalid")
+            and safe_int(r.get("fail_count"), 0) >= max_fails
+            and r.get("_reason") not in FATAL_FAIL_STATUSES
+        ]
+        if retry_candidates:
+            random.shuffle(retry_candidates)
+            retry_conc = min(max(1, concurrency), EVICT_RETRY_CONCURRENCY)
+            retry_sem = asyncio.Semaphore(retry_conc)
+            recovered_cnt = 0
+
+            async def _retry_one(row: dict):
+                nonlocal pass_count, fail_count_total, recovered_cnt
+                ip = (row.get("ip") or "").strip()
+                port = safe_int(row.get("port"), 0)
+                old_reason = row.get("_reason", "")
+                lock_key = f"{ip}:{port}"
+                async with retry_sem, get_keyed_lock(lock_key):
+                    alive, latency, reason = await probe_ip(ip, port, connect_timeout=timeout, http_timeout=http_timeout)
+
+                if old_reason and reasons_counter.get(old_reason, 0) > 0:
+                    reasons_counter[old_reason] -= 1
+                    if reasons_counter[old_reason] == 0:
+                        del reasons_counter[old_reason]
+                reasons_counter[reason] += 1
+                row["_reason"] = reason
+
+                if alive:
+                    row["fail_count"] = 0
+                    row["delay_ms"] = latency
+                    pass_count += 1
+                    fail_count_total -= 1
+                    recovered_cnt += 1
+
+            await asyncio.gather(*(_retry_one(r) for r in retry_candidates))
+            log.info(
+                "[%s 临门复测] 对 %d 条即将淘汰的软失败节点补测完成: 救回 %d 条 (并发: %d)",
+                tag, len(retry_candidates), recovered_cnt, retry_conc,
+            )
 
     sorted_reasons = sorted(reasons_counter.items(), key=lambda x: x[1], reverse=True)
     reason_summary = ", ".join(f"{k}: {v}" for k, v in sorted_reasons)
@@ -1312,8 +1358,8 @@ def main():
     parser = argparse.ArgumentParser(description="Cloudflare 优选 IP 两阶段主动校验与淘汰引擎")
     parser.add_argument("--concurrency", type=int, default=250, help="并发探测协程数 (默认 250)")
     parser.add_argument("--max-fails", type=int, default=MAX_FAILS, help=f"连续失败淘汰阈值 (默认 {MAX_FAILS})")
-    parser.add_argument("--timeout", type=float, default=TIMEOUT, help="单节点连接与 TLS 握手超时秒数 (默认 3.0)")
-    parser.add_argument("--http-timeout", type=float, default=HTTP_TIMEOUT, help="单节点 HTTP 校验超时秒数 (默认 2.0)")
+    parser.add_argument("--timeout", type=float, default=TIMEOUT, help=f"单节点连接与 TLS 握手超时秒数 (默认 {TIMEOUT})")
+    parser.add_argument("--http-timeout", type=float, default=HTTP_TIMEOUT, help=f"单节点 HTTP 校验超时秒数 (默认 {HTTP_TIMEOUT})")
     parser.add_argument("--no-notify", action="store_true", help="静默模式，不发送 Telegram 质检通知")
     parser.add_argument("--dry-run", action="store_true", help="演练诊断模式，仅探测统计原因，不覆写数据文件也不登记墓地，自动跳过通知")
     parser.add_argument("--probe-baseline", action="store_true", help="探测 300 个官方 Cloudflare Anycast IP 作为并发与网络基线")

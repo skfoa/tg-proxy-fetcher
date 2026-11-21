@@ -528,8 +528,8 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `--max-fails` | 校验脚本 | `全部引擎统一为 3` | `全部引擎统一为 3` | 连续失败物理淘汰阈值（全线引擎统一默认 3 次，允许 1~2 次网络抖动缓冲；设为 `1` 即为严格无缓冲模式） |
 | `--http-max-fails` | `proxies_verify.py` | `1` | `1` | 明文 HTTP 协议专属淘汰阈值（默认 1 次失败立即移出，杜绝短效僵尸节点占用资源） |
 | `--strict` | `proxies_verify.py` | 关闭 | 关闭 | 极致纯净模式（全协议淘汰阈值强制设为 1，等价于 `--max-fails 1 --http-max-fails 1`） |
-| `--timeout` | 校验脚本 | `代理 3.0 · 反代 4.0 · 优选 3.0` | `代理 3.0 · 反代 4.0 · 优选 3.0` | 单节点连接建立与 TLS 握手超时秒数（反代默认 4.0s 充分兼容跨洲 RTT，优选默认 3.0s） |
-| `--http-timeout` | `proxyip_verify.py` / `cf_verify.py` | `反代 3.5 · 优选 2.0` | `反代 3.5 · 优选 2.0` | HTTP 响应读取与 301 重定向检测统一 deadline 超时秒数 |
+| `--timeout` | 校验脚本 | `代理 3.0 · 反代 4.0 · 优选 4.0` | `代理 3.0 · 反代 4.0 · 优选 4.0` | 单节点连接建立与 TLS 握手超时秒数（反代与优选默认 4.0s 兼容跨洲 RTT） |
+| `--http-timeout` | `proxyip_verify.py` / `cf_verify.py` | `反代 3.5 · 优选 3.0` | `反代 3.5 · 优选 3.0` | HTTP 响应读取与 301 重定向检测统一 deadline 超时秒数 |
 | `--http-probe-timeout` | `proxies_verify.py` | `2.0` | `2.0` | 明文 HTTP 协议握手与穿透专属严格超时秒数 |
 | `--http-max-latency` | `proxies_verify.py` | `10000` | `10000` | 明文 HTTP 协议最大允许延迟毫秒数，超出直接判定为 slow_timeout 淘汰 |
 | `--enrich-only` | `proxies_verify.py` | 关闭 | 关闭 | 极速画像补全模式：仅对现有 `proxies.csv` 补全 ASN 与网络属性打标，跳过网络连通性探测 |

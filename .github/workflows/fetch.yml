@@ -110,7 +110,7 @@ jobs:
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
           CHECK_PROXYIP_URL: ${{ inputs.check_proxyip_url || vars.CHECK_PROXYIP_URL || secrets.CHECK_PROXYIP_URL || '' }}
           CHECK_PROXYIP_TOKEN: ${{ inputs.check_proxyip_token || secrets.CHECK_PROXYIP_TOKEN || secrets.CF_CHECK_TOKEN || secrets.AUTH_TOKEN || vars.CHECK_PROXYIP_TOKEN || '' }}
-        run: python cf_verify.py --concurrency 250 --max-fails 3 --timeout 3.0
+        run: python cf_verify.py --concurrency 250 --max-fails 3 --timeout 4.0 --http-timeout 3.0
 
       - name: 🚨 任务失败告警推送
         if: failure()

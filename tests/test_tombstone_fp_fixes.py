@@ -129,6 +129,62 @@ class TestCfVerifyTransientErrors(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(by_ip["104.16.1.4"]["fail_count"], 3)
         self.assertEqual(by_ip["104.16.1.5"]["fail_count"], 3)
 
+    async def test_verify_all_retries_only_evicting_soft_failures_and_updates_stats(self):
+        self.assertEqual(cf_verify.TIMEOUT, 4.0)
+        self.assertEqual(cf_verify.HTTP_TIMEOUT, 3.0)
+
+        rows = [
+            # fc=2 软失败，复测通过 -> 应救回 (fail_count=0, _old_fc=2, delay_ms 更新)
+            {"ip": "104.16.2.1", "port": "443", "fail_count": 2, "delay_ms": 500},
+            # fc=2 软失败，复测仍失败 -> 保持 fail_count=3 正常淘汰
+            {"ip": "104.16.2.2", "port": "443", "fail_count": 2, "delay_ms": 500},
+            # fc=1 软失败 -> 仅升为 fc=2，不触发临门复测
+            {"ip": "104.16.2.3", "port": "443", "fail_count": 1, "delay_ms": 500},
+            # fc=2 致命硬故障 (conn_error / non_cf_cdn) -> 不触发临门复测
+            {"ip": "104.16.2.4", "port": "443", "fail_count": 2, "delay_ms": 500},
+            {"ip": "104.16.2.5", "port": "443", "fail_count": 2, "delay_ms": 500},
+        ]
+        call_counts: dict[str, int] = {}
+
+        async def _fake_probe(ip, port, connect_timeout=4.0, http_timeout=3.0):
+            call_counts[ip] = call_counts.get(ip, 0) + 1
+            if ip == "104.16.2.1":
+                return (False, 0, "connect_timeout") if call_counts[ip] == 1 else (True, 188, "ok")
+            if ip == "104.16.2.2":
+                return (False, 0, "tls_error") if call_counts[ip] == 1 else (False, 0, "connect_timeout")
+            if ip == "104.16.2.3":
+                return (False, 0, "connect_timeout")
+            if ip == "104.16.2.4":
+                return (False, 0, "conn_error")
+            return (False, 15, "non_cf_cdn")
+
+        with patch("cf_verify.probe_ip", side_effect=_fake_probe):
+            with self.assertLogs(cf_verify.log, level="INFO") as cm:
+                await cf_verify.verify_all(rows, tag="test-retry", concurrency=5, max_fails=3)
+
+        by_ip = {r["ip"]: r for r in rows}
+        self.assertEqual(call_counts["104.16.2.1"], 2)
+        self.assertEqual(call_counts["104.16.2.2"], 2)
+        self.assertEqual(call_counts["104.16.2.3"], 1)
+        self.assertEqual(call_counts["104.16.2.4"], 1)
+        self.assertEqual(call_counts["104.16.2.5"], 1)
+
+        self.assertEqual(by_ip["104.16.2.1"]["fail_count"], 0)
+        self.assertEqual(by_ip["104.16.2.1"]["_old_fc"], 2)
+        self.assertEqual(by_ip["104.16.2.1"]["delay_ms"], 188)
+        self.assertEqual(by_ip["104.16.2.1"]["_reason"], "ok")
+
+        self.assertEqual(by_ip["104.16.2.2"]["fail_count"], 3)
+        self.assertEqual(by_ip["104.16.2.2"]["_reason"], "connect_timeout")
+        self.assertEqual(by_ip["104.16.2.3"]["fail_count"], 2)
+        self.assertEqual(by_ip["104.16.2.4"]["fail_count"], 3)
+        self.assertEqual(by_ip["104.16.2.5"]["fail_count"], 3)
+
+        logs_text = "\n".join(cm.output)
+        self.assertIn("[test-retry 临门复测] 对 2 条即将淘汰的软失败节点补测完成: 救回 1 条", logs_text)
+        self.assertIn("验证通过 1 条, 验证失败 4 条", logs_text)
+        self.assertNotIn("tls_error", logs_text)
+
 
 class TestProxyIpVerifyTransientErrors(unittest.IsolatedAsyncioTestCase):
     async def test_probe_proxyip_classifies_tls_eof_and_oserror_separately(self):
