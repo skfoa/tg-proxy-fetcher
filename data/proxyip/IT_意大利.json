@@ -20,27 +20,5 @@
     "isp": "Host Telecom Ltd",
     "net_type": "isp",
     "source": "@otcjlq"
-  },
-  {
-    "proxy": "151.91.39.191:443",
-    "ip": "151.91.39.191",
-    "port": 443,
-    "tls": true,
-    "clientIp": "151.91.34.1",
-    "clientIps": [
-      "151.91.34.1"
-    ],
-    "clientIpv4": "151.91.34.1",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "IT",
-    "country_name": "意大利",
-    "country_cn": "意大利",
-    "country_emoji": "🇮🇹",
-    "asn": "12734",
-    "asOrganization": "Stellantis Auto SAS",
-    "isp": "Stellantis Auto SAS",
-    "net_type": "business",
-    "source": "@danfeng2"
   }
 ]
