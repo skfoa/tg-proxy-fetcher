@@ -3384,7 +3384,18 @@
     "KATCH NETWORK INC.": "AS59108",
     "Limited Network LTD": "AS213790",
     "Illinois Century Network": "AS6325",
-    "Telekom Ltd": "AS197831"
+    "Telekom Ltd": "AS197831",
+    "PT BITNIAGA CIPTA GEMILANG": "AS140384",
+    "OOO \"Teleservis\"": "AS50126",
+    "NewMountainView Satellite Corporation": "AS135345",
+    "RZ NET LTDA.": "AS264114",
+    "Broadlink Nepal": "AS55427",
+    "PT Aktech Digital Solutions": "AS149672",
+    "PT Bittara Interkoneksi Nusantara": "AS151009",
+    "DREAMMARK1": "AS17878",
+    "Blatant Technologies, LLC": "AS403005",
+    "China Unicom IP network": "AS133119",
+    "Computer Sales & Services": "AS327792"
   },
   "asn_to_isp": {
     "AS10001": "Mics Network Corporation",
@@ -6692,7 +6703,19 @@
     "AS59108": "KATCH NETWORK INC.",
     "AS213790": "Limited Network LTD",
     "AS6325": "Illinois Century Network",
-    "AS197831": "Telekom Ltd"
+    "AS197831": "Telekom Ltd",
+    "AS140384": "PT BITNIAGA CIPTA GEMILANG",
+    "AS50126": "OOO \"Teleservis\"",
+    "AS135345": "NewMountainView Satellite Corporation",
+    "AS264114": "RZ NET LTDA.",
+    "AS55427": "Broadlink Nepal",
+    "AS149672": "PT Aktech Digital Solutions",
+    "AS151009": "PT Bittara Interkoneksi Nusantara",
+    "AS17878": "DREAMMARK1",
+    "AS403005": "Blatant Technologies, LLC",
+    "AS32875": "Wowrack.com",
+    "AS133119": "China Unicom IP network",
+    "AS327792": "Computer Sales & Services"
   },
   "asn_to_net_type": {
     "AS10001": "isp",
@@ -10993,6 +11016,18 @@
     "AS59108": "isp",
     "AS213790": "datacenter",
     "AS6325": "government",
-    "AS197831": "isp"
+    "AS197831": "isp",
+    "AS140384": "isp",
+    "AS50126": "isp",
+    "AS135345": "isp",
+    "AS264114": "isp",
+    "AS55427": "isp",
+    "AS149672": "isp",
+    "AS151009": "isp",
+    "AS17878": "datacenter",
+    "AS403005": "datacenter",
+    "AS32875": "datacenter",
+    "AS133119": "isp",
+    "AS327792": "isp"
   }
 }

@@ -1,27 +1,5 @@
 [
   {
-    "proxy": "79.112.138.33:443",
-    "ip": "79.112.138.33",
-    "port": 443,
-    "tls": true,
-    "clientIp": "2a0c:5a86:960d:df00:b25e:6e77:b85c:e05f",
-    "clientIps": [
-      "2a0c:5a86:960d:df00:b25e:6e77:b85c:e05f"
-    ],
-    "clientIpv4": "",
-    "clientIpv6": "2a0c:5a86:960d:df00:b25e:6e77:b85c:e05f",
-    "dual_stack": false,
-    "country": "ES",
-    "country_name": "西班牙",
-    "country_cn": "西班牙",
-    "country_emoji": "🇪🇸",
-    "asn": "57269",
-    "asOrganization": "DIGI Spain Telecom IPv6",
-    "isp": "DIGI Spain Telecom IPv6",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
-  },
-  {
     "proxy": "79.112.73.59:443",
     "ip": "79.112.73.59",
     "port": 443,
@@ -62,6 +40,28 @@
     "asn": "12479",
     "asOrganization": "YIF Network",
     "isp": "YIF Network",
+    "net_type": "isp",
+    "source": "@cmliussss_all"
+  },
+  {
+    "proxy": "79.112.138.33:443",
+    "ip": "79.112.138.33",
+    "port": 443,
+    "tls": true,
+    "clientIp": "2a0c:5a86:960d:df00:3e8f:d163:ffc7:ad34",
+    "clientIps": [
+      "2a0c:5a86:960d:df00:3e8f:d163:ffc7:ad34"
+    ],
+    "clientIpv4": "",
+    "clientIpv6": "2a0c:5a86:960d:df00:3e8f:d163:ffc7:ad34",
+    "dual_stack": false,
+    "country": "ES",
+    "country_name": "西班牙",
+    "country_cn": "西班牙",
+    "country_emoji": "🇪🇸",
+    "asn": "57269",
+    "asOrganization": "DIGI Spain Telecom IPv6",
+    "isp": "DIGI Spain Telecom IPv6",
     "net_type": "isp",
     "source": "@cmliussss_all"
   }
