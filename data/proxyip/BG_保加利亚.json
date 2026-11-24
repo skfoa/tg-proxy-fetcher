@@ -1,27 +1,5 @@
 [
   {
-    "proxy": "158.51.78.180:443",
-    "ip": "158.51.78.180",
-    "port": 443,
-    "tls": true,
-    "clientIp": "158.51.78.180",
-    "clientIps": [
-      "158.51.78.180"
-    ],
-    "clientIpv4": "158.51.78.180",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "BG",
-    "country_name": "保加利亚",
-    "country_cn": "保加利亚",
-    "country_emoji": "🇧🇬",
-    "asn": "209604",
-    "asOrganization": "2E TELEKOMUNIKASYON LTD STI",
-    "isp": "2E TELEKOMUNIKASYON LTD STI",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "158.51.78.244:443",
     "ip": "158.51.78.244",
     "port": 443,
@@ -42,6 +20,28 @@
     "isp": "2E TELEKOMUNIKASYON LTD STI",
     "net_type": "isp",
     "source": "@otcjlq"
+  },
+  {
+    "proxy": "158.51.78.180:443",
+    "ip": "158.51.78.180",
+    "port": 443,
+    "tls": true,
+    "clientIp": "158.51.78.180",
+    "clientIps": [
+      "158.51.78.180"
+    ],
+    "clientIpv4": "158.51.78.180",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "BG",
+    "country_name": "保加利亚",
+    "country_cn": "保加利亚",
+    "country_emoji": "🇧🇬",
+    "asn": "209604",
+    "asOrganization": "2E TELEKOMUNIKASYON LTD STI",
+    "isp": "2E TELEKOMUNIKASYON LTD STI",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
   },
   {
     "proxy": "136.175.82.62:443",
@@ -108,27 +108,5 @@
     "isp": "Cifrova Kabelna Korporacia EOOD",
     "net_type": "isp",
     "source": "@cmliussss_all"
-  },
-  {
-    "proxy": "108.165.233.9:443",
-    "ip": "108.165.233.9",
-    "port": 443,
-    "tls": true,
-    "clientIp": "108.165.233.9",
-    "clientIps": [
-      "108.165.233.9"
-    ],
-    "clientIpv4": "108.165.233.9",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "BG",
-    "country_name": "保加利亚",
-    "country_cn": "保加利亚",
-    "country_emoji": "🇧🇬",
-    "asn": "209604",
-    "asOrganization": "2E TELEKOMUNIKASYON LTD STI",
-    "isp": "2E TELEKOMUNIKASYON LTD STI",
-    "net_type": "isp",
-    "source": "@otcjlq"
   }
 ]
