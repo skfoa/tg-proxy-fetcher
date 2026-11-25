@@ -22,28 +22,6 @@
     "source": "@cmliussss_all"
   },
   {
-    "proxy": "84.242.64.86:8443",
-    "ip": "84.242.64.86",
-    "port": 8443,
-    "tls": true,
-    "clientIp": "84.242.64.86",
-    "clientIps": [
-      "84.242.64.86"
-    ],
-    "clientIpv4": "84.242.64.86",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "CZ",
-    "country_name": "捷克",
-    "country_cn": "捷克",
-    "country_emoji": "🇨🇿",
-    "asn": "16019",
-    "asOrganization": "Vodafone Czech Republic a.s.",
-    "isp": "Vodafone Czech Republic a.s.",
-    "net_type": "isp",
-    "source": "@cmliussss_all"
-  },
-  {
     "proxy": "95.82.176.133:443",
     "ip": "95.82.176.133",
     "port": 443,
@@ -64,5 +42,27 @@
     "isp": "O2 Czech Republic, a.s.",
     "net_type": "isp",
     "source": "@danfeng_chat"
+  },
+  {
+    "proxy": "84.242.64.86:8443",
+    "ip": "84.242.64.86",
+    "port": 8443,
+    "tls": true,
+    "clientIp": "84.242.64.86",
+    "clientIps": [
+      "84.242.64.86"
+    ],
+    "clientIpv4": "84.242.64.86",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "CZ",
+    "country_name": "捷克",
+    "country_cn": "捷克",
+    "country_emoji": "🇨🇿",
+    "asn": "16019",
+    "asOrganization": "Vodafone Czech Republic a.s.",
+    "isp": "Vodafone Czech Republic a.s.",
+    "net_type": "isp",
+    "source": "@cmliussss_all"
   }
 ]
