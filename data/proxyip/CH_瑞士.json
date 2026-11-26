@@ -1,27 +1,5 @@
 [
   {
-    "proxy": "179.255.191.82:443",
-    "ip": "179.255.191.82",
-    "port": 443,
-    "tls": true,
-    "clientIp": "179.255.191.82",
-    "clientIps": [
-      "179.255.191.82"
-    ],
-    "clientIpv4": "179.255.191.82",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "CH",
-    "country_name": "瑞士",
-    "country_cn": "瑞士",
-    "country_emoji": "🇨🇭",
-    "asn": "214238",
-    "asOrganization": "Host Telecom Ltd",
-    "isp": "Host Telecom Ltd",
-    "net_type": "isp",
-    "source": "@otcjlq"
-  },
-  {
     "proxy": "188.60.117.140:443",
     "ip": "188.60.117.140",
     "port": 443,
@@ -42,6 +20,28 @@
     "isp": "Bluewin",
     "net_type": "isp",
     "source": "@cmliussss_all"
+  },
+  {
+    "proxy": "179.255.191.82:443",
+    "ip": "179.255.191.82",
+    "port": 443,
+    "tls": true,
+    "clientIp": "179.255.191.82",
+    "clientIps": [
+      "179.255.191.82"
+    ],
+    "clientIpv4": "179.255.191.82",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "CH",
+    "country_name": "瑞士",
+    "country_cn": "瑞士",
+    "country_emoji": "🇨🇭",
+    "asn": "214238",
+    "asOrganization": "Host Telecom Ltd",
+    "isp": "Host Telecom Ltd",
+    "net_type": "isp",
+    "source": "@otcjlq"
   },
   {
     "proxy": "209.99.184.60:443",

@@ -44,6 +44,28 @@
     "source": "@danfeng2"
   },
   {
+    "proxy": "178.160.230.83:443",
+    "ip": "178.160.230.83",
+    "port": 443,
+    "tls": true,
+    "clientIp": "178.160.230.83",
+    "clientIps": [
+      "178.160.230.83"
+    ],
+    "clientIpv4": "178.160.230.83",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "AM",
+    "country_name": "亚美尼亚",
+    "country_cn": "亚美尼亚",
+    "country_emoji": "🇦🇲",
+    "asn": "12297",
+    "asOrganization": "Telecom Armenia OJSC",
+    "isp": "Telecom Armenia OJSC",
+    "net_type": "isp",
+    "source": "@danfeng2"
+  },
+  {
     "proxy": "178.160.230.90:443",
     "ip": "178.160.230.90",
     "port": 443,
@@ -108,28 +130,6 @@
     "isp": "Telecom Armenia OJSC",
     "net_type": "isp",
     "source": "@danfeng_chat"
-  },
-  {
-    "proxy": "178.160.230.83:443",
-    "ip": "178.160.230.83",
-    "port": 443,
-    "tls": true,
-    "clientIp": "178.160.230.83",
-    "clientIps": [
-      "178.160.230.83"
-    ],
-    "clientIpv4": "178.160.230.83",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "AM",
-    "country_name": "亚美尼亚",
-    "country_cn": "亚美尼亚",
-    "country_emoji": "🇦🇲",
-    "asn": "12297",
-    "asOrganization": "Telecom Armenia OJSC",
-    "isp": "Telecom Armenia OJSC",
-    "net_type": "isp",
-    "source": "@danfeng2"
   },
   {
     "proxy": "37.186.84.80:443",
