@@ -503,7 +503,7 @@ Step 1: tg_fetch        Step 2: proxies_verify    Step 3: proxyip_verify    Step
 | `FETCH_MAX_PAGES` | Web 免登录模式最大抓取页数 | `35` | 可选 | 控制无凭据网页爬虫向前抓取历史消息的最大分页数（每页约 20 条消息） |
 | `PROXY` | 抓取代理设置 | 留空 | 可选 | GitHub Actions 云端默认直连 Telegram 无需配置；自建私有 Runner 或特殊网络时可按需配置 |
 | `PROXY_CHANNELS` | 代理抓取目标频道/群组（逗号/空格分隔） | `@otcjlq, @danfeng_chat` | 可选 | 自定义抓取通用代理的频道/群组（若未配置自动回退至全局 `CHANNELS` 或默认值） |
-| `CF_IP_CHANNELS` | 优选 IP 抓取目标频道/群组（逗号/空格分隔） | `@otcjlq, @danfeng_chat` | 可选 | 自定义抓取 Cloudflare 优选 IP 与测速附件的频道/群组（若未配置自动回退至全局 `CHANNELS` 或默认值） |
+| `CF_IP_CHANNELS` | 优选 IP 抓取目标频道/群组（逗号/空格分隔） | `@otcjlq, @danfeng_chat, @C_CFly` | 可选 | 自定义抓取 Cloudflare 优选 IP、轮换优选卡片与测速附件的频道/群组（若未配置自动回退至全局 `CHANNELS` 或默认值） |
 | `SUB_URLS` | 外部通用订阅源 URL 列表（逗号/换行分隔） | 内置公共订阅镜像（留空默认） | 可选 | 配置外部公开订阅链接（用于拓展 SSTP 等节点）；如需**彻底禁用外部订阅**，设置为 `off`、`none` 或 `false` 即可；亦可填入自定义订阅链接 |
 | `EDT_MIRRORS` | 外部代理源镜像加速前缀列表（逗号/空格分隔） | 留空（自动竞速多组内置镜像源） | 可选 | 配置自定义加速镜像域名或前缀。**系统采用多源并发竞速机制**：所有候选源并发请求，最快有效返回者率先采用，防止单源超时阻塞；若需彻底禁用外部镜像拉取，设为 `off` 即可 |
 | `EDT_URLS` | 自定义代理完整 JSON URL 列表（逗号/空格分隔） | 留空（由镜像自动推导） | 可选 | 直接传入多个完整的 proxy json 链接（支持同时混合 https/http/socks5，系统自动按文件名路由），进入并发竞速池 |

@@ -105,6 +105,7 @@ from providers import (
 from parsers import (
     extract_proxies,
     parse_cf_ip,
+    parse_cf_channel_cards,
     parse_cf_csv_content,
     parse_otc_scan_content,
     parse_proxy_attachment_content,
@@ -153,7 +154,7 @@ def _parse_channels(env_name: str, default: list[str]) -> list[str]:
 
 
 PROXY_CHANNELS = _parse_channels("PROXY_CHANNELS", ["@otcjlq", "@danfeng_chat"])
-CF_IP_CHANNELS = _parse_channels("CF_IP_CHANNELS", ["@otcjlq", "@danfeng_chat"])
+CF_IP_CHANNELS = _parse_channels("CF_IP_CHANNELS", ["@otcjlq", "@danfeng_chat", "@C_CFly"])
 
 DEFAULT_SUB_URLS = [
     "https://sub.cmliussss.net/vpngate?token=20260924233538",
@@ -2470,17 +2471,67 @@ def collect_domain_cf_ips(
     return dom_unrec
 
 
+def _merge_scraped_card_ips(
+    scraped_card_ips: dict[str, dict],
+    existing_proxyips: dict,
+    existing_scan_ips: dict,
+    scraped_proxyips: dict,
+    scraped_scan_ips: dict,
+    tombstone: dict[str, int],
+    ip_cache: dict[str, dict] | None = None,
+) -> int:
+    """
+    在所有频道附件与外部 ProxyIP 源收集完毕后，将频道轮换卡片解析出的纯新增候选合入 scraped_scan_ips，
+    交由 merge_and_save() 统一执行 P1 真实 BGP 反查、未收录 ASN 自动入库与双池分流（非机房 -> proxyip.csv，机房 -> scan_ips.csv）。
+    严格跳过已有存量与同批更优来源已收录的节点，杜绝覆盖历史元数据或因频道字母序挤占高完整度附件记录。
+    """
+    added = 0
+    skipped_existing = 0
+    skipped_tomb = 0
+    skipped_cf = 0
+    for key, item in scraped_card_ips.items():
+        if (
+            key in existing_proxyips
+            or key in existing_scan_ips
+            or key in scraped_proxyips
+            or key in scraped_scan_ips
+        ):
+            skipped_existing += 1
+            continue
+        if is_tombstoned(key, tombstone):
+            skipped_tomb += 1
+            continue
+        if is_cloudflare_node(item, ip_cache, trusts_asn_label=False):
+            skipped_cf += 1
+            continue
+        scraped_scan_ips[key] = item
+        added += 1
+
+    if scraped_card_ips:
+        log.info(
+            "频道卡片候选 IP 延后合并完成: 纯新增 %d 条待 BGP 反查分流 (已有/更优源跳过 %d, 墓地跳过 %d, CF 拦截 %d)",
+            added,
+            skipped_existing,
+            skipped_tomb,
+            skipped_cf,
+        )
+    return added
+
+
 def scrape_channel_web(
     channel: str,
     cutoff: datetime,
     proxy: str = "",
     ip_cache: dict[str, dict] | None = None,
+    card_ips_out: list[dict] | None = None,
 ) -> tuple[list[tuple[str, str]], list[dict]]:
     clean_channel = channel.lstrip("@")
     base_url = f"https://t.me/s/{clean_channel}"
     
     proxies_found = []
     cf_ips_found = []
+    dead_card_keys: set[str] = set()
+    seen_card_keys: set[str] = set()
     
     url = base_url
     page_num = 1
@@ -2561,6 +2612,24 @@ def scrape_channel_web(
                 if not cf_data.get("first_seen") and dt:
                     cf_data["first_seen"] = dt.astimezone(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S")
                 cf_ips_found.append(cf_data)
+            elif not cf_data and card_ips_out is not None:
+                for card_item in parse_cf_channel_cards(
+                    cleaned_text,
+                    default_channel=channel,
+                    ip_cache=ip_cache,
+                    dead_keys_out=dead_card_keys,
+                ):
+                    card_key = f"{card_item['ip']}:{card_item['port']}"
+                    if (
+                        card_key in dead_card_keys
+                        or card_key in seen_card_keys
+                        or is_cloudflare_node(card_item, ip_cache, trusts_asn_label=False)
+                    ):
+                        continue
+                    if not card_item.get("first_seen") and dt:
+                        card_item["first_seen"] = dt.astimezone(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S")
+                    seen_card_keys.add(card_key)
+                    card_ips_out.append(card_item)
 
         if reached_cutoff or not earliest_id:
             log.info("频道 %s 已到达时间截止点 (%s)，停止向后翻页", channel, cutoff.strftime("%Y-%m-%d %H:%M:%S UTC"))
@@ -3426,6 +3495,7 @@ def run_web_scraper():
 
     scraped_proxies = {}
     scraped_cf_ips = {}
+    scraped_card_ips = {}
 
     for channel in all_channels:
         is_proxy_target = channel in PROXY_CHANNELS
@@ -3434,7 +3504,14 @@ def run_web_scraper():
         log.info("-" * 50)
         log.info("开始处理频道: %s (代理: %s, 优选IP: %s)", channel, is_proxy_target, is_cf_target)
 
-        raw_proxies, raw_cf_ips = scrape_channel_web(channel, cutoff, proxy=proxy, ip_cache=ip_cache)
+        raw_card_ips: list[dict] = []
+        raw_proxies, raw_cf_ips = scrape_channel_web(
+            channel,
+            cutoff,
+            proxy=proxy,
+            ip_cache=ip_cache,
+            card_ips_out=raw_card_ips if is_cf_target else None,
+        )
 
         if is_proxy_target:
             p_cnt = 0
@@ -3456,6 +3533,17 @@ def run_web_scraper():
                     scraped_cf_ips[key] = item
                     cf_cnt += 1
             log.info("频道 %s 提取单条优选 IP: %d 条", channel, cf_cnt)
+
+            card_cnt = 0
+            for item in raw_card_ips:
+                key = f"{item['ip']}:{item['port']}"
+                if is_tombstoned(key, tombstone):
+                    continue
+                if key not in scraped_card_ips:
+                    scraped_card_ips[key] = item
+                    card_cnt += 1
+            if card_cnt > 0:
+                log.info("频道 %s 提取轮换卡片候选 IP: %d 条", channel, card_cnt)
 
     # 1.5 外部通用订阅源抓取 (如 VPNGate SSTP 订阅等)
     fetch_external_subscriptions(SUB_URLS, proxy, tombstone, scraped_proxies)
@@ -3494,6 +3582,17 @@ def run_web_scraper():
             scraped_cf_ips,
             ip_cache=ip_cache,
         )
+    )
+
+    # 1.9 频道轮换卡片候选延后合并（低优先级补漏：仅收录存量与更优来源均未命中的纯新增节点）
+    _merge_scraped_card_ips(
+        scraped_card_ips,
+        existing_proxyips,
+        existing_scan_ips,
+        scraped_proxyips,
+        scraped_scan_ips,
+        tombstone,
+        ip_cache=ip_cache,
     )
 
     # 2. 智能增量合并并落盘保存 (统一单次原子持久化写盘)
@@ -3543,6 +3642,7 @@ async def run_telethon():
     scraped_cf_ips = {}
     scraped_scan_ips = {}
     scraped_proxyips = {}
+    scraped_card_ips = {}
 
     try:
         await client.connect()
@@ -3570,8 +3670,10 @@ async def run_telethon():
             msg_count = 0
             proxy_count = 0
             cf_count = 0
+            card_count = 0
             scan_count = 0
             proxyip_count = 0
+            dead_card_keys: set[str] = set()
 
             try:
                 async for msg in client.iter_messages(entity):
@@ -3612,8 +3714,9 @@ async def run_telethon():
                                     log.warning("下载/解析频道 %s 代理附件 %s 失败: %s", channel_name, msg.file.name, e)
 
                     if is_cf_target:
-                        if msg.text:
-                            cf_data = parse_cf_ip(msg.text, default_channel=channel_name, ip_cache=ip_cache)
+                        msg_plain = getattr(msg, "raw_text", None) or msg.text or ""
+                        if msg.text or msg_plain:
+                            cf_data = parse_cf_ip(msg.text, default_channel=channel_name, ip_cache=ip_cache) if msg.text else None
                             if cf_data and not is_cloudflare_node(cf_data, ip_cache, trusts_asn_label=False):
                                 cf_key = f"{cf_data['ip']}:{cf_data['port']}"
                                 if not is_tombstoned(cf_key, tombstone):
@@ -3622,6 +3725,25 @@ async def run_telethon():
                                             cf_data["first_seen"] = msg.date.astimezone(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S")
                                         scraped_cf_ips[cf_key] = cf_data
                                         cf_count += 1
+                            elif not cf_data and msg_plain:
+                                for card_item in parse_cf_channel_cards(
+                                    msg_plain,
+                                    default_channel=channel_name,
+                                    ip_cache=ip_cache,
+                                    dead_keys_out=dead_card_keys,
+                                ):
+                                    card_key = f"{card_item['ip']}:{card_item['port']}"
+                                    if (
+                                        card_key in dead_card_keys
+                                        or is_tombstoned(card_key, tombstone)
+                                        or is_cloudflare_node(card_item, ip_cache, trusts_asn_label=False)
+                                    ):
+                                        continue
+                                    if card_key not in scraped_card_ips:
+                                        if not card_item.get("first_seen") and msg.date:
+                                            card_item["first_seen"] = msg.date.astimezone(TZ_BJT).strftime("%Y-%m-%d %H:%M:%S")
+                                        scraped_card_ips[card_key] = card_item
+                                        card_count += 1
 
                         # 支持自动下载并解析优选扫描附件与反代 ProxyIP 附件 (独立归入各自集合)
                         if msg.file and msg.file.name:
@@ -3788,8 +3910,8 @@ async def run_telethon():
             except FloodWaitError as e:
                 log.warning("频道 %s 扫描时触发 Telegram 频控限制 (等待 %d 秒): %s", channel_name, e.seconds, e)
 
-            log.info("频道 %s 扫描完毕: 消息 %d 条, 新增代理 %d 个, 单条优选IP %d 个, 扫描优选IP %d 个, 反代ProxyIP %d 个", 
-                     channel_name, msg_count, proxy_count, cf_count, scan_count, proxyip_count)
+            log.info("频道 %s 扫描完毕: 消息 %d 条, 新增代理 %d 个, 单条优选IP %d 个, 卡片候选 %d 个, 扫描优选IP %d 个, 反代ProxyIP %d 个", 
+                     channel_name, msg_count, proxy_count, cf_count, card_count, scan_count, proxyip_count)
 
         # 1.5 外部通用订阅源抓取 (如 VPNGate SSTP 订阅等)
         web_proxy = PROXY or get_system_proxy()
@@ -3828,6 +3950,17 @@ async def run_telethon():
                 scraped_cf_ips,
                 ip_cache=ip_cache,
             )
+        )
+
+        # 1.9 频道轮换卡片候选延后合并（低优先级补漏：仅收录存量与更优来源均未命中的纯新增节点）
+        _merge_scraped_card_ips(
+            scraped_card_ips,
+            existing_proxyips,
+            existing_scan_ips,
+            scraped_proxyips,
+            scraped_scan_ips,
+            tombstone,
+            ip_cache=ip_cache,
         )
 
         # 2. 智能增量合并并落盘保存 (统一单次原子持久化写盘)

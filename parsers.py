@@ -18,6 +18,7 @@ import re
 from urllib.parse import parse_qs, urlparse
 
 from providers import (
+    COUNTRY_NAME_MAP,
     KNOWN_CLOUD_PROVIDERS,
     ASN_TO_PROVIDER,
     SORTED_CLOUD_PROVIDER_KEYS,
@@ -161,6 +162,25 @@ RE_CF_TIME = re.compile(r"(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})")
 RE_CF_SOURCE = re.compile(r"IP来源[:：]\s*([@\w]+)")
 RE_AS_CODE = re.compile(r"(AS\d+)", re.IGNORECASE)
 RE_SPEED_EXTRACT = re.compile(r"(\d+(?:\.\d+)?)\s*([a-zA-Z/]+)?")
+
+# 频道轮换优选卡片 / 恢复通告（如 @C_CFly）专用预编译正则
+RE_CARD_ADDR = re.compile(r"地址[:：]\s*(\d{1,3}(?:\.\d{1,3}){3}):(\d{1,5})")
+RE_CARD_ANCHOR = re.compile(r"(?:状态|ProxyIP|厂商)[:：]", re.IGNORECASE)
+RE_CARD_BAD_STATUS = re.compile(r"(?:状态|ProxyIP)[:：]\s*[^\r\n]*(?:🔴|❌)", re.IGNORECASE)
+RE_CARD_EXIT_LOC = re.compile(r"出口[:：]\s*([^\r\n]+)")
+RE_CARD_SPEED = re.compile(r"速度[:：\s]+(\d+(?:\.\d+)?)\s*([KMG]?B/s|[KMG]?bps)\b", re.IGNORECASE)
+RE_CARD_RECOVERY_HEADER = re.compile(r"已恢复")
+RE_CARD_RECOVERY_ARROW = re.compile(
+    r"(\d{1,3}(?:\.\d{1,3}){3}):(\d{1,5})\s*(?:→|->)\s*(\d{1,3}(?:\.\d{1,3}){3}):(\d{1,5})"
+)
+RE_FLAG_EMOJI = re.compile(r"([\U0001F1E6-\U0001F1FF]{2})")
+_SORTED_COUNTRY_NAMES: tuple[tuple[str, str], ...] = tuple(
+    sorted(
+        ((name, code) for code, name in COUNTRY_NAME_MAP.items() if name and code),
+        key=lambda item: len(item[0]),
+        reverse=True,
+    )
+)
 
 
 def parse_speed_to_kbs(
@@ -340,6 +360,180 @@ def parse_cf_ip(
         "channel": source_m.group(1).strip() if source_m else default_channel,
         "fail_count": 0,
     }
+
+
+def _extract_card_country(header_line: str) -> tuple[str, str]:
+    """从频道卡片首行（国旗 Emoji 或中文国名）提取 (ISO 国家码, 中文国名)。"""
+    line = (header_line or "").strip()
+    if not line:
+        return "", ""
+
+    flag_m = RE_FLAG_EMOJI.search(line)
+    if flag_m:
+        pair = flag_m.group(1)
+        code = "".join(chr(ord(ch) - 0x1F1E6 + ord("A")) for ch in pair)
+        if len(code) == 2 and code.isalpha():
+            return code, COUNTRY_NAME_MAP.get(code, "")
+
+    for cname, code in _SORTED_COUNTRY_NAMES:
+        if cname in line:
+            return code, cname
+
+    return "", ""
+
+
+def _build_card_location(header_line: str, exit_city: str = "") -> str:
+    """构造可被 extract_country() 精准识别的 cf_location（绝不落裸城市名）。"""
+    cc, cname = _extract_card_country(header_line)
+    city = (exit_city or "").strip()
+    if city and cc:
+        return f"{city} · {cc}"
+    if cname:
+        return cname
+    return ""
+
+
+def _build_card_item(
+    ip: str,
+    port_num: int,
+    *,
+    default_channel: str,
+    cf_location: str,
+    speed_kbs: str | int,
+    ip_cache: dict[str, dict] | None,
+) -> dict:
+    """构造频道卡片候选节点（delay_ms=0 保护首轮致命淘汰；未命中权威 ip_cache 时留空 ASN 交 P1 真 BGP 反查）。"""
+    cached_asn, cached_isp = ("", "")
+    if isinstance(ip_cache, dict) and ip_cache:
+        cached_asn, cached_isp = resolve_authoritative_cache_asn(ip_cache, ip)
+    final_asn = format_asn_isp(cached_asn, cached_isp) if cached_asn else ""
+    return {
+        "ip": ip,
+        "port": str(port_num),
+        "tls": "true",
+        "delay_ms": 0,
+        "speed_kbs": speed_kbs,
+        "colo": "",
+        "cf_location": cf_location,
+        "isp": cached_isp if cached_asn else "",
+        "asn": final_asn,
+        "raw_asn": cached_asn,
+        "exit_ip": "",
+        "exit_ipv6": "",
+        "exit_asn": "",
+        "exit_isp": "",
+        "exit_location": "",
+        "first_seen": "",
+        "channel": default_channel,
+        "fail_count": 0,
+        "net_type": "",
+    }
+
+
+def parse_cf_channel_cards(
+    text: str,
+    default_channel: str = "",
+    ip_cache: dict[str, dict] | None = None,
+    dead_keys_out: set[str] | None = None,
+) -> list[dict]:
+    """
+    解析 Telegram 优选 IP 轮换卡片与节点恢复通告（如 @C_CFly）：
+    1. 自动兼容 Telethon Markdown 实体反引号/加粗与 Web 纯文本；
+    2. 支持标准卡片（地址: ip:port + 状态/ProxyIP/厂商锚点，不绑定延迟/括号/字段顺序）；
+    3. 支持节点恢复通告（旧IP:Port → 新IP:Port），仅提取箭头右侧新 IP 并把左侧旧 IP 记入 dead_keys_out；
+    4. 状态/ProxyIP 标红（🔴/❌）的卡片拒收并记入 dead_keys_out；
+    5. 跳过纯汇总类日报与无锚点公告；不猜写厂商 ASN，未命中 ip_cache 时留空交后续 P1 真实 BGP 批量反查。
+    """
+    if not text or not isinstance(text, str):
+        return []
+
+    norm_text = text.replace("`", "").replace("**", "").replace("__", "")
+    lines = [ln.strip() for ln in norm_text.splitlines() if ln.strip()]
+    if not lines:
+        return []
+
+    # 分支 1：标准轮换/沿用/已更新卡片（地址：ip:port + 状态/ProxyIP/厂商任一锚点）
+    addr_m = RE_CARD_ADDR.search(norm_text)
+    if addr_m and RE_CARD_ANCHOR.search(norm_text):
+        ip = addr_m.group(1).strip()
+        port_num = int(addr_m.group(2))
+        if not is_valid_ipv4(ip) or not is_valid_public_ip(ip) or not (1 <= port_num <= 65535):
+            return []
+        if RE_CARD_BAD_STATUS.search(norm_text):
+            if dead_keys_out is not None:
+                dead_keys_out.add(f"{ip}:{port_num}")
+            return []
+
+        exit_m = RE_CARD_EXIT_LOC.search(norm_text)
+        exit_city = exit_m.group(1).strip() if exit_m else ""
+        cf_location = _build_card_location(lines[0], exit_city)
+
+        speed_m = RE_CARD_SPEED.search(norm_text)
+        speed_kbs: str | int = (
+            parse_speed_to_kbs(speed_m.group(1), speed_m.group(2)) if speed_m else ""
+        )
+        return [
+            _build_card_item(
+                ip,
+                port_num,
+                default_channel=default_channel,
+                cf_location=cf_location,
+                speed_kbs=speed_kbs,
+                ip_cache=ip_cache,
+            )
+        ]
+
+    # 分支 2：节点恢复通告（旧IP:Port → 新IP:Port，只收箭头右侧新节点，左侧记入 dead_keys_out）
+    if RE_CARD_RECOVERY_HEADER.search(norm_text) and RE_CARD_RECOVERY_ARROW.search(norm_text):
+        results: list[dict] = []
+        seen_keys: set[str] = set()
+        for block in re.split(r"\n\s*\n", norm_text):
+            block_s = block.strip()
+            if not block_s or not RE_CARD_RECOVERY_ARROW.search(block_s):
+                continue
+            block_lines = [ln.strip() for ln in block_s.splitlines() if ln.strip()]
+            header = block_lines[0] if block_lines else lines[0]
+            block_active = bool(RE_CARD_RECOVERY_HEADER.search(header)) and not any(
+                bad in header for bad in ("🔴", "❌", "维护中")
+            )
+            speed_m = RE_CARD_SPEED.search(block_s)
+            speed_kbs = parse_speed_to_kbs(speed_m.group(1), speed_m.group(2)) if speed_m else ""
+            cf_location = _build_card_location(header)
+
+            for m in RE_CARD_RECOVERY_ARROW.finditer(block_s):
+                old_ip, old_port_s, new_ip, new_port_s = m.groups()
+                old_port = int(old_port_s)
+                new_port = int(new_port_s)
+                old_key = f"{old_ip}:{old_port}"
+                new_key = f"{new_ip}:{new_port}"
+                if (
+                    dead_keys_out is not None
+                    and old_key != new_key
+                    and is_valid_ipv4(old_ip)
+                    and 1 <= old_port <= 65535
+                ):
+                    dead_keys_out.add(old_key)
+                if not block_active:
+                    continue
+                if not is_valid_ipv4(new_ip) or not is_valid_public_ip(new_ip) or not (1 <= new_port <= 65535):
+                    continue
+                key = new_key
+                if key in seen_keys:
+                    continue
+                seen_keys.add(key)
+                results.append(
+                    _build_card_item(
+                        new_ip,
+                        new_port,
+                        default_channel=default_channel,
+                        cf_location=cf_location,
+                        speed_kbs=speed_kbs,
+                        ip_cache=ip_cache,
+                    )
+                )
+        return results
+
+    return []
 
 
 def parse_cf_csv_content(
