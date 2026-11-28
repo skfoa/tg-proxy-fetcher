@@ -66,28 +66,6 @@
     "source": "@danfeng_chat"
   },
   {
-    "proxy": "64.81.73.243:443",
-    "ip": "64.81.73.243",
-    "port": 443,
-    "tls": true,
-    "clientIp": "64.81.73.243",
-    "clientIps": [
-      "64.81.73.243"
-    ],
-    "clientIpv4": "64.81.73.243",
-    "clientIpv6": "",
-    "dual_stack": false,
-    "country": "PH",
-    "country_name": "菲律宾",
-    "country_cn": "菲律宾",
-    "country_emoji": "🇵🇭",
-    "asn": "50118",
-    "asOrganization": "Caribbean Telecom S.A",
-    "isp": "Caribbean Telecom S.A",
-    "net_type": "isp",
-    "source": "@danfeng_chat"
-  },
-  {
     "proxy": "120.89.46.123:443",
     "ip": "120.89.46.123",
     "port": 443,
@@ -106,6 +84,28 @@
     "asn": "9658",
     "asOrganization": "Eastern Telecoms Phils., Inc.",
     "isp": "Eastern Telecoms Phils., Inc.",
+    "net_type": "isp",
+    "source": "@danfeng_chat"
+  },
+  {
+    "proxy": "64.81.73.243:443",
+    "ip": "64.81.73.243",
+    "port": 443,
+    "tls": true,
+    "clientIp": "64.81.73.243",
+    "clientIps": [
+      "64.81.73.243"
+    ],
+    "clientIpv4": "64.81.73.243",
+    "clientIpv6": "",
+    "dual_stack": false,
+    "country": "PH",
+    "country_name": "菲律宾",
+    "country_cn": "菲律宾",
+    "country_emoji": "🇵🇭",
+    "asn": "50118",
+    "asOrganization": "Caribbean Telecom S.A",
+    "isp": "Caribbean Telecom S.A",
     "net_type": "isp",
     "source": "@danfeng_chat"
   }
